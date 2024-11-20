@@ -1,0 +1,1 @@
+addCatchTest(test_threadSplit.cpp "common;common.image" "ThreadSplit")

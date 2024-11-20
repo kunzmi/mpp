@@ -1,0 +1,9 @@
+---
+Checks:		'*,-abseil-*,-altera-*,-fuchsia-*,-google-*,-llvm*,-zircon-*,-modernize-use-trailing-return-type,-*-avoid-c-arrays,-*-uppercase-literal-suffix,-*-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-reinterpret-cast,-*-use-auto,-readability-identifier-length,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-hicpp-no-array-decay,-readability-function-cognitive-complexity,-performance-avoid-endl'
+WarningsAsErrors: '-*'
+FormatStyle:     none
+CheckOptions:
+- key:   readability-identifier-naming.ParameterPrefix
+  value: 'a'
+
+

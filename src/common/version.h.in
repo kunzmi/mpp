@@ -1,0 +1,11 @@
+#pragma once
+
+constexpr char OPP_PROJECT_NAME[] = "@PROJECT_NAME@";
+constexpr char OPP_COPYRIGHT[] = "@COPYRIGHT_MESSAGE@";
+
+constexpr char OPP_VERSION[] = "@OPP_VERSION@";
+
+constexpr unsigned int OPP_VERSION_MAJOR = @OPP_VERSION_MAJOR@;
+constexpr unsigned int OPP_VERSION_MINOR = @OPP_VERSION_MINOR@ + 0;
+constexpr unsigned int OPP_VERSION_PATCH = @OPP_VERSION_PATCH@ + 0;
+constexpr unsigned int OPP_VERSION_TWEAK = @OPP_VERSION_TWEAK@ + 0;
