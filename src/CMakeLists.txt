@@ -8,9 +8,12 @@ add_executable(dummy_test
 				)
 
 
+target_include_directories(dummy_test PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 target_link_libraries(dummy_test PUBLIC  
+
 						common
 						common.image
+						backends.cuda
 						backends.cuda.image)
 target_link_libraries(dummy_test PRIVATE  
 						project_options

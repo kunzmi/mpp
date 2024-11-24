@@ -1,14 +1,20 @@
 #pragma once
 #include "defines.h"
 #include "exception.h"
+#include "needSaturationClamp.h"
 #include "safeCast.h"
 #include <cmath>
+#include <common/complex_typetraits.h>
+#include <complex>
 #include <concepts>
 #include <iostream>
 #include <type_traits>
 
 namespace opp
 {
+
+// forward declaration
+template <ComplexOrNumber T> struct Vector2;
 
 /// <summary>
 /// Our own definition of a complex number, that we can use on device and host
@@ -19,7 +25,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     T imag;
 
     /// <summary>
-    /// Default constructor does not initializes the members
+    /// Default constructor does not initialize the members
     /// </summary>
     DEVICE_CODE Complex() noexcept
     {
@@ -47,12 +53,54 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     }
 
     /// <summary>
-    /// Type conversion
+    /// Convert from Vector2 of same type
     /// </summary>
-    template <SignedNumber T2> Complex(const Complex<T2> &aVec) noexcept : real(T(aVec.real)), imag(T(aVec.imag))
+    DEVICE_CODE Complex(const Vector2<T> &aVec) noexcept : real(aVec.x), imag(aVec.y)
     {
-        assert(check_is_safe_cast<T>(aVec.real));
-        assert(check_is_safe_cast<T>(aVec.imag));
+    }
+
+    /// <summary>
+    /// Convert from std::complex of same type
+    /// </summary>
+    Complex(const std::complex<T> &aCplx) noexcept : real(aCplx.real()), imag(aCplx.imag())
+    {
+    }
+
+    /// <summary>
+    /// Type conversion with saturation if needed<para/>
+    /// E.g.: when converting int to byte, values are clamped to 0..255<para/>
+    /// But when converting byte to int, no clamping operation is performed.
+    /// </summary>
+    template <SignedNumber T2> DEVICE_CODE Complex(const Complex<T2> &aCplx) noexcept
+    {
+        if constexpr (need_saturation_clamp_v<T2, T>)
+        {
+            Complex<T2> temp(aCplx);
+            temp.template ClampToTargetType<T>();
+            real = static_cast<T>(temp.real);
+            imag = static_cast<T>(temp.imag);
+        }
+        else
+        {
+            real = static_cast<T>(aCplx.real);
+            imag = static_cast<T>(aCplx.imag);
+        }
+    }
+
+    /// <summary>
+    /// Type conversion with saturation if needed<para/>
+    /// E.g.: when converting int to byte, values are clamped to 0..255<para/>
+    /// But when converting byte to int, no clamping operation is performed.<para/>
+    /// If we can modify the input variable, no need to allocate temporary storage for clamping.
+    /// </summary>
+    template <SignedNumber T2> DEVICE_CODE Complex(Complex<T2> &aVec) noexcept
+    {
+        if constexpr (need_saturation_clamp_v<T2, T>)
+        {
+            aVec.template ClampToTargetType<T>();
+        }
+        real = static_cast<T>(aVec.real);
+        imag = static_cast<T>(aVec.imag);
     }
 
     ~Complex() = default;
@@ -62,6 +110,11 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     Complex &operator=(const Complex &) noexcept = default;
     Complex &operator=(Complex &&) noexcept      = default;
 
+    /// <summary>
+    /// Keep space-ship for equality and inequality, we don't have plans to enable comparison for complex to OPP
+    /// </summary>
+    /// <param name=""></param>
+    /// <returns></returns>
     auto operator<=>(const Complex &) const = default;
 
     /// <summary>
@@ -298,6 +351,26 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     }
 
     /// <summary>
+    /// Component wise clamp to maximum value range of given target type
+    /// </summary>
+    template <Number TTarget>
+    DEVICE_CODE void ClampToTargetType() noexcept
+        requires(need_saturation_clamp_v<T, TTarget>)
+    {
+        Clamp(T(numeric_limits<TTarget>::lowest()), T(numeric_limits<TTarget>::max()));
+    }
+
+    /// <summary>
+    /// Component wise clamp to maximum value range of given target type<para/>
+    /// NOP in case no saturation clamping is needed.
+    /// </summary>
+    template <Number TTarget>
+    DEVICE_CODE void ClampToTargetType() noexcept
+        requires(!need_saturation_clamp_v<T, TTarget>)
+    {
+    }
+
+    /// <summary>
     /// Complex minimum
     /// </summary>
     [[nodiscard]] Complex<T> Min(const Complex<T> &aRight) const
@@ -347,6 +420,196 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     DEVICE_CODE [[nodiscard]] static Complex<T> Max(const Complex<T> &aLeft, const Complex<T> &aRight)
     {
         return aLeft.Max(aRight);
+    }
+
+    /// <summary>
+    /// Element wise round()
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Complex<T> Round(const Complex<T> &aValue)
+        requires FloatingPoint<T>
+    {
+        Complex<T> ret = aValue;
+        ret.Round();
+        return ret;
+    }
+
+    /// <summary>
+    /// Element wise round() and return as integer
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Complex<int> RoundI(const Complex<T> &aValue)
+        requires FloatingPoint<T>
+    {
+        Complex<T> ret = aValue;
+        ret.Round();
+        return Complex<int>(ret);
+    }
+
+    /// <summary>
+    /// Element wise round()
+    /// </summary>
+    DEVICE_CODE void Round()
+        requires DeviceCode<T> && FloatingPoint<T>
+    {
+        real = round(real);
+        imag = round(imag);
+    }
+
+    /// <summary>
+    /// Element wise round()
+    /// </summary>
+    void Round()
+        requires HostCode<T> && FloatingPoint<T>
+    {
+        real = std::round(real);
+        imag = std::round(imag);
+    }
+
+    /// <summary>
+    /// Element wise floor()
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Complex<T> Floor(const Complex<T> &aValue)
+        requires FloatingPoint<T>
+    {
+        Complex<T> ret = aValue;
+        ret.Floor();
+        return ret;
+    }
+
+    /// <summary>
+    /// Element wise floor() and return as integer
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Complex<int> FloorI(const Complex<T> &aValue)
+        requires FloatingPoint<T>
+    {
+        Complex<T> ret = aValue;
+        ret.Floor();
+        return Complex<int>(ret);
+    }
+
+    /// <summary>
+    /// Element wise floor()
+    /// </summary>
+    DEVICE_CODE void Floor()
+        requires DeviceCode<T> && FloatingPoint<T>
+    {
+        real = floor(real);
+        imag = floor(imag);
+    }
+
+    /// <summary>
+    /// Element wise floor()
+    /// </summary>
+    void Floor()
+        requires HostCode<T> && FloatingPoint<T>
+    {
+        real = std::floor(real);
+        imag = std::floor(imag);
+    }
+
+    /// <summary>
+    /// Element wise ceil()
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Complex<T> Ceil(const Complex<T> &aValue)
+        requires FloatingPoint<T>
+    {
+        Complex<T> ret = aValue;
+        ret.Ceil();
+        return ret;
+    }
+
+    /// <summary>
+    /// Element wise ceil() and return as integer
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Complex<int> CeilI(const Complex<T> &aValue)
+        requires FloatingPoint<T>
+    {
+        Complex<T> ret = aValue;
+        ret.Ceil();
+        return Complex<int>(ret);
+    }
+
+    /// <summary>
+    /// Element wise ceil()
+    /// </summary>
+    DEVICE_CODE void Ceil()
+        requires DeviceCode<T> && FloatingPoint<T>
+    {
+        real = ceil(real);
+        imag = ceil(imag);
+    }
+
+    /// <summary>
+    /// Element wise ceil()
+    /// </summary>
+    void Ceil()
+        requires HostCode<T> && FloatingPoint<T>
+    {
+        real = std::ceil(real);
+        imag = std::ceil(imag);
+    }
+
+    /// <summary>
+    /// Element wise round nearest ties to even<para/>
+    /// Note: the host function assumes that current rounding mode is set to FE_TONEAREST
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Complex<T> RoundNearest(const Complex<T> &aValue)
+        requires FloatingPoint<T>
+    {
+        Complex<T> ret = aValue;
+        ret.RoundNearest();
+        return ret;
+    }
+
+    /// <summary>
+    /// Element wise round nearest ties to even
+    /// </summary>
+    DEVICE_CODE void RoundNearest()
+        requires DeviceCode<T> && FloatingPoint<T>
+    {
+        real = __float2int_rn(real);
+        imag = __float2int_rn(imag);
+    }
+
+    /// <summary>
+    /// Element wise round nearest ties to even<para/>
+    /// Note: this host function assumes that current rounding mode is set to FE_TONEAREST
+    /// </summary>
+    void RoundNearest()
+        requires HostCode<T> && FloatingPoint<T>
+    {
+        real = std::nearbyint(real);
+        imag = std::nearbyint(imag);
+    }
+
+    /// <summary>
+    /// Element wise round toward zero
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Complex<T> RoundZero(const Complex<T> &aValue)
+        requires FloatingPoint<T>
+    {
+        Complex<T> ret = aValue;
+        ret.RoundZero();
+        return ret;
+    }
+
+    /// <summary>
+    /// Element wise round toward zero
+    /// </summary>
+    DEVICE_CODE void RoundZero()
+        requires DeviceCode<T> && FloatingPoint<T>
+    {
+        real = __float2int_rz(real);
+        imag = __float2int_rz(imag);
+    }
+
+    /// <summary>
+    /// Element wise round toward zero
+    /// </summary>
+    void RoundZero()
+        requires HostCode<T> && FloatingPoint<T>
+    {
+        real = std::trunc(real);
+        imag = std::trunc(imag);
     }
 };
 
@@ -424,29 +687,4 @@ template <HostCode T2> std::wistream &operator>>(std::wistream &aIs, Complex<T2>
     aIs >> aVec.real >> aVec.imag;
     return aIs;
 }
-
-template <typename T> struct isComplexType : std::false_type
-{
-};
-template <typename T> struct isComplexType<Complex<T>> : std::true_type
-{
-};
-
-template <typename T> struct remove_complex
-{
-    using type = void;
-};
-template <typename T> struct remove_complex<Complex<T>>
-{
-    using type = T;
-};
-
-template <typename T>
-concept ComplexType = isComplexType<T>::value;
-
-template <typename T>
-concept IntComplexType = isComplexType<T>::value && Integral<typename remove_complex<T>::type>;
-
-template <typename T>
-concept FloatingComplexType = isComplexType<T>::value && FloatingPoint<typename remove_complex<T>::type>;
 } // namespace opp

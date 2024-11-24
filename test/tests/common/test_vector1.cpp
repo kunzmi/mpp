@@ -220,27 +220,27 @@ TEST_CASE("Pixel32fC1_additionalMethods", "[Common]")
     CHECK(absdiffA.x == Approx(32.514758920888809).margin(0.00001));
 
     Pixel32fC1 clampByte(float(numeric_limits<byte>::max()) + 1);
-    clampByte.ClampToTargetType(static_cast<byte>(0));
+    clampByte.template ClampToTargetType<byte>();
     CHECK(clampByte.x == 255);
 
     Pixel32fC1 clampShort(float(numeric_limits<short>::max()) + 1);
-    clampShort.ClampToTargetType(static_cast<short>(0));
+    clampShort.template ClampToTargetType<short>();
     CHECK(clampShort.x == 32767);
 
     Pixel32fC1 clampSByte(float(numeric_limits<sbyte>::max()) + 1);
-    clampSByte.ClampToTargetType(static_cast<sbyte>(0));
+    clampSByte.template ClampToTargetType<sbyte>();
     CHECK(clampSByte.x == 127);
 
     Pixel32fC1 clampUShort(float(numeric_limits<ushort>::max()) + 1);
-    clampUShort.ClampToTargetType(static_cast<ushort>(0));
+    clampUShort.template ClampToTargetType<ushort>();
     CHECK(clampUShort.x == 65535);
 
     Pixel32fC1 clampInt(float(numeric_limits<int>::max()) + 1000);
-    clampInt.ClampToTargetType(0);
+    clampInt.template ClampToTargetType<int>();
     CHECK(clampInt.x == 2147483647);
 
     Pixel32fC1 clampUInt(float(numeric_limits<uint>::max()) + 1000);
-    clampUInt.ClampToTargetType(static_cast<uint>(0));
+    clampUInt.template ClampToTargetType<uint>();
     CHECK(clampUInt.x == 0xffffffffUL);
 }
 
@@ -392,23 +392,23 @@ TEST_CASE("Pixel32sC1_additionalMethods", "[Common]")
     CHECK(absdiffA.x == 32);
 
     Pixel32sC1 clampByte(int(numeric_limits<byte>::max()) + 1);
-    clampByte.ClampToTargetType(static_cast<byte>(0));
+    clampByte.template ClampToTargetType<byte>();
     CHECK(clampByte.x == 255);
 
     Pixel32sC1 clampShort(int(numeric_limits<short>::max()) + 1);
-    clampShort.ClampToTargetType(static_cast<short>(0));
+    clampShort.template ClampToTargetType<short>();
     CHECK(clampShort.x == 32767);
 
     Pixel32sC1 clampSByte(int(numeric_limits<sbyte>::max()) + 1);
-    clampSByte.ClampToTargetType(static_cast<sbyte>(0));
+    clampSByte.template ClampToTargetType<sbyte>();
     CHECK(clampSByte.x == 127);
 
     Pixel32sC1 clampUShort(int(numeric_limits<ushort>::max()) + 1);
-    clampUShort.ClampToTargetType(static_cast<ushort>(0));
+    clampUShort.template ClampToTargetType<ushort>();
     CHECK(clampUShort.x == 65535);
 
     Pixel32sC1 clampInt(numeric_limits<int>::max());
-    clampInt.ClampToTargetType(0);
+    clampInt.template ClampToTargetType<int>();
     CHECK(clampInt.x == 2147483647);
 
     Pixel32sC1 lshift(1024);

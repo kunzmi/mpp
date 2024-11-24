@@ -12,6 +12,9 @@ using uint    = std::uint32_t;
 using ulong64 = std::uint64_t;
 using long64  = std::int64_t;
 
+constexpr byte TRUE_VALUE  = 255; // NPP result of comparisons is 255 for "true"
+constexpr byte FALSE_VALUE = 0;
+
 // with these compiler dependent concepts and defines, we can enable/disable
 // code segments even if host code never is compiled by nvcc or hipcc
 #ifdef __CUDACC__
@@ -29,7 +32,12 @@ concept HOST_COMPILER = std::false_type::value;
 
 // device code needs the __device__ annotation, use the compiler dependent macro:
 #define DEVICE_CODE __device__ __host__
-#define PRAGMA_UNROLL _Pragma("unroll")
+
+// device code needs the __device__ annotation, use the compiler dependent macro:
+#define DEVICE_ONLY_CODE __device__
+
+// __restrict__ for device code
+#define RESTRICT __restrict__
 #elif __HIP_PLATFORM_AMD__
 template <typename T>
 concept DEVICE_COMPILER = std::true_type::value;
@@ -45,7 +53,12 @@ concept HOST_COMPILER = std::false_type::value;
 
 // device code needs the __device__ annotation, use the compiler dependent macro:
 #define DEVICE_CODE __device__ __host__
-#define PRAGMA_UNROLL _Pragma("unroll")
+
+// device code needs the __device__ annotation, use the compiler dependent macro:
+#define DEVICE_ONLY_CODE __device__
+
+// __restrict__ for device code
+#define RESTRICT __restrict__
 #elif _MSC_VER
 template <typename T>
 concept DEVICE_COMPILER = std::false_type::value;
@@ -61,8 +74,12 @@ concept HOST_COMPILER = std::true_type::value;
 
 // device code needs the __device__ annotation, use the compiler dependent macro:
 #define DEVICE_CODE
-// pragma unroll is only for device code
-#define PRAGMA_UNROLL
+
+// device code needs the __device__ annotation, use the compiler dependent macro:
+#define DEVICE_ONLY_CODE
+
+// __restrict__ for device code
+#define RESTRICT
 #elif __clang__
 template <typename T>
 concept DEVICE_COMPILER = std::false_type::value;
@@ -78,8 +95,12 @@ concept HOST_COMPILER = std::true_type::value;
 
 // device code needs the __device__ annotation, use the compiler dependent macro:
 #define DEVICE_CODE
-// pragma unroll is only for device code
-#define PRAGMA_UNROLL
+
+// device code needs the __device__ annotation, use the compiler dependent macro:
+#define DEVICE_ONLY_CODE
+
+// __restrict__ for device code
+#define RESTRICT
 #else // GCC and others
 template <typename T>
 concept DEVICE_COMPILER = std::false_type::value;
@@ -95,8 +116,12 @@ concept HOST_COMPILER = std::true_type::value;
 
 // device code needs the __device__ annotation, use the compiler dependent macro:
 #define DEVICE_CODE
-// pragma unroll is only for device code
-#define PRAGMA_UNROLL
+
+// device code needs the __device__ annotation, use the compiler dependent macro:
+#define DEVICE_ONLY_CODE
+
+// __restrict__ for device code
+#define RESTRICT
 #endif
 
 template <typename T>
@@ -148,13 +173,13 @@ concept SignedNumber = FloatingPoint<T> || SignedIntegral<T>;
 template <typename T>
 concept ByteSizeType = sizeof(T) == 1;
 
+// T is sizeof 2 byte
+template <typename T>
+concept TwoBytesSizeType = sizeof(T) == 2;
+
 // size is Power of 2
 template <std::size_t size>
 concept IsPowerOf2 = (size != 0) && ((size & (size - 1)) == 0);
-
-// size is Power of 2 and <= 16
-template <std::size_t size>
-concept IsTupelSize = IsPowerOf2<size> && size <= 16;
 
 // GCC complains if we directly use std::false_type in a static_assert
 // (we do that from time to time for checking if we missed a use case)
@@ -287,7 +312,11 @@ enum class RoudingMode
     /// - ceil(-1.5) = -1<para/>
     /// - ceil(-2.5) = -2<para/>
     /// </summary>
-    TowardPositiveInfinity
+    TowardPositiveInfinity,
+    /// <summary>
+    /// No rounding at all, NOP
+    /// </summary>
+    None
 };
 
 } // namespace opp

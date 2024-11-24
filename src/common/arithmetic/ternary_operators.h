@@ -1,5 +1,6 @@
 #pragma once
 #include <common/defines.h>
+#include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
 #include <concepts>
 
@@ -15,9 +16,9 @@ template <VectorType T> struct AddMul
 
 template <VectorType T> struct AddWeighted
 {
-    typename remove_vector<T>::type Alpha;
+    remove_vector_t<T> Alpha;
 
-    AddWeighted(typename remove_vector<T>::type aAlpha) : Alpha(aAlpha)
+    AddWeighted(remove_vector_t<T> aAlpha) : Alpha(aAlpha)
     {
     }
 

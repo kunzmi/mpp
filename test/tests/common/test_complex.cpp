@@ -3,6 +3,7 @@
 #include <common/complex.h>
 #include <common/defines.h>
 #include <common/safeCast.h>
+#include <common/Vector2.h>
 #include <complex>
 #include <cstddef>
 #include <cstdint>
@@ -35,6 +36,14 @@ TEST_CASE("Complex<float>", "[Common]")
     CHECK(c2.real == 0);
     CHECK(c2.imag == 1);
     CHECK(c2 == t1);
+
+    Complex<float> c3 = Vector2<float>(10, 20);
+    CHECK(c3.real == 10);
+    CHECK(c3.imag == 20);
+
+    Complex<float> c4 = std::complex<float>(10, 20);
+    CHECK(c4.real == 10);
+    CHECK(c4.imag == 20);
 
     Complex<float> t2(5);
     CHECK(t2.real == 5);
@@ -158,6 +167,23 @@ TEST_CASE("Complex<float>", "[Common]")
 
     CHECK(minmax1.Max(minmax2) == Complex<float>(10, 20));
     CHECK(minmax2.Max(minmax1) == Complex<float>(10, 20));
+
+    Complex<float> conj(10, 20);
+    Complex<float> conj2 = Complex<float>::Conj(conj);
+    conj.Conj();
+    CHECK(conj == Complex<float>(10, -20));
+    CHECK(conj == conj2);
+
+    Complex<float> conjMulA(10, 20);
+    Complex<float> conjMulB(3, -2);
+    Complex<float> conjMul = Complex<float>::ConjMul(conjMulA, conjMulB);
+    conjMulA.ConjMul(conjMulB);
+    CHECK(conjMul == Complex<float>(-10, 80));
+    CHECK(conjMulA == conjMul);
+
+    Complex<float> fromInt = Complex<int>(10, 20);
+    CHECK(fromInt.real == 10);
+    CHECK(fromInt.imag == 20);
 }
 
 TEST_CASE("Complex<float>_additionalMethods", "[Common]")
@@ -291,6 +317,140 @@ TEST_CASE("Complex<int>", "[Common]")
 
     CHECK(minmax1.Max(minmax2) == Complex<int>(10, 20));
     CHECK(minmax2.Max(minmax1) == Complex<int>(10, 20));
+
+    Complex<int> fromFloat = Complex<float>(10.2f, 20.3f);
+    CHECK(fromFloat.real == 10);
+    CHECK(fromFloat.imag == 20);
+}
+
+TEST_CASE("Complex<short>", "[Common]")
+{
+    // check size:
+    CHECK(sizeof(Complex<short>) == 2 * sizeof(short));
+
+    Complex<short> t1(100, 200);
+    CHECK(t1.real == 100);
+    CHECK(t1.imag == 200);
+
+    Complex<short> c(t1);
+    CHECK(c.real == 100);
+    CHECK(c.imag == 200);
+    CHECK(c == t1);
+
+    Complex<short> c2 = t1;
+    CHECK(c2.real == 100);
+    CHECK(c2.imag == 200);
+    CHECK(c2 == t1);
+
+    Complex<short> t2(5);
+    CHECK(t2.real == 5);
+    CHECK(t2.imag == 0);
+    CHECK(c2 != t2);
+
+    Complex<short> add1 = t1 + t2;
+    CHECK(add1.real == 105);
+    CHECK(add1.imag == 200);
+
+    Complex<short> add2 = 3 + t1;
+    CHECK(add2.real == 103);
+    CHECK(add2.imag == 200);
+
+    Complex<short> add3 = t1 + 4;
+    CHECK(add3.real == 104);
+    CHECK(add3.imag == 200);
+
+    Complex<short> add4 = t1;
+    add4 += add3;
+    CHECK(add4.real == 204);
+    CHECK(add4.imag == 400);
+
+    add4 += 3;
+    CHECK(add4.real == 207);
+    CHECK(add4.imag == 400);
+
+    Complex<short> sub1 = t1 - t2;
+    CHECK(sub1.real == 95);
+    CHECK(sub1.imag == 200);
+
+    Complex<short> sub2 = 3 - t1;
+    CHECK(sub2.real == -97);
+    CHECK(sub2.imag == 200);
+
+    Complex<short> sub3 = t1 - 4;
+    CHECK(sub3.real == 96);
+    CHECK(sub3.imag == 200);
+
+    Complex<short> sub4 = t1;
+    sub4 -= sub3;
+    CHECK(sub4.real == 4);
+    CHECK(sub4.imag == 0);
+
+    sub4 -= 3;
+    CHECK(sub4.real == 1);
+    CHECK(sub4.imag == 0);
+
+    t1                  = Complex<short>(4, 5);
+    t2                  = Complex<short>(6, 7);
+    Complex<short> mul1 = t1 * t2;
+    CHECK(mul1.real == -11);
+    CHECK(mul1.imag == 58);
+
+    Complex<short> mul2 = 3 * t1;
+    CHECK(mul2.real == 12);
+    CHECK(mul2.imag == 15);
+
+    Complex<short> mul3 = t1 * 4;
+    CHECK(mul3.real == 16);
+    CHECK(mul3.imag == 20);
+
+    Complex<short> mul4 = t1;
+    mul4 *= mul3;
+    CHECK(mul4.real == -36);
+    CHECK(mul4.imag == 160);
+
+    mul4 *= 3;
+    CHECK(mul4.real == -108);
+    CHECK(mul4.imag == 480);
+
+    t1                  = Complex<short>(10, 20);
+    t2                  = Complex<short>(6, 7);
+    Complex<short> div1 = t1 / t2;
+    CHECK(div1.real == 2);
+    CHECK(div1.imag == 0);
+
+    Complex<short> div2 = 300 / t1;
+    CHECK(div2.real == 6);
+    CHECK(div2.imag == -12);
+
+    Complex<short> div3 = t1 / 4;
+    CHECK(div3.real == 2);
+    CHECK(div3.imag == 5);
+
+    Complex<short> div4 = t2 * 100;
+    div4 /= div3;
+    CHECK(div4.real == 162);
+    CHECK(div4.imag == -55);
+
+    div4 /= 3;
+    CHECK(div4.real == 54);
+    CHECK(div4.imag == -18);
+
+    Complex<short> minmax1(10, 20);
+    Complex<short> minmax2(-20, 10);
+
+    CHECK(minmax1.Min(minmax2) == Complex<short>(-20, 10));
+    CHECK(minmax2.Min(minmax1) == Complex<short>(-20, 10));
+
+    CHECK(minmax1.Max(minmax2) == Complex<short>(10, 20));
+    CHECK(minmax2.Max(minmax1) == Complex<short>(10, 20));
+
+    Complex<short> fromFloat = Complex<float>(10.4f, 20.9f);
+    CHECK(fromFloat.real == 10);
+    CHECK(fromFloat.imag == 20);
+
+    Complex<short> fromFloatClamp = Complex<float>(SHRT_MAX + 1000, SHRT_MIN - 1000);
+    CHECK(fromFloatClamp.real == SHRT_MAX);
+    CHECK(fromFloatClamp.imag == SHRT_MIN);
 }
 
 TEST_CASE("Complex<float>_alignment", "[Common]")
@@ -369,14 +529,14 @@ TEST_CASE("Complex<int>_alignment", "[Common]")
     }
 }
 
-TEST_CASE("Complex<ushort>_alignment", "[Common]")
+TEST_CASE("Complex<short>_alignment", "[Common]")
 {
     constexpr int count = 10;
-    std::vector<Complex<ushort> *> buffer(count);
+    std::vector<Complex<short> *> buffer(count);
 
     for (size_t i = 0; i < count; i++)
     {
-        buffer[i] = new Complex<ushort>(ushort(i));
+        buffer[i] = new Complex<short>(short(i));
     }
 
     for (size_t i = 0; i < count; i++)
@@ -386,19 +546,19 @@ TEST_CASE("Complex<ushort>_alignment", "[Common]")
         void *ptrVector      = buffer[i];
 
         CHECK(ptrFirstMember == ptrVector);
-        CHECK(ptrLastMember == (reinterpret_cast<ushort *>(ptrVector) + 1));
+        CHECK(ptrLastMember == (reinterpret_cast<short *>(ptrVector) + 1));
 
         // vector must be 4 byte memory aligned:
         CHECK(std::int64_t(ptrVector) % 4 == 0);
     }
 
-    std::vector<Complex<ushort>> buffer2(count);
+    std::vector<Complex<short>> buffer2(count);
     for (size_t i = 0; i < count - 1; i++)
     {
         void *ptrVector1 = &buffer2[i];
         void *ptrVector2 = &buffer2[i + 1];
 
-        CHECK(ptrVector2 == reinterpret_cast<void *>(reinterpret_cast<char *>(ptrVector1) + (2 * sizeof(ushort))));
+        CHECK(ptrVector2 == reinterpret_cast<void *>(reinterpret_cast<char *>(ptrVector1) + (2 * sizeof(short))));
     }
 
     for (size_t i = 0; i < count; i++)

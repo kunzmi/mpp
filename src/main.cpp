@@ -11,111 +11,80 @@
 #include <common/arithmetic/binary_operators.h>
 #include <common/arithmetic/ternary_operators.h>
 #include <common/arithmetic/unary_operators.h>
-#include <common/needSaurationClamp.h>
+#include <common/image/pixelTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vector4A.h>
 #include <common/vectorTypes.h>
+
+#include <backends/cuda/image/addKernel.h>
+#include <backends/cuda/image/configurations.h>
+
+#include <backends/cuda/streamCtx.h>
+
+#include <common/scratchBuffer.h>
 
 using namespace opp;
 using namespace opp::image;
+using namespace opp::cuda::image;
 
-template <size_t tupelSize, typename ComputeType, typename ResultType, typename SrcType, typename operation>
-struct TestFunctor
-{
-    const SrcType *Src1;
-    size_t SrcPitch1;
-
-    const SrcType *Src2;
-    size_t SrcPitch2;
-
-    operation Op;
-    float ScaleFactor;
-
-    TestFunctor()
-    {
-    }
-
-    TestFunctor(SrcType *aSrc1, size_t aSrcPitch1, SrcType *aSrc2, size_t aSrcPitch2, operation aOp, float aScaleFactor)
-        : Src1(aSrc1), SrcPitch1(aSrcPitch1), Src2(aSrc2), SrcPitch2(aSrcPitch2), Op(aOp), ScaleFactor(aScaleFactor)
-    {
-    }
-
-    void operator()(int aPixelX, int aPixelY, ResultType &aResult)
-        requires std::integral<typename remove_vector<ResultType>::type> &&
-                 std::floating_point<typename remove_vector<ComputeType>::type>
-    {
-        if (aPixelX > aPixelY)
-        {
-            return;
-        }
-        const SrcType *pixelSrc1 = Src1;
-        const SrcType *pixelSrc2 = Src2;
-        ComputeType temp;
-        Op(ComputeType(*pixelSrc1), ComputeType(*pixelSrc2), temp);
-        temp *= ScaleFactor;
-        // temp.ClampToTargetType(aResult);
-        temp.ClampToTargetType<typename remove_vector<ResultType>::type>();
-        aResult = ResultType(temp);
-    }
-};
-
-template <VectorType T> int check(T hallo)
-{
-    return hallo.x;
-}
-
-void forEachPixelKernelWithCuda(const int *aIn1, size_t aPitch1, const int *aIn2, size_t aPitch2, int *aOut,
-                                size_t aPitchOut, Size2D aSize);
 int main()
 {
     try
     {
+        std::array<size_t, 3> sizes{1000, 200, 64};
+        ScratchBuffer<byte, int, double> buffer(nullptr, sizes);
 
-        Add<Vector1<float>> op;
-        Vector1<int> in1(1000);
-        Vector1<int> in2(10);
-        Vector1<int> outres;
-        Vector1<byte> outresByte(in1);
-        byte tt(static_cast<byte>(in1.x));
-        if (tt)
+        auto ptr1 = buffer.Get<0>();
+        auto ptr2 = buffer.Get<1>();
+        auto ptr3 = buffer.Get<2>();
+
+        size_t size1 = buffer.GetSubBufferSize(0);
+        size_t size2 = buffer.GetSubBufferSize(1);
+        size_t size3 = buffer.GetSubBufferSize(2);
+
+        size_t sizeTotal = buffer.GetTotalBufferSize();
+
+        if (size1 + size2 + size3 == sizeTotal)
+        {
+            if (ptr1 != nullptr && ptr2 != nullptr && ptr3 != nullptr)
+            {
+            }
+        }
+
+        Vector4<int> vec4i(1, 6, 3, 7);
+        Vector4<int> alpha(5, 6, 7, 8);
+
+        byte eqt = vec4i < alpha;
+        if (eqt)
         {
         }
 
-        TestFunctor<2, Vector1<float>, Vector1<int>, Vector1<int>, Add<Vector1<float>>> functor(&in1, 1, &in2, 1, op,
-                                                                                                1.0f);
-        functor(0, 0, outres);
-
-        Vector1<float> ttt(1024);
-        ttt.ClampToTargetType<Vector1<byte>>();
-
-        Magnitude<Complex<double>> testMag;
-        Complex<double> testVal1(10, -10);
-        Complex<short> testVal2(-10, 100);
-        Complex<short> testVal3;
-        double res = 0;
-        testMag(testVal1, res);
+        opp::cuda::StreamCtx ctx = opp::cuda::StreamCtxSingleton::Get();
+        std::cout << ctx.DeviceId;
 
         const Size2D imgSize{1025, 1024};
 
         std::cout << "Hello world! This is " << OPP_PROJECT_NAME << " version " << OPP_VERSION << "!" << std::endl;
 
-        std::vector<int> vecImg1(imgSize.TotalSize());
-        std::vector<int> vecImg2(imgSize.TotalSize());
-        std::vector<int> vecImg3(imgSize.TotalSize());
+        std::vector<Pixel8uC4A> vecImg1(imgSize.TotalSize());
+        std::vector<Pixel8uC4A> vecImg2(imgSize.TotalSize());
+        std::vector<Pixel8uC4A> vecImg3(imgSize.TotalSize());
 
-        int *img1 = vecImg1.data();
-        int *img2 = vecImg2.data();
-        int *out  = vecImg3.data();
+        Pixel8uC4A *img1 = vecImg1.data();
+        Pixel8uC4A *img2 = vecImg2.data();
+        Pixel8uC4A *out  = vecImg3.data();
 
         for (size_t i = 0; i < imgSize.TotalSize(); i++)
         {
-            img1[i] = to_int(i);
-            img2[i] = 2;
-            out[i]  = 0;
+            img1[i]  = Pixel8uC4A(to_byte(i % 255));
+            img2[i]  = Pixel8uC4A(2);
+            out[i]   = Pixel8uC4A(to_byte(0));
+            out[i].w = 128;
         }
 
-        int *dev_in1 = nullptr;
-        int *dev_in2 = nullptr;
-        int *dev_out = nullptr;
+        Pixel8uC4A *dev_in1 = nullptr;
+        Pixel8uC4A *dev_in2 = nullptr;
+        Pixel8uC4A *dev_out = nullptr;
 
         size_t pitch1          = 0;
         size_t pitch2          = 0;
@@ -131,24 +100,24 @@ int main()
         }
 
         // Allocate GPU buffers for three vectors (two input, one output)    .
-        cudaStatus = cudaMallocPitch(reinterpret_cast<void **>(&dev_in1), &pitch1, sizeof(int) * to_size_t(imgSize.x),
-                                     to_size_t(imgSize.y));
+        cudaStatus = cudaMallocPitch(reinterpret_cast<void **>(&dev_in1), &pitch1,
+                                     sizeof(Pixel8uC4) * to_size_t(imgSize.x), to_size_t(imgSize.y));
         if (cudaStatus != cudaSuccess)
         {
             std::cerr << "cudaMalloc failed!";
             return 1;
         }
 
-        cudaStatus = cudaMallocPitch(reinterpret_cast<void **>(&dev_in2), &pitch2, sizeof(int) * to_size_t(imgSize.x),
-                                     to_size_t(imgSize.y));
+        cudaStatus = cudaMallocPitch(reinterpret_cast<void **>(&dev_in2), &pitch2,
+                                     sizeof(Pixel8uC4) * to_size_t(imgSize.x), to_size_t(imgSize.y));
         if (cudaStatus != cudaSuccess)
         {
             std::cerr << "cudaMalloc failed!";
             return 1;
         }
 
-        cudaStatus = cudaMallocPitch(reinterpret_cast<void **>(&dev_out), &pitchOut, sizeof(int) * to_size_t(imgSize.x),
-                                     to_size_t(imgSize.y));
+        cudaStatus = cudaMallocPitch(reinterpret_cast<void **>(&dev_out), &pitchOut,
+                                     sizeof(Pixel8uC4) * to_size_t(imgSize.x), to_size_t(imgSize.y));
         if (cudaStatus != cudaSuccess)
         {
             std::cerr << "cudaMalloc failed!";
@@ -156,7 +125,7 @@ int main()
         }
 
         // Copy input vectors from host memory to GPU buffers.
-        cudaStatus = cudaMemcpy2D(dev_in1, pitch1, img1, sizeof(int) * to_size_t(imgSize.x),
+        cudaStatus = cudaMemcpy2D(dev_in1, pitch1, img1, sizeof(Pixel8uC4) * to_size_t(imgSize.x),
                                   sizeof(int) * to_size_t(imgSize.x), to_size_t(imgSize.y), cudaMemcpyHostToDevice);
         if (cudaStatus != cudaSuccess)
         {
@@ -164,7 +133,7 @@ int main()
             return 1;
         }
 
-        cudaStatus = cudaMemcpy2D(dev_in2, pitch2, img2, sizeof(int) * to_size_t(imgSize.x),
+        cudaStatus = cudaMemcpy2D(dev_in2, pitch2, img2, sizeof(Pixel8uC4) * to_size_t(imgSize.x),
                                   sizeof(int) * to_size_t(imgSize.x), to_size_t(imgSize.y), cudaMemcpyHostToDevice);
         if (cudaStatus != cudaSuccess)
         {
@@ -172,7 +141,7 @@ int main()
             return 1;
         }
 
-        cudaStatus = cudaMemcpy2D(dev_out, pitchOut, out, sizeof(int) * to_size_t(imgSize.x),
+        cudaStatus = cudaMemcpy2D(dev_out, pitchOut, out, sizeof(Pixel8uC4) * to_size_t(imgSize.x),
                                   sizeof(int) * to_size_t(imgSize.x), to_size_t(imgSize.y), cudaMemcpyHostToDevice);
         if (cudaStatus != cudaSuccess)
         {
@@ -180,7 +149,7 @@ int main()
             return 1;
         }
 
-        forEachPixelKernelWithCuda(dev_in1, pitch1, dev_in2, pitch2, dev_out, pitchOut, imgSize);
+        InvokeAddSrcSrc(dev_in1, pitch1, dev_in2, pitch2, dev_out, pitchOut, imgSize);
 
         // Copy output vector from GPU buffer to host memory.
         cudaStatus = cudaMemcpy2D(out, sizeof(int) * to_size_t(imgSize.x), dev_out, pitchOut,
@@ -194,7 +163,9 @@ int main()
         int check_host = 0;
         for (size_t i = 0; i < imgSize.TotalSize(); i++)
         {
-            if (out[i] != img1[i] + img2[i])
+            Pixel8uC4A temp = Pixel8uC4A(Pixel32sC4A(img1[i]) + Pixel32sC4A(img2[i]));
+
+            if (out[i] != temp)
             {
                 std::cout << "Wrong result in pixel " << imgSize.GetCoordinates(i) << std::endl;
                 check_host++;

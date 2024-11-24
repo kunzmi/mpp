@@ -14,10 +14,10 @@ namespace opp
 {
 
 // forward declaration:
-template <Number T> struct Vector1;
-template <Number T> struct Vector2;
-template <Number T> struct Vector3;
-template <Number T> struct Vector4;
+template <ComplexOrNumber T> struct Vector1;
+template <ComplexOrNumber T> struct Vector2;
+template <ComplexOrNumber T> struct Vector3;
+template <ComplexOrNumber T> struct Vector4;
 
 enum class Axis3D
 {
@@ -65,7 +65,7 @@ inline std::wostream &operator<<(std::wostream &aOs, const Axis3D &aAxis)
 /// <summary>
 /// A three T component vector. Can replace CUDA's vector3 types
 /// </summary>
-template <Number T> struct alignas(sizeof(T)) Vector3
+template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector3
 {
     T x;
     T y;
@@ -104,12 +104,12 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// E.g.: when converting int to byte, values are clamped to 0..255<para/>
     /// But when converting byte to int, no clamping operation is performed.
     /// </summary>
-    template <Number T2> DEVICE_CODE Vector3(const Vector3<T2> &aVec) noexcept
+    template <ComplexOrNumber T2> DEVICE_CODE Vector3(const Vector3<T2> &aVec) noexcept
     {
-        if constexpr (need_saturation_clamp<T2, T>::value)
+        if constexpr (need_saturation_clamp_v<T2, T>)
         {
             Vector3<T2> temp(aVec);
-            temp.ClampToTargetType<T>();
+            temp.template ClampToTargetType<T>();
             x = static_cast<T>(temp.x);
             y = static_cast<T>(temp.y);
             z = static_cast<T>(temp.z);
@@ -128,11 +128,11 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// But when converting byte to int, no clamping operation is performed.<para/>
     /// If we can modify the input variable, no need to allocate temporary storage for clamping.
     /// </summary>
-    template <Number T2> DEVICE_CODE Vector3(Vector3<T2> &aVec) noexcept
+    template <ComplexOrNumber T2> DEVICE_CODE Vector3(Vector3<T2> &aVec) noexcept
     {
-        if constexpr (need_saturation_clamp<T2, T>::value)
+        if constexpr (need_saturation_clamp_v<T2, T>)
         {
-            aVec.ClampToTargetType<T>();
+            aVec.template ClampToTargetType<T>();
         }
         x = static_cast<T>(aVec.x);
         y = static_cast<T>(aVec.y);
@@ -146,12 +146,82 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     Vector3 &operator=(const Vector3 &) noexcept = default;
     Vector3 &operator=(Vector3 &&) noexcept      = default;
 
-    auto operator<=>(const Vector3 &) const = default;
+    // don't use space-ship operator as it returns true if any comparison returns true.
+    // But NPP only returns true if all channels fulfill the comparison.
+    // Also return TRUE_VALUE as byte instead of bool
+    // auto operator<=>(const Vector3 &) const = default;
+
+    /// <summary>
+    /// Returns true-value if each element comparison is true
+    /// </summary>
+    byte operator<(const Vector3 &aOther) const
+    {
+        bool res = x < aOther.x;
+        res &= y < aOther.y;
+        res &= z < aOther.z;
+        return res * TRUE_VALUE;
+    }
+
+    /// <summary>
+    /// Returns true-value if each element comparison is true
+    /// </summary>
+    byte operator<=(const Vector3 &aOther) const
+    {
+        bool res = x <= aOther.x;
+        res &= y <= aOther.y;
+        res &= z <= aOther.z;
+        return res * TRUE_VALUE;
+    }
+
+    /// <summary>
+    /// Returns true-value if each element comparison is true
+    /// </summary>
+    byte operator>(const Vector3 &aOther) const
+    {
+        bool res = x > aOther.x;
+        res &= y > aOther.y;
+        res &= z > aOther.z;
+        return res * TRUE_VALUE;
+    }
+
+    /// <summary>
+    /// Returns true-value if each element comparison is true
+    /// </summary>
+    byte operator>=(const Vector3 &aOther) const
+    {
+        bool res = x >= aOther.x;
+        res &= y >= aOther.y;
+        res &= z >= aOther.z;
+        return res * TRUE_VALUE;
+    }
+
+    /// <summary>
+    /// Returns true-value if each element comparison is true
+    /// </summary>
+    byte operator==(const Vector3 &aOther) const
+    {
+        bool res = x == aOther.x;
+        res &= y == aOther.y;
+        res &= z == aOther.z;
+        return res * TRUE_VALUE;
+    }
+
+    /// <summary>
+    /// Returns true-value if any element comparison is true
+    /// </summary>
+    byte operator!=(const Vector3 &aOther) const
+    {
+        bool res = x != aOther.x;
+        res |= y != aOther.y;
+        res |= z != aOther.z;
+        return res * TRUE_VALUE;
+    }
 
     /// <summary>
     /// Negation
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector3 operator-() const
+        requires SignedNumber<T>
     {
         return Vector3<T>(T(-x), T(-y), T(-z));
     }
@@ -351,7 +421,7 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Type conversion without saturation, direct type conversion
     /// </summary>
-    template <Number T2> [[nodiscard]] static Vector3<T> DEVICE_CODE Convert(const Vector3<T2> &aVec)
+    template <ComplexOrNumber T2> [[nodiscard]] static Vector3<T> DEVICE_CODE Convert(const Vector3<T2> &aVec)
     {
         return {static_cast<T>(aVec.x), static_cast<T>(aVec.y), static_cast<T>(aVec.z)};
     }
@@ -950,9 +1020,9 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Component wise clamp to maximum value range of given target type
     /// </summary>
-    template <Number TTarget>
+    template <ComplexOrNumber TTarget>
     DEVICE_CODE void ClampToTargetType() noexcept
-        requires(need_saturation_clamp<T, TTarget>::value)
+        requires(need_saturation_clamp_v<T, TTarget>)
     {
         Clamp(T(numeric_limits<TTarget>::lowest()), T(numeric_limits<TTarget>::max()));
     }
@@ -961,9 +1031,9 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// Component wise clamp to maximum value range of given target type<para/>
     /// NOP in case no saturation clamping is needed.
     /// </summary>
-    template <Number TTarget>
+    template <ComplexOrNumber TTarget>
     DEVICE_CODE void ClampToTargetType() noexcept
-        requires(!need_saturation_clamp<T, TTarget>::value)
+        requires(!need_saturation_clamp_v<T, TTarget>)
     {
     }
 
@@ -1075,6 +1145,17 @@ template <Number T> struct alignas(sizeof(T)) Vector3
         Vector3<T> ret = aValue;
         ret.Round();
         return Vector3<int>(ret);
+    }
+
+    /// <summary>
+    /// Element wise round()
+    /// </summary>
+    DEVICE_CODE void Round()
+        requires FloatingComplexType<T>
+    {
+        x.Round();
+        y.Round();
+        z.Round();
     }
 
     /// <summary>
@@ -1274,50 +1355,50 @@ template <Number T> struct alignas(sizeof(T)) Vector3
 
 template <typename T, typename T2>
 DEVICE_CODE Vector3<T> operator+(const Vector3<T> &aLeft, T2 aRight)
-    requires Number<T2>
+    requires ComplexOrNumber<T2>
 {
     return Vector3<T>{T(aLeft.x + aRight), T(aLeft.y + aRight), T(aLeft.z + aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector3<T> operator+(T2 aLeft, const Vector3<T> &aRight)
-    requires Number<T2>
+    requires ComplexOrNumber<T2>
 {
     return Vector3<T>{T(aLeft + aRight.x), T(aLeft + aRight.y), T(aLeft + aRight.z)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector3<T> operator-(const Vector3<T> &aLeft, T2 aRight)
-    requires Number<T2>
+    requires ComplexOrNumber<T2>
 {
     return Vector3<T>{T(aLeft.x - aRight), T(aLeft.y - aRight), T(aLeft.z - aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector3<T> operator-(T2 aLeft, const Vector3<T> &aRight)
-    requires Number<T2>
+    requires ComplexOrNumber<T2>
 {
     return Vector3<T>{T(aLeft - aRight.x), T(aLeft - aRight.y), T(aLeft - aRight.z)};
 }
 
 template <typename T, typename T2>
 DEVICE_CODE Vector3<T> operator*(const Vector3<T> &aLeft, T2 aRight)
-    requires Number<T2>
+    requires ComplexOrNumber<T2>
 {
     return Vector3<T>{T(aLeft.x * aRight), T(aLeft.y * aRight), T(aLeft.z * aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector3<T> operator*(T2 aLeft, const Vector3<T> &aRight)
-    requires Number<T2>
+    requires ComplexOrNumber<T2>
 {
     return Vector3<T>{T(aLeft * aRight.x), T(aLeft * aRight.y), T(aLeft * aRight.z)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector3<T> operator/(const Vector3<T> &aLeft, T2 aRight)
-    requires Number<T2>
+    requires ComplexOrNumber<T2>
 {
     return Vector3<T>{T(aLeft.x / aRight), T(aLeft.y / aRight), T(aLeft.z / aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector3<T> operator/(T2 aLeft, const Vector3<T> &aRight)
-    requires Number<T2>
+    requires ComplexOrNumber<T2>
 {
     return Vector3<T>{T(aLeft / aRight.x), T(aLeft / aRight.y), T(aLeft / aRight.z)};
 }

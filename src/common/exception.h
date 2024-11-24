@@ -78,21 +78,10 @@ class InvalidArgumentException : public OPPException
 };
 } // namespace opp
 
-// clang-format off
-//#ifdef _MSC_VER
-// NOLINTNEXTLINE --> function like macro
+// NOLINTBEGIN --> function like macro, parantheses for "msg"...
 #define EXCEPTION(msg) (opp::Exception((std::ostringstream() << msg).str(), __FILE__, __LINE__, __PRETTY_FUNCTION__))
-// NOLINTNEXTLINE --> function like macro
-#define INVALIDARGUMENT(argument, msg) (opp::InvalidArgumentException(#argument, (std::ostringstream() << msg).str(), __FILE__, __LINE__, __PRETTY_FUNCTION__))
-//#elif __clang__
-//// NOLINTNEXTLINE --> function like macro
-//#define EXCEPTION(msg) (opp::Exception(dynamic_cast<std::ostringstream&>((std::ostringstream() << msg)).str(), __FILE__, __LINE__, __PRETTY_FUNCTION__))
-//// NOLINTNEXTLINE --> function like macro
-//#define INVALIDARGUMENT(argument, msg) (opp::InvalidArgumentException(#argument, (std::ostringstream() << msg).str(), __FILE__, __LINE__, __PRETTY_FUNCTION__))
-//#else
-//// NOLINTNEXTLINE --> function like macro
-//#define EXCEPTION(msg) (opp::Exception(dynamic_cast<std::ostringstream&>((std::ostringstream() << msg)).str(), __FILE__, __LINE__, __PRETTY_FUNCTION__))
-//// NOLINTNEXTLINE --> function like macro
-//#define INVALIDARGUMENT(argument, msg) (opp::InvalidArgumentException(#argument, (std::ostringstream() << msg).str(), __FILE__, __LINE__, __PRETTY_FUNCTION__))
-//#endif
-// clang-format on
+
+#define INVALIDARGUMENT(argument, msg)                                                                                 \
+    (opp::InvalidArgumentException(#argument, (std::ostringstream() << msg).str(), __FILE__, __LINE__,                 \
+                                   __PRETTY_FUNCTION__))
+// NOLINTEND

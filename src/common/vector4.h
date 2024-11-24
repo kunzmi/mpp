@@ -1,4 +1,5 @@
 #pragma once
+#include "complex_typetraits.h"
 #include "defines.h"
 #include "exception.h"
 #include "limits.h"
@@ -15,10 +16,11 @@ namespace opp
 {
 
 // forward declaration:
-template <Number T> struct Vector1;
-template <Number T> struct Vector2;
-template <Number T> struct Vector3;
-template <Number T> struct Vector4;
+template <ComplexOrNumber T> struct Vector1;
+template <ComplexOrNumber T> struct Vector2;
+template <ComplexOrNumber T> struct Vector3;
+template <ComplexOrNumber T> struct Vector4;
+template <ComplexOrNumber T> struct Vector4A;
 
 enum class Axis4D
 {
@@ -73,7 +75,7 @@ inline std::wostream &operator<<(std::wostream &aOs, const Axis4D &aAxis)
 /// <summary>
 /// A four T component vector. Can replace CUDA's vector4 types
 /// </summary>
-template <Number T> struct alignas(4 * sizeof(T)) Vector4
+template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
 {
     T x;
     T y;
@@ -116,16 +118,44 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     }
 
     /// <summary>
+    /// Usefull constructor for SIMD instructions
+    /// </summary>
+    explicit DEVICE_CODE Vector4(const uint &aUint) noexcept
+        requires(sizeof(T) == 1)
+    {
+        const Vector4<T> &aOther = *reinterpret_cast<const Vector4<T> *>(&aUint);
+
+        x = aOther.x;
+        y = aOther.y;
+        z = aOther.z;
+        w = aOther.w;
+    }
+
+    /// <summary>
+    /// Usefull constructor for SIMD instructions
+    /// </summary>
+    explicit DEVICE_CODE Vector4(const ulong64 &aUlong) noexcept
+        requires(sizeof(T) == 2)
+    {
+        const Vector4<T> &aOther = *reinterpret_cast<const Vector4<T> *>(&aUlong);
+
+        x = aOther.x;
+        y = aOther.y;
+        z = aOther.z;
+        w = aOther.w;
+    }
+
+    /// <summary>
     /// Type conversion with saturation if needed<para/>
     /// E.g.: when converting int to byte, values are clamped to 0..255<para/>
     /// But when converting byte to int, no clamping operation is performed.
     /// </summary>
-    template <Number T2> DEVICE_CODE Vector4(const Vector4<T2> &aVec) noexcept
+    template <ComplexOrNumber T2> DEVICE_CODE Vector4(const Vector4<T2> &aVec) noexcept
     {
-        if constexpr (need_saturation_clamp<T2, T>::value)
+        if constexpr (need_saturation_clamp_v<T2, T>)
         {
             Vector4<T2> temp(aVec);
-            temp.ClampToTargetType<T>();
+            temp.template ClampToTargetType<T>();
             x = static_cast<T>(temp.x);
             y = static_cast<T>(temp.y);
             z = static_cast<T>(temp.z);
@@ -146,11 +176,11 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// But when converting byte to int, no clamping operation is performed.<para/>
     /// If we can modify the input variable, no need to allocate temporary storage for clamping.
     /// </summary>
-    template <Number T2> DEVICE_CODE Vector4(Vector4<T2> &aVec) noexcept
+    template <ComplexOrNumber T2> DEVICE_CODE Vector4(Vector4<T2> &aVec) noexcept
     {
-        if constexpr (need_saturation_clamp<T2, T>::value)
+        if constexpr (need_saturation_clamp_v<T2, T>)
         {
-            aVec.ClampToTargetType<T>();
+            aVec.template ClampToTargetType<T>();
         }
         x = static_cast<T>(aVec.x);
         y = static_cast<T>(aVec.y);
@@ -165,12 +195,127 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     Vector4 &operator=(const Vector4 &) noexcept = default;
     Vector4 &operator=(Vector4 &&) noexcept      = default;
 
-    auto operator<=>(const Vector4 &) const = default;
+    // implemented in Vector4A.h to avoid cyclic includes:
+    Vector4 &operator=(const Vector4A<T> &) noexcept;
+
+    /// <summary>
+    /// converter to uint for SIMD operations
+    /// </summary>
+    DEVICE_CODE operator const uint &() const
+        requires ByteSizeType<T>
+    {
+        return *reinterpret_cast<const uint *>(this);
+    }
+
+    /// <summary>
+    /// converter to uint for SIMD operations
+    /// </summary>
+    DEVICE_CODE operator uint &()
+        requires ByteSizeType<T>
+    {
+        return *reinterpret_cast<uint *>(this);
+    }
+
+    /// <summary>
+    /// converter to ulong64 for SIMD operations
+    /// </summary>
+    DEVICE_CODE operator const ulong64 &() const
+        requires TwoBytesSizeType<T>
+    {
+        return *reinterpret_cast<const ulong64 *>(this);
+    }
+
+    /// <summary>
+    /// converter to ulong64 for SIMD operations
+    /// </summary>
+    DEVICE_CODE operator ulong64 &()
+        requires TwoBytesSizeType<T>
+    {
+        return *reinterpret_cast<ulong64 *>(this);
+    }
+
+    // don't use space-ship operator as it returns true if any comparison returns true.
+    // But NPP only returns true if all channels fulfill the comparison.
+    // Also return TRUE_VALUE as byte instead of bool
+    // auto operator<=>(const Vector4 &) const = default;
+
+    /// <summary>
+    /// Returns true-value if each element comparison is true
+    /// </summary>
+    byte operator<(const Vector4 &aOther) const
+    {
+        bool res = x < aOther.x;
+        res &= y < aOther.y;
+        res &= z < aOther.z;
+        res &= w < aOther.w;
+        return res * TRUE_VALUE;
+    }
+
+    /// <summary>
+    /// Returns true-value if each element comparison is true
+    /// </summary>
+    byte operator<=(const Vector4 &aOther) const
+    {
+        bool res = x <= aOther.x;
+        res &= y <= aOther.y;
+        res &= z <= aOther.z;
+        res &= w <= aOther.w;
+        return res * TRUE_VALUE;
+    }
+
+    /// <summary>
+    /// Returns true-value if each element comparison is true
+    /// </summary>
+    byte operator>(const Vector4 &aOther) const
+    {
+        bool res = x > aOther.x;
+        res &= y > aOther.y;
+        res &= z > aOther.z;
+        res &= w > aOther.w;
+        return res * TRUE_VALUE;
+    }
+
+    /// <summary>
+    /// Returns true-value if each element comparison is true
+    /// </summary>
+    byte operator>=(const Vector4 &aOther) const
+    {
+        bool res = x >= aOther.x;
+        res &= y >= aOther.y;
+        res &= z >= aOther.z;
+        res &= w >= aOther.w;
+        return res * TRUE_VALUE;
+    }
+
+    /// <summary>
+    /// Returns true-value if each element comparison is true
+    /// </summary>
+    byte operator==(const Vector4 &aOther) const
+    {
+        bool res = x == aOther.x;
+        res &= y == aOther.y;
+        res &= z == aOther.z;
+        res &= w == aOther.w;
+        return res * TRUE_VALUE;
+    }
+
+    /// <summary>
+    /// Returns true-value if any element comparison is true
+    /// </summary>
+    byte operator!=(const Vector4 &aOther) const
+    {
+        bool res = x != aOther.x;
+        res |= y != aOther.y;
+        res |= z != aOther.z;
+        res |= w != aOther.w;
+        return res * TRUE_VALUE;
+    }
 
     /// <summary>
     /// Negation
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector4 operator-() const
+        requires SignedNumber<T>
     {
         return Vector4<T>(T(-x), T(-y), T(-z), T(-w));
     }
@@ -205,6 +350,24 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     DEVICE_CODE [[nodiscard]] Vector4 operator+(const Vector4 &aOther) const
     {
         return Vector4<T>{T(x + aOther.x), T(y + aOther.y), T(z + aOther.z), T(w + aOther.w)};
+    }
+
+    /// <summary>
+    /// Component wise addition SIMD
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] Vector4 operator+(const Vector4 &aOther) const
+        requires isSameType<T, byte> && CUDA_ONLY<T>
+    {
+        return Vector4(__vaddus4(*this, aOther));
+    }
+
+    /// <summary>
+    /// Component wise addition SIMD
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] Vector4 operator+(const Vector4 &aOther) const
+        requires isSameType<T, sbyte> && CUDA_ONLY<T>
+    {
+        return Vector4(__vaddss4(*this, aOther));
     }
 
     /// <summary>
@@ -386,7 +549,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Type conversion without saturation, direct type conversion
     /// </summary>
-    template <Number T2> [[nodiscard]] static Vector4<T> DEVICE_CODE Convert(const Vector4<T2> &aVec)
+    template <ComplexOrNumber T2> [[nodiscard]] static Vector4<T> DEVICE_CODE Convert(const Vector4<T2> &aVec)
     {
         return {static_cast<T>(aVec.x), static_cast<T>(aVec.y), static_cast<T>(aVec.z), static_cast<T>(aVec.w)};
     }
@@ -1007,9 +1170,9 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Component wise clamp to maximum value range of given target type
     /// </summary>
-    template <Number TTarget>
+    template <ComplexOrNumber TTarget>
     DEVICE_CODE void ClampToTargetType() noexcept
-        requires(need_saturation_clamp<T, TTarget>::value)
+        requires(need_saturation_clamp_v<T, TTarget>)
     {
         Clamp(T(numeric_limits<TTarget>::lowest()), T(numeric_limits<TTarget>::max()));
     }
@@ -1018,9 +1181,9 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise clamp to maximum value range of given target type<para/>
     /// NOP in case no saturation clamping is needed.
     /// </summary>
-    template <Number TTarget>
+    template <ComplexOrNumber TTarget>
     DEVICE_CODE void ClampToTargetType() noexcept
-        requires(!need_saturation_clamp<T, TTarget>::value)
+        requires(!need_saturation_clamp_v<T, TTarget>)
     {
     }
 
@@ -1132,6 +1295,18 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
         Vector4<T> ret = aValue;
         ret.Round();
         return Vector4<int>(ret);
+    }
+
+    /// <summary>
+    /// Element wise round()
+    /// </summary>
+    DEVICE_CODE void Round()
+        requires FloatingComplexType<T>
+    {
+        x.Round();
+        y.Round();
+        z.Round();
+        w.Round();
     }
 
     /// <summary>
@@ -1365,50 +1540,50 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
 
 template <typename T, typename T2>
 DEVICE_CODE Vector4<T> operator+(const Vector4<T> &aLeft, T2 aRight)
-    requires Number<T2>
+    requires ComplexOrNumber<T2>
 {
     return Vector4<T>{T(aLeft.x + aRight), T(aLeft.y + aRight), T(aLeft.z + aRight), T(aLeft.w + aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector4<T> operator+(T2 aLeft, const Vector4<T> &aRight)
-    requires Number<T2>
+    requires ComplexOrNumber<T2>
 {
     return Vector4<T>{T(aLeft + aRight.x), T(aLeft + aRight.y), T(aLeft + aRight.z), T(aLeft + aRight.w)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector4<T> operator-(const Vector4<T> &aLeft, T2 aRight)
-    requires Number<T2>
+    requires ComplexOrNumber<T2>
 {
     return Vector4<T>{T(aLeft.x - aRight), T(aLeft.y - aRight), T(aLeft.z - aRight), T(aLeft.w - aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector4<T> operator-(T2 aLeft, const Vector4<T> &aRight)
-    requires Number<T2>
+    requires ComplexOrNumber<T2>
 {
     return Vector4<T>{T(aLeft - aRight.x), T(aLeft - aRight.y), T(aLeft - aRight.z), T(aLeft - aRight.w)};
 }
 
 template <typename T, typename T2>
 DEVICE_CODE Vector4<T> operator*(const Vector4<T> &aLeft, T2 aRight)
-    requires Number<T2>
+    requires ComplexOrNumber<T2>
 {
     return Vector4<T>{T(aLeft.x * aRight), T(aLeft.y * aRight), T(aLeft.z * aRight), T(aLeft.w * aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector4<T> operator*(T2 aLeft, const Vector4<T> &aRight)
-    requires Number<T2>
+    requires ComplexOrNumber<T2>
 {
     return Vector4<T>{T(aLeft * aRight.x), T(aLeft * aRight.y), T(aLeft * aRight.z), T(aLeft * aRight.w)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector4<T> operator/(const Vector4<T> &aLeft, T2 aRight)
-    requires Number<T2>
+    requires ComplexOrNumber<T2>
 {
     return Vector4<T>{T(aLeft.x / aRight), T(aLeft.y / aRight), T(aLeft.z / aRight), T(aLeft.w / aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector4<T> operator/(T2 aLeft, const Vector4<T> &aRight)
-    requires Number<T2>
+    requires ComplexOrNumber<T2>
 {
     return Vector4<T>{T(aLeft / aRight.x), T(aLeft / aRight.y), T(aLeft / aRight.z), T(aLeft / aRight.w)};
 }

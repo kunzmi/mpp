@@ -1,4 +1,5 @@
 #pragma once
+#include <common/complex_typetraits.h>
 #include <common/defines.h>
 #include <concepts>
 #include <type_traits>
@@ -7,13 +8,11 @@ namespace opp
 {
 
 // forward declaration:
-template <SignedNumber T> struct Complex;
-template <typename T> struct isComplexType;
-
-template <Number T> struct Vector1;
-template <Number T> struct Vector2;
-template <Number T> struct Vector3;
-template <Number T> struct Vector4;
+template <ComplexOrNumber T> struct Vector1;
+template <ComplexOrNumber T> struct Vector2;
+template <ComplexOrNumber T> struct Vector3;
+template <ComplexOrNumber T> struct Vector4;
+template <ComplexOrNumber T> struct Vector4A;
 
 template <typename T> struct remove_vector
 {
@@ -35,6 +34,18 @@ template <typename T> struct remove_vector<Vector4<T>>
 {
     using type = T;
 };
+template <typename T> struct remove_vector<Vector4A<T>>
+{
+    using type = T;
+};
+
+// well, Complex is not per se a vector, but we use C1 directly as complex, but C2 to C4 as vector...
+template <typename T> struct remove_vector<Complex<T>>
+{
+    using type = T;
+};
+
+template <typename T> using remove_vector_t = typename remove_vector<T>::type;
 
 template <typename T> struct vector_size : std::integral_constant<int, 0>
 {
@@ -51,19 +62,26 @@ template <typename T> struct vector_size<Vector3<T>> : std::integral_constant<in
 template <typename T> struct vector_size<Vector4<T>> : std::integral_constant<int, 4>
 {
 };
+template <typename T> struct vector_size<Vector4A<T>> : std::integral_constant<int, 4>
+{
+};
+
+template <class T> inline constexpr int vector_size_v = vector_size<T>::value;
 
 template <typename T>
-concept VectorType = (vector_size<T>::value > 0) && (vector_size<T>::value <= 4);
+concept VectorType = (vector_size_v<T> > 0) && (vector_size_v<T> <= 4);
 
 template <typename T>
-concept IntVectorType =
-    (vector_size<T>::value > 0) && (vector_size<T>::value <= 4) && Integral<typename remove_vector<T>::type>;
+concept IntVectorType = (vector_size_v<T> > 0) && (vector_size_v<T> <= 4) && Integral<remove_vector_t<T>>;
 
 template <typename T>
-concept FloatingVectorType =
-    (vector_size<T>::value > 0) && (vector_size<T>::value <= 4) && FloatingPoint<typename remove_vector<T>::type>;
+concept FloatingVectorType = (vector_size_v<T> > 0) && (vector_size_v<T> <= 4) && FloatingPoint<remove_vector_t<T>>;
 
 template <typename T>
-concept VectorOrComplexType = VectorType<T> || isComplexType<T>::value;
+concept VectorOrComplexType = VectorType<T> || ComplexType<T>;
+
+template <typename T>
+concept FloatingVectorOrComplexType =
+    FloatingVectorType<T> || FloatingComplexType<T> || (VectorType<T> && ComplexType<remove_vector_t<T>>);
 
 } // namespace opp

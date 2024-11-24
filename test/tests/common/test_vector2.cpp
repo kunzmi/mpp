@@ -36,7 +36,7 @@ TEST_CASE("Pixel32fC2", "[Common]")
     CHECK(c2.y == 1);
     CHECK(c2 == t1);
 
-    Pixel32fC2 t2(5);
+    Pixel32fC2 t2(5.0f);
     CHECK(t2.x == 5);
     CHECK(t2.y == 5);
     CHECK(c2 != t2);
@@ -268,32 +268,32 @@ TEST_CASE("Pixel32fC2_additionalMethods", "[Common]")
     CHECK(absdiffA.y == Approx(86.734813019986703).margin(0.00001));
 
     Pixel32fC2 clampByte(float(numeric_limits<byte>::max()) + 1, float(numeric_limits<byte>::min()) - 1);
-    clampByte.ClampToTargetType(static_cast<byte>(0));
+    clampByte.template ClampToTargetType<byte>();
     CHECK(clampByte.x == 255);
     CHECK(clampByte.y == 0);
 
     Pixel32fC2 clampShort(float(numeric_limits<short>::max()) + 1, float(numeric_limits<short>::min()) - 1);
-    clampShort.ClampToTargetType(static_cast<short>(0));
+    clampShort.template ClampToTargetType<short>();
     CHECK(clampShort.x == 32767);
     CHECK(clampShort.y == -32768);
 
     Pixel32fC2 clampSByte(float(numeric_limits<sbyte>::max()) + 1, float(numeric_limits<sbyte>::min()) - 1);
-    clampSByte.ClampToTargetType(static_cast<sbyte>(0));
+    clampSByte.template ClampToTargetType<sbyte>();
     CHECK(clampSByte.x == 127);
     CHECK(clampSByte.y == -128);
 
     Pixel32fC2 clampUShort(float(numeric_limits<ushort>::max()) + 1, float(numeric_limits<ushort>::min()) - 1);
-    clampUShort.ClampToTargetType(static_cast<ushort>(0));
+    clampUShort.template ClampToTargetType<ushort>();
     CHECK(clampUShort.x == 65535);
     CHECK(clampUShort.y == 0);
 
     Pixel32fC2 clampInt(float(numeric_limits<int>::max()) + 1000, float(numeric_limits<int>::min()) - 1000);
-    clampInt.ClampToTargetType(0);
+    clampInt.template ClampToTargetType<int>();
     CHECK(clampInt.x == 2147483647);
     CHECK(clampInt.y == -2147483648);
 
     Pixel32fC2 clampUInt(float(numeric_limits<uint>::max()) + 1000, float(numeric_limits<uint>::min()) - 1000);
-    clampUInt.ClampToTargetType(static_cast<uint>(0));
+    clampUInt.template ClampToTargetType<uint>();
     CHECK(clampUInt.x == 0xffffffffUL);
     CHECK(clampUInt.y == 0);
 }
@@ -479,27 +479,27 @@ TEST_CASE("Pixel32sC2_additionalMethods", "[Common]")
     CHECK(absdiffA.y == 86);
 
     Pixel32sC2 clampByte(int(numeric_limits<byte>::max()) + 1, int(numeric_limits<byte>::min()) - 1);
-    clampByte.ClampToTargetType(static_cast<byte>(0));
+    clampByte.template ClampToTargetType<byte>();
     CHECK(clampByte.x == 255);
     CHECK(clampByte.y == 0);
 
     Pixel32sC2 clampShort(int(numeric_limits<short>::max()) + 1, int(numeric_limits<short>::min()) - 1);
-    clampShort.ClampToTargetType(static_cast<short>(0));
+    clampShort.template ClampToTargetType<short>();
     CHECK(clampShort.x == 32767);
     CHECK(clampShort.y == -32768);
 
     Pixel32sC2 clampSByte(int(numeric_limits<sbyte>::max()) + 1, int(numeric_limits<sbyte>::min()) - 1);
-    clampSByte.ClampToTargetType(static_cast<sbyte>(0));
+    clampSByte.template ClampToTargetType<sbyte>();
     CHECK(clampSByte.x == 127);
     CHECK(clampSByte.y == -128);
 
     Pixel32sC2 clampUShort(int(numeric_limits<ushort>::max()) + 1, int(numeric_limits<ushort>::min()) - 1);
-    clampUShort.ClampToTargetType(static_cast<ushort>(0));
+    clampUShort.template ClampToTargetType<ushort>();
     CHECK(clampUShort.x == 65535);
     CHECK(clampUShort.y == 0);
 
     Pixel32sC2 clampInt(numeric_limits<int>::max(), numeric_limits<int>::min());
-    clampInt.ClampToTargetType(0);
+    clampInt.template ClampToTargetType<int>();
     CHECK(clampInt.x == 2147483647);
     CHECK(clampInt.y == -2147483648);
 

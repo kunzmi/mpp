@@ -1,11 +1,20 @@
 #pragma once
 #include <common/complex.h>
 #include <common/defines.h>
+#include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
 #include <concepts>
 
 namespace opp
 {
+/// <summary>
+/// Placeholder mainly for the case that no SIMD operation is possible
+/// </summary>
+/// <typeparam name="T"></typeparam>
+template <typename T> struct NullOp
+{
+};
+
 template <IntVectorType T> struct Not
 {
     DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
@@ -80,7 +89,7 @@ template <VectorType T> struct Abs
 
 template <FloatingComplexType T> struct Magnitude
 {
-    DEVICE_CODE void operator()(const T &aSrc1, typename remove_complex<T>::type &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, remove_complex_t<T> &aDst)
     {
         aDst = aSrc1.Magnitude();
     }
@@ -88,7 +97,7 @@ template <FloatingComplexType T> struct Magnitude
 
 template <FloatingComplexType T> struct MagnitudeSqr
 {
-    DEVICE_CODE void operator()(const T &aSrc1, typename remove_complex<T>::type &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, remove_complex_t<T> &aDst)
     {
         aDst = aSrc1.MagnitudeSqr();
     }

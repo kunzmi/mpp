@@ -1,10 +1,13 @@
 #pragma once
+#include "complex_typetraits.h"
 #include "defines.h"
 #include "exception.h"
 #include "limits.h"
 #include "needSaturationClamp.h"
 #include "safeCast.h"
 #include "vector_typetraits.h"
+#include "vector3.h" //for additional constructor from Vector3<T>
+#include "vector4.h"
 #include <cmath>
 #include <concepts>
 #include <iostream>
@@ -14,116 +17,92 @@ namespace opp
 {
 
 // forward declaration:
-namespace image
-{
-class Size2D;
-}
-
 template <ComplexOrNumber T> struct Vector1;
 template <ComplexOrNumber T> struct Vector2;
-template <ComplexOrNumber T> struct Vector3;
-template <ComplexOrNumber T> struct Vector4;
-
-enum class Axis2D
-{
-    X = 0,
-    Y = 1
-};
-
-inline std::ostream &operator<<(std::ostream &aOs, const Axis2D &aAxis)
-{
-    switch (aAxis)
-    {
-        case Axis2D::X:
-            aOs << 'X';
-            return aOs;
-        case Axis2D::Y:
-            aOs << 'Y';
-            return aOs;
-    }
-    aOs << "Out of range: " << int(aAxis) << ". Must be X or Y (0 or 1).";
-    return aOs;
-}
-
-inline std::wostream &operator<<(std::wostream &aOs, const Axis2D &aAxis)
-{
-    switch (aAxis)
-    {
-        case Axis2D::X:
-            aOs << 'X';
-            return aOs;
-        case Axis2D::Y:
-            aOs << 'Y';
-            return aOs;
-    }
-    aOs << "Out of range: " << int(aAxis) << ". Must be X or Y (0 or 1).";
-    return aOs;
-}
 
 /// <summary>
-/// A two T component vector. Can replace CUDA's vector2 types
+/// A four T component vector. Operations are performed on the first three channels, W is treated as additional Alpha
+/// channel and remains unused. Can replace CUDA's vector4 types
 /// </summary>
-template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
+template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4A
 {
     T x;
     T y;
+    T z;
+    T w;
 
     /// <summary>
     /// Default constructor does not initializes the members
     /// </summary>
-    DEVICE_CODE Vector2() noexcept
+    DEVICE_CODE Vector4A() noexcept
     {
     }
 
     /// <summary>
-    /// Initializes vector to all components = aVal
+    /// Initializes vector to all components = aVal, except w
     /// </summary>
-    DEVICE_CODE Vector2(T aVal) noexcept : x(aVal), y(aVal)
+    DEVICE_CODE explicit Vector4A(T aVal) noexcept : x(aVal), y(aVal), z(aVal)
     {
     }
 
     /// <summary>
-    /// Initializes vector to all components = [aVal[0], aVal[1]]
+    /// Initializes vector to all components = [aVal[0], aVal[1], aVal[2]], w remains unitialized
     /// </summary>
-    DEVICE_CODE Vector2(T aVal[2]) noexcept : x(aVal[0]), y(aVal[1])
+    DEVICE_CODE explicit Vector4A(T aVal[3]) noexcept : x(aVal[0]), y(aVal[1]), z(aVal[2])
     {
     }
 
     /// <summary>
-    /// Initializes vector to [aX, aY]
+    /// Initializes vector to [aX, aY, aZ], w remains unitialized
     /// </summary>
-    DEVICE_CODE Vector2(T aX, T aY) noexcept : x(aX), y(aY)
+    DEVICE_CODE Vector4A(T aX, T aY, T aZ) noexcept : x(aX), y(aY), z(aZ)
     {
     }
 
     /// <summary>
-    /// Type conversion with saturation if needed<para/>
+    /// Usefull constructor if we want a Vector4A from 3 channel pixel Vector3, w remains unitialized
+    /// </summary>
+    DEVICE_CODE explicit Vector4A(const Vector3<T> &aVec3) noexcept : x(aVec3.x), y(aVec3.y), z(aVec3.z)
+    {
+    }
+
+    /// <summary>
+    /// Usefull constructor if we want a Vector4A from 4 channel pixel Vector4, w remains unitialized
+    /// </summary>
+    DEVICE_CODE explicit Vector4A(const Vector4<T> &aVec4) noexcept : x(aVec4.x), y(aVec4.y), z(aVec4.z)
+    {
+    }
+
+    /// <summary>
+    /// Type conversion with saturation if needed, w remains unitialized<para/>
     /// E.g.: when converting int to byte, values are clamped to 0..255<para/>
     /// But when converting byte to int, no clamping operation is performed.
     /// </summary>
-    template <ComplexOrNumber T2> DEVICE_CODE Vector2(const Vector2<T2> &aVec) noexcept
+    template <ComplexOrNumber T2> DEVICE_CODE explicit Vector4A(const Vector4A<T2> &aVec) noexcept
     {
         if constexpr (need_saturation_clamp_v<T2, T>)
         {
-            Vector2<T2> temp(aVec);
+            Vector4A<T2> temp(aVec);
             temp.template ClampToTargetType<T>();
             x = static_cast<T>(temp.x);
             y = static_cast<T>(temp.y);
+            z = static_cast<T>(temp.z);
         }
         else
         {
             x = static_cast<T>(aVec.x);
             y = static_cast<T>(aVec.y);
+            z = static_cast<T>(aVec.z);
         }
     }
 
     /// <summary>
-    /// Type conversion with saturation if needed<para/>
+    /// Type conversion with saturation if needed, w remains unitialized<para/>
     /// E.g.: when converting int to byte, values are clamped to 0..255<para/>
     /// But when converting byte to int, no clamping operation is performed.<para/>
     /// If we can modify the input variable, no need to allocate temporary storage for clamping.
     /// </summary>
-    template <ComplexOrNumber T2> DEVICE_CODE Vector2(Vector2<T2> &aVec) noexcept
+    template <ComplexOrNumber T2> DEVICE_CODE explicit Vector4A(Vector4A<T2> &aVec) noexcept
     {
         if constexpr (need_saturation_clamp_v<T2, T>)
         {
@@ -131,270 +110,251 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
         }
         x = static_cast<T>(aVec.x);
         y = static_cast<T>(aVec.y);
+        z = static_cast<T>(aVec.z);
     }
 
-    /// <summary>
-    /// Usefull constructor for SIMD instructions
-    /// </summary>
-    explicit DEVICE_CODE Vector2(const uint &aUint) noexcept
-        requires(sizeof(T) == 2)
-    {
-        const Vector2<T> &aOther = *reinterpret_cast<const Vector2<T> *>(&aUint);
+    ~Vector4A() = default;
 
-        x = aOther.x;
-        y = aOther.y;
-    }
-
-    /// <summary>
-    /// Usefull constructor for SIMD instructions
-    /// </summary>
-    explicit DEVICE_CODE Vector2(const ulong64 &aUlong) noexcept
-        requires(sizeof(T) == 4)
-    {
-        const Vector2<T> &aOther = *reinterpret_cast<const Vector2<T> *>(&aUlong);
-
-        x = aOther.x;
-        y = aOther.y;
-    }
-
-    ~Vector2() = default;
-
-    Vector2(const Vector2 &) noexcept            = default;
-    Vector2(Vector2 &&) noexcept                 = default;
-    Vector2 &operator=(const Vector2 &) noexcept = default;
-    Vector2 &operator=(Vector2 &&) noexcept      = default;
+    Vector4A(const Vector4A &) noexcept            = default;
+    Vector4A(Vector4A &&) noexcept                 = default;
+    Vector4A &operator=(const Vector4A &) noexcept = default;
+    Vector4A &operator=(Vector4A &&) noexcept      = default;
 
     // don't use space-ship operator as it returns true if any comparison returns true.
     // But NPP only returns true if all channels fulfill the comparison.
     // Also return TRUE_VALUE as byte instead of bool
-    // auto operator<=>(const Vector2 &) const = default;
+    // auto operator<=>(const Vector4A &) const = default;
 
     /// <summary>
-    /// Returns true-value if each element comparison is true
+    /// Returns true-value if each element comparison is true, ignoring alpha / w-value
     /// </summary>
-    byte operator<(const Vector2 &aOther) const
+    byte operator<(const Vector4A &aOther) const
     {
         bool res = x < aOther.x;
         res &= y < aOther.y;
+        res &= z < aOther.z;
         return res * TRUE_VALUE;
     }
 
     /// <summary>
-    /// Returns true-value if each element comparison is true
+    /// Returns true-value if each element comparison is true, ignoring alpha / w-value
     /// </summary>
-    byte operator<=(const Vector2 &aOther) const
+    byte operator<=(const Vector4A &aOther) const
     {
         bool res = x <= aOther.x;
         res &= y <= aOther.y;
+        res &= z <= aOther.z;
         return res * TRUE_VALUE;
     }
 
     /// <summary>
-    /// Returns true-value if each element comparison is true
+    /// Returns true-value if each element comparison is true, ignoring alpha / w-value
     /// </summary>
-    byte operator>(const Vector2 &aOther) const
+    byte operator>(const Vector4A &aOther) const
     {
         bool res = x > aOther.x;
         res &= y > aOther.y;
+        res &= z > aOther.z;
         return res * TRUE_VALUE;
     }
 
     /// <summary>
-    /// Returns true-value if each element comparison is true
+    /// Returns true-value if each element comparison is true, ignoring alpha / w-value
     /// </summary>
-    byte operator>=(const Vector2 &aOther) const
+    byte operator>=(const Vector4A &aOther) const
     {
         bool res = x >= aOther.x;
         res &= y >= aOther.y;
+        res &= z >= aOther.z;
         return res * TRUE_VALUE;
     }
 
     /// <summary>
-    /// Returns true-value if each element comparison is true
+    /// Returns true-value if each element comparison is true, ignoring alpha / w-value
     /// </summary>
-    byte operator==(const Vector2 &aOther) const
+    byte operator==(const Vector4A &aOther) const
     {
         bool res = x == aOther.x;
         res &= y == aOther.y;
+        res &= z == aOther.z;
         return res * TRUE_VALUE;
     }
 
     /// <summary>
-    /// Returns true-value if any element comparison is true
+    /// Returns true-value if any element comparison is true, ignoring alpha / w-value
     /// </summary>
-    byte operator!=(const Vector2 &aOther) const
+    byte operator!=(const Vector4A &aOther) const
     {
         bool res = x != aOther.x;
         res |= y != aOther.y;
+        res |= z != aOther.z;
         return res * TRUE_VALUE;
     }
 
     /// <summary>
     /// Negation
     /// </summary>
-    DEVICE_CODE [[nodiscard]] Vector2 operator-() const
+    DEVICE_CODE [[nodiscard]] Vector4A operator-() const
         requires SignedNumber<T>
     {
-        return Vector2<T>(T(-x), T(-y));
+        return Vector4A<T>(T(-x), T(-y), T(-z));
     }
 
     /// <summary>
     /// Component wise addition
     /// </summary>
-    DEVICE_CODE Vector2 &operator+=(T aOther)
+    DEVICE_CODE Vector4A &operator+=(T aOther)
     {
         x += aOther;
         y += aOther;
+        z += aOther;
         return *this;
     }
 
     /// <summary>
     /// Component wise addition
     /// </summary>
-    DEVICE_CODE Vector2 &operator+=(const Vector2 &aOther)
+    DEVICE_CODE Vector4A &operator+=(const Vector4A &aOther)
     {
         x += aOther.x;
         y += aOther.y;
+        z += aOther.z;
         return *this;
     }
 
     /// <summary>
     /// Component wise addition
     /// </summary>
-    DEVICE_CODE [[nodiscard]] Vector2 operator+(const Vector2 &aOther) const
+    DEVICE_CODE [[nodiscard]] Vector4A operator+(const Vector4A &aOther) const
     {
-        return Vector2<T>{T(x + aOther.x), T(y + aOther.y)};
-    }
-
-    /// <summary>
-    /// Component wise addition SIMD
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] Vector2 operator+(const Vector2 &aOther) const
-        requires isSameType<T, ushort> && CUDA_ONLY<T>
-    {
-        return __vaddus2(*this, aOther);
-    }
-
-    /// <summary>
-    /// Component wise addition SIMD
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] Vector2 operator+(const Vector2 &aOther) const
-        requires isSameType<T, short> && CUDA_ONLY<T>
-    {
-        return __vaddss2(*this, aOther);
+        return Vector4A<T>{T(x + aOther.x), T(y + aOther.y), T(z + aOther.z)};
     }
 
     /// <summary>
     /// Component wise subtraction
     /// </summary>
-    DEVICE_CODE Vector2 &operator-=(T aOther)
+    DEVICE_CODE Vector4A &operator-=(T aOther)
     {
         x -= aOther;
         y -= aOther;
+        z -= aOther;
         return *this;
     }
 
     /// <summary>
     /// Component wise subtraction
     /// </summary>
-    DEVICE_CODE Vector2 &operator-=(const Vector2 &aOther)
+    DEVICE_CODE Vector4A &operator-=(const Vector4A &aOther)
     {
         x -= aOther.x;
         y -= aOther.y;
+        z -= aOther.z;
         return *this;
     }
 
     /// <summary>
     /// Component wise subtraction
     /// </summary>
-    DEVICE_CODE [[nodiscard]] Vector2 operator-(const Vector2 &aOther) const
+    DEVICE_CODE [[nodiscard]] Vector4A operator-(const Vector4A &aOther) const
     {
-        return Vector2<T>{T(x - aOther.x), T(y - aOther.y)};
+        return Vector4A<T>{T(x - aOther.x), T(y - aOther.y), T(z - aOther.z)};
     }
 
     /// <summary>
     /// Component wise multiplication
     /// </summary>
-    DEVICE_CODE Vector2 &operator*=(T aOther)
+    DEVICE_CODE Vector4A &operator*=(T aOther)
     {
         x *= aOther;
         y *= aOther;
+        z *= aOther;
         return *this;
     }
 
     /// <summary>
     /// Component wise multiplication
     /// </summary>
-    DEVICE_CODE Vector2 &operator*=(const Vector2 &aOther)
+    DEVICE_CODE Vector4A &operator*=(const Vector4A &aOther)
     {
         x *= aOther.x;
         y *= aOther.y;
+        z *= aOther.z;
         return *this;
     }
 
     /// <summary>
     /// Component wise multiplication
     /// </summary>
-    DEVICE_CODE [[nodiscard]] Vector2 operator*(const Vector2 &aOther) const
+    DEVICE_CODE [[nodiscard]] Vector4A operator*(const Vector4A &aOther) const
     {
-        return Vector2<T>{T(x * aOther.x), T(y * aOther.y)};
+        return Vector4A<T>{T(x * aOther.x), T(y * aOther.y), T(z * aOther.z)};
     }
 
     /// <summary>
     /// Component wise division
     /// </summary>
-    DEVICE_CODE Vector2 &operator/=(T aOther)
+    DEVICE_CODE Vector4A &operator/=(T aOther)
     {
         x /= aOther;
         y /= aOther;
+        z /= aOther;
         return *this;
     }
 
     /// <summary>
     /// Component wise division
     /// </summary>
-    DEVICE_CODE Vector2 &operator/=(const Vector2 &aOther)
+    DEVICE_CODE Vector4A &operator/=(const Vector4A &aOther)
     {
         x /= aOther.x;
         y /= aOther.y;
+        z /= aOther.z;
         return *this;
     }
 
     /// <summary>
     /// Component wise division
     /// </summary>
-    DEVICE_CODE [[nodiscard]] Vector2 operator/(const Vector2 &aOther) const
+    DEVICE_CODE [[nodiscard]] Vector4A operator/(const Vector4A &aOther) const
     {
-        return Vector2<T>{T(x / aOther.x), T(y / aOther.y)};
+        return Vector4A<T>{T(x / aOther.x), T(y / aOther.y), T(z / aOther.z)};
     }
 
     /// <summary>
     /// returns the element corresponding to the given axis
     /// </summary>
-    DEVICE_CODE [[nodiscard]] const T &operator[](Axis2D aAxis) const
+    DEVICE_CODE [[nodiscard]] const T &operator[](Axis4D aAxis) const
         requires DeviceCode<T>
     {
         switch (aAxis)
         {
-            case Axis2D::X:
+            case Axis4D::X:
                 return x;
-            case Axis2D::Y:
+            case Axis4D::Y:
                 return y;
+            case Axis4D::Z:
+                return z;
+            case Axis4D::W:
+                return w;
         }
     }
 
     /// <summary>
     /// returns the element corresponding to the given axis
     /// </summary>
-    [[nodiscard]] const T &operator[](Axis2D aAxis) const
+    [[nodiscard]] const T &operator[](Axis4D aAxis) const
         requires HostCode<T>
     {
         switch (aAxis)
         {
-            case Axis2D::X:
+            case Axis4D::X:
                 return x;
-            case Axis2D::Y:
+            case Axis4D::Y:
                 return y;
+            case Axis4D::Z:
+                return z;
+            case Axis4D::W:
+                return w;
         }
 
         throw INVALIDARGUMENT(aAxis, aAxis);
@@ -403,30 +363,38 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// <summary>
     /// returns the element corresponding to the given axis
     /// </summary>
-    DEVICE_CODE [[nodiscard]] T &operator[](Axis2D aAxis)
+    DEVICE_CODE [[nodiscard]] T &operator[](Axis4D aAxis)
         requires DeviceCode<T>
     {
         switch (aAxis)
         {
-            case Axis2D::X:
+            case Axis4D::X:
                 return x;
-            case Axis2D::Y:
+            case Axis4D::Y:
                 return y;
+            case Axis4D::Z:
+                return z;
+            case Axis4D::W:
+                return w;
         }
     }
 
     /// <summary>
     /// returns the element corresponding to the given axis
     /// </summary>
-    [[nodiscard]] T &operator[](Axis2D aAxis)
+    [[nodiscard]] T &operator[](Axis4D aAxis)
         requires HostCode<T>
     {
         switch (aAxis)
         {
-            case Axis2D::X:
+            case Axis4D::X:
                 return x;
-            case Axis2D::Y:
+            case Axis4D::Y:
                 return y;
+            case Axis4D::Z:
+                return z;
+            case Axis4D::W:
+                return w;
         }
 
         throw INVALIDARGUMENT(aAxis, aAxis);
@@ -435,52 +403,56 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// <summary>
     /// Type conversion without saturation, direct type conversion
     /// </summary>
-    template <ComplexOrNumber T2> [[nodiscard]] static Vector2<T> DEVICE_CODE Convert(const Vector2<T2> &aVec)
+    template <ComplexOrNumber T2> [[nodiscard]] static Vector4A<T> DEVICE_CODE Convert(const Vector4A<T2> &aVec)
     {
-        return {static_cast<T>(aVec.x), static_cast<T>(aVec.y)};
+        return {static_cast<T>(aVec.x), static_cast<T>(aVec.y), static_cast<T>(aVec.z)};
     }
 
     /// <summary>
     /// Element wise bitwise left shift
     /// </summary>
-    DEVICE_CODE void LShift(const Vector2<T> &aOther)
+    DEVICE_CODE void LShift(const Vector4A<T> &aOther)
         requires Integral<T>
     {
         x = x << aOther.x;
         y = y << aOther.y;
+        z = z << aOther.z;
     }
 
     /// <summary>
     /// Element wise bitwise left shift
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> LShift(const Vector2<T> &aLeft, const Vector2<T> &aRight)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> LShift(const Vector4A<T> &aLeft, const Vector4A<T> &aRight)
         requires Integral<T>
     {
-        Vector2<T> ret;
+        Vector4A<T> ret;
         ret.x = aLeft.x << aRight.x;
         ret.y = aLeft.y << aRight.y;
+        ret.z = aLeft.z << aRight.z;
         return ret;
     }
 
     /// <summary>
     /// Element wise bitwise right shift
     /// </summary>
-    DEVICE_CODE void RShift(const Vector2<T> &aOther)
+    DEVICE_CODE void RShift(const Vector4A<T> &aOther)
         requires Integral<T>
     {
         x = x >> aOther.x;
         y = y >> aOther.y;
+        z = z >> aOther.z;
     }
 
     /// <summary>
     /// Element wise bitwise right shift
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> RShift(const Vector2<T> &aLeft, const Vector2<T> &aRight)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> RShift(const Vector4A<T> &aLeft, const Vector4A<T> &aRight)
         requires Integral<T>
     {
-        Vector2<T> ret;
+        Vector4A<T> ret;
         ret.x = aLeft.x >> aRight.x;
         ret.y = aLeft.y >> aRight.y;
+        ret.z = aLeft.z >> aRight.z;
         return ret;
     }
 
@@ -492,17 +464,19 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = x << aOther;
         y = y << aOther;
+        z = z << aOther;
     }
 
     /// <summary>
     /// Element wise bitwise left shift
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> LShift(const Vector2<T> &aLeft, const T &aRight)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> LShift(const Vector4A<T> &aLeft, const T &aRight)
         requires Integral<T>
     {
-        Vector2<T> ret;
+        Vector4A<T> ret;
         ret.x = aLeft.x << aRight;
         ret.y = aLeft.y << aRight;
+        ret.z = aLeft.z << aRight;
         return ret;
     }
 
@@ -514,83 +488,91 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = x >> aOther;
         y = y >> aOther;
+        z = z >> aOther;
     }
 
     /// <summary>
     /// Element wise bitwise right shift
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> RShift(const Vector2<T> &aLeft, const T &aRight)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> RShift(const Vector4A<T> &aLeft, const T &aRight)
         requires Integral<T>
     {
-        Vector2<T> ret;
+        Vector4A<T> ret;
         ret.x = aLeft.x >> aRight;
         ret.y = aLeft.y >> aRight;
+        ret.z = aLeft.z >> aRight;
         return ret;
     }
 
     /// <summary>
     /// Element wise bitwise And
     /// </summary>
-    DEVICE_CODE void And(const Vector2<T> &aOther)
+    DEVICE_CODE void And(const Vector4A<T> &aOther)
         requires Integral<T>
     {
         x = x & aOther.x;
         y = y & aOther.y;
+        z = z & aOther.z;
     }
 
     /// <summary>
     /// Element wise bitwise And
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> And(const Vector2<T> &aLeft, const Vector2<T> &aRight)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> And(const Vector4A<T> &aLeft, const Vector4A<T> &aRight)
         requires Integral<T>
     {
-        Vector2<T> ret;
+        Vector4A<T> ret;
         ret.x = aLeft.x & aRight.x;
         ret.y = aLeft.y & aRight.y;
+        ret.z = aLeft.z & aRight.z;
         return ret;
     }
 
     /// <summary>
     /// Element wise bitwise Or
     /// </summary>
-    DEVICE_CODE void Or(const Vector2<T> &aOther)
+    DEVICE_CODE void Or(const Vector4A<T> &aOther)
         requires Integral<T>
     {
         x = x | aOther.x;
         y = y | aOther.y;
+        z = z | aOther.z;
     }
 
     /// <summary>
     /// Element wise bitwise Or
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> Or(const Vector2<T> &aLeft, const Vector2<T> &aRight)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> Or(const Vector4A<T> &aLeft, const Vector4A<T> &aRight)
         requires Integral<T>
     {
-        Vector2<T> ret;
+        Vector4A<T> ret;
         ret.x = aLeft.x | aRight.x;
         ret.y = aLeft.y | aRight.y;
+        ret.z = aLeft.z | aRight.z;
         return ret;
     }
 
     /// <summary>
     /// Element wise bitwise Xor
     /// </summary>
-    DEVICE_CODE void Xor(const Vector2<T> &aOther)
+    DEVICE_CODE void Xor(const Vector4A<T> &aOther)
         requires Integral<T>
     {
         x = x ^ aOther.x;
         y = y ^ aOther.y;
+        z = z ^ aOther.z;
     }
 
     /// <summary>
     /// Element wise bitwise Xor
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> Xor(const Vector2<T> &aLeft, const Vector2<T> &aRight)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> Xor(const Vector4A<T> &aLeft, const Vector4A<T> &aRight)
         requires Integral<T>
     {
-        Vector2<T> ret;
+        Vector4A<T> ret;
         ret.x = aLeft.x ^ aRight.x;
         ret.y = aLeft.y ^ aRight.y;
+        ret.z = aLeft.z ^ aRight.z;
         return ret;
     }
 
@@ -602,17 +584,19 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = ~x;
         y = ~y;
+        z = ~z;
     }
 
     /// <summary>
     /// Element wise bitwise negation
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> Not(const Vector2<T> &aVec)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> Not(const Vector4A<T> &aVec)
         requires Integral<T>
     {
-        Vector2<T> ret;
+        Vector4A<T> ret;
         ret.x = ~aVec.x;
         ret.y = ~aVec.y;
+        ret.z = ~aVec.z;
         return ret;
     }
 
@@ -624,6 +608,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = std::exp(x);
         y = std::exp(y);
+        z = std::exp(z);
     }
 
     /// <summary>
@@ -634,29 +619,32 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = exp(x);
         y = exp(y);
+        z = exp(z);
     }
 
     /// <summary>
     /// Element wise exponential
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> Exp(const Vector2<T> &aVec)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> Exp(const Vector4A<T> &aVec)
         requires DeviceCode<T> && FloatingPoint<T>
     {
-        Vector2<T> ret;
+        Vector4A<T> ret;
         ret.x = exp(aVec.x);
         ret.y = exp(aVec.y);
+        ret.z = exp(aVec.z);
         return ret;
     }
 
     /// <summary>
     /// Element wise exponential
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> Exp(const Vector2<T> &aVec)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> Exp(const Vector4A<T> &aVec)
         requires HostCode<T>
     {
-        Vector2<T> ret;
+        Vector4A<T> ret;
         ret.x = std::exp(aVec.x);
         ret.y = std::exp(aVec.y);
+        ret.z = std::exp(aVec.z);
         return ret;
     }
 
@@ -668,6 +656,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = std::log(x);
         y = std::log(y);
+        z = std::log(z);
     }
 
     /// <summary>
@@ -678,29 +667,32 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = log(x);
         y = log(y);
+        z = log(z);
     }
 
     /// <summary>
     /// Element wise natural logarithm
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> Ln(const Vector2<T> &aVec)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> Ln(const Vector4A<T> &aVec)
         requires DeviceCode<T> && FloatingPoint<T>
     {
-        Vector2<T> ret;
+        Vector4A<T> ret;
         ret.x = log(aVec.x);
         ret.y = log(aVec.y);
+        ret.z = log(aVec.z);
         return ret;
     }
 
     /// <summary>
     /// Element wise natural logarithm
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> Ln(const Vector2<T> &aVec)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> Ln(const Vector4A<T> &aVec)
         requires HostCode<T>
     {
-        Vector2<T> ret;
+        Vector4A<T> ret;
         ret.x = std::log(aVec.x);
         ret.y = std::log(aVec.y);
+        ret.z = std::log(aVec.z);
         return ret;
     }
 
@@ -711,16 +703,18 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = x * x;
         y = y * y;
+        z = z * z;
     }
 
     /// <summary>
     /// Element wise square
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> Sqr(const Vector2<T> &aVec)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> Sqr(const Vector4A<T> &aVec)
     {
-        Vector2<T> ret;
+        Vector4A<T> ret;
         ret.x = aVec.x * aVec.x;
         ret.y = aVec.y * aVec.y;
+        ret.z = aVec.z * aVec.z;
         return ret;
     }
 
@@ -732,6 +726,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = std::sqrt(x);
         y = std::sqrt(y);
+        z = std::sqrt(z);
     }
 
     /// <summary>
@@ -742,29 +737,32 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = sqrt(x);
         y = sqrt(y);
+        z = sqrt(z);
     }
 
     /// <summary>
     /// Element wise square root
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> Sqrt(const Vector2<T> &aVec)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> Sqrt(const Vector4A<T> &aVec)
         requires DeviceCode<T> && FloatingPoint<T>
     {
-        Vector2<T> ret;
+        Vector4A<T> ret;
         ret.x = sqrt(aVec.x);
         ret.y = sqrt(aVec.y);
+        ret.z = sqrt(aVec.z);
         return ret;
     }
 
     /// <summary>
     /// Element wise square root
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> Sqrt(const Vector2<T> &aVec)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> Sqrt(const Vector4A<T> &aVec)
         requires HostCode<T>
     {
-        Vector2<T> ret;
+        Vector4A<T> ret;
         ret.x = std::sqrt(aVec.x);
         ret.y = std::sqrt(aVec.y);
+        ret.z = std::sqrt(aVec.z);
         return ret;
     }
 
@@ -776,6 +774,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = std::abs(x);
         y = std::abs(y);
+        z = std::abs(z);
     }
 
     /// <summary>
@@ -786,92 +785,99 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = abs(x);
         y = abs(y);
+        z = abs(z);
     }
 
     /// <summary>
     /// Element wise absolute
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> Abs(const Vector2<T> &aVec)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> Abs(const Vector4A<T> &aVec)
         requires DeviceCode<T>
     {
-        Vector2<T> ret;
+        Vector4A<T> ret;
         ret.x = abs(aVec.x);
         ret.y = abs(aVec.y);
+        ret.z = abs(aVec.z);
         return ret;
     }
 
     /// <summary>
     /// Element wise absolute
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> Abs(const Vector2<T> &aVec)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> Abs(const Vector4A<T> &aVec)
         requires HostCode<T>
     {
-        Vector2<T> ret;
+        Vector4A<T> ret;
         ret.x = std::abs(aVec.x);
         ret.y = std::abs(aVec.y);
+        ret.z = std::abs(aVec.z);
         return ret;
     }
 
     /// <summary>
     /// Element wise absolute difference
     /// </summary>
-    DEVICE_CODE void AbsDiff(const Vector2<T> &aOther)
+    DEVICE_CODE void AbsDiff(const Vector4A<T> &aOther)
         requires HostCode<T>
     {
         x = std::abs(x - aOther.x);
         y = std::abs(y - aOther.y);
+        z = std::abs(z - aOther.z);
     }
 
     /// <summary>
     /// Element wise bitwise Xor
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> AbsDiff(const Vector2<T> &aLeft, const Vector2<T> &aRight)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> AbsDiff(const Vector4A<T> &aLeft, const Vector4A<T> &aRight)
         requires HostCode<T>
     {
-        Vector2<T> ret;
+        Vector4A<T> ret;
         ret.x = std::abs(aLeft.x - aRight.x);
         ret.y = std::abs(aLeft.y - aRight.y);
+        ret.z = std::abs(aLeft.z - aRight.z);
         return ret;
     }
 
     /// <summary>
     /// Element wise absolute difference
     /// </summary>
-    DEVICE_CODE void AbsDiff(const Vector2<T> &aOther)
+    DEVICE_CODE void AbsDiff(const Vector4A<T> &aOther)
         requires DeviceCode<T>
     {
         x = abs(x - aOther.x);
         y = abs(y - aOther.y);
+        z = abs(z - aOther.z);
     }
 
     /// <summary>
     /// Element wise absolute difference
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> AbsDiff(const Vector2<T> &aLeft, const Vector2<T> &aRight)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> AbsDiff(const Vector4A<T> &aLeft, const Vector4A<T> &aRight)
         requires DeviceCode<T>
     {
-        Vector2<T> ret;
+        Vector4A<T> ret;
         ret.x = abs(aLeft.x - aRight.x);
         ret.y = abs(aLeft.y - aRight.y);
+        ret.z = abs(aLeft.z - aRight.z);
         return ret;
     }
 
     /// <summary>
     /// Vector dot product
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static T Dot(const Vector2<T> &aLeft, const Vector2<T> &aRight)
+    DEVICE_CODE [[nodiscard]] static T Dot(const Vector4A<T> &aLeft, const Vector4A<T> &aRight)
         requires FloatingPoint<T>
     {
-        return aLeft.x * aRight.x + aLeft.y * aRight.y;
+        return aLeft.x * aRight.x + aLeft.y * aRight.y + aLeft.z * aRight.z;
     }
 
     /// <summary>
     /// Vector dot product
     /// </summary>
-    DEVICE_CODE [[nodiscard]] T Dot(const Vector2<T> &aRight) const
+    DEVICE_CODE [[nodiscard]] T Dot(const Vector4A<T> &aRight) const
         requires FloatingPoint<T>
     {
-        return x * aRight.x + y * aRight.y;
+        return x * aRight.x + y * aRight.y + z * aRight.z;
     }
 
     /// <summary>
@@ -927,8 +933,9 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         double dx = to_double(x);
         double dy = to_double(y);
+        double dz = to_double(z);
 
-        return dx * dx + dy * dy;
+        return dx * dx + dy * dy + dz * dz;
     }
 
     /// <summary>
@@ -943,10 +950,10 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// <summary>
     /// Normalizes a vector
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> Normalize(const Vector2<T> &aValue)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> Normalize(const Vector4A<T> &aValue)
         requires FloatingPoint<T>
     {
-        Vector2<T> ret = aValue;
+        Vector4A<T> ret = aValue;
         ret.Normalize();
         return ret;
     }
@@ -959,6 +966,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = max(aMinVal, min(x, aMaxVal));
         y = max(aMinVal, min(y, aMaxVal));
+        z = max(aMinVal, min(z, aMaxVal));
     }
 
     /// <summary>
@@ -969,6 +977,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = std::max(aMinVal, std::min(x, aMaxVal));
         y = std::max(aMinVal, std::min(y, aMaxVal));
+        z = std::max(aMinVal, std::min(z, aMaxVal));
     }
 
     /// <summary>
@@ -994,43 +1003,43 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// <summary>
     /// Component wise minimum
     /// </summary>
-    [[nodiscard]] Vector2<T> Min(const Vector2<T> &aRight) const
+    [[nodiscard]] Vector4A<T> Min(const Vector4A<T> &aRight) const
         requires HostCode<T>
     {
-        return Vector2<T>{std::min(x, aRight.x), std::min(y, aRight.y)};
+        return Vector4A<T>{std::min(x, aRight.x), std::min(y, aRight.y), std::min(z, aRight.z)};
     }
 
     /// <summary>
     /// Component wise minimum
     /// </summary>
-    DEVICE_CODE [[nodiscard]] Vector2<T> Min(const Vector2<T> &aRight) const
+    DEVICE_CODE [[nodiscard]] Vector4A<T> Min(const Vector4A<T> &aRight) const
         requires DeviceCode<T>
     {
-        return Vector2<T>{min(x, aRight.x), min(y, aRight.y)};
+        return Vector4A<T>{min(x, aRight.x), min(y, aRight.y), min(z, aRight.z)};
     }
 
     /// <summary>
     /// Component wise maximum
     /// </summary>
-    DEVICE_CODE [[nodiscard]] Vector2<T> Max(const Vector2<T> &aRight) const
+    DEVICE_CODE [[nodiscard]] Vector4A<T> Max(const Vector4A<T> &aRight) const
         requires DeviceCode<T>
     {
-        return Vector2<T>{max(x, aRight.x), max(y, aRight.y)};
+        return Vector4A<T>{max(x, aRight.x), max(y, aRight.y), max(z, aRight.z)};
     }
 
     /// <summary>
     /// Component wise maximum
     /// </summary>
-    [[nodiscard]] Vector2<T> Max(const Vector2<T> &aRight) const
+    [[nodiscard]] Vector4A<T> Max(const Vector4A<T> &aRight) const
         requires HostCode<T>
     {
-        return Vector2<T>{std::max(x, aRight.x), std::max(y, aRight.y)};
+        return Vector4A<T>{std::max(x, aRight.x), std::max(y, aRight.y), std::max(z, aRight.z)};
     }
 
     /// <summary>
     /// Component wise minimum
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> Min(const Vector2<T> &aLeft, const Vector2<T> &aRight)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> Min(const Vector4A<T> &aLeft, const Vector4A<T> &aRight)
     {
         return aLeft.Min(aRight);
     }
@@ -1038,7 +1047,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// <summary>
     /// Component wise maximum
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> Max(const Vector2<T> &aLeft, const Vector2<T> &aRight)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> Max(const Vector4A<T> &aLeft, const Vector4A<T> &aRight)
     {
         return aLeft.Max(aRight);
     }
@@ -1049,7 +1058,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     DEVICE_CODE [[nodiscard]] T Min() const
         requires DeviceCode<T>
     {
-        return min(x, y);
+        return min(min(x, y), z);
     }
 
     /// <summary>
@@ -1058,7 +1067,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     [[nodiscard]] T Min() const
         requires HostCode<T>
     {
-        return std::min({x, y});
+        return std::min({x, y, z});
     }
 
     /// <summary>
@@ -1067,7 +1076,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     DEVICE_CODE [[nodiscard]] T Max() const
         requires DeviceCode<T>
     {
-        return max(x, y);
+        return max(max(x, y), z);
     }
 
     /// <summary>
@@ -1076,16 +1085,16 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     [[nodiscard]] T Max() const
         requires HostCode<T>
     {
-        return std::max({x, y});
+        return std::max({x, y, z});
     }
 
     /// <summary>
     /// Element wise round()
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> Round(const Vector2<T> &aValue)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> Round(const Vector4A<T> &aValue)
         requires FloatingPoint<T>
     {
-        Vector2<T> ret = aValue;
+        Vector4A<T> ret = aValue;
         ret.Round();
         return ret;
     }
@@ -1093,12 +1102,12 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// <summary>
     /// Element wise round() and return as integer
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<int> RoundI(const Vector2<T> &aValue)
+    DEVICE_CODE [[nodiscard]] static Vector4A<int> RoundI(const Vector4A<T> &aValue)
         requires FloatingPoint<T>
     {
-        Vector2<T> ret = aValue;
+        Vector4A<T> ret = aValue;
         ret.Round();
-        return Vector2<int>(ret);
+        return Vector4A<int>(ret);
     }
 
     /// <summary>
@@ -1109,6 +1118,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x.Round();
         y.Round();
+        z.Round();
     }
 
     /// <summary>
@@ -1119,6 +1129,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = round(x);
         y = round(y);
+        z = round(z);
     }
 
     /// <summary>
@@ -1129,15 +1140,16 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = std::round(x);
         y = std::round(y);
+        z = std::round(z);
     }
 
     /// <summary>
     /// Element wise floor()
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> Floor(const Vector2<T> &aValue)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> Floor(const Vector4A<T> &aValue)
         requires FloatingPoint<T>
     {
-        Vector2<T> ret = aValue;
+        Vector4A<T> ret = aValue;
         ret.Floor();
         return ret;
     }
@@ -1145,12 +1157,12 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// <summary>
     /// Element wise floor() and return as integer
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<int> FloorI(const Vector2<T> &aValue)
+    DEVICE_CODE [[nodiscard]] static Vector4A<int> FloorI(const Vector4A<T> &aValue)
         requires FloatingPoint<T>
     {
-        Vector2<T> ret = aValue;
+        Vector4A<T> ret = aValue;
         ret.Floor();
-        return Vector2<int>(ret);
+        return Vector4A<int>(ret);
     }
 
     /// <summary>
@@ -1161,6 +1173,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = floor(x);
         y = floor(y);
+        z = floor(z);
     }
 
     /// <summary>
@@ -1171,15 +1184,16 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = std::floor(x);
         y = std::floor(y);
+        z = std::floor(z);
     }
 
     /// <summary>
     /// Element wise ceil()
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> Ceil(const Vector2<T> &aValue)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> Ceil(const Vector4A<T> &aValue)
         requires FloatingPoint<T>
     {
-        Vector2<T> ret = aValue;
+        Vector4A<T> ret = aValue;
         ret.Ceil();
         return ret;
     }
@@ -1187,12 +1201,12 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// <summary>
     /// Element wise ceil() and return as integer
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<int> CeilI(const Vector2<T> &aValue)
+    DEVICE_CODE [[nodiscard]] static Vector4A<int> CeilI(const Vector4A<T> &aValue)
         requires FloatingPoint<T>
     {
-        Vector2<T> ret = aValue;
+        Vector4A<T> ret = aValue;
         ret.Ceil();
-        return Vector2<int>(ret);
+        return Vector4A<int>(ret);
     }
 
     /// <summary>
@@ -1203,6 +1217,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = ceil(x);
         y = ceil(y);
+        z = ceil(z);
     }
 
     /// <summary>
@@ -1213,16 +1228,17 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = std::ceil(x);
         y = std::ceil(y);
+        z = std::ceil(z);
     }
 
     /// <summary>
     /// Element wise round nearest ties to even<para/>
     /// Note: the host function assumes that current rounding mode is set to FE_TONEAREST
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> RoundNearest(const Vector2<T> &aValue)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> RoundNearest(const Vector4A<T> &aValue)
         requires FloatingPoint<T>
     {
-        Vector2<T> ret = aValue;
+        Vector4A<T> ret = aValue;
         ret.RoundNearest();
         return ret;
     }
@@ -1235,10 +1251,11 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = __float2int_rn(x);
         y = __float2int_rn(y);
+        z = __float2int_rn(z);
     }
 
     /// <summary>
-    /// Element wise round nearest ties to even<para/>
+    /// Element wise round nearest ties to even <para/>
     /// Note: this host function assumes that current rounding mode is set to FE_TONEAREST
     /// </summary>
     void RoundNearest()
@@ -1246,15 +1263,16 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = std::nearbyint(x);
         y = std::nearbyint(y);
+        z = std::nearbyint(z);
     }
 
     /// <summary>
     /// Element wise round toward zero
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> RoundZero(const Vector2<T> &aValue)
+    DEVICE_CODE [[nodiscard]] static Vector4A<T> RoundZero(const Vector4A<T> &aValue)
         requires FloatingPoint<T>
     {
-        Vector2<T> ret = aValue;
+        Vector4A<T> ret = aValue;
         ret.RoundZero();
         return ret;
     }
@@ -1267,6 +1285,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = __float2int_rz(x);
         y = __float2int_rz(y);
+        z = __float2int_rz(z);
     }
 
     /// <summary>
@@ -1277,81 +1296,129 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         x = std::trunc(x);
         y = std::trunc(y);
+        z = std::trunc(z);
+    }
+
+    /// <summary>
+    /// return sub-vector elements
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] Vector3<T> XYZ() const
+    {
+        return Vector3<T>(x, y, z);
+    }
+
+    /// <summary>
+    /// return sub-vector elements
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] Vector3<T> YZW() const
+    {
+        return Vector3<T>(y, z, w);
+    }
+
+    /// <summary>
+    /// return sub-vector elements
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] Vector2<T> XY() const
+    {
+        return Vector2<T>(x, y);
+    }
+
+    /// <summary>
+    /// return sub-vector elements
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] Vector2<T> YZ() const
+    {
+        return Vector2<T>(y, z);
+    }
+
+    /// <summary>
+    /// return sub-vector elements
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] Vector2<T> ZW() const
+    {
+        return Vector2<T>(z, w);
     }
 };
 
 template <typename T, typename T2>
-DEVICE_CODE Vector2<T> operator+(const Vector2<T> &aLeft, T2 aRight)
+DEVICE_CODE Vector4A<T> operator+(const Vector4A<T> &aLeft, T2 aRight)
     requires ComplexOrNumber<T2>
 {
-    return Vector2<T>{T(aLeft.x + aRight), T(aLeft.y + aRight)};
+    return Vector4A<T>{T(aLeft.x + aRight), T(aLeft.y + aRight), T(aLeft.z + aRight)};
 }
 template <typename T, typename T2>
-DEVICE_CODE Vector2<T> operator+(T2 aLeft, const Vector2<T> &aRight)
+DEVICE_CODE Vector4A<T> operator+(T2 aLeft, const Vector4A<T> &aRight)
     requires ComplexOrNumber<T2>
 {
-    return Vector2<T>{T(aLeft + aRight.x), T(aLeft + aRight.y)};
+    return Vector4A<T>{T(aLeft + aRight.x), T(aLeft + aRight.y), T(aLeft + aRight.z)};
 }
 template <typename T, typename T2>
-DEVICE_CODE Vector2<T> operator-(const Vector2<T> &aLeft, T2 aRight)
+DEVICE_CODE Vector4A<T> operator-(const Vector4A<T> &aLeft, T2 aRight)
     requires ComplexOrNumber<T2>
 {
-    return Vector2<T>{T(aLeft.x - aRight), T(aLeft.y - aRight)};
+    return Vector4A<T>{T(aLeft.x - aRight), T(aLeft.y - aRight), T(aLeft.z - aRight)};
 }
 template <typename T, typename T2>
-DEVICE_CODE Vector2<T> operator-(T2 aLeft, const Vector2<T> &aRight)
+DEVICE_CODE Vector4A<T> operator-(T2 aLeft, const Vector4A<T> &aRight)
     requires ComplexOrNumber<T2>
 {
-    return Vector2<T>{T(aLeft - aRight.x), T(aLeft - aRight.y)};
+    return Vector4A<T>{T(aLeft - aRight.x), T(aLeft - aRight.y), T(aLeft - aRight.z)};
 }
 
 template <typename T, typename T2>
-DEVICE_CODE Vector2<T> operator*(const Vector2<T> &aLeft, T2 aRight)
+DEVICE_CODE Vector4A<T> operator*(const Vector4A<T> &aLeft, T2 aRight)
     requires ComplexOrNumber<T2>
 {
-    return Vector2<T>{T(aLeft.x * aRight), T(aLeft.y * aRight)};
+    return Vector4A<T>{T(aLeft.x * aRight), T(aLeft.y * aRight), T(aLeft.z * aRight)};
 }
 template <typename T, typename T2>
-DEVICE_CODE Vector2<T> operator*(T2 aLeft, const Vector2<T> &aRight)
+DEVICE_CODE Vector4A<T> operator*(T2 aLeft, const Vector4A<T> &aRight)
     requires ComplexOrNumber<T2>
 {
-    return Vector2<T>{T(aLeft * aRight.x), T(aLeft * aRight.y)};
+    return Vector4A<T>{T(aLeft * aRight.x), T(aLeft * aRight.y), T(aLeft * aRight.z)};
 }
 template <typename T, typename T2>
-DEVICE_CODE Vector2<T> operator/(const Vector2<T> &aLeft, T2 aRight)
+DEVICE_CODE Vector4A<T> operator/(const Vector4A<T> &aLeft, T2 aRight)
     requires ComplexOrNumber<T2>
 {
-    return Vector2<T>{T(aLeft.x / aRight), T(aLeft.y / aRight)};
+    return Vector4A<T>{T(aLeft.x / aRight), T(aLeft.y / aRight), T(aLeft.z / aRight)};
 }
 template <typename T, typename T2>
-DEVICE_CODE Vector2<T> operator/(T2 aLeft, const Vector2<T> &aRight)
+DEVICE_CODE Vector4A<T> operator/(T2 aLeft, const Vector4A<T> &aRight)
     requires ComplexOrNumber<T2>
 {
-    return Vector2<T>{T(aLeft / aRight.x), T(aLeft / aRight.y)};
+    return Vector4A<T>{T(aLeft / aRight.x), T(aLeft / aRight.y), T(aLeft / aRight.z)};
 }
 
-template <HostCode T2> std::ostream &operator<<(std::ostream &aOs, const Vector2<T2> &aVec)
+template <HostCode T2> std::ostream &operator<<(std::ostream &aOs, const Vector4A<T2> &aVec)
 {
-    aOs << '(' << aVec.x << ", " << aVec.y << ')';
+    aOs << '(' << aVec.x << ", " << aVec.y << ", " << aVec.z << ", " << aVec.w << ')';
     return aOs;
 }
 
-template <HostCode T2> std::wostream &operator<<(std::wostream &aOs, const Vector2<T2> &aVec)
+template <HostCode T2> std::wostream &operator<<(std::wostream &aOs, const Vector4A<T2> &aVec)
 {
-    aOs << '(' << aVec.x << ", " << aVec.y << ')';
+    aOs << '(' << aVec.x << ", " << aVec.y << ", " << aVec.z << ", " << aVec.w << ')';
     return aOs;
 }
 
-template <HostCode T2> std::istream &operator>>(std::istream &aIs, Vector2<T2> &aVec)
+template <HostCode T2> std::istream &operator>>(std::istream &aIs, Vector4A<T2> &aVec)
 {
-    aIs >> aVec.x >> aVec.y;
+    aIs >> aVec.x >> aVec.y >> aVec.z >> aVec.w;
     return aIs;
 }
 
-template <HostCode T2> std::wistream &operator>>(std::wistream &aIs, Vector2<T2> &aVec)
+template <HostCode T2> std::wistream &operator>>(std::wistream &aIs, Vector4A<T2> &aVec)
 {
-    aIs >> aVec.x >> aVec.y;
+    aIs >> aVec.x >> aVec.y >> aVec.z >> aVec.w;
     return aIs;
 }
 
+template <ComplexOrNumber T> Vector4<T> &Vector4<T>::operator=(const Vector4A<T> &aOther) noexcept
+{
+    x = aOther.x;
+    y = aOther.y;
+    z = aOther.z;
+    return *this;
+}
 } // namespace opp

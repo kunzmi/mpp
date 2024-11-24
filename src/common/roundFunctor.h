@@ -1,21 +1,15 @@
 #pragma once
 #include <common/complex.h>
 #include <common/defines.h>
+#include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
-#include <concepts>
 
 namespace opp
 {
-
-//// for all other undefined types, just do nothing:
-// template <RoudingMode roundingMode, typename T> struct RoundFunctor
-//{
-// };
-
-template <RoudingMode roundingMode, VectorType T> struct RoundFunctor
+template <RoudingMode roundingMode, typename T> struct RoundFunctor
 {
     DEVICE_CODE void operator()(T &aVec)
-        requires std::floating_point<typename remove_vector<T>::type>
+        requires FloatingVectorOrComplexType<T>
     {
         if constexpr (roundingMode == RoudingMode::NearestTiesToEven)
         {
@@ -40,6 +34,10 @@ template <RoudingMode roundingMode, VectorType T> struct RoundFunctor
         else if constexpr (roundingMode == RoudingMode::TowardPositiveInfinity)
         {
             aVec.Ceil();
+            return;
+        }
+        else if constexpr (roundingMode == RoudingMode::None)
+        {
             return;
         }
         else

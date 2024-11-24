@@ -184,4 +184,6 @@ template <> struct need_saturation_clamp<double, ulong64> : std::true_type
 {
 };
 
+template <typename TFrom, typename TTo>
+inline constexpr bool need_saturation_clamp_v = need_saturation_clamp<TFrom, TTo>::value;
 } // namespace opp
