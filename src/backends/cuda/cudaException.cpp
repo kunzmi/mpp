@@ -31,7 +31,8 @@ CudaException::CudaException(cudaError_t aCuResult, const std::filesystem::path 
     ss << "'" << errorDescr << "' (" << aCuResult << ") " << std::endl;
 #else
     std::stringstream ss;
-    ss << "Error in " << codeFileName.string() << " in function " << aFunctionName << " @ " << aLineNumber << std::endl
+    ss << "Cuda-Error in " << codeFileName.string() << " in function " << aFunctionName << " @ " << aLineNumber
+       << std::endl
        << "'" << errorDescr << "' (" << aCuResult << ") " << std::endl;
 #endif
 
@@ -58,7 +59,8 @@ CudaException::CudaException(cudaError_t aCuResult, const std::string &aMessage,
     ss << "'" << errorDescr << "' (" << aCuResult << ") " << std::endl << "Additional info: " << aMessage;
 #else
     std::stringstream ss;
-    ss << "Error in " << codeFileName.string() << " in function " << aFunctionName << " @ " << aLineNumber << std::endl
+    ss << "Cuda-Error in " << codeFileName.string() << " in function " << aFunctionName << " @ " << aLineNumber
+       << std::endl
        << "'" << errorDescr << "' (" << aCuResult << ") " << std::endl
        << "Additional info: " << aMessage;
 #endif
@@ -83,7 +85,8 @@ CudaException::CudaException(const std::string &aMessage, const std::filesystem:
     ss << "Error message: " << aMessage;
 #else
     std::stringstream ss;
-    ss << "Error in " << codeFileName.string() << " in function " << aFunctionName << " @ " << aLineNumber << std::endl
+    ss << "Cuda-Error in " << codeFileName.string() << " in function " << aFunctionName << " @ " << aLineNumber
+       << std::endl
        << "Error message: " << aMessage;
 #endif
 

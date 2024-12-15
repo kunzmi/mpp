@@ -2,8 +2,7 @@
 #include "roi.h"
 #include "size2D.h"
 #include <common/safeCast.h>
-#include <common/vector2.h>
-#include <common/vector4.h>
+#include <common/vectorTypes.h>
 #include <istream>
 #include <ostream>
 
@@ -16,15 +15,14 @@ Roi::Roi(int aX, int aY, int aWidth, int aHeight) noexcept : x(aX), y(aY), width
 Roi::Roi(int aX, int aY, const Size2D &aSize) noexcept : x(aX), y(aY), width(aSize.x), height(aSize.y)
 {
 }
-Roi::Roi(const Vector2<int> &aPos, const Size2D &aSize) noexcept : x(aPos.x), y(aPos.y), width(aSize.x), height(aSize.y)
+Roi::Roi(const Vec2i &aPos, const Size2D &aSize) noexcept : x(aPos.x), y(aPos.y), width(aSize.x), height(aSize.y)
 {
 }
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-Roi::Roi(const Vector2<int> &aPos, int aWidth, int aHeight) noexcept
-    : x(aPos.x), y(aPos.y), width(aWidth), height(aHeight)
+Roi::Roi(const Vec2i &aPos, int aWidth, int aHeight) noexcept : x(aPos.x), y(aPos.y), width(aWidth), height(aHeight)
 {
 }
-Roi::Roi(const Vector4<int> &aVec) noexcept : x(aVec.x), y(aVec.y), width(aVec.z), height(aVec.w)
+Roi::Roi(const Vec4i &aVec) noexcept : x(aVec.x), y(aVec.y), width(aVec.z), height(aVec.w)
 {
 }
 Roi::Roi(int aArr[4]) noexcept : x(aArr[0]), y(aArr[1]), width(aArr[2]), height(aArr[3])
@@ -46,21 +44,25 @@ int Roi::LastY() const
 {
     return y + height - 1;
 }
-Vector2<int> Roi::FirstPixel() const
+Vec2i Roi::FirstPixel() const
 {
-    return Vector2<int>{FirstX(), FirstY()};
+    return Vec2i{FirstX(), FirstY()};
 }
-Vector2<int> Roi::LastPixel() const
+Vec2i Roi::LastPixel() const
 {
-    return Vector2<int>{LastX(), LastY()};
+    return Vec2i{LastX(), LastY()};
 }
-Vector2<int> Roi::BoundingBoxMin() const
+Vec2i Roi::BoundingBoxMin() const
 {
     return FirstPixel();
 }
-Vector2<int> Roi::BoundingBoxMax() const
+Vec2i Roi::BoundingBoxMax() const
 {
-    return Vector2<int>{x + width, y + height};
+    return Vec2i{x + width, y + height};
+}
+Size2D Roi::Size() const
+{
+    return {width, height};
 }
 Roi &Roi::operator+=(int aOther)
 {
@@ -70,7 +72,7 @@ Roi &Roi::operator+=(int aOther)
     height += 2 * aOther;
     return *this;
 }
-Roi &Roi::operator+=(const Vector2<int> &aOther)
+Roi &Roi::operator+=(const Vec2i &aOther)
 {
     x -= aOther.x;
     y -= aOther.y;
@@ -107,7 +109,7 @@ Roi &Roi::operator-=(const Border &aOther)
     height -= aOther.lowerY + aOther.higherY;
     return *this;
 }
-Roi &Roi::operator-=(const Vector2<int> &aOther)
+Roi &Roi::operator-=(const Vec2i &aOther)
 {
     x += aOther.x;
     y += aOther.y;
@@ -139,7 +141,7 @@ bool Roi::operator!=(const Roi &aOther) const
 {
     return x != aOther.x || y != aOther.y || width != aOther.width || height != aOther.height;
 }
-bool Roi::Contains(const Vector2<int> &aPoint) const
+bool Roi::Contains(const Vec2i &aPoint) const
 {
     return Contains(aPoint.x, aPoint.y);
 }
@@ -147,7 +149,11 @@ bool Roi::Contains(int aX, int aY) const
 {
     return (aX >= FirstX()) && (aX <= LastX()) && (aY >= FirstY()) && (aY <= LastY());
 }
-bool Roi::Contains(const Vector2<float> &aPoint) const
+bool Roi::Contains(const Vec2f &aPoint) const
+{
+    return Contains(aPoint.x, aPoint.y);
+}
+bool Roi::Contains(const Vec2d &aPoint) const
 {
     return Contains(aPoint.x, aPoint.y);
 }
@@ -155,6 +161,11 @@ bool Roi::Contains(float aX, float aY) const
 {
     return (aX >= to_float(FirstX())) && (aX <= to_float(LastX())) && (aY >= to_float(FirstY())) &&
            (aY <= to_float(LastY()));
+}
+bool Roi::Contains(double aX, double aY) const
+{
+    return (aX >= to_double(FirstX())) && (aX <= to_double(LastX())) && (aY >= to_double(FirstY())) &&
+           (aY <= to_double(LastY()));
 }
 bool Roi::Contains(const Roi &aRoi) const
 {
@@ -199,14 +210,22 @@ Roi Roi::Intersect(const Roi &aOther) const
 }
 bool Roi::IntersectsWith(const Roi &aOther) const
 {
-    const Vector2<int> firstPixel = aOther.FirstPixel();
-    const Vector2<int> lastPixel  = aOther.LastPixel();
-    const Vector2<int> firstXlastY{firstPixel.x, lastPixel.y};
-    const Vector2<int> lastXfirstY{lastPixel.x, firstPixel.y};
-    return (Contains(firstPixel) || Contains(lastPixel) || aOther.Contains(firstXlastY) ||
-            aOther.Contains(lastXfirstY));
+    const Vec2i otherFirstPixel = aOther.FirstPixel();
+    const Vec2i otherLastPixel  = aOther.LastPixel();
+    const Vec2i otherFirstXlastY{otherFirstPixel.x, otherLastPixel.y};
+    const Vec2i otherLastXfirstY{otherLastPixel.x, otherFirstPixel.y};
+
+    const Vec2i firstPixel = FirstPixel();
+    const Vec2i lastPixel  = LastPixel();
+    const Vec2i firstXlastY{firstPixel.x, lastPixel.y};
+    const Vec2i lastXfirstY{lastPixel.x, firstPixel.y};
+
+    // the one Roi might completly contain the other roi, so we have to check all 8 corners:
+    return Contains(otherFirstPixel) || Contains(otherLastPixel) || Contains(otherFirstXlastY) ||
+           Contains(otherLastXfirstY) || aOther.Contains(firstPixel) || aOther.Contains(lastPixel) ||
+           aOther.Contains(firstXlastY) || aOther.Contains(lastXfirstY);
 }
-Vector2<int> Roi::Center() const
+Vec2i Roi::Center() const
 {
     return {x + width / 2, y + height / 2};
 }
@@ -298,13 +317,13 @@ Roi Roi::Union(const Roi &aOtherRoi) const
 }
 std::ostream &operator<<(std::ostream &aOs, const Roi &aRoi)
 {
-    aOs << "ROI: X = [" << aRoi.FirstX() << ":" << aRoi.LastX() << "] Y = [" << aRoi.FirstY() << ":" << aRoi.LastY()
+    aOs << "ROI: X = [" << aRoi.FirstX() << ".." << aRoi.LastX() << "] Y = [" << aRoi.FirstY() << ".." << aRoi.LastY()
         << "]";
     return aOs;
 }
 std::wostream &operator<<(std::wostream &aOs, const Roi &aRoi)
 {
-    aOs << "ROI: X = [" << aRoi.FirstX() << ":" << aRoi.LastX() << "] Y = [" << aRoi.FirstY() << ":" << aRoi.LastY()
+    aOs << "ROI: X = [" << aRoi.FirstX() << ".." << aRoi.LastX() << "] Y = [" << aRoi.FirstY() << ".." << aRoi.LastY()
         << "]";
     return aOs;
 }
@@ -318,7 +337,7 @@ std::wistream &operator>>(std::wistream &aIs, Roi &aRoi)
     aIs >> aRoi.x >> aRoi.y >> aRoi.width >> aRoi.height;
     return aIs;
 }
-Roi operator+(const Roi &aLeft, const Vector2<int> &aRight)
+Roi operator+(const Roi &aLeft, const Vec2i &aRight)
 {
     return Roi{aLeft.x - aRight.x, aLeft.y - aRight.y, aLeft.width + 2 * aRight.x, aLeft.height + 2 * aRight.y};
 }
@@ -338,9 +357,9 @@ Roi operator+(const Roi &aLeft, int aRight)
 }
 Roi operator+(int aLeft, const Roi &aRight)
 {
-    return Roi{aLeft - aRight.x, aLeft - aRight.y, 2 * aLeft + aRight.width, 2 * aLeft + aRight.height};
+    return Roi{aRight.x - aLeft, aRight.y - aLeft, 2 * aLeft + aRight.width, 2 * aLeft + aRight.height};
 }
-Roi operator-(const Roi &aLeft, const Vector2<int> &aRight)
+Roi operator-(const Roi &aLeft, const Vec2i &aRight)
 {
     return Roi{aLeft.x + aRight.x, aLeft.y + aRight.y, aLeft.width - 2 * aRight.x, aLeft.height - 2 * aRight.y};
 }
@@ -351,18 +370,18 @@ Roi operator-(const Roi &aLeft, const Border &aRight)
 }
 Border operator-(const Roi &aLeft, const Roi &aRight)
 {
-    return {aLeft.FirstX() - aRight.FirstX(), aLeft.FirstY() - aRight.FirstY(), aLeft.LastX() - aRight.LastX(),
+    return {aRight.FirstX() - aLeft.FirstX(), aRight.FirstY() - aLeft.FirstY(), aLeft.LastX() - aRight.LastX(),
             aLeft.LastY() - aRight.LastY()};
 }
 Roi operator-(const Roi &aLeft, int aRight)
 {
     return Roi{aLeft.x + aRight, aLeft.y + aRight, aLeft.width - 2 * aRight, aLeft.height - 2 * aRight};
 }
-Roi operator-(int aLeft, const Roi &aRight)
-{
-    return Roi{aLeft + aRight.x, aLeft + aRight.y, 2 * aLeft - aRight.width, 2 * aLeft - aRight.height};
-}
-Roi operator*(const Roi &aLeft, const Vector2<int> &aRight)
+// Roi operator-(int aLeft, const Roi &aRight)
+//{
+//     return Roi{aLeft + aRight.x, aLeft + aRight.y, aRight.width - 2 * aLeft, aRight.height - 2 * aLeft};
+// }
+Roi operator*(const Roi &aLeft, const Vec2i &aRight)
 {
     return Roi{aLeft.x * aRight.x, aLeft.y * aRight.y, aLeft.width * aRight.x, aLeft.height * aRight.y};
 }
@@ -374,7 +393,7 @@ Roi operator*(int aLeft, const Roi &aRight)
 {
     return Roi{aLeft * aRight.x, aLeft * aRight.y, aLeft * aRight.width, aLeft * aRight.height};
 }
-Roi operator/(const Roi &aLeft, const Vector2<int> &aRight)
+Roi operator/(const Roi &aLeft, const Vec2i &aRight)
 {
     return Roi{aLeft.x / aRight.x, aLeft.y / aRight.y, aLeft.width / aRight.x, aLeft.height / aRight.y};
 }
@@ -382,8 +401,8 @@ Roi operator/(const Roi &aLeft, int aRight)
 {
     return Roi{aLeft.x / aRight, aLeft.y / aRight, aLeft.width / aRight, aLeft.height / aRight};
 }
-Roi operator/(int aLeft, const Roi &aRight)
-{
-    return Roi{aLeft / aRight.x, aLeft / aRight.y, aLeft / aRight.width, aLeft / aRight.height};
-}
+// Roi operator/(int aLeft, const Roi &aRight)
+//{
+//     return Roi{aLeft / aRight.x, aLeft / aRight.y, aLeft / aRight.width, aLeft / aRight.height};
+// }
 } // namespace opp::image

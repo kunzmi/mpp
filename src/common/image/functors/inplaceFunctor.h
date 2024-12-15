@@ -24,14 +24,15 @@ namespace opp::image
 /// <typeparam name="operation"></typeparam>
 /// <typeparam name="tupelSize"></typeparam>
 /// <typeparam name="roundingMode"></typeparam>
-template <size_t tupelSize, typename ComputeT, typename DstT, typename operation, typename ComputeT_SIMD = void,
-          typename operation_SIMD = NullOp<void>, RoudingMode roundingMode = RoudingMode::NearestTiesAwayFromZero>
+template <size_t tupelSize, typename ComputeT, typename DstT, typename operation,
+          RoudingMode roundingMode = RoudingMode::NearestTiesAwayFromZero, typename ComputeT_SIMD = voidType,
+          typename operation_SIMD = voidType>
 struct InplaceFunctor : public ImageFunctor<true>
 {
-    operation Op;
-    operation_SIMD OpSIMD;
+    [[no_unique_address]] operation Op;
+    [[no_unique_address]] operation_SIMD OpSIMD;
 
-    RoundFunctor<roundingMode, ComputeT> round;
+    [[no_unique_address]] RoundFunctor<roundingMode, ComputeT> round;
 
     InplaceFunctor()
     {
@@ -59,6 +60,7 @@ struct InplaceFunctor : public ImageFunctor<true>
     DEVICE_CODE void operator()(int /*aPixelX*/, int /*aPixelY*/, Tupel<DstT, tupelSize> &aDst)
         requires Integral<pixel_basetype_t<DstT>> &&          //
                  FloatingPoint<pixel_basetype_t<ComputeT>> && //
+                 std::same_as<ComputeT_SIMD, voidType> &&     //
                  (tupelSize > 1)
     {
 #pragma unroll
@@ -79,7 +81,8 @@ struct InplaceFunctor : public ImageFunctor<true>
     }
 
     DEVICE_CODE void operator()(int /*aPixelX*/, int /*aPixelY*/, Tupel<DstT, tupelSize> &aDst)
-        requires std::same_as<ComputeT, DstT> && //
+        requires std::same_as<ComputeT, DstT> &&          //
+                 std::same_as<ComputeT_SIMD, voidType> && //
                  (tupelSize > 1)
     {
 #pragma unroll
@@ -87,6 +90,13 @@ struct InplaceFunctor : public ImageFunctor<true>
         {
             Op(aDst.value[i]);
         }
+    }
+
+    DEVICE_CODE void operator()(int /*aPixelX*/, int /*aPixelY*/, Tupel<DstT, tupelSize> &aDst)
+        requires std::same_as<ComputeT_SIMD, DstT> && //
+                 (tupelSize > 1)
+    {
+        OpSIMD(aDst);
     }
 };
 } // namespace opp::image

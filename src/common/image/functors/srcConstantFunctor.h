@@ -26,8 +26,8 @@ namespace opp::image
 /// <typeparam name="tupelSize"></typeparam>
 /// <typeparam name="roundingMode"></typeparam>
 template <size_t tupelSize, typename SrcT, typename ComputeT, typename DstT, typename operation,
-          typename ComputeT_SIMD = void *, typename operation_SIMD = NullOp<void>,
-          RoudingMode roundingMode = RoudingMode::NearestTiesAwayFromZero>
+          RoudingMode roundingMode = RoudingMode::NearestTiesAwayFromZero, typename ComputeT_SIMD = voidType,
+          typename operation_SIMD = voidType>
 struct SrcConstantFunctor : public ImageFunctor<false>
 {
     const SrcT *RESTRICT Src1;
@@ -36,22 +36,23 @@ struct SrcConstantFunctor : public ImageFunctor<false>
     ComputeT Constant;
     ComputeT_SIMD ConstantSIMD;
 
-    operation Op;
-    operation_SIMD OpSIMD;
+    [[no_unique_address]] operation Op;
+    [[no_unique_address]] operation_SIMD OpSIMD;
 
-    RoundFunctor<roundingMode, ComputeT> round;
+    [[no_unique_address]] RoundFunctor<roundingMode, ComputeT> round;
 
     SrcConstantFunctor()
     {
     }
 
     SrcConstantFunctor(const SrcT *aSrc1, size_t aSrcPitch1, ComputeT aConstant, operation aOp)
-        : Op(aOp), Constant(aConstant), Src1(aSrc1), SrcPitch1(aSrcPitch1)
+        : Src1(aSrc1), SrcPitch1(aSrcPitch1), Constant(aConstant), Op(aOp)
     {
     }
 
-    SrcConstantFunctor(const SrcT *aSrc1, size_t aSrcPitch1, ComputeT aConstant, operation aOp, operation_SIMD aOpSIMD)
-        : Op(aOp), OpSIMD(aOpSIMD), Constant(aConstant), Src1(aSrc1), SrcPitch1(aSrcPitch1)
+    SrcConstantFunctor(const SrcT *aSrc1, size_t aSrcPitch1, ComputeT aConstant, operation aOp,
+                       ComputeT_SIMD aConstantSIMD, operation_SIMD aOpSIMD)
+        : Src1(aSrc1), SrcPitch1(aSrcPitch1), Constant(aConstant), ConstantSIMD(aConstantSIMD), Op(aOp), OpSIMD(aOpSIMD)
     {
     }
 
@@ -63,7 +64,19 @@ struct SrcConstantFunctor : public ImageFunctor<false>
     }
 
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
-        requires std::same_as<ComputeT, DstT> && //
+        requires std::same_as<ComputeT_SIMD, DstT> && //
+                 (tupelSize > 1)
+    {
+        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+
+        Tupel<SrcT, tupelSize> tupelSrc1 = Tupel<SrcT, tupelSize>::Load(pixelSrc1);
+
+        OpSIMD(tupelSrc1, ConstantSIMD, aDst);
+    }
+
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+        requires std::same_as<ComputeT, DstT> &&          //
+                 std::same_as<ComputeT_SIMD, voidType> && //
                  (tupelSize > 1)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
@@ -92,6 +105,7 @@ struct SrcConstantFunctor : public ImageFunctor<false>
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
         requires Integral<pixel_basetype_t<DstT>> &&          //
                  FloatingPoint<pixel_basetype_t<ComputeT>> && //
+                 std::same_as<ComputeT_SIMD, voidType> &&     //
                  (tupelSize > 1)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
@@ -122,9 +136,10 @@ struct SrcConstantFunctor : public ImageFunctor<false>
     }
 
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
-        requires(!std::same_as<ComputeT, DstT>) &&      //
-                Integral<pixel_basetype_t<DstT>> &&     //
-                Integral<pixel_basetype_t<ComputeT>> && //
+        requires(!std::same_as<ComputeT, DstT>) &&       //
+                Integral<pixel_basetype_t<DstT>> &&      //
+                Integral<pixel_basetype_t<ComputeT>> &&  //
+                std::same_as<ComputeT_SIMD, voidType> && //
                 (tupelSize > 1)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);

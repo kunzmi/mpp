@@ -1,91 +1,129 @@
 #include "addKernel.h"
 #include "forEachPixelKernel.cuh"
-
+#include <backends/cuda/image/configurations.h>
+#include <backends/cuda/simd_operators/binary_operators.h>
+#include <backends/cuda/simd_operators/simd_types.h>
+#include <backends/cuda/streamCtx.h>
+#include <backends/cuda/templateRegistry.h>
+#include <common/arithmetic/binary_operators.h>
+#include <common/image/functors/srcSrcFunctor.h>
+#include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
-#include <cuda_runtime.h>
-#include <iostream>
-
-#include <common/arithmetic/binary_operators.h>
-#include <common/arithmetic/ternary_operators.h>
-#include <common/arithmetic/unary_operators.h>
-#include <common/image/functors/srcSrcFunctor.h>
-#include <common/image/pixelTypes.h>
 #include <common/vectorTypes.h>
+#include <cuda_runtime.h>
 
-#include <backends/cuda/image/configurations.h>
+using namespace opp::cuda;
 
-using namespace opp::image;
-
-namespace opp::cuda::image
+namespace opp::image::cuda
 {
-template <typename SrcT, typename ComputeT, typename DstT, int hardwareMajor, int hardwareMinor>
+template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAddSrcSrc(const SrcT *aSrc1, size_t pitchSrc1, const SrcT *aSrc2, size_t pitchSrc2, DstT *aDst,
-                     size_t pitchDst, const Size2D &aSize)
+                     size_t pitchDst, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
+    OPP_CUDA_REGISTER_TEMPALTE;
+
     const dim3 BlockSize               = KernelConfiguration<sizeof(DstT)>::BlockSize;
     constexpr int WarpAlignmentInBytes = KernelConfiguration<sizeof(DstT)>::WarpAlignmentInBytes;
     constexpr size_t TupelSize         = KernelConfiguration<sizeof(DstT)>::TupelSize;
+    constexpr uint SharedMemory        = 0;
 
-    // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
-    using addSrcSrc =
-        SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, void, NullOp<void>, RoudingMode::None>;
+    if constexpr (is_simd_type_v<DstT>)
+    {
+        // Note: we have two SIMD versions for CUDA: SIMD over Vector4 and Vector2 types for (s)byte/(u)short and SIMD
+        // over Tupels for Vector1 and Vector2 types for (s)byte/(u)short. The Vector4/2 SIMD is activated using the
+        // same ComputeT as DstT in the instantiate macro.
+        // The Tupel-SIMD is activated here:
 
-    Add<ComputeT> op;
+        // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
+        using addSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoudingMode::None, DstT,
+                                        simd::Add<Tupel<DstT, TupelSize>>>;
 
-    addSrcSrc functor(aSrc1, pitchSrc1, aSrc2, pitchSrc2, op);
+        Add<ComputeT> op;
+        simd::Add<Tupel<DstT, TupelSize>> opSIMD;
 
-    InvokeForEachPixelKernel<SrcT, DstT, TupelSize, WarpAlignmentInBytes, addSrcSrc>(BlockSize, aDst, pitchDst, aSize,
-                                                                                     functor);
+        addSrcSrc functor(aSrc1, pitchSrc1, aSrc2, pitchSrc2, op, opSIMD);
+
+        InvokeForEachPixelKernel<SrcT, DstT, TupelSize, WarpAlignmentInBytes, addSrcSrc>(
+            BlockSize, SharedMemory, aStreamCtx.Stream, aDst, pitchDst, aSize, functor);
+    }
+    else
+    {
+        // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
+        using addSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoudingMode::None>;
+
+        Add<ComputeT> op;
+
+        addSrcSrc functor(aSrc1, pitchSrc1, aSrc2, pitchSrc2, op);
+
+        InvokeForEachPixelKernel<SrcT, DstT, TupelSize, WarpAlignmentInBytes, addSrcSrc>(
+            BlockSize, SharedMemory, aStreamCtx.Stream, aDst, pitchDst, aSize, functor);
+    }
 }
 
-#define InstantiateAddSrcSrc_For(typeSrcIsTypeDst)                                                                     \
+#define DefaultInstantiate_For(typeSrcIsTypeDst)                                                                       \
     template void InvokeAddSrcSrc<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(   \
         const typeSrcIsTypeDst *aSrc1, size_t aPitchSrc1, const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,            \
-        typeSrcIsTypeDst *aDst, size_t aPitchDst, const Size2D &aSize);
+        typeSrcIsTypeDst *aDst, size_t aPitchDst, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
-#define forAllChannels(type)                                                                                           \
-    InstantiateAddSrcSrc_For(Pixel##type##C1);                                                                         \
-    InstantiateAddSrcSrc_For(Pixel##type##C2);                                                                         \
-    InstantiateAddSrcSrc_For(Pixel##type##C3);                                                                         \
-    InstantiateAddSrcSrc_For(Pixel##type##C4);
+#define SIMDInstantiate_For(typeSrcIsTypeDst)                                                                          \
+    template void InvokeAddSrcSrc<typeSrcIsTypeDst, typeSrcIsTypeDst, typeSrcIsTypeDst>(                               \
+        const typeSrcIsTypeDst *aSrc1, size_t aPitchSrc1, const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,            \
+        typeSrcIsTypeDst *aDst, size_t aPitchDst, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
-InstantiateAddSrcSrc_For(Pixel8uC1);
-InstantiateAddSrcSrc_For(Pixel8uC2);
-InstantiateAddSrcSrc_For(Pixel8uC3);
-template void InvokeAddSrcSrc<Pixel8uC4, Pixel8uC4, Pixel8uC4>(const Pixel8uC4 *aSrc1, size_t aPitchSrc1,
-                                                               const Pixel8uC4 *aSrc2, size_t aPitchSrc2,
-                                                               Pixel8uC4 *aDst, size_t aPitchDst, const Size2D &aSize);
+#define DefaultForAllChannels(type)                                                                                    \
+    DefaultInstantiate_For(Pixel##type##C1);                                                                           \
+    DefaultInstantiate_For(Pixel##type##C2);                                                                           \
+    DefaultInstantiate_For(Pixel##type##C3);                                                                           \
+    DefaultInstantiate_For(Pixel##type##C4);
 
-// forAllChannels(8u);
-forAllChannels(8s);
-forAllChannels(16u);
-forAllChannels(16s);
-forAllChannels(32u);
-forAllChannels(32s);
+DefaultInstantiate_For(Pixel8uC1);
+DefaultInstantiate_For(Pixel8uC2);
+DefaultInstantiate_For(Pixel8uC3);
+SIMDInstantiate_For(Pixel8uC4);
+
+DefaultInstantiate_For(Pixel8sC1);
+DefaultInstantiate_For(Pixel8sC2);
+DefaultInstantiate_For(Pixel8sC3);
+SIMDInstantiate_For(Pixel8sC4);
+
+DefaultInstantiate_For(Pixel16uC1);
+SIMDInstantiate_For(Pixel16uC2);
+DefaultInstantiate_For(Pixel16uC3);
+DefaultInstantiate_For(Pixel16uC4);
+
+DefaultInstantiate_For(Pixel16sC1);
+SIMDInstantiate_For(Pixel16sC2);
+DefaultInstantiate_For(Pixel16sC3);
+DefaultInstantiate_For(Pixel16sC4);
+
+DefaultForAllChannels(32u);
+DefaultForAllChannels(32s);
 
 // forAllChannels(16f);
-forAllChannels(32f);
-forAllChannels(64f);
+DefaultForAllChannels(32f);
+DefaultForAllChannels(64f);
 
-forAllChannels(16sc);
-forAllChannels(32sc);
-forAllChannels(32fc);
+DefaultForAllChannels(16sc);
+DefaultForAllChannels(32sc);
+DefaultForAllChannels(32fc);
 
 // alpha channels:
-InstantiateAddSrcSrc_For(Pixel8uC4A);
-InstantiateAddSrcSrc_For(Pixel8sC4A);
-InstantiateAddSrcSrc_For(Pixel16uC4A);
-InstantiateAddSrcSrc_For(Pixel16sC4A);
-InstantiateAddSrcSrc_For(Pixel32uC4A);
-InstantiateAddSrcSrc_For(Pixel32sC4A);
+SIMDInstantiate_For(Pixel8uC4A);
+SIMDInstantiate_For(Pixel8sC4A);
+DefaultInstantiate_For(Pixel16uC4A);
+DefaultInstantiate_For(Pixel16sC4A);
 
-InstantiateAddSrcSrc_For(Pixel32fC4A);
-InstantiateAddSrcSrc_For(Pixel64fC4A);
+DefaultInstantiate_For(Pixel32uC4A);
+DefaultInstantiate_For(Pixel32sC4A);
 
-#undef forAllChannels
-#undef InstantiateAddSrcSrc_For
+DefaultInstantiate_For(Pixel32fC4A);
+DefaultInstantiate_For(Pixel64fC4A);
 
-} // namespace opp::cuda::image
+#undef DefaultForAllChannels
+#undef DefaultInstantiate_For
+#undef SIMDInstantiate_For
+
+} // namespace opp::image::cuda

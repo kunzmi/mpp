@@ -33,16 +33,16 @@ struct InplaceDevConstantScaleFunctor : public ImageFunctor<true>
 
     remove_vector_t<ComputeT> ScaleFactor;
 
-    operation Op;
+    [[no_unique_address]] operation Op;
 
-    RoundFunctor<roundingMode, ComputeT> round;
+    [[no_unique_address]] RoundFunctor<roundingMode, ComputeT> round;
 
     InplaceDevConstantScaleFunctor()
     {
     }
 
     InplaceDevConstantScaleFunctor(const DstT *aConstant, operation aOp, remove_vector_t<ComputeT> aScaleFactor)
-        : Op(aOp), Constant(aConstant), ScaleFactor(aScaleFactor)
+        : Constant(aConstant), ScaleFactor(aScaleFactor), Op(aOp)
     {
     }
 

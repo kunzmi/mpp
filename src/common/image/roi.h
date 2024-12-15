@@ -2,8 +2,7 @@
 #include <common/defines.h>
 #include <common/image/border.h>
 #include <common/image/size2D.h>
-#include <common/vector2.h>
-#include <common/vector4.h>
+#include <common/vectorTypes.h>
 #include <istream>
 #include <ostream>
 
@@ -12,7 +11,7 @@ namespace opp::image
 /// <summary>
 /// A 2D roi represented as a start pixel and a size
 /// Note: we avoid any absolute referencing like top/left or lower/right as an image can have any orientation. Instead
-/// we only reference lower X -> higher X accoriding to the coordinate value.
+/// we only reference lower X -> higher X according to the coordinate value.
 /// Note: in device code, only the value members are available.
 /// </summary>
 struct alignas(4 * sizeof(int)) Roi
@@ -40,17 +39,17 @@ struct alignas(4 * sizeof(int)) Roi
     /// <summary>
     /// Initializes a new roi to (aPos.x, aPos.y, aSize.x, aSize.y)
     /// </summary>
-    Roi(const Vector2<int> &aPos, const Size2D &aSize) noexcept;
+    Roi(const Vec2i &aPos, const Size2D &aSize) noexcept;
 
     /// <summary>
     /// Initializes a new roi to (aPos.x, aPos.y, aWidth, aHeight)
     /// </summary>
-    Roi(const Vector2<int> &aPos, int aWidth, int aHeight) noexcept;
+    Roi(const Vec2i &aPos, int aWidth, int aHeight) noexcept;
 
     /// <summary>
     /// Initializes a new roi to (aVec.x, aVec.y, aVec.z, aVec.w)
     /// </summary>
-    Roi(const Vector4<int> &aVec) noexcept; // NOLINT(hicpp-explicit-conversions)
+    Roi(const Vec4i &aVec) noexcept; // NOLINT(hicpp-explicit-conversions)
 
     /// <summary>
     /// Initializes a new roi to (aArr[0], aArr[1], aArr[2], aArr[3])
@@ -87,22 +86,27 @@ struct alignas(4 * sizeof(int)) Roi
     /// <summary>
     /// Gets the first x/y-coordinate inside the roi.
     /// </summary>
-    [[nodiscard]] Vector2<int> FirstPixel() const;
+    [[nodiscard]] Vec2i FirstPixel() const;
 
     /// <summary>
     /// Gets the x/y-coordinate of the last pixel inside the roi.
     /// </summary>
-    [[nodiscard]] Vector2<int> LastPixel() const;
+    [[nodiscard]] Vec2i LastPixel() const;
 
     /// <summary>
     /// Gets the x/y-coordinate of the first pixel inside the roi.
     /// </summary>
-    [[nodiscard]] Vector2<int> BoundingBoxMin() const;
+    [[nodiscard]] Vec2i BoundingBoxMin() const;
 
     /// <summary>
     /// Gets the x/y-coordinate of first pixel outside the roi.
     /// </summary>
-    [[nodiscard]] Vector2<int> BoundingBoxMax() const;
+    [[nodiscard]] Vec2i BoundingBoxMax() const;
+
+    /// <summary>
+    /// Gets the width and height of the ROI.
+    /// </summary>
+    [[nodiscard]] Size2D Size() const;
 
     /// <summary>
     /// Enlarges the roi by the specified amount (add border)
@@ -112,7 +116,7 @@ struct alignas(4 * sizeof(int)) Roi
     /// <summary>
     /// Enlarges the roi by the specified amount (add border), different values for X and Y
     /// </summary>
-    Roi &operator+=(const Vector2<int> &aOther);
+    Roi &operator+=(const Vec2i &aOther);
 
     /// <summary>
     /// Enlarges the roi by the specified amount (add border)
@@ -137,7 +141,7 @@ struct alignas(4 * sizeof(int)) Roi
     /// <summary>
     /// Reduces the roi by the specified amount (subtract border), different values for X and Y
     /// </summary>
-    Roi &operator-=(const Vector2<int> &aOther);
+    Roi &operator-=(const Vec2i &aOther);
 
     /// <summary>
     /// Component wise multiplication
@@ -162,7 +166,7 @@ struct alignas(4 * sizeof(int)) Roi
     /// <summary>
     /// returns true if the specified point is within the roi area
     /// </summary>
-    [[nodiscard]] bool Contains(const Vector2<int> &aPoint) const;
+    [[nodiscard]] bool Contains(const Vec2i &aPoint) const;
 
     /// <summary>
     /// returns true if the specified point is within the roi area
@@ -172,12 +176,22 @@ struct alignas(4 * sizeof(int)) Roi
     /// <summary>
     /// returns true if the specified point is within the roi area
     /// </summary>
-    [[nodiscard]] bool Contains(const Vector2<float> &aPoint) const;
+    [[nodiscard]] bool Contains(const Vec2f &aPoint) const;
+
+    /// <summary>
+    /// returns true if the specified point is within the roi area
+    /// </summary>
+    [[nodiscard]] bool Contains(const Vec2d &aPoint) const;
 
     /// <summary>
     /// returns true if the specified point is within the roi area
     /// </summary>
     [[nodiscard]] bool Contains(float aX, float aY) const;
+
+    /// <summary>
+    /// returns true if the specified point is within the roi area
+    /// </summary>
+    [[nodiscard]] bool Contains(double aX, double aY) const;
 
     /// <summary>
     /// returns true if aRoi is entirely within the roi area
@@ -198,7 +212,7 @@ struct alignas(4 * sizeof(int)) Roi
     /// <summary>
     /// Returns the center pixel of roi
     /// </summary>
-    [[nodiscard]] Vector2<int> Center() const;
+    [[nodiscard]] Vec2i Center() const;
 
     /// <summary>
     /// Shifts the smaller roi until it entirely fits into the larger roi.<para/>
@@ -217,25 +231,25 @@ std::wostream &operator<<(std::wostream &aOs, const Roi &aRoi);
 std::istream &operator>>(std::istream &aIs, Roi &aRoi);
 std::wistream &operator>>(std::wistream &aIs, Roi &aRoi);
 
-Roi operator+(const Roi &aLeft, const Vector2<int> &aRight);
+Roi operator+(const Roi &aLeft, const Vec2i &aRight);
 Roi operator+(const Roi &aLeft, const Border &aRight);
 Roi operator+(const Border &aLeft, const Roi &aRight);
 // Roi operator+(const Roi &aLeft, const Roi &aRight);
 Roi operator+(const Roi &aLeft, int aRight);
 Roi operator+(int aLeft, const Roi &aRight);
-Roi operator-(const Roi &aLeft, const Vector2<int> &aRight);
+Roi operator-(const Roi &aLeft, const Vec2i &aRight);
 Roi operator-(const Roi &aLeft, const Border &aRight);
 Border operator-(const Roi &aLeft, const Roi &aRight);
 Roi operator-(const Roi &aLeft, int aRight);
-Roi operator-(int aLeft, const Roi &aRight);
+// Roi operator-(int aLeft, const Roi &aRight);
 
-Roi operator*(const Roi &aLeft, const Vector2<int> &aRight);
+Roi operator*(const Roi &aLeft, const Vec2i &aRight);
 // Roi operator*(const Roi &aLeft, const Roi &aRight);
 Roi operator*(const Roi &aLeft, int aRight);
 Roi operator*(int aLeft, const Roi &aRight);
-Roi operator/(const Roi &aLeft, const Vector2<int> &aRight);
+Roi operator/(const Roi &aLeft, const Vec2i &aRight);
 // Roi operator/(const Roi &aLeft, const Roi &aRight);
 Roi operator/(const Roi &aLeft, int aRight);
-Roi operator/(int aLeft, const Roi &aRight);
+// Roi operator/(int aLeft, const Roi &aRight);
 
 } // namespace opp::image

@@ -1,4 +1,5 @@
 #pragma once
+#include "complex_typetraits.h"
 #include "defines.h"
 #include "exception.h"
 #include "limits.h"
@@ -56,7 +57,7 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     T x;
 
     /// <summary>
-    /// Default constructor does not initializes the members
+    /// Default constructor does not initialize the members
     /// </summary>
     DEVICE_CODE Vector1() noexcept
     {
@@ -119,70 +120,63 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
 
     // don't use space-ship operator as it returns true if any comparison returns true.
     // But NPP only returns true if all channels fulfill the comparison.
-    // Also return TRUE_VALUE as byte instead of bool
     // auto operator<=>(const Vector1 &) const = default;
 
     /// <summary>
-    /// Returns true-value if each element comparison is true
+    /// Returns true if each element comparison is true
     /// </summary>
-    byte operator<(const Vector1 &aOther) const
+    DEVICE_CODE [[nodiscard]] bool operator<(const Vector1 &aOther) const
     {
-        const bool res = x < aOther.x;
-        return res * TRUE_VALUE;
+        return x < aOther.x;
     }
 
     /// <summary>
-    /// Returns true-value if each element comparison is true
+    /// Returns true if each element comparison is true
     /// </summary>
-    byte operator<=(const Vector1 &aOther) const
+    DEVICE_CODE [[nodiscard]] bool operator<=(const Vector1 &aOther) const
     {
-        const bool res = x <= aOther.x;
-        return res * TRUE_VALUE;
+        return x <= aOther.x;
     }
 
     /// <summary>
-    /// Returns true-value if each element comparison is true
+    /// Returns true if each element comparison is true
     /// </summary>
-    byte operator>(const Vector1 &aOther) const
+    DEVICE_CODE [[nodiscard]] bool operator>(const Vector1 &aOther) const
     {
-        const bool res = x > aOther.x;
-        return res * TRUE_VALUE;
+        return x > aOther.x;
     }
 
     /// <summary>
-    /// Returns true-value if each element comparison is true
+    /// Returns true if each element comparison is true
     /// </summary>
-    byte operator>=(const Vector1 &aOther) const
+    DEVICE_CODE [[nodiscard]] bool operator>=(const Vector1 &aOther) const
     {
-        const bool res = x >= aOther.x;
-        return res * TRUE_VALUE;
+        return x >= aOther.x;
     }
 
     /// <summary>
-    /// Returns true-value if each element comparison is true
+    /// Returns true if each element comparison is true
     /// </summary>
-    byte operator==(const Vector1 &aOther) const
+    DEVICE_CODE [[nodiscard]] bool operator==(const Vector1 &aOther) const
     {
-        const bool res = x == aOther.x;
-        return res * TRUE_VALUE;
+        return x == aOther.x;
     }
 
     /// <summary>
-    /// Returns true-value if any element comparison is true
+    /// Returns true if any element comparison is true
     /// </summary>
-    byte operator!=(const Vector1 &aOther) const
+    DEVICE_CODE [[nodiscard]] bool operator!=(const Vector1 &aOther) const
     {
-        const bool res = x != aOther.x;
-        return res * TRUE_VALUE;
+        return x != aOther.x;
     }
 
     /// <summary>
     /// Negation
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector1 operator-() const
-        requires SignedNumber<T>
+        requires SignedNumber<T> || ComplexType<T>
     {
-        return Vector1<T>(T(-x));
+        return Vector1<T>(-x);
     }
 
     /// <summary>
@@ -825,17 +819,6 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
         x = std::max(aMinVal, std::min(x, aMaxVal));
     }
 
-    ///// <summary>
-    ///// Component wise clamp to maximum value range of given target type
-    ///// Note: nvcc doesn't accept the variant without parameters...
-    ///// </summary>
-    // template <ComplexOrNumber TTarget>
-    // DEVICE_CODE void ClampToTargetTypeOf(Vector1<TTarget> /*aTarget*/)
-    //     requires std::same_as<T, TTarget>
-    //{
-    //     // Do nothing in case TTarget is the same as T
-    // }
-
     /// <summary>
     /// Component wise clamp to maximum value range of given target type
     /// </summary>
@@ -856,90 +839,76 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     {
     }
 
-    ///// <summary>
-    ///// Component wise clamp to maximum value range of given target type
-    ///// Note: nvcc doesn't accept the variant without parameters...
-    ///// </summary>
-    // template <ComplexOrNumber TTarget>
-    // DEVICE_CODE void ClampToTargetType()
-    //     requires(std::same_as<T, TTarget>)
-    //{
-    //     // Do nothing in case TTarget is the same as T
-    // }
-
-    ///// <summary>
-    ///// Component wise clamp to maximum value range of given target type
-    ///// Note: nvcc doesn't accept the variant without parameters...
-    ///// </summary>
-    // template <VectorType TTarget>
-    // DEVICE_CODE void ClampToTargetType()
-    //     requires(!std::same_as<T, typename remove_vector<TTarget>::type>)
-    //{
-    //     Clamp(T(numeric_limits<typename remove_vector<TTarget>::type>::lowest()),
-    //           T(numeric_limits<typename remove_vector<TTarget>::type>::max()));
-    // }
-
-    ///// <summary>
-    ///// Component wise clamp to maximum value range of given target type
-    ///// Note: nvcc doesn't accept the variant without parameters...
-    ///// </summary>
-    // template <VectorType TTarget>
-    // DEVICE_CODE void ClampToTargetType()
-    //     requires(std::same_as<T, typename remove_vector<TTarget>::type>)
-    //{
-    //     // Do nothing in case TTarget is the same as T
-    // }
-
     /// <summary>
     /// Component wise minimum
     /// </summary>
-    [[nodiscard]] Vector1<T> Min(const Vector1<T> &aRight) const
+    void Min(const Vector1<T> &aRight)
         requires HostCode<T>
     {
-        return Vector1<T>{std::min(x, aRight.x)};
+        x = std::min(x, aRight.x);
     }
 
     /// <summary>
     /// Component wise minimum
     /// </summary>
-    DEVICE_CODE [[nodiscard]] Vector1<T> Min(const Vector1<T> &aRight) const
+    void Min(const Vector1<T> &aRight)
         requires DeviceCode<T>
     {
-        return Vector1<T>{min(x, aRight.x)};
+        x = min(x, aRight.x);
     }
 
     /// <summary>
     /// Component wise maximum
     /// </summary>
-    DEVICE_CODE [[nodiscard]] Vector1<T> Max(const Vector1<T> &aRight) const
+    void Max(const Vector1<T> &aRight)
         requires DeviceCode<T>
     {
-        return Vector1<T>{max(x, aRight.x)};
+        x = max(x, aRight.x);
     }
 
     /// <summary>
     /// Component wise maximum
     /// </summary>
-    [[nodiscard]] Vector1<T> Max(const Vector1<T> &aRight) const
+    void Max(const Vector1<T> &aRight)
         requires HostCode<T>
     {
-        return Vector1<T>{std::max(x, aRight.x)};
+        x = std::max(x, aRight.x);
     }
 
     /// <summary>
     /// Component wise minimum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector1<T> Min(const Vector1<T> &aLeft, const Vector1<T> &aRight)
+        requires DeviceCode<T>
     {
-        return aLeft.Min(aRight);
+        return Vector1<T>{min(aLeft.x, aRight.x)};
+    }
+
+    /// <summary>
+    /// Component wise minimum
+    /// </summary>
+    [[nodiscard]] static Vector1<T> Min(const Vector1<T> &aLeft, const Vector1<T> &aRight)
+        requires HostCode<T>
+    {
+        return Vector1<T>{std::min(aLeft.x, aRight.x)};
     }
 
     /// <summary>
     /// Component wise maximum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector1<T> Max(const Vector1<T> &aLeft, const Vector1<T> &aRight)
+        requires DeviceCode<T>
     {
-        return aLeft.Max(aRight);
+        return Vector1<T>{max(aLeft.x, aRight.x)};
+    }
+
+    /// <summary>
+    /// Component wise maximum
+    /// </summary>
+    [[nodiscard]] static Vector1<T> Max(const Vector1<T> &aLeft, const Vector1<T> &aRight)
+        requires HostCode<T>
+    {
+        return Vector1<T>{std::max(aLeft.x, aRight.x)};
     }
 
     /// <summary>
@@ -1129,6 +1098,22 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
         requires HostCode<T> && FloatingPoint<T>
     {
         x = std::trunc(x);
+    }
+
+    /// <summary>
+    /// Provide a smiliar accessor to inner data similar to std container
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] T *data()
+    {
+        return &x;
+    }
+
+    /// <summary>
+    /// Provide a smiliar accessor to inner data similar to std container
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] const T *data() const
+    {
+        return &x;
     }
 };
 

@@ -159,11 +159,11 @@ TEST_CASE("Pixel32fC3", "[Common]")
     Pixel32fC3 minmax1(10, 20, -10);
     Pixel32fC3 minmax2(-20, 10, 40);
 
-    CHECK(minmax1.Min(minmax2) == Pixel32fC3(-20, 10, -10));
-    CHECK(minmax2.Min(minmax1) == Pixel32fC3(-20, 10, -10));
+    CHECK(Pixel32fC3::Min(minmax1, minmax2) == Pixel32fC3(-20, 10, -10));
+    CHECK(Pixel32fC3::Min(minmax2, minmax1) == Pixel32fC3(-20, 10, -10));
 
-    CHECK(minmax1.Max(minmax2) == Pixel32fC3(10, 20, 40));
-    CHECK(minmax2.Max(minmax1) == Pixel32fC3(10, 20, 40));
+    CHECK(Pixel32fC3::Max(minmax1, minmax2) == Pixel32fC3(10, 20, 40));
+    CHECK(Pixel32fC3::Max(minmax2, minmax1) == Pixel32fC3(10, 20, 40));
 
     CHECK(minmax2.Min() == -20);
     CHECK(minmax1.Max() == 20);
@@ -498,11 +498,11 @@ TEST_CASE("Pixel32sC3", "[Common]")
     Pixel32sC3 minmax1(10, 20, -10);
     Pixel32sC3 minmax2(-20, 10, 40);
 
-    CHECK(minmax1.Min(minmax2) == Pixel32sC3(-20, 10, -10));
-    CHECK(minmax2.Min(minmax1) == Pixel32sC3(-20, 10, -10));
+    CHECK(Pixel32sC3::Min(minmax1, minmax2) == Pixel32sC3(-20, 10, -10));
+    CHECK(Pixel32sC3::Min(minmax2, minmax1) == Pixel32sC3(-20, 10, -10));
 
-    CHECK(minmax1.Max(minmax2) == Pixel32sC3(10, 20, 40));
-    CHECK(minmax2.Max(minmax1) == Pixel32sC3(10, 20, 40));
+    CHECK(Pixel32sC3::Max(minmax1, minmax2) == Pixel32sC3(10, 20, 40));
+    CHECK(Pixel32sC3::Max(minmax2, minmax1) == Pixel32sC3(10, 20, 40));
 
     CHECK(minmax2.Min() == -20);
     CHECK(minmax1.Max() == 20);

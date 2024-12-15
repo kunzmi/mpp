@@ -24,28 +24,29 @@ namespace opp::image
 /// <typeparam name="operation"></typeparam>
 /// <typeparam name="tupelSize"></typeparam>
 /// <typeparam name="roundingMode"></typeparam>
-template <size_t tupelSize, typename ComputeT, typename DstT, typename operation, typename ComputeT_SIMD = ComputeT,
-          typename operation_SIMD = NullOp<void>, RoudingMode roundingMode = RoudingMode::NearestTiesAwayFromZero>
+template <size_t tupelSize, typename ComputeT, typename DstT, typename operation,
+          RoudingMode roundingMode = RoudingMode::NearestTiesAwayFromZero, typename ComputeT_SIMD = voidType,
+          typename operation_SIMD = voidType>
 struct InplaceConstantFunctor : public ImageFunctor<true>
 {
     ComputeT Constant;
     ComputeT_SIMD ConstantSIMD;
 
-    operation Op;
-    operation_SIMD OpSIMD;
+    [[no_unique_address]] operation Op;
+    [[no_unique_address]] operation_SIMD OpSIMD;
 
-    RoundFunctor<roundingMode, ComputeT> round;
+    [[no_unique_address]] RoundFunctor<roundingMode, ComputeT> round;
 
     InplaceConstantFunctor()
     {
     }
 
-    InplaceConstantFunctor(ComputeT aConstant, operation aOp) : Op(aOp), Constant(aConstant)
+    InplaceConstantFunctor(ComputeT aConstant, operation aOp) : Constant(aConstant), Op(aOp)
     {
     }
 
-    InplaceConstantFunctor(ComputeT aConstant, operation aOp, operation_SIMD aOpSIMD)
-        : Op(aOp), OpSIMD(aOpSIMD), Constant(aConstant)
+    InplaceConstantFunctor(ComputeT aConstant, operation aOp, ComputeT_SIMD aConstantSIMD, operation_SIMD aOpSIMD)
+        : Constant(aConstant), ConstantSIMD(aConstantSIMD), Op(aOp), OpSIMD(aOpSIMD)
     {
     }
 
@@ -63,6 +64,7 @@ struct InplaceConstantFunctor : public ImageFunctor<true>
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
         requires Integral<pixel_basetype_t<DstT>> &&          //
                  FloatingPoint<pixel_basetype_t<ComputeT>> && //
+                 std::same_as<ComputeT_SIMD, voidType> &&     //
                  (tupelSize > 1)
     {
 #pragma unroll
@@ -88,9 +90,10 @@ struct InplaceConstantFunctor : public ImageFunctor<true>
     }
 
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
-        requires(!std::same_as<ComputeT, DstT>) &&      //
-                Integral<pixel_basetype_t<DstT>> &&     //
-                Integral<pixel_basetype_t<ComputeT>> && //
+        requires(!std::same_as<ComputeT, DstT>) &&       //
+                Integral<pixel_basetype_t<DstT>> &&      //
+                Integral<pixel_basetype_t<ComputeT>> &&  //
+                std::same_as<ComputeT_SIMD, voidType> && //
                 (tupelSize > 1)
     {
 #pragma unroll
@@ -110,7 +113,8 @@ struct InplaceConstantFunctor : public ImageFunctor<true>
     }
 
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
-        requires std::same_as<ComputeT, DstT> && //
+        requires std::same_as<ComputeT, DstT> &&          //
+                 std::same_as<ComputeT_SIMD, voidType> && //
                  (tupelSize > 1)
     {
 #pragma unroll
@@ -118,6 +122,13 @@ struct InplaceConstantFunctor : public ImageFunctor<true>
         {
             Op(Constant, aDst.value[i]);
         }
+    }
+
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+        requires std::same_as<ComputeT_SIMD, DstT> && //
+                 (tupelSize > 1)
+    {
+        OpSIMD(ConstantSIMD, aDst);
     }
 };
 } // namespace opp::image

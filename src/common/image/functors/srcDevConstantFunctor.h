@@ -34,16 +34,16 @@ struct SrcDevConstantFunctor : public ImageFunctor<false>
 
     const SrcT *RESTRICT Constant;
 
-    operation Op;
+    [[no_unique_address]] operation Op;
 
-    RoundFunctor<roundingMode, ComputeT> round;
+    [[no_unique_address]] RoundFunctor<roundingMode, ComputeT> round;
 
     SrcDevConstantFunctor()
     {
     }
 
     SrcDevConstantFunctor(const SrcT *aSrc1, size_t aSrcPitch1, ComputeT *aConstant, operation aOp)
-        : Op(aOp), Constant(aConstant), Src1(aSrc1), SrcPitch1(aSrcPitch1)
+        : Src1(aSrc1), SrcPitch1(aSrcPitch1), Constant(aConstant), Op(aOp)
     {
     }
 

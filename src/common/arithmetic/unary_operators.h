@@ -7,12 +7,24 @@
 
 namespace opp
 {
-/// <summary>
-/// Placeholder mainly for the case that no SIMD operation is possible
-/// </summary>
-/// <typeparam name="T"></typeparam>
-template <typename T> struct NullOp
+template <VectorType T> struct Set
 {
+    DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
+    {
+        aDst = aSrc1;
+    }
+};
+
+template <VectorType T> struct Neg
+{
+    DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
+    {
+        aDst = -aSrc1;
+    }
+    DEVICE_CODE void operator()(T &aSrcDst)
+    {
+        aSrcDst = -aSrcDst;
+    }
 };
 
 template <IntVectorType T> struct Not

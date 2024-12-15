@@ -16,7 +16,7 @@ template <ComplexOrNumber T> struct Vector4A;
 
 template <typename T> struct remove_vector
 {
-    using type = void;
+    using type = T;
 };
 template <typename T> struct remove_vector<Vector1<T>>
 {
@@ -39,11 +39,11 @@ template <typename T> struct remove_vector<Vector4A<T>>
     using type = T;
 };
 
-// well, Complex is not per se a vector, but we use C1 directly as complex, but C2 to C4 as vector...
-template <typename T> struct remove_vector<Complex<T>>
-{
-    using type = T;
-};
+//// well, Complex is not per se a vector, but we use C1 directly as complex, but C2 to C4 as vector...
+// template <typename T> struct remove_vector<Complex<T>>
+//{
+//     using type = T;
+// };
 
 template <typename T> using remove_vector_t = typename remove_vector<T>::type;
 
@@ -51,6 +51,9 @@ template <typename T> struct vector_size : std::integral_constant<int, 0>
 {
 };
 template <typename T> struct vector_size<Vector1<T>> : std::integral_constant<int, 1>
+{
+};
+template <typename T> struct vector_size<Complex<T>> : std::integral_constant<int, 1>
 {
 };
 template <typename T> struct vector_size<Vector2<T>> : std::integral_constant<int, 2>
@@ -73,6 +76,9 @@ concept VectorType = (vector_size_v<T> > 0) && (vector_size_v<T> <= 4);
 
 template <typename T>
 concept IntVectorType = (vector_size_v<T> > 0) && (vector_size_v<T> <= 4) && Integral<remove_vector_t<T>>;
+
+template <typename T>
+concept SignedVectorType = (vector_size_v<T> > 0) && (vector_size_v<T> <= 4) && SignedNumber<remove_vector_t<T>>;
 
 template <typename T>
 concept FloatingVectorType = (vector_size_v<T> > 0) && (vector_size_v<T> <= 4) && FloatingPoint<remove_vector_t<T>>;

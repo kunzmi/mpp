@@ -1,1 +1,7 @@
+addCatchTest(test_affineTransformation.cpp "common;common.image" "AffineTransformation")
+addCatchTest(test_border.cpp "common;common.image" "Border")
+addCatchTest(test_matrix.cpp "common;common.image" "Matrix")
+addCatchTest(test_roi.cpp "common;common.image" "Roi")
 addCatchTest(test_threadSplit.cpp "common;common.image" "ThreadSplit")
+addCatchTest(test_size2D.cpp "common;common.image" "Size2D")
+addCatchTest(test_sizePitched.cpp "common;common.image" "SizePitched")

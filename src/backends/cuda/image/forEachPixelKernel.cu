@@ -18,9 +18,7 @@
 
 #include <backends/cuda/image/configurations.h>
 
-namespace opp
-{
-namespace image
+namespace opp::image::cuda
 {
 constexpr int WarpAlignmentInBytes = 64;
 
@@ -57,5 +55,4 @@ void forEachPixelKernelWithCuda(Pixel8uC4 *in1, size_t pitch1, Pixel8uC4 *in2, s
     }
 }
 
-} // namespace image
-} // namespace opp
+} // namespace opp::image::cuda

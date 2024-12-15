@@ -1,6 +1,5 @@
 #include "border.h"
-#include <common/vector2.h>
-#include <common/vector4.h>
+#include <common/vectorTypes.h>
 #include <istream>
 #include <ostream>
 
@@ -17,7 +16,7 @@ Border::Border(int aX, int aY) noexcept : lowerX(aX), lowerY(aY), higherX(aX), h
 Border::Border(int aSize) noexcept : lowerX(aSize), lowerY(aSize), higherX(aSize), higherY(aSize)
 {
 }
-Border::Border(const Vector4<int> &aVec) noexcept : lowerX(aVec.x), lowerY(aVec.y), higherX(aVec.z), higherY(aVec.w)
+Border::Border(const Vec4i &aVec) noexcept : lowerX(aVec.x), lowerY(aVec.y), higherX(aVec.z), higherY(aVec.w)
 {
 }
 Border::Border(int aArr[4]) noexcept : lowerX(aArr[0]), lowerY(aArr[1]), higherX(aArr[2]), higherY(aArr[3])
@@ -47,7 +46,7 @@ Border &Border::operator-=(int aOther)
     higherY -= aOther;
     return *this;
 }
-Border &Border::operator+=(const Vector2<int> &aOther)
+Border &Border::operator+=(const Vec2i &aOther)
 {
     lowerX += aOther.x;
     lowerY += aOther.y;
@@ -55,7 +54,7 @@ Border &Border::operator+=(const Vector2<int> &aOther)
     higherY += aOther.y;
     return *this;
 }
-Border &Border::operator-=(const Vector2<int> &aOther)
+Border &Border::operator-=(const Vec2i &aOther)
 {
     lowerX -= aOther.x;
     lowerY -= aOther.y;
@@ -107,7 +106,7 @@ std::wistream &operator>>(std::wistream &aIs, Border &aBorder)
     aIs >> aBorder.lowerX >> aBorder.lowerY >> aBorder.higherX >> aBorder.higherY;
     return aIs;
 }
-Border operator+(const Border &aLeft, const Vector2<int> &aRight)
+Border operator+(const Border &aLeft, const Vec2i &aRight)
 {
 
     return {aLeft.lowerX + aRight.x, aLeft.lowerY + aRight.y, aLeft.higherX + aRight.x, aLeft.higherY + aRight.y};
@@ -125,7 +124,7 @@ Border operator+(int aLeft, const Border &aRight)
 {
     return {aLeft + aRight.lowerX, aLeft + aRight.lowerY, aLeft + aRight.higherX, aLeft + aRight.higherY};
 }
-Border operator-(const Border &aLeft, const Vector2<int> &aRight)
+Border operator-(const Border &aLeft, const Vec2i &aRight)
 {
     return {aLeft.lowerX - aRight.x, aLeft.lowerY - aRight.y, aLeft.higherX - aRight.x, aLeft.higherY - aRight.y};
 }
@@ -142,7 +141,7 @@ Border operator-(int aLeft, const Border &aRight)
 {
     return {aLeft - aRight.lowerX, aLeft - aRight.lowerY, aLeft - aRight.higherX, aLeft - aRight.higherY};
 }
-Border operator*(const Border &aLeft, const Vector2<int> &aRight)
+Border operator*(const Border &aLeft, const Vec2i &aRight)
 {
     return {aLeft.lowerX * aRight.x, aLeft.lowerY * aRight.y, aLeft.higherX * aRight.x, aLeft.higherY * aRight.y};
 }
@@ -159,7 +158,7 @@ Border operator*(int aLeft, const Border &aRight)
 {
     return {aLeft * aRight.lowerX, aLeft * aRight.lowerY, aLeft * aRight.higherX, aLeft * aRight.higherY};
 }
-Border operator/(const Border &aLeft, const Vector2<int> &aRight)
+Border operator/(const Border &aLeft, const Vec2i &aRight)
 {
     return {aLeft.lowerX / aRight.x, aLeft.lowerY / aRight.y, aLeft.higherX / aRight.x, aLeft.higherY / aRight.y};
 }

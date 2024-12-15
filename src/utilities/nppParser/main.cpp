@@ -13,96 +13,7 @@
 #include <string>
 #include <vector>
 
-bool baseNameHas_(const std::string &aFName)
-{
-    const size_t first_  = aFName.find('_');
-    const size_t second_ = aFName.find('_', first_ + 1);
-
-    std::string shouldBeType = aFName.substr(first_ + 1, second_ - first_ - 1);
-    // if the type string doesn't start with a number, it is likely that the actual name contains a '_'
-
-    if (shouldBeType.empty())
-    {
-        return false;
-    }
-    if (shouldBeType[0] == '8' || shouldBeType[0] == '1' || shouldBeType[0] == '3' || shouldBeType[0] == '6')
-    {
-        return false;
-    }
-    return true;
-}
-
-bool isMergedColorTwist(const std::string &aFName)
-{
-    return aFName.find("_ColorTwist32f_") < aFName.size();
-}
-
-std::string getTypeString(const std::string &aFName)
-{
-    if (aFName == "nppiYCCKToCMYK_JPEG_601_8u_P4R" || aFName == "nppiYCCKToCMYK_JPEG_601_8u_P4R_Ctx")
-    {
-        return "8u";
-    }
-
-    if (!baseNameHas_(aFName))
-    {
-        const size_t first_  = aFName.find('_');
-        const size_t second_ = aFName.find('_', first_ + 1);
-        return aFName.substr(first_ + 1, second_ - first_ - 1);
-    }
-    const size_t first_  = aFName.find('_');
-    const size_t second_ = aFName.find('_', first_ + 1);
-    const size_t third_  = aFName.find('_', second_ + 1);
-    return aFName.substr(second_ + 1, third_ - second_ - 1);
-}
-
-std::string getChannelString(const std::string &aFName)
-{
-    if (aFName == "nppiYCCKToCMYK_JPEG_601_8u_P4R" || aFName == "nppiYCCKToCMYK_JPEG_601_8u_P4R_Ctx")
-    {
-        return "P4R";
-    }
-
-    if (!baseNameHas_(aFName) && !isMergedColorTwist(aFName))
-    {
-        const size_t first_  = aFName.find('_');
-        const size_t second_ = aFName.find('_', first_ + 1);
-        const size_t third_  = aFName.find('_', second_ + 1);
-        return aFName.substr(second_ + 1, third_ - second_ - 1);
-    }
-
-    const size_t first_  = aFName.find('_');
-    const size_t second_ = aFName.find('_', first_ + 1);
-    const size_t third_  = aFName.find('_', second_ + 1);
-    const size_t fourth_ = aFName.find('_', third_ + 1);
-    return aFName.substr(third_ + 1, fourth_ - third_ - 1);
-}
-
-std::string getBaseName(const std::string &aFName)
-{
-    if (aFName == "nppiYCCKToCMYK_JPEG_601_8u_P4R" || aFName == "nppiYCCKToCMYK_JPEG_601_8u_P4R_Ctx")
-    {
-        return "nppiYCCKToCMYK_JPEG_601";
-    }
-    if (aFName == "nppiFusedAbsDiff_Threshold_GTVal_Ctx" || aFName == "nppiFusedAbsDiff_Threshold_GTVal_I_Ctx")
-    {
-        return "nppiFusedAbsDiff_Threshold_GTVal";
-    }
-
-    if (baseNameHas_(aFName))
-    {
-        const size_t first_  = aFName.find('_');
-        const size_t second_ = aFName.find('_', first_ + 1);
-        return aFName.substr(0, second_);
-    }
-
-    return aFName.substr(0, aFName.find('_'));
-}
-
-bool getContext(const std::string &aFName)
-{
-    return aFName.substr(aFName.size() - 3) == "Ctx";
-}
+using namespace opp::utilities::nppParser;
 
 struct NppiFunction
 {
@@ -142,7 +53,7 @@ struct NppiFunction
     bool planarInSomeWay{false};
 };
 
-inline void to_json(nlohmann::json &aj, const NppiFunction &aFunction)
+void to_json(nlohmann::json &aj, const NppiFunction &aFunction)
 {
     aj = nlohmann::json{{"name", aFunction.name},           {"category", aFunction.category},
                         {"type8s", aFunction.type8s},       {"type8u", aFunction.type8u},
@@ -160,7 +71,7 @@ inline void to_json(nlohmann::json &aj, const NppiFunction &aFunction)
                         {"withMask", aFunction.withMask},   {"planarInSomeWay", aFunction.planarInSomeWay}};
 }
 
-inline std::string to_string(const NppiFunction &aFunction, const std::string &aSeperator = "\t")
+std::string to_string(const NppiFunction &aFunction, const std::string &aSeperator = "\t")
 {
     std::stringstream ss;
 
@@ -196,7 +107,7 @@ inline std::string to_string(const NppiFunction &aFunction, const std::string &a
     return ss.str();
 }
 
-inline std::string getTitleString(const std::string &aSeperator = "\t")
+std::string getTitleString(const std::string &aSeperator = "\t")
 {
     std::stringstream ss;
 
@@ -438,22 +349,22 @@ int main()
     try
     {
         std::map<std::string, NppiFunction> nppiFunctions;
-        // std::vector<nppParser::Function> undecided;
+        // std::vector<Function> undecided;
 
-        const std::vector<nppParser::Function> functions = nppParser::NPPParser::GetFunctions();
+        const std::vector<Function> functions = NPPParser::GetFunctions();
 
         // std::set<std::string> undecidedClean;
 
         for (const auto &elem : functions)
         {
-            const std::string name = getBaseName(elem.name);
+            const std::string name = NPPParser::GetBaseName(elem.name);
 
             NppiFunction &f = nppiFunctions[name];
             f.name          = name;
             f.category      = elem.category;
-            bool ok         = setType(getTypeString(elem.name), f);
-            ok &= setChannel(getChannelString(elem.name), f);
-            ok &= setContext(getContext(elem.name), f);
+            bool ok         = setType(NPPParser::GetTypeString(elem.name), f);
+            ok &= setChannel(NPPParser::GetChannelString(elem.name), f);
+            ok &= setContext(NPPParser::GetContext(elem.name), f);
             if (!ok)
             {
                 /*undecided.push_back(elem);
@@ -463,12 +374,12 @@ int main()
 
             /*NppiFunction& f = nppiFunctions[name];
             f.name = name;
-            setType(getTypeString(elem.name), f);
-            setChannel(getChannelString(elem.name), f);
-            setContext(getContext(elem.name), f);*/
+            setType(NPPParser::GetTypeString(elem.name), f);
+            setChannel(NPPParser::GetChannelString(elem.name), f);
+            setContext(NPPParser::GetContext(elem.name), f);*/
         }
 
-        // std::sort(undecided.begin(), undecided.end(), [](const nppParser::Function& a, const nppParser::Function& b)
+        // std::sort(undecided.begin(), undecided.end(), [](const Function& a, const Function& b)
         // {return a.name < b.name; });
 
         // for (const auto& elem : undecidedClean)
@@ -481,7 +392,8 @@ int main()
         // std::cout << std::endl;
         // std::cout << std::endl;
 
-        std::ofstream of(R"(F:\ogpp\nppParser\functionlist.txt)");
+        std::filesystem::path outFile = std::filesystem::path(DEFAULT_OUT_DIR) / "nppFunctionlist.txt";
+        std::ofstream of(outFile);
 
         of << getTitleString() << std::endl;
 

@@ -15,6 +15,10 @@ using long64  = std::int64_t;
 constexpr byte TRUE_VALUE  = 255; // NPP result of comparisons is 255 for "true"
 constexpr byte FALSE_VALUE = 0;
 
+struct voidType
+{
+};
+
 // with these compiler dependent concepts and defines, we can enable/disable
 // code segments even if host code never is compiled by nvcc or hipcc
 #ifdef __CUDACC__
@@ -124,6 +128,13 @@ concept HOST_COMPILER = std::true_type::value;
 #define RESTRICT
 #endif
 
+// clang on mac doesn't support parallel execution, so disable it by macro:
+#ifdef __APPLE__
+#define EXECMODE(type) // NOLINT
+#else
+#define EXECMODE(type) type, // NOLINT
+#endif
+
 template <typename T>
 concept HostCode = HOST_COMPILER<T>;
 
@@ -173,9 +184,13 @@ concept SignedNumber = FloatingPoint<T> || SignedIntegral<T>;
 template <typename T>
 concept ByteSizeType = sizeof(T) == 1;
 
-// T is sizeof 2 byte
+// T is sizeof 2 bytes
 template <typename T>
 concept TwoBytesSizeType = sizeof(T) == 2;
+
+// T is sizeof 4 bytes
+template <typename T>
+concept FourBytesSizeType = sizeof(T) == 4;
 
 // size is Power of 2
 template <std::size_t size>

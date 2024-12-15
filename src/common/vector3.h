@@ -1,4 +1,5 @@
 #pragma once
+#include "complex_typetraits.h"
 #include "defines.h"
 #include "exception.h"
 #include "limits.h"
@@ -72,7 +73,7 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector3
     T z;
 
     /// <summary>
-    /// Default constructor does not initializes the members
+    /// Default constructor does not initialize the members
     /// </summary>
     DEVICE_CODE Vector3() noexcept
     {
@@ -148,82 +149,81 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector3
 
     // don't use space-ship operator as it returns true if any comparison returns true.
     // But NPP only returns true if all channels fulfill the comparison.
-    // Also return TRUE_VALUE as byte instead of bool
     // auto operator<=>(const Vector3 &) const = default;
 
     /// <summary>
-    /// Returns true-value if each element comparison is true
+    /// Returns true if each element comparison is true
     /// </summary>
-    byte operator<(const Vector3 &aOther) const
+    DEVICE_CODE [[nodiscard]] bool operator<(const Vector3 &aOther) const
     {
         bool res = x < aOther.x;
         res &= y < aOther.y;
         res &= z < aOther.z;
-        return res * TRUE_VALUE;
+        return res;
     }
 
     /// <summary>
-    /// Returns true-value if each element comparison is true
+    /// Returns true if each element comparison is true
     /// </summary>
-    byte operator<=(const Vector3 &aOther) const
+    DEVICE_CODE [[nodiscard]] bool operator<=(const Vector3 &aOther) const
     {
         bool res = x <= aOther.x;
         res &= y <= aOther.y;
         res &= z <= aOther.z;
-        return res * TRUE_VALUE;
+        return res;
     }
 
     /// <summary>
-    /// Returns true-value if each element comparison is true
+    /// Returns true if each element comparison is true
     /// </summary>
-    byte operator>(const Vector3 &aOther) const
+    DEVICE_CODE [[nodiscard]] bool operator>(const Vector3 &aOther) const
     {
         bool res = x > aOther.x;
         res &= y > aOther.y;
         res &= z > aOther.z;
-        return res * TRUE_VALUE;
+        return res;
     }
 
     /// <summary>
-    /// Returns true-value if each element comparison is true
+    /// Returns true if each element comparison is true
     /// </summary>
-    byte operator>=(const Vector3 &aOther) const
+    DEVICE_CODE [[nodiscard]] bool operator>=(const Vector3 &aOther) const
     {
         bool res = x >= aOther.x;
         res &= y >= aOther.y;
         res &= z >= aOther.z;
-        return res * TRUE_VALUE;
+        return res;
     }
 
     /// <summary>
-    /// Returns true-value if each element comparison is true
+    /// Returns true if each element comparison is true
     /// </summary>
-    byte operator==(const Vector3 &aOther) const
+    DEVICE_CODE [[nodiscard]] bool operator==(const Vector3 &aOther) const
     {
         bool res = x == aOther.x;
         res &= y == aOther.y;
         res &= z == aOther.z;
-        return res * TRUE_VALUE;
+        return res;
     }
 
     /// <summary>
-    /// Returns true-value if any element comparison is true
+    /// Returns true if any element comparison is true
     /// </summary>
-    byte operator!=(const Vector3 &aOther) const
+    DEVICE_CODE [[nodiscard]] bool operator!=(const Vector3 &aOther) const
     {
         bool res = x != aOther.x;
         res |= y != aOther.y;
         res |= z != aOther.z;
-        return res * TRUE_VALUE;
+        return res;
     }
 
     /// <summary>
     /// Negation
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector3 operator-() const
-        requires SignedNumber<T>
+        requires SignedNumber<T> || ComplexType<T>
     {
-        return Vector3<T>(T(-x), T(-y), T(-z));
+        return Vector3<T>(-x, -y, -z);
     }
 
     /// <summary>
@@ -1040,53 +1040,81 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Component wise minimum
     /// </summary>
-    [[nodiscard]] Vector3<T> Min(const Vector3<T> &aRight) const
-        requires HostCode<T>
+    DEVICE_CODE void Min(const Vector3<T> &aRight)
+        requires DeviceCode<T>
     {
-        return Vector3<T>{std::min(x, aRight.x), std::min(y, aRight.y), std::min(z, aRight.z)};
+        x = min(x, aRight.x);
+        y = min(y, aRight.y);
+        z = min(z, aRight.z);
     }
 
     /// <summary>
     /// Component wise minimum
     /// </summary>
-    DEVICE_CODE [[nodiscard]] Vector3<T> Min(const Vector3<T> &aRight) const
-        requires DeviceCode<T>
-    {
-        return Vector3<T>{min(x, aRight.x), min(y, aRight.y), min(z, aRight.z)};
-    }
-
-    /// <summary>
-    /// Component wise maximum
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] Vector3<T> Max(const Vector3<T> &aRight) const
-        requires DeviceCode<T>
-    {
-        return Vector3<T>{max(x, aRight.x), max(y, aRight.y), max(z, aRight.z)};
-    }
-
-    /// <summary>
-    /// Component wise maximum
-    /// </summary>
-    [[nodiscard]] Vector3<T> Max(const Vector3<T> &aRight) const
+    void Min(const Vector3<T> &aRight)
         requires HostCode<T>
     {
-        return Vector3<T>{std::max(x, aRight.x), std::max(y, aRight.y), std::max(z, aRight.z)};
+        x = std::min(x, aRight.x);
+        y = std::min(y, aRight.y);
+        z = std::min(z, aRight.z);
+    }
+
+    /// <summary>
+    /// Component wise maximum
+    /// </summary>
+    DEVICE_CODE void Max(const Vector3<T> &aRight)
+        requires DeviceCode<T>
+    {
+        x = max(x, aRight.x);
+        y = max(y, aRight.y);
+        z = max(z, aRight.z);
+    }
+
+    /// <summary>
+    /// Component wise maximum
+    /// </summary>
+    void Max(const Vector3<T> &aRight)
+        requires HostCode<T>
+    {
+        x = std::max(x, aRight.x);
+        y = std::max(y, aRight.y);
+        z = std::max(z, aRight.z);
     }
 
     /// <summary>
     /// Component wise minimum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector3<T> Min(const Vector3<T> &aLeft, const Vector3<T> &aRight)
+        requires DeviceCode<T>
     {
-        return aLeft.Min(aRight);
+        return Vector3<T>{min(aLeft.x, aRight.x), min(aLeft.y, aRight.y), min(aLeft.z, aRight.z)};
+    }
+
+    /// <summary>
+    /// Component wise minimum
+    /// </summary>
+    [[nodiscard]] static Vector3<T> Min(const Vector3<T> &aLeft, const Vector3<T> &aRight)
+        requires HostCode<T>
+    {
+        return Vector3<T>{std::min(aLeft.x, aRight.x), std::min(aLeft.y, aRight.y), std::min(aLeft.z, aRight.z)};
     }
 
     /// <summary>
     /// Component wise maximum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector3<T> Max(const Vector3<T> &aLeft, const Vector3<T> &aRight)
+        requires DeviceCode<T>
     {
-        return aLeft.Max(aRight);
+        return Vector3<T>{max(aLeft.x, aRight.x), max(aLeft.y, aRight.y), max(aLeft.z, aRight.z)};
+    }
+
+    /// <summary>
+    /// Component wise maximum
+    /// </summary>
+    [[nodiscard]] static Vector3<T> Max(const Vector3<T> &aLeft, const Vector3<T> &aRight)
+        requires HostCode<T>
+    {
+        return Vector3<T>{std::max(aLeft.x, aRight.x), std::max(aLeft.y, aRight.y), std::max(aLeft.z, aRight.z)};
     }
 
     /// <summary>
@@ -1350,6 +1378,22 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector3
     DEVICE_CODE [[nodiscard]] Vector2<T> YZ() const
     {
         return Vector2<T>(y, z);
+    }
+
+    /// <summary>
+    /// Provide a smiliar accessor to inner data similar to std container
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] T *data()
+    {
+        return &x;
+    }
+
+    /// <summary>
+    /// Provide a smiliar accessor to inner data similar to std container
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] const T *data() const
+    {
+        return &x;
     }
 };
 

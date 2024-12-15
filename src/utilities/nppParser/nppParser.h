@@ -2,13 +2,15 @@
 
 #include "function.h"
 #include <clang-c/Index.h>
+#include <common/image/pixelTypes.h>
 #include <filesystem>
 #include <json.h>
 #include <string>
 #include <vector>
 
-namespace nppParser
+namespace opp::utilities::nppParser
 {
+
 class NPPParser
 {
   public:
@@ -16,6 +18,36 @@ class NPPParser
     ~NPPParser() = default;
 
     static std::vector<Function> GetFunctions();
+
+    static bool BaseNameHas_(const std::string &aFName);
+
+    static bool IsMergedColorTwist(const std::string &aFName);
+
+    static std::string GetTypeString(const std::string &aFName);
+
+    static std::string GetChannelString(const std::string &aFName);
+
+    static std::string GetBaseName(const std::string &aFName);
+
+    static std::string GetShortName(Function &aFunction);
+
+    static bool GetContext(const std::string &aFName);
+
+    static opp::image::PixelTypeEnum GetPixelType(Function &aFunction);
+
+    static bool IsPlanar(Function &aFunction);
+
+    static bool IsInplace(Function &aFunction);
+
+    static bool IsMasked(Function &aFunction);
+
+    static bool IsSfs(Function &aFunction);
+
+    static bool IsCtx(Function &aFunction);
+
+    static bool IsConstant(Function &aFunction);
+
+    static bool IsDeviceConstant(Function &aFunction);
 
   private:
     static const std::filesystem::path _basePath;
@@ -33,4 +65,4 @@ class NPPParser
     static std::vector<Function> GetFunctions(size_t aHeaderID);
 };
 
-} // namespace nppParser
+} // namespace opp::utilities::nppParser

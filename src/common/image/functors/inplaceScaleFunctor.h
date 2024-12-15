@@ -30,15 +30,15 @@ struct InplaceScaleFunctor : public ImageFunctor<true>
 {
     remove_vector_t<ComputeT> ScaleFactor;
 
-    operation Op;
+    [[no_unique_address]] operation Op;
 
-    RoundFunctor<roundingMode, ComputeT> round;
+    [[no_unique_address]] RoundFunctor<roundingMode, ComputeT> round;
 
     InplaceScaleFunctor()
     {
     }
 
-    InplaceScaleFunctor(operation aOp, remove_vector_t<ComputeT> aScaleFactor) : Op(aOp), ScaleFactor(aScaleFactor)
+    InplaceScaleFunctor(operation aOp, remove_vector_t<ComputeT> aScaleFactor) : ScaleFactor(aScaleFactor), Op(aOp)
     {
     }
 

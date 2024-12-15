@@ -1,9 +1,11 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <common/defines.h>
+#include <common/image/affineTransformation.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/threadSplit.h>
 #include <common/safeCast.h>
+#include <common/vector2.h>
 #include <common/vectorTypes.h>
 #include <cstddef>
 #include <cstdint>

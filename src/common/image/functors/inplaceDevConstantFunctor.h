@@ -30,15 +30,15 @@ struct InplaceDevConstantFunctor : public ImageFunctor<true>
 {
     const DstT *RESTRICT Constant;
 
-    operation Op;
+    [[no_unique_address]] operation Op;
 
-    RoundFunctor<roundingMode, ComputeT> round;
+    [[no_unique_address]] RoundFunctor<roundingMode, ComputeT> round;
 
     InplaceDevConstantFunctor()
     {
     }
 
-    InplaceDevConstantFunctor(const DstT *aConstant, operation aOp) : Op(aOp), Constant(aConstant)
+    InplaceDevConstantFunctor(const DstT *aConstant, operation aOp) : Constant(aConstant), Op(aOp)
     {
     }
 

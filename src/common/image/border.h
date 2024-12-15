@@ -1,15 +1,14 @@
 #pragma once
 #include <common/defines.h>
 #include <common/image/size2D.h>
-#include <common/vector2.h>
-#include <common/vector4.h>
+#include <common/vectorTypes.h>
 
 namespace opp::image
 {
 /// <summary>
 /// A Border defines the number of border pixels on each side of a 2D roi
 /// Note: we avoid any absolute referencing like top/left or lower/right as an image can have any orientation. Instead
-/// we only reference lower X -> higher X accoriding to the coordinate value.
+/// we only reference lower X -> higher X according to the coordinate value.
 /// Note: in device code, only the value members are available.
 /// </summary>
 struct alignas(4 * sizeof(int)) Border
@@ -30,7 +29,7 @@ struct alignas(4 * sizeof(int)) Border
     Border(int aLowerX, int aLowerY, int aHigherX, int aHigherY) noexcept;
 
     /// <summary>
-    /// Initializes a new border to (aX, aY, aX,aY)
+    /// Initializes a new border to (aX, aY, aX, aY)
     /// </summary>
     Border(int aX, int aY) noexcept;
 
@@ -42,7 +41,7 @@ struct alignas(4 * sizeof(int)) Border
     /// <summary>
     /// Initializes a new border to (aVec.x, aVec.y, aVec.z, aVec.w)
     /// </summary>
-    Border(const Vector4<int> &aVec) noexcept; // NOLINT(hicpp-explicit-conversions)
+    Border(const Vec4i &aVec) noexcept; // NOLINT(hicpp-explicit-conversions)
 
     /// <summary>
     /// Initializes a new border to (aArr[0], aArr[1], aArr[2], aArr[3])
@@ -74,12 +73,12 @@ struct alignas(4 * sizeof(int)) Border
     /// <summary>
     /// Enlarges the border by the specified amount, different values for X and Y
     /// </summary>
-    Border &operator+=(const Vector2<int> &aOther);
+    Border &operator+=(const Vec2i &aOther);
 
     /// <summary>
     /// Reduces the border by the specified amount, different values for X and Y
     /// </summary>
-    Border &operator-=(const Vector2<int> &aOther);
+    Border &operator-=(const Vec2i &aOther);
 
     /// <summary>
     /// Component wise multiplication
@@ -102,20 +101,20 @@ struct alignas(4 * sizeof(int)) Border
     bool operator!=(const Border &aOther) const;
 };
 
-Border operator+(const Border &aLeft, const Vector2<int> &aRight);
+Border operator+(const Border &aLeft, const Vec2i &aRight);
 Border operator+(const Border &aLeft, const Border &aRight);
 Border operator+(const Border &aLeft, int aRight);
 Border operator+(int aLeft, const Border &aRight);
-Border operator-(const Border &aLeft, const Vector2<int> &aRight);
+Border operator-(const Border &aLeft, const Vec2i &aRight);
 Border operator-(const Border &aLeft, const Border &aRight);
 Border operator-(const Border &aLeft, int aRight);
 Border operator-(int aLeft, const Border &aRight);
 
-Border operator*(const Border &aLeft, const Vector2<int> &aRight);
+Border operator*(const Border &aLeft, const Vec2i &aRight);
 Border operator*(const Border &aLeft, const Border &aRight);
 Border operator*(const Border &aLeft, int aRight);
 Border operator*(int aLeft, const Border &aRight);
-Border operator/(const Border &aLeft, const Vector2<int> &aRight);
+Border operator/(const Border &aLeft, const Vec2i &aRight);
 Border operator/(const Border &aLeft, const Border &aRight);
 Border operator/(const Border &aLeft, int aRight);
 Border operator/(int aLeft, const Border &aRight);

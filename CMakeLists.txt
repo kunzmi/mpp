@@ -80,30 +80,55 @@ find_package(LIBCLANG REQUIRED)
 
 ######################### CUDA ##################################
 
+if (NOT APPLE)
+	find_package(CUDAToolkit 12.0 REQUIRED)
+	# we need it in order to link to NPP
+endif()
 #find_package(CUDAToolkit REQUIRED)
 
 ######################### CUDA ##################################
 
+
+########################## ZLIB ##########################
+if(WIN32)
+	add_library(zlib STATIC IMPORTED)
+	set_target_properties(zlib PROPERTIES
+		IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/external/lib/zlib/zlibstatic.lib
+		INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/external/include/"
+	)
+	link_directories(${CMAKE_SOURCE_DIR}/external/lib/zlib/)
+elseif(APPLE)
+	find_package( ZLIB REQUIRED )
+else()
+	add_library(zlib STATIC IMPORTED)
+	set_target_properties(zlib PROPERTIES
+		IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/external/lib/zlib/libz.a
+		INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/external/include/"
+	)
+	link_directories(${CMAKE_SOURCE_DIR}/external/lib/zlib/)
+endif()
+##########################################################
+
 ######################### LIBPNG ##############################
 
-if(WIN32)
-	# On windows, use the lib compiled by us:
-	add_library(PNG::PNG SHARED IMPORTED)
-	set_target_properties(PNG::PNG PROPERTIES
-		IMPORTED_LOCATION "F:/ImportantLibs/lpng1643/projects/vstudio/x64/Debug/libpng16.dll"		
-		IMPORTED_IMPLIB "F:/ImportantLibs/lpng1643/projects/vstudio/x64/Debug/libpng16.lib"
-		INTERFACE_INCLUDE_DIRECTORIES "F:/ImportantLibs/lpng1643/"
-	)
-	#link_directories("F:/ImportantLibs/libpng/projects/vstudio/Debug/")
-
-	set(PNG_FOUND TRUE)
-elseif(APPLE)
-	# use libpng from system:
-	find_package(PNG REQUIRED)
-else()
-	# use libpng from system:
-	find_package(PNG REQUIRED)
-endif()
+#if(WIN32)
+#	# On windows, use the lib compiled by us:
+#	add_library(PNG::PNG SHARED IMPORTED)
+#	set_target_properties(PNG::PNG PROPERTIES
+#		IMPORTED_LOCATION "F:/ImportantLibs/lpng1643/projects/vstudio/x64/Debug/libpng16.dll"		
+#		IMPORTED_IMPLIB "F:/ImportantLibs/lpng1643/projects/vstudio/x64/Debug/libpng16.lib"
+#		INTERFACE_INCLUDE_DIRECTORIES "F:/ImportantLibs/lpng1643/"
+#	)
+#	#link_directories("F:/ImportantLibs/libpng/projects/vstudio/Debug/")
+#
+#	set(PNG_FOUND TRUE)
+#elseif(APPLE)
+#	# use libpng from system:
+#	find_package(PNG REQUIRED)
+#else()
+#	# use libpng from system:
+#	find_package(PNG REQUIRED)
+#endif()
 
 ######################### LIBPNG ################################
 

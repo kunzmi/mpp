@@ -37,9 +37,9 @@ struct SrcSrcScaleFunctor : public ImageFunctor<false>
 
     remove_vector_t<ComputeT> ScaleFactor;
 
-    operation Op;
+    [[no_unique_address]] operation Op;
 
-    RoundFunctor<roundingMode, ComputeT> round;
+    [[no_unique_address]] RoundFunctor<roundingMode, ComputeT> round;
 
     SrcSrcScaleFunctor()
     {
@@ -47,7 +47,7 @@ struct SrcSrcScaleFunctor : public ImageFunctor<false>
 
     SrcSrcScaleFunctor(const SrcT *aSrc1, size_t aSrcPitch1, const SrcT *aSrc2, size_t aSrcPitch2, operation aOp,
                        remove_vector_t<ComputeT> aScaleFactor)
-        : Op(aOp), ScaleFactor(aScaleFactor), Src1(aSrc1), SrcPitch2(aSrcPitch2), SrcPitch1(aSrcPitch1), Src2(aSrc2)
+        : Src1(aSrc1), SrcPitch2(aSrcPitch2), SrcPitch1(aSrcPitch1), Src2(aSrc2), ScaleFactor(aScaleFactor), Op(aOp)
     {
     }
 

@@ -184,11 +184,11 @@ TEST_CASE("Pixel32fC4", "[Common]")
     Pixel32fC4 minmax1(10, 20, -10, 50);
     Pixel32fC4 minmax2(-20, 10, 40, 30);
 
-    CHECK((minmax1.Min(minmax2) == Pixel32fC4(-20, 10, -10, 30)) == TRUE_VALUE);
-    CHECK((minmax2.Min(minmax1) == Pixel32fC4(-20, 10, -10, 30)) == TRUE_VALUE);
+    CHECK(Pixel32fC4::Min(minmax1, minmax2) == Pixel32fC4(-20, 10, -10, 30));
+    CHECK(Pixel32fC4::Min(minmax2, minmax1) == Pixel32fC4(-20, 10, -10, 30));
 
-    CHECK((minmax1.Max(minmax2) == Pixel32fC4(10, 20, 40, 50)) == TRUE_VALUE);
-    CHECK((minmax2.Max(minmax1) == Pixel32fC4(10, 20, 40, 50)) == TRUE_VALUE);
+    CHECK(Pixel32fC4::Max(minmax1, minmax2) == Pixel32fC4(10, 20, 40, 50));
+    CHECK(Pixel32fC4::Max(minmax2, minmax1) == Pixel32fC4(10, 20, 40, 50));
 
     CHECK(minmax2.Min() == -20);
     CHECK(minmax1.Max() == 50);
@@ -207,7 +207,7 @@ TEST_CASE("Pixel32fC4_additionalMethods", "[Common]")
     CHECK(norm.z == Approx(0.5345).margin(0.001));
     CHECK(norm.w == Approx(0.6236).margin(0.001));
 
-    CHECK((Pixel32fC4::Normalize(Pixel32fC4(4, 5, 6, 7)) == norm) == TRUE_VALUE);
+    CHECK((Pixel32fC4::Normalize(Pixel32fC4(4, 5, 6, 7)) == norm));
 
     Pixel32fC4 roundA(0.4f, 0.5f, 0.6f, 1.5f);
     Pixel32fC4 roundB(1.9f, -1.5f, -2.5f, numeric_limits<float>::maxExact() - 0.5f);
@@ -567,11 +567,11 @@ TEST_CASE("Pixel32sC4", "[Common]")
     Pixel32sC4 minmax1(10, 20, -10, 50);
     Pixel32sC4 minmax2(-20, 10, 40, 30);
 
-    CHECK((minmax1.Min(minmax2) == Pixel32sC4(-20, 10, -10, 30)) == TRUE_VALUE);
-    CHECK((minmax2.Min(minmax1) == Pixel32sC4(-20, 10, -10, 30)) == TRUE_VALUE);
+    CHECK(Pixel32sC4::Min(minmax1, minmax2) == Pixel32sC4(-20, 10, -10, 30));
+    CHECK(Pixel32sC4::Min(minmax2, minmax1) == Pixel32sC4(-20, 10, -10, 30));
 
-    CHECK((minmax1.Max(minmax2) == Pixel32sC4(10, 20, 40, 50)) == TRUE_VALUE);
-    CHECK((minmax2.Max(minmax1) == Pixel32sC4(10, 20, 40, 50)) == TRUE_VALUE);
+    CHECK(Pixel32sC4::Max(minmax1, minmax2) == Pixel32sC4(10, 20, 40, 50));
+    CHECK(Pixel32sC4::Max(minmax2, minmax1) == Pixel32sC4(10, 20, 40, 50));
 
     CHECK(minmax2.Min() == -20);
     CHECK(minmax1.Max() == 50);

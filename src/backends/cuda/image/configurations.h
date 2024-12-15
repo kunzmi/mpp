@@ -3,7 +3,7 @@
 #include <common/image/pixelTypes.h>
 #include <cuda_runtime_api.h>
 
-namespace opp::cuda::image
+namespace opp::image::cuda
 {
 struct ConstExprDim3
 {
@@ -47,4 +47,4 @@ struct KernelConfiguration
 //     static constexpr int WarpAlignmentInBytes{DefaultConfiguration::WarpAlignmentInBytes};
 //     static constexpr size_t TupelSize{typeSize == 1 ? 8 : typeSize == 2 ? 4 : typeSize == 4 ? 2 : 1};
 // };
-} // namespace opp::cuda::image
+} // namespace opp::image::cuda
