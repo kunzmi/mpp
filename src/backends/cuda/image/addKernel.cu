@@ -6,10 +6,12 @@
 #include <backends/cuda/streamCtx.h>
 #include <backends/cuda/templateRegistry.h>
 #include <common/arithmetic/binary_operators.h>
+#include <common/defines.h>
 #include <common/image/functors/srcSrcFunctor.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
+#include <common/opp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
@@ -30,7 +32,8 @@ void InvokeAddSrcSrc(const SrcT *aSrc1, size_t pitchSrc1, const SrcT *aSrc2, siz
     constexpr size_t TupelSize         = KernelConfiguration<sizeof(DstT)>::TupelSize;
     constexpr uint SharedMemory        = 0;
 
-    if constexpr (is_simd_type_v<DstT>)
+    using simdOP_t = simd::Add<Tupel<DstT, TupelSize>>;
+    if constexpr (simdOP_t::has_simd)
     {
         // Note: we have two SIMD versions for CUDA: SIMD over Vector4 and Vector2 types for (s)byte/(u)short and SIMD
         // over Tupels for Vector1 and Vector2 types for (s)byte/(u)short. The Vector4/2 SIMD is activated using the
@@ -38,11 +41,11 @@ void InvokeAddSrcSrc(const SrcT *aSrc1, size_t pitchSrc1, const SrcT *aSrc2, siz
         // The Tupel-SIMD is activated here:
 
         // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
-        using addSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoudingMode::None, DstT,
-                                        simd::Add<Tupel<DstT, TupelSize>>>;
+        using addSrcSrc =
+            SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoudingMode::None, DstT, simdOP_t>;
 
         Add<ComputeT> op;
-        simd::Add<Tupel<DstT, TupelSize>> opSIMD;
+        simdOP_t opSIMD;
 
         addSrcSrc functor(aSrc1, pitchSrc1, aSrc2, pitchSrc2, op, opSIMD);
 
@@ -92,17 +95,26 @@ SIMDInstantiate_For(Pixel8sC4);
 DefaultInstantiate_For(Pixel16uC1);
 SIMDInstantiate_For(Pixel16uC2);
 DefaultInstantiate_For(Pixel16uC3);
-DefaultInstantiate_For(Pixel16uC4);
+SIMDInstantiate_For(Pixel16uC4);
 
 DefaultInstantiate_For(Pixel16sC1);
 SIMDInstantiate_For(Pixel16sC2);
 DefaultInstantiate_For(Pixel16sC3);
-DefaultInstantiate_For(Pixel16sC4);
+SIMDInstantiate_For(Pixel16sC4);
 
 DefaultForAllChannels(32u);
 DefaultForAllChannels(32s);
 
-// forAllChannels(16f);
+DefaultInstantiate_For(Pixel16fC1);
+SIMDInstantiate_For(Pixel16fC2);
+DefaultInstantiate_For(Pixel16fC3);
+SIMDInstantiate_For(Pixel16fC4);
+
+DefaultInstantiate_For(Pixel16bfC1);
+SIMDInstantiate_For(Pixel16bfC2);
+DefaultInstantiate_For(Pixel16bfC3);
+SIMDInstantiate_For(Pixel16bfC4);
+
 DefaultForAllChannels(32f);
 DefaultForAllChannels(64f);
 

@@ -59,12 +59,12 @@ AffineTransformation::AffineTransformation(double a00, double a01, double a02, d
                                            double a12) noexcept
     : mData()
 {
-    mData[GetIndex(0, 0)] = a00;
-    mData[GetIndex(0, 1)] = a01;
-    mData[GetIndex(0, 2)] = a02;
-    mData[GetIndex(1, 0)] = a10;
-    mData[GetIndex(1, 1)] = a11;
-    mData[GetIndex(1, 2)] = a12;
+    mData[GetIndex(0, 0)] = a00; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+    mData[GetIndex(0, 1)] = a01; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+    mData[GetIndex(0, 2)] = a02; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+    mData[GetIndex(1, 0)] = a10; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+    mData[GetIndex(1, 1)] = a11; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+    mData[GetIndex(1, 2)] = a12; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 }
 
 AffineTransformation::AffineTransformation(const std::pair<Vec2d, Vec2d> &aP0, const std::pair<Vec2d, Vec2d> &aP1,

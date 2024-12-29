@@ -19,6 +19,7 @@ namespace opp::image::cpuSimple
 template <PixelType T> class ImageView
 {
   public:
+    // With this iterator we can use a simple foreach-loop over the imageView to iterate through the pixels
     struct iterator
     {
       private:
@@ -44,7 +45,10 @@ template <PixelType T> class ImageView
         using value_type        = T;
         using difference_type   = std::ptrdiff_t;
         using pointer           = T *;
-        using reference         = T &;
+        // By setting the reference type to the iterator itself, foreach-loops allow us the access to the iterator
+        // and we have the information of the current pixel coordinate. To access the actual pixel value, we use the
+        // Value() method.
+        using reference = ImageView<T>::iterator &;
 
         iterator &operator++()
         {
@@ -92,7 +96,8 @@ template <PixelType T> class ImageView
 
         reference operator*()
         {
-            return *gotoPtr(mImgView.mPtr, mImgView.mPitch, mPixel.x, mPixel.y);
+            return *this;
+            // return *gotoPtr(mImgView.mPtr, mImgView.mPitch, mPixel.x, mPixel.y);
         }
 
         pointer operator->()
@@ -117,7 +122,11 @@ template <PixelType T> class ImageView
                 x += mImgView.mRoi.width;
                 y--;
             }
-            return *gotoPtr(mImgView.mPtr, mImgView.mPitch, x, y);
+            iterator ret = *this;
+            ret.mPixel.x = x;
+            ret.mPixel.y = y;
+            return ret;
+            // return *gotoPtr(mImgView.mPtr, mImgView.mPitch, x, y);
         }
 
         [[nodiscard]] difference_type operator-(const iterator &aRhs) const
@@ -298,6 +307,16 @@ template <PixelType T> class ImageView
         const Vec2i &Pixel() const
         {
             return mPixel;
+        }
+
+        const T &Value() const
+        {
+            return *gotoPtr(mImgView.mPtr, mImgView.mPitch, mPixel.x, mPixel.y);
+        }
+
+        T &Value()
+        {
+            return *gotoPtr(mImgView.mPtr, mImgView.mPitch, mPixel.x, mPixel.y);
         }
     };
 

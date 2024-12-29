@@ -7,6 +7,9 @@
 // must thus be clamped to 255
 namespace opp
 {
+class HalfFp16;
+class BFloat16;
+
 // by default, no clamping needed
 template <typename TFrom, typename TTo> struct need_saturation_clamp : std::false_type
 {
@@ -54,6 +57,9 @@ template <> struct need_saturation_clamp<ushort, sbyte> : std::true_type
 template <> struct need_saturation_clamp<ushort, short> : std::true_type
 {
 };
+template <> struct need_saturation_clamp<ushort, HalfFp16> : std::true_type
+{ // max value of ushort is slightly larger than max value of HalfFp16
+};
 
 template <> struct need_saturation_clamp<int, byte> : std::true_type
 {
@@ -73,6 +79,9 @@ template <> struct need_saturation_clamp<int, uint> : std::true_type
 template <> struct need_saturation_clamp<int, ulong64> : std::true_type
 {
 };
+template <> struct need_saturation_clamp<int, HalfFp16> : std::true_type
+{
+};
 
 template <> struct need_saturation_clamp<uint, byte> : std::true_type
 {
@@ -87,6 +96,9 @@ template <> struct need_saturation_clamp<uint, ushort> : std::true_type
 {
 };
 template <> struct need_saturation_clamp<uint, int> : std::true_type
+{
+};
+template <> struct need_saturation_clamp<uint, HalfFp16> : std::true_type
 {
 };
 
@@ -111,6 +123,9 @@ template <> struct need_saturation_clamp<long64, uint> : std::true_type
 template <> struct need_saturation_clamp<long64, ulong64> : std::true_type
 {
 };
+template <> struct need_saturation_clamp<long64, HalfFp16> : std::true_type
+{
+};
 
 template <> struct need_saturation_clamp<ulong64, byte> : std::true_type
 {
@@ -131,6 +146,9 @@ template <> struct need_saturation_clamp<ulong64, uint> : std::true_type
 {
 };
 template <> struct need_saturation_clamp<ulong64, long64> : std::true_type
+{
+};
+template <> struct need_saturation_clamp<ulong64, HalfFp16> : std::true_type
 {
 };
 
@@ -158,6 +176,9 @@ template <> struct need_saturation_clamp<float, long64> : std::true_type
 template <> struct need_saturation_clamp<float, ulong64> : std::true_type
 {
 };
+template <> struct need_saturation_clamp<float, HalfFp16> : std::true_type
+{
+};
 
 template <> struct need_saturation_clamp<double, byte> : std::true_type
 {
@@ -181,6 +202,56 @@ template <> struct need_saturation_clamp<double, long64> : std::true_type
 {
 };
 template <> struct need_saturation_clamp<double, ulong64> : std::true_type
+{
+};
+template <> struct need_saturation_clamp<double, HalfFp16> : std::true_type
+{
+};
+
+template <> struct need_saturation_clamp<HalfFp16, byte> : std::true_type
+{
+};
+template <> struct need_saturation_clamp<HalfFp16, sbyte> : std::true_type
+{
+};
+template <> struct need_saturation_clamp<HalfFp16, ushort> : std::true_type
+{
+};
+template <> struct need_saturation_clamp<HalfFp16, short> : std::true_type
+{
+};
+template <> struct need_saturation_clamp<HalfFp16, uint> : std::true_type
+{
+};
+template <> struct need_saturation_clamp<HalfFp16, ulong64> : std::true_type
+{
+};
+
+template <> struct need_saturation_clamp<BFloat16, byte> : std::true_type
+{
+};
+template <> struct need_saturation_clamp<BFloat16, sbyte> : std::true_type
+{
+};
+template <> struct need_saturation_clamp<BFloat16, short> : std::true_type
+{
+};
+template <> struct need_saturation_clamp<BFloat16, ushort> : std::true_type
+{
+};
+template <> struct need_saturation_clamp<BFloat16, int> : std::true_type
+{
+};
+template <> struct need_saturation_clamp<BFloat16, uint> : std::true_type
+{
+};
+template <> struct need_saturation_clamp<BFloat16, long64> : std::true_type
+{
+};
+template <> struct need_saturation_clamp<BFloat16, ulong64> : std::true_type
+{
+};
+template <> struct need_saturation_clamp<BFloat16, HalfFp16> : std::true_type
 {
 };
 

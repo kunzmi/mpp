@@ -31,6 +31,7 @@
 #include <backends/simple_cpu/image/image.h>
 #include <backends/simple_cpu/image/imageView.h>
 #include <common/scratchBuffer.h>
+#include <half/half.hpp>
 
 using namespace opp;
 using namespace opp::cuda;
@@ -40,8 +41,16 @@ namespace cpu = opp::image::cpuSimple;
 
 int main()
 {
+    Vector1<float> t1(12.0f);
+    Vector1<float> t2(13.0f);
+    Vector1<byte> t3 = Vector1<float>::CompareLE(t1, t2);
 
-    /*bool ok = cpu::Image<Pixel8uC1>::CanLoad(R"(C:\Users\kunz_\OneDrive\Desktop\Unbenannt-3.tif)");
+    Vector4<int> i4;
+    Vector4<int>::same_vector_size_different_type_t<byte> b4;
+    b4.x;
+    Vector4<bool> isthisallowed(true, false, false, true);
+
+    bool ok = cpu::Image<Pixel8uC1>::CanLoad(R"(C:\Users\kunz_\OneDrive\Desktop\Unbenannt-3.tif)");
     if (ok)
     {
         auto imgs = cpu::Image<Pixel8uC1>::LoadPlanar(R"(C:\Users\kunz_\OneDrive\Desktop\Unbenannt-1.tif)");
@@ -53,9 +62,9 @@ int main()
         auto it2 = imgs[2].begin();
         for (auto &elem : img2)
         {
-            elem.x = it0->x;
-            elem.y = it1->x;
-            elem.z = it2->x;
+            elem.Value().x = it0->x;
+            elem.Value().y = it1->x;
+            elem.Value().z = it2->x;
             it0++;
             it1++;
             it2++;
@@ -66,7 +75,7 @@ int main()
                                          imgs[1].Pointer(), imgs[2].Pointer(), nullptr, 9);
 
         img2.Save(R"(C:\Users\kunz_\OneDrive\Desktop\Unbenannt-2.tif)");
-    }*/
+    } /**/
 
     try
     {

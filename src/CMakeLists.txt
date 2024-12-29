@@ -16,8 +16,9 @@ target_link_libraries(dummy_test PUBLIC
 						common.image
 						backends.cuda
 						backends.cuda.image
-						backends.npp
-						backends.npp.image)
+						#backends.npp
+						#backends.npp.image
+)
 target_link_libraries(dummy_test PRIVATE  
 						project_options
 						project_warnings)

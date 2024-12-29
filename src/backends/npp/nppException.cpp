@@ -1,9 +1,9 @@
 #include "nppException.h"
-#include <common/defines.h>
-#include <common/exception.h>
 #include <filesystem>
-#include <npp.h>
+#include <nppdefs.h>
+#include <ostream>
 #include <sstream>
+#include <string>
 
 namespace opp::npp
 {

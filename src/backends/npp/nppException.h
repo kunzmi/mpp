@@ -1,8 +1,7 @@
 #pragma once
-#include <common/defines.h>
 #include <common/exception.h>
 #include <filesystem>
-#include <npp.h>
+#include <nppdefs.h>
 #include <sstream>
 
 constexpr bool NPP_TRHOW_ON_WARNING = true;
@@ -33,7 +32,7 @@ class NppException : public OPPException
     NppException &operator=(NppException &&)      = delete;
 };
 
-inline constexpr const char *NppException::ConvertErrorCodeToMessage(NppStatus aErrorCode)
+constexpr const char *NppException::ConvertErrorCodeToMessage(NppStatus aErrorCode)
 {
     switch (aErrorCode)
     {
@@ -149,7 +148,7 @@ inline constexpr const char *NppException::ConvertErrorCodeToMessage(NppStatus a
     }
 }
 
-inline constexpr const char *NppException::ConvertErrorCodeToName(NppStatus aErrorCode)
+constexpr const char *NppException::ConvertErrorCodeToName(NppStatus aErrorCode)
 {
     switch (aErrorCode)
     {

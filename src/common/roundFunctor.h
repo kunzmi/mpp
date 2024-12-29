@@ -1,6 +1,7 @@
 #pragma once
 #include <common/complex.h>
 #include <common/defines.h>
+#include <common/opp_defs.h>
 #include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
 

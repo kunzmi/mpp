@@ -2,6 +2,8 @@
 #include "defines.h"
 #include <cfloat>
 #include <climits>
+#include <common/bfloat16.h>
+#include <common/half_fp16.h>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
@@ -279,6 +281,60 @@ template <> struct numeric_limits<double>
     [[nodiscard]] static constexpr DEVICE_CODE double maxExact() noexcept
     {
         return 9007199254740992.0;
+    }
+};
+
+// 16 bit half precision floating point types
+template <> struct numeric_limits<HalfFp16>
+{
+    [[nodiscard]] static constexpr DEVICE_CODE HalfFp16 min() noexcept
+    {
+        return HalfFp16::FromUShort(ushort(0x0400));
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE HalfFp16 max() noexcept
+    {
+        return HalfFp16::FromUShort(ushort(0x7BFF));
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE HalfFp16 lowest() noexcept
+    {
+        return HalfFp16::FromUShort(ushort(0xFBFF));
+    }
+    // minimum exact integer in float = -(2^11) = -2048
+    [[nodiscard]] static constexpr DEVICE_CODE HalfFp16 minExact() noexcept
+    {
+        return HalfFp16::FromUShort(ushort(0xE800));
+    }
+    // maximum exact integer in float = 2^11 = 2048
+    [[nodiscard]] static constexpr DEVICE_CODE HalfFp16 maxExact() noexcept
+    {
+        return HalfFp16::FromUShort(ushort(0x6800));
+    }
+};
+
+// 16 bit BFloat floating point types
+template <> struct numeric_limits<BFloat16>
+{
+    [[nodiscard]] static constexpr DEVICE_CODE BFloat16 min() noexcept
+    {
+        return BFloat16::FromUShort(ushort(0x0400));
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE BFloat16 max() noexcept
+    {
+        return BFloat16::FromUShort(ushort(0x7F7F));
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE BFloat16 lowest() noexcept
+    {
+        return BFloat16::FromUShort(ushort(0xFF7F));
+    }
+    // minimum exact integer in float = -(2^8) = -256
+    [[nodiscard]] static constexpr DEVICE_CODE BFloat16 minExact() noexcept
+    {
+        return BFloat16::FromUShort(ushort(0xC380));
+    }
+    // maximum exact integer in float = 2^9 = 256
+    [[nodiscard]] static constexpr DEVICE_CODE BFloat16 maxExact() noexcept
+    {
+        return BFloat16::FromUShort(ushort(0x4380));
     }
 };
 

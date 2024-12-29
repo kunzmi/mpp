@@ -1,6 +1,7 @@
 #pragma once
 
 #include <backends/cuda/cudaException.h>
+#include <backends/npp/nppException.h>
 #include <common/defines.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
@@ -11,6 +12,9 @@
 #include <common/safeCast.h>
 #include <cstddef>
 #include <nppdefs.h>
+#include <nppi_filtering_functions.h>
+#include <nppi_statistics_functions.h>
+#include <utility>
 #include <vector>
 
 namespace opp::image::npp
@@ -277,6 +281,11 @@ template <PixelType T> class ImageView
         return {mRoi.x, mRoi.y, mRoi.width, mRoi.height};
     }
 
+    [[nodiscard]] NppiPoint NppiPointRoi() const
+    {
+        return {mRoi.x, mRoi.y};
+    }
+
     [[nodiscard]] NppiSize NppiSizeFull() const
     {
         return {mSizeAlloc.x, mSizeAlloc.y};
@@ -438,6 +447,207 @@ template <PixelType T> class ImageView
 
         cudaSafeCall(cudaMemcpy2D(dest, aDestPitch, mPtrRoi, mPitch, WidthRoiInBytes(), to_size_t(HeightRoi()),
                                   cudaMemcpyDeviceToHost));
+    }
+
+    [[nodiscard]] size_t FilterBoxBorderAdvancedGetDeviceBufferSize() const
+        requires(sizeof(pixel_basetype_t<T>) < 8)
+    {
+        int retValue = 0;
+        nppSafeCall(nppiFilterBoxBorderAdvancedGetDeviceBufferSize(NppiSizeRoi(), to_int(ChannelCount), &retValue));
+        return to_size_t(retValue);
+    }
+
+    [[nodiscard]] size_t FilterBoxBorderAdvancedGetDeviceBufferSize() const
+        requires(sizeof(pixel_basetype_t<T>) >= 8)
+    {
+        int retValue = 0;
+        nppSafeCall(nppiFilterBoxBorderAdvancedGetDeviceBufferSize_64(NppiSizeRoi(), to_int(ChannelCount), &retValue));
+        return to_size_t(retValue);
+    }
+
+    [[nodiscard]] NppiSize GetFilterGaussPyramidLayerDownBorderDstROI(float aRate) const
+    {
+        NppiSize retValue{};
+        nppSafeCall(nppiGetFilterGaussPyramidLayerDownBorderDstROI(mRoi.width, mRoi.height, &retValue, aRate));
+        return retValue;
+    }
+
+    [[nodiscard]] std::pair<NppiSize, NppiSize> GetFilterGaussPyramidLayerUpBorderDstROI(float aRate) const
+    {
+        NppiSize roiMin{};
+        NppiSize roiMax{};
+        nppSafeCall(nppiGetFilterGaussPyramidLayerUpBorderDstROI(mRoi.width, mRoi.height, &roiMin, &roiMax, aRate));
+        return {roiMin, roiMax};
+    }
+
+    [[nodiscard]] size_t DistanceTransformPBAGetBufferSize() const
+    {
+        size_t retValue = 0;
+        nppSafeCall(nppiDistanceTransformPBAGetBufferSize(NppiSizeRoi(), &retValue));
+        return retValue;
+    }
+
+    [[nodiscard]] size_t DistanceTransformPBAGetAntialiasingBufferSize() const
+    {
+        size_t retValue = 0;
+        nppSafeCall(nppiDistanceTransformPBAGetAntialiasingBufferSize(NppiSizeRoi(), &retValue));
+        return retValue;
+    }
+
+    [[nodiscard]] size_t SignedDistanceTransformPBAGetBufferSize() const
+    {
+        size_t retValue = 0;
+        nppSafeCall(nppiSignedDistanceTransformPBAGetBufferSize(NppiSizeRoi(), &retValue));
+        return retValue;
+    }
+
+    [[nodiscard]] size_t SignedDistanceTransformPBAGet64fBufferSize() const
+    {
+        size_t retValue = 0;
+        nppSafeCall(nppiSignedDistanceTransformPBAGet64fBufferSize(NppiSizeRoi(), &retValue));
+        return retValue;
+    }
+
+    [[nodiscard]] size_t SignedDistanceTransformPBAGetAntialiasingBufferSize() const
+    {
+        size_t retValue = 0;
+        nppSafeCall(nppiSignedDistanceTransformPBAGetAntialiasingBufferSize(NppiSizeRoi(), &retValue));
+        return retValue;
+    }
+
+    [[nodiscard]] size_t FilterCannyBorderGetBufferSize() const
+    {
+        int retValue = 0;
+        nppSafeCall(nppiFilterCannyBorderGetBufferSize(NppiSizeRoi(), &retValue));
+        return to_size_t(retValue);
+    }
+
+    [[nodiscard]] size_t FilterHarrisCornersBorderGetBufferSize() const
+    {
+        int retValue = 0;
+        nppSafeCall(nppiFilterHarrisCornersBorderGetBufferSize(NppiSizeRoi(), &retValue));
+        return to_size_t(retValue);
+    }
+
+    [[nodiscard]] size_t FilterHoughLineGetBufferSize(NppPointPolar aDelta, int aMaxLineCount) const
+    {
+        int retValue = 0;
+        nppSafeCall(nppiFilterHoughLineGetBufferSize(NppiSizeRoi(), aDelta, aMaxLineCount, &retValue));
+        return to_size_t(retValue);
+    }
+
+    [[nodiscard]] size_t HistogramOfGradientsBorderGetBufferSize(const NppiHOGConfig aHOGConfig,
+                                                                 const NppiPoint *ahpLocations, int aLocations) const
+    {
+        int retValue = 0;
+        nppSafeCall(nppiHistogramOfGradientsBorderGetBufferSize(aHOGConfig, ahpLocations, aLocations, NppiSizeRoi(),
+                                                                &retValue));
+        return to_size_t(retValue);
+    }
+
+    [[nodiscard]] static size_t HistogramOfGradientsBorderGetDescriptorsSize(const NppiHOGConfig aHOGConfig,
+                                                                             int aLocations)
+    {
+        int retValue = 0;
+        nppSafeCall(nppiHistogramOfGradientsBorderGetDescriptorsSize(aHOGConfig, aLocations, &retValue));
+        return to_size_t(retValue);
+    }
+
+    [[nodiscard]] size_t FloodFillGetBufferSize() const
+    {
+        int retValue = 0;
+        nppSafeCall(nppiFloodFillGetBufferSize(NppiSizeRoi(), &retValue));
+        return to_size_t(retValue);
+    }
+
+    [[nodiscard]] static std::vector<int> EvenLevels(int aLevels, int aLowerLevel, int aUpperLevel,
+                                                     const NppStreamContext &aNppStreamCtx)
+    {
+        std::vector<int> retValue(to_size_t(aLevels));
+        nppSafeCall(nppiEvenLevelsHost_32s_Ctx(retValue.data(), aLevels, aLowerLevel, aUpperLevel, aNppStreamCtx));
+        return retValue;
+    }
+
+    [[nodiscard]] size_t CrossCorrFull_NormLevel_GetAdvancedScratchBufferSize(NppiSize aTplRoiSize) const
+    {
+        constexpr int dstSize = TypeSize == 8 ? sizeof(double) : sizeof(float);
+        size_t retValue       = 0;
+        nppSafeCall(nppiCrossCorrFull_NormLevel_GetAdvancedScratchBufferSize(NppiSizeRoi(), aTplRoiSize, dstSize,
+                                                                             to_int(ChannelCount), &retValue));
+        return retValue;
+    }
+
+    [[nodiscard]] size_t CrossCorrSame_NormLevel_GetAdvancedScratchBufferSize(NppiSize aTplRoiSize) const
+    {
+        constexpr int dstSize = TypeSize == 8 ? sizeof(double) : sizeof(float);
+        size_t retValue       = 0;
+        nppSafeCall(nppiCrossCorrSame_NormLevel_GetAdvancedScratchBufferSize(NppiSizeRoi(), aTplRoiSize, dstSize,
+                                                                             to_int(ChannelCount), &retValue));
+        return retValue;
+    }
+
+    [[nodiscard]] size_t CrossCorrValid_NormLevel_GetAdvancedScratchBufferSize(NppiSize aTplRoiSize) const
+    {
+        constexpr int dstSize = TypeSize == 8 ? sizeof(double) : sizeof(float);
+        size_t retValue       = 0;
+        nppSafeCall(nppiCrossCorrValid_NormLevel_GetAdvancedScratchBufferSize(NppiSizeRoi(), aTplRoiSize, dstSize,
+                                                                              to_int(ChannelCount), &retValue));
+        return retValue;
+    }
+
+    [[nodiscard]] NppiRect GetResizeRect(double aXFactor, double aYFactor, double aXShift, double aYShift,
+                                         int aInterpolation) const
+    {
+        NppiRect retValue{};
+        nppSafeCall(nppiGetResizeRect(NppiSizeRoi(), &retValue, aXFactor, aYFactor, aXShift, aYShift, aInterpolation));
+        return retValue;
+    }
+
+    [[nodiscard]] NppiPoint GetResizeTiledSourceOffset(NppiRect aDstRectROI) const
+    {
+        NppiPoint retValue{};
+        nppSafeCall(nppiGetResizeTiledSourceOffset(NppiSizeRoi(), aDstRectROI, &retValue));
+        return retValue;
+    }
+
+    void GetRotateQuad(double aQuad[4][2], double aAngle, double aShiftX, double aShiftY) const
+    {
+        nppSafeCall(nppiGetRotateQuad(NppiSizeRoi(), aQuad, aAngle, aShiftX, aShiftY));
+    }
+
+    void GetRotateBound(double aBoundingBox[2][2], double aAngle, double aShiftX, double aShiftY) const
+    {
+        nppSafeCall(nppiGetRotateBound(NppiSizeRoi(), aBoundingBox, aAngle, aShiftX, aShiftY));
+    }
+
+    void GetAffineTransform(const double aQuad[4][2], double aCoeffs[2][3]) const
+    {
+        nppSafeCall(nppiGetAffineTransform(NppiSizeRoi(), aQuad, aCoeffs));
+    }
+
+    void GetAffineQuad(double aQuad[4][2], const double aCoeffs[2][3]) const
+    {
+        nppSafeCall(nppiGetAffineQuad(NppiSizeRoi(), aQuad, aCoeffs));
+    }
+
+    void GetAffineBound(double aBound[2][2], const double aCoeffs[2][3]) const
+    {
+        nppSafeCall(nppiGetAffineBound(NppiSizeRoi(), aBound, aCoeffs));
+    }
+
+    void GetPerspectiveTransform(const double aQuad[4][2], double aCoeffs[3][3]) const
+    {
+        nppSafeCall(nppiGetPerspectiveTransform(NppiSizeRoi(), aQuad, aCoeffs));
+    }
+
+    void GetPerspectiveQuad(double aQuad[4][2], const double aCoeffs[3][3]) const
+    {
+        nppSafeCall(nppiGetPerspectiveQuad(NppiSizeRoi(), aQuad, aCoeffs));
+    }
+
+    void GetPerspectiveBound(double aBound[2][2], const double aCoeffs[3][3]) const
+    {
+        nppSafeCall(nppiGetPerspectiveBound(NppiSizeRoi(), aBound, aCoeffs));
     }
 };
 } // namespace opp::image::npp

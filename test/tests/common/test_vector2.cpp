@@ -7,6 +7,7 @@
 #include <common/vectorTypes.h>
 #include <cstddef>
 #include <cstdint>
+#include <math.h>
 
 using namespace opp;
 using namespace opp::image;
@@ -714,4 +715,304 @@ TEST_CASE("Axis2D", "[Common]")
     {
         CHECK(ex.Message() == "Out of range: 5. Must be X or Y (0 or 1).");
     }
+}
+
+TEST_CASE("Pixel16fC2", "[Common]")
+{
+    // check size:
+    CHECK(sizeof(Pixel16fC2) == 2 * sizeof(HalfFp16));
+
+    HalfFp16 arr[4] = {HalfFp16(4), HalfFp16(5)};
+    Pixel16fC2 t0(arr);
+    CHECK(t0.x == 4);
+    CHECK(t0.y == 5);
+
+    Pixel16fC2 t1(HalfFp16(0), HalfFp16(1));
+    CHECK(t1.x == 0);
+    CHECK(t1.y == 1);
+
+    Pixel16fC2 c(t1);
+    CHECK(c.x == 0);
+    CHECK(c.y == 1);
+    CHECK(c == t1);
+
+    Pixel16fC2 c2 = t1;
+    CHECK(c2.x == 0);
+    CHECK(c2.y == 1);
+    CHECK(c2 == t1);
+
+    Pixel16fC2 t2(HalfFp16(5));
+    CHECK(t2.x == 5);
+    CHECK(t2.y == 5);
+    CHECK(c2 != t2);
+
+    Pixel16fC2 add1 = t1 + t2;
+    CHECK(add1.x == 5);
+    CHECK(add1.y == 6);
+
+    Pixel16fC2 add2 = 3 + t1;
+    CHECK(add2.x == 3);
+    CHECK(add2.y == 4);
+
+    Pixel16fC2 add3 = t1 + 4;
+    CHECK(add3.x == 4);
+    CHECK(add3.y == 5);
+
+    Pixel16fC2 add4 = t1;
+    add4 += add3;
+    CHECK(add4.x == 4);
+    CHECK(add4.y == 6);
+
+    add4 += HalfFp16(3);
+    CHECK(add4.x == 7);
+    CHECK(add4.y == 9);
+
+    Pixel16fC2 sub1 = t1 - t2;
+    CHECK(sub1.x == -5);
+    CHECK(sub1.y == -4);
+
+    Pixel16fC2 sub2 = 3 - t1;
+    CHECK(sub2.x == 3);
+    CHECK(sub2.y == 2);
+
+    Pixel16fC2 sub3 = t1 - 4;
+    CHECK(sub3.x == -4);
+    CHECK(sub3.y == -3);
+
+    Pixel16fC2 sub4 = t1;
+    sub4 -= sub3;
+    CHECK(sub4.x == 4);
+    CHECK(sub4.y == 4);
+
+    sub4 -= HalfFp16(3);
+    CHECK(sub4.x == 1);
+    CHECK(sub4.y == 1);
+
+    t1              = Pixel16fC2(HalfFp16(4), HalfFp16(5));
+    t2              = Pixel16fC2(HalfFp16(6), HalfFp16(7));
+    Pixel16fC2 mul1 = t1 * t2;
+    CHECK(mul1.x == 24);
+    CHECK(mul1.y == 35);
+
+    Pixel16fC2 mul2 = 3 * t1;
+    CHECK(mul2.x == 12);
+    CHECK(mul2.y == 15);
+
+    Pixel16fC2 mul3 = t1 * 4;
+    CHECK(mul3.x == 16);
+    CHECK(mul3.y == 20);
+
+    Pixel16fC2 mul4 = t1;
+    mul4 *= mul3;
+    CHECK(mul4.x == 64);
+    CHECK(mul4.y == 100);
+
+    mul4 *= HalfFp16(3);
+    CHECK(mul4.x == 192);
+    CHECK(mul4.y == 300);
+
+    Pixel16fC2 div1 = t1 / t2;
+    CHECK(div1.x == Approx(0.667).margin(0.001));
+    CHECK(div1.y == Approx(0.714).margin(0.001));
+
+    Pixel16fC2 div2 = 3 / t1;
+    CHECK(div2.x == Approx(0.75).margin(0.001));
+    CHECK(div2.y == Approx(0.6).margin(0.001));
+
+    Pixel16fC2 div3 = t1 / 4;
+    CHECK(div3.x == Approx(1.0).margin(0.001));
+    CHECK(div3.y == Approx(1.25).margin(0.001));
+
+    Pixel16fC2 div4 = t2;
+    div4 /= div3;
+    CHECK(div4.x == Approx(6.0).margin(0.001));
+    CHECK(div4.y == Approx(5.6).margin(0.01));
+
+    div4 /= HalfFp16(3);
+    CHECK(div4.x == Approx(2.0).margin(0.001));
+    CHECK(div4.y == Approx(1.867).margin(0.001));
+
+    Pixel16fC2 l(HalfFp16(4), HalfFp16(6));
+    CHECK(l.MagnitudeSqr() == 52);
+    CHECK(l.Magnitude() == Approx(std::sqrt(52)).margin(0.01));
+
+    Pixel16fC2 minmax1(HalfFp16(10), HalfFp16(20));
+    Pixel16fC2 minmax2(HalfFp16(-20), HalfFp16(10));
+
+    CHECK(Pixel16fC2::Min(minmax1, minmax2) == Pixel16fC2(HalfFp16(-20), HalfFp16(10)));
+    CHECK(Pixel16fC2::Min(minmax2, minmax1) == Pixel16fC2(HalfFp16(-20), HalfFp16(10)));
+
+    CHECK(Pixel16fC2::Max(minmax1, minmax2) == Pixel16fC2(HalfFp16(10), HalfFp16(20)));
+    CHECK(Pixel16fC2::Max(minmax2, minmax1) == Pixel16fC2(HalfFp16(10), HalfFp16(20)));
+
+    CHECK(minmax2.Min() == -20);
+    CHECK(minmax1.Max() == 20);
+}
+
+TEST_CASE("Pixel16fC2_additionalMethods", "[Common]")
+{
+    CHECK(Pixel16fC2::Dot(Pixel16fC2(HalfFp16(4), HalfFp16(5)), Pixel16fC2(HalfFp16(6), HalfFp16(7))) == 59);
+    CHECK(Pixel16fC2(HalfFp16(4), HalfFp16(5)).Dot(Pixel16fC2(HalfFp16(6), HalfFp16(7))) == 59.0f);
+
+    Pixel16fC2 norm(HalfFp16(4), HalfFp16(5));
+    norm.Normalize();
+    CHECK(norm.Magnitude() == 1);
+    CHECK(norm.x == Approx(0.625).margin(0.001));
+    CHECK(norm.y == Approx(0.780762).margin(0.001));
+
+    CHECK((Pixel16fC2::Normalize(Pixel16fC2(HalfFp16(4), HalfFp16(5))) == norm));
+
+    Pixel16fC2 roundA(HalfFp16(0.4f), HalfFp16(0.5f));
+    Pixel16fC2 roundB(HalfFp16(1.9f), HalfFp16(-1.5f));
+    Pixel16fC2 round2A = Pixel16fC2::Round(roundA);
+    Pixel16fC2 round2B = Pixel16fC2::Round(roundB);
+    roundA.Round();
+    roundB.Round();
+    CHECK(round2A == roundA);
+    CHECK(round2B == roundB);
+    CHECK(roundA.x == 0.0f);
+    CHECK(roundA.y == 1.0f);
+    CHECK(roundB.x == 2.0f);
+    CHECK(roundB.y == -2.0f);
+
+    Pixel16fC2 floorA(HalfFp16(0.4f), HalfFp16(0.5f));
+    Pixel16fC2 floorB(HalfFp16(1.9f), HalfFp16(-1.5f));
+    Pixel16fC2 floor2A = Pixel16fC2::Floor(floorA);
+    Pixel16fC2 floor2B = Pixel16fC2::Floor(floorB);
+    floorA.Floor();
+    floorB.Floor();
+    CHECK(floor2A == floorA);
+    CHECK(floor2B == floorB);
+    CHECK(floorA.x == 0.0f);
+    CHECK(floorA.y == 0.0f);
+    CHECK(floorB.x == 1.0f);
+    CHECK(floorB.y == -2.0f);
+
+    Pixel16fC2 ceilA(HalfFp16(0.4f), HalfFp16(0.5f));
+    Pixel16fC2 ceilB(HalfFp16(1.9f), HalfFp16(-1.5f));
+    Pixel16fC2 ceil2A = Pixel16fC2::Ceil(ceilA);
+    Pixel16fC2 ceil2B = Pixel16fC2::Ceil(ceilB);
+    ceilA.Ceil();
+    ceilB.Ceil();
+    CHECK(ceil2A == ceilA);
+    CHECK(ceil2B == ceilB);
+    CHECK(ceilA.x == 1.0f);
+    CHECK(ceilA.y == 1.0f);
+    CHECK(ceilB.x == 2.0f);
+    CHECK(ceilB.y == -1.0f);
+
+    Pixel16fC2 zeroA(HalfFp16(0.4f), HalfFp16(0.5f));
+    Pixel16fC2 zeroB(HalfFp16(1.9f), HalfFp16(-1.5f));
+    Pixel16fC2 zero2A = Pixel16fC2::RoundZero(zeroA);
+    Pixel16fC2 zero2B = Pixel16fC2::RoundZero(zeroB);
+    zeroA.RoundZero();
+    zeroB.RoundZero();
+    CHECK(zero2A == zeroA);
+    CHECK(zero2B == zeroB);
+    CHECK(zeroA.x == 0.0f);
+    CHECK(zeroA.y == 0.0f);
+    CHECK(zeroB.x == 1.0f);
+    CHECK(zeroB.y == -1.0f);
+
+    Pixel16fC2 nearestA(HalfFp16(0.4f), HalfFp16(0.5f));
+    Pixel16fC2 nearestB(HalfFp16(1.9f), HalfFp16(-1.5f));
+    Pixel16fC2 nearest2A = Pixel16fC2::RoundNearest(nearestA);
+    Pixel16fC2 nearest2B = Pixel16fC2::RoundNearest(nearestB);
+    nearestA.RoundNearest();
+    nearestB.RoundNearest();
+    CHECK(nearest2A == nearestA);
+    CHECK(nearest2B == nearestB);
+    CHECK(nearestA.x == 0.0f);
+    CHECK(nearestA.y == 0.0f);
+    CHECK(nearestB.x == 2.0f);
+    CHECK(nearestB.y == -2.0f);
+
+    Pixel16fC2 exp(HalfFp16(2.4f), HalfFp16(12.5f));
+    Pixel16fC2 exp2 = Pixel16fC2::Exp(exp);
+    exp.Exp();
+    CHECK(exp == exp2);
+    CHECK(exp.x == Approx(11.023176380641601).margin(0.01));
+    CHECK(isinf(exp.y));
+
+    Pixel16fC2 ln(HalfFp16(2.4f), HalfFp16(12.5f));
+    Pixel16fC2 ln2 = Pixel16fC2::Ln(ln);
+    ln.Ln();
+    CHECK(ln == ln2);
+    CHECK(ln.x == Approx(0.875468737353900).margin(0.01));
+    CHECK(ln.y == Approx(2.525728644308256).margin(0.01));
+
+    Pixel16fC2 sqr(HalfFp16(2.4f), HalfFp16(12.5f));
+    Pixel16fC2 sqr2 = Pixel16fC2::Sqr(sqr);
+    sqr.Sqr();
+    CHECK(sqr == sqr2);
+    CHECK(sqr.x == Approx(5.76).margin(0.01));
+    CHECK(sqr.y == Approx(156.25).margin(0.01));
+
+    Pixel16fC2 sqrt(HalfFp16(2.4f), HalfFp16(12.5f));
+    Pixel16fC2 sqrt2 = Pixel16fC2::Sqrt(sqrt);
+    sqrt.Sqrt();
+    CHECK(sqrt == sqrt2);
+    CHECK(sqrt.x == Approx(1.549193338482967).margin(0.01));
+    CHECK(sqrt.y == Approx(3.535533905932738).margin(0.01));
+
+    Pixel16fC2 abs(HalfFp16(-2.4f), HalfFp16(12.5f));
+    Pixel16fC2 abs2 = Pixel16fC2::Abs(abs);
+    abs.Abs();
+    CHECK(abs == abs2);
+    CHECK(abs.x == HalfFp16(2.4f));
+    CHECK(abs.y == HalfFp16(12.5f));
+
+    Pixel16fC2 absdiffA(HalfFp16(13.23592f), HalfFp16(-40.24595f));
+    Pixel16fC2 absdiffB(HalfFp16(45.75068f), HalfFp16(46.488853f));
+    Pixel16fC2 absdiff2 = Pixel16fC2::AbsDiff(absdiffA, absdiffB);
+    Pixel16fC2 absdiff3 = Pixel16fC2::AbsDiff(absdiffB, absdiffA);
+    absdiffA.AbsDiff(absdiffB);
+    CHECK(absdiffA == absdiff2);
+    CHECK(absdiffA == absdiff3);
+    CHECK(absdiffA.x == Approx(32.514758920888809).margin(0.02));
+    CHECK(absdiffA.y == Approx(86.734813019986703).margin(0.02));
+
+    Pixel16fC2 clampByte(HalfFp16(float(numeric_limits<byte>::max()) + 1),
+                         HalfFp16(float(numeric_limits<byte>::min()) - 1));
+    clampByte.template ClampToTargetType<byte>();
+    CHECK(clampByte.x == 255);
+    CHECK(clampByte.y == 0);
+
+    Pixel16fC2 clampShort(HalfFp16(float(numeric_limits<short>::max()) + 1),
+                          HalfFp16(float(numeric_limits<short>::min()) - 1));
+    clampShort.template ClampToTargetType<short>();
+    CHECK(clampShort.x == 32752);
+    CHECK(clampShort.y == -32768);
+
+    Pixel16fC2 clampSByte(HalfFp16(float(numeric_limits<sbyte>::max()) + 1),
+                          HalfFp16(float(numeric_limits<sbyte>::min()) - 1));
+    clampSByte.template ClampToTargetType<sbyte>();
+    CHECK(clampSByte.x == 127);
+    CHECK(clampSByte.y == -128);
+
+    Pixel16fC2 clampUShort(HalfFp16(0.0f), HalfFp16(float(numeric_limits<ushort>::min()) - 1));
+
+    clampUShort.template ClampToTargetType<ushort>();
+    CHECK(clampUShort.x == 0);
+    CHECK(clampUShort.y == 0);
+
+    CHECK_FALSE(need_saturation_clamp_v<HalfFp16, int>);
+
+    CHECK(need_saturation_clamp_v<HalfFp16, uint>);
+    Pixel16fC2 clampUInt(HalfFp16(0), HalfFp16(float(numeric_limits<uint>::min()) - 1000));
+
+    clampUInt.template ClampToTargetType<uint>();
+    CHECK(clampUInt.x == 0);
+    CHECK(clampUInt.y == 0);
+
+    Pixel32fC2 clampFloatToFp16(float(numeric_limits<int>::min()) - 1000.0f, //
+                                float(numeric_limits<int>::max()) + 1000.0f);
+
+    clampFloatToFp16.template ClampToTargetType<HalfFp16>();
+    CHECK(clampFloatToFp16.x == -65504);
+    CHECK(clampFloatToFp16.y == 65504);
+
+    Pixel16fC2 fromFromFloat(clampFloatToFp16);
+    CHECK(fromFromFloat.x == -65504);
+    CHECK(fromFromFloat.y == 65504);
 }

@@ -20,9 +20,9 @@ template <typename T> class DevVar : public DevVarView<T>
     /// <param name="aSize">In elements</param>
     explicit DevVar(size_t aSize) : DevVarView<T>(aSize)
     {
-        cudaSafeCallExt(cudaMalloc(&DevVarView<T>::PointerRef(), DevVarView<T>::TypeSize() * aSize),
-                        "Number of elements = " << aSize << " element size = " << DevVarView<T>::TypeSize()
-                                                << " [bytes]");
+        cudaSafeCallExt(
+            cudaMalloc(reinterpret_cast<void **>(&DevVarView<T>::PointerRef()), DevVarView<T>::TypeSize() * aSize),
+            "Number of elements = " << aSize << " element size = " << DevVarView<T>::TypeSize() << " [bytes]");
     }
 
     ~DevVar()

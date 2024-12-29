@@ -49,7 +49,7 @@ template <VectorOrComplexType T> struct SubInv
 {
     DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
     {
-        aSrcDst = aSrc1 - aSrcDst;
+        aSrcDst.SubInv(aSrc1);
     }
 };
 
@@ -84,7 +84,7 @@ template <VectorOrComplexType T> struct DivInv
 {
     DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
     {
-        aSrcDst = aSrc1 / aSrcDst;
+        aSrcDst.DivInv(aSrc1);
     }
 };
 
@@ -126,7 +126,7 @@ template <IntVectorType T> struct Xor
 
 template <IntVectorType T> struct LShift
 {
-    int Shift;
+    const int Shift;
 
     LShift(int aShift) : Shift(aShift)
     {
@@ -144,7 +144,7 @@ template <IntVectorType T> struct LShift
 
 template <IntVectorType T> struct RShift
 {
-    int Shift;
+    const int Shift;
 
     RShift(int aShift) : Shift(aShift)
     {
@@ -165,6 +165,78 @@ template <VectorType T> struct AddSqr
     DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
     {
         aSrcDst += T::Sqr(aSrc1);
+    }
+};
+
+template <VectorOrComplexType T> struct Min
+{
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    {
+        aDst = T::Min(aSrc1, aSrc2);
+    }
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
+    {
+        aSrcDst.Min(aSrc1);
+    }
+};
+
+template <VectorOrComplexType T> struct Max
+{
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    {
+        aDst = T::Max(aSrc1, aSrc2);
+    }
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
+    {
+        aSrcDst.Max(aSrc1);
+    }
+};
+
+template <VectorOrComplexType T> struct Eq
+{
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, bool &aDst)
+    {
+        aDst = aSrc1 == aSrc2;
+    }
+};
+
+template <VectorOrComplexType T> struct Ge
+{
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, bool &aDst)
+    {
+        aDst = aSrc1 >= aSrc2;
+    }
+};
+
+template <VectorOrComplexType T> struct Gt
+{
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, bool &aDst)
+    {
+        aDst = aSrc1 > aSrc2;
+    }
+};
+
+template <VectorOrComplexType T> struct Le
+{
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, bool &aDst)
+    {
+        aDst = aSrc1 <= aSrc2;
+    }
+};
+
+template <VectorOrComplexType T> struct Lt
+{
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, bool &aDst)
+    {
+        aDst = aSrc1 < aSrc2;
+    }
+};
+
+template <VectorOrComplexType T> struct NEq
+{
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, bool &aDst)
+    {
+        aDst = aSrc1 != aSrc2;
     }
 };
 } // namespace opp

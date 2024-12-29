@@ -5,6 +5,7 @@
 #include <common/defines.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
+#include <common/opp_defs.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
 #include <common/vector_typetraits.h>
@@ -56,6 +57,7 @@ struct SrcSrcFunctor : public ImageFunctor<false>
     {
     }
 
+    // Case ComputeT==DstT, no conversion, no rounding
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
         requires std::same_as<ComputeT, DstT>
     {
@@ -64,37 +66,7 @@ struct SrcSrcFunctor : public ImageFunctor<false>
         Op(ComputeT(*pixelSrc1), ComputeT(*pixelSrc2), aDst);
     }
 
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
-        requires std::same_as<ComputeT_SIMD, DstT> && //
-                 (tupelSize > 1)
-    {
-        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
-        const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
-
-        Tupel<SrcT, tupelSize> tupelSrc1 = Tupel<SrcT, tupelSize>::Load(pixelSrc1);
-        Tupel<SrcT, tupelSize> tupelSrc2 = Tupel<SrcT, tupelSize>::Load(pixelSrc2);
-
-        OpSIMD(tupelSrc1, tupelSrc2, aDst);
-    }
-
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
-        requires std::same_as<ComputeT, DstT> &&          //
-                 std::same_as<ComputeT_SIMD, voidType> && //
-                 (tupelSize > 1)
-    {
-        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
-        const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
-
-        Tupel<SrcT, tupelSize> tupelSrc1 = Tupel<SrcT, tupelSize>::Load(pixelSrc1);
-        Tupel<SrcT, tupelSize> tupelSrc2 = Tupel<SrcT, tupelSize>::Load(pixelSrc2);
-
-#pragma unroll
-        for (size_t i = 0; i < tupelSize; i++)
-        {
-            Op(ComputeT(tupelSrc1.value[i]), ComputeT(tupelSrc2.value[i]), aDst.value[i]);
-        }
-    }
-
+    // Case ComputeT==Floating, DstT==Integral, conversion and rounding of result
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
         requires Integral<pixel_basetype_t<DstT>> && //
                  FloatingPoint<pixel_basetype_t<ComputeT>>
@@ -109,11 +81,55 @@ struct SrcSrcFunctor : public ImageFunctor<false>
         aDst = DstT(temp);
     }
 
+    // Case (ComputeT==Floating, DstT==Floating) or (ComputeT==Integral, DstT==Integral), conversion result, no rounding
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+        requires(!std::same_as<ComputeT, DstT>) &&
+                ((Integral<pixel_basetype_t<DstT>> && Integral<pixel_basetype_t<ComputeT>>) ||
+                 (FloatingPoint<pixel_basetype_t<DstT>> && FloatingPoint<pixel_basetype_t<ComputeT>>))
+    {
+        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+        const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
+
+        ComputeT temp;
+        Op(ComputeT(*pixelSrc1), ComputeT(*pixelSrc2), temp);
+        // DstT constructor will clamp temp to value range of DstT
+        aDst = DstT(temp);
+    }
+
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+        requires std::same_as<ComputeT_SIMD, DstT>
+    {
+        static_assert(OpSIMD.has_simd, "Trying to run a SIMD operation that is not implemented for this type.");
+        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+        const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
+
+        Tupel<SrcT, tupelSize> tupelSrc1 = Tupel<SrcT, tupelSize>::Load(pixelSrc1);
+        Tupel<SrcT, tupelSize> tupelSrc2 = Tupel<SrcT, tupelSize>::Load(pixelSrc2);
+
+        OpSIMD(tupelSrc1, tupelSrc2, aDst);
+    }
+
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+        requires std::same_as<ComputeT, DstT> && //
+                 std::same_as<ComputeT_SIMD, voidType>
+    {
+        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+        const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
+
+        Tupel<SrcT, tupelSize> tupelSrc1 = Tupel<SrcT, tupelSize>::Load(pixelSrc1);
+        Tupel<SrcT, tupelSize> tupelSrc2 = Tupel<SrcT, tupelSize>::Load(pixelSrc2);
+
+#pragma unroll
+        for (size_t i = 0; i < tupelSize; i++)
+        {
+            Op(ComputeT(tupelSrc1.value[i]), ComputeT(tupelSrc2.value[i]), aDst.value[i]);
+        }
+    }
+
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
         requires Integral<pixel_basetype_t<DstT>> &&          //
                  FloatingPoint<pixel_basetype_t<ComputeT>> && //
-                 std::same_as<ComputeT_SIMD, voidType> &&     //
-                 (tupelSize > 1)
+                 std::same_as<ComputeT_SIMD, voidType>
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
@@ -132,26 +148,11 @@ struct SrcSrcFunctor : public ImageFunctor<false>
         }
     }
 
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
-        requires(!std::same_as<ComputeT, DstT>) &&  //
-                Integral<pixel_basetype_t<DstT>> && //
-                Integral<pixel_basetype_t<ComputeT>>
-    {
-        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
-        const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
-
-        ComputeT temp;
-        Op(ComputeT(*pixelSrc1), ComputeT(*pixelSrc2), temp);
-        // DstT constructor will clamp temp to value range of DstT
-        aDst = DstT(temp);
-    }
-
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
-        requires(!std::same_as<ComputeT, DstT>) &&       //
-                Integral<pixel_basetype_t<DstT>> &&      //
-                Integral<pixel_basetype_t<ComputeT>> &&  //
-                std::same_as<ComputeT_SIMD, voidType> && //
-                (tupelSize > 1)
+        requires(!std::same_as<ComputeT, DstT>) &&
+                ((Integral<pixel_basetype_t<DstT>> && Integral<pixel_basetype_t<ComputeT>>) ||
+                 (FloatingPoint<pixel_basetype_t<DstT>> && FloatingPoint<pixel_basetype_t<ComputeT>>)) &&
+                std::same_as<ComputeT_SIMD, voidType>
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);

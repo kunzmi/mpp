@@ -114,6 +114,30 @@ TEST_CASE("Pixel32fC1", "[Common]")
 
     CHECK(Pixel32fC1::Max(minmax1, minmax2) == Pixel32fC1(10));
     CHECK(Pixel32fC1::Max(minmax2, minmax1) == Pixel32fC1(10));
+
+    CHECK(Pixel32fC1::CompareEQ(Pixel32fC1(12.0f), Pixel32fC1(12.0f)) == Pixel8uC1(0xFF));
+    CHECK(Pixel32fC1::CompareEQ(Pixel32fC1(12.0f), Pixel32fC1(13.0f)) == Pixel8uC1(0x00));
+
+    CHECK(Pixel32fC1::CompareNEQ(Pixel32fC1(12.0f), Pixel32fC1(13.0f)) == Pixel8uC1(0xFF));
+    CHECK(Pixel32fC1::CompareNEQ(Pixel32fC1(12.0f), Pixel32fC1(12.0f)) == Pixel8uC1(0x00));
+
+    CHECK(Pixel32fC1::CompareGE(Pixel32fC1(13.0f), Pixel32fC1(12.0f)) == Pixel8uC1(0xFF));
+    CHECK(Pixel32fC1::CompareGE(Pixel32fC1(12.0f), Pixel32fC1(13.0f)) == Pixel8uC1(0x00));
+    CHECK(Pixel32fC1::CompareGE(Pixel32fC1(12.0f), Pixel32fC1(12.0f)) == Pixel8uC1(0xFF));
+    CHECK(Pixel32fC1::CompareGE(Pixel32fC1(12.0f), Pixel32fC1(13.0f)) == Pixel8uC1(0x00));
+
+    CHECK(Pixel32fC1::CompareGT(Pixel32fC1(13.0f), Pixel32fC1(12.0f)) == Pixel8uC1(0xFF));
+    CHECK(Pixel32fC1::CompareGT(Pixel32fC1(12.0f), Pixel32fC1(13.0f)) == Pixel8uC1(0x00));
+    CHECK(Pixel32fC1::CompareGT(Pixel32fC1(12.0f), Pixel32fC1(12.0f)) == Pixel8uC1(0x00));
+
+    CHECK(Pixel32fC1::CompareLE(Pixel32fC1(12.0f), Pixel32fC1(13.0f)) == Pixel8uC1(0xFF));
+    CHECK(Pixel32fC1::CompareLE(Pixel32fC1(13.0f), Pixel32fC1(12.0f)) == Pixel8uC1(0x00));
+    CHECK(Pixel32fC1::CompareLE(Pixel32fC1(12.0f), Pixel32fC1(12.0f)) == Pixel8uC1(0xFF));
+    CHECK(Pixel32fC1::CompareLE(Pixel32fC1(13.0f), Pixel32fC1(12.0f)) == Pixel8uC1(0x00));
+
+    CHECK(Pixel32fC1::CompareLT(Pixel32fC1(12.0f), Pixel32fC1(13.0f)) == Pixel8uC1(0xFF));
+    CHECK(Pixel32fC1::CompareLT(Pixel32fC1(13.0f), Pixel32fC1(12.0f)) == Pixel8uC1(0x00));
+    CHECK(Pixel32fC1::CompareLT(Pixel32fC1(12.0f), Pixel32fC1(12.0f)) == Pixel8uC1(0x00));
 }
 
 TEST_CASE("Pixel32fC1_additionalMethods", "[Common]")
@@ -607,4 +631,245 @@ TEST_CASE("Axis1D", "[Common]")
     {
         CHECK(ex.Message() == "Out of range: 5. Must be X (0).");
     }
+}
+
+TEST_CASE("Pixel16fC1", "[Common]")
+{
+    // check size:
+    CHECK(sizeof(Pixel16fC1) == 1 * sizeof(HalfFp16));
+
+    HalfFp16 arr[4] = {HalfFp16(4)};
+    Pixel16fC1 t0(arr);
+    CHECK(t0.x == 4);
+
+    Pixel16fC1 t1(HalfFp16(0));
+    CHECK(t1.x == 0);
+
+    Pixel16fC1 c(t1);
+    CHECK(c.x == 0);
+    CHECK(c == t1);
+
+    Pixel16fC1 c2 = t1;
+    CHECK(c2.x == 0);
+    CHECK(c2 == t1);
+
+    Pixel16fC1 t2(HalfFp16(5));
+    CHECK(t2.x == 5);
+    CHECK(c2 != t2);
+
+    Pixel16fC1 add1 = t1 + t2;
+    CHECK(add1.x == 5);
+
+    Pixel16fC1 add2 = 3 + t1;
+    CHECK(add2.x == 3);
+
+    Pixel16fC1 add3 = t1 + 4;
+    CHECK(add3.x == 4);
+
+    Pixel16fC1 add4 = t1;
+    add4 += add3;
+    CHECK(add4.x == 4);
+
+    add4 += HalfFp16(3);
+    CHECK(add4.x == 7);
+
+    Pixel16fC1 sub1 = t1 - t2;
+    CHECK(sub1.x == -5);
+
+    Pixel16fC1 sub2 = 3 - t1;
+    CHECK(sub2.x == 3);
+
+    Pixel16fC1 sub3 = t1 - 4;
+    CHECK(sub3.x == -4);
+
+    Pixel16fC1 sub4 = t1;
+    sub4 -= sub3;
+    CHECK(sub4.x == 4);
+
+    sub4 -= HalfFp16(3);
+    CHECK(sub4.x == 1);
+
+    t1              = Pixel16fC1(HalfFp16(4));
+    t2              = Pixel16fC1(HalfFp16(6));
+    Pixel16fC1 mul1 = t1 * t2;
+    CHECK(mul1.x == 24);
+
+    Pixel16fC1 mul2 = 3 * t1;
+    CHECK(mul2.x == 12);
+
+    Pixel16fC1 mul3 = t1 * 4;
+    CHECK(mul3.x == 16);
+
+    Pixel16fC1 mul4 = t1;
+    mul4 *= mul3;
+    CHECK(mul4.x == 64);
+
+    mul4 *= HalfFp16(3);
+    CHECK(mul4.x == 192);
+
+    Pixel16fC1 div1 = t1 / t2;
+    CHECK(div1.x == Approx(0.667).margin(0.001));
+
+    Pixel16fC1 div2 = 3 / t1;
+    CHECK(div2.x == Approx(0.75).margin(0.001));
+
+    Pixel16fC1 div3 = t1 / 4;
+    CHECK(div3.x == Approx(1.0).margin(0.001));
+
+    Pixel16fC1 div4 = t2;
+    div4 /= div3;
+    CHECK(div4.x == Approx(6.0).margin(0.001));
+
+    div4 /= HalfFp16(3);
+    CHECK(div4.x == Approx(2.0).margin(0.001));
+
+    Pixel16fC1 l(HalfFp16(4));
+    CHECK(l.MagnitudeSqr() == 16);
+    CHECK(l.Magnitude() == Approx(std::sqrt(16)).margin(0.01));
+
+    Pixel16fC1 minmax1(HalfFp16(10));
+    Pixel16fC1 minmax2(HalfFp16(-20));
+
+    CHECK(Pixel16fC1::Min(minmax1, minmax2) == Pixel16fC1(HalfFp16(-20)));
+    CHECK(Pixel16fC1::Min(minmax2, minmax1) == Pixel16fC1(HalfFp16(-20)));
+
+    CHECK(Pixel16fC1::Max(minmax1, minmax2) == Pixel16fC1(HalfFp16(10)));
+    CHECK(Pixel16fC1::Max(minmax2, minmax1) == Pixel16fC1(HalfFp16(10)));
+}
+
+TEST_CASE("Pixel16fC1_additionalMethods", "[Common]")
+{
+    Pixel16fC1 norm(HalfFp16(4));
+    norm.Normalize();
+    CHECK(norm.Magnitude() == 1);
+    CHECK(norm.x == Approx(1).margin(0.001));
+
+    CHECK((Pixel16fC1::Normalize(Pixel16fC1(HalfFp16(4))) == norm));
+
+    Pixel16fC1 roundA(HalfFp16(0.4f));
+    Pixel16fC1 roundB(HalfFp16(1.9f));
+    Pixel16fC1 round2A = Pixel16fC1::Round(roundA);
+    Pixel16fC1 round2B = Pixel16fC1::Round(roundB);
+    roundA.Round();
+    roundB.Round();
+    CHECK(round2A == roundA);
+    CHECK(round2B == roundB);
+    CHECK(roundA.x == 0.0f);
+    CHECK(roundB.x == 2.0f);
+
+    Pixel16fC1 floorA(HalfFp16(0.4f));
+    Pixel16fC1 floorB(HalfFp16(1.9f));
+    Pixel16fC1 floor2A = Pixel16fC1::Floor(floorA);
+    Pixel16fC1 floor2B = Pixel16fC1::Floor(floorB);
+    floorA.Floor();
+    floorB.Floor();
+    CHECK(floor2A == floorA);
+    CHECK(floor2B == floorB);
+    CHECK(floorA.x == 0.0f);
+    CHECK(floorB.x == 1.0f);
+
+    Pixel16fC1 ceilA(HalfFp16(0.4f));
+    Pixel16fC1 ceilB(HalfFp16(1.9f));
+    Pixel16fC1 ceil2A = Pixel16fC1::Ceil(ceilA);
+    Pixel16fC1 ceil2B = Pixel16fC1::Ceil(ceilB);
+    ceilA.Ceil();
+    ceilB.Ceil();
+    CHECK(ceil2A == ceilA);
+    CHECK(ceil2B == ceilB);
+    CHECK(ceilA.x == 1.0f);
+    CHECK(ceilB.x == 2.0f);
+
+    Pixel16fC1 zeroA(HalfFp16(0.4f));
+    Pixel16fC1 zeroB(HalfFp16(1.9f));
+    Pixel16fC1 zero2A = Pixel16fC1::RoundZero(zeroA);
+    Pixel16fC1 zero2B = Pixel16fC1::RoundZero(zeroB);
+    zeroA.RoundZero();
+    zeroB.RoundZero();
+    CHECK(zero2A == zeroA);
+    CHECK(zero2B == zeroB);
+    CHECK(zeroA.x == 0.0f);
+    CHECK(zeroB.x == 1.0f);
+
+    Pixel16fC1 nearestA(HalfFp16(0.4f));
+    Pixel16fC1 nearestB(HalfFp16(1.9f));
+    Pixel16fC1 nearest2A = Pixel16fC1::RoundNearest(nearestA);
+    Pixel16fC1 nearest2B = Pixel16fC1::RoundNearest(nearestB);
+    nearestA.RoundNearest();
+    nearestB.RoundNearest();
+    CHECK(nearest2A == nearestA);
+    CHECK(nearest2B == nearestB);
+    CHECK(nearestA.x == 0.0f);
+    CHECK(nearestB.x == 2.0f);
+
+    Pixel16fC1 exp(HalfFp16(2.4f));
+    Pixel16fC1 exp2 = Pixel16fC1::Exp(exp);
+    exp.Exp();
+    CHECK(exp == exp2);
+    CHECK(exp.x == Approx(11.023176380641601).margin(0.01));
+
+    Pixel16fC1 ln(HalfFp16(2.4f));
+    Pixel16fC1 ln2 = Pixel16fC1::Ln(ln);
+    ln.Ln();
+    CHECK(ln == ln2);
+    CHECK(ln.x == Approx(0.875468737353900).margin(0.01));
+
+    Pixel16fC1 sqr(HalfFp16(2.4f));
+    Pixel16fC1 sqr2 = Pixel16fC1::Sqr(sqr);
+    sqr.Sqr();
+    CHECK(sqr == sqr2);
+    CHECK(sqr.x == Approx(5.76).margin(0.01));
+
+    Pixel16fC1 sqrt(HalfFp16(2.4f));
+    Pixel16fC1 sqrt2 = Pixel16fC1::Sqrt(sqrt);
+    sqrt.Sqrt();
+    CHECK(sqrt == sqrt2);
+    CHECK(sqrt.x == Approx(1.549193338482967).margin(0.01));
+
+    Pixel16fC1 abs(HalfFp16(-2.4f));
+    Pixel16fC1 abs2 = Pixel16fC1::Abs(abs);
+    abs.Abs();
+    CHECK(abs == abs2);
+    CHECK(abs.x == HalfFp16(2.4f));
+
+    Pixel16fC1 absdiffA(HalfFp16(13.23592f));
+    Pixel16fC1 absdiffB(HalfFp16(45.75068f));
+    Pixel16fC1 absdiff2 = Pixel16fC1::AbsDiff(absdiffA, absdiffB);
+    Pixel16fC1 absdiff3 = Pixel16fC1::AbsDiff(absdiffB, absdiffA);
+    absdiffA.AbsDiff(absdiffB);
+    CHECK(absdiffA == absdiff2);
+    CHECK(absdiffA == absdiff3);
+    CHECK(absdiffA.x == Approx(32.514758920888809).margin(0.02));
+
+    Pixel16fC1 clampByte(HalfFp16(float(numeric_limits<byte>::max()) + 1));
+    clampByte.template ClampToTargetType<byte>();
+    CHECK(clampByte.x == 255);
+
+    Pixel16fC1 clampShort(HalfFp16(float(numeric_limits<short>::max()) + 1));
+    clampShort.template ClampToTargetType<short>();
+    CHECK(clampShort.x == 32752);
+
+    Pixel16fC1 clampSByte(HalfFp16(float(numeric_limits<sbyte>::max()) + 1));
+    clampSByte.template ClampToTargetType<sbyte>();
+    CHECK(clampSByte.x == 127);
+
+    Pixel16fC1 clampUShort(HalfFp16(-10.0f));
+
+    clampUShort.template ClampToTargetType<ushort>();
+    CHECK(clampUShort.x == 0);
+
+    CHECK_FALSE(need_saturation_clamp_v<HalfFp16, int>);
+
+    CHECK(need_saturation_clamp_v<HalfFp16, uint>);
+    Pixel16fC1 clampUInt(HalfFp16(-10));
+
+    clampUInt.template ClampToTargetType<uint>();
+    CHECK(clampUInt.x == 0);
+
+    Pixel32fC1 clampFloatToFp16(float(numeric_limits<int>::min()) - 1000.0f);
+
+    clampFloatToFp16.template ClampToTargetType<HalfFp16>();
+    CHECK(clampFloatToFp16.x == -65504);
+
+    Pixel16fC1 fromFromFloat(clampFloatToFp16);
+    CHECK(fromFromFloat.x == -65504);
 }

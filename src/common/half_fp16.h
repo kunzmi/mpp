@@ -1,0 +1,646 @@
+#pragma once
+#include <common/defines.h>
+#include <concepts>
+#ifdef IS_CUDA_COMPILER
+#include <cuda_fp16.h>
+#endif
+#ifdef IS_HOST_COMPILER
+#include <bit>
+#include <half/half.hpp>
+#include <iostream>
+#endif
+
+namespace opp
+{
+/// <summary>
+/// We implement our own Half-FP16 type, as different devices use different implementations. This is meant to wrap them
+/// all together to one type: On CPU we use the half-library from Christian Rau, on Cuda devices the fp16 header from
+/// Nvidia and on AMD devices the implementation coming with ROCm. But from an external view, it is always the same
+/// opp::HalfFp16 datatype.
+/// </summary>
+class alignas(2) HalfFp16
+{
+  private:
+#ifdef IS_HOST_COMPILER
+    half_float::half value{};
+#endif
+#ifdef IS_CUDA_COMPILER
+    __half value{};
+#endif
+
+  public:
+    HalfFp16() = default;
+#ifdef IS_HOST_COMPILER
+    explicit constexpr HalfFp16(half_float::half aHalf) : value(aHalf)
+    {
+    }
+    explicit HalfFp16(float aFloat) : value(aFloat)
+    {
+    }
+    explicit HalfFp16(double aDouble) : value(aDouble)
+    {
+    }
+    explicit HalfFp16(int aInt) : value(aInt)
+    {
+    }
+    explicit HalfFp16(uint aUInt) : value(aUInt)
+    {
+    }
+    explicit HalfFp16(short aShort) : value(aShort)
+    {
+    }
+    explicit HalfFp16(ushort aUShort) : value(aUShort)
+    {
+    }
+    explicit HalfFp16(sbyte aSbyte) : value(aSbyte)
+    {
+    }
+    explicit HalfFp16(byte aByte) : value(aByte)
+    {
+    }
+#endif
+#ifdef IS_CUDA_COMPILER
+    DEVICE_CODE explicit HalfFp16(__half aHalf) : value(aHalf)
+    {
+    }
+    DEVICE_CODE explicit HalfFp16(float aFloat) : value(__float2half_rn(aFloat))
+    {
+    }
+    DEVICE_CODE explicit HalfFp16(double aDouble) : value(__double2half(aDouble))
+    {
+    }
+    DEVICE_CODE explicit HalfFp16(int aInt) : value(__int2half_rn(aInt))
+    {
+    }
+    DEVICE_CODE explicit HalfFp16(uint aUInt) : value(__uint2half_rn(aUInt))
+    {
+    }
+    DEVICE_CODE explicit HalfFp16(short aShort) : value(__short2half_rn(aShort))
+    {
+    }
+    DEVICE_CODE explicit HalfFp16(ushort aUShort) : value(__ushort2half_rn(aUShort))
+    {
+    }
+    DEVICE_CODE explicit HalfFp16(sbyte aSbyte) : value(__short2half_rn(aSbyte))
+    {
+    }
+    DEVICE_CODE explicit HalfFp16(byte aByte) : value(__ushort2half_rn(aByte))
+    {
+    }
+#endif
+    ~HalfFp16() = default;
+
+    HalfFp16(const HalfFp16 &)     = default;
+    HalfFp16(HalfFp16 &&) noexcept = default;
+
+    HalfFp16 &operator=(const HalfFp16 &)     = default;
+    HalfFp16 &operator=(HalfFp16 &&) noexcept = default;
+
+#ifdef IS_CUDA_COMPILER
+    // despite being in a "IS_CUDA_COMPILER" section, we mark it as DEVICE_CODE, i.e. including __host__ annotation so
+    // that we can use DEVICE_CODE later in calling functions, like in limits.h which then avoids endles #ifdef switches
+    DEVICE_CODE [[nodiscard]] inline constexpr static HalfFp16 FromUShort(ushort aUShort)
+    {
+        HalfFp16 ret;
+        ret.value = __half(__nv_half_raw(aUShort));
+        return ret;
+    }
+#endif
+
+    DEVICE_CODE inline operator float() const
+    {
+#ifdef IS_HOST_COMPILER
+        return value;
+#endif
+#ifdef IS_CUDA_COMPILER
+        return __half2float(value);
+#endif
+    }
+
+#ifdef IS_HOST_COMPILER
+    [[nodiscard]] inline constexpr static HalfFp16 FromUShort(ushort aUShort)
+    {
+        return std::bit_cast<HalfFp16>(aUShort);
+    }
+#endif
+
+    /// <summary>
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] inline bool operator<(HalfFp16 aOther) const
+    {
+        return value < aOther.value;
+    }
+
+    /// <summary>
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] inline bool operator<=(HalfFp16 aOther) const
+    {
+        return value <= aOther.value;
+    }
+
+    /// <summary>
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] inline bool operator>(HalfFp16 aOther) const
+    {
+        return value > aOther.value;
+    }
+
+    /// <summary>
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] inline bool operator>=(HalfFp16 aOther) const
+    {
+        return value >= aOther.value;
+    }
+
+    /// <summary>
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] inline bool operator==(HalfFp16 aOther) const
+    {
+        return value == aOther.value;
+    }
+
+    /// <summary>
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] inline bool operator!=(HalfFp16 aOther) const
+    {
+        return value != aOther.value;
+    }
+
+    /// <summary>
+    /// Negation
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] inline HalfFp16 operator-() const
+    {
+#ifdef IS_HOST_COMPILER
+        return HalfFp16(-value);
+#endif
+#ifdef IS_CUDA_COMPILER
+        return HalfFp16(-value);
+#endif
+    }
+
+    /// <summary>
+    /// </summary>
+    DEVICE_CODE inline HalfFp16 &operator+=(HalfFp16 aOther)
+    {
+        value += aOther.value;
+        return *this;
+    }
+
+    /// <summary>
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] inline HalfFp16 operator+(HalfFp16 aOther) const
+    {
+        return HalfFp16(value + aOther.value);
+    }
+
+    /// <summary>
+    /// </summary>
+    DEVICE_CODE inline HalfFp16 &operator-=(HalfFp16 aOther)
+    {
+        value -= aOther.value;
+        return *this;
+    }
+
+    /// <summary>
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] inline HalfFp16 operator-(HalfFp16 aOther) const
+    {
+        return HalfFp16(value - aOther.value);
+    }
+
+    /// <summary>
+    /// </summary>
+    DEVICE_CODE inline HalfFp16 &operator*=(HalfFp16 aOther)
+    {
+        value *= aOther.value;
+        return *this;
+    }
+
+    /// <summary>
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] inline HalfFp16 operator*(HalfFp16 aOther) const
+    {
+        return HalfFp16(value * aOther.value);
+    }
+
+    /// <summary>
+    /// </summary>
+    DEVICE_CODE inline HalfFp16 &operator/=(HalfFp16 aOther)
+    {
+        value /= aOther.value;
+        return *this;
+    }
+
+    /// <summary>
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] inline HalfFp16 operator/(HalfFp16 aOther) const
+    {
+        return HalfFp16(value / aOther.value);
+    }
+
+#ifdef IS_HOST_COMPILER
+    /// <summary>
+    /// </summary>
+    inline void Exp()
+    {
+        value = half_float::exp(value);
+    }
+#endif
+
+#ifdef IS_CUDA_COMPILER
+    /// <summary>
+    /// </summary>
+    DEVICE_ONLY_CODE inline void Exp()
+    {
+        value = hexp(value);
+    }
+#endif
+
+#ifdef IS_HOST_COMPILER
+    /// <summary>
+    /// </summary>
+    [[nodiscard]] inline static HalfFp16 Exp(HalfFp16 aOther)
+    {
+        return HalfFp16(half_float::exp(aOther.value));
+    }
+#endif
+
+#ifdef IS_CUDA_COMPILER
+    /// <summary>
+    /// </summary>
+    DEVICE_ONLY_CODE [[nodiscard]] inline static HalfFp16 Exp(HalfFp16 aOther)
+    {
+        return HalfFp16(hexp(aOther.value));
+    }
+#endif
+
+#ifdef IS_HOST_COMPILER
+    /// <summary>
+    /// </summary>
+    inline void Ln()
+    {
+        value = half_float::log(value);
+    }
+#endif
+
+#ifdef IS_CUDA_COMPILER
+    /// <summary>
+    /// </summary>
+    DEVICE_ONLY_CODE inline void Ln()
+    {
+        value = hlog(value);
+    }
+#endif
+
+#ifdef IS_HOST_COMPILER
+    /// <summary>
+    /// </summary>
+    [[nodiscard]] inline static HalfFp16 Ln(HalfFp16 aOther)
+    {
+        return HalfFp16(half_float::log(aOther.value));
+    }
+#endif
+
+#ifdef IS_CUDA_COMPILER
+    /// <summary>
+    /// </summary>
+    DEVICE_ONLY_CODE [[nodiscard]] inline static HalfFp16 Ln(HalfFp16 aOther)
+    {
+        return HalfFp16(hlog(aOther.value));
+    }
+#endif
+
+#ifdef IS_HOST_COMPILER
+    /// <summary>
+    /// </summary>
+    inline void Sqrt()
+    {
+        value = half_float::sqrt(value);
+    }
+#endif
+
+#ifdef IS_CUDA_COMPILER
+    /// <summary>
+    /// </summary>
+    DEVICE_ONLY_CODE inline void Sqrt()
+    {
+        value = hsqrt(value);
+    }
+#endif
+
+#ifdef IS_HOST_COMPILER
+    /// <summary>
+    /// </summary>
+    [[nodiscard]] inline static HalfFp16 Sqrt(HalfFp16 aOther)
+    {
+        return HalfFp16(half_float::sqrt(aOther.value));
+    }
+#endif
+
+#ifdef IS_CUDA_COMPILER
+    /// <summary>
+    /// </summary>
+    DEVICE_ONLY_CODE [[nodiscard]] inline static HalfFp16 Sqrt(HalfFp16 aOther)
+    {
+        return HalfFp16(hsqrt(aOther.value));
+    }
+#endif
+
+    /// <summary>
+    /// </summary>
+    DEVICE_CODE inline void Abs()
+    {
+#ifdef IS_HOST_COMPILER
+        value = half_float::abs(value);
+#endif
+#ifdef IS_CUDA_COMPILER
+        value = __habs(value);
+#endif
+    }
+
+#ifdef IS_HOST_COMPILER
+    /// <summary>
+    /// </summary>
+    [[nodiscard]] inline static HalfFp16 Abs(HalfFp16 aOther)
+    {
+        return HalfFp16(half_float::abs(aOther.value));
+    }
+#endif
+
+#ifdef IS_CUDA_COMPILER
+    /// <summary>
+    /// </summary>
+    DEVICE_ONLY_CODE [[nodiscard]] inline static HalfFp16 Abs(HalfFp16 aOther)
+    {
+        return HalfFp16(__habs(aOther.value));
+    }
+#endif
+
+    /// <summary>
+    /// </summary>
+    DEVICE_CODE inline void Min(const HalfFp16 &aOther)
+    {
+#ifdef IS_HOST_COMPILER
+        *this = HalfFp16(std::min(value, aOther.value));
+#endif
+#ifdef IS_CUDA_COMPILER
+        value = __hmin(value, aOther.value);
+#endif
+    }
+
+    /// <summary>
+    /// Minimum
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] inline static HalfFp16 Min(const HalfFp16 &aLeft, const HalfFp16 &aRight)
+    {
+#ifdef IS_HOST_COMPILER
+        return HalfFp16(std::min(aLeft.value, aRight.value));
+#endif
+#ifdef IS_CUDA_COMPILER
+        return HalfFp16(__hmin(aLeft.value, aRight.value));
+#endif
+    }
+
+    /// <summary>
+    /// </summary>
+    DEVICE_CODE inline void Max(const HalfFp16 &aOther)
+    {
+#ifdef IS_HOST_COMPILER
+        *this = HalfFp16(std::max(value, aOther.value));
+#endif
+#ifdef IS_CUDA_COMPILER
+        value = __hmax(value, aOther.value);
+#endif
+    }
+
+    /// <summary>
+    /// Maximum
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] inline static HalfFp16 Max(const HalfFp16 &aLeft, const HalfFp16 &aRight)
+    {
+#ifdef IS_HOST_COMPILER
+        return HalfFp16(std::max(aLeft.value, aRight.value));
+#endif
+#ifdef IS_CUDA_COMPILER
+        return HalfFp16(__hmax(aLeft.value, aRight.value));
+#endif
+    }
+
+    /// <summary>
+    /// round()
+    /// </summary>
+    DEVICE_CODE inline void Round()
+    {
+#ifdef IS_HOST_COMPILER
+        value = half_float::round(value);
+#endif
+#ifdef IS_CUDA_COMPILER
+        value = round(float(value));
+#endif
+    }
+
+    /// <summary>
+    /// round()
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] inline static HalfFp16 Round(HalfFp16 aOther)
+    {
+#ifdef IS_HOST_COMPILER
+        return HalfFp16(half_float::round(aOther.value));
+#endif
+#ifdef IS_CUDA_COMPILER
+        return HalfFp16(round(float(aOther.value)));
+#endif
+    }
+
+#ifdef IS_HOST_COMPILER
+    /// <summary>
+    /// </summary>
+    inline void Floor()
+    {
+        value = half_float::floor(value);
+    }
+#endif
+
+#ifdef IS_CUDA_COMPILER
+    /// <summary>
+    /// </summary>
+    DEVICE_ONLY_CODE inline void Floor()
+    {
+        value = __int2half_rd(__half2int_rd(value));
+    }
+#endif
+
+#ifdef IS_HOST_COMPILER
+    /// <summary>
+    /// floor()
+    /// </summary>
+    [[nodiscard]] inline static HalfFp16 Floor(HalfFp16 aOther)
+    {
+        return HalfFp16(half_float::floor(aOther.value));
+    }
+#endif
+
+#ifdef IS_CUDA_COMPILER
+    /// <summary>
+    /// floor()
+    /// </summary>
+    DEVICE_ONLY_CODE [[nodiscard]] inline static HalfFp16 Floor(HalfFp16 aOther)
+    {
+        return HalfFp16(__int2half_rd(__half2int_rd(aOther.value)));
+    }
+#endif
+
+#ifdef IS_HOST_COMPILER
+    /// <summary>
+    /// </summary>
+    inline void Ceil()
+    {
+        value = half_float::ceil(value);
+    }
+#endif
+
+#ifdef IS_CUDA_COMPILER
+    /// <summary>
+    /// </summary>
+    DEVICE_ONLY_CODE inline void Ceil()
+    {
+        value = __int2half_ru(__half2int_ru(value));
+    }
+#endif
+
+#ifdef IS_HOST_COMPILER
+    /// <summary>
+    /// ceil()
+    /// </summary>
+    [[nodiscard]] inline static HalfFp16 Ceil(HalfFp16 aOther)
+    {
+        return HalfFp16(half_float::ceil(aOther.value));
+    }
+#endif
+
+#ifdef IS_CUDA_COMPILER
+    /// <summary>
+    /// ceil()
+    /// </summary>
+    DEVICE_ONLY_CODE [[nodiscard]] inline static HalfFp16 Ceil(HalfFp16 aOther)
+    {
+        return HalfFp16(__int2half_ru(__half2int_ru(aOther.value)));
+    }
+#endif
+
+#ifdef IS_HOST_COMPILER
+    /// <summary>
+    /// Round nearest ties to even<para/>
+    /// Note: the host function assumes that current rounding mode is set to FE_TONEAREST
+    /// </summary>
+    inline void RoundNearest()
+    {
+        value = half_float::nearbyint(value);
+    }
+#endif
+
+#ifdef IS_CUDA_COMPILER
+    /// <summary>
+    /// Round nearest ties to even<para/>
+    /// Note: the host function assumes that current rounding mode is set to FE_TONEAREST
+    /// </summary>
+    DEVICE_ONLY_CODE inline void RoundNearest()
+    {
+        value = __int2half_rn(__half2int_rn(value));
+    }
+#endif
+
+#ifdef IS_HOST_COMPILER
+    /// <summary>
+    /// Round nearest ties to even<para/>
+    /// Note: the host function assumes that current rounding mode is set to FE_TONEAREST
+    /// </summary>
+    [[nodiscard]] inline static HalfFp16 RoundNearest(HalfFp16 aOther)
+    {
+        return HalfFp16(half_float::nearbyint(aOther.value));
+    }
+#endif
+
+#ifdef IS_CUDA_COMPILER
+    /// <summary>
+    /// Round nearest ties to even<para/>
+    /// Note: the host function assumes that current rounding mode is set to FE_TONEAREST
+    /// </summary>
+    DEVICE_ONLY_CODE [[nodiscard]] inline static HalfFp16 RoundNearest(HalfFp16 aOther)
+    {
+        return HalfFp16(__int2half_rn(__half2int_rn(aOther.value)));
+    }
+#endif
+
+#ifdef IS_HOST_COMPILER
+    /// <summary>
+    /// Round toward zero
+    /// </summary>
+    inline void RoundZero()
+    {
+        value = half_float::trunc(value);
+    }
+#endif
+
+#ifdef IS_CUDA_COMPILER
+    /// <summary>
+    /// Round toward zero
+    /// </summary>
+    DEVICE_ONLY_CODE inline void RoundZero()
+    {
+        value = __int2half_rz(__half2int_rz(value));
+    }
+#endif
+
+#ifdef IS_HOST_COMPILER
+    /// <summary>
+    /// Round toward zero
+    /// </summary>
+    [[nodiscard]] inline static HalfFp16 RoundZero(HalfFp16 aOther)
+    {
+        return HalfFp16(half_float::trunc(aOther.value));
+    }
+#endif
+
+#ifdef IS_CUDA_COMPILER
+    /// <summary>
+    /// Round toward zero
+    /// </summary>
+    DEVICE_ONLY_CODE [[nodiscard]] inline static HalfFp16 RoundZero(HalfFp16 aOther)
+    {
+        return HalfFp16(__int2half_rz(__half2int_rz(aOther.value)));
+    }
+#endif
+
+#ifdef IS_HOST_COMPILER
+    friend std::ostream &operator<<(std::ostream &aOs, const HalfFp16 &aHalf);
+    friend std::wostream &operator<<(std::wostream &aOs, const HalfFp16 &aHalf);
+#endif
+};
+
+#ifdef IS_HOST_COMPILER
+inline std::ostream &operator<<(std::ostream &aOs, const HalfFp16 &aHalf)
+{
+    return aOs << float(aHalf.value);
+}
+inline std::wostream &operator<<(std::wostream &aOs, const HalfFp16 &aHalf)
+{
+    return aOs << float(aHalf.value);
+}
+inline std::istream &operator>>(std::istream &aIs, HalfFp16 &aHalf)
+{
+    float temp;
+    aIs >> temp;
+    aHalf = HalfFp16(temp);
+    return aIs;
+}
+inline std::wistream &operator>>(std::wistream &aIs, HalfFp16 &aHalf)
+{
+    float temp;
+    aIs >> temp;
+    aHalf = HalfFp16(temp);
+    return aIs;
+}
+#endif
+} // namespace opp

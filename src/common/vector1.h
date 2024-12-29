@@ -56,6 +56,15 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
 {
     T x;
 
+    template <typename T2> struct same_vector_size_different_type
+    {
+        using vector = Vector1<T2>;
+    };
+
+    template <typename T2>
+    using same_vector_size_different_type_t = typename same_vector_size_different_type<T2>::vector;
+
+#pragma region Constructors
     /// <summary>
     /// Default constructor does not initialize the members
     /// </summary>
@@ -74,6 +83,16 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Initializes vector to all components = [aVal[0]]
     /// </summary>
     DEVICE_CODE Vector1(T aVal[1]) noexcept : x(aVal[0])
+    {
+    }
+
+    /// <summary>
+    /// Initializes vector to all components = aVal with cast to T
+    /// Note: this constructor avoids confusion for integral types when initialising to 0 as it could also be a nullptr
+    /// </summary>
+    DEVICE_CODE Vector1(int aVal) noexcept
+        requires Integral<T> && (!std::same_as<T, int>)
+        : x(T(aVal))
     {
     }
 
@@ -117,7 +136,9 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     Vector1(Vector1 &&) noexcept                 = default;
     Vector1 &operator=(const Vector1 &) noexcept = default;
     Vector1 &operator=(Vector1 &&) noexcept      = default;
+#pragma endregion
 
+#pragma region Operators
     // don't use space-ship operator as it returns true if any comparison returns true.
     // But NPP only returns true if all channels fulfill the comparison.
     // auto operator<=>(const Vector1 &) const = default;
@@ -224,6 +245,15 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     }
 
     /// <summary>
+    /// Component wise subtraction (inverted inplace sub: this = aOther - this)
+    /// </summary>
+    DEVICE_CODE Vector1 &SubInv(const Vector1 &aOther)
+    {
+        x = aOther.x - x;
+        return *this;
+    }
+
+    /// <summary>
     /// Component wise subtraction
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector1 operator-(const Vector1 &aOther) const
@@ -272,6 +302,15 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     DEVICE_CODE Vector1 &operator/=(const Vector1 &aOther)
     {
         x /= aOther.x;
+        return *this;
+    }
+
+    /// <summary>
+    /// Component wise division (inverted inplace div: this = aOther / this)
+    /// </summary>
+    DEVICE_CODE Vector1 &DivInv(const Vector1 &aOther)
+    {
+        x = aOther.x / x;
         return *this;
     }
 
@@ -338,7 +377,7 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
 
         throw INVALIDARGUMENT(aAxis, aAxis);
     }
-
+#pragma region Convert Methods
     /// <summary>
     /// Type conversion without saturation, direct type conversion
     /// </summary>
@@ -346,7 +385,9 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     {
         return {static_cast<T>(aVec.x)};
     }
+#pragma endregion
 
+#pragma region Integral only Methods
     /// <summary>
     /// Element wise bitwise left shift
     /// </summary>
@@ -506,21 +547,32 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
         ret.x = ~aVec.x;
         return ret;
     }
+#pragma endregion
 
+#pragma region Methods
+#pragma region Exp
     /// <summary>
     /// Element wise exponential
     /// </summary>
     void Exp()
-        requires HostCode<T>
+        requires HostCode<T> && NativeType<T>
     {
         x = std::exp(x);
+    }
+    /// <summary>
+    /// Element wise exponential
+    /// </summary>
+    DEVICE_CODE void Exp()
+        requires NonNativeType<T>
+    {
+        x = T::Exp(x);
     }
 
     /// <summary>
     /// Element wise exponential
     /// </summary>
     DEVICE_CODE void Exp()
-        requires DeviceCode<T> && FloatingPoint<T>
+        requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         x = exp(x);
     }
@@ -529,7 +581,7 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise exponential
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector1<T> Exp(const Vector1<T> &aVec)
-        requires DeviceCode<T> && FloatingPoint<T>
+        requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         Vector1<T> ret;
         ret.x = exp(aVec.x);
@@ -540,7 +592,7 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise exponential
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector1<T> Exp(const Vector1<T> &aVec)
-        requires HostCode<T>
+        requires HostCode<T> && NativeType<T>
     {
         Vector1<T> ret;
         ret.x = std::exp(aVec.x);
@@ -548,10 +600,23 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     }
 
     /// <summary>
+    /// Element wise exponential
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector1<T> Exp(const Vector1<T> &aVec)
+        requires NonNativeType<T>
+    {
+        Vector1<T> ret;
+        ret.x = T::Exp(aVec.x);
+        return ret;
+    }
+#pragma endregion
+
+#pragma region Log
+    /// <summary>
     /// Element wise natural logarithm
     /// </summary>
     void Ln()
-        requires HostCode<T>
+        requires HostCode<T> && NativeType<T>
     {
         x = std::log(x);
     }
@@ -560,7 +625,16 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise natural logarithm
     /// </summary>
     DEVICE_CODE void Ln()
-        requires DeviceCode<T> && FloatingPoint<T>
+        requires NonNativeType<T>
+    {
+        x = T::Ln(x);
+    }
+
+    /// <summary>
+    /// Element wise natural logarithm
+    /// </summary>
+    DEVICE_CODE void Ln()
+        requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         x = log(x);
     }
@@ -569,7 +643,7 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise natural logarithm
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector1<T> Ln(const Vector1<T> &aVec)
-        requires DeviceCode<T> && FloatingPoint<T>
+        requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         Vector1<T> ret;
         ret.x = log(aVec.x);
@@ -580,13 +654,26 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise natural logarithm
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector1<T> Ln(const Vector1<T> &aVec)
-        requires HostCode<T>
+        requires HostCode<T> && NativeType<T>
     {
         Vector1<T> ret;
         ret.x = std::log(aVec.x);
         return ret;
     }
 
+    /// <summary>
+    /// Element wise natural logarithm
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector1<T> Ln(const Vector1<T> &aVec)
+        requires NonNativeType<T>
+    {
+        Vector1<T> ret;
+        ret.x = T::Ln(aVec.x);
+        return ret;
+    }
+#pragma endregion
+
+#pragma region Sqr
     /// <summary>
     /// Element wise square
     /// </summary>
@@ -604,12 +691,14 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
         ret.x = aVec.x * aVec.x;
         return ret;
     }
+#pragma endregion
 
+#pragma region Sqrt
     /// <summary>
     /// Element wise square root
     /// </summary>
     void Sqrt()
-        requires HostCode<T>
+        requires HostCode<T> && NativeType<T>
     {
         x = std::sqrt(x);
     }
@@ -618,7 +707,16 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise square root
     /// </summary>
     DEVICE_CODE void Sqrt()
-        requires DeviceCode<T> && FloatingPoint<T>
+        requires NonNativeType<T>
+    {
+        x = T::Sqrt(x);
+    }
+
+    /// <summary>
+    /// Element wise square root
+    /// </summary>
+    DEVICE_CODE void Sqrt()
+        requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         x = sqrt(x);
     }
@@ -627,7 +725,7 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise square root
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector1<T> Sqrt(const Vector1<T> &aVec)
-        requires DeviceCode<T> && FloatingPoint<T>
+        requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         Vector1<T> ret;
         ret.x = sqrt(aVec.x);
@@ -638,7 +736,7 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise square root
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector1<T> Sqrt(const Vector1<T> &aVec)
-        requires HostCode<T>
+        requires HostCode<T> && NativeType<T>
     {
         Vector1<T> ret;
         ret.x = std::sqrt(aVec.x);
@@ -646,10 +744,23 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     }
 
     /// <summary>
+    /// Element wise square root
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector1<T> Sqrt(const Vector1<T> &aVec)
+        requires NonNativeType<T>
+    {
+        Vector1<T> ret;
+        ret.x = T::Sqrt(aVec.x);
+        return ret;
+    }
+#pragma endregion
+
+#pragma region Abs
+    /// <summary>
     /// Element wise absolute
     /// </summary>
     void Abs()
-        requires HostCode<T>
+        requires HostCode<T> && SignedNumber<T> && NativeType<T>
     {
         x = std::abs(x);
     }
@@ -658,7 +769,16 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise absolute
     /// </summary>
     DEVICE_CODE void Abs()
-        requires DeviceCode<T>
+        requires SignedNumber<T> && NonNativeType<T>
+    {
+        x = T::Abs(x);
+    }
+
+    /// <summary>
+    /// Element wise absolute
+    /// </summary>
+    DEVICE_CODE void Abs()
+        requires DeviceCode<T> && SignedNumber<T> && NativeType<T>
     {
         x = abs(x);
     }
@@ -667,7 +787,7 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise absolute
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector1<T> Abs(const Vector1<T> &aVec)
-        requires DeviceCode<T>
+        requires DeviceCode<T> && SignedNumber<T> && NativeType<T>
     {
         Vector1<T> ret;
         ret.x = abs(aVec.x);
@@ -678,7 +798,7 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise absolute
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector1<T> Abs(const Vector1<T> &aVec)
-        requires HostCode<T>
+        requires HostCode<T> && SignedNumber<T> && NativeType<T>
     {
         Vector1<T> ret;
         ret.x = std::abs(aVec.x);
@@ -686,10 +806,23 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     }
 
     /// <summary>
+    /// Element wise absolute
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector1<T> Abs(const Vector1<T> &aVec)
+        requires NonNativeType<T>
+    {
+        Vector1<T> ret;
+        ret.x = T::Abs(aVec.x);
+        return ret;
+    }
+#pragma endregion
+
+#pragma region AbsDiff
+    /// <summary>
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE void AbsDiff(const Vector1<T> &aOther)
-        requires HostCode<T>
+        requires HostCode<T> && NativeType<T>
     {
         x = std::abs(x - aOther.x);
     }
@@ -698,7 +831,7 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise bitwise Xor
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector1<T> AbsDiff(const Vector1<T> &aLeft, const Vector1<T> &aRight)
-        requires HostCode<T>
+        requires HostCode<T> && NativeType<T>
     {
         Vector1<T> ret;
         ret.x = std::abs(aLeft.x - aRight.x);
@@ -709,7 +842,7 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE void AbsDiff(const Vector1<T> &aOther)
-        requires DeviceCode<T>
+        requires DeviceCode<T> && NativeType<T>
     {
         x = abs(x - aOther.x);
     }
@@ -718,7 +851,7 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector1<T> AbsDiff(const Vector1<T> &aLeft, const Vector1<T> &aRight)
-        requires DeviceCode<T>
+        requires DeviceCode<T> && NativeType<T>
     {
         Vector1<T> ret;
         ret.x = abs(aLeft.x - aRight.x);
@@ -726,21 +859,52 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     }
 
     /// <summary>
+    /// Element wise absolute difference
+    /// </summary>
+    DEVICE_CODE void AbsDiff(const Vector1<T> &aOther)
+        requires NonNativeType<T>
+    {
+        x = T::Abs(x - aOther.x);
+    }
+
+    /// <summary>
+    /// Element wise absolute difference
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector1<T> AbsDiff(const Vector1<T> &aLeft, const Vector1<T> &aRight)
+        requires NonNativeType<T>
+    {
+        Vector1<T> ret;
+        ret.x = T::Abs(aLeft.x - aRight.x);
+        return ret;
+    }
+#pragma endregion
+
+#pragma region Magnitude(Sqr)
+    /// <summary>
     /// Vector length (L2 norm)
     /// </summary>
     DEVICE_CODE [[nodiscard]] T Magnitude() const
-        requires DeviceCode<T> && FloatingPoint<T>
+        requires DeviceCode<T> && NativeFloatingPoint<T>
     {
-        return fabsf(x);
+        return abs(x);
     }
 
     /// <summary>
     /// Vector length (L2 norm)
     /// </summary>
     [[nodiscard]] T Magnitude() const
-        requires HostCode<T> && FloatingPoint<T>
+        requires HostCode<T> && NativeFloatingPoint<T>
     {
         return std::abs(x);
+    }
+
+    /// <summary>
+    /// Vector length (L2 norm)
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] T Magnitude() const
+        requires NonNativeType<T>
+    {
+        return T::Abs(x);
     }
 
     /// <summary>
@@ -780,7 +944,9 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
 
         return dx * dx;
     }
+#pragma endregion
 
+#pragma region Normalize
     /// <summary>
     /// Normalizes the vector components
     /// </summary>
@@ -800,12 +966,14 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
         ret.Normalize();
         return ret;
     }
+#pragma endregion
 
+#pragma region Clamp
     /// <summary>
     /// Component wise clamp to value range
     /// </summary>
     DEVICE_CODE void Clamp(T aMinVal, T aMaxVal)
-        requires DeviceCode<T>
+        requires DeviceCode<T> && NativeType<T>
     {
         x = max(aMinVal, min(x, aMaxVal));
     }
@@ -814,9 +982,18 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Component wise clamp to value range
     /// </summary>
     void Clamp(T aMinVal, T aMaxVal)
-        requires HostCode<T>
+        requires HostCode<T> && NativeType<T>
     {
         x = std::max(aMinVal, std::min(x, aMaxVal));
+    }
+
+    /// <summary>
+    /// Component wise clamp to value range
+    /// </summary>
+    DEVICE_CODE void Clamp(T aMinVal, T aMaxVal)
+        requires NonNativeType<T>
+    {
+        x = T::Max(aMinVal, T::Min(x, aMaxVal));
     }
 
     /// <summary>
@@ -824,9 +1001,23 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// </summary>
     template <ComplexOrNumber TTarget>
     DEVICE_CODE void ClampToTargetType() noexcept
-        requires(need_saturation_clamp_v<T, TTarget>)
+        requires(need_saturation_clamp_v<T, TTarget>) && (!isSameType<T, HalfFp16> || !isSameType<TTarget, short>)
     {
         Clamp(T(numeric_limits<TTarget>::lowest()), T(numeric_limits<TTarget>::max()));
+    }
+
+    /// <summary>
+    /// Component wise clamp to maximum value range of given target type
+    /// </summary>
+    template <ComplexOrNumber TTarget>
+    DEVICE_CODE void ClampToTargetType() noexcept
+        requires(need_saturation_clamp_v<T, TTarget>) && isSameType<T, HalfFp16> && isSameType<TTarget, short>
+    {
+        // special case for half floats: the maximum value of short is slightly larger than the closest exact
+        // integer in HalfFp16, and as we use round to nearest, the clamping would result in a too large number.
+        // Thus for HalfFp16 and short, we clamp to the exact integer smaller than short::max(), i.e. 32752
+        constexpr HalfFp16 maxExactShort = HalfFp16::FromUShort(0x77FF); // = 32752
+        Clamp(T(numeric_limits<TTarget>::lowest()), maxExactShort);
     }
 
     /// <summary>
@@ -838,12 +1029,14 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
         requires(!need_saturation_clamp_v<T, TTarget>)
     {
     }
+#pragma endregion
 
+#pragma region Min
     /// <summary>
     /// Component wise minimum
     /// </summary>
     void Min(const Vector1<T> &aRight)
-        requires HostCode<T>
+        requires HostCode<T> && NativeType<T>
     {
         x = std::min(x, aRight.x);
     }
@@ -851,17 +1044,55 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// <summary>
     /// Component wise minimum
     /// </summary>
-    void Min(const Vector1<T> &aRight)
-        requires DeviceCode<T>
+    DEVICE_CODE void Min(const Vector1<T> &aRight)
+        requires NonNativeType<T>
+    {
+        x.Min(aRight.x);
+    }
+
+    /// <summary>
+    /// Component wise minimum
+    /// </summary>
+    DEVICE_CODE void Min(const Vector1<T> &aRight)
+        requires DeviceCode<T> && NativeType<T>
     {
         x = min(x, aRight.x);
     }
 
     /// <summary>
+    /// Component wise minimum
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector1<T> Min(const Vector1<T> &aLeft, const Vector1<T> &aRight)
+        requires DeviceCode<T> && NativeType<T>
+    {
+        return Vector1<T>{T(min(aLeft.x, aRight.x))};
+    }
+
+    /// <summary>
+    /// Component wise minimum
+    /// </summary>
+    [[nodiscard]] static Vector1<T> Min(const Vector1<T> &aLeft, const Vector1<T> &aRight)
+        requires HostCode<T> && NativeType<T>
+    {
+        return Vector1<T>{std::min(aLeft.x, aRight.x)};
+    }
+
+    /// <summary>
+    /// Component wise minimum
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector1<T> Min(const Vector1<T> &aLeft, const Vector1<T> &aRight)
+        requires NonNativeType<T>
+    {
+        return Vector1<T>{T::Min(aLeft.x, aRight.x)};
+    }
+#pragma endregion
+
+#pragma region Max
+    /// <summary>
     /// Component wise maximum
     /// </summary>
-    void Max(const Vector1<T> &aRight)
-        requires DeviceCode<T>
+    DEVICE_CODE void Max(const Vector1<T> &aRight)
+        requires DeviceCode<T> && NativeType<T>
     {
         x = max(x, aRight.x);
     }
@@ -870,47 +1101,49 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Component wise maximum
     /// </summary>
     void Max(const Vector1<T> &aRight)
-        requires HostCode<T>
+        requires HostCode<T> && NativeType<T>
     {
         x = std::max(x, aRight.x);
     }
 
     /// <summary>
-    /// Component wise minimum
+    /// Component wise maximum
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector1<T> Min(const Vector1<T> &aLeft, const Vector1<T> &aRight)
-        requires DeviceCode<T>
+    DEVICE_CODE void Max(const Vector1<T> &aRight)
+        requires NonNativeType<T>
     {
-        return Vector1<T>{min(aLeft.x, aRight.x)};
-    }
-
-    /// <summary>
-    /// Component wise minimum
-    /// </summary>
-    [[nodiscard]] static Vector1<T> Min(const Vector1<T> &aLeft, const Vector1<T> &aRight)
-        requires HostCode<T>
-    {
-        return Vector1<T>{std::min(aLeft.x, aRight.x)};
+        x.Max(aRight.x);
     }
 
     /// <summary>
     /// Component wise maximum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector1<T> Max(const Vector1<T> &aLeft, const Vector1<T> &aRight)
-        requires DeviceCode<T>
+        requires DeviceCode<T> && NativeType<T>
     {
-        return Vector1<T>{max(aLeft.x, aRight.x)};
+        return Vector1<T>{T(max(aLeft.x, aRight.x))};
     }
 
     /// <summary>
     /// Component wise maximum
     /// </summary>
     [[nodiscard]] static Vector1<T> Max(const Vector1<T> &aLeft, const Vector1<T> &aRight)
-        requires HostCode<T>
+        requires HostCode<T> && NativeType<T>
     {
         return Vector1<T>{std::max(aLeft.x, aRight.x)};
     }
 
+    /// <summary>
+    /// Component wise maximum
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector1<T> Max(const Vector1<T> &aLeft, const Vector1<T> &aRight)
+        requires NonNativeType<T>
+    {
+        return Vector1<T>{T::Max(aLeft.x, aRight.x)};
+    }
+#pragma endregion
+
+#pragma region Round
     /// <summary>
     /// Element wise round()
     /// </summary>
@@ -946,7 +1179,7 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise round()
     /// </summary>
     DEVICE_CODE void Round()
-        requires DeviceCode<T> && FloatingPoint<T>
+        requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         x = round(x);
     }
@@ -955,9 +1188,18 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise round()
     /// </summary>
     void Round()
-        requires HostCode<T> && FloatingPoint<T>
+        requires HostCode<T> && NativeFloatingPoint<T>
     {
         x = std::round(x);
+    }
+
+    /// <summary>
+    /// Element wise round()
+    /// </summary>
+    DEVICE_ONLY_CODE void Round()
+        requires NonNativeType<T>
+    {
+        x.Round();
     }
 
     /// <summary>
@@ -986,7 +1228,7 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise floor()
     /// </summary>
     DEVICE_CODE void Floor()
-        requires DeviceCode<T> && FloatingPoint<T>
+        requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         x = floor(x);
     }
@@ -995,9 +1237,18 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise floor()
     /// </summary>
     void Floor()
-        requires HostCode<T> && FloatingPoint<T>
+        requires HostCode<T> && NativeFloatingPoint<T>
     {
         x = std::floor(x);
+    }
+
+    /// <summary>
+    /// Element wise floor()
+    /// </summary>
+    DEVICE_ONLY_CODE void Floor()
+        requires NonNativeType<T>
+    {
+        x.Floor();
     }
 
     /// <summary>
@@ -1026,7 +1277,7 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise ceil()
     /// </summary>
     DEVICE_CODE void Ceil()
-        requires DeviceCode<T> && FloatingPoint<T>
+        requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         x = ceil(x);
     }
@@ -1035,9 +1286,18 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise ceil()
     /// </summary>
     void Ceil()
-        requires HostCode<T> && FloatingPoint<T>
+        requires HostCode<T> && NativeFloatingPoint<T>
     {
         x = std::ceil(x);
+    }
+
+    /// <summary>
+    /// Element wise ceil()
+    /// </summary>
+    DEVICE_ONLY_CODE void Ceil()
+        requires NonNativeType<T>
+    {
+        x.Ceil();
     }
 
     /// <summary>
@@ -1056,7 +1316,7 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise round nearest ties to even
     /// </summary>
     DEVICE_CODE void RoundNearest()
-        requires DeviceCode<T> && FloatingPoint<T>
+        requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         x = __float2int_rn(x);
     }
@@ -1066,9 +1326,18 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Note: this host function assumes that current rounding mode is set to FE_TONEAREST
     /// </summary>
     void RoundNearest()
-        requires HostCode<T> && FloatingPoint<T>
+        requires HostCode<T> && NativeFloatingPoint<T>
     {
         x = std::nearbyint(x);
+    }
+
+    /// <summary>
+    /// Element wise round nearest ties to even
+    /// </summary>
+    DEVICE_ONLY_CODE void RoundNearest()
+        requires NonNativeType<T>
+    {
+        x.RoundNearest();
     }
 
     /// <summary>
@@ -1086,7 +1355,7 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise round toward zero
     /// </summary>
     DEVICE_CODE void RoundZero()
-        requires DeviceCode<T> && FloatingPoint<T>
+        requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         x = __float2int_rz(x);
     }
@@ -1095,13 +1364,24 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     /// Element wise round toward zero
     /// </summary>
     void RoundZero()
-        requires HostCode<T> && FloatingPoint<T>
+        requires HostCode<T> && NativeFloatingPoint<T>
     {
         x = std::trunc(x);
     }
 
     /// <summary>
-    /// Provide a smiliar accessor to inner data similar to std container
+    /// Element wise round toward zero
+    /// </summary>
+    DEVICE_ONLY_CODE void RoundZero()
+        requires NonNativeType<T>
+    {
+        x.RoundZero();
+    }
+#pragma endregion
+
+#pragma region Data accessors
+    /// <summary>
+    /// Provide a smiliar accessor to inner data as for std container
     /// </summary>
     DEVICE_CODE [[nodiscard]] T *data()
     {
@@ -1109,12 +1389,76 @@ template <ComplexOrNumber T> struct alignas(sizeof(T)) Vector1
     }
 
     /// <summary>
-    /// Provide a smiliar accessor to inner data similar to std container
+    /// Provide a smiliar accessor to inner data as for std container
     /// </summary>
     DEVICE_CODE [[nodiscard]] const T *data() const
     {
         return &x;
     }
+#pragma endregion
+
+#pragma region Compare
+    /// <summary>
+    /// Element wise comparison equal, returns 0xFF per element for true, 0x00 for false
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector1<byte> CompareEQ(const Vector1<T> &aLeft, const Vector1<T> &aRight)
+    {
+        Vector1<byte> ret;
+        ret.x = byte(aLeft.x == aRight.x) * TRUE_VALUE;
+        return ret;
+    }
+
+    /// <summary>
+    /// Element wise comparison greater or equal, returns 0xFF per element for true, 0x00 for false
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector1<byte> CompareGE(const Vector1<T> &aLeft, const Vector1<T> &aRight)
+    {
+        Vector1<byte> ret;
+        ret.x = byte(aLeft.x >= aRight.x) * TRUE_VALUE;
+        return ret;
+    }
+
+    /// <summary>
+    /// Element wise comparison greater than, returns 0xFF per element for true, 0x00 for false
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector1<byte> CompareGT(const Vector1<T> &aLeft, const Vector1<T> &aRight)
+    {
+        Vector1<byte> ret;
+        ret.x = byte(aLeft.x > aRight.x) * TRUE_VALUE;
+        return ret;
+    }
+
+    /// <summary>
+    /// Element wise comparison less or equal, returns 0xFF per element for true, 0x00 for false
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector1<byte> CompareLE(const Vector1<T> &aLeft, const Vector1<T> &aRight)
+    {
+        Vector1<byte> ret;
+        ret.x = byte(aLeft.x <= aRight.x) * TRUE_VALUE;
+        return ret;
+    }
+
+    /// <summary>
+    /// Element wise comparison less than, returns 0xFF per element for true, 0x00 for false
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector1<byte> CompareLT(const Vector1<T> &aLeft, const Vector1<T> &aRight)
+    {
+        Vector1<byte> ret;
+        ret.x = byte(aLeft.x < aRight.x) * TRUE_VALUE;
+        return ret;
+    }
+
+    /// <summary>
+    /// Element wise comparison not equal, returns 0xFF per element for true, 0x00 for false
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector1<byte> CompareNEQ(const Vector1<T> &aLeft, const Vector1<T> &aRight)
+    {
+        Vector1<byte> ret;
+        ret.x = byte(aLeft.x != aRight.x) * TRUE_VALUE;
+        return ret;
+    }
+#pragma endregion
+#pragma endregion
 };
 
 template <typename T, typename T2>

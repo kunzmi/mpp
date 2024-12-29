@@ -29,25 +29,33 @@ class NPPParser
 
     static std::string GetBaseName(const std::string &aFName);
 
-    static std::string GetShortName(Function &aFunction);
+    static std::string GetShortName(const Function &aFunction);
 
     static bool GetContext(const std::string &aFName);
 
-    static opp::image::PixelTypeEnum GetPixelType(Function &aFunction);
+    static opp::image::PixelTypeEnum GetPixelType(const Function &aFunction);
 
-    static bool IsPlanar(Function &aFunction);
+    static bool IsPlanar(const Function &aFunction);
 
-    static bool IsInplace(Function &aFunction);
+    static bool IsPlanarSource(const Function &aFunction);
 
-    static bool IsMasked(Function &aFunction);
+    static bool IsPlanarDest(const Function &aFunction);
 
-    static bool IsSfs(Function &aFunction);
+    static int GetPlanarDestCount(const Function &aFunction);
 
-    static bool IsCtx(Function &aFunction);
+    static int GetPlanarSrcCount(const Function &aFunction);
 
-    static bool IsConstant(Function &aFunction);
+    static bool IsInplace(const Function &aFunction);
 
-    static bool IsDeviceConstant(Function &aFunction);
+    static bool IsMasked(const Function &aFunction);
+
+    static bool IsSfs(const Function &aFunction);
+
+    static bool IsCtx(const Function &aFunction);
+
+    static bool IsConstant(const Function &aFunction);
+
+    static bool IsDeviceConstant(const Function &aFunction);
 
   private:
     static const std::filesystem::path _basePath;

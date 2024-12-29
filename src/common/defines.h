@@ -3,6 +3,9 @@
 #include <cstdint>
 #include <type_traits>
 
+// definitions of types, concepts and macros etc. that are used through out in the OPP library. Basically all files
+// include this header, so it should't be changed too often...
+
 namespace opp
 {
 using byte    = std::uint8_t;
@@ -42,6 +45,9 @@ concept HOST_COMPILER = std::false_type::value;
 
 // __restrict__ for device code
 #define RESTRICT __restrict__
+
+#define IS_DEVICE_COMPILER
+#define IS_CUDA_COMPILER
 #elif __HIP_PLATFORM_AMD__
 template <typename T>
 concept DEVICE_COMPILER = std::true_type::value;
@@ -63,6 +69,9 @@ concept HOST_COMPILER = std::false_type::value;
 
 // __restrict__ for device code
 #define RESTRICT __restrict__
+
+#define IS_DEVICE_COMPILER
+#define IS_HIP_COMPILER
 #elif _MSC_VER
 template <typename T>
 concept DEVICE_COMPILER = std::false_type::value;
@@ -84,6 +93,8 @@ concept HOST_COMPILER = std::true_type::value;
 
 // __restrict__ for device code
 #define RESTRICT
+
+#define IS_HOST_COMPILER
 #elif __clang__
 template <typename T>
 concept DEVICE_COMPILER = std::false_type::value;
@@ -105,6 +116,8 @@ concept HOST_COMPILER = std::true_type::value;
 
 // __restrict__ for device code
 #define RESTRICT
+
+#define IS_HOST_COMPILER
 #else // GCC and others
 template <typename T>
 concept DEVICE_COMPILER = std::false_type::value;
@@ -126,6 +139,8 @@ concept HOST_COMPILER = std::true_type::value;
 
 // __restrict__ for device code
 #define RESTRICT
+
+#define IS_HOST_COMPILER
 #endif
 
 // clang on mac doesn't support parallel execution, so disable it by macro:
@@ -144,11 +159,16 @@ concept DeviceCode = DEVICE_COMPILER<T>;
 template <typename T>
 concept HostAndDeviceCode = HOST_COMPILER<T> || DEVICE_COMPILER<T>;
 
-// Define our own FP concept as we might add FP16, Bfloat16 and FP8 one day...
-template <typename T>
-concept FloatingPoint = std::floating_point<T>;
+// forward declaration for HalfFp16 and BFloat16
+class HalfFp16;
+class BFloat16;
 
-// Floating point number of native type, i.e. float or double, but no FP16, Bfloat16 etc.
+// Define our own FP concept as HalfFp16 and BFloat16 are not part of std::floating_point and we don't want to modify
+// std namespace
+template <typename T>
+concept FloatingPoint = std::floating_point<T> || std::same_as<T, HalfFp16> || std::same_as<T, BFloat16>;
+
+// Floating point number of native type, i.e. float or double, but no HalfFp16, BFloat16 etc.
 template <typename T>
 concept NativeFloatingPoint = std::floating_point<T>;
 
@@ -180,6 +200,22 @@ concept NativeNumber = NativeFloatingPoint<T> || NativeIntegral<T>;
 template <typename T>
 concept SignedNumber = FloatingPoint<T> || SignedIntegral<T>;
 
+// All types that are non native C++ types, currently HalfFp16 and BFloat16
+template <typename T>
+concept NonNativeType = std::same_as<T, HalfFp16> || std::same_as<T, BFloat16>;
+
+// All types that are native C++ types, all but HalfFp16 and BFloat16
+template <typename T>
+concept NativeType = !NonNativeType<T>;
+
+// Is of type BFloat16
+template <typename T>
+concept IsBFloat16 = std::same_as<T, BFloat16>;
+
+// Is of type HalfFp16
+template <typename T>
+concept IsHalfFp16 = std::same_as<T, HalfFp16>;
+
 // T is sizeof 1 byte
 template <typename T>
 concept ByteSizeType = sizeof(T) == 1;
@@ -196,6 +232,10 @@ concept FourBytesSizeType = sizeof(T) == 4;
 template <std::size_t size>
 concept IsPowerOf2 = (size != 0) && ((size & (size - 1)) == 0);
 
+// Set to true to enable SIMD versions of implementation (applies only when both implementations exist)
+template <typename T>
+concept EnableSIMD = std::true_type::value;
+
 // GCC complains if we directly use std::false_type in a static_assert
 // (we do that from time to time for checking if we missed a use case)
 template <typename T> struct AlwaysFalse : std::false_type
@@ -204,134 +244,6 @@ template <typename T> struct AlwaysFalse : std::false_type
 
 template <typename T> struct AlwaysTrue : std::true_type
 {
-};
-
-// template <size_t N> struct KernelNameWrapper
-//{
-//     constexpr KernelNameWrapper(const char (&kernelName)[N])
-//     {
-//         for (size_t i = 0; i < N; i++)
-//         {
-//             value[i] = kernelName[i];
-//         }
-//     }
-//
-//     char value[N];
-// };
-//
-// template <KernelNameWrapper kernelName, typename T, int ComputeCapability = -1> struct blockSizeConfig
-//{
-//     static constexpr uint value[] = {32, 8, 1};
-// };
-// template <int ComputeCapability, typename T> struct blockSizeConfig<"hallo", T, ComputeCapability>
-//{
-//     static constexpr uint value[] = {16, 16, 1};
-// };
-// template <int ComputeCapability, typename T> struct blockSizeConfig<"hallo2", T, ComputeCapability>
-//{
-//     static constexpr uint value[] = {8, 8, 1};
-// };
-//
-// template <KernelNameWrapper kernelName, int ComputeCapability = -1, typename T = void> struct bytesPerWarpConfig
-//{
-//     static constexpr int value = 256;
-// };
-//
-// template <KernelNameWrapper kernelName, int ComputeCapability = -1, typename T = void> struct
-// dynamicSharedMemoryConfig
-//{
-//     static constexpr int value = 0;
-// };
-//
-// template <KernelNameWrapper kernelName, int ComputeCapability = -1, typename T = void> struct kernelLaunchConfig
-//{
-//     static constexpr uint value[]            = blockSizeConfig<kernelName, ComputeCapability, T>::value;
-//     static constexpr int bytesPerWarp        = bytesPerWarpConfig<kernelName, ComputeCapability, T>::value;
-//     static constexpr int dynamicSharedMemory = dynamicSharedMemoryConfig<kernelName, ComputeCapability, T>::value;
-// };
-
-/// <summary>
-/// Rounding Modes<para/>
-/// The enumerated rounding modes are used by a large number of OPP primitives
-/// to allow the user to specify the method by which fractional values are converted
-/// to integer values.
-/// </summary>
-enum class RoudingMode
-{
-    /// <summary>
-    /// Round to the nearest even integer.<para/>
-    /// All fractional numbers are rounded to their nearest integer. The ambiguous
-    /// cases (i.e. integer.5) are rounded to the closest even integer.<para/>
-    /// __float2int_rn in CUDA<para/>
-    /// E.g.<para/>
-    /// - roundNear(0.4) = 0<para/>
-    /// - roundNear(0.5) = 0<para/>
-    /// - roundNear(0.6) = 1<para/>
-    /// - roundNear(1.5) = 2<para/>
-    /// - roundNear(1.9) = 2<para/>
-    /// - roundNear(-1.5) = -2<para/>
-    /// - roundNear(-2.5) = -2<para/>
-    /// </summary>
-    NearestTiesToEven,
-    /// <summary>
-    /// Round according to financial rule.<para/>
-    /// All fractional numbers are rounded to their nearest integer. The ambiguous
-    /// cases (i.e. integer.5) are rounded away from zero.<para/>
-    /// C++ round() function<para/>
-    /// E.g.<para/>
-    /// - roundNearestTiesAwayFromZero(0.4)  = 0<para/>
-    /// - roundNearestTiesAwayFromZero(0.5)  = 1<para/>
-    /// - roundNearestTiesAwayFromZero(0.6)  = 1<para/>
-    /// - roundNearestTiesAwayFromZero(1.5)  = 2<para/>
-    /// - roundNearestTiesAwayFromZero(1.9)  = 2<para/>
-    /// - roundNearestTiesAwayFromZero(-1.5) = -2<para/>
-    /// - roundNearestTiesAwayFromZero(-2.5) = -3<para/>
-    /// </summary>
-    NearestTiesAwayFromZero,
-    /// <summary>
-    /// Round towards zero (truncation).<para/>
-    /// All fractional numbers of the form integer.decimals are truncated to
-    /// __float2int_rz in CUDA<para/>
-    /// integer.<para/>
-    /// - roundZero(0.4)  = 0<para/>
-    /// - roundZero(0.5)  = 0<para/>
-    /// - roundZero(0.6)  = 0<para/>
-    /// - roundZero(1.5)  = 1<para/>
-    /// - roundZero(1.9)  = 1<para/>
-    /// - roundZero(-1.5) = -1<para/>
-    /// - roundZero(-2.5) = -2<para/>
-    /// </summary>
-    TowardZero,
-    /// <summary>
-    /// Round towards negative infinity.<para/>
-    /// C++ floor() function<para/>
-    /// E.g.<para/>
-    /// - floor(0.4)  = 0<para/>
-    /// - floor(0.5)  = 0<para/>
-    /// - floor(0.6)  = 0<para/>
-    /// - floor(1.5)  = 1<para/>
-    /// - floor(1.9)  = 1<para/>
-    /// - floor(-1.5) = -2<para/>
-    /// - floor(-2.5) = -3<para/>
-    /// </summary>
-    TowardNegativeInfinity,
-    /// <summary>
-    /// Round towards positive infinity.<para/>
-    /// C++ ceil() function<para/>
-    /// E.g.<para/>
-    /// - ceil(0.4)  = 1<para/>
-    /// - ceil(0.5)  = 1<para/>
-    /// - ceil(0.6)  = 1<para/>
-    /// - ceil(1.5)  = 2<para/>
-    /// - ceil(1.9)  = 2<para/>
-    /// - ceil(-1.5) = -1<para/>
-    /// - ceil(-2.5) = -2<para/>
-    /// </summary>
-    TowardPositiveInfinity,
-    /// <summary>
-    /// No rounding at all, NOP
-    /// </summary>
-    None
 };
 
 } // namespace opp

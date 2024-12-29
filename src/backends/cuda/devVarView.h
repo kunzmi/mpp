@@ -182,7 +182,7 @@ template <typename T> class DevVarView
     /// </summary>
     void CopyToDevice(T *aSource, size_t aSizeInElements = 0)
     {
-        const size_t sizeInBytes = std::min(SizeInBytes(), aSizeInElements * mTypeSize);
+        size_t sizeInBytes = std::min(SizeInBytes(), aSizeInElements * mTypeSize);
         if (aSizeInElements == 0)
         {
             sizeInBytes = SizeInBytes();
@@ -207,7 +207,7 @@ template <typename T> class DevVarView
     /// </summary>
     void CopyToDevice(const void *aSource, size_t aSizeInBytes = 0)
     {
-        const size_t sizeInBytes = std::min(SizeInBytes(), aSizeInBytes);
+        size_t sizeInBytes = std::min(SizeInBytes(), aSizeInBytes);
         if (aSizeInBytes == 0)
         {
             sizeInBytes = SizeInBytes();
@@ -233,7 +233,7 @@ template <typename T> class DevVarView
     /// </summary>
     void CopyToHost(T *aDest, size_t aSizeInElements = 0)
     {
-        const size_t sizeInBytes = std::min(SizeInBytes(), aSizeInElements * mTypeSize);
+        size_t sizeInBytes = std::min(SizeInBytes(), aSizeInElements * mTypeSize);
         if (aSizeInElements == 0)
         {
             sizeInBytes = SizeInBytes();
@@ -258,7 +258,7 @@ template <typename T> class DevVarView
     /// </summary>
     void CopyToHost(void *aDest, size_t aSizeInBytes = 0) const
     {
-        const size_t sizeInBytes = std::min(SizeInBytes(), aSizeInBytes);
+        size_t sizeInBytes = std::min(SizeInBytes(), aSizeInBytes);
         if (aSizeInBytes == 0)
         {
             sizeInBytes = SizeInBytes();

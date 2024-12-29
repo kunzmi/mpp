@@ -11,7 +11,11 @@
 
 #include <iostream>
 
-namespace opp::image::cuda
+namespace opp
+{
+namespace image
+{
+namespace cuda
 {
 /// <summary>
 /// runs aOp on every pixel of an image. Inplace and outplace operation, no mask.
@@ -140,4 +144,6 @@ void InvokeForEachPixelKernel(const dim3 &aBlockSize, uint aSharedMemory, cudaSt
                                              << " SharedMemory: " << aSharedMemory << " Stream: " << aStream
                                              << " Tupel size: " << TupelSize);
 }
-} // namespace opp::image::cuda
+} // namespace cuda
+} // namespace image
+} // namespace opp
