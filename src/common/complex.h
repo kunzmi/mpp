@@ -4,7 +4,7 @@
 #include "needSaturationClamp.h"
 #include "safeCast.h"
 #include <cmath>
-#include <common/complex_typetraits.h>
+#include <common/numberTypes.h>
 #include <complex>
 #include <concepts>
 #include <iostream>
@@ -36,25 +36,15 @@ namespace opp
 {
 
 // forward declaration
-template <ComplexOrNumber T> struct Vector1;
-template <ComplexOrNumber T> struct Vector2;
+template <Number T> struct Vector2;
 
 /// <summary>
 /// Our own definition of a complex number, that we can use on device and host
 /// </summary>
-template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
+template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
 {
     T real;
     T imag;
-
-    // we need this interface in order to allow comparison and return a Vector1<byte>
-    template <typename T2> struct same_vector_size_different_type
-    {
-        using vector = Vector1<T2>;
-    };
-
-    template <typename T2>
-    using same_vector_size_different_type_t = typename same_vector_size_different_type<T2>::vector;
 
 #pragma region Constructors
     /// <summary>
@@ -104,14 +94,12 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// E.g.: when converting int to byte, values are clamped to 0..255<para/>
     /// But when converting byte to int, no clamping operation is performed.
     /// </summary>
-    template <SignedNumber T2>
+    template <RealSignedNumber T2>
     DEVICE_CODE Complex(const Complex<T2> &aCplx) noexcept
         // Disable the non-const variant for half and bfloat to / from float,
         // otherwise the const specialization will never be picked up:
-        requires(!(IsBFloat16<T> && isSameType<T2, float> && CUDA_ONLY<T>) &&
-                 !(isSameType<T, float> && isSameType<T2, BFloat16> && CUDA_ONLY<T>) &&
-                 !(IsHalfFp16<T> && isSameType<T2, float> && CUDA_ONLY<T>) &&
-                 !(isSameType<T, float> && isSameType<T2, HalfFp16> && CUDA_ONLY<T>))
+        requires(!(IsBFloat16<T> && IsFloat<T2> && CUDA_ONLY<T>) && !(IsFloat<T> && IsBFloat16<T2> && CUDA_ONLY<T>) &&
+                 !(IsHalfFp16<T> && IsFloat<T2> && CUDA_ONLY<T>) && !(IsFloat<T> && IsHalfFp16<T2> && CUDA_ONLY<T>))
     {
         if constexpr (need_saturation_clamp_v<T2, T>)
         {
@@ -133,7 +121,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// But when converting byte to int, no clamping operation is performed.<para/>
     /// If we can modify the input variable, no need to allocate temporary storage for clamping.
     /// </summary>
-    template <SignedNumber T2> DEVICE_CODE Complex(Complex<T2> &aVec) noexcept
+    template <RealSignedNumber T2> DEVICE_CODE Complex(Complex<T2> &aVec) noexcept
     {
         if constexpr (need_saturation_clamp_v<T2, T>)
         {
@@ -146,9 +134,9 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// <summary>
     /// Type conversion using CUDA intrinsics for float2 to BFloat2
     /// </summary>
-    template <ComplexOrNumber T2>
+    template <Number T2>
     DEVICE_CODE Complex(const Complex<T2> &aVec) noexcept
-        requires IsBFloat16<T> && isSameType<T2, float> && CUDA_ONLY<T>
+        requires IsBFloat16<T> && IsFloat<T2> && CUDA_ONLY<T>
     {
         const float2 *aVecPtr = reinterpret_cast<const float2 *>(&aVec);
         nv_bfloat162 *thisPtr = reinterpret_cast<nv_bfloat162 *>(this);
@@ -158,9 +146,9 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// <summary>
     /// Type conversion using CUDA intrinsics for BFloat2 to float2
     /// </summary>
-    template <ComplexOrNumber T2>
+    template <IsBFloat16 T2>
     DEVICE_CODE Complex(const Complex<T2> &aVec) noexcept
-        requires isSameType<T, float> && isSameType<T2, BFloat16> && CUDA_ONLY<T>
+        requires IsFloat<T> && CUDA_ONLY<T>
     {
         const nv_bfloat162 *aVecPtr = reinterpret_cast<const nv_bfloat162 *>(&aVec);
         float2 *thisPtr             = reinterpret_cast<float2 *>(this);
@@ -170,9 +158,9 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// <summary>
     /// Type conversion using CUDA intrinsics for float2 to half2
     /// </summary>
-    template <ComplexOrNumber T2>
+    template <Number T2>
     DEVICE_CODE Complex(const Complex<T2> &aVec) noexcept
-        requires IsHalfFp16<T> && isSameType<T2, float> && CUDA_ONLY<T>
+        requires IsHalfFp16<T> && IsFloat<T2> && CUDA_ONLY<T>
     {
         const float2 *aVecPtr = reinterpret_cast<const float2 *>(&aVec);
         half2 *thisPtr        = reinterpret_cast<half2 *>(this);
@@ -182,9 +170,9 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// <summary>
     /// Type conversion using CUDA intrinsics for half2 to float2
     /// </summary>
-    template <ComplexOrNumber T2>
+    template <IsHalfFp16 T2>
     DEVICE_CODE Complex(const Complex<T2> &aVec) noexcept
-        requires isSameType<T, float> && isSameType<T2, HalfFp16> && CUDA_ONLY<T>
+        requires IsFloat<T> && CUDA_ONLY<T>
     {
         const half2 *aVecPtr = reinterpret_cast<const half2 *>(&aVec);
         float2 *thisPtr      = reinterpret_cast<float2 *>(this);
@@ -283,13 +271,15 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
 #pragma endregion
   public:
 #pragma region Operators
+    // No operators for < or > as complex numbers have no ordering
+
     /// <summary>
     /// Returns true if each element comparison is true
     /// </summary>
     DEVICE_CODE [[nodiscard]] bool operator==(const Complex &aOther) const
     {
-        bool res = x == aOther.x;
-        res &= y == aOther.y;
+        bool res = real == aOther.real;
+        res &= imag == aOther.imag;
         return res;
     }
 
@@ -298,8 +288,8 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// </summary>
     DEVICE_CODE [[nodiscard]] bool operator!=(const Complex &aOther) const
     {
-        bool res = x != aOther.x;
-        res |= y != aOther.y;
+        bool res = real != aOther.real;
+        res |= imag != aOther.imag;
         return res;
     }
 
@@ -307,7 +297,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator==(const Complex &aOther) const
-        requires isSameType<T, short> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpeq2(*this, aOther) == 0xFFFFFFFFU;
     }
@@ -316,7 +306,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Returns true if any element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator!=(const Complex &aOther) const
-        requires isSameType<T, short> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpne2(*this, aOther) != 0U;
     }
@@ -373,7 +363,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Negation (SIMD)
     /// </summary>
     DEVICE_CODE [[nodiscard]] Complex operator-() const
-        requires isSameType<T, short> && CUDA_ONLY<T>
+        requires IsShort<T> && CUDA_ONLY<T>
     {
         return FromUint(__vnegss2(*this));
     }
@@ -382,7 +372,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Negation (SIMD)
     /// </summary>
     DEVICE_CODE [[nodiscard]] Complex operator-() const
-        requires NonNativeType<T> && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T>
     {
         return FromNV16BitFloat(__hneg2(*this));
     }
@@ -410,7 +400,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex addition SIMD
     /// </summary>
     DEVICE_CODE Complex &operator+=(const Complex &aOther)
-        requires isSameType<T, short> && CUDA_ONLY<T>
+        requires IsShort<T> && CUDA_ONLY<T>
     {
         *this = FromUint(__vaddss2(*this, aOther));
         return *this;
@@ -420,7 +410,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex addition SIMD
     /// </summary>
     DEVICE_CODE Complex &operator+=(const Complex &aOther)
-        requires(IsBFloat16<T> || IsHalfFp16<T>) && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T>
     {
         *this = FromNV16BitFloat(__hadd2(*this, aOther));
         return *this;
@@ -457,7 +447,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex subtraction SIMD
     /// </summary>
     DEVICE_CODE Complex &operator-=(const Complex &aOther)
-        requires isSameType<T, short> && CUDA_ONLY<T>
+        requires IsShort<T> && CUDA_ONLY<T>
     {
         *this = FromUint(__vsubss2(*this, aOther));
         return *this;
@@ -467,7 +457,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex subtraction SIMD
     /// </summary>
     DEVICE_CODE Complex &operator-=(const Complex &aOther)
-        requires(IsBFloat16<T> || IsHalfFp16<T>) && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T>
     {
         *this = FromNV16BitFloat(__hsub2(*this, aOther));
         return *this;
@@ -478,8 +468,8 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// </summary>
     DEVICE_CODE Complex &SubInv(const Complex &aOther)
     {
-        x = aOther.x - x;
-        y = aOther.y - y;
+        real = aOther.real - real;
+        imag = aOther.imag - imag;
         return *this;
     }
 
@@ -487,7 +477,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex subtraction SIMD (inverted inplace sub: this = aOther - this)
     /// </summary>
     DEVICE_CODE Complex &SubInv(const Complex &aOther)
-        requires isSameType<T, short> && CUDA_ONLY<T>
+        requires IsShort<T> && CUDA_ONLY<T>
     {
         *this = FromUint(__vsubss2(aOther, *this));
         return *this;
@@ -497,7 +487,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex subtraction SIMD (inverted inplace sub: this = aOther - this)
     /// </summary>
     DEVICE_CODE Complex &SubInv(const Complex &aOther)
-        requires(IsBFloat16<T> || IsHalfFp16<T>) && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T>
     {
         *this = FromNV16BitFloat(__hsub2(aOther, *this));
         return *this;
@@ -515,7 +505,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex subtraction SIMD
     /// </summary>
     DEVICE_CODE [[nodiscard]] Complex operator-(const Complex &aOther) const
-        requires isSameType<T, short> && CUDA_ONLY<T>
+        requires IsShort<T> && CUDA_ONLY<T>
     {
         return FromUint(__vsubss2(*this, aOther));
     }
@@ -524,7 +514,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex subtraction SIMD
     /// </summary>
     DEVICE_CODE [[nodiscard]] Complex operator-(const Complex &aOther) const
-        requires(IsBFloat16<T> || IsHalfFp16<T>) && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T>
     {
         return FromNV16BitFloat(__hsub2(*this, aOther));
     }
@@ -651,30 +641,30 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// <summary>
     /// Element wise absolute difference
     /// </summary>
-    DEVICE_CODE void AbsDiff(const Vector2<T> &aOther)
-        requires HostCode<T> && NativeType<T>
+    DEVICE_CODE void AbsDiff(const Complex<T> &aOther)
+        requires HostCode<T> && NativeNumber<T>
     {
-        x = std::abs(x - aOther.x);
-        y = std::abs(y - aOther.y);
+        real = std::abs(real - aOther.real);
+        imag = std::abs(imag - aOther.imag);
     }
 
     /// <summary>
     /// Element wise bitwise Xor
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> AbsDiff(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires HostCode<T> && NativeType<T>
+    DEVICE_CODE [[nodiscard]] static Complex<T> AbsDiff(const Complex<T> &aLeft, const Complex<T> &aRight)
+        requires HostCode<T> && NativeNumber<T>
     {
-        Vector2<T> ret;
-        ret.x = std::abs(aLeft.x - aRight.x);
-        ret.y = std::abs(aLeft.y - aRight.y);
+        Complex<T> ret;
+        ret.real = std::abs(aLeft.real - aRight.real);
+        ret.imag = std::abs(aLeft.imag - aRight.imag);
         return ret;
     }
 
     /// <summary>
     /// Element wise absolute difference (SIMD)
     /// </summary>
-    DEVICE_CODE void AbsDiff(const Vector2<T> &aOther)
-        requires isSameType<T, short> && CUDA_ONLY<T> && NativeType<T>
+    DEVICE_CODE void AbsDiff(const Complex<T> &aOther)
+        requires IsShort<T> && CUDA_ONLY<T> && NativeNumber<T>
     {
         *this = FromUint(__vabsdiffs2(*this, aOther));
     }
@@ -682,30 +672,30 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// <summary>
     /// Element wise absolute difference
     /// </summary>
-    DEVICE_CODE void AbsDiff(const Vector2<T> &aOther)
-        requires DeviceCode<T> && NativeType<T>
+    DEVICE_CODE void AbsDiff(const Complex<T> &aOther)
+        requires DeviceCode<T> && NativeNumber<T>
     {
-        x = abs(x - aOther.x);
-        y = abs(y - aOther.y);
+        real = abs(real - aOther.real);
+        imag = abs(imag - aOther.imag);
     }
 
     /// <summary>
     /// Element wise absolute difference
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> AbsDiff(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires DeviceCode<T> && NativeType<T>
+    DEVICE_CODE [[nodiscard]] static Complex<T> AbsDiff(const Complex<T> &aLeft, const Complex<T> &aRight)
+        requires DeviceCode<T> && NativeNumber<T>
     {
-        Vector2<T> ret;
-        ret.x = abs(aLeft.x - aRight.x);
-        ret.y = abs(aLeft.y - aRight.y);
+        Complex<T> ret;
+        ret.real = abs(aLeft.real - aRight.real);
+        ret.imag = abs(aLeft.imag - aRight.imag);
         return ret;
     }
 
     /// <summary>
     /// Element wise absolute difference
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> AbsDiff(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires isSameType<T, short> && CUDA_ONLY<T> && NativeType<T>
+    DEVICE_CODE [[nodiscard]] static Complex<T> AbsDiff(const Complex<T> &aLeft, const Complex<T> &aRight)
+        requires IsShort<T> && CUDA_ONLY<T> && NativeNumber<T>
     {
         return FromUint(__vabsdiffs2(aLeft, aRight));
     }
@@ -713,86 +703,66 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// <summary>
     /// Element wise absolute difference
     /// </summary>
-    DEVICE_CODE void AbsDiff(const Vector2<T> &aOther)
-        requires NonNativeType<T>
+    DEVICE_CODE void AbsDiff(const Complex<T> &aOther)
+        requires NonNativeNumber<T>
     {
-        x = T::Abs(x - aOther.x);
-        y = T::Abs(y - aOther.y);
+        real = T::Abs(real - aOther.real);
+        imag = T::Abs(imag - aOther.imag);
     }
 
     /// <summary>
     /// Element wise absolute difference
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> AbsDiff(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires NonNativeType<T>
+    DEVICE_CODE [[nodiscard]] static Complex<T> AbsDiff(const Complex<T> &aLeft, const Complex<T> &aRight)
+        requires NonNativeNumber<T>
     {
-        Vector2<T> ret;
-        ret.x = T::Abs(aLeft.x - aRight.x);
-        ret.y = T::Abs(aLeft.y - aRight.y);
+        Complex<T> ret;
+        ret.real = T::Abs(aLeft.real - aRight.real);
+        ret.imag = T::Abs(aLeft.imag - aRight.imag);
         return ret;
     }
 
     /// <summary>
-    /// Vector length (L2 norm)
+    /// Complex magnitude
     /// </summary>
     DEVICE_CODE [[nodiscard]] T Magnitude() const
         requires DeviceCode<T> && NativeFloatingPoint<T>
     {
-        return sqrt(real * real + imag * imag);
+        return sqrt(MagnitudeSqr());
     }
 
     /// <summary>
-    /// Vector length (L2 norm)
+    /// Complex magnitude
     /// </summary>
     [[nodiscard]] T Magnitude() const
         requires HostCode<T> && NativeFloatingPoint<T>
     {
-        return std::sqrt(real * real + imag * imag);
+        return std::sqrt(MagnitudeSqr());
     }
 
     /// <summary>
-    /// Vector length (L2 norm)
+    /// Complex magnitude
     /// </summary>
     DEVICE_CODE [[nodiscard]] T Magnitude() const
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
-        return T::Sqrt(real * real + imag * imag);
+        return T::Sqrt(MagnitudeSqr());
     }
 
     /// <summary>
-    /// Squared vector length
+    /// Complex magnitude squared
     /// </summary>
     DEVICE_CODE [[nodiscard]] T MagnitudeSqr() const
-        requires FloatingPoint<T>
+        requires RealFloatingPoint<T>
     {
         return real * real + imag * imag;
-    }
-
-    /// <summary>
-    /// Normalizes the vector components
-    /// </summary>
-    DEVICE_CODE void Normalize()
-        requires FloatingPoint<T>
-    {
-        *this = *this / Magnitude();
-    }
-
-    /// <summary>
-    /// Normalizes a vector
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static Complex<T> Normalize(const Complex<T> &aValue)
-        requires FloatingPoint<T>
-    {
-        Complex<T> ret = aValue;
-        ret.Normalize();
-        return ret;
     }
 
     /// <summary>
     /// Complex clamp to value range
     /// </summary>
     DEVICE_CODE void Clamp(T aMinVal, T aMaxVal)
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeNumber<T>
     {
         real = max(aMinVal, min(real, aMaxVal));
         imag = max(aMinVal, min(imag, aMaxVal));
@@ -802,7 +772,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex clamp to value range
     /// </summary>
     void Clamp(T aMinVal, T aMaxVal)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         real = std::max(aMinVal, std::min(real, aMaxVal));
         imag = std::max(aMinVal, std::min(imag, aMaxVal));
@@ -812,10 +782,10 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex clamp to value range
     /// </summary>
     DEVICE_CODE void Clamp(T aMinVal, T aMaxVal)
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
-        x = T::Max(aMinVal, T::Min(x, aMaxVal));
-        y = T::Max(aMinVal, T::Min(y, aMaxVal));
+        real = T::Max(aMinVal, T::Min(real, aMaxVal));
+        imag = T::Max(aMinVal, T::Min(imag, aMaxVal));
     }
 
     /// <summary>
@@ -823,7 +793,8 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// </summary>
     template <Number TTarget>
     DEVICE_CODE void ClampToTargetType() noexcept
-        requires(need_saturation_clamp_v<T, TTarget>) && (!isSameType<T, HalfFp16> || !isSameType<TTarget, short>)
+        requires(need_saturation_clamp_v<T, TTarget>) && (!IsHalfFp16<T> || !IsShort<TTarget>) &&
+                (!IsBFloat16<T> || !IsShort<TTarget>)
     {
         Clamp(T(numeric_limits<TTarget>::lowest()), T(numeric_limits<TTarget>::max()));
     }
@@ -831,14 +802,28 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// <summary>
     /// Component wise clamp to maximum value range of given target type
     /// </summary>
-    template <ComplexOrNumber TTarget>
+    template <Number TTarget>
     DEVICE_CODE void ClampToTargetType() noexcept
-        requires(need_saturation_clamp_v<T, TTarget>) && isSameType<T, HalfFp16> && isSameType<TTarget, short>
+        requires(need_saturation_clamp_v<T, TTarget>) && IsHalfFp16<T> && IsShort<TTarget>
     {
         // special case for half floats: the maximum value of short is slightly larger than the closest exact
         // integer in HalfFp16, and as we use round to nearest, the clamping would result in a too large number.
         // Thus for HalfFp16 and short, we clamp to the exact integer smaller than short::max(), i.e. 32752
         constexpr HalfFp16 maxExactShort = HalfFp16::FromUShort(0x77FF); // = 32752
+        Clamp(T(numeric_limits<TTarget>::lowest()), maxExactShort);
+    }
+
+    /// <summary>
+    /// Component wise clamp to maximum value range of given target type
+    /// </summary>
+    template <Number TTarget>
+    DEVICE_CODE void ClampToTargetType() noexcept
+        requires(need_saturation_clamp_v<T, TTarget>) && IsBFloat16<T> && IsShort<TTarget>
+    {
+        // special case for half floats: the maximum value of short is slightly smaller than the closest exact
+        // integer in BFloat16, and as we use round to nearest, the clamping would result in a too large number.
+        // Thus for BFloat16 and short, we clamp to the next integer smaller than short::max(), i.e. 32640
+        constexpr BFloat16 maxExactShort = BFloat16::FromUShort(0x46FF); // = 32640
         Clamp(T(numeric_limits<TTarget>::lowest()), maxExactShort);
     }
 
@@ -856,7 +841,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex minimum
     /// </summary>
     [[nodiscard]] Complex<T> Min(const Complex<T> &aRight) const
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         return Complex<T>{std::min(real, aRight.real), std::min(imag, aRight.imag)};
     }
@@ -865,7 +850,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex minimum
     /// </summary>
     DEVICE_CODE [[nodiscard]] Complex<T> Min(const Complex<T> &aRight) const
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeNumber<T>
     {
         return Complex<T>{T(min(real, aRight.real)), T(min(imag, aRight.imag))};
     }
@@ -874,7 +859,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex minimum
     /// </summary>
     DEVICE_CODE void Min(const Complex<T> &aRight)
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         real.Min(aRight.real);
         imag.Min(aRight.imag);
@@ -884,7 +869,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex minimum (SIMD)
     /// </summary>
     DEVICE_CODE void Min(const Complex<T> &aOther)
-        requires isSameType<T, short> && CUDA_ONLY<T> && NativeType<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         *this = FromUint(__vmins2(*this, aOther));
     }
@@ -893,7 +878,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex minimum (SIMD)
     /// </summary>
     DEVICE_CODE void Min(const Complex<T> &aOther)
-        requires NonNativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromNV16BitFloat(__hmin2(*this, aOther));
     }
@@ -902,7 +887,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex minimum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Complex<T> Min(const Complex<T> &aLeft, const Complex<T> &aRight)
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeNumber<T>
     {
         return Complex<T>{T(min(aLeft.real, aRight.real)), T(min(aLeft.imag, aRight.imag))};
     }
@@ -911,7 +896,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex minimum
     /// </summary>
     [[nodiscard]] static Complex<T> Min(const Complex<T> &aLeft, const Complex<T> &aRight)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         return Complex<T>{std::min(aLeft.real, aRight.real), std::min(aLeft.imag, aRight.imag)};
     }
@@ -920,7 +905,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex minimum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Complex<T> Min(const Complex<T> &aLeft, const Complex<T> &aRight)
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         return Complex<T>{T::Min(aLeft.real, aRight.real), T::Min(aLeft.imag, aRight.imag)};
     }
@@ -929,7 +914,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex minimum (SIMD)
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Min(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires isSameType<T, short> && NativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromUint(__vmins2(aLeft, aRight));
     }
@@ -938,7 +923,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex minimum (SIMD)
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Min(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires NonNativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromNV16BitFloat(__hmin2(aLeft, aRight));
     }
@@ -947,7 +932,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex maximum
     /// </summary>
     DEVICE_CODE [[nodiscard]] Complex<T> Max(const Complex<T> &aRight) const
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeNumber<T>
     {
         return Complex<T>{T(max(real, aRight.real)), T(max(imag, aRight.imag))};
     }
@@ -956,7 +941,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex maximum
     /// </summary>
     [[nodiscard]] Complex<T> Max(const Complex<T> &aRight) const
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         return Complex<T>{std::max(real, aRight.real), std::max(imag, aRight.imag)};
     }
@@ -965,7 +950,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex maximum
     /// </summary>
     DEVICE_CODE void Max(const Complex<T> &aRight)
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         real.Max(aRight.real);
         imag.Max(aRight.imag);
@@ -975,7 +960,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex maximum (SIMD)
     /// </summary>
     DEVICE_CODE void Max(const Complex<T> &aOther)
-        requires isSameType<T, short> && CUDA_ONLY<T> && NativeType<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         *this = FromUint(__vmaxs2(*this, aOther));
     }
@@ -984,7 +969,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex maximum (SIMD)
     /// </summary>
     DEVICE_CODE void Max(const Complex<T> &aOther)
-        requires NonNativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromNV16BitFloat(__hmax2(*this, aOther));
     }
@@ -993,7 +978,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex maximum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Complex<T> Max(const Complex<T> &aLeft, const Complex<T> &aRight)
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeNumber<T>
     {
         return Complex<T>{T(max(aLeft.real, aRight.real)), T(max(aLeft.imag, aRight.imag))};
     }
@@ -1002,7 +987,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex maximum
     /// </summary>
     [[nodiscard]] static Complex<T> Max(const Complex<T> &aLeft, const Complex<T> &aRight)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         return Complex<T>{std::max(aLeft.real, aRight.real), std::max(aLeft.imag, aRight.imag)};
     }
@@ -1011,7 +996,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex maximum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Complex<T> Max(const Complex<T> &aLeft, const Complex<T> &aRight)
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         return Complex<T>{T::Max(aLeft.real, aRight.real), T::Max(aLeft.imag, aRight.imag)};
     }
@@ -1020,7 +1005,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex maximum (SIMD)
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Max(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires isSameType<T, short> && NativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromUint(__vmaxs2(aLeft, aRight));
     }
@@ -1029,7 +1014,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Complex maximum (SIMD)
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Max(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires NonNativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromNV16BitFloat(__hmax2(aLeft, aRight));
     }
@@ -1038,7 +1023,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Element wise round()
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Complex<T> Round(const Complex<T> &aValue)
-        requires FloatingPoint<T>
+        requires RealFloatingPoint<T>
     {
         Complex<T> ret = aValue;
         ret.Round();
@@ -1049,7 +1034,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Element wise round() and return as integer
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Complex<int> RoundI(const Complex<T> &aValue)
-        requires FloatingPoint<T>
+        requires RealFloatingPoint<T>
     {
         Complex<T> ret = aValue;
         ret.Round();
@@ -1080,17 +1065,17 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Element wise round()
     /// </summary>
     DEVICE_ONLY_CODE void Round()
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
-        x.Round();
-        y.Round();
+        real.Round();
+        imag.Round();
     }
 
     /// <summary>
     /// Element wise floor()
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Complex<T> Floor(const Complex<T> &aValue)
-        requires FloatingPoint<T>
+        requires RealFloatingPoint<T>
     {
         Complex<T> ret = aValue;
         ret.Floor();
@@ -1101,7 +1086,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Element wise floor() and return as integer
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Complex<int> FloorI(const Complex<T> &aValue)
-        requires FloatingPoint<T>
+        requires RealFloatingPoint<T>
     {
         Complex<T> ret = aValue;
         ret.Floor();
@@ -1132,7 +1117,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Element wise floor() (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void Floor()
-        requires NonNativeType<T> && FloatingPoint<T> && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T>
     {
         *this = FromNV16BitFloat(h2floor(*this));
     }
@@ -1141,17 +1126,17 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Element wise floor()
     /// </summary>
     DEVICE_ONLY_CODE void Floor()
-        requires NonNativeType<T> && FloatingPoint<T> && HostCode<T>
+        requires NonNativeNumber<T>
     {
-        x.Floor();
-        y.Floor();
+        real.Floor();
+        imag.Floor();
     }
 
     /// <summary>
     /// Element wise ceil()
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Complex<T> Ceil(const Complex<T> &aValue)
-        requires FloatingPoint<T>
+        requires RealFloatingPoint<T>
     {
         Complex<T> ret = aValue;
         ret.Ceil();
@@ -1162,7 +1147,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Element wise ceil() and return as integer
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Complex<int> CeilI(const Complex<T> &aValue)
-        requires FloatingPoint<T>
+        requires RealFloatingPoint<T>
     {
         Complex<T> ret = aValue;
         ret.Ceil();
@@ -1193,7 +1178,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Element wise ceil() (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void Ceil()
-        requires NonNativeType<T> && FloatingPoint<T> && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T>
     {
         *this = FromNV16BitFloat(h2ceil(*this));
     }
@@ -1202,10 +1187,10 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Element wise ceil()
     /// </summary>
     DEVICE_ONLY_CODE void Ceil()
-        requires NonNativeType<T> && FloatingPoint<T> && HostCode<T>
+        requires NonNativeNumber<T>
     {
-        x.Ceil();
-        y.Ceil();
+        real.Ceil();
+        imag.Ceil();
     }
 
     /// <summary>
@@ -1213,7 +1198,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Note: the host function assumes that current rounding mode is set to FE_TONEAREST
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Complex<T> RoundNearest(const Complex<T> &aValue)
-        requires FloatingPoint<T>
+        requires RealFloatingPoint<T>
     {
         Complex<T> ret = aValue;
         ret.RoundNearest();
@@ -1245,7 +1230,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Element wise round nearest ties to even (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void RoundNearest()
-        requires NonNativeType<T> && FloatingPoint<T> && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromNV16BitFloat(h2rint(*this));
     }
@@ -1254,17 +1239,17 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Element wise round nearest ties to even
     /// </summary>
     DEVICE_ONLY_CODE void RoundNearest()
-        requires NonNativeType<T> && FloatingPoint<T> && HostCode<T>
+        requires NonNativeNumber<T>
     {
-        x.RoundNearest();
-        y.RoundNearest();
+        real.RoundNearest();
+        imag.RoundNearest();
     }
 
     /// <summary>
     /// Element wise round toward zero
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Complex<T> RoundZero(const Complex<T> &aValue)
-        requires FloatingPoint<T>
+        requires RealFloatingPoint<T>
     {
         Complex<T> ret = aValue;
         ret.RoundZero();
@@ -1295,7 +1280,7 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Element wise round toward zero (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void RoundZero()
-        requires NonNativeType<T> && FloatingPoint<T> && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromNV16BitFloat(h2trunc(*this));
     }
@@ -1304,59 +1289,59 @@ template <SignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Element wise round toward zero
     /// </summary>
     DEVICE_ONLY_CODE void RoundZero()
-        requires NonNativeType<T> && FloatingPoint<T> && HostCode<T>
+        requires NonNativeNumber<T>
     {
-        x.RoundZero();
-        y.RoundZero();
+        real.RoundZero();
+        imag.RoundZero();
     }
 };
 
 template <typename T, typename T2>
 DEVICE_CODE Complex<T> operator+(const Complex<T> &aLeft, T2 aRight)
-    requires SignedNumber<T2>
+    requires RealSignedNumber<T2>
 {
     return Complex<T>{T(aLeft.real + aRight), T(aLeft.imag)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Complex<T> operator+(T2 aLeft, const Complex<T> &aRight)
-    requires SignedNumber<T2>
+    requires RealSignedNumber<T2>
 {
     return Complex<T>{T(aLeft + aRight.real), T(aRight.imag)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Complex<T> operator-(const Complex<T> &aLeft, T2 aRight)
-    requires SignedNumber<T2>
+    requires RealSignedNumber<T2>
 {
     return Complex<T>{T(aLeft.real - aRight), T(aLeft.imag)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Complex<T> operator-(T2 aLeft, const Complex<T> &aRight)
-    requires SignedNumber<T2>
+    requires RealSignedNumber<T2>
 {
     return Complex<T>{T(aLeft - aRight.real), T(aRight.imag)};
 }
 
 template <typename T, typename T2>
 DEVICE_CODE Complex<T> operator*(const Complex<T> &aLeft, T2 aRight)
-    requires SignedNumber<T2>
+    requires RealSignedNumber<T2>
 {
     return Complex<T>{T(aLeft.real * aRight), T(aLeft.imag * aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Complex<T> operator*(T2 aLeft, const Complex<T> &aRight)
-    requires SignedNumber<T2>
+    requires RealSignedNumber<T2>
 {
     return Complex<T>{T(aLeft * aRight.real), T(aLeft * aRight.imag)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Complex<T> operator/(const Complex<T> &aLeft, T2 aRight)
-    requires SignedNumber<T2>
+    requires RealSignedNumber<T2>
 {
     return Complex<T>{T(aLeft.real / aRight), T(aLeft.imag / aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Complex<T> operator/(T2 aLeft, const Complex<T> &aRight)
-    requires SignedNumber<T2>
+    requires RealSignedNumber<T2>
 {
     Complex<T> ret(aLeft);
     return ret / aRight; // complex division

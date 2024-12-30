@@ -2,7 +2,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <common/bfloat16.h>
 #include <common/defines.h>
-#include <common/limits.h>
+#include <common/numeric_limits.h>
 #include <cstddef>
 #include <cstdint>
 #include <math.h>

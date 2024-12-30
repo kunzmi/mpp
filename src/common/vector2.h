@@ -1,9 +1,9 @@
 #pragma once
-#include "complex_typetraits.h"
 #include "defines.h"
 #include "exception.h"
-#include "limits.h"
 #include "needSaturationClamp.h"
+#include "numberTypes.h"
+#include "numeric_limits.h"
 #include "safeCast.h"
 #include "vector_typetraits.h"
 #include <cmath>
@@ -42,10 +42,10 @@ namespace image
 class Size2D;
 }
 
-template <ComplexOrNumber T> struct Vector1;
-template <ComplexOrNumber T> struct Vector2;
-template <ComplexOrNumber T> struct Vector3;
-template <ComplexOrNumber T> struct Vector4;
+template <Number T> struct Vector1;
+template <Number T> struct Vector2;
+template <Number T> struct Vector3;
+template <Number T> struct Vector4;
 
 enum class Axis2D
 {
@@ -86,7 +86,7 @@ inline std::wostream &operator<<(std::wostream &aOs, const Axis2D &aAxis)
 /// <summary>
 /// A two T component vector. Can replace CUDA's vector2 types
 /// </summary>
-template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
+template <Number T> struct alignas(2 * sizeof(T)) Vector2
 {
     T x;
     T y;
@@ -133,7 +133,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// E.g.: when converting int to byte, values are clamped to 0..255<para/>
     /// But when converting byte to int, no clamping operation is performed.
     /// </summary>
-    template <ComplexOrNumber T2> DEVICE_CODE Vector2(const Vector2<T2> &aVec) noexcept
+    template <Number T2> DEVICE_CODE Vector2(const Vector2<T2> &aVec) noexcept
     {
         if constexpr (need_saturation_clamp_v<T2, T>)
         {
@@ -155,14 +155,12 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// But when converting byte to int, no clamping operation is performed.<para/>
     /// If we can modify the input variable, no need to allocate temporary storage for clamping.
     /// </summary>
-    template <ComplexOrNumber T2>
+    template <Number T2>
     DEVICE_CODE Vector2(Vector2<T2> &aVec) noexcept
         // Disable the non-const variant for half and bfloat to / from float,
         // otherwise the const specialization will never be picked up:
-        requires(!(IsBFloat16<T> && isSameType<T2, float> && CUDA_ONLY<T>) &&
-                 !(isSameType<T, float> && isSameType<T2, BFloat16> && CUDA_ONLY<T>) &&
-                 !(IsHalfFp16<T> && isSameType<T2, float> && CUDA_ONLY<T>) &&
-                 !(isSameType<T, float> && isSameType<T2, HalfFp16> && CUDA_ONLY<T>))
+        requires(!(IsBFloat16<T> && IsFloat<T2> && CUDA_ONLY<T>) && !(IsFloat<T> && IsBFloat16<T2> && CUDA_ONLY<T>) &&
+                 !(IsHalfFp16<T> && IsFloat<T2> && CUDA_ONLY<T>) && !(IsFloat<T> && IsHalfFp16<T2> && CUDA_ONLY<T>))
     {
         if constexpr (need_saturation_clamp_v<T2, T>)
         {
@@ -175,9 +173,9 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// <summary>
     /// Type conversion using CUDA intrinsics for float2 to BFloat2
     /// </summary>
-    template <ComplexOrNumber T2>
+    template <Number T2>
     DEVICE_CODE Vector2(const Vector2<T2> &aVec) noexcept
-        requires IsBFloat16<T> && isSameType<T2, float> && CUDA_ONLY<T>
+        requires IsBFloat16<T> && IsFloat<T2> && CUDA_ONLY<T>
     {
         const float2 *aVecPtr = reinterpret_cast<const float2 *>(&aVec);
         nv_bfloat162 *thisPtr = reinterpret_cast<nv_bfloat162 *>(this);
@@ -187,9 +185,9 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// <summary>
     /// Type conversion using CUDA intrinsics for BFloat2 to float2
     /// </summary>
-    template <ComplexOrNumber T2>
+    template <Number T2>
     DEVICE_CODE Vector2(const Vector2<T2> &aVec) noexcept
-        requires isSameType<T, float> && isSameType<T2, BFloat16> && CUDA_ONLY<T>
+        requires IsFloat<T> && IsBFloat16<T2> && CUDA_ONLY<T>
     {
         const nv_bfloat162 *aVecPtr = reinterpret_cast<const nv_bfloat162 *>(&aVec);
         float2 *thisPtr             = reinterpret_cast<float2 *>(this);
@@ -199,9 +197,9 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// <summary>
     /// Type conversion using CUDA intrinsics for float2 to half2
     /// </summary>
-    template <ComplexOrNumber T2>
+    template <Number T2>
     DEVICE_CODE Vector2(const Vector2<T2> &aVec) noexcept
-        requires IsHalfFp16<T> && isSameType<T2, float> && CUDA_ONLY<T>
+        requires IsHalfFp16<T> && IsFloat<T2> && CUDA_ONLY<T>
     {
         const float2 *aVecPtr = reinterpret_cast<const float2 *>(&aVec);
         half2 *thisPtr        = reinterpret_cast<half2 *>(this);
@@ -211,9 +209,9 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// <summary>
     /// Type conversion using CUDA intrinsics for half2 to float2
     /// </summary>
-    template <ComplexOrNumber T2>
+    template <Number T2>
     DEVICE_CODE Vector2(const Vector2<T2> &aVec) noexcept
-        requires isSameType<T, float> && isSameType<T2, HalfFp16> && CUDA_ONLY<T>
+        requires IsFloat<T> && IsHalfFp16<T2> && CUDA_ONLY<T>
     {
         const half2 *aVecPtr = reinterpret_cast<const half2 *>(&aVec);
         float2 *thisPtr      = reinterpret_cast<float2 *>(this);
@@ -246,15 +244,6 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     {
         return Vector2(*reinterpret_cast<const Vector2<T> *>(&aNVHalf2));
     }
-
-    /*/// <summary>
-    /// Usefull constructor for SIMD instructions
-    /// </summary>
-    DEVICE_CODE static Vector2 FromUlong(const ulong64 &aUlong) noexcept
-        requires FourBytesSizeType<T>
-    {
-        return Vector2(*reinterpret_cast<const Vector2<T> *>(&aUlong));
-    }*/
 
     ~Vector2() = default;
 
@@ -319,24 +308,6 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
         return *reinterpret_cast<half2 *>(this);
     }
 
-    ///// <summary>
-    ///// converter to ulong64 for SIMD operations
-    ///// </summary>
-    // DEVICE_CODE operator const ulong64 &() const
-    //     requires FourBytesSizeType<T>
-    //{
-    //     return *reinterpret_cast<const ulong64 *>(this);
-    // }
-
-    ///// <summary>
-    ///// converter to ulong64 for SIMD operations
-    ///// </summary>
-    // DEVICE_CODE operator ulong64 &()
-    //     requires FourBytesSizeType<T>
-    //{
-    //     return *reinterpret_cast<ulong64 *>(this);
-    // }
-
 #pragma endregion
   public:
 #pragma region Operators
@@ -348,6 +319,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if each element comparison is true
     /// </summary>
     DEVICE_CODE [[nodiscard]] bool operator<(const Vector2 &aOther) const
+        requires RealNumber<T>
     {
         bool res = x < aOther.x;
         res &= y < aOther.y;
@@ -358,6 +330,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if each element comparison is true
     /// </summary>
     DEVICE_CODE [[nodiscard]] bool operator<=(const Vector2 &aOther) const
+        requires RealNumber<T>
     {
         bool res = x <= aOther.x;
         res &= y <= aOther.y;
@@ -368,6 +341,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if each element comparison is true
     /// </summary>
     DEVICE_CODE [[nodiscard]] bool operator>(const Vector2 &aOther) const
+        requires RealNumber<T>
     {
         bool res = x > aOther.x;
         res &= y > aOther.y;
@@ -378,6 +352,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if each element comparison is true
     /// </summary>
     DEVICE_CODE [[nodiscard]] bool operator>=(const Vector2 &aOther) const
+        requires RealNumber<T>
     {
         bool res = x >= aOther.x;
         res &= y >= aOther.y;
@@ -408,7 +383,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator==(const Vector2 &aOther) const
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpeq2(*this, aOther) == 0xFFFFFFFFU;
     }
@@ -417,7 +392,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator>=(const Vector2 &aOther) const
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpgeu2(*this, aOther) == 0xFFFFFFFFU;
     }
@@ -426,7 +401,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator>(const Vector2 &aOther) const
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpgtu2(*this, aOther) == 0xFFFFFFFFU;
     }
@@ -435,7 +410,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator<=(const Vector2 &aOther) const
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpleu2(*this, aOther) == 0xFFFFFFFFU;
     }
@@ -444,7 +419,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator<(const Vector2 &aOther) const
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpltu2(*this, aOther) == 0xFFFFFFFFU;
     }
@@ -453,7 +428,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if any element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator!=(const Vector2 &aOther) const
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpne2(*this, aOther) != 0U;
     }
@@ -462,7 +437,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator==(const Vector2 &aOther) const
-        requires isSameType<T, short> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpeq2(*this, aOther) == 0xFFFFFFFFU;
     }
@@ -471,7 +446,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator>=(const Vector2 &aOther) const
-        requires isSameType<T, short> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpges2(*this, aOther) == 0xFFFFFFFFU;
     }
@@ -480,7 +455,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator>(const Vector2 &aOther) const
-        requires isSameType<T, short> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpgts2(*this, aOther) == 0xFFFFFFFFU;
     }
@@ -489,7 +464,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator<=(const Vector2 &aOther) const
-        requires isSameType<T, short> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmples2(*this, aOther) == 0xFFFFFFFFU;
     }
@@ -498,7 +473,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator<(const Vector2 &aOther) const
-        requires isSameType<T, short> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmplts2(*this, aOther) == 0xFFFFFFFFU;
     }
@@ -507,7 +482,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if any element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator!=(const Vector2 &aOther) const
-        requires isSameType<T, short> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpne2(*this, aOther) != 0U;
     }
@@ -516,7 +491,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator==(const Vector2 &aOther) const
-        requires IsBFloat16<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __hbeq2(*this, aOther);
     }
@@ -525,7 +500,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator>=(const Vector2 &aOther) const
-        requires IsBFloat16<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __hbge2(*this, aOther);
     }
@@ -534,7 +509,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator>(const Vector2 &aOther) const
-        requires IsBFloat16<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __hbgt2(*this, aOther);
     }
@@ -543,7 +518,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator<=(const Vector2 &aOther) const
-        requires IsBFloat16<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __hble2(*this, aOther);
     }
@@ -552,7 +527,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator<(const Vector2 &aOther) const
-        requires IsBFloat16<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __hblt2(*this, aOther);
     }
@@ -561,63 +536,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns true if any element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator!=(const Vector2 &aOther) const
-        requires IsBFloat16<T> && CUDA_ONLY<T> && EnableSIMD<T>
-    {
-        // __hbne2 returns true only if both elements are != but we need true if any element is !=
-        // so we use hbeq and negate the result
-        return !(__hbeq2(*this, aOther));
-    }
-
-    /// <summary>
-    /// Returns true if each element comparison is true (SIMD)
-    /// </summary>
-    DEVICE_ONLY_CODE [[nodiscard]] bool operator==(const Vector2 &aOther) const
-        requires IsHalfFp16<T> && CUDA_ONLY<T> && EnableSIMD<T>
-    {
-        return __hbeq2(*this, aOther);
-    }
-
-    /// <summary>
-    /// Returns true if each element comparison is true (SIMD)
-    /// </summary>
-    DEVICE_ONLY_CODE [[nodiscard]] bool operator>=(const Vector2 &aOther) const
-        requires IsHalfFp16<T> && CUDA_ONLY<T> && EnableSIMD<T>
-    {
-        return __hbge2(*this, aOther);
-    }
-
-    /// <summary>
-    /// Returns true if each element comparison is true (SIMD)
-    /// </summary>
-    DEVICE_ONLY_CODE [[nodiscard]] bool operator>(const Vector2 &aOther) const
-        requires IsHalfFp16<T> && CUDA_ONLY<T> && EnableSIMD<T>
-    {
-        return __hbgt2(*this, aOther);
-    }
-
-    /// <summary>
-    /// Returns true if each element comparison is true (SIMD)
-    /// </summary>
-    DEVICE_ONLY_CODE [[nodiscard]] bool operator<=(const Vector2 &aOther) const
-        requires IsHalfFp16<T> && CUDA_ONLY<T> && EnableSIMD<T>
-    {
-        return __hble2(*this, aOther);
-    }
-
-    /// <summary>
-    /// Returns true if each element comparison is true (SIMD)
-    /// </summary>
-    DEVICE_ONLY_CODE [[nodiscard]] bool operator<(const Vector2 &aOther) const
-        requires IsHalfFp16<T> && CUDA_ONLY<T> && EnableSIMD<T>
-    {
-        return __hblt2(*this, aOther);
-    }
-
-    /// <summary>
-    /// Returns true if any element comparison is true (SIMD)
-    /// </summary>
-    DEVICE_ONLY_CODE [[nodiscard]] bool operator!=(const Vector2 &aOther) const
-        requires IsHalfFp16<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         // __hbne2 returns true only if both elements are != but we need true if any element is !=
         // so we use hbeq and negate the result
@@ -628,7 +547,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Negation
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector2 operator-() const
-        requires SignedNumber<T> || ComplexType<T>
+        requires RealSignedNumber<T> || ComplexNumber<T>
     {
         return Vector2<T>(-x, -y);
     }
@@ -637,7 +556,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Negation (SIMD)
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector2 operator-() const
-        requires isSameType<T, short> && SignedNumber<T> && CUDA_ONLY<T>
+        requires IsShort<T> && RealSignedNumber<T> && CUDA_ONLY<T>
     {
         return FromUint(__vnegss2(*this));
     }
@@ -646,7 +565,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Negation (SIMD)
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector2 operator-() const
-        requires NonNativeType<T> && SignedNumber<T> && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && RealSignedNumber<T> && CUDA_ONLY<T>
     {
         return FromNV16BitFloat(__hneg2(*this));
     }
@@ -675,7 +594,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise addition SIMD
     /// </summary>
     DEVICE_CODE Vector2 &operator+=(const Vector2 &aOther)
-        requires isSameType<T, ushort> && CUDA_ONLY<T>
+        requires IsUShort<T> && CUDA_ONLY<T>
     {
         *this = FromUint(__vaddus2(*this, aOther));
         return *this;
@@ -685,7 +604,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise addition SIMD
     /// </summary>
     DEVICE_CODE Vector2 &operator+=(const Vector2 &aOther)
-        requires isSameType<T, short> && CUDA_ONLY<T>
+        requires IsShort<T> && CUDA_ONLY<T>
     {
         *this = FromUint(__vaddss2(*this, aOther));
         return *this;
@@ -695,7 +614,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise addition SIMD
     /// </summary>
     DEVICE_CODE Vector2 &operator+=(const Vector2 &aOther)
-        requires(IsBFloat16<T> || IsHalfFp16<T>) && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T>
     {
         *this = FromNV16BitFloat(__hadd2(*this, aOther));
         return *this;
@@ -713,7 +632,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise addition SIMD
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector2 operator+(const Vector2 &aOther) const
-        requires isSameType<T, ushort> && CUDA_ONLY<T>
+        requires IsUShort<T> && CUDA_ONLY<T>
     {
         return FromUint(__vaddus2(*this, aOther));
     }
@@ -722,7 +641,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise addition SIMD
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector2 operator+(const Vector2 &aOther) const
-        requires isSameType<T, short> && CUDA_ONLY<T>
+        requires IsShort<T> && CUDA_ONLY<T>
     {
         return FromUint(__vaddss2(*this, aOther));
     }
@@ -731,7 +650,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise addition SIMD
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector2 operator+(const Vector2 &aOther) const
-        requires(IsBFloat16<T> || IsHalfFp16<T>) && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T>
     {
         return FromNV16BitFloat(__hadd2(*this, aOther));
     }
@@ -760,7 +679,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise subtraction SIMD
     /// </summary>
     DEVICE_CODE Vector2 &operator-=(const Vector2 &aOther)
-        requires isSameType<T, ushort> && CUDA_ONLY<T>
+        requires IsUShort<T> && CUDA_ONLY<T>
     {
         *this = FromUint(__vsubus2(*this, aOther));
         return *this;
@@ -770,7 +689,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise subtraction SIMD
     /// </summary>
     DEVICE_CODE Vector2 &operator-=(const Vector2 &aOther)
-        requires isSameType<T, short> && CUDA_ONLY<T>
+        requires IsShort<T> && CUDA_ONLY<T>
     {
         *this = FromUint(__vsubss2(*this, aOther));
         return *this;
@@ -780,7 +699,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise subtraction SIMD
     /// </summary>
     DEVICE_CODE Vector2 &operator-=(const Vector2 &aOther)
-        requires(IsBFloat16<T> || IsHalfFp16<T>) && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T>
     {
         *this = FromNV16BitFloat(__hsub2(*this, aOther));
         return *this;
@@ -800,7 +719,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise subtraction SIMD (inverted inplace sub: this = aOther - this)
     /// </summary>
     DEVICE_CODE Vector2 &SubInv(const Vector2 &aOther)
-        requires isSameType<T, ushort> && CUDA_ONLY<T>
+        requires IsUShort<T> && CUDA_ONLY<T>
     {
         *this = FromUint(__vsubus2(aOther, *this));
         return *this;
@@ -810,7 +729,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise subtraction SIMD (inverted inplace sub: this = aOther - this)
     /// </summary>
     DEVICE_CODE Vector2 &SubInv(const Vector2 &aOther)
-        requires isSameType<T, short> && CUDA_ONLY<T>
+        requires IsShort<T> && CUDA_ONLY<T>
     {
         *this = FromUint(__vsubss2(aOther, *this));
         return *this;
@@ -820,7 +739,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise subtraction SIMD (inverted inplace sub: this = aOther - this)
     /// </summary>
     DEVICE_CODE Vector2 &SubInv(const Vector2 &aOther)
-        requires(IsBFloat16<T> || IsHalfFp16<T>) && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T>
     {
         *this = FromNV16BitFloat(__hsub2(aOther, *this));
         return *this;
@@ -838,7 +757,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise subtraction SIMD
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector2 operator-(const Vector2 &aOther) const
-        requires isSameType<T, ushort> && CUDA_ONLY<T>
+        requires IsUShort<T> && CUDA_ONLY<T>
     {
         return FromUint(__vsubus2(*this, aOther));
     }
@@ -847,7 +766,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise subtraction SIMD
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector2 operator-(const Vector2 &aOther) const
-        requires isSameType<T, short> && CUDA_ONLY<T>
+        requires IsShort<T> && CUDA_ONLY<T>
     {
         return FromUint(__vsubss2(*this, aOther));
     }
@@ -856,7 +775,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise subtraction SIMD
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector2 operator-(const Vector2 &aOther) const
-        requires(IsBFloat16<T> || IsHalfFp16<T>) && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T>
     {
         return FromNV16BitFloat(__hsub2(*this, aOther));
     }
@@ -885,7 +804,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise multiplication SIMD
     /// </summary>
     DEVICE_CODE Vector2 &operator*=(const Vector2 &aOther)
-        requires(IsBFloat16<T> || IsHalfFp16<T>) && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T>
     {
         *this = FromNV16BitFloat(__hmul2(*this, aOther));
         return *this;
@@ -903,7 +822,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise multiplication SIMD
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector2 operator*(const Vector2 &aOther) const
-        requires(IsBFloat16<T> || IsHalfFp16<T>) && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T>
     {
         return FromNV16BitFloat(__hmul2(*this, aOther));
     }
@@ -932,7 +851,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise division SIMD
     /// </summary>
     DEVICE_CODE Vector2 &operator/=(const Vector2 &aOther)
-        requires(IsBFloat16<T> || IsHalfFp16<T>) && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T>
     {
         *this = FromNV16BitFloat(__h2div(*this, aOther));
         return *this;
@@ -952,7 +871,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise division SIMD (inverted inplace div: this = aOther / this)
     /// </summary>
     DEVICE_CODE Vector2 &DivInv(const Vector2 &aOther)
-        requires(IsBFloat16<T> || IsHalfFp16<T>) && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T>
     {
         *this = FromNV16BitFloat(__h2div(aOther, *this));
         return *this;
@@ -970,7 +889,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise division SIMD
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector2 operator/(const Vector2 &aOther) const
-        requires(IsBFloat16<T> || IsHalfFp16<T>) && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T>
     {
         return FromNV16BitFloat(__h2div(*this, aOther));
     }
@@ -1044,7 +963,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// <summary>
     /// Type conversion without saturation, direct type conversion
     /// </summary>
-    template <ComplexOrNumber T2> [[nodiscard]] static Vector2<T> DEVICE_CODE Convert(const Vector2<T2> &aVec)
+    template <Number T2> [[nodiscard]] static Vector2<T> DEVICE_CODE Convert(const Vector2<T2> &aVec)
     {
         return {static_cast<T>(aVec.x), static_cast<T>(aVec.y)};
     }
@@ -1055,7 +974,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise bitwise left shift
     /// </summary>
     DEVICE_CODE void LShift(const Vector2<T> &aOther)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         x = x << aOther.x;
         y = y << aOther.y;
@@ -1065,7 +984,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise bitwise left shift
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> LShift(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         Vector2<T> ret;
         ret.x = aLeft.x << aRight.x;
@@ -1077,7 +996,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise bitwise right shift
     /// </summary>
     DEVICE_CODE void RShift(const Vector2<T> &aOther)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         x = x >> aOther.x;
         y = y >> aOther.y;
@@ -1087,7 +1006,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise bitwise right shift
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> RShift(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         Vector2<T> ret;
         ret.x = aLeft.x >> aRight.x;
@@ -1099,7 +1018,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise bitwise left shift
     /// </summary>
     DEVICE_CODE void LShift(const T &aOther)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         x = x << aOther;
         y = y << aOther;
@@ -1109,7 +1028,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise bitwise left shift
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> LShift(const Vector2<T> &aLeft, const T &aRight)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         Vector2<T> ret;
         ret.x = aLeft.x << aRight;
@@ -1121,7 +1040,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise bitwise right shift
     /// </summary>
     DEVICE_CODE void RShift(const T &aOther)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         x = x >> aOther;
         y = y >> aOther;
@@ -1131,7 +1050,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise bitwise right shift
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> RShift(const Vector2<T> &aLeft, const T &aRight)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         Vector2<T> ret;
         ret.x = aLeft.x >> aRight;
@@ -1143,7 +1062,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise bitwise And
     /// </summary>
     DEVICE_CODE void And(const Vector2<T> &aOther)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         x = x & aOther.x;
         y = y & aOther.y;
@@ -1153,7 +1072,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise bitwise And
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> And(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         Vector2<T> ret;
         ret.x = aLeft.x & aRight.x;
@@ -1165,7 +1084,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise bitwise Or
     /// </summary>
     DEVICE_CODE void Or(const Vector2<T> &aOther)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         x = x | aOther.x;
         y = y | aOther.y;
@@ -1175,7 +1094,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise bitwise Or
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Or(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         Vector2<T> ret;
         ret.x = aLeft.x | aRight.x;
@@ -1187,7 +1106,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise bitwise Xor
     /// </summary>
     DEVICE_CODE void Xor(const Vector2<T> &aOther)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         x = x ^ aOther.x;
         y = y ^ aOther.y;
@@ -1197,7 +1116,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise bitwise Xor
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Xor(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         Vector2<T> ret;
         ret.x = aLeft.x ^ aRight.x;
@@ -1209,7 +1128,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise bitwise negation
     /// </summary>
     DEVICE_CODE void Not()
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         x = ~x;
         y = ~y;
@@ -1219,7 +1138,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise bitwise negation
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Not(const Vector2<T> &aVec)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         Vector2<T> ret;
         ret.x = ~aVec.x;
@@ -1234,7 +1153,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise exponential
     /// </summary>
     void Exp()
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         x = std::exp(x);
         y = std::exp(y);
@@ -1243,7 +1162,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise exponential
     /// </summary>
     DEVICE_ONLY_CODE void Exp()
-        requires(HostCode<T> && NonNativeType<T>) || (!EnableSIMD<T>)
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
     {
         x = T::Exp(x);
         y = T::Exp(y);
@@ -1263,7 +1182,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise exponential (SIMD)
     /// </summary>
     DEVICE_CODE void Exp()
-        requires NonNativeType<T> && FloatingPoint<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromNV16BitFloat(h2exp(*this));
     }
@@ -1284,7 +1203,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise exponential (SIMD)
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Exp(const Vector2<T> &aVec)
-        requires NonNativeType<T> && FloatingPoint<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromNV16BitFloat(h2exp(aVec));
     }
@@ -1293,7 +1212,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise exponential
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Exp(const Vector2<T> &aVec)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         Vector2<T> ret;
         ret.x = std::exp(aVec.x);
@@ -1305,7 +1224,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise exponential
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Exp(const Vector2<T> &aVec)
-        requires(HostCode<T> && NonNativeType<T>) || (!EnableSIMD<T>)
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
     {
         Vector2<T> ret;
         ret.x = T::Exp(aVec.x);
@@ -1319,7 +1238,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise natural logarithm
     /// </summary>
     void Ln()
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         x = std::log(x);
         y = std::log(y);
@@ -1328,7 +1247,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise natural logarithm
     /// </summary>
     DEVICE_CODE void Ln()
-        requires(HostCode<T> && NonNativeType<T>) || (!EnableSIMD<T>)
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
     {
         x = T::Ln(x);
         y = T::Ln(y);
@@ -1348,7 +1267,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise natural logarithm (SIMD)
     /// </summary>
     DEVICE_CODE void Ln()
-        requires NonNativeType<T> && FloatingPoint<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromNV16BitFloat(h2log(*this));
     }
@@ -1369,7 +1288,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise natural logarithm (SIMD)
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Ln(const Vector2<T> &aVec)
-        requires NonNativeType<T> && FloatingPoint<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromNV16BitFloat(h2log(aVec));
     }
@@ -1378,7 +1297,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise natural logarithm
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Ln(const Vector2<T> &aVec)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         Vector2<T> ret;
         ret.x = std::log(aVec.x);
@@ -1390,7 +1309,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise natural logarithm
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Ln(const Vector2<T> &aVec)
-        requires(HostCode<T> && NonNativeType<T>) || (!EnableSIMD<T>)
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
     {
         Vector2<T> ret;
         ret.x = T::Ln(aVec.x);
@@ -1426,7 +1345,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise square root
     /// </summary>
     void Sqrt()
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         x = std::sqrt(x);
         y = std::sqrt(y);
@@ -1435,7 +1354,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise square root
     /// </summary>
     void Sqrt()
-        requires(HostCode<T> && NonNativeType<T>) || (!EnableSIMD<T>)
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
     {
         x = T::Sqrt(x);
         y = T::Sqrt(y);
@@ -1455,7 +1374,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise square root (SIMD)
     /// </summary>
     DEVICE_CODE void Sqrt()
-        requires NonNativeType<T> && FloatingPoint<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromNV16BitFloat(h2sqrt(*this));
     }
@@ -1476,7 +1395,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise square root (SIMD)
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Sqrt(const Vector2<T> &aVec)
-        requires NonNativeType<T> && FloatingPoint<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromNV16BitFloat(h2sqrt(aVec));
     }
@@ -1485,7 +1404,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise square root
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Sqrt(const Vector2<T> &aVec)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         Vector2<T> ret;
         ret.x = std::sqrt(aVec.x);
@@ -1497,7 +1416,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise square root
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Sqrt(const Vector2<T> &aVec)
-        requires(HostCode<T> && NonNativeType<T>) || (!EnableSIMD<T>)
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
     {
         Vector2<T> ret;
         ret.x = T::Sqrt(aVec.x);
@@ -1511,7 +1430,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute
     /// </summary>
     void Abs()
-        requires HostCode<T> && SignedNumber<T> && NativeType<T>
+        requires HostCode<T> && RealSignedNumber<T> && NativeNumber<T>
     {
         x = std::abs(x);
         y = std::abs(y);
@@ -1521,7 +1440,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute
     /// </summary>
     void Abs()
-        requires SignedNumber<T> && NonNativeType<T>
+        requires RealSignedNumber<T> && NonNativeNumber<T>
     {
         x = T::Abs(x);
         y = T::Abs(y);
@@ -1531,7 +1450,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute
     /// </summary>
     DEVICE_CODE void Abs()
-        requires DeviceCode<T> && SignedNumber<T> && NativeType<T>
+        requires DeviceCode<T> && RealSignedNumber<T> && NativeNumber<T>
     {
         x = abs(x);
         y = abs(y);
@@ -1541,7 +1460,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute  (SIMD)
     /// </summary>
     DEVICE_CODE void Abs()
-        requires isSameType<T, short> && SignedNumber<T> && CUDA_ONLY<T> && NativeType<T> && EnableSIMD<T>
+        requires IsShort<T> && RealSignedNumber<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         *this = FromUint(__vabsss2(*this));
     }
@@ -1550,7 +1469,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute  (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void Abs()
-        requires NonNativeType<T> && FloatingPoint<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromNV16BitFloat(__habs2(*this));
     }
@@ -1559,7 +1478,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Abs(const Vector2<T> &aVec)
-        requires DeviceCode<T> && SignedNumber<T> && NativeType<T>
+        requires DeviceCode<T> && RealSignedNumber<T> && NativeNumber<T>
     {
         Vector2<T> ret;
         ret.x = abs(aVec.x);
@@ -1571,7 +1490,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute (SIMD)
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Abs(const Vector2<T> &aVec)
-        requires NonNativeType<T> && FloatingPoint<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromNV16BitFloat(__habs2(aVec));
     }
@@ -1580,7 +1499,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute  (SIMD)
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Abs(const Vector2<T> &aVec)
-        requires isSameType<T, short> && SignedNumber<T> && CUDA_ONLY<T> && NativeType<T> && EnableSIMD<T>
+        requires IsShort<T> && RealSignedNumber<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         return FromUint(__vabsss2(aVec));
     }
@@ -1589,7 +1508,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Abs(const Vector2<T> &aVec)
-        requires HostCode<T> && SignedNumber<T> && NativeType<T>
+        requires HostCode<T> && RealSignedNumber<T> && NativeNumber<T>
     {
         Vector2<T> ret;
         ret.x = std::abs(aVec.x);
@@ -1601,7 +1520,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Abs(const Vector2<T> &aVec)
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         Vector2<T> ret;
         ret.x = T::Abs(aVec.x);
@@ -1615,7 +1534,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE void AbsDiff(const Vector2<T> &aOther)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeFloatingPoint<T>
     {
         x = std::abs(x - aOther.x);
         y = std::abs(y - aOther.y);
@@ -1625,7 +1544,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise bitwise Xor
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> AbsDiff(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeFloatingPoint<T>
     {
         Vector2<T> ret;
         ret.x = std::abs(aLeft.x - aRight.x);
@@ -1637,7 +1556,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute difference (SIMD)
     /// </summary>
     DEVICE_CODE void AbsDiff(const Vector2<T> &aOther)
-        requires isSameType<T, short> && CUDA_ONLY<T> && NativeType<T>
+        requires IsShort<T> && CUDA_ONLY<T> && NativeNumber<T>
     {
         *this = FromUint(__vabsdiffs2(*this, aOther));
     }
@@ -1646,7 +1565,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute difference (SIMD)
     /// </summary>
     DEVICE_CODE void AbsDiff(const Vector2<T> &aOther)
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && NativeType<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && NativeNumber<T>
     {
         *this = FromUint(__vabsdiffu2(*this, aOther));
     }
@@ -1655,7 +1574,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE void AbsDiff(const Vector2<T> &aOther)
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         x = abs(x - aOther.x);
         y = abs(y - aOther.y);
@@ -1665,7 +1584,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> AbsDiff(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         Vector2<T> ret;
         ret.x = abs(aLeft.x - aRight.x);
@@ -1677,7 +1596,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> AbsDiff(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires isSameType<T, short> && CUDA_ONLY<T> && NativeType<T>
+        requires IsShort<T> && CUDA_ONLY<T> && NativeNumber<T>
     {
         return FromUint(__vabsdiffs2(aLeft, aRight));
     }
@@ -1686,7 +1605,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> AbsDiff(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && NativeType<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && NativeNumber<T>
     {
         return FromUint(__vabsdiffu2(aLeft, aRight));
     }
@@ -1695,7 +1614,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE void AbsDiff(const Vector2<T> &aOther)
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         x = T::Abs(x - aOther.x);
         y = T::Abs(y - aOther.y);
@@ -1705,7 +1624,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> AbsDiff(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         Vector2<T> ret;
         ret.x = T::Abs(aLeft.x - aRight.x);
@@ -1714,112 +1633,28 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     }
 #pragma endregion
 
-#pragma region Dot
-    /// <summary>
-    /// Vector dot product
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static T Dot(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires FloatingPoint<T>
-    {
-        return aLeft.x * aRight.x + aLeft.y * aRight.y;
-    }
-
-    /// <summary>
-    /// Vector dot product
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] T Dot(const Vector2<T> &aRight) const
-        requires FloatingPoint<T>
-    {
-        return x * aRight.x + y * aRight.y;
-    }
-#pragma endregion
-
 #pragma region Magnitude(Sqr)
     /// <summary>
-    /// Vector length (L2 norm)
+    /// Complex magnitude
     /// </summary>
-    DEVICE_CODE [[nodiscard]] T Magnitude() const
-        requires DeviceCode<T> && NativeFloatingPoint<T>
+    DEVICE_CODE [[nodiscard]] Vector2<complex_basetype_t<T>> Magnitude() const
+        requires ComplexFloatingPoint<T>
     {
-        return sqrt(Dot(*this, *this));
+        Vector2<complex_basetype_t<T>> ret;
+        ret.x = x.Magnitude();
+        ret.y = y.Magnitude();
+        return ret;
     }
 
     /// <summary>
-    /// Vector length (L2 norm)
+    /// Complex magnitude squared
     /// </summary>
-    [[nodiscard]] T Magnitude() const
-        requires HostCode<T> && NativeFloatingPoint<T>
+    DEVICE_CODE [[nodiscard]] Vector2<complex_basetype_t<T>> MagnitudeSqr() const
+        requires ComplexFloatingPoint<T>
     {
-        return std::sqrt(Dot(*this, *this));
-    }
-
-    /// <summary>
-    /// Vector length (L2 norm)
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] T Magnitude() const
-        requires NonNativeType<T>
-    {
-        return T::Sqrt(Dot(*this, *this));
-    }
-
-    /// <summary>
-    /// Squared vector length
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] T MagnitudeSqr() const
-        requires FloatingPoint<T>
-    {
-        return Dot(*this, *this);
-    }
-
-    /// <summary>
-    /// Vector length (L2 norm)
-    /// </summary>
-    [[nodiscard]] double Magnitude() const
-        requires Integral<T> && DeviceCode<T>
-    {
-        return sqrt(MagnitudeSqr());
-    }
-
-    /// <summary>
-    /// Vector length (L2 norm)
-    /// </summary>
-    [[nodiscard]] double Magnitude() const
-        requires Integral<T> && HostCode<T>
-    {
-        return std::sqrt(MagnitudeSqr());
-    }
-
-    /// <summary>
-    /// Squared vector length
-    /// </summary>
-    [[nodiscard]] double MagnitudeSqr() const
-        requires Integral<T> && HostCode<T>
-    {
-        double dx = to_double(x);
-        double dy = to_double(y);
-
-        return dx * dx + dy * dy;
-    }
-#pragma endregion
-
-#pragma region Normalize
-    /// <summary>
-    /// Normalizes the vector components
-    /// </summary>
-    DEVICE_CODE void Normalize()
-        requires FloatingPoint<T>
-    {
-        *this = *this / Magnitude();
-    }
-
-    /// <summary>
-    /// Normalizes a vector
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> Normalize(const Vector2<T> &aValue)
-        requires FloatingPoint<T>
-    {
-        Vector2<T> ret = aValue;
-        ret.Normalize();
+        Vector2<complex_basetype_t<T>> ret;
+        ret.x = x.MagnitudeSqr();
+        ret.y = y.MagnitudeSqr();
         return ret;
     }
 #pragma endregion
@@ -1829,7 +1664,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise clamp to value range
     /// </summary>
     DEVICE_CODE void Clamp(T aMinVal, T aMaxVal)
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeNumber<T>
     {
         x = max(aMinVal, min(x, aMaxVal));
         y = max(aMinVal, min(y, aMaxVal));
@@ -1839,7 +1674,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise clamp to value range
     /// </summary>
     void Clamp(T aMinVal, T aMaxVal)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         x = std::max(aMinVal, std::min(x, aMaxVal));
         y = std::max(aMinVal, std::min(y, aMaxVal));
@@ -1849,7 +1684,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise clamp to value range
     /// </summary>
     DEVICE_CODE void Clamp(T aMinVal, T aMaxVal)
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         x = T::Max(aMinVal, T::Min(x, aMaxVal));
         y = T::Max(aMinVal, T::Min(y, aMaxVal));
@@ -1858,9 +1693,10 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// <summary>
     /// Component wise clamp to maximum value range of given target type
     /// </summary>
-    template <ComplexOrNumber TTarget>
+    template <Number TTarget>
     DEVICE_CODE void ClampToTargetType() noexcept
-        requires(need_saturation_clamp_v<T, TTarget>) && (!IsHalfFp16<T> || !isSameType<TTarget, short>)
+        requires(need_saturation_clamp_v<T, TTarget>) && (!IsHalfFp16<T> || !IsShort<TTarget>) &&
+                (!IsBFloat16<T> || !IsShort<TTarget>) && (!IsBFloat16<T> || !IsUShort<TTarget>)
     {
         Clamp(T(numeric_limits<TTarget>::lowest()), T(numeric_limits<TTarget>::max()));
     }
@@ -1868,9 +1704,9 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// <summary>
     /// Component wise clamp to maximum value range of given target type
     /// </summary>
-    template <ComplexOrNumber TTarget>
+    template <Number TTarget>
     DEVICE_CODE void ClampToTargetType() noexcept
-        requires(need_saturation_clamp_v<T, TTarget>) && IsHalfFp16<T> && isSameType<TTarget, short>
+        requires(need_saturation_clamp_v<T, TTarget>) && IsHalfFp16<T> && IsShort<TTarget>
     {
         // special case for half floats: the maximum value of short is slightly larger than the closest exact
         // integer in HalfFp16, and as we use round to nearest, the clamping would result in a too large number.
@@ -1880,10 +1716,38 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     }
 
     /// <summary>
+    /// Component wise clamp to maximum value range of given target type
+    /// </summary>
+    template <Number TTarget>
+    DEVICE_CODE void ClampToTargetType() noexcept
+        requires(need_saturation_clamp_v<T, TTarget>) && IsBFloat16<T> && IsShort<TTarget>
+    {
+        // special case for half floats: the maximum value of short is slightly smaller than the closest exact
+        // integer in BFloat16, and as we use round to nearest, the clamping would result in a too large number.
+        // Thus for BFloat16 and short, we clamp to the next integer smaller than short::max(), i.e. 32640
+        constexpr BFloat16 maxExactShort = BFloat16::FromUShort(0x46FF); // = 32640
+        Clamp(T(numeric_limits<TTarget>::lowest()), maxExactShort);
+    }
+
+    /// <summary>
+    /// Component wise clamp to maximum value range of given target type
+    /// </summary>
+    template <Number TTarget>
+    DEVICE_CODE void ClampToTargetType() noexcept
+        requires(need_saturation_clamp_v<T, TTarget>) && IsBFloat16<T> && IsUShort<TTarget>
+    {
+        // special case for half floats: the maximum value of ushort is slightly smaller than the closest exact
+        // integer in BFloat16, and as we use round to nearest, the clamping would result in a too large number.
+        // Thus for BFloat16 and short, we clamp to the next integer smaller than ushort::max(), i.e. 65280
+        constexpr BFloat16 maxExactShort = BFloat16::FromUShort(0x477f); // = 65280
+        Clamp(T(numeric_limits<TTarget>::lowest()), maxExactShort);
+    }
+
+    /// <summary>
     /// Component wise clamp to maximum value range of given target type<para/>
     /// NOP in case no saturation clamping is needed.
     /// </summary>
-    template <ComplexOrNumber TTarget>
+    template <Number TTarget>
     DEVICE_CODE void ClampToTargetType() noexcept
         requires(!need_saturation_clamp_v<T, TTarget>)
     {
@@ -1895,7 +1759,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise minimum
     /// </summary>
     DEVICE_CODE void Min(const Vector2<T> &aOther)
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeNumber<T>
     {
         x = min(x, aOther.x);
         y = min(y, aOther.y);
@@ -1905,7 +1769,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise minimum (SIMD)
     /// </summary>
     DEVICE_CODE void Min(const Vector2<T> &aOther)
-        requires isSameType<T, short> && CUDA_ONLY<T> && NativeType<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         *this = FromUint(__vmins2(*this, aOther));
     }
@@ -1914,7 +1778,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise minimum (SIMD)
     /// </summary>
     DEVICE_CODE void Min(const Vector2<T> &aOther)
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && NativeType<T> && EnableSIMD<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         *this = FromUint(__vminu2(*this, aOther));
     }
@@ -1923,7 +1787,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise minimum (SIMD)
     /// </summary>
     DEVICE_CODE void Min(const Vector2<T> &aOther)
-        requires NonNativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromNV16BitFloat(__hmin2(*this, aOther));
     }
@@ -1942,7 +1806,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise minimum
     /// </summary>
     DEVICE_CODE void Min(const Vector2<T> &aRight)
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         x.Min(aRight.x);
         y.Min(aRight.y);
@@ -1952,7 +1816,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise minimum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Min(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeNumber<T>
     {
         return Vector2<T>{T(min(aLeft.x, aRight.x)), T(min(aLeft.y, aRight.y))};
     }
@@ -1961,7 +1825,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise minimum (SIMD)
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Min(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires isSameType<T, short> && NativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromUint(__vmins2(aLeft, aRight));
     }
@@ -1970,7 +1834,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise minimum (SIMD)
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Min(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires isSameType<T, ushort> && NativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromUint(__vminu2(aLeft, aRight));
     }
@@ -1979,7 +1843,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise minimum (SIMD)
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Min(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires NonNativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromNV16BitFloat(__hmin2(aLeft, aRight));
     }
@@ -1988,7 +1852,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise minimum
     /// </summary>
     [[nodiscard]] static Vector2<T> Min(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         return Vector2<T>{std::min(aLeft.x, aRight.x), std::min(aLeft.y, aRight.y)};
     }
@@ -1997,7 +1861,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise minimum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Min(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires NonNativeType<T> && HostCode<T>
+        requires NonNativeNumber<T> && HostCode<T>
     {
         return Vector2<T>{T::Min(aLeft.x, aRight.x), T::Min(aLeft.y, aRight.y)};
     }
@@ -2006,7 +1870,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns the minimum component of the vector
     /// </summary>
     DEVICE_CODE [[nodiscard]] T Min() const
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeNumber<T>
     {
         return min(x, y);
     }
@@ -2015,7 +1879,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns the minimum component of the vector
     /// </summary>
     DEVICE_CODE [[nodiscard]] T Min() const
-        requires DeviceCode<T> && NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         return T::Min(x, y);
     }
@@ -2024,7 +1888,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns the minimum component of the vector
     /// </summary>
     [[nodiscard]] T Min() const
-        requires HostCode<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         return std::min({x, y});
     }
@@ -2035,7 +1899,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise maximum
     /// </summary>
     DEVICE_CODE void Max(const Vector2<T> &aOther)
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeNumber<T>
     {
         x = max(x, aOther.x);
         y = max(y, aOther.y);
@@ -2045,7 +1909,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise maximum (SIMD)
     /// </summary>
     DEVICE_CODE void Max(const Vector2<T> &aOther)
-        requires isSameType<T, short> && NativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromUint(__vmaxs2(*this, aOther));
     }
@@ -2054,7 +1918,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise maximum (SIMD)
     /// </summary>
     DEVICE_CODE void Max(const Vector2<T> &aOther)
-        requires isSameType<T, ushort> && NativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromUint(__vmaxu2(*this, aOther));
     }
@@ -2063,7 +1927,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise maximum (SIMD)
     /// </summary>
     DEVICE_CODE void Max(const Vector2<T> &aOther)
-        requires NonNativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromNV16BitFloat(__hmax2(*this, aOther));
     }
@@ -2072,7 +1936,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise maximum
     /// </summary>
     void Max(const Vector2<T> &aOther)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         x = std::max(x, aOther.x);
         y = std::max(y, aOther.y);
@@ -2082,7 +1946,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise maximum
     /// </summary>
     DEVICE_CODE void Max(const Vector2<T> &aRight)
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         x.Max(aRight.x);
         y.Max(aRight.y);
@@ -2092,7 +1956,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise maximum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Max(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeNumber<T>
     {
         return Vector2<T>{T(max(aLeft.x, aRight.x)), T(max(aLeft.y, aRight.y))};
     }
@@ -2101,7 +1965,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise maximum (SIMD)
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Max(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires isSameType<T, short> && NativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromUint(__vmaxs2(aLeft, aRight));
     }
@@ -2110,7 +1974,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise maximum (SIMD)
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Max(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires isSameType<T, ushort> && NativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromUint(__vmaxu2(aLeft, aRight));
     }
@@ -2119,7 +1983,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise maximum (SIMD)
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Max(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires NonNativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires NonNativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromNV16BitFloat(__hmax2(aLeft, aRight));
     }
@@ -2128,7 +1992,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise maximum
     /// </summary>
     [[nodiscard]] static Vector2<T> Max(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         return Vector2<T>{std::max(aLeft.x, aRight.x), std::max(aLeft.y, aRight.y)};
     }
@@ -2137,7 +2001,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise maximum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Max(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         return Vector2<T>{T::Max(aLeft.x, aRight.x), T::Max(aLeft.y, aRight.y)};
     }
@@ -2146,7 +2010,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns the maximum component of the vector
     /// </summary>
     DEVICE_CODE [[nodiscard]] T Max() const
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeNumber<T>
     {
         return max(x, y);
     }
@@ -2155,7 +2019,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns the maximum component of the vector
     /// </summary>
     DEVICE_CODE [[nodiscard]] T Max() const
-        requires DeviceCode<T> && NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         return T::Max(x, y);
     }
@@ -2164,7 +2028,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns the maximum component of the vector
     /// </summary>
     [[nodiscard]] T Max() const
-        requires HostCode<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         return std::max({x, y});
     }
@@ -2175,7 +2039,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise round()
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Round(const Vector2<T> &aValue)
-        requires FloatingPoint<T>
+        requires RealOrComplexFloatingPoint<T>
     {
         Vector2<T> ret = aValue;
         ret.Round();
@@ -2183,21 +2047,10 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     }
 
     /// <summary>
-    /// Element wise round() and return as integer
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<int> RoundI(const Vector2<T> &aValue)
-        requires FloatingPoint<T>
-    {
-        Vector2<T> ret = aValue;
-        ret.Round();
-        return Vector2<int>(ret);
-    }
-
-    /// <summary>
     /// Element wise round()
     /// </summary>
-    DEVICE_CODE void Round()
-        requires FloatingComplexType<T>
+    DEVICE_ONLY_CODE void Round()
+        requires NonNativeFloatingPoint<T>
     {
         x.Round();
         y.Round();
@@ -2224,35 +2077,14 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     }
 
     /// <summary>
-    /// Element wise round()
-    /// </summary>
-    DEVICE_ONLY_CODE void Round()
-        requires NonNativeType<T>
-    {
-        x.Round();
-        y.Round();
-    }
-
-    /// <summary>
     /// Element wise floor()
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Floor(const Vector2<T> &aValue)
-        requires FloatingPoint<T>
+        requires RealOrComplexFloatingPoint<T>
     {
         Vector2<T> ret = aValue;
         ret.Floor();
         return ret;
-    }
-
-    /// <summary>
-    /// Element wise floor() and return as integer
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<int> FloorI(const Vector2<T> &aValue)
-        requires FloatingPoint<T>
-    {
-        Vector2<T> ret = aValue;
-        ret.Floor();
-        return Vector2<int>(ret);
     }
 
     /// <summary>
@@ -2279,7 +2111,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise floor() (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void Floor()
-        requires NonNativeType<T> && FloatingPoint<T> && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T>
     {
         *this = FromNV16BitFloat(h2floor(*this));
     }
@@ -2288,7 +2120,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise floor()
     /// </summary>
     DEVICE_ONLY_CODE void Floor()
-        requires NonNativeType<T> && FloatingPoint<T> && HostCode<T>
+        requires NonNativeFloatingPoint<T>
     {
         x.Floor();
         y.Floor();
@@ -2298,22 +2130,11 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise ceil()
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Ceil(const Vector2<T> &aValue)
-        requires FloatingPoint<T>
+        requires RealOrComplexFloatingPoint<T>
     {
         Vector2<T> ret = aValue;
         ret.Ceil();
         return ret;
-    }
-
-    /// <summary>
-    /// Element wise ceil() and return as integer
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<int> CeilI(const Vector2<T> &aValue)
-        requires FloatingPoint<T>
-    {
-        Vector2<T> ret = aValue;
-        ret.Ceil();
-        return Vector2<int>(ret);
     }
 
     /// <summary>
@@ -2340,7 +2161,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise ceil() (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void Ceil()
-        requires NonNativeType<T> && FloatingPoint<T> && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T>
     {
         *this = FromNV16BitFloat(h2ceil(*this));
     }
@@ -2349,7 +2170,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise ceil()
     /// </summary>
     DEVICE_ONLY_CODE void Ceil()
-        requires NonNativeType<T> && FloatingPoint<T> && HostCode<T>
+        requires NonNativeFloatingPoint<T>
     {
         x.Ceil();
         y.Ceil();
@@ -2360,7 +2181,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Note: the host function assumes that current rounding mode is set to FE_TONEAREST
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> RoundNearest(const Vector2<T> &aValue)
-        requires FloatingPoint<T>
+        requires RealOrComplexFloatingPoint<T>
     {
         Vector2<T> ret = aValue;
         ret.RoundNearest();
@@ -2392,7 +2213,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise round nearest ties to even (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void RoundNearest()
-        requires NonNativeType<T> && FloatingPoint<T> && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T>
     {
         *this = FromNV16BitFloat(h2rint(*this));
     }
@@ -2401,7 +2222,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise round nearest ties to even
     /// </summary>
     DEVICE_ONLY_CODE void RoundNearest()
-        requires NonNativeType<T> && FloatingPoint<T> && HostCode<T>
+        requires NativeFloatingPoint<T> && HostCode<T>
     {
         x.RoundNearest();
         y.RoundNearest();
@@ -2411,7 +2232,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise round toward zero
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> RoundZero(const Vector2<T> &aValue)
-        requires FloatingPoint<T>
+        requires RealOrComplexFloatingPoint<T>
     {
         Vector2<T> ret = aValue;
         ret.RoundZero();
@@ -2442,7 +2263,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise round toward zero (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void RoundZero()
-        requires NonNativeType<T> && FloatingPoint<T> && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T>
     {
         *this = FromNV16BitFloat(h2trunc(*this));
     }
@@ -2451,7 +2272,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise round toward zero
     /// </summary>
     DEVICE_ONLY_CODE void RoundZero()
-        requires NonNativeType<T> && FloatingPoint<T> && HostCode<T>
+        requires NonNativeFloatingPoint<T>
     {
         x.RoundZero();
         y.RoundZero();
@@ -2492,6 +2313,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise comparison greater or equal, returns 0xFF per element for true, 0x00 for false
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<byte> CompareGE(const Vector2<T> &aLeft, const Vector2<T> &aRight)
+        requires RealNumber<T>
     {
         Vector2<byte> ret;
         ret.x = byte(aLeft.x >= aRight.x) * TRUE_VALUE;
@@ -2503,6 +2325,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise comparison greater than, returns 0xFF per element for true, 0x00 for false
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<byte> CompareGT(const Vector2<T> &aLeft, const Vector2<T> &aRight)
+        requires RealNumber<T>
     {
         Vector2<byte> ret;
         ret.x = byte(aLeft.x > aRight.x) * TRUE_VALUE;
@@ -2514,6 +2337,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise comparison less or equal, returns 0xFF per element for true, 0x00 for false
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<byte> CompareLE(const Vector2<T> &aLeft, const Vector2<T> &aRight)
+        requires RealNumber<T>
     {
         Vector2<byte> ret;
         ret.x = byte(aLeft.x <= aRight.x) * TRUE_VALUE;
@@ -2525,6 +2349,7 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise comparison less than, returns 0xFF per element for true, 0x00 for false
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<byte> CompareLT(const Vector2<T> &aLeft, const Vector2<T> &aRight)
+        requires RealNumber<T>
     {
         Vector2<byte> ret;
         ret.x = byte(aLeft.x < aRight.x) * TRUE_VALUE;
@@ -2548,50 +2373,50 @@ template <ComplexOrNumber T> struct alignas(2 * sizeof(T)) Vector2
 
 template <typename T, typename T2>
 DEVICE_CODE Vector2<T> operator+(const Vector2<T> &aLeft, T2 aRight)
-    requires ComplexOrNumber<T2>
+    requires Number<T2>
 {
     return Vector2<T>{T(aLeft.x + aRight), T(aLeft.y + aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector2<T> operator+(T2 aLeft, const Vector2<T> &aRight)
-    requires ComplexOrNumber<T2>
+    requires Number<T2>
 {
     return Vector2<T>{T(aLeft + aRight.x), T(aLeft + aRight.y)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector2<T> operator-(const Vector2<T> &aLeft, T2 aRight)
-    requires ComplexOrNumber<T2>
+    requires Number<T2>
 {
     return Vector2<T>{T(aLeft.x - aRight), T(aLeft.y - aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector2<T> operator-(T2 aLeft, const Vector2<T> &aRight)
-    requires ComplexOrNumber<T2>
+    requires Number<T2>
 {
     return Vector2<T>{T(aLeft - aRight.x), T(aLeft - aRight.y)};
 }
 
 template <typename T, typename T2>
 DEVICE_CODE Vector2<T> operator*(const Vector2<T> &aLeft, T2 aRight)
-    requires ComplexOrNumber<T2>
+    requires Number<T2>
 {
     return Vector2<T>{T(aLeft.x * aRight), T(aLeft.y * aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector2<T> operator*(T2 aLeft, const Vector2<T> &aRight)
-    requires ComplexOrNumber<T2>
+    requires Number<T2>
 {
     return Vector2<T>{T(aLeft * aRight.x), T(aLeft * aRight.y)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector2<T> operator/(const Vector2<T> &aLeft, T2 aRight)
-    requires ComplexOrNumber<T2>
+    requires Number<T2>
 {
     return Vector2<T>{T(aLeft.x / aRight), T(aLeft.y / aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector2<T> operator/(T2 aLeft, const Vector2<T> &aRight)
-    requires ComplexOrNumber<T2>
+    requires Number<T2>
 {
     return Vector2<T>{T(aLeft / aRight.x), T(aLeft / aRight.y)};
 }

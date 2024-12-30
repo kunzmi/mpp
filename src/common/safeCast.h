@@ -6,15 +6,15 @@
 
 namespace opp
 {
-template <typename T_toTest, typename T_required>
-concept isSameType = std::is_same<T_toTest, T_required>::value;
+// template <typename T_toTest, typename T_required>
+// concept isSameType = std::is_same<T_toTest, T_required>::value;
 
 template <typename T_From, typename T_FromShouldBe, typename T_To, typename T_ToShouldBe>
-concept selectCase = isSameType<T_FromShouldBe, T_From> && isSameType<T_ToShouldBe, T_To>;
+concept selectCase = std::same_as<T_FromShouldBe, T_From> && std::same_as<T_ToShouldBe, T_To>;
 
 template <typename T_To, typename T_From>
 DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
-    requires isSameType<T_To, T_From>
+    requires std::same_as<T_To, T_From>
 {
     return true;
 }
@@ -118,13 +118,13 @@ DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
 // To = unsigned long int
 template <typename T_To, typename T_From>
 DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
-    requires isSameType<T_To, unsigned long int> && std::is_unsigned<T_From>::value
+    requires std::same_as<T_To, unsigned long int> && std::is_unsigned<T_From>::value
 {
     return true;
 }
 template <typename T_To, typename T_From>
 DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
-    requires isSameType<T_To, unsigned long int>
+    requires std::same_as<T_To, unsigned long int>
 {
     return aValue >= 0;
 }
@@ -391,13 +391,13 @@ DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
 // To = ulong64
 template <typename T_To, typename T_From>
 DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
-    requires(isSameType<T_To, ulong64> && std::is_unsigned<T_From>::value && !isSameType<T_To, T_From>)
+    requires(std::same_as<T_To, ulong64> && std::is_unsigned<T_From>::value && !std::same_as<T_To, T_From>)
 {
     return true;
 }
 template <typename T_To, typename T_From>
 DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
-    requires(isSameType<T_To, ulong64> && !std::is_unsigned<T_From>::value && !isSameType<T_To, T_From>)
+    requires(std::same_as<T_To, ulong64> && !std::is_unsigned<T_From>::value && !std::same_as<T_To, T_From>)
 {
     return aValue >= 0;
 }

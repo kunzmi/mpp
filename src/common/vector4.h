@@ -1,9 +1,9 @@
 #pragma once
-#include "complex_typetraits.h"
 #include "defines.h"
 #include "exception.h"
-#include "limits.h"
 #include "needSaturationClamp.h"
+#include "numberTypes.h"
+#include "numeric_limits.h"
 #include "safeCast.h"
 #include "vector_typetraits.h"
 #include "vector3.h" //for additional constructor from Vector3<T>
@@ -113,11 +113,11 @@ namespace opp
 {
 
 // forward declaration:
-template <ComplexOrNumber T> struct Vector1;
-template <ComplexOrNumber T> struct Vector2;
-template <ComplexOrNumber T> struct Vector3;
-template <ComplexOrNumber T> struct Vector4;
-template <ComplexOrNumber T> struct Vector4A;
+template <Number T> struct Vector1;
+template <Number T> struct Vector2;
+template <Number T> struct Vector3;
+template <Number T> struct Vector4;
+template <Number T> struct Vector4A;
 
 enum class Axis4D
 {
@@ -172,7 +172,7 @@ inline std::wostream &operator<<(std::wostream &aOs, const Axis4D &aAxis)
 /// <summary>
 /// A four T component vector. Can replace CUDA's vector4 types
 /// </summary>
-template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
+template <Number T> struct alignas(4 * sizeof(T)) Vector4
 {
     T x;
     T y;
@@ -238,7 +238,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// types)
     /// </summary>
     DEVICE_CODE static Vector4 FromUint(uint aUintLO, uint aUintHI) noexcept
-        requires isSameType<byte, T>
+        requires IsByte<T>
     {
         // from two UInts building an ULong of value 0xaUintHIaUintLO or 0xDDDDCCCCBBBBAAAA, shift bits and mask them so
         // that we get an UInt 0xDDCCBBAA
@@ -262,7 +262,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// E.g.: when converting int to byte, values are clamped to 0..255<para/>
     /// But when converting byte to int, no clamping operation is performed.
     /// </summary>
-    template <ComplexOrNumber T2> DEVICE_CODE Vector4(const Vector4<T2> &aVec) noexcept
+    template <Number T2> DEVICE_CODE Vector4(const Vector4<T2> &aVec) noexcept
     {
         if constexpr (need_saturation_clamp_v<T2, T>)
         {
@@ -288,14 +288,12 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// But when converting byte to int, no clamping operation is performed.<para/>
     /// If we can modify the input variable, no need to allocate temporary storage for clamping.
     /// </summary>
-    template <ComplexOrNumber T2>
+    template <Number T2>
     DEVICE_CODE Vector4(Vector4<T2> &aVec) noexcept
         // Disable the non-const variant for half and bfloat to / from float,
         // otherwise the const specialization will never be picked up:
-        requires(!(IsBFloat16<T> && isSameType<T2, float> && CUDA_ONLY<T>) &&
-                 !(isSameType<T, float> && isSameType<T2, BFloat16> && CUDA_ONLY<T>) &&
-                 !(IsHalfFp16<T> && isSameType<T2, float> && CUDA_ONLY<T>) &&
-                 !(isSameType<T, float> && isSameType<T2, HalfFp16> && CUDA_ONLY<T>))
+        requires(!(IsBFloat16<T> && IsFloat<T2> && CUDA_ONLY<T>) && !(IsFloat<T> && IsBFloat16<T2> && CUDA_ONLY<T>) &&
+                 !(IsHalfFp16<T> && IsFloat<T2> && CUDA_ONLY<T>) && !(IsFloat<T> && IsHalfFp16<T2> && CUDA_ONLY<T>))
     {
         if constexpr (need_saturation_clamp_v<T2, T>)
         {
@@ -310,9 +308,9 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Type conversion using CUDA intrinsics for float2 to BFloat2
     /// </summary>
-    template <ComplexOrNumber T2>
+    template <Number T2>
     DEVICE_CODE Vector4(const Vector4<T2> &aVec) noexcept
-        requires IsBFloat16<T> && isSameType<T2, float> && CUDA_ONLY<T>
+        requires IsBFloat16<T> && IsFloat<T2> && CUDA_ONLY<T>
     {
         const float2 *aVecPtr = reinterpret_cast<const float2 *>(&aVec);
         nv_bfloat162 *thisPtr = reinterpret_cast<nv_bfloat162 *>(this);
@@ -323,9 +321,9 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Type conversion using CUDA intrinsics for BFloat2 to float2
     /// </summary>
-    template <ComplexOrNumber T2>
+    template <Number T2>
     DEVICE_CODE Vector4(const Vector4<T2> &aVec) noexcept
-        requires isSameType<T, float> && isSameType<T2, BFloat16> && CUDA_ONLY<T>
+        requires IsFloat<T> && IsBFloat16<T2> && CUDA_ONLY<T>
     {
         const nv_bfloat162 *aVecPtr = reinterpret_cast<const nv_bfloat162 *>(&aVec);
         float2 *thisPtr             = reinterpret_cast<float2 *>(this);
@@ -336,9 +334,9 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Type conversion using CUDA intrinsics for float2 to half2
     /// </summary>
-    template <ComplexOrNumber T2>
+    template <Number T2>
     DEVICE_CODE Vector4(const Vector4<T2> &aVec) noexcept
-        requires IsHalfFp16<T> && isSameType<T2, float> && CUDA_ONLY<T>
+        requires IsHalfFp16<T> && IsFloat<T2> && CUDA_ONLY<T>
     {
         const float2 *aVecPtr = reinterpret_cast<const float2 *>(&aVec);
         half2 *thisPtr        = reinterpret_cast<half2 *>(this);
@@ -349,9 +347,9 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Type conversion using CUDA intrinsics for half2 to float2
     /// </summary>
-    template <ComplexOrNumber T2>
+    template <Number T2>
     DEVICE_CODE Vector4(const Vector4<T2> &aVec) noexcept
-        requires isSameType<T, float> && isSameType<T2, HalfFp16> && CUDA_ONLY<T>
+        requires IsFloat<T> && IsHalfFp16<T2> && CUDA_ONLY<T>
     {
         const half2 *aVecPtr = reinterpret_cast<const half2 *>(&aVec);
         float2 *thisPtr      = reinterpret_cast<float2 *>(this);
@@ -389,24 +387,6 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
         return *reinterpret_cast<uint *>(this);
     }
 
-    /*/// <summary>
-    /// converter to ulong64 for SIMD operations
-    /// </summary>
-    DEVICE_CODE operator const ulong64 &() const
-        requires TwoBytesSizeType<T>
-    {
-        return *reinterpret_cast<const ulong64 *>(this);
-    }
-
-    /// <summary>
-    /// converter to ulong64 for SIMD operations
-    /// </summary>
-    DEVICE_CODE operator ulong64 &()
-        requires TwoBytesSizeType<T>
-    {
-        return *reinterpret_cast<ulong64 *>(this);
-    }*/
-
 #pragma endregion
   public:
 #pragma region Operators
@@ -418,6 +398,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true
     /// </summary>
     DEVICE_CODE [[nodiscard]] bool operator<(const Vector4 &aOther) const
+        requires RealNumber<T>
     {
         bool res = x < aOther.x;
         res &= y < aOther.y;
@@ -430,6 +411,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true
     /// </summary>
     DEVICE_CODE [[nodiscard]] bool operator<=(const Vector4 &aOther) const
+        requires RealNumber<T>
     {
         bool res = x <= aOther.x;
         res &= y <= aOther.y;
@@ -442,6 +424,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true
     /// </summary>
     DEVICE_CODE [[nodiscard]] bool operator>(const Vector4 &aOther) const
+        requires RealNumber<T>
     {
         bool res = x > aOther.x;
         res &= y > aOther.y;
@@ -454,6 +437,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true
     /// </summary>
     DEVICE_CODE [[nodiscard]] bool operator>=(const Vector4 &aOther) const
+        requires RealNumber<T>
     {
         bool res = x >= aOther.x;
         res &= y >= aOther.y;
@@ -490,7 +474,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator==(const Vector4 &aOther) const
-        requires isSameType<T, byte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpeq4(*this, aOther) == 0xFFFFFFFFU;
     }
@@ -499,7 +483,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator>=(const Vector4 &aOther) const
-        requires isSameType<T, byte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpgeu4(*this, aOther) == 0xFFFFFFFFU;
     }
@@ -508,7 +492,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator>(const Vector4 &aOther) const
-        requires isSameType<T, byte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpgtu4(*this, aOther) == 0xFFFFFFFFU;
     }
@@ -517,7 +501,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator<=(const Vector4 &aOther) const
-        requires isSameType<T, byte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpleu4(*this, aOther) == 0xFFFFFFFFU;
     }
@@ -526,7 +510,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator<(const Vector4 &aOther) const
-        requires isSameType<T, byte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpltu4(*this, aOther) == 0xFFFFFFFFU;
     }
@@ -535,7 +519,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if any element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator!=(const Vector4 &aOther) const
-        requires isSameType<T, byte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpne4(*this, aOther) != 0U;
     }
@@ -544,7 +528,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator==(const Vector4 &aOther) const
-        requires isSameType<T, sbyte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsSByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpeq4(*this, aOther) == 0xFFFFFFFFU;
     }
@@ -553,7 +537,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator>=(const Vector4 &aOther) const
-        requires isSameType<T, sbyte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsSByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpges4(*this, aOther) == 0xFFFFFFFFU;
     }
@@ -562,7 +546,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator>(const Vector4 &aOther) const
-        requires isSameType<T, sbyte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsSByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpgts4(*this, aOther) == 0xFFFFFFFFU;
     }
@@ -571,7 +555,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator<=(const Vector4 &aOther) const
-        requires isSameType<T, sbyte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsSByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmples4(*this, aOther) == 0xFFFFFFFFU;
     }
@@ -580,7 +564,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator<(const Vector4 &aOther) const
-        requires isSameType<T, sbyte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsSByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmplts4(*this, aOther) == 0xFFFFFFFFU;
     }
@@ -589,7 +573,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if any element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator!=(const Vector4 &aOther) const
-        requires isSameType<T, sbyte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsSByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return __vcmpne4(*this, aOther) != 0U;
     }
@@ -598,7 +582,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator==(const Vector4 &aOther) const
-        requires isSameType<T, short> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(this);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aOther);
@@ -610,7 +594,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator>=(const Vector4 &aOther) const
-        requires isSameType<T, short> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(this);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aOther);
@@ -621,7 +605,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator>(const Vector4 &aOther) const
-        requires isSameType<T, short> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(this);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aOther);
@@ -632,7 +616,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator<=(const Vector4 &aOther) const
-        requires isSameType<T, short> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(this);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aOther);
@@ -643,7 +627,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator<(const Vector4 &aOther) const
-        requires isSameType<T, short> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(this);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aOther);
@@ -654,7 +638,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if any element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator!=(const Vector4 &aOther) const
-        requires isSameType<T, short> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(this);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aOther);
@@ -665,7 +649,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator==(const Vector4 &aOther) const
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(this);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aOther);
@@ -676,7 +660,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator>=(const Vector4 &aOther) const
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(this);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aOther);
@@ -687,7 +671,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator>(const Vector4 &aOther) const
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(this);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aOther);
@@ -698,7 +682,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator<=(const Vector4 &aOther) const
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(this);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aOther);
@@ -709,7 +693,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if each element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator<(const Vector4 &aOther) const
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(this);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aOther);
@@ -720,7 +704,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns true if any element comparison is true (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] bool operator!=(const Vector4 &aOther) const
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(this);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aOther);
@@ -867,7 +851,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Negation
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector4 operator-() const
-        requires SignedNumber<T> || ComplexType<T>
+        requires RealSignedNumber<T> || ComplexNumber<T>
     {
         return Vector4<T>(-x, -y, -z, -w);
     }
@@ -876,7 +860,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Negation (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] Vector4 operator-() const
-        requires isSameType<T, sbyte> && SignedNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsSByte<T> && RealSignedNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromUint(__vnegss4(*this));
     }
@@ -885,7 +869,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Negation (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] Vector4 operator-() const
-        requires isSameType<T, short> && SignedNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && RealSignedNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *temp = reinterpret_cast<const uint *>(this);
         Vector4 res;
@@ -899,7 +883,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Negation (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] Vector4 operator-() const
-        requires IsBFloat16<T> && SignedNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsBFloat16<T> && RealSignedNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const nv_bfloat162 *temp = reinterpret_cast<const nv_bfloat162 *>(this);
         Vector4 res;
@@ -913,7 +897,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Negation (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] Vector4 operator-() const
-        requires IsHalfFp16<T> && SignedNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsHalfFp16<T> && RealSignedNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const half2 *temp = reinterpret_cast<const half2 *>(this);
         Vector4 res;
@@ -951,7 +935,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise addition SIMD
     /// </summary>
     DEVICE_CODE Vector4 &operator+=(const Vector4 &aOther)
-        requires isSameType<T, byte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromUint(__vaddus4(*this, aOther));
         return *this;
@@ -961,7 +945,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise addition SIMD
     /// </summary>
     DEVICE_ONLY_CODE Vector4 &operator+=(const Vector4 &aOther)
-        requires isSameType<T, sbyte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsSByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromUint(__vaddss4(*this, aOther));
         return *this;
@@ -971,7 +955,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise addition SIMD
     /// </summary>
     DEVICE_ONLY_CODE Vector4 &operator+=(const Vector4 &aOther)
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         uint *thisPtr        = reinterpret_cast<uint *>(this);
         const uint *otherPtr = reinterpret_cast<const uint *>(&aOther);
@@ -985,7 +969,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise addition SIMD
     /// </summary>
     DEVICE_ONLY_CODE Vector4 &operator+=(const Vector4 &aOther)
-        requires isSameType<T, short> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         uint *thisPtr        = reinterpret_cast<uint *>(this);
         const uint *otherPtr = reinterpret_cast<const uint *>(&aOther);
@@ -1035,7 +1019,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise addition SIMD
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] Vector4 operator+(const Vector4 &aOther) const
-        requires isSameType<T, byte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromUint(__vaddus4(*this, aOther));
     }
@@ -1044,7 +1028,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise addition SIMD
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] Vector4 operator+(const Vector4 &aOther) const
-        requires isSameType<T, sbyte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsSByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromUint(__vaddss4(*this, aOther));
     }
@@ -1053,7 +1037,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise addition SIMD
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] Vector4 operator+(const Vector4 &aOther) const
-        requires isSameType<T, short> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *thisPtr  = reinterpret_cast<const uint *>(this);
         const uint *otherPtr = reinterpret_cast<const uint *>(&aOther);
@@ -1068,7 +1052,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise addition SIMD
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] Vector4 operator+(const Vector4 &aOther) const
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *thisPtr  = reinterpret_cast<const uint *>(this);
         const uint *otherPtr = reinterpret_cast<const uint *>(&aOther);
@@ -1137,7 +1121,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise subtraction SIMD
     /// </summary>
     DEVICE_ONLY_CODE Vector4 &operator-=(const Vector4 &aOther)
-        requires isSameType<T, byte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromUint(__vsubus4(*this, aOther));
         return *this;
@@ -1147,7 +1131,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise subtraction SIMD
     /// </summary>
     DEVICE_ONLY_CODE Vector4 &operator-=(const Vector4 &aOther)
-        requires isSameType<T, sbyte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsSByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromUint(__vsubss4(*this, aOther));
         return *this;
@@ -1157,7 +1141,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise subtraction SIMD
     /// </summary>
     DEVICE_ONLY_CODE Vector4 &operator-=(const Vector4 &aOther)
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         uint *thisPtr        = reinterpret_cast<uint *>(this);
         const uint *otherPtr = reinterpret_cast<const uint *>(&aOther);
@@ -1171,7 +1155,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise subtraction SIMD
     /// </summary>
     DEVICE_ONLY_CODE Vector4 &operator-=(const Vector4 &aOther)
-        requires isSameType<T, short> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         uint *thisPtr        = reinterpret_cast<uint *>(this);
         const uint *otherPtr = reinterpret_cast<const uint *>(&aOther);
@@ -1225,7 +1209,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise subtraction SIMD (inverted inplace sub: this = aOther - this)
     /// </summary>
     DEVICE_ONLY_CODE Vector4 &SubInv(const Vector4 &aOther)
-        requires isSameType<T, byte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromUint(__vsubus4(aOther, *this));
         return *this;
@@ -1235,7 +1219,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise subtraction SIMD (inverted inplace sub: this = aOther - this)
     /// </summary>
     DEVICE_ONLY_CODE Vector4 &SubInv(const Vector4 &aOther)
-        requires isSameType<T, sbyte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsSByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromUint(__vsubss4(aOther, *this));
         return *this;
@@ -1245,7 +1229,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise subtraction SIMD (inverted inplace sub: this = aOther - this)
     /// </summary>
     DEVICE_ONLY_CODE Vector4 &SubInv(const Vector4 &aOther)
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         uint *thisPtr        = reinterpret_cast<uint *>(this);
         const uint *otherPtr = reinterpret_cast<const uint *>(&aOther);
@@ -1259,7 +1243,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise subtraction SIMD (inverted inplace sub: this = aOther - this)
     /// </summary>
     DEVICE_ONLY_CODE Vector4 &SubInv(const Vector4 &aOther)
-        requires isSameType<T, short> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         uint *thisPtr        = reinterpret_cast<uint *>(this);
         const uint *otherPtr = reinterpret_cast<const uint *>(&aOther);
@@ -1309,7 +1293,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise subtraction SIMD
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] Vector4 operator-(const Vector4 &aOther) const
-        requires isSameType<T, byte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromUint(__vsubus4(*this, aOther));
     }
@@ -1318,7 +1302,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise subtraction SIMD
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] Vector4 operator-(const Vector4 &aOther) const
-        requires isSameType<T, sbyte> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsSByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromUint(__vsubss4(*this, aOther));
     }
@@ -1327,7 +1311,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise subtraction SIMD
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] Vector4 operator-(const Vector4 &aOther) const
-        requires isSameType<T, short> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *thisPtr  = reinterpret_cast<const uint *>(this);
         const uint *otherPtr = reinterpret_cast<const uint *>(&aOther);
@@ -1342,7 +1326,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise subtraction SIMD
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] Vector4 operator-(const Vector4 &aOther) const
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *thisPtr  = reinterpret_cast<const uint *>(this);
         const uint *otherPtr = reinterpret_cast<const uint *>(&aOther);
@@ -1688,7 +1672,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Type conversion without saturation, direct type conversion
     /// </summary>
-    template <ComplexOrNumber T2> [[nodiscard]] static Vector4<T> DEVICE_CODE Convert(const Vector4<T2> &aVec)
+    template <Number T2> [[nodiscard]] static Vector4<T> DEVICE_CODE Convert(const Vector4<T2> &aVec)
     {
         return {static_cast<T>(aVec.x), static_cast<T>(aVec.y), static_cast<T>(aVec.z), static_cast<T>(aVec.w)};
     }
@@ -1699,7 +1683,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise bitwise left shift
     /// </summary>
     DEVICE_CODE void LShift(const Vector4<T> &aOther)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         x = x << aOther.x;
         y = y << aOther.y;
@@ -1711,7 +1695,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise bitwise left shift
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> LShift(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         Vector4<T> ret;
         ret.x = aLeft.x << aRight.x;
@@ -1725,7 +1709,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise bitwise right shift
     /// </summary>
     DEVICE_CODE void RShift(const Vector4<T> &aOther)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         x = x >> aOther.x;
         y = y >> aOther.y;
@@ -1737,7 +1721,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise bitwise right shift
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> RShift(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         Vector4<T> ret;
         ret.x = aLeft.x >> aRight.x;
@@ -1751,7 +1735,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise bitwise left shift
     /// </summary>
     DEVICE_CODE void LShift(const T &aOther)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         x = x << aOther;
         y = y << aOther;
@@ -1763,7 +1747,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise bitwise left shift
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> LShift(const Vector4<T> &aLeft, const T &aRight)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         Vector4<T> ret;
         ret.x = aLeft.x << aRight;
@@ -1777,7 +1761,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise bitwise right shift
     /// </summary>
     DEVICE_CODE void RShift(const T &aOther)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         x = x >> aOther;
         y = y >> aOther;
@@ -1789,7 +1773,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise bitwise right shift
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> RShift(const Vector4<T> &aLeft, const T &aRight)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         Vector4<T> ret;
         ret.x = aLeft.x >> aRight;
@@ -1803,7 +1787,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise bitwise And
     /// </summary>
     DEVICE_CODE void And(const Vector4<T> &aOther)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         x = x & aOther.x;
         y = y & aOther.y;
@@ -1815,7 +1799,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise bitwise And
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> And(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         Vector4<T> ret;
         ret.x = aLeft.x & aRight.x;
@@ -1829,7 +1813,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise bitwise Or
     /// </summary>
     DEVICE_CODE void Or(const Vector4<T> &aOther)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         x = x | aOther.x;
         y = y | aOther.y;
@@ -1841,7 +1825,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise bitwise Or
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Or(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         Vector4<T> ret;
         ret.x = aLeft.x | aRight.x;
@@ -1855,7 +1839,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise bitwise Xor
     /// </summary>
     DEVICE_CODE void Xor(const Vector4<T> &aOther)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         x = x ^ aOther.x;
         y = y ^ aOther.y;
@@ -1867,7 +1851,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise bitwise Xor
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Xor(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         Vector4<T> ret;
         ret.x = aLeft.x ^ aRight.x;
@@ -1881,7 +1865,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise bitwise negation
     /// </summary>
     DEVICE_CODE void Not()
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         x = ~x;
         y = ~y;
@@ -1893,7 +1877,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise bitwise negation
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Not(const Vector4<T> &aVec)
-        requires Integral<T>
+        requires RealIntegral<T>
     {
         Vector4<T> ret;
         ret.x = ~aVec.x;
@@ -1910,7 +1894,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise exponential
     /// </summary>
     void Exp()
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         x = std::exp(x);
         y = std::exp(y);
@@ -1921,7 +1905,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise exponential
     /// </summary>
     DEVICE_CODE void Exp()
-        requires(HostCode<T> && NonNativeType<T>) || (!EnableSIMD<T>)
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
     {
         x = T::Exp(x);
         y = T::Exp(y);
@@ -1981,7 +1965,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise exponential
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Exp(const Vector4<T> &aVec)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         Vector4<T> ret;
         ret.x = std::exp(aVec.x);
@@ -1995,7 +1979,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise exponential
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Exp(const Vector4<T> &aVec)
-        requires(HostCode<T> && NonNativeType<T>) || (!EnableSIMD<T>)
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
     {
         Vector4<T> ret;
         ret.x = T::Exp(aVec.x);
@@ -2040,7 +2024,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise natural logarithm
     /// </summary>
     void Ln()
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         x = std::log(x);
         y = std::log(y);
@@ -2051,7 +2035,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise natural logarithm
     /// </summary>
     DEVICE_CODE void Ln()
-        requires(HostCode<T> && NonNativeType<T>) || (!EnableSIMD<T>)
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
     {
         x = T::Ln(x);
         y = T::Ln(y);
@@ -2111,7 +2095,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise natural logarithm
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Ln(const Vector4<T> &aVec)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         Vector4<T> ret;
         ret.x = std::log(aVec.x);
@@ -2125,7 +2109,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise natural logarithm
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Ln(const Vector4<T> &aVec)
-        requires(HostCode<T> && NonNativeType<T>) || (!EnableSIMD<T>)
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
     {
         Vector4<T> ret;
         ret.x = T::Ln(aVec.x);
@@ -2197,7 +2181,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise square root
     /// </summary>
     void Sqrt()
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         x = std::sqrt(x);
         y = std::sqrt(y);
@@ -2209,7 +2193,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise square root
     /// </summary>
     DEVICE_CODE void Sqrt()
-        requires(HostCode<T> && NonNativeType<T>) || (!EnableSIMD<T>)
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
     {
         x = T::Sqrt(x);
         y = T::Sqrt(y);
@@ -2269,7 +2253,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise square root
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Sqrt(const Vector4<T> &aVec)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         Vector4<T> ret;
         ret.x = std::sqrt(aVec.x);
@@ -2283,7 +2267,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise square root
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Sqrt(const Vector4<T> &aVec)
-        requires(HostCode<T> && NonNativeType<T>) || (!EnableSIMD<T>)
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
     {
         Vector4<T> ret;
         ret.x = T::Sqrt(aVec.x);
@@ -2327,7 +2311,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute
     /// </summary>
     void Abs()
-        requires HostCode<T> && SignedNumber<T> && NativeType<T>
+        requires HostCode<T> && RealSignedNumber<T> && NativeNumber<T>
     {
         x = std::abs(x);
         y = std::abs(y);
@@ -2339,7 +2323,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute
     /// </summary>
     DEVICE_CODE void Abs()
-        requires SignedNumber<T> && NonNativeType<T>
+        requires RealSignedNumber<T> && NonNativeNumber<T>
     {
         x = T::Abs(x);
         y = T::Abs(y);
@@ -2351,7 +2335,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute
     /// </summary>
     DEVICE_CODE void Abs()
-        requires DeviceCode<T> && SignedNumber<T> && NativeType<T>
+        requires DeviceCode<T> && RealSignedNumber<T> && NativeNumber<T>
     {
         x = abs(x);
         y = abs(y);
@@ -2363,7 +2347,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute  (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void Abs()
-        requires isSameType<T, sbyte> && CUDA_ONLY<T> && SignedNumber<T> && NativeType<T> && EnableSIMD<T>
+        requires IsSByte<T> && CUDA_ONLY<T> && RealSignedNumber<T> && NativeNumber<T> && EnableSIMD<T>
     {
         *this = FromUint(__vabsss4(*this));
     }
@@ -2372,7 +2356,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute  (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void Abs()
-        requires isSameType<T, short> && CUDA_ONLY<T> && SignedNumber<T> && NativeType<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && RealSignedNumber<T> && NativeNumber<T> && EnableSIMD<T>
     {
         uint *temp = reinterpret_cast<uint *>(this);
         temp[0]    = __vabsss2(temp[0]);
@@ -2405,7 +2389,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Abs(const Vector4<T> &aVec)
-        requires DeviceCode<T> && SignedNumber<T> && NativeType<T>
+        requires DeviceCode<T> && RealSignedNumber<T> && NativeNumber<T>
     {
         Vector4<T> ret;
         ret.x = abs(aVec.x);
@@ -2419,7 +2403,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute  (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<T> Abs(const Vector4<T> &aVec)
-        requires isSameType<T, sbyte> && CUDA_ONLY<T> && SignedNumber<T> && NativeType<T> && EnableSIMD<T>
+        requires IsSByte<T> && CUDA_ONLY<T> && RealSignedNumber<T> && NativeNumber<T> && EnableSIMD<T>
     {
         return FromUint(__vabsss4(aVec));
     }
@@ -2428,7 +2412,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute  (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<T> Abs(const Vector4<T> &aVec)
-        requires isSameType<T, short> && CUDA_ONLY<T> && SignedNumber<T> && NativeType<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && RealSignedNumber<T> && NativeNumber<T> && EnableSIMD<T>
     {
         const uint *temp = reinterpret_cast<const uint *>(&aVec);
         Vector4<T> res;
@@ -2470,7 +2454,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Abs(const Vector4<T> &aVec)
-        requires HostCode<T> && SignedNumber<T> && NativeType<T>
+        requires HostCode<T> && RealSignedNumber<T> && NativeNumber<T>
     {
         Vector4<T> ret;
         ret.x = std::abs(aVec.x);
@@ -2484,7 +2468,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Abs(const Vector4<T> &aVec)
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         Vector4<T> ret;
         ret.x = T::Abs(aVec.x);
@@ -2500,7 +2484,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE void AbsDiff(const Vector4<T> &aOther)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeFloatingPoint<T>
     {
         x = std::abs(x - aOther.x);
         y = std::abs(y - aOther.y);
@@ -2512,7 +2496,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE void AbsDiff(const Vector4<T> &aOther)
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         x = T::Abs(x - aOther.x);
         y = T::Abs(y - aOther.y);
@@ -2524,7 +2508,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> AbsDiff(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeFloatingPoint<T>
     {
         Vector4<T> ret;
         ret.x = std::abs(aLeft.x - aRight.x);
@@ -2538,7 +2522,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> AbsDiff(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         Vector4<T> ret;
         ret.x = T::Abs(aLeft.x - aRight.x);
@@ -2552,7 +2536,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE void AbsDiff(const Vector4<T> &aOther)
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         x = abs(x - aOther.x);
         y = abs(y - aOther.y);
@@ -2565,7 +2549,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute difference (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void AbsDiff(const Vector4<T> &aOther)
-        requires isSameType<T, sbyte> && CUDA_ONLY<T> && NativeType<T> && EnableSIMD<T>
+        requires IsSByte<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         *this = FromUint(__vabsdiffs4(*this, aOther));
     }
@@ -2574,7 +2558,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute difference (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void AbsDiff(const Vector4<T> &aOther)
-        requires isSameType<T, byte> && CUDA_ONLY<T> && NativeType<T> && EnableSIMD<T>
+        requires IsByte<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         *this = FromUint(__vabsdiffu4(*this, aOther));
     }
@@ -2583,7 +2567,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute difference (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void AbsDiff(const Vector4<T> &aOther)
-        requires isSameType<T, short> && CUDA_ONLY<T> && NativeType<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         const uint *otherPtr = reinterpret_cast<const uint *>(&aOther);
         uint *resPtr         = reinterpret_cast<uint *>(this);
@@ -2595,7 +2579,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute difference (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void AbsDiff(const Vector4<T> &aOther)
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && NativeType<T> && EnableSIMD<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         const uint *otherPtr = reinterpret_cast<const uint *>(&aOther);
         uint *resPtr         = reinterpret_cast<uint *>(this);
@@ -2607,7 +2591,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> AbsDiff(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         Vector4<T> ret;
         ret.x = abs(aLeft.x - aRight.x);
@@ -2621,7 +2605,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute difference (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<T> AbsDiff(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, sbyte> && CUDA_ONLY<T> && NativeType<T> && EnableSIMD<T>
+        requires IsSByte<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         return FromUint(__vabsdiffs4(aLeft, aRight));
     }
@@ -2630,7 +2614,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute difference (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<T> AbsDiff(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, byte> && CUDA_ONLY<T> && NativeType<T> && EnableSIMD<T>
+        requires IsByte<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         return FromUint(__vabsdiffu4(aLeft, aRight));
     }
@@ -2639,7 +2623,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute difference (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<T> AbsDiff(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, short> && CUDA_ONLY<T> && NativeType<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(&aLeft);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aRight);
@@ -2654,7 +2638,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute difference (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<T> AbsDiff(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && NativeType<T> && EnableSIMD<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(&aLeft);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aRight);
@@ -2666,114 +2650,32 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     }
 #pragma endregion
 
-#pragma region Dot
-    /// <summary>
-    /// Vector dot product
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static T Dot(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires FloatingPoint<T>
-    {
-        return aLeft.x * aRight.x + aLeft.y * aRight.y + aLeft.z * aRight.z + aLeft.w * aRight.w;
-    }
-
-    /// <summary>
-    /// Vector dot product
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] T Dot(const Vector4<T> &aRight) const
-        requires FloatingPoint<T>
-    {
-        return x * aRight.x + y * aRight.y + z * aRight.z + w * aRight.w;
-    }
-#pragma endregion
-
 #pragma region Magnitude(Sqr)
     /// <summary>
-    /// Vector length (L2 norm)
+    /// Complex magnitude
     /// </summary>
-    DEVICE_CODE [[nodiscard]] T Magnitude() const
-        requires DeviceCode<T> && NativeFloatingPoint<T>
+    DEVICE_CODE [[nodiscard]] Vector4<complex_basetype_t<T>> Magnitude() const
+        requires ComplexFloatingPoint<T>
     {
-        return sqrt(Dot(*this, *this));
+        Vector4<complex_basetype_t<T>> ret;
+        ret.x = x.Magnitude();
+        ret.y = y.Magnitude();
+        ret.z = z.Magnitude();
+        ret.w = w.Magnitude();
+        return ret;
     }
 
     /// <summary>
-    /// Vector length (L2 norm)
+    /// Complex magnitude squared
     /// </summary>
-    [[nodiscard]] T Magnitude() const
-        requires HostCode<T> && NativeFloatingPoint<T>
+    DEVICE_CODE [[nodiscard]] Vector4<complex_basetype_t<T>> MagnitudeSqr() const
+        requires ComplexFloatingPoint<T>
     {
-        return std::sqrt(Dot(*this, *this));
-    }
-
-    /// <summary>
-    /// Vector length (L2 norm)
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] T Magnitude() const
-        requires NonNativeType<T>
-    {
-        return T::Sqrt(Dot(*this, *this));
-    }
-
-    /// <summary>
-    /// Squared vector length
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] T MagnitudeSqr() const
-        requires FloatingPoint<T>
-    {
-        return Dot(*this, *this);
-    }
-
-    /// <summary>
-    /// Vector length (L2 norm)
-    /// </summary>
-    [[nodiscard]] double Magnitude() const
-        requires Integral<T> && DeviceCode<T>
-    {
-        return sqrt(MagnitudeSqr());
-    }
-
-    /// <summary>
-    /// Vector length (L2 norm)
-    /// </summary>
-    [[nodiscard]] double Magnitude() const
-        requires Integral<T> && HostCode<T>
-    {
-        return std::sqrt(MagnitudeSqr());
-    }
-
-    /// <summary>
-    /// Squared vector length
-    /// </summary>
-    [[nodiscard]] double MagnitudeSqr() const
-        requires Integral<T> && HostCode<T>
-    {
-        double dx = to_double(x);
-        double dy = to_double(y);
-        double dz = to_double(z);
-        double dw = to_double(w);
-
-        return dx * dx + dy * dy + dz * dz + dw * dw;
-    }
-#pragma endregion
-
-#pragma region Normalize
-    /// <summary>
-    /// Normalizes the vector components
-    /// </summary>
-    DEVICE_CODE void Normalize()
-        requires FloatingPoint<T>
-    {
-        *this = *this / Magnitude();
-    }
-
-    /// <summary>
-    /// Normalizes a vector
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector4<T> Normalize(const Vector4<T> &aValue)
-        requires FloatingPoint<T>
-    {
-        Vector4<T> ret = aValue;
-        ret.Normalize();
+        Vector4<complex_basetype_t<T>> ret;
+        ret.x = x.MagnitudeSqr();
+        ret.y = y.MagnitudeSqr();
+        ret.z = z.MagnitudeSqr();
+        ret.w = w.MagnitudeSqr();
         return ret;
     }
 #pragma endregion
@@ -2783,7 +2685,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise clamp to value range
     /// </summary>
     DEVICE_CODE void Clamp(T aMinVal, T aMaxVal)
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeNumber<T>
     {
         x = max(aMinVal, min(x, aMaxVal));
         y = max(aMinVal, min(y, aMaxVal));
@@ -2795,7 +2697,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise clamp to value range
     /// </summary>
     void Clamp(T aMinVal, T aMaxVal)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         x = std::max(aMinVal, std::min(x, aMaxVal));
         y = std::max(aMinVal, std::min(y, aMaxVal));
@@ -2807,7 +2709,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise clamp to value range
     /// </summary>
     DEVICE_CODE void Clamp(T aMinVal, T aMaxVal)
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         x = T::Max(aMinVal, T::Min(x, aMaxVal));
         y = T::Max(aMinVal, T::Min(y, aMaxVal));
@@ -2818,10 +2720,10 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Component wise clamp to maximum value range of given target type
     /// </summary>
-    template <ComplexOrNumber TTarget>
+    template <Number TTarget>
     DEVICE_CODE void ClampToTargetType() noexcept
-        requires(need_saturation_clamp_v<T, TTarget>) && (!IsHalfFp16<T> || !isSameType<TTarget, short>) &&
-                (!IsBFloat16<T> || !isSameType<TTarget, short>) && (!IsBFloat16<T> || !isSameType<TTarget, ushort>)
+        requires(need_saturation_clamp_v<T, TTarget>) && (!IsHalfFp16<T> || !IsShort<TTarget>) &&
+                (!IsBFloat16<T> || !IsShort<TTarget>) && (!IsBFloat16<T> || !IsUShort<TTarget>)
     {
         Clamp(T(numeric_limits<TTarget>::lowest()), T(numeric_limits<TTarget>::max()));
     }
@@ -2829,9 +2731,9 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Component wise clamp to maximum value range of given target type
     /// </summary>
-    template <ComplexOrNumber TTarget>
+    template <Number TTarget>
     DEVICE_CODE void ClampToTargetType() noexcept
-        requires(need_saturation_clamp_v<T, TTarget>) && IsHalfFp16<T> && isSameType<TTarget, short>
+        requires(need_saturation_clamp_v<T, TTarget>) && IsHalfFp16<T> && IsShort<TTarget>
     {
         // special case for half floats: the maximum value of short is slightly smaller than the closest exact
         // integer in HalfFp16, and as we use round to nearest, the clamping would result in a too large number.
@@ -2843,9 +2745,9 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Component wise clamp to maximum value range of given target type
     /// </summary>
-    template <ComplexOrNumber TTarget>
+    template <Number TTarget>
     DEVICE_CODE void ClampToTargetType() noexcept
-        requires(need_saturation_clamp_v<T, TTarget>) && IsBFloat16<T> && isSameType<TTarget, short>
+        requires(need_saturation_clamp_v<T, TTarget>) && IsBFloat16<T> && IsShort<TTarget>
     {
         // special case for half floats: the maximum value of short is slightly smaller than the closest exact
         // integer in BFloat16, and as we use round to nearest, the clamping would result in a too large number.
@@ -2857,9 +2759,9 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Component wise clamp to maximum value range of given target type
     /// </summary>
-    template <ComplexOrNumber TTarget>
+    template <Number TTarget>
     DEVICE_CODE void ClampToTargetType() noexcept
-        requires(need_saturation_clamp_v<T, TTarget>) && IsBFloat16<T> && isSameType<TTarget, ushort>
+        requires(need_saturation_clamp_v<T, TTarget>) && IsBFloat16<T> && IsUShort<TTarget>
     {
         // special case for half floats: the maximum value of ushort is slightly smaller than the closest exact
         // integer in BFloat16, and as we use round to nearest, the clamping would result in a too large number.
@@ -2872,7 +2774,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise clamp to maximum value range of given target type<para/>
     /// NOP in case no saturation clamping is needed.
     /// </summary>
-    template <ComplexOrNumber TTarget>
+    template <Number TTarget>
     DEVICE_CODE void ClampToTargetType() noexcept
         requires(!need_saturation_clamp_v<T, TTarget>)
     {
@@ -2884,7 +2786,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise minimum
     /// </summary>
     DEVICE_CODE void Min(const Vector4<T> &aRight)
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeNumber<T>
     {
         x = min(x, aRight.x);
         y = min(y, aRight.y);
@@ -2896,7 +2798,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise minimum (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void Min(const Vector2<T> &aOther)
-        requires isSameType<T, sbyte> && CUDA_ONLY<T> && NativeType<T> && EnableSIMD<T>
+        requires IsSByte<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         *this = FromUint(__vmins4(*this, aOther));
     }
@@ -2905,7 +2807,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise minimum (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void Min(const Vector2<T> &aOther)
-        requires isSameType<T, byte> && CUDA_ONLY<T> && NativeType<T> && EnableSIMD<T>
+        requires IsByte<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         *this = FromUint(__vminu4(*this, aOther));
     }
@@ -2914,7 +2816,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise minimum (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void Min(const Vector4<T> &aOther)
-        requires isSameType<T, short> && CUDA_ONLY<T> && NativeType<T> && EnableSIMD<T>
+        requires IsShort<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         const uint *otherPtr = reinterpret_cast<const uint *>(&aOther);
         uint *resPtr         = reinterpret_cast<uint *>(this);
@@ -2926,7 +2828,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise minimum (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void Min(const Vector4<T> &aOther)
-        requires isSameType<T, ushort> && CUDA_ONLY<T> && NativeType<T> && EnableSIMD<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         const uint *otherPtr = reinterpret_cast<const uint *>(&aOther);
         uint *resPtr         = reinterpret_cast<uint *>(this);
@@ -2962,7 +2864,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise minimum
     /// </summary>
     void Min(const Vector4<T> &aRight)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         x = std::min(x, aRight.x);
         y = std::min(y, aRight.y);
@@ -2974,7 +2876,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise minimum
     /// </summary>
     DEVICE_CODE void Min(const Vector4<T> &aRight)
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         x.Min(aRight.x);
         y.Min(aRight.y);
@@ -2986,7 +2888,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise minimum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Min(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeNumber<T>
     {
         return Vector4<T>{T(min(aLeft.x, aRight.x)), T(min(aLeft.y, aRight.y)), T(min(aLeft.z, aRight.z)),
                           T(min(aLeft.w, aRight.w))};
@@ -2996,7 +2898,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise minimum (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<T> Min(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, sbyte> && NativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsSByte<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromUint(__vmins4(aLeft, aRight));
     }
@@ -3005,7 +2907,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise minimum (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<T> Min(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, byte> && NativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsByte<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromUint(__vminu4(aLeft, aRight));
     }
@@ -3014,7 +2916,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise minimum (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<T> Min(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, short> && NativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(&aLeft);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aRight);
@@ -3029,7 +2931,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise minimum (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<T> Min(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, ushort> && NativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(&aLeft);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aRight);
@@ -3074,7 +2976,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise minimum
     /// </summary>
     [[nodiscard]] static Vector4<T> Min(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         return Vector4<T>{std::min(aLeft.x, aRight.x), std::min(aLeft.y, aRight.y), std::min(aLeft.z, aRight.z),
                           std::min(aLeft.w, aRight.w)};
@@ -3084,7 +2986,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise minimum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Min(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         return Vector4<T>{T::Min(aLeft.x, aRight.x), T::Min(aLeft.y, aRight.y), T::Min(aLeft.z, aRight.z),
                           T::Min(aLeft.w, aRight.w)};
@@ -3094,7 +2996,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns the minimum component of the vector
     /// </summary>
     DEVICE_CODE [[nodiscard]] T Min() const
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeNumber<T>
     {
         return min(min(x, y), min(z, w));
     }
@@ -3103,7 +3005,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns the minimum component of the vector
     /// </summary>
     DEVICE_CODE [[nodiscard]] T Min() const
-        requires DeviceCode<T> && NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         return T::Min(T::Min(x, y), T::Min(z, w));
     }
@@ -3112,7 +3014,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns the minimum component of the vector
     /// </summary>
     [[nodiscard]] T Min() const
-        requires HostCode<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         return std::min({x, y, z, w});
     }
@@ -3123,7 +3025,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise maximum
     /// </summary>
     DEVICE_CODE void Max(const Vector4<T> &aRight)
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeNumber<T>
     {
         x = max(x, aRight.x);
         y = max(y, aRight.y);
@@ -3135,7 +3037,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise maximum (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void Max(const Vector2<T> &aOther)
-        requires isSameType<T, sbyte> && NativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsSByte<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromUint(__vmaxs4(*this, aOther));
     }
@@ -3144,7 +3046,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise maximum (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void Max(const Vector2<T> &aOther)
-        requires isSameType<T, byte> && NativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsByte<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromUint(__vmaxu4(*this, aOther));
     }
@@ -3153,7 +3055,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise maximum (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void Max(const Vector4<T> &aOther)
-        requires isSameType<T, short> && NativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *otherPtr = reinterpret_cast<const uint *>(&aOther);
         uint *resPtr         = reinterpret_cast<uint *>(this);
@@ -3165,7 +3067,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise maximum (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE void Max(const Vector4<T> &aOther)
-        requires isSameType<T, ushort> && NativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *otherPtr = reinterpret_cast<const uint *>(&aOther);
         uint *resPtr         = reinterpret_cast<uint *>(this);
@@ -3201,7 +3103,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise maximum
     /// </summary>
     void Max(const Vector4<T> &aRight)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         x = std::max(x, aRight.x);
         y = std::max(y, aRight.y);
@@ -3213,7 +3115,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise maximum
     /// </summary>
     DEVICE_CODE void Max(const Vector4<T> &aRight)
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         x.Max(aRight.x);
         y.Max(aRight.y);
@@ -3225,7 +3127,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise maximum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Max(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeNumber<T>
     {
         return Vector4<T>{T(max(aLeft.x, aRight.x)), T(max(aLeft.y, aRight.y)), T(max(aLeft.z, aRight.z)),
                           T(max(aLeft.w, aRight.w))};
@@ -3235,7 +3137,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise maximum (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<T> Max(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, sbyte> && NativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsSByte<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromUint(__vmaxs4(aLeft, aRight));
     }
@@ -3244,7 +3146,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise maximum (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<T> Max(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, byte> && NativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsByte<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromUint(__vmaxu4(aLeft, aRight));
     }
@@ -3253,7 +3155,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise maximum (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<T> Max(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, short> && NativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsShort<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(&aLeft);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aRight);
@@ -3268,7 +3170,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise maximum (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<T> Max(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, ushort> && NativeType<T> && CUDA_ONLY<T> && EnableSIMD<T>
+        requires IsUShort<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(&aLeft);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aRight);
@@ -3313,7 +3215,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise maximum
     /// </summary>
     [[nodiscard]] static Vector4<T> Max(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires HostCode<T> && NativeType<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         return Vector4<T>{std::max(aLeft.x, aRight.x), std::max(aLeft.y, aRight.y), std::max(aLeft.z, aRight.z),
                           std::max(aLeft.w, aRight.w)};
@@ -3323,7 +3225,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise maximum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Max(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         return Vector4<T>{T::Max(aLeft.x, aRight.x), T::Max(aLeft.y, aRight.y), T::Max(aLeft.z, aRight.z),
                           T::Max(aLeft.w, aRight.w)};
@@ -3333,7 +3235,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns the maximum component of the vector
     /// </summary>
     DEVICE_CODE [[nodiscard]] T Max() const
-        requires DeviceCode<T> && NativeType<T>
+        requires DeviceCode<T> && NativeNumber<T>
     {
         return max(max(x, y), max(z, w));
     }
@@ -3342,7 +3244,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns the maximum component of the vector
     /// </summary>
     DEVICE_CODE [[nodiscard]] T Max() const
-        requires DeviceCode<T> && NonNativeType<T>
+        requires NonNativeNumber<T>
     {
         return T::Max(T::Max(x, y), T::Max(z, w));
     }
@@ -3351,7 +3253,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns the maximum component of the vector
     /// </summary>
     [[nodiscard]] T Max() const
-        requires HostCode<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         return std::max({x, y, z, w});
     }
@@ -3362,7 +3264,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise round()
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Round(const Vector4<T> &aValue)
-        requires FloatingPoint<T>
+        requires RealOrComplexFloatingPoint<T>
     {
         Vector4<T> ret = aValue;
         ret.Round();
@@ -3370,21 +3272,10 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     }
 
     /// <summary>
-    /// Element wise round() and return as integer
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector4<int> RoundI(const Vector4<T> &aValue)
-        requires FloatingPoint<T>
-    {
-        Vector4<T> ret = aValue;
-        ret.Round();
-        return Vector4<int>(ret);
-    }
-
-    /// <summary>
     /// Element wise round()
     /// </summary>
     DEVICE_CODE void Round()
-        requires FloatingComplexType<T>
+        requires NonNativeFloatingPoint<T>
     {
         x.Round();
         y.Round();
@@ -3417,37 +3308,14 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     }
 
     /// <summary>
-    /// Element wise round()
-    /// </summary>
-    DEVICE_ONLY_CODE void Round()
-        requires NonNativeType<T>
-    {
-        x.Round();
-        y.Round();
-        z.Round();
-        w.Round();
-    }
-
-    /// <summary>
     /// Element wise floor()
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Floor(const Vector4<T> &aValue)
-        requires FloatingPoint<T>
+        requires RealOrComplexFloatingPoint<T>
     {
         Vector4<T> ret = aValue;
         ret.Floor();
         return ret;
-    }
-
-    /// <summary>
-    /// Element wise floor() and return as integer
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector4<int> FloorI(const Vector4<T> &aValue)
-        requires FloatingPoint<T>
-    {
-        Vector4<T> ret = aValue;
-        ret.Floor();
-        return Vector4<int>(ret);
     }
 
     /// <summary>
@@ -3500,7 +3368,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise floor()
     /// </summary>
     void Floor()
-        requires NonNativeType<T> && HostCode<T>
+        requires NonNativeFloatingPoint<T>
     {
         x.Floor();
         y.Floor();
@@ -3512,22 +3380,11 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise ceil()
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Ceil(const Vector4<T> &aValue)
-        requires FloatingPoint<T>
+        requires RealOrComplexFloatingPoint<T>
     {
         Vector4<T> ret = aValue;
         ret.Ceil();
         return ret;
-    }
-
-    /// <summary>
-    /// Element wise ceil() and return as integer
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector4<int> CeilI(const Vector4<T> &aValue)
-        requires FloatingPoint<T>
-    {
-        Vector4<T> ret = aValue;
-        ret.Ceil();
-        return Vector4<int>(ret);
     }
 
     /// <summary>
@@ -3580,7 +3437,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise ceil()
     /// </summary>
     void Ceil()
-        requires NonNativeType<T> && HostCode<T>
+        requires NonNativeFloatingPoint<T>
     {
         x.Ceil();
         y.Ceil();
@@ -3593,7 +3450,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Note: the host function assumes that current rounding mode is set to FE_TONEAREST
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> RoundNearest(const Vector4<T> &aValue)
-        requires FloatingPoint<T>
+        requires RealOrComplexFloatingPoint<T>
     {
         Vector4<T> ret = aValue;
         ret.RoundNearest();
@@ -3651,7 +3508,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise round nearest ties to even
     /// </summary>
     void RoundNearest()
-        requires NonNativeType<T> && HostCode<T>
+        requires NonNativeFloatingPoint<T>
     {
         x.RoundNearest();
         y.RoundNearest();
@@ -3663,7 +3520,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise round toward zero
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> RoundZero(const Vector4<T> &aValue)
-        requires FloatingPoint<T>
+        requires RealOrComplexFloatingPoint<T>
     {
         Vector4<T> ret = aValue;
         ret.RoundZero();
@@ -3674,7 +3531,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise round toward zero
     /// </summary>
     DEVICE_CODE void RoundZero()
-        requires DeviceCode<T> && FloatingPoint<T>
+        requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         x = __float2int_rz(x);
         y = __float2int_rz(y);
@@ -3720,7 +3577,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise round toward zero
     /// </summary>
     void RoundZero()
-        requires NonNativeType<T> && HostCode<T>
+        requires NonNativeFloatingPoint<T>
     {
         x.RoundZero();
         y.RoundZero();
@@ -3747,6 +3604,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison greater or equal, returns 0xFF per element for true, 0x00 for false
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<byte> CompareGE(const Vector4<T> &aLeft, const Vector4<T> &aRight)
+        requires RealNumber<T>
     {
         Vector4<byte> ret;
         ret.x = byte(aLeft.x >= aRight.x) * TRUE_VALUE;
@@ -3760,6 +3618,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison greater than, returns 0xFF per element for true, 0x00 for false
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<byte> CompareGT(const Vector4<T> &aLeft, const Vector4<T> &aRight)
+        requires RealNumber<T>
     {
         Vector4<byte> ret;
         ret.x = byte(aLeft.x > aRight.x) * TRUE_VALUE;
@@ -3773,6 +3632,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison less or equal, returns 0xFF per element for true, 0x00 for false
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<byte> CompareLE(const Vector4<T> &aLeft, const Vector4<T> &aRight)
+        requires RealNumber<T>
     {
         Vector4<byte> ret;
         ret.x = byte(aLeft.x <= aRight.x) * TRUE_VALUE;
@@ -3786,6 +3646,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison less than, returns 0xFF per element for true, 0x00 for false
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<byte> CompareLT(const Vector4<T> &aLeft, const Vector4<T> &aRight)
+        requires RealNumber<T>
     {
         Vector4<byte> ret;
         ret.x = byte(aLeft.x < aRight.x) * TRUE_VALUE;
@@ -3812,7 +3673,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison equal, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareEQ(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, byte> && CUDA_ONLY<T>
+        requires IsByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return Vector4<byte>::FromUint(__vcmpeq4(aLeft, aRight));
     }
@@ -3821,7 +3682,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison greater or equal, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareGE(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, byte> && CUDA_ONLY<T>
+        requires IsByte<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return Vector4<byte>::FromUint(__vcmpgeu4(aLeft, aRight));
     }
@@ -3830,7 +3691,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison greater than, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareGT(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, byte> && CUDA_ONLY<T>
+        requires IsByte<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return Vector4<byte>::FromUint(__vcmpgtu4(aLeft, aRight));
     }
@@ -3839,7 +3700,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison less or equal, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareLE(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, byte> && CUDA_ONLY<T>
+        requires IsByte<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return Vector4<byte>::FromUint(__vcmpleu4(aLeft, aRight));
     }
@@ -3848,7 +3709,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison less than, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareLT(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, byte> && CUDA_ONLY<T>
+        requires IsByte<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return Vector4<byte>::FromUint(__vcmpltu4(aLeft, aRight));
     }
@@ -3857,7 +3718,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison not equal, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareNEQ(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, byte> && CUDA_ONLY<T>
+        requires IsByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return Vector4<byte>::FromUint(__vcmpne4(aLeft, aRight));
     }
@@ -3866,7 +3727,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison equal, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareEQ(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, sbyte> && CUDA_ONLY<T>
+        requires IsSByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return Vector4<byte>::FromUint(__vcmpeq4(aLeft, aRight));
     }
@@ -3875,7 +3736,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison greater or equal, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareGE(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, sbyte> && CUDA_ONLY<T>
+        requires IsSByte<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return Vector4<byte>::FromUint(__vcmpges4(aLeft, aRight));
     }
@@ -3884,7 +3745,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison greater than, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareGT(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, sbyte> && CUDA_ONLY<T>
+        requires IsSByte<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return Vector4<byte>::FromUint(__vcmpgts4(aLeft, aRight));
     }
@@ -3893,7 +3754,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison less or equal, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareLE(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, sbyte> && CUDA_ONLY<T>
+        requires IsSByte<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return Vector4<byte>::FromUint(__vcmples4(aLeft, aRight));
     }
@@ -3902,7 +3763,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison less than, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareLT(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, sbyte> && CUDA_ONLY<T>
+        requires IsSByte<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return Vector4<byte>::FromUint(__vcmplts4(aLeft, aRight));
     }
@@ -3911,7 +3772,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison not equal, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareNEQ(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, sbyte> && CUDA_ONLY<T>
+        requires IsSByte<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return Vector4<byte>::FromUint(__vcmpne4(aLeft, aRight));
     }
@@ -3920,7 +3781,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison equal, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareEQ(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, short> && CUDA_ONLY<T>
+        requires IsShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(&aLeft);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aRight);
@@ -3931,7 +3792,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison greater or equal, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareGE(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, short> && CUDA_ONLY<T>
+        requires IsShort<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(&aLeft);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aRight);
@@ -3942,7 +3803,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison greater than, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareGT(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, short> && CUDA_ONLY<T>
+        requires IsShort<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(&aLeft);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aRight);
@@ -3953,7 +3814,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison less or equal, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareLE(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, short> && CUDA_ONLY<T>
+        requires IsShort<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(&aLeft);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aRight);
@@ -3964,7 +3825,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison less than, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareLT(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, short> && CUDA_ONLY<T>
+        requires IsShort<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(&aLeft);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aRight);
@@ -3975,7 +3836,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison not equal, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareNEQ(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, short> && CUDA_ONLY<T>
+        requires IsShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(&aLeft);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aRight);
@@ -3986,7 +3847,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison equal, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareEQ(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, ushort> && CUDA_ONLY<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(&aLeft);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aRight);
@@ -3997,7 +3858,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison greater or equal, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareGE(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, ushort> && CUDA_ONLY<T>
+        requires IsUShort<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(&aLeft);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aRight);
@@ -4008,7 +3869,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison greater than, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareGT(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, ushort> && CUDA_ONLY<T>
+        requires IsUShort<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(&aLeft);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aRight);
@@ -4019,7 +3880,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison less or equal, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareLE(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, ushort> && CUDA_ONLY<T>
+        requires IsUShort<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(&aLeft);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aRight);
@@ -4030,7 +3891,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison less than, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareLT(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, ushort> && CUDA_ONLY<T>
+        requires IsUShort<T> && RealNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(&aLeft);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aRight);
@@ -4041,7 +3902,7 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise comparison not equal, returns 0xFF per element for true, 0x00 for false (SIMD)
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] static Vector4<byte> CompareNEQ(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires isSameType<T, ushort> && CUDA_ONLY<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         const uint *leftPtr  = reinterpret_cast<const uint *>(&aLeft);
         const uint *rightPtr = reinterpret_cast<const uint *>(&aRight);
@@ -4243,50 +4104,50 @@ template <ComplexOrNumber T> struct alignas(4 * sizeof(T)) Vector4
 
 template <typename T, typename T2>
 DEVICE_CODE Vector4<T> operator+(const Vector4<T> &aLeft, T2 aRight)
-    requires ComplexOrNumber<T2>
+    requires Number<T2>
 {
     return Vector4<T>{T(aLeft.x + aRight), T(aLeft.y + aRight), T(aLeft.z + aRight), T(aLeft.w + aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector4<T> operator+(T2 aLeft, const Vector4<T> &aRight)
-    requires ComplexOrNumber<T2>
+    requires Number<T2>
 {
     return Vector4<T>{T(aLeft + aRight.x), T(aLeft + aRight.y), T(aLeft + aRight.z), T(aLeft + aRight.w)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector4<T> operator-(const Vector4<T> &aLeft, T2 aRight)
-    requires ComplexOrNumber<T2>
+    requires Number<T2>
 {
     return Vector4<T>{T(aLeft.x - aRight), T(aLeft.y - aRight), T(aLeft.z - aRight), T(aLeft.w - aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector4<T> operator-(T2 aLeft, const Vector4<T> &aRight)
-    requires ComplexOrNumber<T2>
+    requires Number<T2>
 {
     return Vector4<T>{T(aLeft - aRight.x), T(aLeft - aRight.y), T(aLeft - aRight.z), T(aLeft - aRight.w)};
 }
 
 template <typename T, typename T2>
 DEVICE_CODE Vector4<T> operator*(const Vector4<T> &aLeft, T2 aRight)
-    requires ComplexOrNumber<T2>
+    requires Number<T2>
 {
     return Vector4<T>{T(aLeft.x * aRight), T(aLeft.y * aRight), T(aLeft.z * aRight), T(aLeft.w * aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector4<T> operator*(T2 aLeft, const Vector4<T> &aRight)
-    requires ComplexOrNumber<T2>
+    requires Number<T2>
 {
     return Vector4<T>{T(aLeft * aRight.x), T(aLeft * aRight.y), T(aLeft * aRight.z), T(aLeft * aRight.w)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector4<T> operator/(const Vector4<T> &aLeft, T2 aRight)
-    requires ComplexOrNumber<T2>
+    requires Number<T2>
 {
     return Vector4<T>{T(aLeft.x / aRight), T(aLeft.y / aRight), T(aLeft.z / aRight), T(aLeft.w / aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector4<T> operator/(T2 aLeft, const Vector4<T> &aRight)
-    requires ComplexOrNumber<T2>
+    requires Number<T2>
 {
     return Vector4<T>{T(aLeft / aRight.x), T(aLeft / aRight.y), T(aLeft / aRight.z), T(aLeft / aRight.w)};
 }

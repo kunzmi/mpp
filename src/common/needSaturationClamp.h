@@ -1,6 +1,6 @@
 #pragma once
 #include "defines.h"
-#include "limits.h"
+#include "numeric_limits.h"
 #include <type_traits>
 
 // define which type conversion from->to need value clamping. E.g. an integer of value 1024 cannot be stored in byte and

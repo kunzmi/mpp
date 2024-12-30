@@ -159,63 +159,6 @@ concept DeviceCode = DEVICE_COMPILER<T>;
 template <typename T>
 concept HostAndDeviceCode = HOST_COMPILER<T> || DEVICE_COMPILER<T>;
 
-// forward declaration for HalfFp16 and BFloat16
-class HalfFp16;
-class BFloat16;
-
-// Define our own FP concept as HalfFp16 and BFloat16 are not part of std::floating_point and we don't want to modify
-// std namespace
-template <typename T>
-concept FloatingPoint = std::floating_point<T> || std::same_as<T, HalfFp16> || std::same_as<T, BFloat16>;
-
-// Floating point number of native type, i.e. float or double, but no HalfFp16, BFloat16 etc.
-template <typename T>
-concept NativeFloatingPoint = std::floating_point<T>;
-
-// Define our own integral concept, who knows, maybe some future new int types... int4?
-template <typename T>
-concept Integral = std::integral<T>;
-
-// Integer number of native type, i.e. int, short, ushort etc, but not Int4 etc.
-template <typename T>
-concept NativeIntegral = std::integral<T>;
-
-// all supported native signed integer types
-template <typename T>
-concept SignedIntegral = std::signed_integral<T>;
-
-// all supported native unsigned integer types
-template <typename T>
-concept UnsignedIntegral = std::unsigned_integral<T>;
-
-// all supported number formats: floating point and integral types
-template <typename T>
-concept Number = FloatingPoint<T> || Integral<T>;
-
-// all supported native number formats: floating point and integral types but not fp16, int4 etc
-template <typename T>
-concept NativeNumber = NativeFloatingPoint<T> || NativeIntegral<T>;
-
-// floating point and signed integral types
-template <typename T>
-concept SignedNumber = FloatingPoint<T> || SignedIntegral<T>;
-
-// All types that are non native C++ types, currently HalfFp16 and BFloat16
-template <typename T>
-concept NonNativeType = std::same_as<T, HalfFp16> || std::same_as<T, BFloat16>;
-
-// All types that are native C++ types, all but HalfFp16 and BFloat16
-template <typename T>
-concept NativeType = !NonNativeType<T>;
-
-// Is of type BFloat16
-template <typename T>
-concept IsBFloat16 = std::same_as<T, BFloat16>;
-
-// Is of type HalfFp16
-template <typename T>
-concept IsHalfFp16 = std::same_as<T, HalfFp16>;
-
 // T is sizeof 1 byte
 template <typename T>
 concept ByteSizeType = sizeof(T) == 1;

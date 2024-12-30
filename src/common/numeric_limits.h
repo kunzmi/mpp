@@ -338,4 +338,109 @@ template <> struct numeric_limits<BFloat16>
     }
 };
 
+// numeric limits when converting from one type to another, especially 16-Bit floats have some restrictions
+template <typename TFrom, typename TTo> struct numeric_limits_conversion
+{
+    [[nodiscard]] static constexpr DEVICE_CODE TFrom min() noexcept
+    {
+        return static_cast<TFrom>(numeric_limits<TTo>::min());
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE TFrom max() noexcept
+    {
+        return static_cast<TFrom>(numeric_limits<TTo>::max());
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE TFrom lowest() noexcept
+    {
+        return static_cast<TFrom>(numeric_limits<TTo>::lowest());
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE TFrom minExact() noexcept
+    {
+        return static_cast<TFrom>(numeric_limits<TTo>::minExact());
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE TFrom maxExact() noexcept
+    {
+        return static_cast<TFrom>(numeric_limits<TTo>::maxExact());
+    }
+};
+
+template <> struct numeric_limits_conversion<BFloat16, short>
+{
+    [[nodiscard]] static constexpr DEVICE_CODE short min() noexcept
+    {
+        return static_cast<BFloat16>(numeric_limits<short>::min());
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE short max() noexcept
+    {
+        // special case for half floats: the maximum value of short is slightly smaller than the closest exact
+        // integer in BFloat16, and as we use round to nearest, the clamping would result in a too large number.
+        // Thus for BFloat16 and short, we clamp to the next integer smaller than short::max(), i.e. 32640
+        return BFloat16::FromUShort(0x46FF); // = 32640
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE short lowest() noexcept
+    {
+        return static_cast<BFloat16>(numeric_limits<short>::lowest());
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE short minExact() noexcept
+    {
+        return static_cast<BFloat16>(numeric_limits<short>::minExact());
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE short maxExact() noexcept
+    {
+        return static_cast<BFloat16>(numeric_limits<short>::maxExact());
+    }
+};
+
+template <> struct numeric_limits_conversion<BFloat16, ushort>
+{
+    [[nodiscard]] static constexpr DEVICE_CODE ushort min() noexcept
+    {
+        return static_cast<BFloat16>(numeric_limits<ushort>::min());
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE ushort max() noexcept
+    {
+        // special case for half floats: the maximum value of ushort is slightly smaller than the closest exact
+        // integer in BFloat16, and as we use round to nearest, the clamping would result in a too large number.
+        // Thus for BFloat16 and short, we clamp to the next integer smaller than ushort::max(), i.e. 65280
+        return BFloat16::FromUShort(0x477f); // = 65280
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE ushort lowest() noexcept
+    {
+        return static_cast<BFloat16>(numeric_limits<ushort>::lowest());
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE ushort minExact() noexcept
+    {
+        return static_cast<BFloat16>(numeric_limits<ushort>::minExact());
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE ushort maxExact() noexcept
+    {
+        return static_cast<BFloat16>(numeric_limits<ushort>::maxExact());
+    }
+};
+
+template <> struct numeric_limits_conversion<HalfFp16, short>
+{
+    [[nodiscard]] static constexpr DEVICE_CODE short min() noexcept
+    {
+        return static_cast<HalfFp16>(numeric_limits<short>::min());
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE short max() noexcept
+    {
+        // special case for half floats: the maximum value of short is slightly larger than the closest exact
+        // integer in HalfFp16, and as we use round to nearest, the clamping would result in a too large number.
+        // Thus for HalfFp16 and short, we clamp to the exact integer smaller than short::max(), i.e. 32752
+        return HalfFp16::FromUShort(0x77FF); // = 32752
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE short lowest() noexcept
+    {
+        return static_cast<HalfFp16>(numeric_limits<short>::lowest());
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE short minExact() noexcept
+    {
+        return static_cast<HalfFp16>(numeric_limits<short>::minExact());
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE short maxExact() noexcept
+    {
+        return static_cast<HalfFp16>(numeric_limits<short>::maxExact());
+    }
+};
 } // namespace opp

@@ -2,7 +2,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <common/defines.h>
 #include <common/image/pixelTypes.h>
-#include <common/limits.h>
+#include <common/numeric_limits.h>
 #include <common/safeCast.h>
 #include <common/vectorTypes.h>
 #include <cstddef>

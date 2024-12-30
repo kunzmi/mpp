@@ -213,7 +213,7 @@ template <typename T> using pixel_basetype_t = typename pixel_basetype<T>::type;
 template <typename T>
 concept PixelType = channel_count<T>::value > 0 && channel_count<T>::value <= 4;
 
-template <VectorOrComplexType T> struct default_compute_type_for
+template <typename T> struct default_compute_type_for
 {
     using type = void;
 };
@@ -1237,7 +1237,7 @@ constexpr size_t GetPixelSizeInBytes(PixelTypeEnum aPixelType)
     }
 }
 
-template <VectorOrComplexType T> struct pixel_type_name
+template <typename T> struct pixel_type_name
 {
     static constexpr char value[] = "Unknown";
 };

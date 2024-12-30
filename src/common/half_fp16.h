@@ -98,7 +98,8 @@ class alignas(2) HalfFp16
 
 #ifdef IS_CUDA_COMPILER
     // despite being in a "IS_CUDA_COMPILER" section, we mark it as DEVICE_CODE, i.e. including __host__ annotation so
-    // that we can use DEVICE_CODE later in calling functions, like in limits.h which then avoids endles #ifdef switches
+    // that we can use DEVICE_CODE later in calling functions, like in numeric_limits.h which then avoids endles #ifdef
+    // switches
     DEVICE_CODE [[nodiscard]] inline constexpr static HalfFp16 FromUShort(ushort aUShort)
     {
         HalfFp16 ret;
