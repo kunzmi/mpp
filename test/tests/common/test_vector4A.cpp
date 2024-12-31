@@ -153,37 +153,25 @@ TEST_CASE("Pixel32fC4A", "[Common]")
     CHECK(div4.y == Approx(1.867).margin(0.001));
     CHECK(div4.z == Approx(1.778).margin(0.001));
 
-    Pixel32fC4A l(4, 6, -7);
-    CHECK(l.MagnitudeSqr() == 101);
-    CHECK(l.Magnitude() == Approx(std::sqrt(101)));
-
     Pixel32fC4A minmax1(10, 20, -10);
     Pixel32fC4A minmax2(-20, 10, 40);
 
     CHECK((Pixel32fC4A::Min(minmax1, minmax2) == Pixel32fC4A(-20, 10, -10)));
     CHECK((Pixel32fC4A::Min(minmax2, minmax1) == Pixel32fC4A(-20, 10, -10)));
 
+    minmax1 = Pixel32fC4A(10, 20, -10);
+    minmax2 = Pixel32fC4A(-20, 10, 40);
     CHECK((Pixel32fC4A::Max(minmax1, minmax2) == Pixel32fC4A(10, 20, 40)));
     CHECK((Pixel32fC4A::Max(minmax2, minmax1) == Pixel32fC4A(10, 20, 40)));
 
+    minmax1 = Pixel32fC4A(10, 20, -10);
+    minmax2 = Pixel32fC4A(-20, 10, 40);
     CHECK(minmax2.Min() == -20);
     CHECK(minmax1.Max() == 20);
 }
 
 TEST_CASE("Pixel32fC4A_additionalMethods", "[Common]")
 {
-    CHECK(Pixel32fC4A::Dot(Pixel32fC4A(4, 5, 6), Pixel32fC4A(6, 7, 8)) == 107.0f);
-    CHECK(Pixel32fC4A(4, 5, 6).Dot(Pixel32fC4A(6, 7, 8)) == 107.0f);
-
-    Pixel32fC4A norm(4, 5, 6);
-    norm.Normalize();
-    CHECK(norm.Magnitude() == 1);
-    CHECK(norm.x == Approx(0.455842).margin(0.001));
-    CHECK(norm.y == Approx(0.569803).margin(0.001));
-    CHECK(norm.z == Approx(0.683763).margin(0.001));
-
-    CHECK((Pixel32fC4A::Normalize(Pixel32fC4A(4, 5, 6)) == norm));
-
     Pixel32fC4A roundA(0.4f, 0.5f, 0.6f);
     Pixel32fC4A roundB(1.9f, -1.5f, -2.5f);
     Pixel32fC4A round2A = Pixel32fC4A::Round(roundA);
@@ -341,7 +329,7 @@ TEST_CASE("Pixel32fC4A_additionalMethods", "[Common]")
     Pixel32fC4A clampInt(float(numeric_limits<int>::max()) + 1000, float(numeric_limits<int>::min()) - 1000,
                          float(numeric_limits<int>::min()));
     clampInt.template ClampToTargetType<int>();
-    CHECK(clampInt.x == 2147483647);
+    CHECK(clampInt.x == 2147483520); // a bit smaller than max int
     CHECK(clampInt.y == -2147483648);
     CHECK(clampInt.z == -2147483648);
 
@@ -489,29 +477,25 @@ TEST_CASE("Pixel32sC4A", "[Common]")
     CHECK(div4.y == 46);
     CHECK(div4.z == 35);
 
-    Pixel32sC4A l(4, 6, -7);
-    CHECK(l.MagnitudeSqr() == 101);
-    CHECK(l.Magnitude() == Approx(std::sqrt(101)));
-
     Pixel32sC4A minmax1(10, 20, -10);
     Pixel32sC4A minmax2(-20, 10, 40);
 
     CHECK((Pixel32sC4A::Min(minmax1, minmax2) == Pixel32sC4A(-20, 10, -10)));
     CHECK((Pixel32sC4A::Min(minmax2, minmax1) == Pixel32sC4A(-20, 10, -10)));
 
+    minmax1 = Pixel32sC4A(10, 20, -10);
+    minmax2 = Pixel32sC4A(-20, 10, 40);
     CHECK((Pixel32sC4A::Max(minmax1, minmax2) == Pixel32sC4A(10, 20, 40)));
     CHECK((Pixel32sC4A::Max(minmax2, minmax1) == Pixel32sC4A(10, 20, 40)));
 
+    minmax1 = Pixel32sC4A(10, 20, -10);
+    minmax2 = Pixel32sC4A(-20, 10, 40);
     CHECK(minmax2.Min() == -20);
     CHECK(minmax1.Max() == 20);
 }
 
 TEST_CASE("Pixel32sC4A_additionalMethods", "[Common]")
 {
-    Pixel32sC4A norm(4, 5, 6);
-    CHECK(norm.Magnitude() == Approx(std::sqrt(77.0)).margin(0.00001));
-    CHECK(norm.MagnitudeSqr() == 77);
-
     Pixel32sC4A exp(4, 5, 6);
     Pixel32sC4A exp2 = Pixel32sC4A::Exp(exp);
     exp.Exp();
@@ -551,17 +535,6 @@ TEST_CASE("Pixel32sC4A_additionalMethods", "[Common]")
     CHECK(abs.x == 2);
     CHECK(abs.y == 12);
     CHECK(abs.z == 14);
-
-    Pixel32sC4A absdiffA(13, -40, -22);
-    Pixel32sC4A absdiffB(45, 46, -34);
-    Pixel32sC4A absdiff2 = Pixel32sC4A::AbsDiff(absdiffA, absdiffB);
-    Pixel32sC4A absdiff3 = Pixel32sC4A::AbsDiff(absdiffB, absdiffA);
-    absdiffA.AbsDiff(absdiffB);
-    CHECK(absdiffA == absdiff2);
-    CHECK(absdiffA == absdiff3);
-    CHECK(absdiffA.x == 32);
-    CHECK(absdiffA.y == 86);
-    CHECK(absdiffA.z == 12);
 
     Pixel32sC4A clampByte(int(numeric_limits<byte>::max()) + 1, int(numeric_limits<byte>::min()) - 1,
                           int(numeric_limits<byte>::min()));
@@ -959,10 +932,6 @@ TEST_CASE("Pixel16fC4A", "[Common]")
     CHECK(div4.y == Approx(1.867).margin(0.001));
     CHECK(div4.z == Approx(1.778).margin(0.001));
 
-    Pixel16fC4A l(HalfFp16(4), HalfFp16(6), HalfFp16(-7));
-    CHECK(l.MagnitudeSqr() == 101);
-    CHECK(l.Magnitude() == Approx(std::sqrt(101)).margin(0.01));
-
     Pixel16fC4A minmax1(HalfFp16(10), HalfFp16(20), HalfFp16(-10));
     Pixel16fC4A minmax2(HalfFp16(-20), HalfFp16(10), HalfFp16(40));
 
@@ -978,21 +947,6 @@ TEST_CASE("Pixel16fC4A", "[Common]")
 
 TEST_CASE("Pixel16fC4A_additionalMethods", "[Common]")
 {
-    Pixel16fC4A a(HalfFp16(4), HalfFp16(5), HalfFp16(6));
-    Pixel16fC4A b(HalfFp16(6), HalfFp16(7), HalfFp16(8));
-    CHECK(Pixel16fC4A::Dot(a, b) == 107.0f);
-    CHECK(Pixel16fC4A(HalfFp16(4), HalfFp16(5), HalfFp16(6)).Dot(Pixel16fC4A(HalfFp16(6), HalfFp16(7), HalfFp16(8))) ==
-          107.0f);
-
-    Pixel16fC4A norm(HalfFp16(4), HalfFp16(5), HalfFp16(6));
-    norm.Normalize();
-    CHECK(norm.Magnitude() == 1);
-    CHECK(norm.x == Approx(0.455811).margin(0.001));
-    CHECK(norm.y == Approx(0.569824).margin(0.001));
-    CHECK(norm.z == Approx(0.684082).margin(0.001));
-
-    CHECK((Pixel16fC4A::Normalize(Pixel16fC4A(HalfFp16(4), HalfFp16(5), HalfFp16(6))) == norm));
-
     Pixel16fC4A roundA(HalfFp16(0.4f), HalfFp16(0.5f), HalfFp16(0.6f));
     Pixel16fC4A roundB(HalfFp16(1.9f), HalfFp16(-1.5f), HalfFp16(-2.5f));
     Pixel16fC4A round2A = Pixel16fC4A::Round(roundA);

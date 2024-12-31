@@ -30,7 +30,7 @@ class AffineTransformation;
 /// A 3x3 matrix for general computation
 /// Inner storage order is row major order
 /// </summary>
-template <FloatingPoint T> class Matrix
+template <RealFloatingPoint T> class Matrix
 {
   private:
     static constexpr int const mCols = 3;
@@ -504,48 +504,48 @@ template <FloatingPoint T> class Matrix
     }
 };
 
-template <FloatingPoint T> Matrix<T> operator+(const Matrix<T> &aLeft, T aRight)
+template <RealFloatingPoint T> Matrix<T> operator+(const Matrix<T> &aLeft, T aRight)
 {
     Matrix ret(aLeft);
     ret += aRight;
     return ret;
 }
-template <FloatingPoint T> Matrix<T> operator+(T aLeft, const Matrix<T> &aRight)
+template <RealFloatingPoint T> Matrix<T> operator+(T aLeft, const Matrix<T> &aRight)
 {
     Matrix ret(aLeft);
     ret += aRight;
     return ret;
 }
 
-template <FloatingPoint T> Matrix<T> operator-(const Matrix<T> &aLeft, T aRight)
+template <RealFloatingPoint T> Matrix<T> operator-(const Matrix<T> &aLeft, T aRight)
 {
     Matrix ret(aLeft);
     ret -= aRight;
     return ret;
 }
 
-template <FloatingPoint T> Matrix<T> operator-(T aLeft, const Matrix<T> &aRight)
+template <RealFloatingPoint T> Matrix<T> operator-(T aLeft, const Matrix<T> &aRight)
 {
     Matrix ret(aLeft);
     ret -= aRight;
     return ret;
 }
 
-template <FloatingPoint T> Matrix<T> operator*(const Matrix<T> &aLeft, T aRight)
+template <RealFloatingPoint T> Matrix<T> operator*(const Matrix<T> &aLeft, T aRight)
 {
     Matrix ret(aLeft);
     ret *= aRight;
     return ret;
 }
 
-template <FloatingPoint T> Matrix<T> operator*(T aLeft, const Matrix<T> &aRight)
+template <RealFloatingPoint T> Matrix<T> operator*(T aLeft, const Matrix<T> &aRight)
 {
     Matrix ret(aRight);
     ret *= aLeft;
     return ret;
 }
 
-template <FloatingPoint T> Matrix<T> operator/(const Matrix<T> &aLeft, T aRight)
+template <RealFloatingPoint T> Matrix<T> operator/(const Matrix<T> &aLeft, T aRight)
 {
     Matrix ret(aLeft);
     ret *= T(1) / aRight;
@@ -556,7 +556,7 @@ template <FloatingPoint T> Matrix<T> operator/(const Matrix<T> &aLeft, T aRight)
 /// Matrix - vector multiplication <para/>
 /// assuming vector is column vector
 /// </summary>
-template <FloatingPoint T> Vector3<T> operator*(const Matrix<T> &aLeft, const Vector3<T> &aRight)
+template <RealFloatingPoint T> Vector3<T> operator*(const Matrix<T> &aLeft, const Vector3<T> &aRight)
 {
     return Vector3<T>{aLeft[0] * aRight.x + aLeft[1] * aRight.y + aLeft[2] * aRight.z,
                       aLeft[3] * aRight.x + aLeft[4] * aRight.y + aLeft[5] * aRight.z,
@@ -567,7 +567,7 @@ template <FloatingPoint T> Vector3<T> operator*(const Matrix<T> &aLeft, const Ve
 /// Vector-matrix multiplication <para/>
 /// assuming vector is row vector
 /// </summary>
-template <FloatingPoint T> Vector3<T> operator*(const Vector3<T> &aLeft, const Matrix<T> &aRight)
+template <RealFloatingPoint T> Vector3<T> operator*(const Vector3<T> &aLeft, const Matrix<T> &aRight)
 {
     return Vector3<T>{aLeft.x * aRight[0] + aLeft.y * aRight[3] + aLeft.z * aRight[6],
                       aLeft.x * aRight[1] + aLeft.y * aRight[4] + aLeft.z * aRight[7],
@@ -578,7 +578,7 @@ template <FloatingPoint T> Vector3<T> operator*(const Vector3<T> &aLeft, const M
 /// perspective transformation matrix - vector multiplication <para/>
 /// assuming vector is column vector and z element is 1
 /// </summary>
-template <FloatingPoint T> Vector2<T> operator*(const Matrix<T> &aLeft, const Vector2<T> &aRight)
+template <RealFloatingPoint T> Vector2<T> operator*(const Matrix<T> &aLeft, const Vector2<T> &aRight)
 {
     const T scaling = aLeft[6] * aRight.x + aLeft[7] * aRight.y + aLeft[8];
     // don't throw any exception in case scaling == 0, as they don't exist on GPU

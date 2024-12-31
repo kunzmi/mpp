@@ -5,6 +5,7 @@
 #include <common/defines.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
+#include <common/numberTypes.h>
 #include <common/opp_defs.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
@@ -68,8 +69,8 @@ struct SrcSrcFunctor : public ImageFunctor<false>
 
     // Case ComputeT==Floating, DstT==Integral, conversion and rounding of result
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
-        requires Integral<pixel_basetype_t<DstT>> && //
-                 FloatingPoint<pixel_basetype_t<ComputeT>>
+        requires RealOrComplexIntegral<pixel_basetype_t<DstT>> && //
+                 RealOrComplexFloatingPoint<pixel_basetype_t<ComputeT>>
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
@@ -84,8 +85,9 @@ struct SrcSrcFunctor : public ImageFunctor<false>
     // Case (ComputeT==Floating, DstT==Floating) or (ComputeT==Integral, DstT==Integral), conversion result, no rounding
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
         requires(!std::same_as<ComputeT, DstT>) &&
-                ((Integral<pixel_basetype_t<DstT>> && Integral<pixel_basetype_t<ComputeT>>) ||
-                 (FloatingPoint<pixel_basetype_t<DstT>> && FloatingPoint<pixel_basetype_t<ComputeT>>))
+                ((RealOrComplexIntegral<pixel_basetype_t<DstT>> && RealOrComplexIntegral<pixel_basetype_t<ComputeT>>) ||
+                 (RealOrComplexFloatingPoint<pixel_basetype_t<DstT>> &&
+                  RealOrComplexFloatingPoint<pixel_basetype_t<ComputeT>>))
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
@@ -127,8 +129,8 @@ struct SrcSrcFunctor : public ImageFunctor<false>
     }
 
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
-        requires Integral<pixel_basetype_t<DstT>> &&          //
-                 FloatingPoint<pixel_basetype_t<ComputeT>> && //
+        requires RealOrComplexIntegral<pixel_basetype_t<DstT>> &&          //
+                 RealOrComplexFloatingPoint<pixel_basetype_t<ComputeT>> && //
                  std::same_as<ComputeT_SIMD, voidType>
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
@@ -150,8 +152,9 @@ struct SrcSrcFunctor : public ImageFunctor<false>
 
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
         requires(!std::same_as<ComputeT, DstT>) &&
-                ((Integral<pixel_basetype_t<DstT>> && Integral<pixel_basetype_t<ComputeT>>) ||
-                 (FloatingPoint<pixel_basetype_t<DstT>> && FloatingPoint<pixel_basetype_t<ComputeT>>)) &&
+                ((RealOrComplexIntegral<pixel_basetype_t<DstT>> && RealOrComplexIntegral<pixel_basetype_t<ComputeT>>) ||
+                 (RealOrComplexFloatingPoint<pixel_basetype_t<DstT>> &&
+                  RealOrComplexFloatingPoint<pixel_basetype_t<ComputeT>>)) &&
                 std::same_as<ComputeT_SIMD, voidType>
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);

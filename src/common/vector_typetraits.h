@@ -63,22 +63,30 @@ template <typename T> struct vector_size<Vector4A<T>> : std::integral_constant<i
 template <class T> inline constexpr int vector_size_v = vector_size<T>::value;
 
 template <typename T>
-concept VectorType = (vector_size_v<T> > 0) && (vector_size_v<T> <= 4);
+concept AnyVector = (vector_size_v<T> > 0) && (vector_size_v<T> <= 4);
 
 template <typename T>
-concept IntVectorType = VectorType<T> && RealIntegral<remove_vector_t<T>>;
+concept RealVector = AnyVector<T> && RealNumber<remove_vector_t<T>>;
 
 template <typename T>
-concept SignedVectorType = VectorType<T> && RealSignedNumber<remove_vector_t<T>>;
+concept RealIntVector = AnyVector<T> && RealIntegral<remove_vector_t<T>>;
 
 template <typename T>
-concept FloatingVectorType = VectorType<T> && RealFloatingPoint<remove_vector_t<T>>;
+concept RealSignedVector = AnyVector<T> && RealSignedNumber<remove_vector_t<T>>;
 
 template <typename T>
-concept ComplexVector = VectorType<T> || ComplexNumber<remove_vector_t<T>>;
+concept RealFloatingVector = AnyVector<T> && RealFloatingPoint<remove_vector_t<T>>;
 
 template <typename T>
-concept RealOrComplexFloatingVector =
-    FloatingVectorType<T> || (ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>);
+concept ComplexVector = AnyVector<T> && ComplexNumber<remove_vector_t<T>>;
+
+template <typename T>
+concept RealOrComplexVector = AnyVector<T> && (RealNumber<remove_vector_t<T>> || ComplexNumber<remove_vector_t<T>>);
+
+template <typename T>
+concept RealOrComplexFloatingVector = RealOrComplexVector<T> && RealOrComplexFloatingPoint<remove_vector_t<T>>;
+
+template <typename T>
+concept RealOrCompleIntVector = RealOrComplexVector<T> && RealOrComplexIntegral<remove_vector_t<T>>;
 
 } // namespace opp

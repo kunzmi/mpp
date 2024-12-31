@@ -23,6 +23,8 @@ class alignas(2) BFloat16
 #ifdef IS_HOST_COMPILER
     ushort value{};
 
+    static constexpr bool BINARY = true; // additional argument for constructor to switch to binary
+
     explicit constexpr BFloat16(ushort aUShort, bool /*aBinary*/) : value(aUShort)
     {
     }
@@ -41,28 +43,28 @@ class alignas(2) BFloat16
     explicit constexpr BFloat16(float aFloat) : value(FromFloat(aFloat).value)
     {
     }
-    explicit constexpr BFloat16(sbyte aVal) : value(FromFloat(float(aVal)).value)
+    explicit constexpr BFloat16(sbyte aVal) : value(FromFloat(static_cast<float>(aVal)).value)
     {
     }
-    explicit constexpr BFloat16(byte aVal) : value(FromFloat(float(aVal)).value)
+    explicit constexpr BFloat16(byte aVal) : value(FromFloat(static_cast<float>(aVal)).value)
     {
     }
-    explicit constexpr BFloat16(short aVal) : value(FromFloat(float(aVal)).value)
+    explicit constexpr BFloat16(short aVal) : value(FromFloat(static_cast<float>(aVal)).value)
     {
     }
-    explicit constexpr BFloat16(ushort aVal) : value(FromFloat(float(aVal)).value)
+    explicit constexpr BFloat16(ushort aVal) : value(FromFloat(static_cast<float>(aVal)).value)
     {
     }
-    explicit constexpr BFloat16(int aInt) : value(FromFloat(float(aInt)).value)
+    explicit constexpr BFloat16(int aInt) : value(FromFloat(static_cast<float>(aInt)).value)
     {
     }
-    explicit constexpr BFloat16(uint aVal) : value(FromFloat(float(aVal)).value)
+    explicit constexpr BFloat16(uint aVal) : value(FromFloat(static_cast<float>(aVal)).value)
     {
     }
-    explicit constexpr BFloat16(long64 aVal) : value(FromFloat(float(aVal)).value)
+    explicit constexpr BFloat16(long64 aVal) : value(FromFloat(static_cast<float>(aVal)).value)
     {
     }
-    explicit constexpr BFloat16(ulong64 aVal) : value(FromFloat(float(aVal)).value)
+    explicit constexpr BFloat16(ulong64 aVal) : value(FromFloat(static_cast<float>(aVal)).value)
     {
     }
 #endif
@@ -108,7 +110,7 @@ class alignas(2) BFloat16
 
     DEVICE_CODE [[nodiscard]] inline constexpr static BFloat16 FromUShort(ushort aUShort)
     {
-        return BFloat16(aUShort, true);
+        return BFloat16(aUShort, BINARY);
     }
 
 #ifdef IS_HOST_COMPILER
@@ -151,7 +153,7 @@ class alignas(2) BFloat16
             // the bloat16's mantissa bits are all 0.
             u.int32 |= 0x10000; // Preserve signaling NaN
         }
-        return BFloat16(ushort(u.int32 >> 16), true);
+        return BFloat16(static_cast<ushort>(u.int32 >> 16), BINARY);
     }
 
     /// <summary>
@@ -164,7 +166,8 @@ class alignas(2) BFloat16
             float fp32;
             uint int32;
         } u = {aFloat};
-        return BFloat16(ushort((u.int32 >> 16) | (!(~u.int32 & 0x7f800000) && (u.int32 & 0xffff))), true);
+        return BFloat16(static_cast<ushort>((u.int32 >> 16) | (!(~u.int32 & 0x7f800000) && (u.int32 & 0xffff))),
+                        BINARY);
     }
 #endif
 
@@ -176,7 +179,7 @@ class alignas(2) BFloat16
         {
             uint int32;
             float fp32;
-        } u = {uint(value) << 16};
+        } u = {static_cast<uint>(value) << 16};
         return u.fp32;
 #endif
 #ifdef IS_CUDA_COMPILER
@@ -189,7 +192,7 @@ class alignas(2) BFloat16
     DEVICE_CODE [[nodiscard]] inline bool operator<(BFloat16 aOther) const
     {
 #ifdef IS_HOST_COMPILER
-        return float(*this) < float(aOther);
+        return static_cast<float>(*this) < static_cast<float>(aOther);
 #endif
 
 #ifdef IS_CUDA_COMPILER
@@ -202,7 +205,7 @@ class alignas(2) BFloat16
     DEVICE_CODE [[nodiscard]] inline bool operator<=(BFloat16 aOther) const
     {
 #ifdef IS_HOST_COMPILER
-        return float(*this) <= float(aOther);
+        return static_cast<float>(*this) <= static_cast<float>(aOther);
 #endif
 
 #ifdef IS_CUDA_COMPILER
@@ -215,7 +218,7 @@ class alignas(2) BFloat16
     DEVICE_CODE [[nodiscard]] inline bool operator>(BFloat16 aOther) const
     {
 #ifdef IS_HOST_COMPILER
-        return float(*this) > float(aOther);
+        return static_cast<float>(*this) > static_cast<float>(aOther);
 #endif
 
 #ifdef IS_CUDA_COMPILER
@@ -228,7 +231,7 @@ class alignas(2) BFloat16
     DEVICE_CODE [[nodiscard]] inline bool operator>=(BFloat16 aOther) const
     {
 #ifdef IS_HOST_COMPILER
-        return float(*this) >= float(aOther);
+        return static_cast<float>(*this) >= static_cast<float>(aOther);
 #endif
 
 #ifdef IS_CUDA_COMPILER
@@ -241,7 +244,7 @@ class alignas(2) BFloat16
     DEVICE_CODE [[nodiscard]] inline bool operator==(BFloat16 aOther) const
     {
 #ifdef IS_HOST_COMPILER
-        return float(*this) == float(aOther);
+        return static_cast<float>(*this) == static_cast<float>(aOther);
 #endif
 
 #ifdef IS_CUDA_COMPILER
@@ -254,13 +257,13 @@ class alignas(2) BFloat16
     /// </summary>
     DEVICE_CODE [[nodiscard]] inline bool operator==(float aOther) const
     {
-        return float(*this) == aOther;
+        return static_cast<float>(*this) == aOther;
     }
     /// <summary>
     /// </summary>
     DEVICE_CODE [[nodiscard]] inline bool operator==(int aOther) const
     {
-        return float(*this) == float(aOther);
+        return static_cast<float>(*this) == static_cast<float>(aOther);
     }
 #endif
 
@@ -269,7 +272,7 @@ class alignas(2) BFloat16
     DEVICE_CODE [[nodiscard]] inline bool operator!=(BFloat16 aOther) const
     {
 #ifdef IS_HOST_COMPILER
-        return float(*this) != float(aOther);
+        return static_cast<float>(*this) != static_cast<float>(aOther);
 #endif
 
 #ifdef IS_CUDA_COMPILER
@@ -319,7 +322,7 @@ class alignas(2) BFloat16
     DEVICE_CODE [[nodiscard]] inline BFloat16 operator+(BFloat16 aOther) const
     {
 #ifdef IS_HOST_COMPILER
-        return BFloat16(float(*this) + float(aOther));
+        return BFloat16(static_cast<float>(*this) + static_cast<float>(aOther));
 #endif
 
 #ifdef IS_CUDA_COMPILER
@@ -347,7 +350,7 @@ class alignas(2) BFloat16
     DEVICE_CODE [[nodiscard]] inline BFloat16 operator-(BFloat16 aOther) const
     {
 #ifdef IS_HOST_COMPILER
-        return BFloat16(float(*this) - float(aOther));
+        return BFloat16(static_cast<float>(*this) - static_cast<float>(aOther));
 #endif
 
 #ifdef IS_CUDA_COMPILER
@@ -375,7 +378,7 @@ class alignas(2) BFloat16
     DEVICE_CODE [[nodiscard]] inline BFloat16 operator*(BFloat16 aOther) const
     {
 #ifdef IS_HOST_COMPILER
-        return BFloat16(float(*this) * float(aOther));
+        return BFloat16(static_cast<float>(*this) * static_cast<float>(aOther));
 #endif
 
 #ifdef IS_CUDA_COMPILER
@@ -403,7 +406,7 @@ class alignas(2) BFloat16
     DEVICE_CODE [[nodiscard]] inline BFloat16 operator/(BFloat16 aOther) const
     {
 #ifdef IS_HOST_COMPILER
-        return BFloat16(float(*this) / float(aOther));
+        return BFloat16(static_cast<float>(*this) / static_cast<float>(aOther));
 #endif
 
 #ifdef IS_CUDA_COMPILER
@@ -414,18 +417,20 @@ class alignas(2) BFloat16
 #ifdef IS_HOST_COMPILER
     /// <summary>
     /// </summary>
-    inline void Exp()
+    inline BFloat16 &Exp()
     {
-        *this = BFloat16(std::exp(float(*this)));
+        *this = BFloat16(std::exp(static_cast<float>(*this)));
+        return *this;
     }
 #endif
 
 #ifdef IS_CUDA_COMPILER
     /// <summary>
     /// </summary>
-    DEVICE_ONLY_CODE inline void Exp()
+    DEVICE_ONLY_CODE inline BFloat16 &Exp()
     {
         value = hexp(value);
+        return *this;
     }
 #endif
 
@@ -434,7 +439,7 @@ class alignas(2) BFloat16
     /// </summary>
     [[nodiscard]] inline static BFloat16 Exp(BFloat16 aOther)
     {
-        return BFloat16(std::exp(float(aOther)));
+        return BFloat16(std::exp(static_cast<float>(aOther)));
     }
 #endif
 
@@ -450,18 +455,20 @@ class alignas(2) BFloat16
 #ifdef IS_HOST_COMPILER
     /// <summary>
     /// </summary>
-    inline void Ln()
+    inline BFloat16 &Ln()
     {
-        *this = BFloat16(std::log(float(*this)));
+        *this = BFloat16(std::log(static_cast<float>(*this)));
+        return *this;
     }
 #endif
 
 #ifdef IS_CUDA_COMPILER
     /// <summary>
     /// </summary>
-    DEVICE_ONLY_CODE inline void Ln()
+    DEVICE_ONLY_CODE inline BFloat16 &Ln()
     {
         value = hlog(value);
+        return *this;
     }
 #endif
 
@@ -470,7 +477,7 @@ class alignas(2) BFloat16
     /// </summary>
     [[nodiscard]] inline static BFloat16 Ln(BFloat16 aOther)
     {
-        return BFloat16(std::log(float(aOther)));
+        return BFloat16(std::log(static_cast<float>(aOther)));
     }
 #endif
 
@@ -486,18 +493,20 @@ class alignas(2) BFloat16
 #ifdef IS_HOST_COMPILER
     /// <summary>
     /// </summary>
-    inline void Sqrt()
+    inline BFloat16 &Sqrt()
     {
-        *this = BFloat16(std::sqrt(float(*this)));
+        *this = BFloat16(std::sqrt(static_cast<float>(*this)));
+        return *this;
     }
 #endif
 
 #ifdef IS_CUDA_COMPILER
     /// <summary>
     /// </summary>
-    DEVICE_ONLY_CODE inline void Sqrt()
+    DEVICE_ONLY_CODE inline BFloat16 &Sqrt()
     {
         value = hsqrt(value);
+        return *this;
     }
 #endif
 
@@ -506,7 +515,7 @@ class alignas(2) BFloat16
     /// </summary>
     [[nodiscard]] inline static BFloat16 Sqrt(BFloat16 aOther)
     {
-        return BFloat16(std::sqrt(float(aOther)));
+        return BFloat16(std::sqrt(static_cast<float>(aOther)));
     }
 #endif
 
@@ -521,14 +530,15 @@ class alignas(2) BFloat16
 
     /// <summary>
     /// </summary>
-    DEVICE_CODE inline void Abs()
+    DEVICE_CODE inline BFloat16 &Abs()
     {
 #ifdef IS_HOST_COMPILER
-        *this = BFloat16(std::abs(float(*this)));
+        *this = BFloat16(std::abs(static_cast<float>(*this)));
 #endif
 #ifdef IS_CUDA_COMPILER
         value = __habs(value);
 #endif
+        return *this;
     }
 
     /// <summary>
@@ -536,7 +546,7 @@ class alignas(2) BFloat16
     DEVICE_CODE [[nodiscard]] inline static BFloat16 Abs(BFloat16 aOther)
     {
 #ifdef IS_HOST_COMPILER
-        return BFloat16(std::abs(float(aOther)));
+        return BFloat16(std::abs(static_cast<float>(aOther)));
 #endif
 #ifdef IS_CUDA_COMPILER
         return BFloat16(__habs(aOther.value));
@@ -545,14 +555,15 @@ class alignas(2) BFloat16
 
     /// <summary>
     /// </summary>
-    DEVICE_CODE inline void Min(const BFloat16 &aOther)
+    DEVICE_CODE inline BFloat16 &Min(const BFloat16 &aOther)
     {
 #ifdef IS_HOST_COMPILER
-        *this = BFloat16(std::min(float(*this), float(aOther)));
+        *this = BFloat16(std::min(static_cast<float>(*this), static_cast<float>(aOther)));
 #endif
 #ifdef IS_CUDA_COMPILER
         value = __hmin(value, aOther.value);
 #endif
+        return *this;
     }
 
     /// <summary>
@@ -561,7 +572,7 @@ class alignas(2) BFloat16
     DEVICE_CODE [[nodiscard]] inline static BFloat16 Min(const BFloat16 &aLeft, const BFloat16 &aRight)
     {
 #ifdef IS_HOST_COMPILER
-        return BFloat16(std::min(float(aLeft), float(aRight)));
+        return BFloat16(std::min(static_cast<float>(aLeft), static_cast<float>(aRight)));
 #endif
 #ifdef IS_CUDA_COMPILER
         return BFloat16(__hmin(aLeft.value, aRight.value));
@@ -570,14 +581,15 @@ class alignas(2) BFloat16
 
     /// <summary>
     /// </summary>
-    DEVICE_CODE inline void Max(const BFloat16 &aOther)
+    DEVICE_CODE inline BFloat16 &Max(const BFloat16 &aOther)
     {
 #ifdef IS_HOST_COMPILER
-        *this = BFloat16(std::max(float(*this), float(aOther)));
+        *this = BFloat16(std::max(static_cast<float>(*this), static_cast<float>(aOther)));
 #endif
 #ifdef IS_CUDA_COMPILER
         value = __hmax(value, aOther.value);
 #endif
+        return *this;
     }
 
     /// <summary>
@@ -586,7 +598,7 @@ class alignas(2) BFloat16
     DEVICE_CODE [[nodiscard]] inline static BFloat16 Max(const BFloat16 &aLeft, const BFloat16 &aRight)
     {
 #ifdef IS_HOST_COMPILER
-        return BFloat16(std::max(float(aLeft), float(aRight)));
+        return BFloat16(std::max(static_cast<float>(aLeft), static_cast<float>(aRight)));
 #endif
 #ifdef IS_CUDA_COMPILER
         return BFloat16(__hmax(aLeft.value, aRight.value));
@@ -595,14 +607,15 @@ class alignas(2) BFloat16
 
     /// <summary>
     /// </summary>
-    DEVICE_CODE inline void Round()
+    DEVICE_CODE inline BFloat16 &Round()
     {
 #ifdef IS_HOST_COMPILER
-        *this = BFloat16(std::round(float(*this)));
+        *this = BFloat16(std::round(static_cast<float>(*this)));
 #endif
 #ifdef IS_CUDA_COMPILER
-        *this = BFloat16(round(float(value)));
+        *this = BFloat16(round(static_cast<float>(value)));
 #endif
+        return *this;
     }
 
     /// <summary>
@@ -611,28 +624,30 @@ class alignas(2) BFloat16
     DEVICE_CODE [[nodiscard]] inline static BFloat16 Round(BFloat16 aOther)
     {
 #ifdef IS_HOST_COMPILER
-        return BFloat16(std::round(float(aOther)));
+        return BFloat16(std::round(static_cast<float>(aOther)));
 #endif
 #ifdef IS_CUDA_COMPILER
-        return BFloat16(round(float(aOther.value)));
+        return BFloat16(round(static_cast<float>(aOther.value)));
 #endif
     }
 
 #ifdef IS_HOST_COMPILER
     /// <summary>
     /// </summary>
-    inline void Floor()
+    inline BFloat16 &Floor()
     {
-        *this = BFloat16(std::floor(float(*this)));
+        *this = BFloat16(std::floor(static_cast<float>(*this)));
+        return *this;
     }
 #endif
 
 #ifdef IS_CUDA_COMPILER
     /// <summary>
     /// </summary>
-    DEVICE_ONLY_CODE inline void Floor()
+    DEVICE_ONLY_CODE inline BFloat16 &Floor()
     {
         value = __int2bfloat16_rd(__bfloat162int_rd(value));
+        return *this;
     }
 #endif
 
@@ -642,7 +657,7 @@ class alignas(2) BFloat16
     /// </summary>
     [[nodiscard]] inline static BFloat16 Floor(BFloat16 aOther)
     {
-        return BFloat16(std::floor(float(aOther)));
+        return BFloat16(std::floor(static_cast<float>(aOther)));
     }
 #endif
 
@@ -659,18 +674,20 @@ class alignas(2) BFloat16
 #ifdef IS_HOST_COMPILER
     /// <summary>
     /// </summary>
-    inline void Ceil()
+    inline BFloat16 &Ceil()
     {
-        *this = BFloat16(std::ceil(float(*this)));
+        *this = BFloat16(std::ceil(static_cast<float>(*this)));
+        return *this;
     }
 #endif
 
 #ifdef IS_CUDA_COMPILER
     /// <summary>
     /// </summary>
-    DEVICE_ONLY_CODE inline void Ceil()
+    DEVICE_ONLY_CODE inline BFloat16 &Ceil()
     {
         value = __int2bfloat16_ru(__bfloat162int_ru(value));
+        return *this;
     }
 #endif
 
@@ -680,7 +697,7 @@ class alignas(2) BFloat16
     /// </summary>
     [[nodiscard]] inline static BFloat16 Ceil(BFloat16 aOther)
     {
-        return BFloat16(std::ceil(float(aOther)));
+        return BFloat16(std::ceil(static_cast<float>(aOther)));
     }
 #endif
 
@@ -699,9 +716,10 @@ class alignas(2) BFloat16
     /// Round nearest ties to even<para/>
     /// Note: the host function assumes that current rounding mode is set to FE_TONEAREST
     /// </summary>
-    inline void RoundNearest()
+    inline BFloat16 &RoundNearest()
     {
-        *this = BFloat16(std::nearbyint(float(*this)));
+        *this = BFloat16(std::nearbyint(static_cast<float>(*this)));
+        return *this;
     }
 #endif
 
@@ -710,9 +728,10 @@ class alignas(2) BFloat16
     /// Round nearest ties to even<para/>
     /// Note: the host function assumes that current rounding mode is set to FE_TONEAREST
     /// </summary>
-    DEVICE_ONLY_CODE inline void RoundNearest()
+    DEVICE_ONLY_CODE inline BFloat16 &RoundNearest()
     {
         value = __int2bfloat16_rn(__bfloat162int_rn(value));
+        return *this;
     }
 #endif
 
@@ -723,7 +742,7 @@ class alignas(2) BFloat16
     /// </summary>
     [[nodiscard]] inline static BFloat16 RoundNearest(BFloat16 aOther)
     {
-        return BFloat16(std::nearbyint(float(aOther)));
+        return BFloat16(std::nearbyint(static_cast<float>(aOther)));
     }
 #endif
 
@@ -742,9 +761,10 @@ class alignas(2) BFloat16
     /// <summary>
     /// Round toward zero
     /// </summary>
-    inline void RoundZero()
+    inline BFloat16 &RoundZero()
     {
-        *this = BFloat16(std::trunc(float(*this)));
+        *this = BFloat16(std::trunc(static_cast<float>(*this)));
+        return *this;
     }
 #endif
 
@@ -752,9 +772,10 @@ class alignas(2) BFloat16
     /// <summary>
     /// Round toward zero
     /// </summary>
-    DEVICE_ONLY_CODE inline void RoundZero()
+    DEVICE_ONLY_CODE inline BFloat16 &RoundZero()
     {
         value = __int2bfloat16_rz(__bfloat162int_rz(value));
+        return *this;
     }
 #endif
 
@@ -781,11 +802,11 @@ class alignas(2) BFloat16
 
 inline std::ostream &operator<<(std::ostream &aOs, const BFloat16 &aHalf)
 {
-    return aOs << float(aHalf);
+    return aOs << static_cast<float>(aHalf);
 }
 inline std::wostream &operator<<(std::wostream &aOs, const BFloat16 &aHalf)
 {
-    return aOs << float(aHalf);
+    return aOs << static_cast<float>(aHalf);
 }
 inline std::istream &operator>>(std::istream &aIs, BFloat16 &aHalf)
 {
@@ -800,5 +821,11 @@ inline std::wistream &operator>>(std::wistream &aIs, BFloat16 &aHalf)
     aIs >> temp;
     aHalf = BFloat16(temp);
     return aIs;
+}
+
+// bfloat literal: 2.4_bf is read as BFloat16 when opp namespace is used
+inline BFloat16 operator"" _bf(long double aValue)
+{
+    return BFloat16(float(aValue));
 }
 } // namespace opp

@@ -28,7 +28,7 @@ using Pixel32fC3  = Vector3<float>;
 using Pixel32fC4  = Vector4<float>;
 using Pixel32fC4A = Vector4A<float>;
 
-using Pixel32fcC1 = Complex<float>;
+using Pixel32fcC1 = Vector1<Complex<float>>;
 using Pixel32fcC2 = Vector2<Complex<float>>;
 using Pixel32fcC3 = Vector3<Complex<float>>;
 using Pixel32fcC4 = Vector4<Complex<float>>;
@@ -39,7 +39,7 @@ using Pixel32sC3  = Vector3<int>;
 using Pixel32sC4  = Vector4<int>;
 using Pixel32sC4A = Vector4A<int>;
 
-using Pixel32scC1 = Complex<int>;
+using Pixel32scC1 = Vector1<Complex<int>>;
 using Pixel32scC2 = Vector2<Complex<int>>;
 using Pixel32scC3 = Vector3<Complex<int>>;
 using Pixel32scC4 = Vector4<Complex<int>>;
@@ -68,7 +68,7 @@ using Pixel16sC3  = Vector3<short>;
 using Pixel16sC4  = Vector4<short>;
 using Pixel16sC4A = Vector4A<short>;
 
-using Pixel16scC1 = Complex<short>;
+using Pixel16scC1 = Vector1<Complex<short>>;
 using Pixel16scC2 = Vector2<Complex<short>>;
 using Pixel16scC3 = Vector3<Complex<short>>;
 using Pixel16scC4 = Vector4<Complex<short>>;
@@ -186,27 +186,27 @@ template <typename T> struct pixel_basetype : remove_vector<T>
 {
 };
 
-// return T also for Vector<Complex<T>>
-template <typename T> struct pixel_basetype<Vector1<Complex<T>>>
-{
-    using type = T;
-};
-template <typename T> struct pixel_basetype<Complex<T>>
-{
-    using type = T;
-};
-template <typename T> struct pixel_basetype<Vector2<Complex<T>>>
-{
-    using type = T;
-};
-template <typename T> struct pixel_basetype<Vector3<Complex<T>>>
-{
-    using type = T;
-};
-template <typename T> struct pixel_basetype<Vector4<Complex<T>>>
-{
-    using type = T;
-};
+//// return T also for Vector<Complex<T>>
+// template <typename T> struct pixel_basetype<Vector1<Complex<T>>>
+//{
+//     using type = T;
+// };
+//// template <typename T> struct pixel_basetype<Complex<T>>
+////{
+////     using type = T;
+//// };
+// template <typename T> struct pixel_basetype<Vector2<Complex<T>>>
+//{
+//     using type = T;
+// };
+// template <typename T> struct pixel_basetype<Vector3<Complex<T>>>
+//{
+//     using type = T;
+// };
+// template <typename T> struct pixel_basetype<Vector4<Complex<T>>>
+//{
+//     using type = T;
+// };
 
 template <typename T> using pixel_basetype_t = typename pixel_basetype<T>::type;
 

@@ -1,6 +1,6 @@
 #pragma once
-#include <common/complex.h>
 #include <common/defines.h>
+#include <common/numberTypes.h>
 #include <common/opp_defs.h>
 #include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
@@ -10,7 +10,7 @@ namespace opp
 template <RoudingMode roundingMode, typename T> struct RoundFunctor
 {
     DEVICE_CODE void operator()(T &aVec)
-        requires FloatingVectorOrComplexType<T>
+        requires RealOrComplexFloatingVector<T>
     {
         if constexpr (roundingMode == RoudingMode::NearestTiesToEven)
         {
@@ -45,6 +45,11 @@ template <RoudingMode roundingMode, typename T> struct RoundFunctor
         {
             static_assert(AlwaysFalse<T>::value, "Unknown rounding mode");
         }
+    }
+
+    DEVICE_CODE void operator()(T &aVec)
+        requires RealOrCompleIntVector<T>
+    { // NOP
     }
 };
 } // namespace opp

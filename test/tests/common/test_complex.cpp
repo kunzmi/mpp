@@ -1,7 +1,9 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <common/bfloat16.h>
 #include <common/complex.h>
 #include <common/defines.h>
+#include <common/half_fp16.h>
 #include <common/safeCast.h>
 #include <common/Vector2.h>
 #include <complex>
@@ -165,6 +167,8 @@ TEST_CASE("Complex<float>", "[Common]")
     CHECK(minmax1.Min(minmax2) == Complex<float>(-20, 10));
     CHECK(minmax2.Min(minmax1) == Complex<float>(-20, 10));
 
+    minmax1 = Complex<float>(10, 20);
+    minmax2 = Complex<float>(-20, 10);
     CHECK(minmax1.Max(minmax2) == Complex<float>(10, 20));
     CHECK(minmax2.Max(minmax1) == Complex<float>(10, 20));
 
@@ -184,17 +188,6 @@ TEST_CASE("Complex<float>", "[Common]")
     Complex<float> fromInt = Complex<int>(10, 20);
     CHECK(fromInt.real == 10);
     CHECK(fromInt.imag == 20);
-}
-
-TEST_CASE("Complex<float>_additionalMethods", "[Common]")
-{
-    Complex<float> norm(4, 5);
-    norm.Normalize();
-    CHECK(norm.Magnitude() == 1);
-    CHECK(norm.real == Approx(0.6247).margin(0.001));
-    CHECK(norm.imag == Approx(0.7809).margin(0.001));
-
-    CHECK(Complex<float>::Normalize(Complex<float>(4, 5)) == norm);
 }
 
 TEST_CASE("Complex<int>", "[Common]")
@@ -315,6 +308,8 @@ TEST_CASE("Complex<int>", "[Common]")
     CHECK(minmax1.Min(minmax2) == Complex<int>(-20, 10));
     CHECK(minmax2.Min(minmax1) == Complex<int>(-20, 10));
 
+    minmax1 = Complex<int>(10, 20);
+    minmax2 = Complex<int>(-20, 10);
     CHECK(minmax1.Max(minmax2) == Complex<int>(10, 20));
     CHECK(minmax2.Max(minmax1) == Complex<int>(10, 20));
 
@@ -363,8 +358,8 @@ TEST_CASE("Complex<short>", "[Common]")
     add4 += add3;
     CHECK(add4.real == 204);
     CHECK(add4.imag == 400);
-
-    add4 += 3;
+    Complex<short> aaaa = 3;
+    add4 += to_short(3);
     CHECK(add4.real == 207);
     CHECK(add4.imag == 400);
 
@@ -385,7 +380,7 @@ TEST_CASE("Complex<short>", "[Common]")
     CHECK(sub4.real == 4);
     CHECK(sub4.imag == 0);
 
-    sub4 -= 3;
+    sub4 -= to_short(3);
     CHECK(sub4.real == 1);
     CHECK(sub4.imag == 0);
 
@@ -408,7 +403,7 @@ TEST_CASE("Complex<short>", "[Common]")
     CHECK(mul4.real == -36);
     CHECK(mul4.imag == 160);
 
-    mul4 *= 3;
+    mul4 *= to_short(3);
     CHECK(mul4.real == -108);
     CHECK(mul4.imag == 480);
 
@@ -431,7 +426,7 @@ TEST_CASE("Complex<short>", "[Common]")
     CHECK(div4.real == 162);
     CHECK(div4.imag == -55);
 
-    div4 /= 3;
+    div4 /= to_short(3);
     CHECK(div4.real == 54);
     CHECK(div4.imag == -18);
 
@@ -441,6 +436,8 @@ TEST_CASE("Complex<short>", "[Common]")
     CHECK(minmax1.Min(minmax2) == Complex<short>(-20, 10));
     CHECK(minmax2.Min(minmax1) == Complex<short>(-20, 10));
 
+    minmax1 = Complex<short>(10, 20);
+    minmax2 = Complex<short>(-20, 10);
     CHECK(minmax1.Max(minmax2) == Complex<short>(10, 20));
     CHECK(minmax2.Max(minmax1) == Complex<short>(10, 20));
 
@@ -451,6 +448,348 @@ TEST_CASE("Complex<short>", "[Common]")
     Complex<short> fromFloatClamp = Complex<float>(SHRT_MAX + 1000, SHRT_MIN - 1000);
     CHECK(fromFloatClamp.real == SHRT_MAX);
     CHECK(fromFloatClamp.imag == SHRT_MIN);
+}
+
+TEST_CASE("Complex<BFloat16>", "[Common]")
+{
+    // check size:
+    CHECK(sizeof(Complex<BFloat16>) == 2 * sizeof(BFloat16));
+
+    BFloat16 arr[2] = {4.0_bf, 5.0_bf};
+    Complex<BFloat16> t0(arr);
+    CHECK(t0.real == 4);
+    CHECK(t0.imag == 5);
+
+    Complex<BFloat16> t1(0.0_bf, 1.0_bf);
+    CHECK(t1.real == 0);
+    CHECK(t1.imag == 1);
+
+    Complex<BFloat16> c(t1);
+    CHECK(c.real == 0);
+    CHECK(c.imag == 1);
+    CHECK(c == t1);
+
+    Complex<BFloat16> c2 = t1;
+    CHECK(c2.real == 0);
+    CHECK(c2.imag == 1);
+    CHECK(c2 == t1);
+
+    Complex<BFloat16> c3 = Vector2<BFloat16>(10.0_bf, 20.0_bf);
+    CHECK(c3.real == 10);
+    CHECK(c3.imag == 20);
+
+    Complex<BFloat16> t2(5.0_bf);
+    CHECK(t2.real == 5);
+    CHECK(t2.imag == 0);
+    CHECK(c2 != t2);
+
+    Complex<BFloat16> add1 = t1 + t2;
+    CHECK(add1.real == 5);
+    CHECK(add1.imag == 1);
+
+    Complex<BFloat16> add2 = 3 + t1;
+    CHECK(add2.real == 3);
+    CHECK(add2.imag == 1);
+
+    Complex<BFloat16> add3 = t1 + 4;
+    CHECK(add3.real == 4);
+    CHECK(add3.imag == 1);
+
+    Complex<BFloat16> add4 = t1;
+    add4 += add3;
+    CHECK(add4.real == 4);
+    CHECK(add4.imag == 2);
+
+    add4 += 3.0_bf;
+    CHECK(add4.real == 7);
+    CHECK(add4.imag == 2);
+
+    Complex<BFloat16> sub1 = t1 - t2;
+    CHECK(sub1.real == -5);
+    CHECK(sub1.imag == 1);
+
+    Complex<BFloat16> sub2 = 3 - t1;
+    CHECK(sub2.real == 3);
+    CHECK(sub2.imag == 1);
+
+    Complex<BFloat16> sub3 = t1 - 4;
+    CHECK(sub3.real == -4);
+    CHECK(sub3.imag == 1);
+
+    Complex<BFloat16> sub4 = t1;
+    sub4 -= sub3;
+    CHECK(sub4.real == 4);
+    CHECK(sub4.imag == 0);
+
+    sub4 -= 3.0_bf;
+    CHECK(sub4.real == 1);
+    CHECK(sub4.imag == 0);
+
+    std::complex<float> ref1(4.0f, 5.0f);
+    std::complex<float> ref2(6.0f, 7.0f);
+    std::complex<float> refmul1 = ref1 * ref2;
+    t1                          = Complex<BFloat16>(4.0_bf, 5.0_bf);
+    t2                          = Complex<BFloat16>(6.0_bf, 7.0_bf);
+    Complex<BFloat16> mul1      = t1 * t2;
+    CHECK(mul1.real == refmul1.real());
+    CHECK(mul1.imag == refmul1.imag());
+
+    std::complex<float> refmul2 = ref1;
+    refmul2 *= 3.0_bf;
+    Complex<BFloat16> mul2 = 3 * t1;
+    CHECK(mul2.real == refmul2.real());
+    CHECK(mul2.imag == refmul2.imag());
+
+    std::complex<float> refmul3 = ref1;
+    refmul3 *= 4.0_bf;
+    Complex<BFloat16> mul3 = t1 * 4;
+    CHECK(mul3.real == refmul3.real());
+    CHECK(mul3.imag == refmul3.imag());
+
+    std::complex<float> refmul4 = ref1;
+    refmul4 *= refmul3;
+    Complex<BFloat16> mul4 = t1;
+    mul4 *= mul3;
+    CHECK(mul4.real == refmul4.real());
+    CHECK(mul4.imag == refmul4.imag());
+
+    refmul4 *= 3.0_bf;
+    mul4 *= 3.0_bf;
+    CHECK(mul4.real == refmul4.real());
+    CHECK(mul4.imag == refmul4.imag());
+
+    std::complex<float> refdiv1 = ref1;
+    refdiv1 /= ref2;
+    Complex<BFloat16> div1 = t1 / t2;
+    CHECK(div1.real == Approx(refdiv1.real()).margin(0.005));
+    CHECK(div1.imag == Approx(refdiv1.imag()).margin(0.001));
+
+    std::complex<float> refdiv2 = 3.0f;
+    refdiv2 /= ref1;
+    Complex<BFloat16> div2 = 3.0_bf / t1;
+    CHECK(div2.real == Approx(refdiv2.real()).margin(0.001));
+    CHECK(div2.imag == Approx(refdiv2.imag()).margin(0.001));
+
+    std::complex<float> refdiv3 = ref1;
+    refdiv3 /= 4.0_bf;
+    Complex<BFloat16> div3 = t1 / 4;
+    CHECK(div3.real == Approx(refdiv3.real()).margin(0.001));
+    CHECK(div3.imag == Approx(refdiv3.imag()).margin(0.001));
+
+    std::complex<float> refdiv4 = ref2;
+    refdiv4 /= refdiv3;
+    Complex<BFloat16> div4 = t2;
+    div4 /= div3;
+    CHECK(div4.real == Approx(refdiv4.real()).margin(0.01));
+    CHECK(div4.imag == Approx(refdiv4.imag()).margin(0.001));
+
+    refdiv4 /= 3.0_bf;
+    div4 /= 3.0_bf;
+    CHECK(div4.real == Approx(refdiv4.real()).margin(0.005));
+    CHECK(div4.imag == Approx(refdiv4.imag()).margin(0.001));
+
+    Complex<BFloat16> l(4.0_bf, 6.0_bf);
+    CHECK(l.MagnitudeSqr() == 52);
+    CHECK(l.Magnitude() == Approx(std::sqrt(52)).margin(0.01));
+
+    Complex<BFloat16> minmax1(10.0_bf, 20.0_bf);
+    Complex<BFloat16> minmax2(-20.0_bf, 10.0_bf);
+
+    CHECK((minmax1.Min(minmax2)) == (Complex<BFloat16>(-20.0_bf, 10.0_bf)));
+    CHECK(minmax2.Min(minmax1) == Complex<BFloat16>(-20.0_bf, 10.0_bf));
+
+    minmax1 = Complex<BFloat16>(10.0_bf, 20.0_bf);
+    minmax2 = Complex<BFloat16>(-20.0_bf, 10.0_bf);
+    CHECK(minmax1.Max(minmax2) == Complex<BFloat16>(10.0_bf, 20.0_bf));
+    CHECK(minmax2.Max(minmax1) == Complex<BFloat16>(10.0_bf, 20.0_bf));
+
+    Complex<BFloat16> conj(10.0_bf, 20.0_bf);
+    Complex<BFloat16> conj2 = Complex<BFloat16>::Conj(conj);
+    conj.Conj();
+    CHECK(conj == Complex<BFloat16>(10.0_bf, -20.0_bf));
+    CHECK(conj == conj2);
+
+    Complex<BFloat16> conjMulA(10.0_bf, 20.0_bf);
+    Complex<BFloat16> conjMulB(3.0_bf, -2.0_bf);
+    Complex<BFloat16> conjMul = Complex<BFloat16>::ConjMul(conjMulA, conjMulB);
+    conjMulA.ConjMul(conjMulB);
+    CHECK(conjMul == Complex<BFloat16>(-10.0_bf, 80.0_bf));
+    CHECK(conjMulA == conjMul);
+
+    Complex<BFloat16> fromInt = Complex<int>(10, 20);
+    CHECK(fromInt.real == 10);
+    CHECK(fromInt.imag == 20);
+}
+
+TEST_CASE("Complex<HalfFp16>", "[Common]")
+{
+    // check size:
+    CHECK(sizeof(Complex<HalfFp16>) == 2 * sizeof(HalfFp16));
+
+    HalfFp16 arr[2] = {4.0_hf, 5.0_hf};
+    Complex<HalfFp16> t0(arr);
+    CHECK(t0.real == 4);
+    CHECK(t0.imag == 5);
+
+    Complex<HalfFp16> t1(0.0_hf, 1.0_hf);
+    CHECK(t1.real == 0);
+    CHECK(t1.imag == 1);
+
+    Complex<HalfFp16> c(t1);
+    CHECK(c.real == 0);
+    CHECK(c.imag == 1);
+    CHECK(c == t1);
+
+    Complex<HalfFp16> c2 = t1;
+    CHECK(c2.real == 0);
+    CHECK(c2.imag == 1);
+    CHECK(c2 == t1);
+
+    Complex<HalfFp16> c3 = Vector2<HalfFp16>(10.0_hf, 20.0_hf);
+    CHECK(c3.real == 10);
+    CHECK(c3.imag == 20);
+
+    Complex<HalfFp16> t2(5.0_hf);
+    CHECK(t2.real == 5);
+    CHECK(t2.imag == 0);
+    CHECK(c2 != t2);
+
+    Complex<HalfFp16> add1 = t1 + t2;
+    CHECK(add1.real == 5);
+    CHECK(add1.imag == 1);
+
+    Complex<HalfFp16> add2 = 3.0_hf + t1;
+    CHECK(add2.real == 3);
+    CHECK(add2.imag == 1);
+
+    Complex<HalfFp16> add3 = t1 + 4;
+    CHECK(add3.real == 4);
+    CHECK(add3.imag == 1);
+
+    Complex<HalfFp16> add4 = t1;
+    add4 += add3;
+    CHECK(add4.real == 4);
+    CHECK(add4.imag == 2);
+
+    add4 += 3.0_hf;
+    CHECK(add4.real == 7);
+    CHECK(add4.imag == 2);
+
+    Complex<HalfFp16> sub1 = t1 - t2;
+    CHECK(sub1.real == -5);
+    CHECK(sub1.imag == 1);
+
+    Complex<HalfFp16> sub2 = 3 - t1;
+    CHECK(sub2.real == 3);
+    CHECK(sub2.imag == 1);
+
+    Complex<HalfFp16> sub3 = t1 - 4;
+    CHECK(sub3.real == -4);
+    CHECK(sub3.imag == 1);
+
+    Complex<HalfFp16> sub4 = t1;
+    sub4 -= sub3;
+    CHECK(sub4.real == 4);
+    CHECK(sub4.imag == 0);
+
+    sub4 -= 3.0_hf;
+    CHECK(sub4.real == 1);
+    CHECK(sub4.imag == 0);
+
+    std::complex<float> ref1(4, 5);
+    std::complex<float> ref2(6, 7);
+    std::complex<float> refmul1 = ref1 * ref2;
+    t1                          = Complex<HalfFp16>(4.0_hf, 5.0_hf);
+    t2                          = Complex<HalfFp16>(6.0_hf, 7.0_hf);
+    Complex<HalfFp16> mul1      = t1 * t2;
+    CHECK(mul1.real == refmul1.real());
+    CHECK(mul1.imag == refmul1.imag());
+
+    std::complex<float> refmul2 = ref1;
+    refmul2 *= 3.0_hf;
+    Complex<HalfFp16> mul2 = 3 * t1;
+    CHECK(mul2.real == refmul2.real());
+    CHECK(mul2.imag == refmul2.imag());
+
+    std::complex<float> refmul3 = ref1;
+    refmul3 *= 4.0_hf;
+    Complex<HalfFp16> mul3 = t1 * 4;
+    CHECK(mul3.real == refmul3.real());
+    CHECK(mul3.imag == refmul3.imag());
+
+    std::complex<float> refmul4 = ref1;
+    refmul4 *= refmul3;
+    Complex<HalfFp16> mul4 = t1;
+    mul4 *= mul3;
+    CHECK(mul4.real == refmul4.real());
+    CHECK(mul4.imag == refmul4.imag());
+
+    refmul4 *= 3.0_hf;
+    mul4 *= 3.0_hf;
+    CHECK(mul4.real == refmul4.real());
+    CHECK(mul4.imag == refmul4.imag());
+
+    std::complex<float> refdiv1 = ref1;
+    refdiv1 /= ref2;
+    Complex<HalfFp16> div1 = t1 / t2;
+    CHECK(div1.real == Approx(refdiv1.real()).margin(0.001));
+    CHECK(div1.imag == Approx(refdiv1.imag()).margin(0.001));
+
+    std::complex<float> refdiv2 = 3.0f;
+    refdiv2 /= ref1;
+    Complex<HalfFp16> div2 = 3 / t1;
+    CHECK(div2.real == Approx(refdiv2.real()).margin(0.001));
+    CHECK(div2.imag == Approx(refdiv2.imag()).margin(0.001));
+
+    std::complex<float> refdiv3 = ref1;
+    refdiv3 /= 4.0_hf;
+    Complex<HalfFp16> div3 = t1 / 4;
+    CHECK(div3.real == Approx(refdiv3.real()).margin(0.001));
+    CHECK(div3.imag == Approx(refdiv3.imag()).margin(0.001));
+
+    std::complex<float> refdiv4 = ref2;
+    refdiv4 /= refdiv3;
+    Complex<HalfFp16> div4 = t2;
+    div4 /= div3;
+    CHECK(div4.real == Approx(refdiv4.real()).margin(0.002));
+    CHECK(div4.imag == Approx(refdiv4.imag()).margin(0.001));
+
+    refdiv4 /= 3.0_hf;
+    div4 /= 3.0_hf;
+    CHECK(div4.real == Approx(refdiv4.real()).margin(0.001));
+    CHECK(div4.imag == Approx(refdiv4.imag()).margin(0.001));
+
+    Complex<HalfFp16> l(4.0_hf, 6.0_hf);
+    CHECK(l.MagnitudeSqr() == 52);
+    CHECK(l.Magnitude() == Approx(std::sqrt(52)).margin(0.002));
+
+    Complex<HalfFp16> minmax1(10.0_hf, 20.0_hf);
+    Complex<HalfFp16> minmax2(-20.0_hf, 10.0_hf);
+
+    CHECK(minmax1.Min(minmax2) == Complex<HalfFp16>(-20.0_hf, 10.0_hf));
+    CHECK(minmax2.Min(minmax1) == Complex<HalfFp16>(-20.0_hf, 10.0_hf));
+
+    minmax1 = Complex<HalfFp16>(10.0_hf, 20.0_hf);
+    minmax2 = Complex<HalfFp16>(-20.0_hf, 10.0_hf);
+    CHECK(minmax1.Max(minmax2) == Complex<HalfFp16>(10.0_hf, 20.0_hf));
+    CHECK(minmax2.Max(minmax1) == Complex<HalfFp16>(10.0_hf, 20.0_hf));
+
+    Complex<HalfFp16> conj(10.0_hf, 20.0_hf);
+    Complex<HalfFp16> conj2 = Complex<HalfFp16>::Conj(conj);
+    conj.Conj();
+    CHECK(conj == Complex<HalfFp16>(10.0_hf, -20.0_hf));
+    CHECK(conj == conj2);
+
+    Complex<HalfFp16> conjMulA(10.0_hf, 20.0_hf);
+    Complex<HalfFp16> conjMulB(3.0_hf, -2.0_hf);
+    Complex<HalfFp16> conjMul = Complex<HalfFp16>::ConjMul(conjMulA, conjMulB);
+    conjMulA.ConjMul(conjMulB);
+    CHECK(conjMul == Complex<HalfFp16>(-10.0_hf, 80.0_hf));
+    CHECK(conjMulA == conjMul);
+
+    Complex<HalfFp16> fromInt = Complex<int>(10, 20);
+    CHECK(fromInt.real == 10);
+    CHECK(fromInt.imag == 20);
 }
 
 TEST_CASE("Complex<float>_alignment", "[Common]")
@@ -567,6 +906,82 @@ TEST_CASE("Complex<short>_alignment", "[Common]")
     }
 }
 
+TEST_CASE("Complex<BFloat16>_alignment", "[Common]")
+{
+    constexpr int count = 10;
+    std::vector<Complex<BFloat16> *> buffer(count);
+
+    for (size_t i = 0; i < count; i++)
+    {
+        buffer[i] = new Complex<BFloat16>(BFloat16(i));
+    }
+
+    for (size_t i = 0; i < count; i++)
+    {
+        void *ptrFirstMember = &buffer[i]->real;
+        void *ptrLastMember  = &buffer[i]->imag;
+        void *ptrVector      = buffer[i];
+
+        CHECK(ptrFirstMember == ptrVector);
+        CHECK(ptrLastMember == (reinterpret_cast<BFloat16 *>(ptrVector) + 1));
+
+        // vector must be 4 byte memory aligned:
+        CHECK(std::int64_t(ptrVector) % 4 == 0);
+    }
+
+    std::vector<Complex<BFloat16>> buffer2(count);
+    for (size_t i = 0; i < count - 1; i++)
+    {
+        void *ptrVector1 = &buffer2[i];
+        void *ptrVector2 = &buffer2[i + 1];
+
+        CHECK(ptrVector2 == reinterpret_cast<void *>(reinterpret_cast<char *>(ptrVector1) + (2 * sizeof(BFloat16))));
+    }
+
+    for (size_t i = 0; i < count; i++)
+    {
+        delete buffer[i];
+    }
+}
+
+TEST_CASE("Complex<HalfFp16>_alignment", "[Common]")
+{
+    constexpr int count = 10;
+    std::vector<Complex<HalfFp16> *> buffer(count);
+
+    for (size_t i = 0; i < count; i++)
+    {
+        buffer[i] = new Complex<HalfFp16>(HalfFp16(to_int(i)));
+    }
+
+    for (size_t i = 0; i < count; i++)
+    {
+        void *ptrFirstMember = &buffer[i]->real;
+        void *ptrLastMember  = &buffer[i]->imag;
+        void *ptrVector      = buffer[i];
+
+        CHECK(ptrFirstMember == ptrVector);
+        CHECK(ptrLastMember == (reinterpret_cast<HalfFp16 *>(ptrVector) + 1));
+
+        // vector must be 4 byte memory aligned:
+        CHECK(std::int64_t(ptrVector) % 4 == 0);
+    }
+
+    std::vector<Complex<HalfFp16>> buffer2(count);
+    for (size_t i = 0; i < count - 1; i++)
+    {
+        void *ptrVector1 = &buffer2[i];
+        void *ptrVector2 = &buffer2[i + 1];
+
+        CHECK(ptrVector2 == reinterpret_cast<void *>(reinterpret_cast<char *>(ptrVector1) + (2 * sizeof(HalfFp16))));
+    }
+
+    for (size_t i = 0; i < count; i++)
+    {
+        delete buffer[i];
+    }
+}
+
 TEST_CASE("Complex<int>_streams", "[Common]")
 {
     std::string str = "3 4";
@@ -599,4 +1014,38 @@ TEST_CASE("Complex<float>_streams", "[Common]")
     ss2 << cmplx;
 
     CHECK(ss2.str() == "3.14 + 2.7i");
+}
+
+TEST_CASE("Complex<BFloat16>_streams", "[Common]")
+{
+    std::string str = "3.14 2.7";
+    std::stringstream ss(str);
+
+    Complex<BFloat16> cmplx;
+    ss >> cmplx;
+
+    CHECK(cmplx.real == Approx(3.14).margin(0.005));
+    CHECK(cmplx.imag == Approx(2.7).margin(0.005));
+
+    std::stringstream ss2;
+    ss2 << cmplx;
+
+    CHECK(ss2.str() == "3.14062 + 2.70312i");
+}
+
+TEST_CASE("Complex<HalfFp16>_streams", "[Common]")
+{
+    std::string str = "3.14 2.7";
+    std::stringstream ss(str);
+
+    Complex<HalfFp16> cmplx;
+    ss >> cmplx;
+
+    CHECK(cmplx.real == Approx(3.14).margin(0.005));
+    CHECK(cmplx.imag == Approx(2.7).margin(0.005));
+
+    std::stringstream ss2;
+    ss2 << cmplx;
+
+    CHECK(ss2.str() == "3.14062 + 2.69922i");
 }

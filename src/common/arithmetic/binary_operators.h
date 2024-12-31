@@ -6,7 +6,7 @@
 
 namespace opp
 {
-template <VectorType T> struct AbsDiff
+template <AnyVector T> struct AbsDiff
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
     {
@@ -18,7 +18,7 @@ template <VectorType T> struct AbsDiff
     }
 };
 
-template <VectorOrComplexType T> struct Add
+template <AnyVector T> struct Add
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
     {
@@ -30,7 +30,7 @@ template <VectorOrComplexType T> struct Add
     }
 };
 
-template <VectorOrComplexType T> struct Sub
+template <AnyVector T> struct Sub
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
     {
@@ -45,7 +45,7 @@ template <VectorOrComplexType T> struct Sub
 /// <summary>
 /// Inverted argument order for inplace sub: aSrcDst = aSrc1 - aSrcDst
 /// </summary>
-template <VectorOrComplexType T> struct SubInv
+template <AnyVector T> struct SubInv
 {
     DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
     {
@@ -53,7 +53,7 @@ template <VectorOrComplexType T> struct SubInv
     }
 };
 
-template <VectorOrComplexType T> struct Mul
+template <AnyVector T> struct Mul
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
     {
@@ -65,7 +65,7 @@ template <VectorOrComplexType T> struct Mul
     }
 };
 
-template <VectorOrComplexType T> struct Div
+template <AnyVector T> struct Div
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
     {
@@ -80,7 +80,7 @@ template <VectorOrComplexType T> struct Div
 /// <summary>
 /// Inverted argument order for inplace div: aSrcDst = aSrc1 / aSrcDst
 /// </summary>
-template <VectorOrComplexType T> struct DivInv
+template <AnyVector T> struct DivInv
 {
     DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
     {
@@ -88,7 +88,7 @@ template <VectorOrComplexType T> struct DivInv
     }
 };
 
-template <IntVectorType T> struct And
+template <RealIntVector T> struct And
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
     {
@@ -100,7 +100,7 @@ template <IntVectorType T> struct And
     }
 };
 
-template <IntVectorType T> struct Or
+template <RealIntVector T> struct Or
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
     {
@@ -112,7 +112,7 @@ template <IntVectorType T> struct Or
     }
 };
 
-template <IntVectorType T> struct Xor
+template <RealIntVector T> struct Xor
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
     {
@@ -124,7 +124,7 @@ template <IntVectorType T> struct Xor
     }
 };
 
-template <IntVectorType T> struct LShift
+template <RealIntVector T> struct LShift
 {
     const int Shift;
 
@@ -142,7 +142,7 @@ template <IntVectorType T> struct LShift
     }
 };
 
-template <IntVectorType T> struct RShift
+template <RealIntVector T> struct RShift
 {
     const int Shift;
 
@@ -160,7 +160,7 @@ template <IntVectorType T> struct RShift
     }
 };
 
-template <VectorType T> struct AddSqr
+template <AnyVector T> struct AddSqr
 {
     DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
     {
@@ -168,7 +168,7 @@ template <VectorType T> struct AddSqr
     }
 };
 
-template <VectorOrComplexType T> struct Min
+template <AnyVector T> struct Min
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
     {
@@ -180,7 +180,7 @@ template <VectorOrComplexType T> struct Min
     }
 };
 
-template <VectorOrComplexType T> struct Max
+template <AnyVector T> struct Max
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
     {
@@ -192,7 +192,7 @@ template <VectorOrComplexType T> struct Max
     }
 };
 
-template <VectorOrComplexType T> struct Eq
+template <AnyVector T> struct Eq
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, bool &aDst)
     {
@@ -200,7 +200,7 @@ template <VectorOrComplexType T> struct Eq
     }
 };
 
-template <VectorOrComplexType T> struct Ge
+template <AnyVector T> struct Ge
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, bool &aDst)
     {
@@ -208,7 +208,7 @@ template <VectorOrComplexType T> struct Ge
     }
 };
 
-template <VectorOrComplexType T> struct Gt
+template <RealVector T> struct Gt
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, bool &aDst)
     {
@@ -216,7 +216,7 @@ template <VectorOrComplexType T> struct Gt
     }
 };
 
-template <VectorOrComplexType T> struct Le
+template <RealVector T> struct Le
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, bool &aDst)
     {
@@ -224,7 +224,7 @@ template <VectorOrComplexType T> struct Le
     }
 };
 
-template <VectorOrComplexType T> struct Lt
+template <RealVector T> struct Lt
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, bool &aDst)
     {
@@ -232,7 +232,7 @@ template <VectorOrComplexType T> struct Lt
     }
 };
 
-template <VectorOrComplexType T> struct NEq
+template <AnyVector T> struct NEq
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, bool &aDst)
     {

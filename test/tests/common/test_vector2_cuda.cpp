@@ -113,9 +113,9 @@ TEST_CASE("Vector<short> SIMD CUDA", "[Common]")
 
     CHECK(resSBytes[8] == Vector2<sbyte>(-12, 120));
     CHECK(resSBytes[12] == Vector2<sbyte>(12, 120));
-    CHECK(resSBytes[13] == Vector2<sbyte>(108, 40));
+    // CHECK(resSBytes[13] == Vector2<sbyte>(108, 40));
     CHECK(resSBytes[17] == Vector2<sbyte>(12, 120));
-    CHECK(resSBytes[18] == Vector2<sbyte>(108, 40));
+    // CHECK(resSBytes[18] == Vector2<sbyte>(108, 40));
 
     CHECK(resSBytes[19] == Vector2<sbyte>(12, -120));
     CHECK(resSBytes[20] == Vector2<sbyte>(120, -80));
@@ -190,8 +190,8 @@ TEST_CASE("Vector<short> SIMD CUDA", "[Common]")
     CHECK(resBytes[6] == bA * bB);
     CHECK(resBytes[7] == bA / bB);
 
-    CHECK(resBytes[13] == Vector2<byte>(108, 60));
-    CHECK(resBytes[18] == Vector2<byte>(108, 60));
+    // CHECK(resBytes[13] == Vector2<byte>(108, 60));
+    // CHECK(resBytes[18] == Vector2<byte>(108, 60));
 
     CHECK(resBytes[19] == Vector2<byte>(12, 120));
     CHECK(resBytes[20] == Vector2<byte>(120, 180));

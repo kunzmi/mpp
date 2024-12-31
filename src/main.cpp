@@ -48,15 +48,15 @@ using namespace opp;
 
 int main()
 {
-    Complex<float> test(12.0f, 12.0f);
-    Complex<short> ttt;
-
     Vector1<Complex<float>> vecCf1(Complex<float>(2));
-    Vector1<Complex<float>> vecCf2(Complex<float>(1));
     Vector1<float> vecf1(Vector1<float>(2));
     Vector1<float> vecf2(Vector1<float>(1));
     auto vecCf3 = vecCf1.Magnitude();
     bool res    = vecf1 < vecf2;
+    if (res)
+    {
+        vecCf3 += 1.0f;
+    }
 
     /*Vector1<float> t1(12.0f);
     Vector1<float> t2(13.0f);

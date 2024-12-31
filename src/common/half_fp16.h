@@ -22,7 +22,7 @@ class alignas(2) HalfFp16
 {
   private:
 #ifdef IS_HOST_COMPILER
-    half_float::half value{};
+    half_float::half value{0.0f};
 #endif
 #ifdef IS_CUDA_COMPILER
     __half value{};
@@ -37,25 +37,25 @@ class alignas(2) HalfFp16
     explicit HalfFp16(float aFloat) : value(aFloat)
     {
     }
-    explicit HalfFp16(double aDouble) : value(aDouble)
+    explicit HalfFp16(double aDouble) : value(static_cast<float>(aDouble))
     {
     }
-    explicit HalfFp16(int aInt) : value(aInt)
+    explicit HalfFp16(int aInt) : value(static_cast<float>(aInt))
     {
     }
-    explicit HalfFp16(uint aUInt) : value(aUInt)
+    explicit HalfFp16(uint aUInt) : value(static_cast<float>(aUInt))
     {
     }
-    explicit HalfFp16(short aShort) : value(aShort)
+    explicit HalfFp16(short aShort) : value(static_cast<float>(aShort))
     {
     }
-    explicit HalfFp16(ushort aUShort) : value(aUShort)
+    explicit HalfFp16(ushort aUShort) : value(static_cast<float>(aUShort))
     {
     }
-    explicit HalfFp16(sbyte aSbyte) : value(aSbyte)
+    explicit HalfFp16(sbyte aSbyte) : value(static_cast<float>(aSbyte))
     {
     }
-    explicit HalfFp16(byte aByte) : value(aByte)
+    explicit HalfFp16(byte aByte) : value(static_cast<float>(aByte))
     {
     }
 #endif
@@ -111,7 +111,7 @@ class alignas(2) HalfFp16
     DEVICE_CODE inline operator float() const
     {
 #ifdef IS_HOST_COMPILER
-        return value;
+        return static_cast<float>(value);
 #endif
 #ifdef IS_CUDA_COMPILER
         return __half2float(value);
@@ -121,7 +121,10 @@ class alignas(2) HalfFp16
 #ifdef IS_HOST_COMPILER
     [[nodiscard]] inline constexpr static HalfFp16 FromUShort(ushort aUShort)
     {
-        return std::bit_cast<HalfFp16>(aUShort);
+        HalfFp16 ret;
+        ret.value = half_float::half(aUShort, true);
+        return ret;
+        // return std::bit_cast<HalfFp16>(aUShort);
     }
 #endif
 
@@ -243,18 +246,20 @@ class alignas(2) HalfFp16
 #ifdef IS_HOST_COMPILER
     /// <summary>
     /// </summary>
-    inline void Exp()
+    inline HalfFp16 &Exp()
     {
         value = half_float::exp(value);
+        return *this;
     }
 #endif
 
 #ifdef IS_CUDA_COMPILER
     /// <summary>
     /// </summary>
-    DEVICE_ONLY_CODE inline void Exp()
+    DEVICE_ONLY_CODE inline HalfFp16 &Exp()
     {
         value = hexp(value);
+        return *this;
     }
 #endif
 
@@ -279,18 +284,20 @@ class alignas(2) HalfFp16
 #ifdef IS_HOST_COMPILER
     /// <summary>
     /// </summary>
-    inline void Ln()
+    inline HalfFp16 &Ln()
     {
         value = half_float::log(value);
+        return *this;
     }
 #endif
 
 #ifdef IS_CUDA_COMPILER
     /// <summary>
     /// </summary>
-    DEVICE_ONLY_CODE inline void Ln()
+    DEVICE_ONLY_CODE inline HalfFp16 &Ln()
     {
         value = hlog(value);
+        return *this;
     }
 #endif
 
@@ -315,18 +322,20 @@ class alignas(2) HalfFp16
 #ifdef IS_HOST_COMPILER
     /// <summary>
     /// </summary>
-    inline void Sqrt()
+    inline HalfFp16 &Sqrt()
     {
         value = half_float::sqrt(value);
+        return *this;
     }
 #endif
 
 #ifdef IS_CUDA_COMPILER
     /// <summary>
     /// </summary>
-    DEVICE_ONLY_CODE inline void Sqrt()
+    DEVICE_ONLY_CODE inline HalfFp16 &Sqrt()
     {
         value = hsqrt(value);
+        return *this;
     }
 #endif
 
@@ -350,7 +359,7 @@ class alignas(2) HalfFp16
 
     /// <summary>
     /// </summary>
-    DEVICE_CODE inline void Abs()
+    DEVICE_CODE inline HalfFp16 &Abs()
     {
 #ifdef IS_HOST_COMPILER
         value = half_float::abs(value);
@@ -358,6 +367,7 @@ class alignas(2) HalfFp16
 #ifdef IS_CUDA_COMPILER
         value = __habs(value);
 #endif
+        return *this;
     }
 
 #ifdef IS_HOST_COMPILER
@@ -380,7 +390,7 @@ class alignas(2) HalfFp16
 
     /// <summary>
     /// </summary>
-    DEVICE_CODE inline void Min(const HalfFp16 &aOther)
+    DEVICE_CODE inline HalfFp16 &Min(const HalfFp16 &aOther)
     {
 #ifdef IS_HOST_COMPILER
         *this = HalfFp16(std::min(value, aOther.value));
@@ -388,6 +398,7 @@ class alignas(2) HalfFp16
 #ifdef IS_CUDA_COMPILER
         value = __hmin(value, aOther.value);
 #endif
+        return *this;
     }
 
     /// <summary>
@@ -405,7 +416,7 @@ class alignas(2) HalfFp16
 
     /// <summary>
     /// </summary>
-    DEVICE_CODE inline void Max(const HalfFp16 &aOther)
+    DEVICE_CODE inline HalfFp16 &Max(const HalfFp16 &aOther)
     {
 #ifdef IS_HOST_COMPILER
         *this = HalfFp16(std::max(value, aOther.value));
@@ -413,6 +424,7 @@ class alignas(2) HalfFp16
 #ifdef IS_CUDA_COMPILER
         value = __hmax(value, aOther.value);
 #endif
+        return *this;
     }
 
     /// <summary>
@@ -431,7 +443,7 @@ class alignas(2) HalfFp16
     /// <summary>
     /// round()
     /// </summary>
-    DEVICE_CODE inline void Round()
+    DEVICE_CODE inline HalfFp16 &Round()
     {
 #ifdef IS_HOST_COMPILER
         value = half_float::round(value);
@@ -439,6 +451,7 @@ class alignas(2) HalfFp16
 #ifdef IS_CUDA_COMPILER
         value = round(float(value));
 #endif
+        return *this;
     }
 
     /// <summary>
@@ -457,18 +470,20 @@ class alignas(2) HalfFp16
 #ifdef IS_HOST_COMPILER
     /// <summary>
     /// </summary>
-    inline void Floor()
+    inline HalfFp16 &Floor()
     {
         value = half_float::floor(value);
+        return *this;
     }
 #endif
 
 #ifdef IS_CUDA_COMPILER
     /// <summary>
     /// </summary>
-    DEVICE_ONLY_CODE inline void Floor()
+    DEVICE_ONLY_CODE inline HalfFp16 &Floor()
     {
         value = __int2half_rd(__half2int_rd(value));
+        return *this;
     }
 #endif
 
@@ -495,18 +510,20 @@ class alignas(2) HalfFp16
 #ifdef IS_HOST_COMPILER
     /// <summary>
     /// </summary>
-    inline void Ceil()
+    inline HalfFp16 &Ceil()
     {
         value = half_float::ceil(value);
+        return *this;
     }
 #endif
 
 #ifdef IS_CUDA_COMPILER
     /// <summary>
     /// </summary>
-    DEVICE_ONLY_CODE inline void Ceil()
+    DEVICE_ONLY_CODE inline HalfFp16 &Ceil()
     {
         value = __int2half_ru(__half2int_ru(value));
+        return *this;
     }
 #endif
 
@@ -535,9 +552,10 @@ class alignas(2) HalfFp16
     /// Round nearest ties to even<para/>
     /// Note: the host function assumes that current rounding mode is set to FE_TONEAREST
     /// </summary>
-    inline void RoundNearest()
+    inline HalfFp16 &RoundNearest()
     {
         value = half_float::nearbyint(value);
+        return *this;
     }
 #endif
 
@@ -546,9 +564,10 @@ class alignas(2) HalfFp16
     /// Round nearest ties to even<para/>
     /// Note: the host function assumes that current rounding mode is set to FE_TONEAREST
     /// </summary>
-    DEVICE_ONLY_CODE inline void RoundNearest()
+    DEVICE_ONLY_CODE inline HalfFp16 &RoundNearest()
     {
         value = __int2half_rn(__half2int_rn(value));
+        return *this;
     }
 #endif
 
@@ -578,9 +597,10 @@ class alignas(2) HalfFp16
     /// <summary>
     /// Round toward zero
     /// </summary>
-    inline void RoundZero()
+    inline HalfFp16 &RoundZero()
     {
         value = half_float::trunc(value);
+        return *this;
     }
 #endif
 
@@ -588,9 +608,10 @@ class alignas(2) HalfFp16
     /// <summary>
     /// Round toward zero
     /// </summary>
-    DEVICE_ONLY_CODE inline void RoundZero()
+    DEVICE_ONLY_CODE inline HalfFp16 &RoundZero()
     {
         value = __int2half_rz(__half2int_rz(value));
+        return *this;
     }
 #endif
 
@@ -623,11 +644,11 @@ class alignas(2) HalfFp16
 #ifdef IS_HOST_COMPILER
 inline std::ostream &operator<<(std::ostream &aOs, const HalfFp16 &aHalf)
 {
-    return aOs << float(aHalf.value);
+    return aOs << static_cast<float>(aHalf.value);
 }
 inline std::wostream &operator<<(std::wostream &aOs, const HalfFp16 &aHalf)
 {
-    return aOs << float(aHalf.value);
+    return aOs << static_cast<float>(aHalf.value);
 }
 inline std::istream &operator>>(std::istream &aIs, HalfFp16 &aHalf)
 {
@@ -644,4 +665,10 @@ inline std::wistream &operator>>(std::wistream &aIs, HalfFp16 &aHalf)
     return aIs;
 }
 #endif
+
+// bfloat literal: 2.4_hf is read as HalfFp16 when opp namespace is used
+inline HalfFp16 operator"" _hf(long double aValue)
+{
+    return HalfFp16(static_cast<float>(aValue));
+}
 } // namespace opp

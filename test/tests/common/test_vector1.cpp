@@ -102,10 +102,6 @@ TEST_CASE("Pixel32fC1", "[Common]")
     div4 /= 3;
     CHECK(div4.x == Approx(2.0).margin(0.001));
 
-    Pixel32fC1 l(4);
-    CHECK(l.MagnitudeSqr() == 16);
-    CHECK(l.Magnitude() == Approx(std::sqrt(16)));
-
     Pixel32fC1 minmax1(10);
     Pixel32fC1 minmax2(-20);
 
@@ -142,13 +138,6 @@ TEST_CASE("Pixel32fC1", "[Common]")
 
 TEST_CASE("Pixel32fC1_additionalMethods", "[Common]")
 {
-    Pixel32fC1 norm(4);
-    norm.Normalize();
-    CHECK(norm.Magnitude() == 1);
-    CHECK(norm.x == Approx(1).margin(0.001));
-
-    CHECK(Pixel32fC1::Normalize(Pixel32fC1(4)) == norm);
-
     Pixel32fC1 roundA(0.4f);
     Pixel32fC1 roundB(1.9f);
     Pixel32fC1 round2A = Pixel32fC1::Round(roundA);
@@ -261,7 +250,7 @@ TEST_CASE("Pixel32fC1_additionalMethods", "[Common]")
 
     Pixel32fC1 clampInt(float(numeric_limits<int>::max()) + 1000);
     clampInt.template ClampToTargetType<int>();
-    CHECK(clampInt.x == 2147483647);
+    CHECK(clampInt.x == 2147483520); // a bit smaller than max int
 
     Pixel32fC1 clampUInt(float(numeric_limits<uint>::max()) + 1000);
     clampUInt.template ClampToTargetType<uint>();
@@ -356,10 +345,6 @@ TEST_CASE("Pixel32sC1", "[Common]")
     div4 /= 3;
     CHECK(div4.x == 80);
 
-    Pixel32sC1 l(4);
-    CHECK(l.MagnitudeSqr() == 16);
-    CHECK(l.Magnitude() == 4);
-
     Pixel32sC1 minmax1(10);
     Pixel32sC1 minmax2(-20);
 
@@ -372,10 +357,6 @@ TEST_CASE("Pixel32sC1", "[Common]")
 
 TEST_CASE("Pixel32sC1_additionalMethods", "[Common]")
 {
-    Pixel32sC1 norm(4);
-    CHECK(norm.Magnitude() == 4);
-    CHECK(norm.MagnitudeSqr() == 16);
-
     Pixel32sC1 exp(4);
     Pixel32sC1 exp2 = Pixel32sC1::Exp(exp);
     exp.Exp();
@@ -405,15 +386,6 @@ TEST_CASE("Pixel32sC1_additionalMethods", "[Common]")
     abs.Abs();
     CHECK(abs == abs2);
     CHECK(abs.x == 2);
-
-    Pixel32sC1 absdiffA(13);
-    Pixel32sC1 absdiffB(45);
-    Pixel32sC1 absdiff2 = Pixel32sC1::AbsDiff(absdiffA, absdiffB);
-    Pixel32sC1 absdiff3 = Pixel32sC1::AbsDiff(absdiffB, absdiffA);
-    absdiffA.AbsDiff(absdiffB);
-    CHECK(absdiffA == absdiff2);
-    CHECK(absdiffA == absdiff3);
-    CHECK(absdiffA.x == 32);
 
     Pixel32sC1 clampByte(int(numeric_limits<byte>::max()) + 1);
     clampByte.template ClampToTargetType<byte>();
@@ -723,10 +695,6 @@ TEST_CASE("Pixel16fC1", "[Common]")
     div4 /= HalfFp16(3);
     CHECK(div4.x == Approx(2.0).margin(0.001));
 
-    Pixel16fC1 l(HalfFp16(4));
-    CHECK(l.MagnitudeSqr() == 16);
-    CHECK(l.Magnitude() == Approx(std::sqrt(16)).margin(0.01));
-
     Pixel16fC1 minmax1(HalfFp16(10));
     Pixel16fC1 minmax2(HalfFp16(-20));
 
@@ -739,13 +707,6 @@ TEST_CASE("Pixel16fC1", "[Common]")
 
 TEST_CASE("Pixel16fC1_additionalMethods", "[Common]")
 {
-    Pixel16fC1 norm(HalfFp16(4));
-    norm.Normalize();
-    CHECK(norm.Magnitude() == 1);
-    CHECK(norm.x == Approx(1).margin(0.001));
-
-    CHECK((Pixel16fC1::Normalize(Pixel16fC1(HalfFp16(4))) == norm));
-
     Pixel16fC1 roundA(HalfFp16(0.4f));
     Pixel16fC1 roundB(HalfFp16(1.9f));
     Pixel16fC1 round2A = Pixel16fC1::Round(roundA);

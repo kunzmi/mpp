@@ -7,7 +7,7 @@
 
 namespace opp
 {
-template <VectorType T> struct Set
+template <AnyVector T> struct Set
 {
     DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
     {
@@ -15,7 +15,7 @@ template <VectorType T> struct Set
     }
 };
 
-template <VectorType T> struct Neg
+template <AnyVector T> struct Neg
 {
     DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
     {
@@ -27,7 +27,7 @@ template <VectorType T> struct Neg
     }
 };
 
-template <IntVectorType T> struct Not
+template <RealIntVector T> struct Not
 {
     DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
     {
@@ -39,7 +39,7 @@ template <IntVectorType T> struct Not
     }
 };
 
-template <VectorType T> struct Sqr
+template <RealVector T> struct Sqr
 {
     DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
     {
@@ -51,7 +51,7 @@ template <VectorType T> struct Sqr
     }
 };
 
-template <VectorType T> struct Sqrt
+template <RealVector T> struct Sqrt
 {
     DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
     {
@@ -63,7 +63,7 @@ template <VectorType T> struct Sqrt
     }
 };
 
-template <VectorType T> struct Ln
+template <RealVector T> struct Ln
 {
     DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
     {
@@ -75,7 +75,7 @@ template <VectorType T> struct Ln
     }
 };
 
-template <VectorType T> struct Exp
+template <RealVector T> struct Exp
 {
     DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
     {
@@ -87,7 +87,7 @@ template <VectorType T> struct Exp
     }
 };
 
-template <VectorType T> struct Abs
+template <RealVector T> struct Abs
 {
     DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
     {
@@ -99,7 +99,7 @@ template <VectorType T> struct Abs
     }
 };
 
-template <FloatingVectorOrComplexType T> struct Round
+template <RealOrComplexFloatingVector T> struct Round
 {
     DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
     {
@@ -111,7 +111,7 @@ template <FloatingVectorOrComplexType T> struct Round
     }
 };
 
-template <FloatingVectorOrComplexType T> struct Floor
+template <RealOrComplexFloatingVector T> struct Floor
 {
     DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
     {
@@ -123,7 +123,7 @@ template <FloatingVectorOrComplexType T> struct Floor
     }
 };
 
-template <FloatingVectorOrComplexType T> struct Ceil
+template <RealOrComplexFloatingVector T> struct Ceil
 {
     DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
     {
@@ -135,7 +135,7 @@ template <FloatingVectorOrComplexType T> struct Ceil
     }
 };
 
-template <FloatingVectorOrComplexType T> struct RoundNearest
+template <RealOrComplexFloatingVector T> struct RoundNearest
 {
     DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
     {
@@ -147,7 +147,7 @@ template <FloatingVectorOrComplexType T> struct RoundNearest
     }
 };
 
-template <FloatingVectorOrComplexType T> struct RoundZero
+template <RealOrComplexFloatingVector T> struct RoundZero
 {
     DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
     {
@@ -159,17 +159,17 @@ template <FloatingVectorOrComplexType T> struct RoundZero
     }
 };
 
-template <FloatingComplexType T> struct Magnitude
+template <ComplexVector T> struct Magnitude
 {
-    DEVICE_CODE void operator()(const T &aSrc1, remove_complex_t<T> &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, complex_basetype_t<T> &aDst)
     {
         aDst = aSrc1.Magnitude();
     }
 };
 
-template <FloatingComplexType T> struct MagnitudeSqr
+template <ComplexVector T> struct MagnitudeSqr
 {
-    DEVICE_CODE void operator()(const T &aSrc1, remove_complex_t<T> &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, complex_basetype_t<T> &aDst)
     {
         aDst = aSrc1.MagnitudeSqr();
     }

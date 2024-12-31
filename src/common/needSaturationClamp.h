@@ -15,10 +15,12 @@ template <typename TFrom, typename TTo> struct need_saturation_clamp : std::fals
 {
 };
 
+// from byte to other
 template <> struct need_saturation_clamp<byte, sbyte> : std::true_type
 {
 };
 
+// from sbyte to other
 template <> struct need_saturation_clamp<sbyte, byte> : std::true_type
 {
 };
@@ -32,6 +34,7 @@ template <> struct need_saturation_clamp<sbyte, ulong64> : std::true_type
 {
 };
 
+// from short to other
 template <> struct need_saturation_clamp<short, byte> : std::true_type
 {
 };
@@ -48,6 +51,7 @@ template <> struct need_saturation_clamp<short, ulong64> : std::true_type
 {
 };
 
+// from ushort to other
 template <> struct need_saturation_clamp<ushort, byte> : std::true_type
 {
 };
@@ -61,6 +65,7 @@ template <> struct need_saturation_clamp<ushort, HalfFp16> : std::true_type
 { // max value of ushort is slightly larger than max value of HalfFp16
 };
 
+// from int to other
 template <> struct need_saturation_clamp<int, byte> : std::true_type
 {
 };
@@ -83,6 +88,7 @@ template <> struct need_saturation_clamp<int, HalfFp16> : std::true_type
 {
 };
 
+// from uint to other
 template <> struct need_saturation_clamp<uint, byte> : std::true_type
 {
 };
@@ -102,6 +108,7 @@ template <> struct need_saturation_clamp<uint, HalfFp16> : std::true_type
 {
 };
 
+// from long64 to other
 template <> struct need_saturation_clamp<long64, byte> : std::true_type
 {
 };
@@ -127,6 +134,7 @@ template <> struct need_saturation_clamp<long64, HalfFp16> : std::true_type
 {
 };
 
+// from ulong64 to other
 template <> struct need_saturation_clamp<ulong64, byte> : std::true_type
 {
 };
@@ -152,6 +160,7 @@ template <> struct need_saturation_clamp<ulong64, HalfFp16> : std::true_type
 {
 };
 
+// from float to other
 template <> struct need_saturation_clamp<float, byte> : std::true_type
 {
 };
@@ -180,6 +189,7 @@ template <> struct need_saturation_clamp<float, HalfFp16> : std::true_type
 {
 };
 
+// from double to other
 template <> struct need_saturation_clamp<double, byte> : std::true_type
 {
 };
@@ -208,6 +218,7 @@ template <> struct need_saturation_clamp<double, HalfFp16> : std::true_type
 {
 };
 
+// from HalfFp16 to other
 template <> struct need_saturation_clamp<HalfFp16, byte> : std::true_type
 {
 };
@@ -227,6 +238,7 @@ template <> struct need_saturation_clamp<HalfFp16, ulong64> : std::true_type
 {
 };
 
+// from BFloat16 to other
 template <> struct need_saturation_clamp<BFloat16, byte> : std::true_type
 {
 };

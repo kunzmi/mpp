@@ -470,12 +470,13 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise bitwise left shift
     /// </summary>
-    DEVICE_CODE void LShift(const Vector3<T> &aOther)
+    DEVICE_CODE Vector3<T> &LShift(const Vector3<T> &aOther)
         requires RealIntegral<T>
     {
         x = x << aOther.x;
         y = y << aOther.y;
         z = z << aOther.z;
+        return *this;
     }
 
     /// <summary>
@@ -494,12 +495,13 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise bitwise right shift
     /// </summary>
-    DEVICE_CODE void RShift(const Vector3<T> &aOther)
+    DEVICE_CODE Vector3<T> &RShift(const Vector3<T> &aOther)
         requires RealIntegral<T>
     {
         x = x >> aOther.x;
         y = y >> aOther.y;
         z = z >> aOther.z;
+        return *this;
     }
 
     /// <summary>
@@ -518,12 +520,13 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise bitwise left shift
     /// </summary>
-    DEVICE_CODE void LShift(const T &aOther)
+    DEVICE_CODE Vector3<T> &LShift(const T &aOther)
         requires RealIntegral<T>
     {
         x = x << aOther;
         y = y << aOther;
         z = z << aOther;
+        return *this;
     }
 
     /// <summary>
@@ -542,12 +545,13 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise bitwise right shift
     /// </summary>
-    DEVICE_CODE void RShift(const T &aOther)
+    DEVICE_CODE Vector3<T> &RShift(const T &aOther)
         requires RealIntegral<T>
     {
         x = x >> aOther;
         y = y >> aOther;
         z = z >> aOther;
+        return *this;
     }
 
     /// <summary>
@@ -566,12 +570,13 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise bitwise And
     /// </summary>
-    DEVICE_CODE void And(const Vector3<T> &aOther)
+    DEVICE_CODE Vector3<T> &And(const Vector3<T> &aOther)
         requires RealIntegral<T>
     {
         x = x & aOther.x;
         y = y & aOther.y;
         z = z & aOther.z;
+        return *this;
     }
 
     /// <summary>
@@ -590,12 +595,13 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise bitwise Or
     /// </summary>
-    DEVICE_CODE void Or(const Vector3<T> &aOther)
+    DEVICE_CODE Vector3<T> &Or(const Vector3<T> &aOther)
         requires RealIntegral<T>
     {
         x = x | aOther.x;
         y = y | aOther.y;
         z = z | aOther.z;
+        return *this;
     }
 
     /// <summary>
@@ -614,12 +620,13 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise bitwise Xor
     /// </summary>
-    DEVICE_CODE void Xor(const Vector3<T> &aOther)
+    DEVICE_CODE Vector3<T> &Xor(const Vector3<T> &aOther)
         requires RealIntegral<T>
     {
         x = x ^ aOther.x;
         y = y ^ aOther.y;
         z = z ^ aOther.z;
+        return *this;
     }
 
     /// <summary>
@@ -638,12 +645,13 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise bitwise negation
     /// </summary>
-    DEVICE_CODE void Not()
+    DEVICE_CODE Vector3<T> &Not()
         requires RealIntegral<T>
     {
         x = ~x;
         y = ~y;
         z = ~z;
+        return *this;
     }
 
     /// <summary>
@@ -665,34 +673,37 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise exponential
     /// </summary>
-    void Exp()
+    Vector3<T> &Exp()
         requires HostCode<T> && NativeNumber<T>
     {
         x = std::exp(x);
         y = std::exp(y);
         z = std::exp(z);
+        return *this;
     }
 
     /// <summary>
     /// Element wise exponential
     /// </summary>
-    DEVICE_CODE void Exp()
+    DEVICE_CODE Vector3<T> &Exp()
         requires NonNativeNumber<T>
     {
         x = T::Exp(x);
         y = T::Exp(y);
         z = T::Exp(z);
+        return *this;
     }
 
     /// <summary>
     /// Element wise exponential
     /// </summary>
-    DEVICE_CODE void Exp()
+    DEVICE_CODE Vector3<T> &Exp()
         requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         x = exp(x);
         y = exp(y);
         z = exp(z);
+        return *this;
     }
 
     /// <summary>
@@ -739,34 +750,37 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise natural logarithm
     /// </summary>
-    void Ln()
+    Vector3<T> &Ln()
         requires HostCode<T> && NativeNumber<T>
     {
         x = std::log(x);
         y = std::log(y);
         z = std::log(z);
+        return *this;
     }
 
     /// <summary>
     /// Element wise natural logarithm
     /// </summary>
-    DEVICE_CODE void Ln()
+    DEVICE_CODE Vector3<T> &Ln()
         requires NonNativeNumber<T>
     {
         x = T::Ln(x);
         y = T::Ln(y);
         z = T::Ln(z);
+        return *this;
     }
 
     /// <summary>
     /// Element wise natural logarithm
     /// </summary>
-    DEVICE_CODE void Ln()
+    DEVICE_CODE Vector3<T> &Ln()
         requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         x = log(x);
         y = log(y);
         z = log(z);
+        return *this;
     }
 
     /// <summary>
@@ -813,11 +827,12 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise square
     /// </summary>
-    DEVICE_CODE void Sqr()
+    DEVICE_CODE Vector3<T> &Sqr()
     {
         x = x * x;
         y = y * y;
         z = z * z;
+        return *this;
     }
 
     /// <summary>
@@ -837,34 +852,37 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise square root
     /// </summary>
-    void Sqrt()
+    Vector3<T> &Sqrt()
         requires HostCode<T> && NativeNumber<T>
     {
         x = std::sqrt(x);
         y = std::sqrt(y);
         z = std::sqrt(z);
+        return *this;
     }
 
     /// <summary>
     /// Element wise square root
     /// </summary>
-    DEVICE_CODE void Sqrt()
+    DEVICE_CODE Vector3<T> &Sqrt()
         requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         x = sqrt(x);
         y = sqrt(y);
         z = sqrt(z);
+        return *this;
     }
 
     /// <summary>
     /// Element wise square root
     /// </summary>
-    DEVICE_CODE void Sqrt()
+    DEVICE_CODE Vector3<T> &Sqrt()
         requires NonNativeNumber<T>
     {
         x = T::Sqrt(x);
         y = T::Sqrt(y);
         z = T::Sqrt(z);
+        return *this;
     }
 
     /// <summary>
@@ -911,34 +929,37 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise absolute
     /// </summary>
-    void Abs()
+    Vector3<T> &Abs()
         requires HostCode<T> && RealSignedNumber<T> && NativeNumber<T>
     {
         x = std::abs(x);
         y = std::abs(y);
         z = std::abs(z);
+        return *this;
     }
 
     /// <summary>
     /// Element wise absolute
     /// </summary>
-    DEVICE_CODE void Abs()
+    DEVICE_CODE Vector3<T> &Abs()
         requires RealSignedNumber<T> && NonNativeNumber<T>
     {
         x = T::Abs(x);
         y = T::Abs(y);
         z = T::Abs(z);
+        return *this;
     }
 
     /// <summary>
     /// Element wise absolute
     /// </summary>
-    DEVICE_CODE void Abs()
+    DEVICE_CODE Vector3<T> &Abs()
         requires DeviceCode<T> && RealSignedNumber<T> && NativeNumber<T>
     {
         x = abs(x);
         y = abs(y);
         z = abs(z);
+        return *this;
     }
 
     /// <summary>
@@ -985,12 +1006,13 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise absolute difference
     /// </summary>
-    DEVICE_CODE void AbsDiff(const Vector3<T> &aOther)
+    DEVICE_CODE Vector3<T> &AbsDiff(const Vector3<T> &aOther)
         requires HostCode<T> && NativeFloatingPoint<T>
     {
         x = std::abs(x - aOther.x);
         y = std::abs(y - aOther.y);
         z = std::abs(z - aOther.z);
+        return *this;
     }
 
     /// <summary>
@@ -1009,12 +1031,13 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise absolute difference
     /// </summary>
-    DEVICE_CODE void AbsDiff(const Vector3<T> &aOther)
+    DEVICE_CODE Vector3<T> &AbsDiff(const Vector3<T> &aOther)
         requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         x = abs(x - aOther.x);
         y = abs(y - aOther.y);
         z = abs(z - aOther.z);
+        return *this;
     }
 
     /// <summary>
@@ -1033,12 +1056,13 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise absolute difference
     /// </summary>
-    DEVICE_CODE void AbsDiff(const Vector3<T> &aOther)
+    DEVICE_CODE Vector3<T> &AbsDiff(const Vector3<T> &aOther)
         requires NonNativeNumber<T>
     {
         x = T::Abs(x - aOther.x);
         y = T::Abs(y - aOther.y);
         z = T::Abs(z - aOther.z);
+        return *this;
     }
 
     /// <summary>
@@ -1055,9 +1079,50 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     }
 #pragma endregion
 
-#pragma region Magnitude(Sqr)
+#pragma region Methods for Complex types
     /// <summary>
-    /// Complex magnitude
+    /// Conjugate complex per element
+    /// </summary>
+    DEVICE_CODE Vector3<T> &Conj()
+        requires ComplexNumber<T>
+    {
+        x.Conj();
+        y.Conj();
+        z.Conj();
+        return *this;
+    }
+
+    /// <summary>
+    /// Conjugate complex per element
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector3<T> Conj(const Vector3<T> &aValue)
+        requires ComplexNumber<T>
+    {
+        return {T::Conj(aValue.x), T::Conj(aValue.y), T::Conj(aValue.z)};
+    }
+
+    /// <summary>
+    /// Conjugate complex multiplication: this * conj(aOther)  per element
+    /// </summary>
+    DEVICE_CODE Vector3<T> &ConjMul(const Vector3<T> &aOther)
+        requires ComplexNumber<T>
+    {
+        x.ConjMul(aOther.x);
+        y.ConjMul(aOther.y);
+        z.ConjMul(aOther.z);
+        return *this;
+    }
+
+    /// <summary>
+    /// Conjugate complex multiplication: aLeft * conj(aRight) per element
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector3<T> ConjMul(const Vector3<T> &aLeft, const Vector3<T> &aRight)
+    {
+        return {T::ConjMul(aLeft.x, aRight.x), T::ConjMul(aLeft.y, aRight.y), T::ConjMul(aLeft.z, aRight.z)};
+    }
+
+    /// <summary>
+    /// Complex magnitude per element
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector3<complex_basetype_t<T>> Magnitude() const
         requires ComplexFloatingPoint<T>
@@ -1070,7 +1135,7 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     }
 
     /// <summary>
-    /// Complex magnitude squared
+    /// Complex magnitude squared per element
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector3<complex_basetype_t<T>> MagnitudeSqr() const
         requires ComplexFloatingPoint<T>
@@ -1087,87 +1152,47 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Component wise clamp to value range
     /// </summary>
-    DEVICE_CODE void Clamp(T aMinVal, T aMaxVal)
+    DEVICE_CODE Vector3<T> &Clamp(T aMinVal, T aMaxVal)
         requires DeviceCode<T> && NativeNumber<T>
     {
         x = max(aMinVal, min(x, aMaxVal));
         y = max(aMinVal, min(y, aMaxVal));
         z = max(aMinVal, min(z, aMaxVal));
+        return *this;
     }
 
     /// <summary>
     /// Component wise clamp to value range
     /// </summary>
-    void Clamp(T aMinVal, T aMaxVal)
+    Vector3<T> &Clamp(T aMinVal, T aMaxVal)
         requires HostCode<T> && NativeNumber<T>
     {
         x = std::max(aMinVal, std::min(x, aMaxVal));
         y = std::max(aMinVal, std::min(y, aMaxVal));
         z = std::max(aMinVal, std::min(z, aMaxVal));
+        return *this;
     }
 
     /// <summary>
     /// Component wise clamp to value range
     /// </summary>
-    DEVICE_CODE void Clamp(T aMinVal, T aMaxVal)
+    DEVICE_CODE Vector3<T> &Clamp(T aMinVal, T aMaxVal)
         requires NonNativeNumber<T>
     {
         x = T::Max(aMinVal, T::Min(x, aMaxVal));
         y = T::Max(aMinVal, T::Min(y, aMaxVal));
         z = T::Max(aMinVal, T::Min(z, aMaxVal));
+        return *this;
     }
 
     /// <summary>
     /// Component wise clamp to maximum value range of given target type
     /// </summary>
     template <Number TTarget>
-    DEVICE_CODE void ClampToTargetType() noexcept
-        requires(need_saturation_clamp_v<T, TTarget>) && (!IsHalfFp16<T> || !IsShort<TTarget>) &&
-                (!IsBFloat16<T> || !IsShort<TTarget>) && (!IsBFloat16<T> || !IsUShort<TTarget>)
+    DEVICE_CODE Vector3<T> &ClampToTargetType() noexcept
+        requires(need_saturation_clamp_v<T, TTarget>)
     {
-        Clamp(T(numeric_limits<TTarget>::lowest()), T(numeric_limits<TTarget>::max()));
-    }
-
-    /// <summary>
-    /// Component wise clamp to maximum value range of given target type
-    /// </summary>
-    template <Number TTarget>
-    DEVICE_CODE void ClampToTargetType() noexcept
-        requires(need_saturation_clamp_v<T, TTarget>) && IsHalfFp16<T> && IsShort<TTarget>
-    {
-        // special case for half floats: the maximum value of short is slightly larger than the closest exact
-        // integer in HalfFp16, and as we use round to nearest, the clamping would result in a too large number.
-        // Thus for HalfFp16 and short, we clamp to the exact integer smaller than short::max(), i.e. 32752
-        constexpr HalfFp16 maxExactShort = HalfFp16::FromUShort(0x77FF); // = 32752
-        Clamp(T(numeric_limits<TTarget>::lowest()), maxExactShort);
-    }
-
-    /// <summary>
-    /// Component wise clamp to maximum value range of given target type
-    /// </summary>
-    template <Number TTarget>
-    DEVICE_CODE void ClampToTargetType() noexcept
-        requires(need_saturation_clamp_v<T, TTarget>) && IsBFloat16<T> && IsShort<TTarget>
-    {
-        // special case for half floats: the maximum value of short is slightly smaller than the closest exact
-        // integer in BFloat16, and as we use round to nearest, the clamping would result in a too large number.
-        // Thus for BFloat16 and short, we clamp to the next integer smaller than short::max(), i.e. 32640
-        constexpr BFloat16 maxExactShort = BFloat16::FromUShort(0x46FF); // = 32640
-        Clamp(T(numeric_limits<TTarget>::lowest()), maxExactShort);
-    }
-
-    /// <summary>
-    /// Component wise clamp to maximum value range of given target type
-    /// </summary>
-    template <Number TTarget>
-    DEVICE_CODE void ClampToTargetType() noexcept
-        requires(need_saturation_clamp_v<T, TTarget>) && IsBFloat16<T> && IsUShort<TTarget>
-    {
-        // special case for half floats: the maximum value of ushort is slightly smaller than the closest exact
-        // integer in BFloat16, and as we use round to nearest, the clamping would result in a too large number.
-        // Thus for BFloat16 and short, we clamp to the next integer smaller than ushort::max(), i.e. 65280
-        constexpr BFloat16 maxExactShort = BFloat16::FromUShort(0x477f); // = 65280
-        Clamp(T(numeric_limits<TTarget>::lowest()), maxExactShort);
+        return Clamp(numeric_limits_conversion<T, TTarget>::lowest(), numeric_limits_conversion<T, TTarget>::max());
     }
 
     /// <summary>
@@ -1175,9 +1200,10 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// NOP in case no saturation clamping is needed.
     /// </summary>
     template <Number TTarget>
-    DEVICE_CODE void ClampToTargetType() noexcept
+    DEVICE_CODE Vector3<T> &ClampToTargetType() noexcept
         requires(!need_saturation_clamp_v<T, TTarget>)
     {
+        return *this;
     }
 #pragma endregion
 
@@ -1185,34 +1211,37 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Component wise minimum
     /// </summary>
-    DEVICE_CODE void Min(const Vector3<T> &aRight)
+    DEVICE_CODE Vector3<T> &Min(const Vector3<T> &aRight)
         requires DeviceCode<T> && NativeNumber<T>
     {
         x = min(x, aRight.x);
         y = min(y, aRight.y);
         z = min(z, aRight.z);
+        return *this;
     }
 
     /// <summary>
     /// Component wise minimum
     /// </summary>
-    void Min(const Vector3<T> &aRight)
+    Vector3<T> &Min(const Vector3<T> &aRight)
         requires HostCode<T> && NativeNumber<T>
     {
         x = std::min(x, aRight.x);
         y = std::min(y, aRight.y);
         z = std::min(z, aRight.z);
+        return *this;
     }
 
     /// <summary>
     /// Component wise minimum
     /// </summary>
-    DEVICE_CODE void Min(const Vector3<T> &aRight)
+    DEVICE_CODE Vector3<T> &Min(const Vector3<T> &aRight)
         requires NonNativeNumber<T>
     {
         x.Min(aRight.x);
         y.Min(aRight.y);
         z.Min(aRight.z);
+        return *this;
     }
 
     /// <summary>
@@ -1274,34 +1303,37 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Component wise maximum
     /// </summary>
-    DEVICE_CODE void Max(const Vector3<T> &aRight)
+    DEVICE_CODE Vector3<T> &Max(const Vector3<T> &aRight)
         requires DeviceCode<T> && NativeNumber<T>
     {
         x = max(x, aRight.x);
         y = max(y, aRight.y);
         z = max(z, aRight.z);
+        return *this;
     }
 
     /// <summary>
     /// Component wise maximum
     /// </summary>
-    void Max(const Vector3<T> &aRight)
+    Vector3<T> &Max(const Vector3<T> &aRight)
         requires HostCode<T> && NativeNumber<T>
     {
         x = std::max(x, aRight.x);
         y = std::max(y, aRight.y);
         z = std::max(z, aRight.z);
+        return *this;
     }
 
     /// <summary>
     /// Component wise maximum
     /// </summary>
-    DEVICE_CODE void Max(const Vector3<T> &aRight)
+    DEVICE_CODE Vector3<T> &Max(const Vector3<T> &aRight)
         requires NonNativeNumber<T>
     {
         x.Max(aRight.x);
         y.Max(aRight.y);
         z.Max(aRight.z);
+        return *this;
     }
 
     /// <summary>
@@ -1374,34 +1406,37 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise round()
     /// </summary>
-    DEVICE_CODE void Round()
+    DEVICE_CODE Vector3<T> &Round()
         requires NonNativeFloatingPoint<T>
     {
         x.Round();
         y.Round();
         z.Round();
+        return *this;
     }
 
     /// <summary>
     /// Element wise round()
     /// </summary>
-    DEVICE_CODE void Round()
+    DEVICE_CODE Vector3<T> &Round()
         requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         x = round(x);
         y = round(y);
         z = round(z);
+        return *this;
     }
 
     /// <summary>
     /// Element wise round()
     /// </summary>
-    void Round()
+    Vector3<T> &Round()
         requires HostCode<T> && NativeFloatingPoint<T>
     {
         x = std::round(x);
         y = std::round(y);
         z = std::round(z);
+        return *this;
     }
 
     /// <summary>
@@ -1418,34 +1453,37 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise floor()
     /// </summary>
-    DEVICE_CODE void Floor()
+    DEVICE_CODE Vector3<T> &Floor()
         requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         x = floor(x);
         y = floor(y);
         z = floor(z);
+        return *this;
     }
 
     /// <summary>
     /// Element wise floor()
     /// </summary>
-    void Floor()
+    Vector3<T> &Floor()
         requires HostCode<T> && NativeFloatingPoint<T>
     {
         x = std::floor(x);
         y = std::floor(y);
         z = std::floor(z);
+        return *this;
     }
 
     /// <summary>
     /// Element wise floor()
     /// </summary>
-    DEVICE_ONLY_CODE void Floor()
+    DEVICE_ONLY_CODE Vector3<T> &Floor()
         requires NonNativeFloatingPoint<T>
     {
         x.Floor();
         y.Floor();
         z.Floor();
+        return *this;
     }
 
     /// <summary>
@@ -1462,34 +1500,37 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise ceil()
     /// </summary>
-    DEVICE_CODE void Ceil()
+    DEVICE_CODE Vector3<T> &Ceil()
         requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         x = ceil(x);
         y = ceil(y);
         z = ceil(z);
+        return *this;
     }
 
     /// <summary>
     /// Element wise ceil()
     /// </summary>
-    void Ceil()
+    Vector3<T> &Ceil()
         requires HostCode<T> && NativeFloatingPoint<T>
     {
         x = std::ceil(x);
         y = std::ceil(y);
         z = std::ceil(z);
+        return *this;
     }
 
     /// <summary>
     /// Element wise ceil()
     /// </summary>
-    DEVICE_ONLY_CODE void Ceil()
+    DEVICE_ONLY_CODE Vector3<T> &Ceil()
         requires NonNativeFloatingPoint<T>
     {
         x.Ceil();
         y.Ceil();
         z.Ceil();
+        return *this;
     }
 
     /// <summary>
@@ -1507,35 +1548,38 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise round nearest ties to even
     /// </summary>
-    DEVICE_CODE void RoundNearest()
+    DEVICE_CODE Vector3<T> &RoundNearest()
         requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         x = __float2int_rn(x);
         y = __float2int_rn(y);
         z = __float2int_rn(z);
+        return *this;
     }
 
     /// <summary>
     /// Element wise round nearest ties to even<para/>
     /// Note: this host function assumes that current rounding mode is set to FE_TONEAREST
     /// </summary>
-    void RoundNearest()
+    Vector3<T> &RoundNearest()
         requires HostCode<T> && NativeFloatingPoint<T>
     {
         x = std::nearbyint(x);
         y = std::nearbyint(y);
         z = std::nearbyint(z);
+        return *this;
     }
 
     /// <summary>
     /// Element wise round nearest ties to even
     /// </summary>
-    DEVICE_ONLY_CODE void RoundNearest()
+    DEVICE_ONLY_CODE Vector3<T> &RoundNearest()
         requires NonNativeFloatingPoint<T>
     {
         x.RoundNearest();
         y.RoundNearest();
         z.RoundNearest();
+        return *this;
     }
 
     /// <summary>
@@ -1552,34 +1596,37 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise round toward zero
     /// </summary>
-    DEVICE_CODE void RoundZero()
+    DEVICE_CODE Vector3<T> &RoundZero()
         requires DeviceCode<T> && NativeFloatingPoint<T>
     {
         x = __float2int_rz(x);
         y = __float2int_rz(y);
         z = __float2int_rz(z);
+        return *this;
     }
 
     /// <summary>
     /// Element wise round toward zero
     /// </summary>
-    void RoundZero()
+    Vector3<T> &RoundZero()
         requires HostCode<T> && NativeFloatingPoint<T>
     {
         x = std::trunc(x);
         y = std::trunc(y);
         z = std::trunc(z);
+        return *this;
     }
 
     /// <summary>
     /// Element wise round toward zero
     /// </summary>
-    DEVICE_ONLY_CODE void RoundZero()
+    DEVICE_ONLY_CODE Vector3<T> &RoundZero()
         requires NonNativeFloatingPoint<T>
     {
         x.RoundZero();
         y.RoundZero();
         z.RoundZero();
+        return *this;
     }
 #pragma endregion
 
@@ -1701,50 +1748,58 @@ template <typename T, typename T2>
 DEVICE_CODE Vector3<T> operator+(const Vector3<T> &aLeft, T2 aRight)
     requires Number<T2>
 {
-    return Vector3<T>{T(aLeft.x + aRight), T(aLeft.y + aRight), T(aLeft.z + aRight)};
+    return Vector3<T>{static_cast<T>(aLeft.x + aRight), static_cast<T>(aLeft.y + aRight),
+                      static_cast<T>(aLeft.z + aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector3<T> operator+(T2 aLeft, const Vector3<T> &aRight)
     requires Number<T2>
 {
-    return Vector3<T>{T(aLeft + aRight.x), T(aLeft + aRight.y), T(aLeft + aRight.z)};
+    return Vector3<T>{static_cast<T>(aLeft + aRight.x), static_cast<T>(aLeft + aRight.y),
+                      static_cast<T>(aLeft + aRight.z)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector3<T> operator-(const Vector3<T> &aLeft, T2 aRight)
     requires Number<T2>
 {
-    return Vector3<T>{T(aLeft.x - aRight), T(aLeft.y - aRight), T(aLeft.z - aRight)};
+    return Vector3<T>{static_cast<T>(aLeft.x - aRight), static_cast<T>(aLeft.y - aRight),
+                      static_cast<T>(aLeft.z - aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector3<T> operator-(T2 aLeft, const Vector3<T> &aRight)
     requires Number<T2>
 {
-    return Vector3<T>{T(aLeft - aRight.x), T(aLeft - aRight.y), T(aLeft - aRight.z)};
+    return Vector3<T>{static_cast<T>(aLeft - aRight.x), static_cast<T>(aLeft - aRight.y),
+                      static_cast<T>(aLeft - aRight.z)};
 }
 
 template <typename T, typename T2>
 DEVICE_CODE Vector3<T> operator*(const Vector3<T> &aLeft, T2 aRight)
     requires Number<T2>
 {
-    return Vector3<T>{T(aLeft.x * aRight), T(aLeft.y * aRight), T(aLeft.z * aRight)};
+    return Vector3<T>{static_cast<T>(aLeft.x * aRight), static_cast<T>(aLeft.y * aRight),
+                      static_cast<T>(aLeft.z * aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector3<T> operator*(T2 aLeft, const Vector3<T> &aRight)
     requires Number<T2>
 {
-    return Vector3<T>{T(aLeft * aRight.x), T(aLeft * aRight.y), T(aLeft * aRight.z)};
+    return Vector3<T>{static_cast<T>(aLeft * aRight.x), static_cast<T>(aLeft * aRight.y),
+                      static_cast<T>(aLeft * aRight.z)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector3<T> operator/(const Vector3<T> &aLeft, T2 aRight)
     requires Number<T2>
 {
-    return Vector3<T>{T(aLeft.x / aRight), T(aLeft.y / aRight), T(aLeft.z / aRight)};
+    return Vector3<T>{static_cast<T>(aLeft.x / aRight), static_cast<T>(aLeft.y / aRight),
+                      static_cast<T>(aLeft.z / aRight)};
 }
 template <typename T, typename T2>
 DEVICE_CODE Vector3<T> operator/(T2 aLeft, const Vector3<T> &aRight)
     requires Number<T2>
 {
-    return Vector3<T>{T(aLeft / aRight.x), T(aLeft / aRight.y), T(aLeft / aRight.z)};
+    return Vector3<T>{static_cast<T>(aLeft / aRight.x), static_cast<T>(aLeft / aRight.y),
+                      static_cast<T>(aLeft / aRight.z)};
 }
 
 template <HostCode T2> std::ostream &operator<<(std::ostream &aOs, const Vector3<T2> &aVec)

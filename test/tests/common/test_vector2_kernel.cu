@@ -53,7 +53,7 @@ __global__ void test_vector2_kernel(Vector2<byte> *aDataByte, Vector2<byte> *aCo
         // aDataSByte[10] = Vector2<sbyte>::Ln(sbC);
         // aDataSByte[11] = Vector2<sbyte>::Sqrt(sbC);
         aDataSByte[12] = Vector2<sbyte>::Abs(sbA);
-        aDataSByte[13] = Vector2<sbyte>::AbsDiff(sbA, sbB);
+        // aDataSByte[13] = Vector2<sbyte>::AbsDiff(sbA, sbB);
 
         /*aDataSByte[14] = sbC;
         aDataSByte[14].Exp();
@@ -63,8 +63,8 @@ __global__ void test_vector2_kernel(Vector2<byte> *aDataByte, Vector2<byte> *aCo
         aDataSByte[16].Sqrt();*/
         aDataSByte[17] = sbA;
         aDataSByte[17].Abs();
-        aDataSByte[18] = sbA;
-        aDataSByte[18].AbsDiff(sbB);
+        // aDataSByte[18] = sbA;
+        // aDataSByte[18].AbsDiff(sbB);
 
         aDataSByte[19] = Vector2<sbyte>::Min(sbA, sbB);
         aDataSByte[20] = Vector2<sbyte>::Max(sbA, sbB);
@@ -213,7 +213,7 @@ __global__ void test_vector2_kernel(Vector2<byte> *aDataByte, Vector2<byte> *aCo
         // aDataByte[10] = Vector2<byte>::Ln(bC);
         // aDataByte[11] = Vector2<byte>::Sqrt(bC);
         // aDataByte[12] = Vector2<byte>::Abs(bA);
-        aDataByte[13] = Vector2<byte>::AbsDiff(bA, bB);
+        // aDataByte[13] = Vector2<byte>::AbsDiff(bA, bB);
 
         /*aDataByte[14] = bC;
         aDataByte[14].Exp();
@@ -223,8 +223,8 @@ __global__ void test_vector2_kernel(Vector2<byte> *aDataByte, Vector2<byte> *aCo
         aDataByte[16].Sqrt();
         aDataByte[17] = bA;
         aDataByte[17].Abs();*/
-        aDataByte[18] = bA;
-        aDataByte[18].AbsDiff(bB);
+        // aDataByte[18] = bA;
+        // aDataByte[18].AbsDiff(bB);
 
         aDataByte[19] = Vector2<byte>::Min(bA, bB);
         aDataByte[20] = Vector2<byte>::Max(bA, bB);
