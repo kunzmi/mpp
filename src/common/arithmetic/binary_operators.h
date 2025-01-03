@@ -239,4 +239,52 @@ template <AnyVector T> struct NEq
         aDst = aSrc1 != aSrc2;
     }
 };
+
+template <AnyVector T> struct CompareEq
+{
+    void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst)
+    {
+        aDst = T::CompareEQ(aSrc1, aSrc2);
+    }
+};
+
+template <AnyVector T> struct CompareGe
+{
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst)
+    {
+        aDst = T::CompareGE(aSrc1, aSrc2);
+    }
+};
+
+template <RealVector T> struct CompareGt
+{
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst)
+    {
+        aDst = T::CompareGT(aSrc1, aSrc2);
+    }
+};
+
+template <RealVector T> struct CompareLe
+{
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst)
+    {
+        aDst = T::CompareLE(aSrc1, aSrc2);
+    }
+};
+
+template <RealVector T> struct CompareLt
+{
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst)
+    {
+        aDst = T::CompareLT(aSrc1, aSrc2);
+    }
+};
+
+template <AnyVector T> struct CompareNEq
+{
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst)
+    {
+        aDst = T::CompareNEQ(aSrc1, aSrc2);
+    }
+};
 } // namespace opp

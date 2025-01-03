@@ -43,6 +43,7 @@ struct SrcSrcFunctor : public ImageFunctor<false>
 
     [[no_unique_address]] RoundFunctor<roundingMode, ComputeT> round;
 
+#pragma region Constructors
     SrcSrcFunctor()
     {
     }
@@ -57,47 +58,34 @@ struct SrcSrcFunctor : public ImageFunctor<false>
         : Src1(aSrc1), SrcPitch1(aSrcPitch1), Src2(aSrc2), SrcPitch2(aSrcPitch2), Op(aOp), OpSIMD(aOpSIMD)
     {
     }
+#pragma endregion
 
+#pragma region run naive on one pixel
     // Case ComputeT==DstT, no conversion, no rounding
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
         requires std::same_as<ComputeT, DstT>
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
-        Op(ComputeT(*pixelSrc1), ComputeT(*pixelSrc2), aDst);
+        Op(static_cast<ComputeT>(*pixelSrc1), static_cast<ComputeT>(*pixelSrc2), aDst);
     }
 
     // Case ComputeT==Floating, DstT==Integral, conversion and rounding of result
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
-        requires RealOrComplexIntegral<pixel_basetype_t<DstT>> && //
-                 RealOrComplexFloatingPoint<pixel_basetype_t<ComputeT>>
+        requires(!std::same_as<ComputeT, DstT>)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
 
         ComputeT temp;
-        Op(ComputeT(*pixelSrc1), ComputeT(*pixelSrc2), temp);
-        round(temp);
+        Op(static_cast<ComputeT>(*pixelSrc1), static_cast<ComputeT>(*pixelSrc2), temp);
+        round(temp); // NOP for integer ComputeT
         // DstT constructor will clamp temp to value range of DstT
-        aDst = DstT(temp);
+        aDst = static_cast<DstT>(temp);
     }
+#pragma endregion
 
-    // Case (ComputeT==Floating, DstT==Floating) or (ComputeT==Integral, DstT==Integral), conversion result, no rounding
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
-        requires(!std::same_as<ComputeT, DstT>) &&
-                ((RealOrComplexIntegral<pixel_basetype_t<DstT>> && RealOrComplexIntegral<pixel_basetype_t<ComputeT>>) ||
-                 (RealOrComplexFloatingPoint<pixel_basetype_t<DstT>> &&
-                  RealOrComplexFloatingPoint<pixel_basetype_t<ComputeT>>))
-    {
-        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
-        const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
-
-        ComputeT temp;
-        Op(ComputeT(*pixelSrc1), ComputeT(*pixelSrc2), temp);
-        // DstT constructor will clamp temp to value range of DstT
-        aDst = DstT(temp);
-    }
-
+#pragma region run SIMD on pixel tupel
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
         requires std::same_as<ComputeT_SIMD, DstT>
     {
@@ -110,7 +98,9 @@ struct SrcSrcFunctor : public ImageFunctor<false>
 
         OpSIMD(tupelSrc1, tupelSrc2, aDst);
     }
+#pragma endregion
 
+#pragma region run sequential on pixel tupel
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
         requires std::same_as<ComputeT, DstT> && //
                  std::same_as<ComputeT_SIMD, voidType>
@@ -124,37 +114,12 @@ struct SrcSrcFunctor : public ImageFunctor<false>
 #pragma unroll
         for (size_t i = 0; i < tupelSize; i++)
         {
-            Op(ComputeT(tupelSrc1.value[i]), ComputeT(tupelSrc2.value[i]), aDst.value[i]);
+            Op(static_cast<ComputeT>(tupelSrc1.value[i]), static_cast<ComputeT>(tupelSrc2.value[i]), aDst.value[i]);
         }
     }
 
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
-        requires RealOrComplexIntegral<pixel_basetype_t<DstT>> &&          //
-                 RealOrComplexFloatingPoint<pixel_basetype_t<ComputeT>> && //
-                 std::same_as<ComputeT_SIMD, voidType>
-    {
-        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
-        const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
-
-        Tupel<SrcT, tupelSize> tupelSrc1 = Tupel<SrcT, tupelSize>::Load(pixelSrc1);
-        Tupel<SrcT, tupelSize> tupelSrc2 = Tupel<SrcT, tupelSize>::Load(pixelSrc2);
-
-#pragma unroll
-        for (size_t i = 0; i < tupelSize; i++)
-        {
-            ComputeT temp;
-            Op(ComputeT(tupelSrc1.value[i]), ComputeT(tupelSrc2.value[i]), temp);
-            round(temp);
-            // DstT constructor will clamp temp to value range of DstT
-            aDst.value[i] = DstT(temp);
-        }
-    }
-
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
-        requires(!std::same_as<ComputeT, DstT>) &&
-                ((RealOrComplexIntegral<pixel_basetype_t<DstT>> && RealOrComplexIntegral<pixel_basetype_t<ComputeT>>) ||
-                 (RealOrComplexFloatingPoint<pixel_basetype_t<DstT>> &&
-                  RealOrComplexFloatingPoint<pixel_basetype_t<ComputeT>>)) &&
+        requires(!std::same_as<ComputeT, DstT>) && //
                 std::same_as<ComputeT_SIMD, voidType>
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
@@ -167,11 +132,13 @@ struct SrcSrcFunctor : public ImageFunctor<false>
         for (size_t i = 0; i < tupelSize; i++)
         {
             ComputeT temp;
-            Op(ComputeT(tupelSrc1.value[i]), ComputeT(tupelSrc2.value[i]), temp);
+            Op(static_cast<ComputeT>(tupelSrc1.value[i]), static_cast<ComputeT>(tupelSrc2.value[i]), temp);
+            round(temp); // NOP for integer ComputeT
             // DstT constructor will clamp temp to value range of DstT
-            aDst.value[i] = DstT(temp);
+            aDst.value[i] = static_cast<DstT>(temp);
         }
     }
+#pragma endregion
 };
 } // namespace opp::image
 #include <common/disableWarningsEnd.h>

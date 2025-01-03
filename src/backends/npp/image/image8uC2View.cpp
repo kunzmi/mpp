@@ -51,24 +51,27 @@ Image8uC2View Image8uC2View::GetView(const Border &aBorder) const
 
 //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 
-void Image8uC2View::Set(const Pixel8uC2 &aValue, const NppStreamContext &nppStreamCtx)
+Image8uC2View &Image8uC2View::Set(const Pixel8uC2 &aValue, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiSet_8u_C2R_Ctx(aValue.data(), reinterpret_cast<Npp8u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image8uC2View::YUV422ToRGB(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const
+Image8uC3View &Image8uC2View::YUV422ToRGB(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiYUV422ToRGB_8u_C2C3R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image8uC2View::YCbCr422ToRGB(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const
+Image8uC3View &Image8uC2View::YCbCr422ToRGB(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiYCbCr422ToRGB_8u_C2C3R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
 void Image8uC2View::YCbCr422ToRGB(Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const NppStreamContext &nppStreamCtx) const
@@ -85,11 +88,12 @@ void Image8uC2View::YCbCr422ToRGB(Image8uC1View &aDstChannel0, Image8uC1View &aD
     nppSafeCall(nppiYCbCr422ToRGB_8u_C2P3R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), dstList, to_int(aDstChannel0.Pitch()), NppiSizeRoi(), nppStreamCtx));
 }
 
-void Image8uC2View::YCrCb422ToRGB(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const
+Image8uC3View &Image8uC2View::YCrCb422ToRGB(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiYCrCb422ToRGB_8u_C2C3R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
 void Image8uC2View::YCrCb422ToRGB(Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const NppStreamContext &nppStreamCtx) const
@@ -106,46 +110,52 @@ void Image8uC2View::YCrCb422ToRGB(Image8uC1View &aDstChannel0, Image8uC1View &aD
     nppSafeCall(nppiYCrCb422ToRGB_8u_C2P3R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), dstList, to_int(aDstChannel0.Pitch()), NppiSizeRoi(), nppStreamCtx));
 }
 
-void Image8uC2View::YCbCr422ToBGR(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const
+Image8uC3View &Image8uC2View::YCbCr422ToBGR(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiYCbCr422ToBGR_8u_C2C3R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image8uC2View::YCbCr422ToBGR(Image8uC4View &pDst, const Pixel8uC1 &nAval, const NppStreamContext &nppStreamCtx) const
+Image8uC4View &Image8uC2View::YCbCr422ToBGR(Image8uC4View &pDst, const Pixel8uC1 &nAval, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiYCbCr422ToBGR_8u_C2C4R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nAval.x, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image8uC2View::CbYCr422ToRGB(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const
+Image8uC3View &Image8uC2View::CbYCr422ToRGB(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiCbYCr422ToRGB_8u_C2C3R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image8uC2View::CbYCr422ToBGR(Image8uC4View &pDst, const Pixel8uC1 &nAval, const NppStreamContext &nppStreamCtx) const
+Image8uC4View &Image8uC2View::CbYCr422ToBGR(Image8uC4View &pDst, const Pixel8uC1 &nAval, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiCbYCr422ToBGR_8u_C2C4R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nAval.x, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image8uC2View::CbYCr422ToBGR_709HDTV(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const
+Image8uC3View &Image8uC2View::CbYCr422ToBGR_709HDTV(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiCbYCr422ToBGR_709HDTV_8u_C2C3R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image8uC2View::CbYCr422ToBGR_709HDTV(Image8uC4View &pDst, const Pixel8uC1 &nAval, const NppStreamContext &nppStreamCtx) const
+Image8uC4View &Image8uC2View::CbYCr422ToBGR_709HDTV(Image8uC4View &pDst, const Pixel8uC1 &nAval, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiCbYCr422ToBGR_709HDTV_8u_C2C4R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nAval.x, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
 void Image8uC2View::YCbCr422(Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const NppStreamContext &nppStreamCtx) const
@@ -155,18 +165,20 @@ void Image8uC2View::YCbCr422(Image8uC1View &aDstChannel0, Image8uC1View &aDstCha
     nppSafeCall(nppiYCbCr422_8u_C2P3R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), dstList, pitchDstList, NppiSizeRoi(), nppStreamCtx));
 }
 
-void Image8uC2View::YCbCr422ToYCrCb422(Image8uC2View &pDst, const NppStreamContext &nppStreamCtx) const
+Image8uC2View &Image8uC2View::YCbCr422ToYCrCb422(Image8uC2View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiYCbCr422ToYCrCb422_8u_C2R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image8uC2View::YCbCr422ToCbYCr422(Image8uC2View &pDst, const NppStreamContext &nppStreamCtx) const
+Image8uC2View &Image8uC2View::YCbCr422ToCbYCr422(Image8uC2View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiYCbCr422ToCbYCr422_8u_C2R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
 void Image8uC2View::CbYCr422ToYCbCr411(Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const NppStreamContext &nppStreamCtx) const
@@ -228,11 +240,12 @@ void Image8uC2View::YCrCb422ToYCbCr411(Image8uC1View &aDstChannel0, Image8uC1Vie
     nppSafeCall(nppiYCrCb422ToYCbCr411_8u_C2P3R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), dstList, pitchDstList, NppiSizeRoi(), nppStreamCtx));
 }
 
-void Image8uC2View::CbYCr422ToYCbCr422(Image8uC2View &pDst, const NppStreamContext &nppStreamCtx) const
+Image8uC2View &Image8uC2View::CbYCr422ToYCbCr422(Image8uC2View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiCbYCr422ToYCbCr422_8u_C2R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
 void Image8uC2View::CbYCr422ToYCbCr422(Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const NppStreamContext &nppStreamCtx) const
@@ -261,34 +274,38 @@ void Image8uC2View::CbYCr422ToYCrCb420(Image8uC1View &aDstChannel0, Image8uC1Vie
     nppSafeCall(nppiCbYCr422ToYCrCb420_8u_C2P3R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), dstList, pitchDstList, NppiSizeRoi(), nppStreamCtx));
 }
 
-void Image8uC2View::ColorTwist32f(Image8uC2View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const
+Image8uC2View &Image8uC2View::ColorTwist32f(Image8uC2View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiColorTwist32f_8u_C2R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), aTwist, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image8uC2View::ColorTwist32f(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx)
+Image8uC2View &Image8uC2View::ColorTwist32f(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiColorTwist32f_8u_C2IR_Ctx(reinterpret_cast<Npp8u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), aTwist, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image8uC2View::YUV422ToRGB(Image8uC3View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const
+Image8uC3View &Image8uC2View::YUV422ToRGB(Image8uC3View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiYUV422ToRGB_8u_ColorTwist32f_C2C3R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), aTwist, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image8uC2View::Filter32f(Image8uC2View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const
+Image8uC2View &Image8uC2View::Filter32f(Image8uC2View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiFilter32f_8u_C2R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pKernel.Pointer(), oKernelSize, oAnchor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image8uC2View::FilterBorder32f(Image8uC2View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image8uC2View &Image8uC2View::FilterBorder32f(Image8uC2View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -300,6 +317,7 @@ void Image8uC2View::FilterBorder32f(Image8uC2View &pDst, const cuda::DevVarView<
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiFilterBorder32f_8u_C2R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pKernel.Pointer(), oKernelSize, oAnchor, eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
 void Image8uC2View::MaximumError(const Image8uC2View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const

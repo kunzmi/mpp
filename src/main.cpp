@@ -7,10 +7,11 @@
 #include <cstddef>
 // #include <cuda_runtime_api.h>
 // #include <driver_types.h>
+#include <common/opp_defs.h>
 #include <iostream>
 #include <vector>
 
-// #include <common/arithmetic/binary_operators.h>
+#include <common/arithmetic/binary_operators.h>
 // #include <common/arithmetic/ternary_operators.h>
 // #include <common/arithmetic/unary_operators.h>
 // #include <common/image/pixelTypes.h>
@@ -18,21 +19,23 @@
 // #include <common/vector4A.h>
 // #include <common/vectorTypes.h>
 
-// #include <backends/cuda/image/addKernel.h>
+#include <backends/cuda/image/addKernel.h>
 // #include <backends/cuda/image/configurations.h>
 //
-// #include <backends/cuda/devVar.h>
-// #include <backends/cuda/devVarView.h>
-// #include <backends/cuda/image/image.h>
-// #include <backends/cuda/image/imageView.h>
-// #include <backends/cuda/streamCtx.h>
-// #include <backends/cuda/templateRegistry.h>
-//
-// #include <backends/simple_cpu/image/image.h>
-// #include <backends/simple_cpu/image/imageView.h>
+#include <backends/cuda/devVar.h>
+#include <backends/cuda/devVarView.h>
+#include <backends/cuda/image/image.h>
+#include <backends/cuda/image/imageView.h>
+#include <backends/cuda/streamCtx.h>
+#include <backends/cuda/templateRegistry.h>
+#include <backends/simple_cpu/image/forEachPixelMasked_impl.h>
+#include <backends/simple_cpu/image/forEachPixel_impl.h>
+#include <backends/simple_cpu/image/image.h>
+#include <backends/simple_cpu/image/imageView.h>
 #include <common/bfloat16.h>
 #include <common/complex.h>
 #include <common/half_fp16.h>
+#include <common/image/pixelTypes.h>
 #include <common/numberTypes.h>
 #include <common/vector1.h>
 #include <common/vector2.h>
@@ -41,32 +44,38 @@
 // #include <half/half.hpp>
 
 using namespace opp;
-// using namespace opp::cuda;
-// using namespace opp::image;
-// using namespace opp::image::cuda;
-// namespace cpu = opp::image::cpuSimple;
+using namespace opp::cuda;
+using namespace opp::image;
+using namespace opp::image::cuda;
+namespace cpu = opp::image::cpuSimple;
+
+void fun(Pixel8uC4 aTest)
+{
+    std::cout << "Test is: " << aTest << std::endl;
+}
 
 int main()
 {
-    Vector1<Complex<float>> vecCf1(Complex<float>(2));
-    Vector1<float> vecf1(Vector1<float>(2));
-    Vector1<float> vecf2(Vector1<float>(1));
-    auto vecCf3 = vecCf1.Magnitude();
-    bool res    = vecf1 < vecf2;
-    if (res)
-    {
-        vecCf3 += 1.0f;
-    }
+    /*
+    constexpr bool val1 = std::is_trivially_assignable_v<Pixel32fC4, Pixel32fC4>;
+    constexpr bool val2 = std::is_trivially_constructible_v<Pixel32fC2>;
+    constexpr bool val3 = std::is_trivially_copyable_v<Pixel32fC4>;
+    constexpr bool val4 = std::is_trivially_copy_assignable_v<Pixel32fC4>;
+    constexpr bool val5 = std::is_trivially_copy_constructible_v<Pixel32fC4>;
+    constexpr bool val6 = std::is_trivially_default_constructible_v<Pixel32fC4>;
+    constexpr bool val6 = std::is_trivially_move_assignable_v<Pixel32fC4>;
+    constexpr bool val6 = std::is_trivially_move_constructible_v<Pixel32fC4>;
 
-    /*Vector1<float> t1(12.0f);
-    Vector1<float> t2(13.0f);
-    Vector1<byte> t3 = Vector1<float>::CompareLE(t1, t2);
+    constexpr bool val1 = std::is_trivially_assignable_v<HalfFp16, HalfFp16>;
+    constexpr bool val2 = std::is_trivially_constructible_v<HalfFp16>;
+    constexpr bool val3 = std::is_trivially_copyable_v<HalfFp16>;
+    constexpr bool val4 = std::is_trivially_copy_assignable_v<HalfFp16>;
+    constexpr bool val5 = std::is_trivially_copy_constructible_v<HalfFp16>;
+    constexpr bool val6 = std::is_trivially_default_constructible_v<HalfFp16>;
+    constexpr bool val6 = std::is_trivially_move_assignable_v<HalfFp16>;
+    constexpr bool val6 = std::is_trivially_move_constructible_v<HalfFp16>;*/
 
-    Vector4<int> i4;
-    Vector4<int>::same_vector_size_different_type_t<byte> b4;
-    b4.x;
-    Vector4<bool> isthisallowed(true, false, false, true);
-
+    /*
         bool ok = cpu::Image<Pixel8uC1>::CanLoad(R"(C:\Users\kunz_\OneDrive\Desktop\Unbenannt-3.tif)");
         if (ok)
         {
@@ -103,50 +112,74 @@ int main()
             std::cout << elem << std::endl;
         }
 #endif
+        std::cout << "Hello world! This is " << OPP_PROJECT_NAME << " version " << OPP_VERSION << "!" << std::endl;
 
-        // DevVar<byte> buffer(1024);
-        // std::vector<byte> hBuffer(1024);
-        // DevVarView<byte> buffer2(buffer);
-        // buffer << hBuffer;
+        /*DevVar<byte> buffer(1024);
+        std::vector<byte> hBuffer(1024);
+        DevVarView<byte> buffer2(buffer);
+        buffer << hBuffer;*/
 
-        // Image<Pixel8uC1> image1(1024, 1024);
-        // Image<Pixel8uC1> image2(1024, 1024);
-        // Image<Pixel8uC1> image3(1024, 1024);
+        const std::filesystem::path baseDir = std::filesystem::path(PROJECT_SOURCE_DIR) / "test/testData";
 
-        // Image<Pixel8uC4> image4(1024, 1024);
-        // Image<Pixel8uC4> image5(1024, 1024);
-        // Image<Pixel8uC4> image6(1024, 1024);
+        auto flower = cpu::Image<Pixel8uC3>::Load(baseDir / "flower.tif");
+        cpu::Image<Pixel8uC3> addToFlower(flower.SizeRoi());
+        cpu::Image<Pixel8uC3> res(flower.SizeRoi());
+        cpu::Image<Pixel8uC3> resGPU(flower.SizeRoi());
 
-        // std::vector<Pixel8uC1> host1(1024 * 1024, Pixel8uC1(25));
-        // std::vector<Pixel8uC1> host2(1024 * 1024, Pixel8uC1(10));
+        for (auto &pixelIterator : addToFlower)
+        {
+            pixelIterator.Value() = 40;
+        }
+        for (auto &pixelIterator : res)
+        {
+            pixelIterator.Value() = 255;
+        }
+        for (auto &pixelIterator : resGPU)
+        {
+            pixelIterator.Value() = 255;
+        }
 
-        // image1 << host1;
-        // image2 << host2;
-        // image3 << host2;
+        Image<Pixel8uC3> image1(flower.SizeRoi());
+        Image<Pixel8uC3> image2(flower.SizeRoi());
+        Image<Pixel8uC3> image3(flower.SizeRoi());
 
-        // opp::cuda::StreamCtx ctx = opp::cuda::StreamCtxSingleton::Get();
-        // std::cout << ctx.DeviceId;
+        flower >> image1;
+        addToFlower >> image2;
+        resGPU >> image3;
 
-        // std::cout << "Hello world! This is " << OPP_PROJECT_NAME << " version " << OPP_VERSION << "!" << std::endl;
+        flower.SetRoi(-20);
+        addToFlower.SetRoi(-20);
+        res.SetRoi(-20);
+        image1.SetRoi(-20);
+        image2.SetRoi(-20);
+        image3.SetRoi(-20);
 
-        // Roi roi = image1.ROI();
-        // roi -= 1;
-        // image1.SetRoi(roi);
-        // image2.SetRoi(roi);
-        // image3.SetRoi(roi);
+        opp::cuda::StreamCtx ctx = opp::cuda::StreamCtxSingleton::Get();
 
-        // InvokeAddSrcSrc(image1.PointerRoi(), image1.Pitch(), image2.PointerRoi(), image2.Pitch(),
-        // image3.PointerRoi(),
-        //                 image3.Pitch(), roi.Size(), ctx);
+        InvokeAddSrcSrc(image1.PointerRoi(), image1.Pitch(), image2.PointerRoi(), image2.Pitch(), image3.PointerRoi(),
+                        image3.Pitch(), image1.SizeRoi(), ctx);
 
-        // InvokeAddSrcSrc<Pixel8uC4, Pixel8uC4, Pixel8uC4>(image4.PointerRoi(), image4.Pitch(), image5.PointerRoi(),
-        //                                                  image5.Pitch(), image6.PointerRoi(), image6.Pitch(),
-        //                                                  roi.Size(), ctx);
+        flower.Add(addToFlower, res);
 
-        // image3.ResetRoi();
-        // image3 >> host2;
+        resGPU << image3;
 
-        // std::cout << "Done!";
+        res.Save(baseDir / "resCPU.tif");
+        resGPU.Save(baseDir / "resGPU.tif");
+
+        res.ResetRoi();
+        resGPU.ResetRoi();
+        bool issame = res.IsIdentical(resGPU);
+
+        std::cout << "Images are identical: " << (issame ? "true" : "false") << std::endl;
+
+        /*InvokeAddSrcSrc(image1.PointerRoi(), image1.Pitch(), image2.PointerRoi(), image2.Pitch(), image3.PointerRoi(),
+                        image3.Pitch(), roi.Size(), ctx);
+
+        InvokeAddSrcSrc<Pixel8uC4, Pixel8uC4, Pixel8uC4>(image4.PointerRoi(), image4.Pitch(), image5.PointerRoi(),
+                                                         image5.Pitch(), image6.PointerRoi(), image6.Pitch(),
+                                                         roi.Size(), ctx);*/
+
+        std::cout << "Done!";
     }
     catch (const opp::OPPException &ex)
     {

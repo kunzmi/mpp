@@ -151,7 +151,15 @@ __global__ void test_half_fp16_kernel(HalfFp16 *aDataOut, bool *aBoolOut)
     temp.Abs();
     aDataOut[offsetOut + 7] = temp;
 
-    offsetOut = 98;
+    temp                    = dataIn[3];
+    temp                    = temp.GetSign();
+    aDataOut[offsetOut + 8] = temp;
+
+    temp                    = dataIn[5];
+    temp                    = temp.GetSign();
+    aDataOut[offsetOut + 9] = temp;
+
+    offsetOut = 100;
 
     aDataOut[offsetOut + 0]  = HalfFp16(0.0f);
     aDataOut[offsetOut + 1]  = HalfFp16(-10.0f);
@@ -165,7 +173,7 @@ __global__ void test_half_fp16_kernel(HalfFp16 *aDataOut, bool *aBoolOut)
     aDataOut[offsetOut + 9]  = HalfFp16(FLT_MIN);
     aDataOut[offsetOut + 10] = HalfFp16(-0.0f);
 
-    offsetOut = 108;
+    offsetOut = 110;
     for (size_t i = 0; i < 8; i++)
     {
         aDataOut[offsetOut + i] = dataIn[i];

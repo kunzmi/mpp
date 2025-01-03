@@ -105,6 +105,7 @@ class ConvertedArgument
     bool mIsOutputImage{false};
 
     static std::string ConvertNppType(const std::string &aNPPType);
+    static std::string GetImageType(const std::string &aNPPType, int aChannelCount);
 };
 
 } // namespace opp::utilities::nppParser

@@ -48,16 +48,16 @@ class Image16uC2View : public ImageView<Pixel16uC2>
 
 
     // NppStatus nppiSet_16u_C2R_Ctx(const Npp16u[2] aValue, Npp16u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Set(const Pixel16uC2 &aValue, const NppStreamContext &nppStreamCtx);
+    Image16uC2View &Set(const Pixel16uC2 &aValue, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiColorTwist32f_16u_C2R_Ctx(const Npp16u * pSrc, int nSrcStep, Npp16u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f[3][4] aTwist, NppStreamContext nppStreamCtx)
-    void ColorTwist32f(Image16uC2View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const;
+    Image16uC2View &ColorTwist32f(Image16uC2View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiColorTwist32f_16u_C2IR_Ctx(Npp16u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp32f[3][4] aTwist, NppStreamContext nppStreamCtx)
-    void ColorTwist32f(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
+    Image16uC2View &ColorTwist32f(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiYUV422ToRGB_16u_ColorTwist32f_C2C3R_Ctx(const Npp16u * pSrc, int nSrcStep, Npp16u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f[3][4] aTwist, NppStreamContext nppStreamCtx)
-    void YUV422ToRGB(Image16uC3View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const;
+    Image16uC3View &YUV422ToRGB(Image16uC3View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumError_16u_C2R_Ctx(const Npp16u * pSrc1, int nSrc1Step, const Npp16u * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
     void MaximumError(const Image16uC2View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;

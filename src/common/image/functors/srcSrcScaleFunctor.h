@@ -5,6 +5,7 @@
 #include <common/defines.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
+#include <common/numberTypes.h>
 #include <common/opp_defs.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
@@ -36,40 +37,44 @@ struct SrcSrcScaleFunctor : public ImageFunctor<false>
     const SrcT *RESTRICT Src2;
     size_t SrcPitch2;
 
-    remove_vector_t<ComputeT> ScaleFactor;
+    scalefactor_t<ComputeT> ScaleFactor;
 
     [[no_unique_address]] operation Op;
 
     [[no_unique_address]] RoundFunctor<roundingMode, ComputeT> round;
 
+#pragma region Constructors
     SrcSrcScaleFunctor()
     {
     }
 
     SrcSrcScaleFunctor(const SrcT *aSrc1, size_t aSrcPitch1, const SrcT *aSrc2, size_t aSrcPitch2, operation aOp,
-                       remove_vector_t<ComputeT> aScaleFactor)
+                       scalefactor_t<ComputeT> aScaleFactor)
         : Src1(aSrc1), SrcPitch2(aSrcPitch2), SrcPitch1(aSrcPitch1), Src2(aSrc2), ScaleFactor(aScaleFactor), Op(aOp)
     {
     }
+#pragma endregion
 
+#pragma region run naive on one pixel
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
-        requires Integral<pixel_basetype_t<DstT>> && //
-                 FloatingPoint<pixel_basetype_t<ComputeT>>
+        requires RealOrComplexIntegral<pixel_basetype_t<DstT>> && //
+                 RealOrComplexFloatingPoint<pixel_basetype_t<ComputeT>>
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
         ComputeT temp;
-        Op(ComputeT(*pixelSrc1), ComputeT(*pixelSrc2), temp);
+        Op(static_cast<ComputeT>(*pixelSrc1), static_cast<ComputeT>(*pixelSrc2), temp);
         temp *= ScaleFactor;
         round(temp);
         // DstT constructor will clamp temp to value range of DstT
-        aDst = DstT(temp);
+        aDst = static_cast<DstT>(temp);
     }
+#pragma endregion
 
+#pragma region run sequential on pixel tupel
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
-        requires Integral<pixel_basetype_t<DstT>> &&          //
-                 FloatingPoint<pixel_basetype_t<ComputeT>> && //
-                 (tupelSize > 1)
+        requires RealOrComplexIntegral<pixel_basetype_t<DstT>> && //
+                 RealOrComplexFloatingPoint<pixel_basetype_t<ComputeT>>
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
@@ -81,13 +86,14 @@ struct SrcSrcScaleFunctor : public ImageFunctor<false>
         for (size_t i = 0; i < tupelSize; i++)
         {
             ComputeT temp;
-            Op(ComputeT(tupelSrc1.value[i]), ComputeT(tupelSrc2.value[i]), temp);
+            Op(static_cast<ComputeT>(tupelSrc1.value[i]), static_cast<ComputeT>(tupelSrc2.value[i]), temp);
             temp *= ScaleFactor;
             round(temp);
             // DstT constructor will clamp temp to value range of DstT
-            aDst.value[i] = DstT(temp);
+            aDst.value[i] = static_cast<DstT>(temp);
         }
     }
+#pragma endregion
 };
 } // namespace opp::image
 #include <common/disableWarningsEnd.h>

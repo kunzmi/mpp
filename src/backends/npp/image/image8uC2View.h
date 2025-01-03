@@ -49,49 +49,49 @@ class Image8uC2View : public ImageView<Pixel8uC2>
 
 
     // NppStatus nppiSet_8u_C2R_Ctx(const Npp8u[2] aValue, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Set(const Pixel8uC2 &aValue, const NppStreamContext &nppStreamCtx);
+    Image8uC2View &Set(const Pixel8uC2 &aValue, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiYUV422ToRGB_8u_C2C3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void YUV422ToRGB(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &YUV422ToRGB(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiYCbCr422ToRGB_8u_C2C3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void YCbCr422ToRGB(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &YCbCr422ToRGB(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiYCbCr422ToRGB_8u_C2P3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u *[3] pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     void YCbCr422ToRGB(Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiYCrCb422ToRGB_8u_C2C3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void YCrCb422ToRGB(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &YCrCb422ToRGB(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiYCrCb422ToRGB_8u_C2P3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u *[3] pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     void YCrCb422ToRGB(Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiYCbCr422ToBGR_8u_C2C3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void YCbCr422ToBGR(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &YCbCr422ToBGR(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiYCbCr422ToBGR_8u_C2C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, Npp8u nAval, NppStreamContext nppStreamCtx)
-    void YCbCr422ToBGR(Image8uC4View &pDst, const Pixel8uC1 &nAval, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &YCbCr422ToBGR(Image8uC4View &pDst, const Pixel8uC1 &nAval, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCbYCr422ToRGB_8u_C2C3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void CbYCr422ToRGB(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &CbYCr422ToRGB(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCbYCr422ToBGR_8u_C2C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, Npp8u nAval, NppStreamContext nppStreamCtx)
-    void CbYCr422ToBGR(Image8uC4View &pDst, const Pixel8uC1 &nAval, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CbYCr422ToBGR(Image8uC4View &pDst, const Pixel8uC1 &nAval, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCbYCr422ToBGR_709HDTV_8u_C2C3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void CbYCr422ToBGR_709HDTV(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &CbYCr422ToBGR_709HDTV(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCbYCr422ToBGR_709HDTV_8u_C2C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, Npp8u nAval, NppStreamContext nppStreamCtx)
-    void CbYCr422ToBGR_709HDTV(Image8uC4View &pDst, const Pixel8uC1 &nAval, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CbYCr422ToBGR_709HDTV(Image8uC4View &pDst, const Pixel8uC1 &nAval, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiYCbCr422_8u_C2P3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u *[3] pDst, int[3] rDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     void YCbCr422(Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiYCbCr422ToYCrCb422_8u_C2R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void YCbCr422ToYCrCb422(Image8uC2View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC2View &YCbCr422ToYCrCb422(Image8uC2View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiYCbCr422ToCbYCr422_8u_C2R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void YCbCr422ToCbYCr422(Image8uC2View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC2View &YCbCr422ToCbYCr422(Image8uC2View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCbYCr422ToYCbCr411_8u_C2P3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u *[3] pDst, int[3] rDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     void CbYCr422ToYCbCr411(Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const NppStreamContext &nppStreamCtx) const;
@@ -121,7 +121,7 @@ class Image8uC2View : public ImageView<Pixel8uC2>
     void YCrCb422ToYCbCr411(Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCbYCr422ToYCbCr422_8u_C2R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void CbYCr422ToYCbCr422(Image8uC2View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC2View &CbYCr422ToYCbCr422(Image8uC2View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCbYCr422ToYCbCr422_8u_C2P3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u *[3] pDst, int[3] rDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     void CbYCr422ToYCbCr422(Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const NppStreamContext &nppStreamCtx) const;
@@ -136,19 +136,19 @@ class Image8uC2View : public ImageView<Pixel8uC2>
     void CbYCr422ToYCrCb420(Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiColorTwist32f_8u_C2R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f[3][4] aTwist, NppStreamContext nppStreamCtx)
-    void ColorTwist32f(Image8uC2View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const;
+    Image8uC2View &ColorTwist32f(Image8uC2View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiColorTwist32f_8u_C2IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp32f[3][4] aTwist, NppStreamContext nppStreamCtx)
-    void ColorTwist32f(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
+    Image8uC2View &ColorTwist32f(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiYUV422ToRGB_8u_ColorTwist32f_C2C3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f[3][4] aTwist, NppStreamContext nppStreamCtx)
-    void YUV422ToRGB(Image8uC3View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &YUV422ToRGB(Image8uC3View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilter32f_8u_C2R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    void Filter32f(Image8uC2View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC2View &Filter32f(Image8uC2View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterBorder32f_8u_C2R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterBorder32f(Image8uC2View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC2View &FilterBorder32f(Image8uC2View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiMaximumError_8u_C2R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
     void MaximumError(const Image8uC2View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;

@@ -49,30 +49,34 @@ Image16uC2View Image16uC2View::GetView(const Border &aBorder) const
 
 //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 
-void Image16uC2View::Set(const Pixel16uC2 &aValue, const NppStreamContext &nppStreamCtx)
+Image16uC2View &Image16uC2View::Set(const Pixel16uC2 &aValue, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiSet_16u_C2R_Ctx(aValue.data(), reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image16uC2View::ColorTwist32f(Image16uC2View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const
+Image16uC2View &Image16uC2View::ColorTwist32f(Image16uC2View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiColorTwist32f_16u_C2R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), aTwist, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image16uC2View::ColorTwist32f(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx)
+Image16uC2View &Image16uC2View::ColorTwist32f(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiColorTwist32f_16u_C2IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), aTwist, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image16uC2View::YUV422ToRGB(Image16uC3View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const
+Image16uC3View &Image16uC2View::YUV422ToRGB(Image16uC3View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiYUV422ToRGB_16u_ColorTwist32f_C2C3R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), aTwist, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
 void Image16uC2View::MaximumError(const Image16uC2View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const

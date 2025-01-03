@@ -23,6 +23,19 @@ std::ostream &operator<<(std::ostream &aOs, const PixelTypeEnum &aPixelType)
         case PixelTypeEnum::PTE64fC4A:
             aOs << pixel_type_name<Pixel64fC4A>::value;
             break;
+            // double complex
+        case PixelTypeEnum::PTE64fcC1:
+            aOs << pixel_type_name<Pixel64fcC1>::value;
+            break;
+        case PixelTypeEnum::PTE64fcC2:
+            aOs << pixel_type_name<Pixel64fcC2>::value;
+            break;
+        case PixelTypeEnum::PTE64fcC3:
+            aOs << pixel_type_name<Pixel64fcC3>::value;
+            break;
+        case PixelTypeEnum::PTE64fcC4:
+            aOs << pixel_type_name<Pixel64fcC4>::value;
+            break;
             // float
         case PixelTypeEnum::PTE32fC1:
             aOs << pixel_type_name<Pixel32fC1>::value;
@@ -68,6 +81,19 @@ std::ostream &operator<<(std::ostream &aOs, const PixelTypeEnum &aPixelType)
         case PixelTypeEnum::PTE16fC4A:
             aOs << pixel_type_name<Pixel16fC4A>::value;
             break;
+            // float16 complex
+        case PixelTypeEnum::PTE16fcC1:
+            aOs << pixel_type_name<Pixel16fcC1>::value;
+            break;
+        case PixelTypeEnum::PTE16fcC2:
+            aOs << pixel_type_name<Pixel16fcC2>::value;
+            break;
+        case PixelTypeEnum::PTE16fcC3:
+            aOs << pixel_type_name<Pixel16fcC3>::value;
+            break;
+        case PixelTypeEnum::PTE16fcC4:
+            aOs << pixel_type_name<Pixel16fcC4>::value;
+            break;
             // bfloat16
         case PixelTypeEnum::PTE16bfC1:
             aOs << pixel_type_name<Pixel16bfC1>::value;
@@ -83,6 +109,19 @@ std::ostream &operator<<(std::ostream &aOs, const PixelTypeEnum &aPixelType)
             break;
         case PixelTypeEnum::PTE16bfC4A:
             aOs << pixel_type_name<Pixel16bfC4A>::value;
+            break;
+            // bfloat16 complex
+        case PixelTypeEnum::PTE16bfcC1:
+            aOs << pixel_type_name<Pixel16bfcC1>::value;
+            break;
+        case PixelTypeEnum::PTE16bfcC2:
+            aOs << pixel_type_name<Pixel16bfcC2>::value;
+            break;
+        case PixelTypeEnum::PTE16bfcC3:
+            aOs << pixel_type_name<Pixel16bfcC3>::value;
+            break;
+        case PixelTypeEnum::PTE16bfcC4:
+            aOs << pixel_type_name<Pixel16bfcC4>::value;
             break;
             // int
         case PixelTypeEnum::PTE32sC1:
@@ -233,6 +272,19 @@ std::wostream &operator<<(std::wostream &aOs, const PixelTypeEnum &aPixelType)
         case PixelTypeEnum::PTE64fC4A:
             aOs << pixel_type_name<Pixel64fC4A>::value;
             break;
+            // double complex
+        case PixelTypeEnum::PTE64fcC1:
+            aOs << pixel_type_name<Pixel64fcC1>::value;
+            break;
+        case PixelTypeEnum::PTE64fcC2:
+            aOs << pixel_type_name<Pixel64fcC2>::value;
+            break;
+        case PixelTypeEnum::PTE64fcC3:
+            aOs << pixel_type_name<Pixel64fcC3>::value;
+            break;
+        case PixelTypeEnum::PTE64fcC4:
+            aOs << pixel_type_name<Pixel64fcC4>::value;
+            break;
             // float
         case PixelTypeEnum::PTE32fC1:
             aOs << pixel_type_name<Pixel32fC1>::value;
@@ -277,6 +329,48 @@ std::wostream &operator<<(std::wostream &aOs, const PixelTypeEnum &aPixelType)
             break;
         case PixelTypeEnum::PTE16fC4A:
             aOs << pixel_type_name<Pixel16fC4A>::value;
+            break;
+            // float16 complex
+        case PixelTypeEnum::PTE16fcC1:
+            aOs << pixel_type_name<Pixel16fcC1>::value;
+            break;
+        case PixelTypeEnum::PTE16fcC2:
+            aOs << pixel_type_name<Pixel16fcC2>::value;
+            break;
+        case PixelTypeEnum::PTE16fcC3:
+            aOs << pixel_type_name<Pixel16fcC3>::value;
+            break;
+        case PixelTypeEnum::PTE16fcC4:
+            aOs << pixel_type_name<Pixel16fcC4>::value;
+            break;
+            // bfloat16
+        case PixelTypeEnum::PTE16bfC1:
+            aOs << pixel_type_name<Pixel16bfC1>::value;
+            break;
+        case PixelTypeEnum::PTE16bfC2:
+            aOs << pixel_type_name<Pixel16bfC2>::value;
+            break;
+        case PixelTypeEnum::PTE16bfC3:
+            aOs << pixel_type_name<Pixel16bfC3>::value;
+            break;
+        case PixelTypeEnum::PTE16bfC4:
+            aOs << pixel_type_name<Pixel16bfC4>::value;
+            break;
+        case PixelTypeEnum::PTE16bfC4A:
+            aOs << pixel_type_name<Pixel16bfC4A>::value;
+            break;
+            // bfloat16 complex
+        case PixelTypeEnum::PTE16bfcC1:
+            aOs << pixel_type_name<Pixel16bfcC1>::value;
+            break;
+        case PixelTypeEnum::PTE16bfcC2:
+            aOs << pixel_type_name<Pixel16bfcC2>::value;
+            break;
+        case PixelTypeEnum::PTE16bfcC3:
+            aOs << pixel_type_name<Pixel16bfcC3>::value;
+            break;
+        case PixelTypeEnum::PTE16bfcC4:
+            aOs << pixel_type_name<Pixel16bfcC4>::value;
             break;
             // int
         case PixelTypeEnum::PTE32sC1:

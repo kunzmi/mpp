@@ -5,6 +5,7 @@
 #include <common/defines.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
+#include <common/numberTypes.h>
 #include <common/opp_defs.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
@@ -35,6 +36,7 @@ struct InplaceDevConstantFunctor : public ImageFunctor<true>
 
     [[no_unique_address]] RoundFunctor<roundingMode, ComputeT> round;
 
+#pragma region Constructors
     InplaceDevConstantFunctor()
     {
     }
@@ -42,80 +44,53 @@ struct InplaceDevConstantFunctor : public ImageFunctor<true>
     InplaceDevConstantFunctor(const DstT *aConstant, operation aOp) : Constant(aConstant), Op(aOp)
     {
     }
+#pragma endregion
 
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
-        requires Integral<pixel_basetype_t<DstT>> && //
-                 FloatingPoint<pixel_basetype_t<ComputeT>>
-    {
-        ComputeT temp(aDst);
-        Op(ComputeT(*Constant), temp);
-        round(temp);
-        // DstT constructor will clamp temp to value range of DstT
-        aDst = DstT(temp);
-    }
-
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
-        requires Integral<pixel_basetype_t<DstT>> &&          //
-                 FloatingPoint<pixel_basetype_t<ComputeT>> && //
-                 (tupelSize > 1)
-    {
-        ComputeT _constant = *Constant;
-#pragma unroll
-        for (size_t i = 0; i < tupelSize; i++)
-        {
-            ComputeT temp(aDst.value[i]);
-            Op(_constant, temp);
-            round(temp);
-            // DstT constructor will clamp temp to value range of DstT
-            aDst.value[i] = DstT(temp);
-        }
-    }
-
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
-        requires(!std::same_as<ComputeT, DstT>) &&  //
-                Integral<pixel_basetype_t<DstT>> && //
-                Integral<pixel_basetype_t<ComputeT>>
-    {
-        ComputeT temp(aDst);
-        Op(ComputeT(*Constant), temp);
-        // DstT constructor will clamp temp to value range of DstT
-        aDst = DstT(temp);
-    }
-
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
-        requires(!std::same_as<ComputeT, DstT>) &&      //
-                Integral<pixel_basetype_t<DstT>> &&     //
-                Integral<pixel_basetype_t<ComputeT>> && //
-                (tupelSize > 1)
-    {
-        ComputeT _constant = *Constant;
-#pragma unroll
-        for (size_t i = 0; i < tupelSize; i++)
-        {
-            ComputeT temp(aDst.value[i]);
-            Op(_constant, temp);
-            // DstT constructor will clamp temp to value range of DstT
-            aDst.value[i] = DstT(temp);
-        }
-    }
-
+#pragma region run naive on one pixel
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
         requires std::same_as<ComputeT, DstT>
     {
-        Op(ComputeT(*Constant), aDst);
+        Op(static_cast<ComputeT>(*Constant), aDst);
     }
 
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
-        requires std::same_as<ComputeT, DstT> && //
-                 (tupelSize > 1)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+        requires(!std::same_as<ComputeT, DstT>)
     {
-        ComputeT _constant = *Constant;
+        ComputeT temp(aDst);
+        Op(static_cast<ComputeT>(*Constant), temp);
+        round(temp); // NOP for integer ComputeT
+        // DstT constructor will clamp temp to value range of DstT
+        aDst = static_cast<DstT>(temp);
+    }
+#pragma endregion
+
+#pragma region run sequential on pixel tupel
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+        requires std::same_as<ComputeT, DstT>
+    {
+        ComputeT _constant = static_cast<ComputeT>(*Constant);
 #pragma unroll
         for (size_t i = 0; i < tupelSize; i++)
         {
             Op(_constant, aDst.value[i]);
         }
     }
+
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+        requires(!std::same_as<ComputeT, DstT>)
+    {
+        ComputeT _constant = static_cast<ComputeT>(*Constant);
+#pragma unroll
+        for (size_t i = 0; i < tupelSize; i++)
+        {
+            ComputeT temp(aDst.value[i]);
+            Op(_constant, temp);
+            round(temp); // NOP for integer ComputeT
+            // DstT constructor will clamp temp to value range of DstT
+            aDst.value[i] = static_cast<DstT>(temp);
+        }
+    }
+#pragma endregion
 };
 } // namespace opp::image
 #include <common/disableWarningsEnd.h>

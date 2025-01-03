@@ -161,7 +161,7 @@ template <RealOrComplexFloatingVector T> struct RoundZero
 
 template <ComplexVector T> struct Magnitude
 {
-    DEVICE_CODE void operator()(const T &aSrc1, complex_basetype_t<T> &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, same_vector_size_different_type_t<T, complex_basetype_t<T>> &aDst)
     {
         aDst = aSrc1.Magnitude();
     }
@@ -169,7 +169,7 @@ template <ComplexVector T> struct Magnitude
 
 template <ComplexVector T> struct MagnitudeSqr
 {
-    DEVICE_CODE void operator()(const T &aSrc1, complex_basetype_t<T> &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, same_vector_size_different_type_t<T, complex_basetype_t<T>> &aDst)
     {
         aDst = aSrc1.MagnitudeSqr();
     }

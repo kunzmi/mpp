@@ -47,6 +47,31 @@ TEST_CASE("Complex<float>", "[Common]")
     CHECK(c4.real == 10);
     CHECK(c4.imag == 20);
 
+    Complex<float> cEps1(1.0f, -4.0f);
+    Complex<float> cEps2(1.001f, -4.001f);
+    CHECK(cEps1 != cEps2);
+    CHECK(Complex<float>::EqEps(cEps1, cEps2, 0.1f));
+    cEps1 = Complex<float>(1.0f, -4.0f);
+    cEps2 = Complex<float>(1.001f, -4.001f);
+    CHECK(cEps1 != cEps2);
+    CHECK_FALSE(Complex<float>::EqEps(cEps1, cEps2, 0.0001f));
+    cEps1 = Complex<float>(HUGE_VALF, -4.0f);
+    cEps2 = Complex<float>(-HUGE_VALF, -4.001f);
+    CHECK(cEps1 != cEps2);
+    CHECK(Complex<float>::EqEps(cEps1, cEps2, 0.1f));
+    cEps1 = Complex<float>(HUGE_VALF, -4.0f);
+    cEps2 = Complex<float>(1.0f, -4.001f);
+    CHECK(cEps1 != cEps2);
+    CHECK_FALSE(Complex<float>::EqEps(cEps1, cEps2, 0.1f));
+    cEps1 = Complex<float>(1.0f, std::numeric_limits<float>::quiet_NaN());
+    cEps2 = Complex<float>(1.001f, std::numeric_limits<float>::quiet_NaN());
+    CHECK(cEps1 != cEps2);
+    CHECK(Complex<float>::EqEps(cEps1, cEps2, 0.1f));
+    cEps1 = Complex<float>(1.0f, 4.0f);
+    cEps2 = Complex<float>(1.001f, std::numeric_limits<float>::quiet_NaN());
+    CHECK(cEps1 != cEps2);
+    CHECK_FALSE(Complex<float>::EqEps(cEps1, cEps2, 0.1f));
+
     Complex<float> t2(5);
     CHECK(t2.real == 5);
     CHECK(t2.imag == 0);
@@ -79,7 +104,7 @@ TEST_CASE("Complex<float>", "[Common]")
 
     Complex<float> sub2 = 3 - t1;
     CHECK(sub2.real == 3);
-    CHECK(sub2.imag == 1);
+    CHECK(sub2.imag == -1);
 
     Complex<float> sub3 = t1 - 4;
     CHECK(sub3.real == -4);
@@ -161,6 +186,33 @@ TEST_CASE("Complex<float>", "[Common]")
     CHECK(l.MagnitudeSqr() == 52);
     CHECK(l.Magnitude() == Approx(std::sqrt(52)));
 
+    std::complex<float> refexp = std::exp(ref1);
+    t1                         = Complex<float>(4, 5);
+    Complex<float> exp1        = Complex<float>::Exp(t1);
+    Complex<float> exp2        = t1.Exp();
+    CHECK(exp1.real == refexp.real());
+    CHECK(exp1.imag == refexp.imag());
+    CHECK(exp2.real == refexp.real());
+    CHECK(exp2.imag == refexp.imag());
+
+    std::complex<float> reflog = std::log(ref1);
+    t1                         = Complex<float>(4, 5);
+    Complex<float> log1        = Complex<float>::Ln(t1);
+    Complex<float> log2        = t1.Ln();
+    CHECK(log1.real == reflog.real());
+    CHECK(log1.imag == reflog.imag());
+    CHECK(log2.real == reflog.real());
+    CHECK(log2.imag == reflog.imag());
+
+    std::complex<float> refsqrt = std::sqrt(ref1);
+    t1                          = Complex<float>(4, 5);
+    Complex<float> sqrt1        = Complex<float>::Sqrt(t1);
+    Complex<float> sqrt2        = t1.Sqrt();
+    CHECK(sqrt1.real == refsqrt.real());
+    CHECK(sqrt1.imag == refsqrt.imag());
+    CHECK(sqrt2.real == refsqrt.real());
+    CHECK(sqrt2.imag == refsqrt.imag());
+
     Complex<float> minmax1(10, 20);
     Complex<float> minmax2(-20, 10);
 
@@ -188,6 +240,26 @@ TEST_CASE("Complex<float>", "[Common]")
     Complex<float> fromInt = Complex<int>(10, 20);
     CHECK(fromInt.real == 10);
     CHECK(fromInt.imag == 20);
+
+    Complex<float> fromLiteral = 10.0f + 20.0_i;
+    CHECK(fromLiteral.real == 10);
+    CHECK(fromLiteral.imag == 20);
+
+    Complex<float> fromLiteral2 = 10 - 20.0_i;
+    CHECK(fromLiteral2.real == 10);
+    CHECK(fromLiteral2.imag == -20);
+
+    Complex<float> fromLiteralInt = 10 + 20_i;
+    CHECK(fromLiteralInt.real == 10);
+    CHECK(fromLiteralInt.imag == 20);
+
+    Complex<float> fromLiteralInt2 = 10.0f + 20_i;
+    CHECK(fromLiteralInt2.real == 10);
+    CHECK(fromLiteralInt2.imag == 20);
+
+    Complex<float> fromLiteralInt3 = 10 + 20.0_i;
+    CHECK(fromLiteralInt3.real == 10);
+    CHECK(fromLiteralInt3.imag == 20);
 }
 
 TEST_CASE("Complex<int>", "[Common]")
@@ -241,7 +313,7 @@ TEST_CASE("Complex<int>", "[Common]")
 
     Complex<int> sub2 = 3 - t1;
     CHECK(sub2.real == -97);
-    CHECK(sub2.imag == 200);
+    CHECK(sub2.imag == -200);
 
     Complex<int> sub3 = t1 - 4;
     CHECK(sub3.real == 96);
@@ -316,6 +388,22 @@ TEST_CASE("Complex<int>", "[Common]")
     Complex<int> fromFloat = Complex<float>(10.2f, 20.3f);
     CHECK(fromFloat.real == 10);
     CHECK(fromFloat.imag == 20);
+
+    Complex<int> fromLiteral = 10.0f + 20.0_i;
+    CHECK(fromLiteral.real == 10);
+    CHECK(fromLiteral.imag == 20);
+
+    Complex<int> fromLiteralFloat = 10 + 20_i;
+    CHECK(fromLiteralFloat.real == 10);
+    CHECK(fromLiteralFloat.imag == 20);
+
+    Complex<int> fromLiteralFloat2 = 10.0f + 20_i;
+    CHECK(fromLiteralFloat2.real == 10);
+    CHECK(fromLiteralFloat2.imag == 20);
+
+    Complex<int> fromLiteralFloat3 = 10 + 20.0_i;
+    CHECK(fromLiteralFloat3.real == 10);
+    CHECK(fromLiteralFloat3.imag == 20);
 }
 
 TEST_CASE("Complex<short>", "[Common]")
@@ -369,7 +457,7 @@ TEST_CASE("Complex<short>", "[Common]")
 
     Complex<short> sub2 = 3 - t1;
     CHECK(sub2.real == -97);
-    CHECK(sub2.imag == 200);
+    CHECK(sub2.imag == -200);
 
     Complex<short> sub3 = t1 - 4;
     CHECK(sub3.real == 96);
@@ -448,6 +536,22 @@ TEST_CASE("Complex<short>", "[Common]")
     Complex<short> fromFloatClamp = Complex<float>(SHRT_MAX + 1000, SHRT_MIN - 1000);
     CHECK(fromFloatClamp.real == SHRT_MAX);
     CHECK(fromFloatClamp.imag == SHRT_MIN);
+
+    Complex<short> fromLiteral = 10.0f + 20.0_i;
+    CHECK(fromLiteral.real == 10);
+    CHECK(fromLiteral.imag == 20);
+
+    Complex<short> fromLiteralFloat = 10 + 20_i;
+    CHECK(fromLiteralFloat.real == 10);
+    CHECK(fromLiteralFloat.imag == 20);
+
+    Complex<short> fromLiteralFloat2 = 10.0f + 20_i;
+    CHECK(fromLiteralFloat2.real == 10);
+    CHECK(fromLiteralFloat2.imag == 20);
+
+    Complex<short> fromLiteralFloat3 = 10 + 20.0_i;
+    CHECK(fromLiteralFloat3.real == 10);
+    CHECK(fromLiteralFloat3.imag == 20);
 }
 
 TEST_CASE("Complex<BFloat16>", "[Common]")
@@ -473,6 +577,31 @@ TEST_CASE("Complex<BFloat16>", "[Common]")
     CHECK(c2.real == 0);
     CHECK(c2.imag == 1);
     CHECK(c2 == t1);
+
+    Complex<BFloat16> cEps1(1.0_bf, -4.0_bf);
+    Complex<BFloat16> cEps2(1.1_bf, -4.1_bf);
+    CHECK(cEps1 != cEps2);
+    CHECK(Complex<BFloat16>::EqEps(cEps1, cEps2, 0.2_bf));
+    cEps1 = Complex<BFloat16>(1.0_bf, -4.0_bf);
+    cEps2 = Complex<BFloat16>(1.1_bf, -4.5_bf);
+    CHECK(cEps1 != cEps2);
+    CHECK_FALSE(Complex<BFloat16>::EqEps(cEps1, cEps2, 0.2_bf));
+    cEps1 = Complex<BFloat16>(numeric_limits<BFloat16>::infinity(), -4.0_bf);
+    cEps2 = Complex<BFloat16>(-numeric_limits<BFloat16>::infinity(), -4.1_bf);
+    CHECK(cEps1 != cEps2);
+    CHECK(Complex<BFloat16>::EqEps(cEps1, cEps2, 0.2_bf));
+    cEps1 = Complex<BFloat16>(numeric_limits<BFloat16>::infinity(), -4.0_bf);
+    cEps2 = Complex<BFloat16>(1.0_bf, -4.1_bf);
+    CHECK(cEps1 != cEps2);
+    CHECK_FALSE(Complex<BFloat16>::EqEps(cEps1, cEps2, 0.2_bf));
+    cEps1 = Complex<BFloat16>(1.0_bf, numeric_limits<BFloat16>::quiet_NaN());
+    cEps2 = Complex<BFloat16>(1.1_bf, numeric_limits<BFloat16>::quiet_NaN());
+    CHECK(cEps1 != cEps2);
+    CHECK(Complex<BFloat16>::EqEps(cEps1, cEps2, 0.2_bf));
+    cEps1 = Complex<BFloat16>(1.0_bf, 4.0_bf);
+    cEps2 = Complex<BFloat16>(1.1_bf, numeric_limits<BFloat16>::quiet_NaN());
+    CHECK(cEps1 != cEps2);
+    CHECK_FALSE(Complex<BFloat16>::EqEps(cEps1, cEps2, 0.2_bf));
 
     Complex<BFloat16> c3 = Vector2<BFloat16>(10.0_bf, 20.0_bf);
     CHECK(c3.real == 10);
@@ -510,7 +639,7 @@ TEST_CASE("Complex<BFloat16>", "[Common]")
 
     Complex<BFloat16> sub2 = 3 - t1;
     CHECK(sub2.real == 3);
-    CHECK(sub2.imag == 1);
+    CHECK(sub2.imag == -1);
 
     Complex<BFloat16> sub3 = t1 - 4;
     CHECK(sub3.real == -4);
@@ -619,6 +748,30 @@ TEST_CASE("Complex<BFloat16>", "[Common]")
     Complex<BFloat16> fromInt = Complex<int>(10, 20);
     CHECK(fromInt.real == 10);
     CHECK(fromInt.imag == 20);
+
+    Complex<BFloat16> fromLiteral = 10.0f + 20.0_ib;
+    CHECK(fromLiteral.real == 10);
+    CHECK(fromLiteral.imag == 20);
+
+    Complex<BFloat16> fromLiteral2 = 10 + 20.0_ib;
+    CHECK(fromLiteral2.real == 10);
+    CHECK(fromLiteral2.imag == 20);
+
+    Complex<BFloat16> fromLiteral3 = 10 - 20.0_ib;
+    CHECK(fromLiteral3.real == 10);
+    CHECK(fromLiteral3.imag == -20);
+
+    Complex<BFloat16> fromLiteralFloat = 10 + 20_i;
+    CHECK(fromLiteralFloat.real == 10);
+    CHECK(fromLiteralFloat.imag == 20);
+
+    Complex<BFloat16> fromLiteralFloat2 = 10.0f + 20_i;
+    CHECK(fromLiteralFloat2.real == 10);
+    CHECK(fromLiteralFloat2.imag == 20);
+
+    Complex<BFloat16> fromLiteralFloat3 = 10 + 20.0_i;
+    CHECK(fromLiteralFloat3.real == 10);
+    CHECK(fromLiteralFloat3.imag == 20);
 }
 
 TEST_CASE("Complex<HalfFp16>", "[Common]")
@@ -648,6 +801,31 @@ TEST_CASE("Complex<HalfFp16>", "[Common]")
     Complex<HalfFp16> c3 = Vector2<HalfFp16>(10.0_hf, 20.0_hf);
     CHECK(c3.real == 10);
     CHECK(c3.imag == 20);
+
+    Complex<HalfFp16> cEps1(1.0_hf, -4.0_hf);
+    Complex<HalfFp16> cEps2(1.001_hf, -4.001_hf);
+    CHECK(cEps1 != cEps2);
+    CHECK(Complex<HalfFp16>::EqEps(cEps1, cEps2, 0.1_hf));
+    cEps1 = Complex<HalfFp16>(1.0_hf, -4.0_hf);
+    cEps2 = Complex<HalfFp16>(1.001_hf, -4.001_hf);
+    CHECK(cEps1 != cEps2);
+    CHECK_FALSE(Complex<HalfFp16>::EqEps(cEps1, cEps2, 0.0001_hf));
+    cEps1 = Complex<HalfFp16>(numeric_limits<HalfFp16>::infinity(), -4.0_hf);
+    cEps2 = Complex<HalfFp16>(-numeric_limits<HalfFp16>::infinity(), -4.001_hf);
+    CHECK(cEps1 != cEps2);
+    CHECK(Complex<HalfFp16>::EqEps(cEps1, cEps2, 0.1_hf));
+    cEps1 = Complex<HalfFp16>(numeric_limits<HalfFp16>::infinity(), -4.0_hf);
+    cEps2 = Complex<HalfFp16>(1.0_hf, -4.001_hf);
+    CHECK(cEps1 != cEps2);
+    CHECK_FALSE(Complex<HalfFp16>::EqEps(cEps1, cEps2, 0.1_hf));
+    cEps1 = Complex<HalfFp16>(1.0_hf, numeric_limits<HalfFp16>::quiet_NaN());
+    cEps2 = Complex<HalfFp16>(1.001_hf, numeric_limits<HalfFp16>::quiet_NaN());
+    CHECK(cEps1 != cEps2);
+    CHECK(Complex<HalfFp16>::EqEps(cEps1, cEps2, 0.1_hf));
+    cEps1 = Complex<HalfFp16>(1.0_hf, 4.0_hf);
+    cEps2 = Complex<HalfFp16>(1.001_hf, numeric_limits<HalfFp16>::quiet_NaN());
+    CHECK(cEps1 != cEps2);
+    CHECK_FALSE(Complex<HalfFp16>::EqEps(cEps1, cEps2, 0.1_hf));
 
     Complex<HalfFp16> t2(5.0_hf);
     CHECK(t2.real == 5);
@@ -681,7 +859,7 @@ TEST_CASE("Complex<HalfFp16>", "[Common]")
 
     Complex<HalfFp16> sub2 = 3 - t1;
     CHECK(sub2.real == 3);
-    CHECK(sub2.imag == 1);
+    CHECK(sub2.imag == -1);
 
     Complex<HalfFp16> sub3 = t1 - 4;
     CHECK(sub3.real == -4);
@@ -790,6 +968,30 @@ TEST_CASE("Complex<HalfFp16>", "[Common]")
     Complex<HalfFp16> fromInt = Complex<int>(10, 20);
     CHECK(fromInt.real == 10);
     CHECK(fromInt.imag == 20);
+
+    Complex<HalfFp16> fromLiteral = 10.0f + 20.0_ih;
+    CHECK(fromLiteral.real == 10);
+    CHECK(fromLiteral.imag == 20);
+
+    Complex<HalfFp16> fromLiteral2 = 10 + 20.0_ih;
+    CHECK(fromLiteral2.real == 10);
+    CHECK(fromLiteral2.imag == 20);
+
+    Complex<HalfFp16> fromLiteral3 = 10 - 20.0_ih;
+    CHECK(fromLiteral3.real == 10);
+    CHECK(fromLiteral3.imag == -20);
+
+    Complex<HalfFp16> fromLiteralFloat = 10 + 20_i;
+    CHECK(fromLiteralFloat.real == 10);
+    CHECK(fromLiteralFloat.imag == 20);
+
+    Complex<HalfFp16> fromLiteralFloat2 = 10.0f + 20_i;
+    CHECK(fromLiteralFloat2.real == 10);
+    CHECK(fromLiteralFloat2.imag == 20);
+
+    Complex<HalfFp16> fromLiteralFloat3 = 10 + 20.0_i;
+    CHECK(fromLiteralFloat3.real == 10);
+    CHECK(fromLiteralFloat3.imag == 20);
 }
 
 TEST_CASE("Complex<float>_alignment", "[Common]")
@@ -996,7 +1198,7 @@ TEST_CASE("Complex<int>_streams", "[Common]")
     std::stringstream ss2;
     ss2 << cmplx;
 
-    CHECK(ss2.str() == "3 + 4i");
+    CHECK(ss2.str() == "(3 + 4i)");
 }
 
 TEST_CASE("Complex<float>_streams", "[Common]")
@@ -1013,7 +1215,7 @@ TEST_CASE("Complex<float>_streams", "[Common]")
     std::stringstream ss2;
     ss2 << cmplx;
 
-    CHECK(ss2.str() == "3.14 + 2.7i");
+    CHECK(ss2.str() == "(3.14 + 2.7i)");
 }
 
 TEST_CASE("Complex<BFloat16>_streams", "[Common]")
@@ -1030,7 +1232,7 @@ TEST_CASE("Complex<BFloat16>_streams", "[Common]")
     std::stringstream ss2;
     ss2 << cmplx;
 
-    CHECK(ss2.str() == "3.14062 + 2.70312i");
+    CHECK(ss2.str() == "(3.14062 + 2.70312i)");
 }
 
 TEST_CASE("Complex<HalfFp16>_streams", "[Common]")
@@ -1047,5 +1249,5 @@ TEST_CASE("Complex<HalfFp16>_streams", "[Common]")
     std::stringstream ss2;
     ss2 << cmplx;
 
-    CHECK(ss2.str() == "3.14062 + 2.69922i");
+    CHECK(ss2.str() == "(3.14062 + 2.69922i)");
 }

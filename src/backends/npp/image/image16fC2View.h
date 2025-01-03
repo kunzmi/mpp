@@ -46,13 +46,13 @@ class Image16fC2View : public ImageView<Pixel16fC2>
 
 
     // NppStatus nppiSet_16f_C2R_Ctx(const Npp32f[2] aValues, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Set(const Pixel32fC2 &aValues, const NppStreamContext &nppStreamCtx);
+    Image16fC2View &Set(const Pixel32fC2 &aValues, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiColorTwist32f_16f_C2R_Ctx(const Npp16f * pSrc, int nSrcStep, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f[3][4] aTwist, NppStreamContext nppStreamCtx)
-    void ColorTwist32f(Image16fC2View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const;
+    Image16fC2View &ColorTwist32f(Image16fC2View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiColorTwist32f_16f_C2IR_Ctx(Npp16f * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp32f[3][4] aTwist, NppStreamContext nppStreamCtx)
-    void ColorTwist32f(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
+    Image16fC2View &ColorTwist32f(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
 
     //NOLINTEND(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 };

@@ -47,130 +47,130 @@ class Image16fC3View : public ImageView<Pixel16fC3>
 
 
     // NppStatus nppiSet_16f_C3R_Ctx(const Npp32f[3] aValues, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Set(const Pixel32fC3 &aValues, const NppStreamContext &nppStreamCtx);
+    Image16fC3View &Set(const Pixel32fC3 &aValues, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiCopy_16f_C3R_Ctx(const Npp16f * pSrc, int nSrcStep, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Copy(Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &Copy(Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiConvert_16f32f_C3R_Ctx(const Npp16f * pSrc, int nSrcStep, Npp32f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Convert(Image32fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fC3View &Convert(Image32fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAddC_16f_C3R_Ctx(const Npp16f * pSrc1, int nSrc1Step, const Npp32f[3] aConstants, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Add(const Pixel32fC3 &aConstants, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &Add(const Pixel32fC3 &aConstants, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAddDeviceC_16f_C3R_Ctx(const Npp16f * pSrc1, int nSrc1Step, const Npp32f * pConstants, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Add(const cuda::DevVarView<Pixel16fC3> &pConstants, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &Add(const cuda::DevVarView<Pixel16fC3> &pConstants, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAddC_16f_C3IR_Ctx(const Npp32f[3] aConstants, Npp16f * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Add(const Pixel32fC3 &aConstants, const NppStreamContext &nppStreamCtx);
+    Image16fC3View &Add(const Pixel32fC3 &aConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAddDeviceC_16f_C3IR_Ctx(const Npp32f * pConstants, Npp16f * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Add(const cuda::DevVarView<Pixel16fC3> &pConstants, const NppStreamContext &nppStreamCtx);
+    Image16fC3View &Add(const cuda::DevVarView<Pixel16fC3> &pConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMulC_16f_C3R_Ctx(const Npp16f * pSrc1, int nSrc1Step, const Npp32f[3] aConstants, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Mul(const Pixel32fC3 &aConstants, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &Mul(const Pixel32fC3 &aConstants, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMulDeviceC_16f_C3R_Ctx(const Npp16f * pSrc1, int nSrc1Step, const Npp32f * pConstants, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Mul(const cuda::DevVarView<Pixel16fC3> &pConstants, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &Mul(const cuda::DevVarView<Pixel16fC3> &pConstants, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMulC_16f_C3IR_Ctx(const Npp32f[3] aConstants, Npp16f * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Mul(const Pixel32fC3 &aConstants, const NppStreamContext &nppStreamCtx);
+    Image16fC3View &Mul(const Pixel32fC3 &aConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMulDeviceC_16f_C3IR_Ctx(const Npp32f * pConstants, Npp16f * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Mul(const cuda::DevVarView<Pixel16fC3> &pConstants, const NppStreamContext &nppStreamCtx);
+    Image16fC3View &Mul(const cuda::DevVarView<Pixel16fC3> &pConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSubC_16f_C3R_Ctx(const Npp16f * pSrc1, int nSrc1Step, const Npp32f[3] aConstants, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Sub(const Pixel32fC3 &aConstants, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &Sub(const Pixel32fC3 &aConstants, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSubDeviceC_16f_C3R_Ctx(const Npp16f * pSrc1, int nSrc1Step, const Npp32f * pConstants, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Sub(const cuda::DevVarView<Pixel16fC3> &pConstants, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &Sub(const cuda::DevVarView<Pixel16fC3> &pConstants, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSubC_16f_C3IR_Ctx(const Npp32f[3] aConstants, Npp16f * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Sub(const Pixel32fC3 &aConstants, const NppStreamContext &nppStreamCtx);
+    Image16fC3View &Sub(const Pixel32fC3 &aConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSubDeviceC_16f_C3IR_Ctx(const Npp32f * pConstants, Npp16f * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Sub(const cuda::DevVarView<Pixel16fC3> &pConstants, const NppStreamContext &nppStreamCtx);
+    Image16fC3View &Sub(const cuda::DevVarView<Pixel16fC3> &pConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiDivC_16f_C3R_Ctx(const Npp16f * pSrc1, int nSrc1Step, const Npp32f[3] aConstants, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Div(const Pixel32fC3 &aConstants, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &Div(const Pixel32fC3 &aConstants, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDivDeviceC_16f_C3R_Ctx(const Npp16f * pSrc1, int nSrc1Step, const Npp32f * pConstants, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Div(const cuda::DevVarView<Pixel16fC3> &pConstants, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &Div(const cuda::DevVarView<Pixel16fC3> &pConstants, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDivC_16f_C3IR_Ctx(const Npp32f[3] aConstants, Npp16f * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Div(const Pixel32fC3 &aConstants, const NppStreamContext &nppStreamCtx);
+    Image16fC3View &Div(const Pixel32fC3 &aConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiDivDeviceC_16f_C3IR_Ctx(const Npp32f * pConstants, Npp16f * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Div(const cuda::DevVarView<Pixel16fC3> &pConstants, const NppStreamContext &nppStreamCtx);
+    Image16fC3View &Div(const cuda::DevVarView<Pixel16fC3> &pConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAdd_16f_C3R_Ctx(const Npp16f * pSrc1, int nSrc1Step, const Npp16f * pSrc2, int nSrc2Step, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Add(const Image16fC3View &pSrc2, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &Add(const Image16fC3View &pSrc2, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAdd_16f_C3IR_Ctx(const Npp16f * pSrc, int nSrcStep, Npp16f * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Add(const Image16fC3View &pSrc, const NppStreamContext &nppStreamCtx);
+    Image16fC3View &Add(const Image16fC3View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMul_16f_C3R_Ctx(const Npp16f * pSrc1, int nSrc1Step, const Npp16f * pSrc2, int nSrc2Step, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Mul(const Image16fC3View &pSrc2, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &Mul(const Image16fC3View &pSrc2, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMul_16f_C3IR_Ctx(const Npp16f * pSrc, int nSrcStep, Npp16f * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Mul(const Image16fC3View &pSrc, const NppStreamContext &nppStreamCtx);
+    Image16fC3View &Mul(const Image16fC3View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSub_16f_C3R_Ctx(const Npp16f * pSrc1, int nSrc1Step, const Npp16f * pSrc2, int nSrc2Step, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Sub(const Image16fC3View &pSrc2, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &Sub(const Image16fC3View &pSrc2, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSub_16f_C3IR_Ctx(const Npp16f * pSrc, int nSrcStep, Npp16f * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Sub(const Image16fC3View &pSrc, const NppStreamContext &nppStreamCtx);
+    Image16fC3View &Sub(const Image16fC3View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiDiv_16f_C3R_Ctx(const Npp16f * pSrc1, int nSrc1Step, const Npp16f * pSrc2, int nSrc2Step, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Div(const Image16fC3View &pSrc2, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &Div(const Image16fC3View &pSrc2, Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDiv_16f_C3IR_Ctx(const Npp16f * pSrc, int nSrcStep, Npp16f * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Div(const Image16fC3View &pSrc, const NppStreamContext &nppStreamCtx);
+    Image16fC3View &Div(const Image16fC3View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAbs_16f_C3R_Ctx(const Npp16f * pSrc, int nSrcStep, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Abs(Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &Abs(Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAbs_16f_C3IR_Ctx(Npp16f * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Abs(const NppStreamContext &nppStreamCtx);
+    Image16fC3View &Abs(const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSqr_16f_C3R_Ctx(const Npp16f * pSrc, int nSrcStep, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Sqr(Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &Sqr(Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSqr_16f_C3IR_Ctx(Npp16f * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Sqr(const NppStreamContext &nppStreamCtx);
+    Image16fC3View &Sqr(const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSqrt_16f_C3R_Ctx(const Npp16f * pSrc, int nSrcStep, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Sqrt(Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &Sqrt(Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSqrt_16f_C3IR_Ctx(Npp16f * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Sqrt(const NppStreamContext &nppStreamCtx);
+    Image16fC3View &Sqrt(const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiLn_16f_C3R_Ctx(const Npp16f * pSrc, int nSrcStep, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Ln(Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &Ln(Image16fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiLn_16f_C3IR_Ctx(Npp16f * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Ln(const NppStreamContext &nppStreamCtx);
+    Image16fC3View &Ln(const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiColorTwist32f_16f_C3R_Ctx(const Npp16f * pSrc, int nSrcStep, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f[3][4] aTwist, NppStreamContext nppStreamCtx)
-    void ColorTwist32f(Image16fC3View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &ColorTwist32f(Image16fC3View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiColorTwist32f_16f_C3IR_Ctx(Npp16f * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp32f[3][4] aTwist, NppStreamContext nppStreamCtx)
-    void ColorTwist32f(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
+    Image16fC3View &ColorTwist32f(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiFilter32f_16f_C3R_Ctx(const Npp16f * pSrc, int nSrcStep, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    void Filter32f(Image16fC3View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &Filter32f(Image16fC3View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterBorder32f_16f_C3R_Ctx(const Npp16f * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterBorder32f(Image16fC3View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image16fC3View &FilterBorder32f(Image16fC3View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiResize_16f_C3R_Ctx(const Npp16f * pSrc, int nSrcStep, NppiSize oSrcSize, NppiRect oSrcRectROI, Npp16f * pDst, int nDstStep, NppiSize oDstSize, NppiRect oDstRectROI, int eInterpolation, NppStreamContext nppStreamCtx)
-    void Resize(Image16fC3View &pDst, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &Resize(Image16fC3View &pDst, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiWarpAffine_16f_C3R_Ctx(const Npp16f * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp16f * pDst, int nDstStep, NppiRect oDstROI, const double[2][3] aCoeffs, int eInterpolation, NppStreamContext nppStreamCtx)
-    void WarpAffine(Image16fC3View &pDst, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &WarpAffine(Image16fC3View &pDst, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiWarpPerspective_16f_C3R_Ctx(const Npp16f * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp16f * pDst, int nDstStep, NppiRect oDstROI, const double[3][3] aCoeffs, int eInterpolation, NppStreamContext nppStreamCtx)
-    void WarpPerspective(Image16fC3View &pDst, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &WarpPerspective(Image16fC3View &pDst, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     //NOLINTEND(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 };

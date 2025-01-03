@@ -46,7 +46,7 @@ class Image32sC2View : public ImageView<Pixel32sC2>
 
 
     // NppStatus nppiSet_32s_C2R_Ctx(const Npp32s[2] aValue, Npp32s * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Set(const Pixel32sC2 &aValue, const NppStreamContext &nppStreamCtx);
+    Image32sC2View &Set(const Pixel32sC2 &aValue, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMaximumError_32s_C2R_Ctx(const Npp32s * pSrc1, int nSrc1Step, const Npp32s * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
     void MaximumError(const Image32sC2View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;

@@ -1,5 +1,7 @@
 #pragma once
 #include <backends/cuda/cudaException.h>
+#include <backends/cuda/image/configurations.h>
+#include <backends/cuda/streamCtx.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
@@ -20,7 +22,7 @@ namespace cuda
 /// <summary>
 /// runs aOp on every pixel of an image. Inplace and outplace operation, no mask.
 /// </summary>
-template <int WarpAlignmentInBytes, int TupelSize, class DstT, class functor>
+template <int WarpAlignmentInBytes, int TupelSize, class DstT, typename functor>
 __global__ void forEachPixelKernel(DstT *__restrict__ aDst, size_t aPitchDst, Size2D aSize,
                                    ThreadSplit<WarpAlignmentInBytes, TupelSize> aSplit, functor aOp)
 {
@@ -129,7 +131,7 @@ __global__ void forEachPixelKernel(DstT *__restrict__ aDst, size_t aPitchDst, Si
     return;
 }
 
-template <typename SrcT, typename DstT, size_t TupelSize, int WarpAlignmentInBytes, class funcType>
+template <typename DstT, size_t TupelSize, int WarpAlignmentInBytes, typename funcType>
 void InvokeForEachPixelKernel(const dim3 &aBlockSize, uint aSharedMemory, cudaStream_t aStream, DstT *aDst,
                               size_t pitchDst, const Size2D &aSize, const funcType &aOp)
 {
@@ -144,6 +146,19 @@ void InvokeForEachPixelKernel(const dim3 &aBlockSize, uint aSharedMemory, cudaSt
                                              << " SharedMemory: " << aSharedMemory << " Stream: " << aStream
                                              << " Tupel size: " << TupelSize);
 }
+
+template <typename DstT, size_t TupelSize, typename funcType>
+void InvokeForEachPixelKernelDefault(DstT *aDst, size_t pitchDst, const Size2D &aSize,
+                                     const opp::cuda::StreamCtx &aStreamCtx, const funcType &aFunc)
+{
+    const dim3 BlockSize               = KernelConfiguration<sizeof(DstT)>::BlockSize;
+    constexpr int WarpAlignmentInBytes = KernelConfiguration<sizeof(DstT)>::WarpAlignmentInBytes;
+    constexpr uint SharedMemory        = 0;
+
+    InvokeForEachPixelKernel<DstT, TupelSize, WarpAlignmentInBytes, funcType>(
+        BlockSize, SharedMemory, aStreamCtx.Stream, aDst, pitchDst, aSize, aFunc);
+}
+
 } // namespace cuda
 } // namespace image
 } // namespace opp

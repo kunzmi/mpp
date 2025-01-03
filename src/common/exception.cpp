@@ -27,24 +27,24 @@ const std::string &OPPException::Message() const noexcept
     return mMessage;
 }
 
-Exception::Exception(const std::string &aMessage, const std::filesystem::path &aCodeFileName, int aLineNumber,
-                     const std::string &aFunctionName)
+Exception::Exception(const std::string &aMessage, [[maybe_unused]] const std::filesystem::path &aCodeFileName,
+                     [[maybe_unused]] int aLineNumber, [[maybe_unused]] const std::string &aFunctionName)
     : OPPException(aMessage)
 {
 #ifdef NDEBUG
-    if (aCodeFileName.empty() && aLineNumber > 0 && aFunctionName.empty())
-    {
-        // dummy to avoid warning because of unused arguments...
-    }
-
     std::stringstream ss;
     ss << "Error message: " << aMessage;
 #else
-    const std::filesystem::path src          = "../../../";
+#ifdef PROJECT_SOURCE_DIR
+    const std::filesystem::path src          = PROJECT_SOURCE_DIR;
     const std::filesystem::path codeFileName = aCodeFileName.lexically_relative(src);
+#else
+    const std::filesystem::path codeFileName = aCodeFileName;
+#endif
 
     std::stringstream ss;
-    ss << "Error in " << codeFileName.string() << " in function " << aFunctionName << " @ " << aLineNumber << std::endl
+    ss << "Error in " << codeFileName.generic_string() << " in function " << aFunctionName << " @ " << aLineNumber
+       << std::endl
        << "Error message: " << aMessage;
 #endif
 
@@ -52,25 +52,26 @@ Exception::Exception(const std::string &aMessage, const std::filesystem::path &a
 }
 
 InvalidArgumentException::InvalidArgumentException(const std::string &aArgumentName, const std::string &aMessage,
-                                                   const std::filesystem::path &aCodeFileName, int aLineNumber,
-                                                   const std::string &aFunctionName)
+                                                   [[maybe_unused]] const std::filesystem::path &aCodeFileName,
+                                                   [[maybe_unused]] int aLineNumber,
+                                                   [[maybe_unused]] const std::string &aFunctionName)
     : OPPException(aMessage)
 {
 #ifdef NDEBUG
-    if (aCodeFileName.empty() && aLineNumber > 0 && aFunctionName.empty())
-    {
-        // dummy to avoid warning because of unused arguments...
-    }
-
     std::stringstream ss;
     ss << "InvalidArgumentException for argument: '" << aArgumentName << "'" << std::endl
        << "Error message: " << aMessage;
 #else
-    const std::filesystem::path src          = "../../../";
+#ifdef PROJECT_SOURCE_DIR
+    const std::filesystem::path src          = PROJECT_SOURCE_DIR;
     const std::filesystem::path codeFileName = aCodeFileName.lexically_relative(src);
+#else
+    const std::filesystem::path codeFileName = aCodeFileName;
+#endif
 
     std::stringstream ss;
-    ss << "Error in " << codeFileName.string() << " in function " << aFunctionName << " @ " << aLineNumber << std::endl
+    ss << "Error in " << codeFileName.generic_string() << " in function " << aFunctionName << " @ " << aLineNumber
+       << std::endl
        << "InvalidArgumentException for argument: '" << aArgumentName << "'" << std::endl
        << "Error message: " << aMessage;
 #endif

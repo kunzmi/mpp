@@ -20,6 +20,7 @@ include(cmake/PreventInSourceBuilds.cmake)
 
 add_library(project_options INTERFACE)
 target_compile_features(project_options INTERFACE cxx_std_20)
+target_compile_definitions(project_options INTERFACE -DPROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}")  
 if (APPLE)
 	set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 	set_target_properties(project_options PROPERTIES CXX_VISIBILITY_PRESET hidden)
@@ -58,7 +59,7 @@ option(BUILD_SHARED_LIBS "Enable compilation of shared libraries" OFF)
 option(ENABLE_TESTING "Enable Test Builds" ON)
 set(INSTALLDEST "${CMAKE_SOURCE_DIR}/install")
 
-set(COPYRIGHT_MESSAGE "(c) 2024 Michael Kunz")
+set(COPYRIGHT_MESSAGE "(c) 2025 Michael Kunz")
 configure_file(${PROJECT_SOURCE_DIR}/src/common/version.h.in ${PROJECT_SOURCE_DIR}/src/common/version.h @ONLY)
 
 # include folder for external dependencies:

@@ -62,6 +62,34 @@ template <typename T> struct vector_size<Vector4A<T>> : std::integral_constant<i
 
 template <class T> inline constexpr int vector_size_v = vector_size<T>::value;
 
+template <typename TVector, typename TOther> struct same_vector_size_different_type
+{
+    using type = void;
+};
+template <typename TVector, typename TOther> struct same_vector_size_different_type<Vector1<TVector>, TOther>
+{
+    using type = Vector1<TOther>;
+};
+template <typename TVector, typename TOther> struct same_vector_size_different_type<Vector2<TVector>, TOther>
+{
+    using type = Vector2<TOther>;
+};
+template <typename TVector, typename TOther> struct same_vector_size_different_type<Vector3<TVector>, TOther>
+{
+    using type = Vector3<TOther>;
+};
+template <typename TVector, typename TOther> struct same_vector_size_different_type<Vector4<TVector>, TOther>
+{
+    using type = Vector4<TOther>;
+};
+template <typename TVector, typename TOther> struct same_vector_size_different_type<Vector4A<TVector>, TOther>
+{
+    using type = Vector4A<TOther>;
+};
+
+template <typename TVector, typename TOther>
+using same_vector_size_different_type_t = typename same_vector_size_different_type<TVector, TOther>::type;
+
 template <typename T>
 concept AnyVector = (vector_size_v<T> > 0) && (vector_size_v<T> <= 4);
 
@@ -87,6 +115,6 @@ template <typename T>
 concept RealOrComplexFloatingVector = RealOrComplexVector<T> && RealOrComplexFloatingPoint<remove_vector_t<T>>;
 
 template <typename T>
-concept RealOrCompleIntVector = RealOrComplexVector<T> && RealOrComplexIntegral<remove_vector_t<T>>;
+concept RealOrComplexIntVector = RealOrComplexVector<T> && RealOrComplexIntegral<remove_vector_t<T>>;
 
 } // namespace opp

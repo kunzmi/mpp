@@ -183,7 +183,7 @@ size_t Size2D::operator()(size_t aX, size_t aY) const
 
 Vector2<int> Size2D::GetCoordinates(size_t aIndex) const
 {
-    Vector2<int> ret;
+    Vector2<int> ret; // NOLINT(cppcoreguidelines-pro-type-member-init,hicpp-member-init)
     ret.y = to_int(aIndex / to_size_t(x));
     ret.x = to_int(aIndex - to_size_t(ret.y) * to_size_t(x));
 

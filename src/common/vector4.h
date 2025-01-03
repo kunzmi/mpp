@@ -8,6 +8,7 @@
 #include "vector_typetraits.h"
 #include "vector3.h" //for additional constructor from Vector3<T>
 #include <cmath>
+#include <common/utilities.h>
 #include <concepts>
 #include <iostream>
 #include <type_traits>
@@ -179,22 +180,11 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     T z;
     T w;
 
-    // usefull when we want to convert data types but maintain the same vector size
-    template <typename T2> struct same_vector_size_different_type
-    {
-        using vector = Vector4<T2>;
-    };
-
-    template <typename T2>
-    using same_vector_size_different_type_t = typename same_vector_size_different_type<T2>::vector;
-
 #pragma region Constructors
     /// <summary>
     /// Default constructor does not initialize the members
     /// </summary>
-    DEVICE_CODE Vector4() noexcept
-    {
-    }
+    Vector4() noexcept = default;
 
     /// <summary>
     /// Initializes vector to all components = aVal
@@ -393,6 +383,78 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     // don't use space-ship operator as it returns true if any comparison returns true.
     // But NPP only returns true if all channels fulfill the comparison.
     // auto operator<=>(const Vector4 &) const = default;
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns true if each element comparison is true
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static bool EqEps(Vector4 aLeft, Vector4 aRight, T aEpsilon)
+        requires NativeFloatingPoint<T> && HostCode<T>
+    {
+        MakeNANandINFValid(aLeft.x, aRight.x);
+        MakeNANandINFValid(aLeft.y, aRight.y);
+        MakeNANandINFValid(aLeft.z, aRight.z);
+        MakeNANandINFValid(aLeft.w, aRight.w);
+
+        bool res = std::abs(aLeft.x - aRight.x) <= aEpsilon;
+        res &= std::abs(aLeft.y - aRight.y) <= aEpsilon;
+        res &= std::abs(aLeft.z - aRight.z) <= aEpsilon;
+        res &= std::abs(aLeft.w - aRight.w) <= aEpsilon;
+        return res;
+    }
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns true if each element comparison is true
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static bool EqEps(Vector4 aLeft, Vector4 aRight, T aEpsilon)
+        requires NativeFloatingPoint<T> && DeviceCode<T>
+    {
+        MakeNANandINFValid(aLeft.x, aRight.x);
+        MakeNANandINFValid(aLeft.y, aRight.y);
+        MakeNANandINFValid(aLeft.z, aRight.z);
+        MakeNANandINFValid(aLeft.w, aRight.w);
+
+        bool res = abs(aLeft.x - aRight.x) <= aEpsilon;
+        res &= abs(aLeft.y - aRight.y) <= aEpsilon;
+        res &= abs(aLeft.z - aRight.z) <= aEpsilon;
+        res &= abs(aLeft.w - aRight.w) <= aEpsilon;
+        return res;
+    }
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns true if each element comparison is true
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static bool EqEps(Vector4 aLeft, Vector4 aRight, T aEpsilon)
+        requires Is16BitFloat<T>
+    {
+        MakeNANandINFValid(aLeft.x, aRight.x);
+        MakeNANandINFValid(aLeft.y, aRight.y);
+        MakeNANandINFValid(aLeft.z, aRight.z);
+        MakeNANandINFValid(aLeft.w, aRight.w);
+
+        bool res = T::Abs(aLeft.x - aRight.x) <= aEpsilon;
+        res &= T::Abs(aLeft.y - aRight.y) <= aEpsilon;
+        res &= T::Abs(aLeft.z - aRight.z) <= aEpsilon;
+        res &= T::Abs(aLeft.w - aRight.w) <= aEpsilon;
+        return res;
+    }
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns true if each element comparison is true
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static bool EqEps(const Vector4 &aLeft, const Vector4 &aRight,
+                                                complex_basetype_t<T> aEpsilon)
+        requires ComplexFloatingPoint<T>
+    {
+        bool res = T::EqEps(aLeft.x, aRight.x, aEpsilon);
+        res &= T::EqEps(aLeft.y, aRight.y, aEpsilon);
+        res &= T::EqEps(aLeft.z, aRight.z, aEpsilon);
+        res &= T::EqEps(aLeft.w, aRight.w, aEpsilon);
+        return res;
+    }
 
     /// <summary>
     /// Returns true if each element comparison is true
@@ -1644,6 +1706,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
             case Axis4D::W:
                 return w;
         }
+        return x;
     }
 
     /// <summary>
@@ -1914,7 +1977,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise exponential
     /// </summary>
     DEVICE_CODE Vector4<T> &Exp()
-        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T> || ComplexFloatingPoint<T>
     {
         x = T::Exp(x);
         y = T::Exp(y);
@@ -1992,7 +2055,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise exponential
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Exp(const Vector4<T> &aVec)
-        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T> || ComplexFloatingPoint<T>
     {
         Vector4<T> ret;
         ret.x = T::Exp(aVec.x);
@@ -2049,7 +2112,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise natural logarithm
     /// </summary>
     DEVICE_CODE Vector4<T> &Ln()
-        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T> || ComplexFloatingPoint<T>
     {
         x = T::Ln(x);
         y = T::Ln(y);
@@ -2127,7 +2190,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise natural logarithm
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Ln(const Vector4<T> &aVec)
-        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T> || ComplexFloatingPoint<T>
     {
         Vector4<T> ret;
         ret.x = T::Ln(aVec.x);
@@ -2213,7 +2276,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise square root
     /// </summary>
     DEVICE_CODE Vector4<T> &Sqrt()
-        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T> || ComplexFloatingPoint<T>
     {
         x = T::Sqrt(x);
         y = T::Sqrt(y);
@@ -2291,7 +2354,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise square root
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Sqrt(const Vector4<T> &aVec)
-        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T> || ComplexFloatingPoint<T>
     {
         Vector4<T> ret;
         ret.x = T::Sqrt(aVec.x);
@@ -2525,10 +2588,10 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     }
 
     /// <summary>
-    /// Element wise absolute difference
+    /// Element wise absolute difference (per element also for complex!)
     /// </summary>
     DEVICE_CODE Vector4<T> &AbsDiff(const Vector4<T> &aOther)
-        requires NonNativeNumber<T>
+        requires Is16BitFloat<T>
     {
         x = T::Abs(x - aOther.x);
         y = T::Abs(y - aOther.y);
@@ -2536,6 +2599,19 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
         w = T::Abs(w - aOther.w);
         return *this;
     }
+
+    /*/// <summary>
+    /// Element wise absolute difference (per element also for complex!)
+    /// </summary>
+    DEVICE_CODE Vector4<T> &AbsDiff(const Vector4<T> &aOther)
+        requires ComplexNumber<T>
+    {
+        x = T::AbsDiff(x, aOther.x);
+        y = T::AbsDiff(y, aOther.y);
+        z = T::AbsDiff(z, aOther.z);
+        w = T::AbsDiff(w, aOther.w);
+        return *this;
+    }*/
 
     /// <summary>
     /// Element wise absolute difference
@@ -2555,7 +2631,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> AbsDiff(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires NonNativeNumber<T>
+        requires Is16BitFloat<T>
     {
         Vector4<T> ret;
         ret.x = T::Abs(aLeft.x - aRight.x);
@@ -2564,6 +2640,20 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
         ret.w = T::Abs(aLeft.w - aRight.w);
         return ret;
     }
+
+    /*/// <summary>
+    /// Element wise absolute difference
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector4<T> AbsDiff(const Vector4<T> &aLeft, const Vector4<T> &aRight)
+        requires ComplexFloatingPoint<T>
+    {
+        Vector4<T> ret;
+        ret.x = T::AbsDiff(aLeft.x, aRight.x);
+        ret.y = T::AbsDiff(aLeft.y, aRight.y);
+        ret.z = T::AbsDiff(aLeft.z, aRight.z);
+        ret.w = T::AbsDiff(aLeft.w, aRight.w);
+        return ret;
+    }*/
 
     /// <summary>
     /// Element wise absolute difference
@@ -2760,6 +2850,20 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
         ret.w = w.MagnitudeSqr();
         return ret;
     }
+
+    /// <summary>
+    /// Angle between real and imaginary of a complex number (atan2(image, real)) per element
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] Vector4<complex_basetype_t<T>> Angle() const
+        requires ComplexFloatingPoint<T>
+    {
+        Vector4<complex_basetype_t<T>> ret;
+        ret.x = x.Angle();
+        ret.y = y.Angle();
+        ret.z = z.Angle();
+        ret.w = w.Angle();
+        return ret;
+    }
 #pragma endregion
 
 #pragma region Clamp
@@ -2795,6 +2899,16 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     DEVICE_CODE Vector4<T> &Clamp(T aMinVal, T aMaxVal)
         requires NonNativeNumber<T>
     {
+        if constexpr (ComplexFloatingPoint<T>)
+        {
+            float checka = aMinVal.real;
+            float checkb = aMinVal.imag;
+            float checkc = aMaxVal.real;
+            float checkd = aMaxVal.imag;
+            if (checka == checkb && checkb == checkc)
+            {
+            }
+        }
         x = T::Max(aMinVal, T::Min(x, aMaxVal));
         y = T::Max(aMinVal, T::Min(y, aMaxVal));
         z = T::Max(aMinVal, T::Min(z, aMaxVal));
@@ -3435,7 +3549,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Element wise floor()
     /// </summary>
-    Vector4<T> &Floor()
+    DEVICE_CODE Vector4<T> &Floor()
         requires NonNativeFloatingPoint<T>
     {
         x.Floor();
@@ -3509,7 +3623,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Element wise ceil()
     /// </summary>
-    Vector4<T> &Ceil()
+    DEVICE_CODE Vector4<T> &Ceil()
         requires NonNativeFloatingPoint<T>
     {
         x.Ceil();
@@ -3537,10 +3651,10 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     DEVICE_CODE Vector4<T> &RoundNearest()
         requires DeviceCode<T> && NativeFloatingPoint<T>
     {
-        x = __float2int_rn(x);
-        y = __float2int_rn(y);
-        z = __float2int_rn(z);
-        w = __float2int_rn(w);
+        x = rint(x);
+        y = rint(y);
+        z = rint(z);
+        w = rint(w);
         return *this;
     }
 
@@ -3585,7 +3699,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Element wise round nearest ties to even
     /// </summary>
-    Vector4<T> &RoundNearest()
+    DEVICE_CODE Vector4<T> &RoundNearest()
         requires NonNativeFloatingPoint<T>
     {
         x.RoundNearest();
@@ -3612,10 +3726,10 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     DEVICE_CODE Vector4<T> &RoundZero()
         requires DeviceCode<T> && NativeFloatingPoint<T>
     {
-        x = __float2int_rz(x);
-        y = __float2int_rz(y);
-        z = __float2int_rz(z);
-        w = __float2int_rz(w);
+        x = trunc(x);
+        y = trunc(y);
+        z = trunc(z);
+        w = trunc(w);
         return *this;
     }
 
@@ -3659,7 +3773,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Element wise round toward zero
     /// </summary>
-    Vector4<T> &RoundZero()
+    DEVICE_CODE Vector4<T> &RoundZero()
         requires NonNativeFloatingPoint<T>
     {
         x.RoundZero();
@@ -3672,15 +3786,91 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
 
 #pragma region Compare per element
     /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns 0xFF per element for true, 0x00 for false
+    /// </summary>
+    [[nodiscard]] static Vector4<byte> CompareEQEps(Vector4<T> aLeft, Vector4<T> aRight, T aEpsilon)
+        requires NativeFloatingPoint<T> && HostCode<T>
+    {
+        MakeNANandINFValid(aLeft.x, aRight.x);
+        MakeNANandINFValid(aLeft.y, aRight.y);
+        MakeNANandINFValid(aLeft.z, aRight.z);
+        MakeNANandINFValid(aLeft.w, aRight.w);
+
+        Vector4<byte> ret;
+        ret.x = static_cast<byte>(static_cast<int>(std::abs(aLeft.x - aRight.x) <= aEpsilon) * TRUE_VALUE);
+        ret.y = static_cast<byte>(static_cast<int>(std::abs(aLeft.y - aRight.y) <= aEpsilon) * TRUE_VALUE);
+        ret.z = static_cast<byte>(static_cast<int>(std::abs(aLeft.z - aRight.z) <= aEpsilon) * TRUE_VALUE);
+        ret.w = static_cast<byte>(static_cast<int>(std::abs(aLeft.w - aRight.w) <= aEpsilon) * TRUE_VALUE);
+        return ret;
+    }
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns 0xFF per element for true, 0x00 for false
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector4<byte> CompareEQEps(Vector4<T> aLeft, Vector4<T> aRight, T aEpsilon)
+        requires NativeFloatingPoint<T> && DeviceCode<T>
+    {
+        MakeNANandINFValid(aLeft.x, aRight.x);
+        MakeNANandINFValid(aLeft.y, aRight.y);
+        MakeNANandINFValid(aLeft.z, aRight.z);
+        MakeNANandINFValid(aLeft.w, aRight.w);
+
+        Vector4<byte> ret;
+        ret.x = static_cast<byte>(static_cast<int>(abs(aLeft.x - aRight.x) <= aEpsilon) * TRUE_VALUE);
+        ret.y = static_cast<byte>(static_cast<int>(abs(aLeft.y - aRight.y) <= aEpsilon) * TRUE_VALUE);
+        ret.z = static_cast<byte>(static_cast<int>(abs(aLeft.z - aRight.z) <= aEpsilon) * TRUE_VALUE);
+        ret.w = static_cast<byte>(static_cast<int>(abs(aLeft.w - aRight.w) <= aEpsilon) * TRUE_VALUE);
+        return ret;
+    }
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns 0xFF per element for true, 0x00 for false
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector4<byte> CompareEQEps(Vector4<T> aLeft, Vector4<T> aRight, T aEpsilon)
+        requires Is16BitFloat<T>
+    {
+        MakeNANandINFValid(aLeft.x, aRight.x);
+        MakeNANandINFValid(aLeft.y, aRight.y);
+        MakeNANandINFValid(aLeft.z, aRight.z);
+        MakeNANandINFValid(aLeft.w, aRight.w);
+
+        Vector4<byte> ret;
+        ret.x = static_cast<byte>(static_cast<int>(T::Abs(aLeft.x - aRight.x) <= aEpsilon) * TRUE_VALUE);
+        ret.y = static_cast<byte>(static_cast<int>(T::Abs(aLeft.y - aRight.y) <= aEpsilon) * TRUE_VALUE);
+        ret.z = static_cast<byte>(static_cast<int>(T::Abs(aLeft.z - aRight.z) <= aEpsilon) * TRUE_VALUE);
+        ret.w = static_cast<byte>(static_cast<int>(T::Abs(aLeft.w - aRight.w) <= aEpsilon) * TRUE_VALUE);
+        return ret;
+    }
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns 0xFF per element for true, 0x00 for false
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector4<byte> CompareEQEps(const Vector4<T> &aLeft, const Vector4<T> &aRight,
+                                                                complex_basetype_t<T> aEpsilon)
+        requires ComplexFloatingPoint<T>
+    {
+        Vector4<byte> ret;
+        ret.x = static_cast<byte>(static_cast<int>(T::EqEps(aLeft.x, aRight.x, aEpsilon)) * TRUE_VALUE);
+        ret.y = static_cast<byte>(static_cast<int>(T::EqEps(aLeft.y, aRight.y, aEpsilon)) * TRUE_VALUE);
+        ret.z = static_cast<byte>(static_cast<int>(T::EqEps(aLeft.z, aRight.z, aEpsilon)) * TRUE_VALUE);
+        ret.w = static_cast<byte>(static_cast<int>(T::EqEps(aLeft.w, aRight.w, aEpsilon)) * TRUE_VALUE);
+        return ret;
+    }
+
+    /// <summary>
     /// Element wise comparison equal, returns 0xFF per element for true, 0x00 for false
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<byte> CompareEQ(const Vector4<T> &aLeft, const Vector4<T> &aRight)
     {
         Vector4<byte> ret;
-        ret.x = byte(aLeft.x == aRight.x) * TRUE_VALUE;
-        ret.y = byte(aLeft.y == aRight.y) * TRUE_VALUE;
-        ret.z = byte(aLeft.z == aRight.z) * TRUE_VALUE;
-        ret.w = byte(aLeft.w == aRight.w) * TRUE_VALUE;
+        ret.x = static_cast<byte>(static_cast<int>(aLeft.x == aRight.x) * TRUE_VALUE);
+        ret.y = static_cast<byte>(static_cast<int>(aLeft.y == aRight.y) * TRUE_VALUE);
+        ret.z = static_cast<byte>(static_cast<int>(aLeft.z == aRight.z) * TRUE_VALUE);
+        ret.w = static_cast<byte>(static_cast<int>(aLeft.w == aRight.w) * TRUE_VALUE);
         return ret;
     }
 
@@ -3691,10 +3881,10 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
         requires RealNumber<T>
     {
         Vector4<byte> ret;
-        ret.x = byte(aLeft.x >= aRight.x) * TRUE_VALUE;
-        ret.y = byte(aLeft.y >= aRight.y) * TRUE_VALUE;
-        ret.z = byte(aLeft.z >= aRight.z) * TRUE_VALUE;
-        ret.w = byte(aLeft.w >= aRight.w) * TRUE_VALUE;
+        ret.x = static_cast<byte>(static_cast<int>(aLeft.x >= aRight.x) * TRUE_VALUE);
+        ret.y = static_cast<byte>(static_cast<int>(aLeft.y >= aRight.y) * TRUE_VALUE);
+        ret.z = static_cast<byte>(static_cast<int>(aLeft.z >= aRight.z) * TRUE_VALUE);
+        ret.w = static_cast<byte>(static_cast<int>(aLeft.w >= aRight.w) * TRUE_VALUE);
         return ret;
     }
 
@@ -3705,10 +3895,10 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
         requires RealNumber<T>
     {
         Vector4<byte> ret;
-        ret.x = byte(aLeft.x > aRight.x) * TRUE_VALUE;
-        ret.y = byte(aLeft.y > aRight.y) * TRUE_VALUE;
-        ret.z = byte(aLeft.z > aRight.z) * TRUE_VALUE;
-        ret.w = byte(aLeft.w > aRight.w) * TRUE_VALUE;
+        ret.x = static_cast<byte>(static_cast<int>(aLeft.x > aRight.x) * TRUE_VALUE);
+        ret.y = static_cast<byte>(static_cast<int>(aLeft.y > aRight.y) * TRUE_VALUE);
+        ret.z = static_cast<byte>(static_cast<int>(aLeft.z > aRight.z) * TRUE_VALUE);
+        ret.w = static_cast<byte>(static_cast<int>(aLeft.w > aRight.w) * TRUE_VALUE);
         return ret;
     }
 
@@ -3719,10 +3909,10 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
         requires RealNumber<T>
     {
         Vector4<byte> ret;
-        ret.x = byte(aLeft.x <= aRight.x) * TRUE_VALUE;
-        ret.y = byte(aLeft.y <= aRight.y) * TRUE_VALUE;
-        ret.z = byte(aLeft.z <= aRight.z) * TRUE_VALUE;
-        ret.w = byte(aLeft.w <= aRight.w) * TRUE_VALUE;
+        ret.x = static_cast<byte>(static_cast<int>(aLeft.x <= aRight.x) * TRUE_VALUE);
+        ret.y = static_cast<byte>(static_cast<int>(aLeft.y <= aRight.y) * TRUE_VALUE);
+        ret.z = static_cast<byte>(static_cast<int>(aLeft.z <= aRight.z) * TRUE_VALUE);
+        ret.w = static_cast<byte>(static_cast<int>(aLeft.w <= aRight.w) * TRUE_VALUE);
         return ret;
     }
 
@@ -3733,10 +3923,10 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
         requires RealNumber<T>
     {
         Vector4<byte> ret;
-        ret.x = byte(aLeft.x < aRight.x) * TRUE_VALUE;
-        ret.y = byte(aLeft.y < aRight.y) * TRUE_VALUE;
-        ret.z = byte(aLeft.z < aRight.z) * TRUE_VALUE;
-        ret.w = byte(aLeft.w < aRight.w) * TRUE_VALUE;
+        ret.x = static_cast<byte>(static_cast<int>(aLeft.x < aRight.x) * TRUE_VALUE);
+        ret.y = static_cast<byte>(static_cast<int>(aLeft.y < aRight.y) * TRUE_VALUE);
+        ret.z = static_cast<byte>(static_cast<int>(aLeft.z < aRight.z) * TRUE_VALUE);
+        ret.w = static_cast<byte>(static_cast<int>(aLeft.w < aRight.w) * TRUE_VALUE);
         return ret;
     }
 
@@ -3746,10 +3936,10 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     DEVICE_CODE [[nodiscard]] static Vector4<byte> CompareNEQ(const Vector4<T> &aLeft, const Vector4<T> &aRight)
     {
         Vector4<byte> ret;
-        ret.x = byte(aLeft.x != aRight.x) * TRUE_VALUE;
-        ret.y = byte(aLeft.y != aRight.y) * TRUE_VALUE;
-        ret.z = byte(aLeft.z != aRight.z) * TRUE_VALUE;
-        ret.w = byte(aLeft.w != aRight.w) * TRUE_VALUE;
+        ret.x = static_cast<byte>(static_cast<int>(aLeft.x != aRight.x) * TRUE_VALUE);
+        ret.y = static_cast<byte>(static_cast<int>(aLeft.y != aRight.y) * TRUE_VALUE);
+        ret.z = static_cast<byte>(static_cast<int>(aLeft.z != aRight.z) * TRUE_VALUE);
+        ret.w = static_cast<byte>(static_cast<int>(aLeft.w != aRight.w) * TRUE_VALUE);
         return ret;
     }
 
@@ -4256,6 +4446,25 @@ template <HostCode T2> std::wostream &operator<<(std::wostream &aOs, const Vecto
     return aOs;
 }
 
+// byte and sbyte are treated as characters and not numbers:
+template <HostCode T2>
+std::ostream &operator<<(std::ostream &aOs, const Vector4<T2> &aVec)
+    requires ByteSizeType<T2>
+{
+    aOs << '(' << static_cast<int>(aVec.x) << ", " << static_cast<int>(aVec.y) << ", " << static_cast<int>(aVec.z)
+        << ", " << static_cast<int>(aVec.w) << ')';
+    return aOs;
+}
+
+template <HostCode T2>
+std::wostream &operator<<(std::wostream &aOs, const Vector4<T2> &aVec)
+    requires ByteSizeType<T2>
+{
+    aOs << '(' << static_cast<int>(aVec.x) << ", " << static_cast<int>(aVec.y) << ", " << static_cast<int>(aVec.z)
+        << ", " << static_cast<int>(aVec.w) << ')';
+    return aOs;
+}
+
 template <HostCode T2> std::istream &operator>>(std::istream &aIs, Vector4<T2> &aVec)
 {
     aIs >> aVec.x >> aVec.y >> aVec.z >> aVec.w;
@@ -4265,6 +4474,38 @@ template <HostCode T2> std::istream &operator>>(std::istream &aIs, Vector4<T2> &
 template <HostCode T2> std::wistream &operator>>(std::wistream &aIs, Vector4<T2> &aVec)
 {
     aIs >> aVec.x >> aVec.y >> aVec.z >> aVec.w;
+    return aIs;
+}
+
+template <HostCode T2>
+std::istream &operator>>(std::istream &aIs, Vector4<T2> &aVec)
+    requires ByteSizeType<T2>
+{
+    int temp = 0;
+    aIs >> temp;
+    aVec.x = static_cast<T2>(temp);
+    aIs >> temp;
+    aVec.y = static_cast<T2>(temp);
+    aIs >> temp;
+    aVec.z = static_cast<T2>(temp);
+    aIs >> temp;
+    aVec.w = static_cast<T2>(temp);
+    return aIs;
+}
+
+template <HostCode T2>
+std::wistream &operator>>(std::wistream &aIs, Vector4<T2> &aVec)
+    requires ByteSizeType<T2>
+{
+    int temp = 0;
+    aIs >> temp;
+    aVec.x = static_cast<T2>(temp);
+    aIs >> temp;
+    aVec.y = static_cast<T2>(temp);
+    aIs >> temp;
+    aVec.z = static_cast<T2>(temp);
+    aIs >> temp;
+    aVec.w = static_cast<T2>(temp);
     return aIs;
 }
 

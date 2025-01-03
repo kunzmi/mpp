@@ -46,13 +46,13 @@ class Image32uC4View : public ImageView<Pixel32uC4>
 
 
     // NppStatus nppiSet_32u_C4R_Ctx(const Npp32u[4] aValue, Npp32u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Set(const Pixel32uC4 &aValue, const NppStreamContext &nppStreamCtx);
+    Image32uC4View &Set(const Pixel32uC4 &aValue, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSet_32u_AC4R_Ctx(const Npp32u[3] aValue, Npp32u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void SetA(const Pixel32uC3 &aValue, const NppStreamContext &nppStreamCtx);
+    Image32uC4View &SetA(const Pixel32uC3 &aValue, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAlphaComp_32u_AC4R_Ctx(const Npp32u * pSrc1, int nSrc1Step, const Npp32u * pSrc2, int nSrc2Step, Npp32u * pDst, int nDstStep, NppiSize oSizeROI, NppiAlphaOp eAlphaOp, NppStreamContext nppStreamCtx)
-    void AlphaCompA(const Image32uC4View &pSrc2, Image32uC4View &pDst, NppiAlphaOp eAlphaOp, const NppStreamContext &nppStreamCtx) const;
+    Image32uC4View &AlphaCompA(const Image32uC4View &pSrc2, Image32uC4View &pDst, NppiAlphaOp eAlphaOp, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDotProd_32u64f_C4R_Ctx(const Npp32u * pSrc1, int nSrc1Step, const Npp32u * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f[4] aDp, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
     void DotProd(const Image32uC4View &pSrc2, cuda::DevVarView<double> &aDp, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;

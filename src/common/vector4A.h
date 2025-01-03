@@ -128,21 +128,11 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     T z;
     T w;
 
-    template <typename T2> struct same_vector_size_different_type
-    {
-        using vector = Vector4A<T2>;
-    };
-
-    template <typename T2>
-    using same_vector_size_different_type_t = typename same_vector_size_different_type<T2>::vector;
-
 #pragma region Constructors
     /// <summary>
     /// Default constructor does not initialize the members
     /// </summary>
-    DEVICE_CODE Vector4A() noexcept
-    {
-    }
+    Vector4A() noexcept = default;
 
     /// <summary>
     /// Initializes vector to all components = aVal, except w
@@ -1864,7 +1854,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     /// Element wise exponential
     /// </summary>
     DEVICE_CODE Vector4A<T> &Exp()
-        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T> || ComplexFloatingPoint<T>
     {
         x = T::Exp(x);
         y = T::Exp(y);
@@ -1938,7 +1928,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     /// Element wise exponential
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4A<T> Exp(const Vector4A<T> &aVec)
-        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T> || ComplexFloatingPoint<T>
     {
         Vector4A<T> ret;
         ret.x = T::Exp(aVec.x);
@@ -1992,7 +1982,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     /// Element wise natural logarithm
     /// </summary>
     DEVICE_CODE Vector4A<T> &Ln()
-        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T> || ComplexFloatingPoint<T>
     {
         x = T::Ln(x);
         y = T::Ln(y);
@@ -2066,7 +2056,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     /// Element wise natural logarithm
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4A<T> Ln(const Vector4A<T> &aVec)
-        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T> || ComplexFloatingPoint<T>
     {
         Vector4A<T> ret;
         ret.x = T::Ln(aVec.x);
@@ -2145,7 +2135,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     /// Element wise square root
     /// </summary>
     DEVICE_CODE Vector4A<T> &Sqrt()
-        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T> || ComplexFloatingPoint<T>
     {
         x = T::Sqrt(x);
         y = T::Sqrt(y);
@@ -2219,7 +2209,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     /// Element wise square root
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4A<T> Sqrt(const Vector4A<T> &aVec)
-        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T>
+        requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T> || ComplexFloatingPoint<T>
     {
         Vector4A<T> ret;
         ret.x = T::Sqrt(aVec.x);
@@ -2667,6 +2657,19 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
         ret.x = x.MagnitudeSqr();
         ret.y = y.MagnitudeSqr();
         ret.z = z.MagnitudeSqr();
+        return ret;
+    }
+
+    /// <summary>
+    /// Angle between real and imaginary of a complex number (atan2(image, real)) per element
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] Vector4A<complex_basetype_t<T>> Angle() const
+        requires ComplexFloatingPoint<T>
+    {
+        Vector4A<complex_basetype_t<T>> ret;
+        ret.x = x.Angle();
+        ret.y = y.Angle();
+        ret.z = z.Angle();
         return ret;
     }
 #pragma endregion
@@ -3430,9 +3433,9 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     DEVICE_CODE Vector4A<T> &RoundNearest()
         requires DeviceCode<T> && NativeFloatingPoint<T>
     {
-        x = __float2int_rn(x);
-        y = __float2int_rn(y);
-        z = __float2int_rn(z);
+        x = rint(x);
+        y = rint(y);
+        z = rint(z);
         return *this;
     }
 
@@ -3502,9 +3505,9 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     DEVICE_CODE Vector4A<T> &RoundZero()
         requires DeviceCode<T> && NativeFloatingPoint<T>
     {
-        x = __float2int_rz(x);
-        y = __float2int_rz(y);
-        z = __float2int_rz(z);
+        x = trunc(x);
+        y = trunc(y);
+        z = trunc(z);
         return *this;
     }
 
@@ -4127,13 +4130,32 @@ DEVICE_CODE Vector4A<T> operator/(T2 aLeft, const Vector4A<T> &aRight)
 
 template <HostCode T2> std::ostream &operator<<(std::ostream &aOs, const Vector4A<T2> &aVec)
 {
-    aOs << '(' << aVec.x << ", " << aVec.y << ", " << aVec.z << ')';
+    aOs << '(' << aVec.x << ", " << aVec.y << ", " << aVec.z << ", A)";
     return aOs;
 }
 
 template <HostCode T2> std::wostream &operator<<(std::wostream &aOs, const Vector4A<T2> &aVec)
 {
-    aOs << '(' << aVec.x << ", " << aVec.y << ", " << aVec.z << ')';
+    aOs << '(' << aVec.x << ", " << aVec.y << ", " << aVec.z << ", A)";
+    return aOs;
+}
+
+// byte and sbyte are treated as characters and not numbers:
+template <HostCode T2>
+std::ostream &operator<<(std::ostream &aOs, const Vector4A<T2> &aVec)
+    requires ByteSizeType<T2>
+{
+    aOs << '(' << static_cast<int>(aVec.x) << ", " << static_cast<int>(aVec.y) << ", " << static_cast<int>(aVec.z)
+        << ", A)";
+    return aOs;
+}
+
+template <HostCode T2>
+std::wostream &operator<<(std::wostream &aOs, const Vector4A<T2> &aVec)
+    requires ByteSizeType<T2>
+{
+    aOs << '(' << static_cast<int>(aVec.x) << ", " << static_cast<int>(aVec.y) << ", " << static_cast<int>(aVec.z)
+        << ", A)";
     return aOs;
 }
 
@@ -4146,6 +4168,34 @@ template <HostCode T2> std::istream &operator>>(std::istream &aIs, Vector4A<T2> 
 template <HostCode T2> std::wistream &operator>>(std::wistream &aIs, Vector4A<T2> &aVec)
 {
     aIs >> aVec.x >> aVec.y >> aVec.z;
+    return aIs;
+}
+
+template <HostCode T2>
+std::istream &operator>>(std::istream &aIs, Vector4A<T2> &aVec)
+    requires ByteSizeType<T2>
+{
+    int temp = 0;
+    aIs >> temp;
+    aVec.x = static_cast<T2>(temp);
+    aIs >> temp;
+    aVec.y = static_cast<T2>(temp);
+    aIs >> temp;
+    aVec.z = static_cast<T2>(temp);
+    return aIs;
+}
+
+template <HostCode T2>
+std::wistream &operator>>(std::wistream &aIs, Vector4A<T2> &aVec)
+    requires ByteSizeType<T2>
+{
+    int temp = 0;
+    aIs >> temp;
+    aVec.x = static_cast<T2>(temp);
+    aIs >> temp;
+    aVec.y = static_cast<T2>(temp);
+    aIs >> temp;
+    aVec.z = static_cast<T2>(temp);
     return aIs;
 }
 

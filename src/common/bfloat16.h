@@ -20,17 +20,17 @@ namespace opp
 class alignas(2) BFloat16
 {
   private:
-#ifdef IS_HOST_COMPILER
-    ushort value{};
-
     static constexpr bool BINARY = true; // additional argument for constructor to switch to binary
+
+#ifdef IS_HOST_COMPILER
+    ushort value;
 
     explicit constexpr BFloat16(ushort aUShort, bool /*aBinary*/) : value(aUShort)
     {
     }
 #endif
 #ifdef IS_CUDA_COMPILER
-    __nv_bfloat16 value{};
+    __nv_bfloat16 value;
 
     DEVICE_CODE explicit constexpr BFloat16(ushort aUShort, bool /*aBinary*/) : value(__nv_bfloat16_raw{aUShort})
     {
@@ -38,7 +38,8 @@ class alignas(2) BFloat16
 #endif
 
   public:
-    BFloat16() = default;
+    BFloat16() noexcept = default;
+
 #ifdef IS_HOST_COMPILER
     explicit constexpr BFloat16(float aFloat) : value(FromFloat(aFloat).value)
     {
@@ -67,6 +68,9 @@ class alignas(2) BFloat16
     explicit constexpr BFloat16(ulong64 aVal) : value(FromFloat(static_cast<float>(aVal)).value)
     {
     }
+    explicit constexpr BFloat16(double aVal) : value(FromFloat(static_cast<float>(aVal)).value)
+    {
+    }
 #endif
 #ifdef IS_CUDA_COMPILER
     DEVICE_CODE explicit BFloat16(__nv_bfloat16 aBFloat) : value(aBFloat)
@@ -93,10 +97,13 @@ class alignas(2) BFloat16
     DEVICE_CODE explicit BFloat16(uint aVal) : value(__uint2bfloat16_rn(aVal))
     {
     }
-    DEVICE_ONLY_CODE explicit BFloat16(long64 aVal) : value(__ll2bfloat16_ru(aVal))
+    DEVICE_ONLY_CODE explicit BFloat16(long64 aVal) : value(__ll2bfloat16_rn(aVal))
     {
     }
-    DEVICE_ONLY_CODE explicit BFloat16(ulong64 aVal) : value(__ull2bfloat16_ru(aVal))
+    DEVICE_ONLY_CODE explicit BFloat16(ulong64 aVal) : value(__ull2bfloat16_rn(aVal))
+    {
+    }
+    DEVICE_ONLY_CODE explicit BFloat16(double aVal) : value(__double2bfloat16(aVal))
     {
     }
 #endif
@@ -796,6 +803,34 @@ class alignas(2) BFloat16
     DEVICE_ONLY_CODE [[nodiscard]] inline static BFloat16 RoundZero(BFloat16 aOther)
     {
         return BFloat16(__int2bfloat16_rz(__bfloat162int_rz(aOther.value)));
+    }
+#endif
+
+    DEVICE_CODE inline BFloat16 GetSign()
+    {
+        constexpr ushort ONE_AS_BFLOAT = 0x3f80;
+        constexpr ushort SIGN_BIT      = 0x8000;
+        ushort bfloatbits              = *reinterpret_cast<ushort *>(&value);
+        bfloatbits &= SIGN_BIT;
+        bfloatbits |= ONE_AS_BFLOAT;
+        return *reinterpret_cast<BFloat16 *>(&bfloatbits);
+    }
+
+#ifdef IS_CUDA_COMPILER
+    /// <summary>
+    /// </summary>
+    DEVICE_ONLY_CODE [[nodiscard]] inline static BFloat16 Sin(BFloat16 aOther)
+    {
+        return BFloat16(hsin(aOther.value));
+    }
+#endif
+
+#ifdef IS_CUDA_COMPILER
+    /// <summary>
+    /// </summary>
+    DEVICE_ONLY_CODE [[nodiscard]] inline static BFloat16 Cos(BFloat16 aOther)
+    {
+        return BFloat16(hcos(aOther.value));
     }
 #endif
 };

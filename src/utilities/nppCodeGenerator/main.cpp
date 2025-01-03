@@ -27,3113 +27,3113 @@ std::string ReplaceAll(std::string aSrc, const std::string &aToReplace, const st
     return aSrc;
 }
 
-int main()
+int main() // NOLINT(hicpp-function-size,readability-function-size)
 {
-    std::vector<Function> functions = NPPParser::GetFunctions();
-
-    std::vector<Function> functionsNoCtxDoublets;
-
-    for (auto &elem : functions)
+    try
     {
-        if (NPPParser::IsCtx(elem))
-        {
-            functionsNoCtxDoublets.push_back(elem);
-        }
-        else
-        {
-            const std::string ctxName = elem.name + "_Ctx";
+        std::vector<Function> functions = NPPParser::GetFunctions();
 
-            auto iter = std::find_if(functions.begin(), functions.end(),
-                                     [&ctxName](const Function &aFunc) { return aFunc.name == ctxName; });
-            if (iter == functions.end())
+        std::vector<Function> functionsNoCtxDoublets;
+
+        for (auto &elem : functions)
+        {
+            if (NPPParser::IsCtx(elem))
             {
-                // function has no _Ctx counterpart so we have to keep it
                 functionsNoCtxDoublets.push_back(elem);
             }
-        }
-    }
-
-    for (const auto &f : functions)
-    {
-        if (f.name == "nppiSet_8u_C4CR_Ctx")
-        {
-            ConvertedFunction cf(f);
-        }
-    }
-
-    std::vector<Function> failed;
-    size_t totalConverted = 0;
-
-    // 8u
-    {
-        // 8uC1
-        {
-            // get all functions for 8uC1
-            std::vector<Function> func8uC1;
-            for (auto &elem : functionsNoCtxDoublets)
+            else
             {
-                if (elem.category != "support") // we don't need malloc and free here
+                const std::string ctxName = elem.name + "_Ctx";
+
+                auto iter = std::find_if(functions.begin(), functions.end(),
+                                         [&ctxName](const Function &aFunc) { return aFunc.name == ctxName; });
+                if (iter == functions.end())
                 {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE8uC1)
+                    // function has no _Ctx counterpart so we have to keep it
+                    functionsNoCtxDoublets.push_back(elem);
+                }
+            }
+        }
+
+        /*for (const auto &f : functions)
+        {
+            if (f.name == "nppiMinEvery_8u_C4IR_Ctx")
+            {
+                ConvertedFunction cf(f);
+            }
+        }*/
+
+        std::vector<Function> failed;
+        size_t totalConverted = 0;
+
+        // 8u
+        {
+            // 8uC1
+            {
+                // get all functions for 8uC1
+                std::vector<Function> func8uC1;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
                     {
-                        func8uC1.push_back(elem);
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE8uC1)
+                        {
+                            func8uC1.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func8uC1.size();
+                totalConverted += func8uC1.size();
 
-            std::cout << "Processing " << func8uC1.size() << " functions for 8uC1." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func8uC1.size() << " functions for 8uC1." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func8uC1)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func8uC1)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8uC1View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8uC1View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 8uC2
-        {
-            // get all functions for 8uC2
-            std::vector<Function> func8uC2;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE8uC2)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func8uC2.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8uC1View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8uC1View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 8uC2
+            {
+                // get all functions for 8uC2
+                std::vector<Function> func8uC2;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE8uC2)
+                        {
+                            func8uC2.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func8uC2.size();
+                totalConverted += func8uC2.size();
 
-            std::cout << "Processing " << func8uC2.size() << " functions for 8uC2." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func8uC2.size() << " functions for 8uC2." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func8uC2)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func8uC2)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8uC2View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8uC2View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                if (conv.IsStatic())
-                {
-                    continue;
-                }
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 8uC3
-        {
-            // get all functions for 8uC3
-            std::vector<Function> func8uC3;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE8uC3)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func8uC3.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8uC2View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8uC2View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    if (conv.IsStatic())
+                    {
+                        continue;
+                    }
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 8uC3
+            {
+                // get all functions for 8uC3
+                std::vector<Function> func8uC3;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE8uC3)
+                        {
+                            func8uC3.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func8uC3.size();
+                totalConverted += func8uC3.size();
 
-            std::cout << "Processing " << func8uC3.size() << " functions for 8uC3." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func8uC3.size() << " functions for 8uC3." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func8uC3)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func8uC3)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8uC3View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8uC3View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 8uC4
-        {
-            // get all functions for 8uC4
-            std::vector<Function> func8uC4;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE8uC4 ||
-                        NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE8uC4A)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func8uC4.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8uC3View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8uC3View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 8uC4
+            {
+                // get all functions for 8uC4
+                std::vector<Function> func8uC4;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE8uC4 ||
+                            NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE8uC4A)
+                        {
+                            func8uC4.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func8uC4.size();
+                totalConverted += func8uC4.size();
 
-            std::cout << "Processing " << func8uC4.size() << " functions for 8uC4." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func8uC4.size() << " functions for 8uC4." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func8uC4)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func8uC4)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8uC4View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8uC4View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-    }
-
-    // 8s
-    {
-        // 8sC1
-        {
-            // get all functions for 8sC1
-            std::vector<Function> func8sC1;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE8sC1)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func8sC1.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8uC4View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8uC4View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+        }
+
+        // 8s
+        {
+            // 8sC1
+            {
+                // get all functions for 8sC1
+                std::vector<Function> func8sC1;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE8sC1)
+                        {
+                            func8sC1.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func8sC1.size();
+                totalConverted += func8sC1.size();
 
-            std::cout << "Processing " << func8sC1.size() << " functions for 8sC1." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func8sC1.size() << " functions for 8sC1." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func8sC1)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func8sC1)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8sC1View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8sC1View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 8sC2
-        {
-            // get all functions for 8sC2
-            std::vector<Function> func8sC2;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE8sC2)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func8sC2.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8sC1View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8sC1View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 8sC2
+            {
+                // get all functions for 8sC2
+                std::vector<Function> func8sC2;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE8sC2)
+                        {
+                            func8sC2.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func8sC2.size();
+                totalConverted += func8sC2.size();
 
-            std::cout << "Processing " << func8sC2.size() << " functions for 8sC2." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func8sC2.size() << " functions for 8sC2." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func8sC2)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func8sC2)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8sC2View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8sC2View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                if (conv.IsStatic())
-                {
-                    continue;
-                }
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 8sC3
-        {
-            // get all functions for 8sC3
-            std::vector<Function> func8sC3;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE8sC3)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func8sC3.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8sC2View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8sC2View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    if (conv.IsStatic())
+                    {
+                        continue;
+                    }
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 8sC3
+            {
+                // get all functions for 8sC3
+                std::vector<Function> func8sC3;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE8sC3)
+                        {
+                            func8sC3.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func8sC3.size();
+                totalConverted += func8sC3.size();
 
-            std::cout << "Processing " << func8sC3.size() << " functions for 8sC3." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func8sC3.size() << " functions for 8sC3." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func8sC3)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func8sC3)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8sC3View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8sC3View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 8sC4
-        {
-            // get all functions for 8sC4
-            std::vector<Function> func8sC4;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE8sC4 ||
-                        NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE8sC4A)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func8sC4.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8sC3View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8sC3View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 8sC4
+            {
+                // get all functions for 8sC4
+                std::vector<Function> func8sC4;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE8sC4 ||
+                            NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE8sC4A)
+                        {
+                            func8sC4.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func8sC4.size();
+                totalConverted += func8sC4.size();
 
-            std::cout << "Processing " << func8sC4.size() << " functions for 8sC4." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func8sC4.size() << " functions for 8sC4." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func8sC4)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func8sC4)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8sC4View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8sC4View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-    }
-
-    // 16u
-    {
-        // 16uC1
-        {
-            // get all functions for 16uC1
-            std::vector<Function> func16uC1;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16uC1)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func16uC1.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8sC4View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image8sC4View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+        }
+
+        // 16u
+        {
+            // 16uC1
+            {
+                // get all functions for 16uC1
+                std::vector<Function> func16uC1;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16uC1)
+                        {
+                            func16uC1.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func16uC1.size();
+                totalConverted += func16uC1.size();
 
-            std::cout << "Processing " << func16uC1.size() << " functions for 16uC1." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func16uC1.size() << " functions for 16uC1." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func16uC1)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func16uC1)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16uC1View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16uC1View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 16uC2
-        {
-            // get all functions for 16uC2
-            std::vector<Function> func16uC2;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16uC2)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func16uC2.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16uC1View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16uC1View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 16uC2
+            {
+                // get all functions for 16uC2
+                std::vector<Function> func16uC2;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16uC2)
+                        {
+                            func16uC2.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func16uC2.size();
+                totalConverted += func16uC2.size();
 
-            std::cout << "Processing " << func16uC2.size() << " functions for 16uC2." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func16uC2.size() << " functions for 16uC2." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func16uC2)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func16uC2)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16uC2View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16uC2View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                if (conv.IsStatic())
-                {
-                    continue;
-                }
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 16uC3
-        {
-            // get all functions for 16uC3
-            std::vector<Function> func16uC3;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16uC3)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func16uC3.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16uC2View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16uC2View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    if (conv.IsStatic())
+                    {
+                        continue;
+                    }
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 16uC3
+            {
+                // get all functions for 16uC3
+                std::vector<Function> func16uC3;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16uC3)
+                        {
+                            func16uC3.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func16uC3.size();
+                totalConverted += func16uC3.size();
 
-            std::cout << "Processing " << func16uC3.size() << " functions for 16uC3." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func16uC3.size() << " functions for 16uC3." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func16uC3)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func16uC3)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16uC3View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16uC3View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 16uC4
-        {
-            // get all functions for 16uC4
-            std::vector<Function> func16uC4;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16uC4 ||
-                        NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16uC4A)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func16uC4.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16uC3View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16uC3View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 16uC4
+            {
+                // get all functions for 16uC4
+                std::vector<Function> func16uC4;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16uC4 ||
+                            NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16uC4A)
+                        {
+                            func16uC4.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func16uC4.size();
+                totalConverted += func16uC4.size();
 
-            std::cout << "Processing " << func16uC4.size() << " functions for 16uC4." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func16uC4.size() << " functions for 16uC4." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func16uC4)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func16uC4)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16uC4View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16uC4View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-    }
-
-    // 16s
-    {
-        // 16sC1
-        {
-            // get all functions for 16sC1
-            std::vector<Function> func16sC1;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16sC1)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func16sC1.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16uC4View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16uC4View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+        }
+
+        // 16s
+        {
+            // 16sC1
+            {
+                // get all functions for 16sC1
+                std::vector<Function> func16sC1;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16sC1)
+                        {
+                            func16sC1.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func16sC1.size();
+                totalConverted += func16sC1.size();
 
-            std::cout << "Processing " << func16sC1.size() << " functions for 16sC1." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func16sC1.size() << " functions for 16sC1." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func16sC1)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func16sC1)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16sC1View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16sC1View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 16sC2
-        {
-            // get all functions for 16sC2
-            std::vector<Function> func16sC2;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16sC2)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func16sC2.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16sC1View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16sC1View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 16sC2
+            {
+                // get all functions for 16sC2
+                std::vector<Function> func16sC2;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16sC2)
+                        {
+                            func16sC2.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func16sC2.size();
+                totalConverted += func16sC2.size();
 
-            std::cout << "Processing " << func16sC2.size() << " functions for 16sC2." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func16sC2.size() << " functions for 16sC2." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func16sC2)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func16sC2)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16sC2View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16sC2View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                if (conv.IsStatic())
-                {
-                    continue;
-                }
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 16sC3
-        {
-            // get all functions for 16sC3
-            std::vector<Function> func16sC3;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16sC3)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func16sC3.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16sC2View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16sC2View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    if (conv.IsStatic())
+                    {
+                        continue;
+                    }
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 16sC3
+            {
+                // get all functions for 16sC3
+                std::vector<Function> func16sC3;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16sC3)
+                        {
+                            func16sC3.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func16sC3.size();
+                totalConverted += func16sC3.size();
 
-            std::cout << "Processing " << func16sC3.size() << " functions for 16sC3." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func16sC3.size() << " functions for 16sC3." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func16sC3)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func16sC3)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16sC3View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16sC3View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 16sC4
-        {
-            // get all functions for 16sC4
-            std::vector<Function> func16sC4;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16sC4 ||
-                        NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16sC4A)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func16sC4.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16sC3View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16sC3View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 16sC4
+            {
+                // get all functions for 16sC4
+                std::vector<Function> func16sC4;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16sC4 ||
+                            NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16sC4A)
+                        {
+                            func16sC4.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func16sC4.size();
+                totalConverted += func16sC4.size();
 
-            std::cout << "Processing " << func16sC4.size() << " functions for 16sC4." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func16sC4.size() << " functions for 16sC4." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func16sC4)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func16sC4)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16sC4View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16sC4View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-    }
-
-    // 16sc
-    {
-        // 16scC1
-        {
-            // get all functions for 16scC1
-            std::vector<Function> func16scC1;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16scC1)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func16scC1.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16sC4View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16sC4View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+        }
+
+        // 16sc
+        {
+            // 16scC1
+            {
+                // get all functions for 16scC1
+                std::vector<Function> func16scC1;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16scC1)
+                        {
+                            func16scC1.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func16scC1.size();
+                totalConverted += func16scC1.size();
 
-            std::cout << "Processing " << func16scC1.size() << " functions for 16scC1." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func16scC1.size() << " functions for 16scC1." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func16scC1)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func16scC1)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16scC1View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16scC1View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 16scC2
-        {
-            // get all functions for 16scC2
-            std::vector<Function> func16scC2;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16scC2)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func16scC2.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16scC1View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16scC1View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 16scC2
+            {
+                // get all functions for 16scC2
+                std::vector<Function> func16scC2;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16scC2)
+                        {
+                            func16scC2.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func16scC2.size();
+                totalConverted += func16scC2.size();
 
-            std::cout << "Processing " << func16scC2.size() << " functions for 16scC2." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func16scC2.size() << " functions for 16scC2." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func16scC2)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func16scC2)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16scC2View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16scC2View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                if (conv.IsStatic())
-                {
-                    continue;
-                }
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 16scC3
-        {
-            // get all functions for 16scC3
-            std::vector<Function> func16scC3;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16scC3)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func16scC3.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16scC2View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16scC2View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    if (conv.IsStatic())
+                    {
+                        continue;
+                    }
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 16scC3
+            {
+                // get all functions for 16scC3
+                std::vector<Function> func16scC3;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16scC3)
+                        {
+                            func16scC3.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func16scC3.size();
+                totalConverted += func16scC3.size();
 
-            std::cout << "Processing " << func16scC3.size() << " functions for 16scC3." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func16scC3.size() << " functions for 16scC3." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func16scC3)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func16scC3)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16scC3View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16scC3View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 16scC4
-        {
-            // get all functions for 16scC4
-            std::vector<Function> func16scC4;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16scC4)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func16scC4.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16scC3View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16scC3View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 16scC4
+            {
+                // get all functions for 16scC4
+                std::vector<Function> func16scC4;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16scC4)
+                        {
+                            func16scC4.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func16scC4.size();
+                totalConverted += func16scC4.size();
 
-            std::cout << "Processing " << func16scC4.size() << " functions for 16scC4." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func16scC4.size() << " functions for 16scC4." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func16scC4)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func16scC4)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16scC4View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16scC4View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-    }
-
-    // 32u
-    {
-        // 32uC1
-        {
-            // get all functions for 32uC1
-            std::vector<Function> func32uC1;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32uC1)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func32uC1.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16scC4View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16scC4View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+        }
+
+        // 32u
+        {
+            // 32uC1
+            {
+                // get all functions for 32uC1
+                std::vector<Function> func32uC1;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32uC1)
+                        {
+                            func32uC1.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func32uC1.size();
+                totalConverted += func32uC1.size();
 
-            std::cout << "Processing " << func32uC1.size() << " functions for 32uC1." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func32uC1.size() << " functions for 32uC1." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func32uC1)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func32uC1)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32uC1View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32uC1View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 32uC2
-        {
-            // get all functions for 32uC2
-            std::vector<Function> func32uC2;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32uC2)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func32uC2.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32uC1View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32uC1View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 32uC2
+            {
+                // get all functions for 32uC2
+                std::vector<Function> func32uC2;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32uC2)
+                        {
+                            func32uC2.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func32uC2.size();
+                totalConverted += func32uC2.size();
 
-            std::cout << "Processing " << func32uC2.size() << " functions for 32uC2." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func32uC2.size() << " functions for 32uC2." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func32uC2)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func32uC2)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32uC2View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32uC2View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                if (conv.IsStatic())
-                {
-                    continue;
-                }
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 32uC3
-        {
-            // get all functions for 32uC3
-            std::vector<Function> func32uC3;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32uC3)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func32uC3.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32uC2View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32uC2View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    if (conv.IsStatic())
+                    {
+                        continue;
+                    }
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 32uC3
+            {
+                // get all functions for 32uC3
+                std::vector<Function> func32uC3;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32uC3)
+                        {
+                            func32uC3.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func32uC3.size();
+                totalConverted += func32uC3.size();
 
-            std::cout << "Processing " << func32uC3.size() << " functions for 32uC3." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func32uC3.size() << " functions for 32uC3." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func32uC3)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func32uC3)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32uC3View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32uC3View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 32uC4
-        {
-            // get all functions for 32uC4
-            std::vector<Function> func32uC4;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32uC4 ||
-                        NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32uC4A)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func32uC4.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32uC3View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32uC3View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 32uC4
+            {
+                // get all functions for 32uC4
+                std::vector<Function> func32uC4;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32uC4 ||
+                            NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32uC4A)
+                        {
+                            func32uC4.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func32uC4.size();
+                totalConverted += func32uC4.size();
 
-            std::cout << "Processing " << func32uC4.size() << " functions for 32uC4." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func32uC4.size() << " functions for 32uC4." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func32uC4)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func32uC4)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32uC4View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32uC4View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-    }
-
-    // 32s
-    {
-        // 32sC1
-        {
-            // get all functions for 32sC1
-            std::vector<Function> func32sC1;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32sC1)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func32sC1.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32uC4View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32uC4View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+        }
+
+        // 32s
+        {
+            // 32sC1
+            {
+                // get all functions for 32sC1
+                std::vector<Function> func32sC1;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32sC1)
+                        {
+                            func32sC1.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func32sC1.size();
+                totalConverted += func32sC1.size();
 
-            std::cout << "Processing " << func32sC1.size() << " functions for 32sC1." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func32sC1.size() << " functions for 32sC1." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func32sC1)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func32sC1)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32sC1View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32sC1View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 32sC2
-        {
-            // get all functions for 32sC2
-            std::vector<Function> func32sC2;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32sC2)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func32sC2.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32sC1View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32sC1View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 32sC2
+            {
+                // get all functions for 32sC2
+                std::vector<Function> func32sC2;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32sC2)
+                        {
+                            func32sC2.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func32sC2.size();
+                totalConverted += func32sC2.size();
 
-            std::cout << "Processing " << func32sC2.size() << " functions for 32sC2." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func32sC2.size() << " functions for 32sC2." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func32sC2)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func32sC2)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32sC2View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32sC2View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                if (conv.IsStatic())
-                {
-                    continue;
-                }
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 32sC3
-        {
-            // get all functions for 32sC3
-            std::vector<Function> func32sC3;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32sC3)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func32sC3.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32sC2View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32sC2View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    if (conv.IsStatic())
+                    {
+                        continue;
+                    }
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 32sC3
+            {
+                // get all functions for 32sC3
+                std::vector<Function> func32sC3;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32sC3)
+                        {
+                            func32sC3.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func32sC3.size();
+                totalConverted += func32sC3.size();
 
-            std::cout << "Processing " << func32sC3.size() << " functions for 32sC3." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func32sC3.size() << " functions for 32sC3." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func32sC3)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func32sC3)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32sC3View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32sC3View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 32sC4
-        {
-            // get all functions for 32sC4
-            std::vector<Function> func32sC4;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32sC4 ||
-                        NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32sC4A)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func32sC4.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32sC3View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32sC3View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 32sC4
+            {
+                // get all functions for 32sC4
+                std::vector<Function> func32sC4;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32sC4 ||
+                            NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32sC4A)
+                        {
+                            func32sC4.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func32sC4.size();
+                totalConverted += func32sC4.size();
 
-            std::cout << "Processing " << func32sC4.size() << " functions for 32sC4." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func32sC4.size() << " functions for 32sC4." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func32sC4)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func32sC4)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32sC4View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32sC4View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-    }
-
-    // 32sc
-    {
-        // 32scC1
-        {
-            // get all functions for 32scC1
-            std::vector<Function> func32scC1;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32scC1)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func32scC1.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32sC4View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32sC4View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+        }
+
+        // 32sc
+        {
+            // 32scC1
+            {
+                // get all functions for 32scC1
+                std::vector<Function> func32scC1;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32scC1)
+                        {
+                            func32scC1.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func32scC1.size();
+                totalConverted += func32scC1.size();
 
-            std::cout << "Processing " << func32scC1.size() << " functions for 32scC1." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func32scC1.size() << " functions for 32scC1." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func32scC1)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func32scC1)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32scC1View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32scC1View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 32scC2
-        {
-            // get all functions for 32scC2
-            std::vector<Function> func32scC2;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32scC2)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func32scC2.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32scC1View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32scC1View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 32scC2
+            {
+                // get all functions for 32scC2
+                std::vector<Function> func32scC2;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32scC2)
+                        {
+                            func32scC2.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func32scC2.size();
+                totalConverted += func32scC2.size();
 
-            std::cout << "Processing " << func32scC2.size() << " functions for 32scC2." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func32scC2.size() << " functions for 32scC2." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func32scC2)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func32scC2)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32scC2View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32scC2View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                if (conv.IsStatic())
-                {
-                    continue;
-                }
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 32scC3
-        {
-            // get all functions for 32scC3
-            std::vector<Function> func32scC3;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32scC3)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func32scC3.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32scC2View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32scC2View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    if (conv.IsStatic())
+                    {
+                        continue;
+                    }
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 32scC3
+            {
+                // get all functions for 32scC3
+                std::vector<Function> func32scC3;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32scC3)
+                        {
+                            func32scC3.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func32scC3.size();
+                totalConverted += func32scC3.size();
 
-            std::cout << "Processing " << func32scC3.size() << " functions for 32scC3." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func32scC3.size() << " functions for 32scC3." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func32scC3)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func32scC3)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32scC3View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32scC3View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 32scC4
-        {
-            // get all functions for 32scC4
-            std::vector<Function> func32scC4;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32scC4)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func32scC4.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32scC3View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32scC3View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 32scC4
+            {
+                // get all functions for 32scC4
+                std::vector<Function> func32scC4;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32scC4)
+                        {
+                            func32scC4.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func32scC4.size();
+                totalConverted += func32scC4.size();
 
-            std::cout << "Processing " << func32scC4.size() << " functions for 32scC4." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func32scC4.size() << " functions for 32scC4." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func32scC4)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func32scC4)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32scC4View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32scC4View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-    }
-
-    // 32f
-    {
-        // 32fC1
-        {
-            // get all functions for 32fC1
-            std::vector<Function> func32fC1;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32fC1)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func32fC1.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32scC4View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32scC4View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+        }
+
+        // 32f
+        {
+            // 32fC1
+            {
+                // get all functions for 32fC1
+                std::vector<Function> func32fC1;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32fC1)
+                        {
+                            func32fC1.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func32fC1.size();
+                totalConverted += func32fC1.size();
 
-            std::cout << "Processing " << func32fC1.size() << " functions for 32fC1." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func32fC1.size() << " functions for 32fC1." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func32fC1)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func32fC1)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fC1View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fC1View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 32fC2
-        {
-            // get all functions for 32fC2
-            std::vector<Function> func32fC2;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32fC2)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func32fC2.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fC1View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fC1View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 32fC2
+            {
+                // get all functions for 32fC2
+                std::vector<Function> func32fC2;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32fC2)
+                        {
+                            func32fC2.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func32fC2.size();
+                totalConverted += func32fC2.size();
 
-            std::cout << "Processing " << func32fC2.size() << " functions for 32fC2." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func32fC2.size() << " functions for 32fC2." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func32fC2)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func32fC2)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fC2View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fC2View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                if (conv.IsStatic())
-                {
-                    continue;
-                }
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 32fC3
-        {
-            // get all functions for 32fC3
-            std::vector<Function> func32fC3;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32fC3)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func32fC3.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fC2View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fC2View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    if (conv.IsStatic())
+                    {
+                        continue;
+                    }
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 32fC3
+            {
+                // get all functions for 32fC3
+                std::vector<Function> func32fC3;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32fC3)
+                        {
+                            func32fC3.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func32fC3.size();
+                totalConverted += func32fC3.size();
 
-            std::cout << "Processing " << func32fC3.size() << " functions for 32fC3." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func32fC3.size() << " functions for 32fC3." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func32fC3)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func32fC3)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fC3View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fC3View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 32fC4
-        {
-            // get all functions for 32fC4
-            std::vector<Function> func32fC4;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32fC4 ||
-                        NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32fC4A)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func32fC4.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fC3View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fC3View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 32fC4
+            {
+                // get all functions for 32fC4
+                std::vector<Function> func32fC4;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32fC4 ||
+                            NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32fC4A)
+                        {
+                            func32fC4.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func32fC4.size();
+                totalConverted += func32fC4.size();
 
-            std::cout << "Processing " << func32fC4.size() << " functions for 32fC4." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func32fC4.size() << " functions for 32fC4." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func32fC4)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func32fC4)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fC4View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fC4View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-    }
-
-    // 32fc
-    {
-        // 32fcC1
-        {
-            // get all functions for 32fcC1
-            std::vector<Function> func32fcC1;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32fcC1)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func32fcC1.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fC4View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fC4View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+        }
+
+        // 32fc
+        {
+            // 32fcC1
+            {
+                // get all functions for 32fcC1
+                std::vector<Function> func32fcC1;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32fcC1)
+                        {
+                            func32fcC1.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func32fcC1.size();
+                totalConverted += func32fcC1.size();
 
-            std::cout << "Processing " << func32fcC1.size() << " functions for 32fcC1." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func32fcC1.size() << " functions for 32fcC1." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func32fcC1)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func32fcC1)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fcC1View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fcC1View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 32fcC2
-        {
-            // get all functions for 32fcC2
-            std::vector<Function> func32fcC2;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32fcC2)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func32fcC2.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fcC1View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fcC1View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 32fcC2
+            {
+                // get all functions for 32fcC2
+                std::vector<Function> func32fcC2;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32fcC2)
+                        {
+                            func32fcC2.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func32fcC2.size();
+                totalConverted += func32fcC2.size();
 
-            std::cout << "Processing " << func32fcC2.size() << " functions for 32fcC2." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func32fcC2.size() << " functions for 32fcC2." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func32fcC2)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func32fcC2)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fcC2View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fcC2View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                if (conv.IsStatic())
-                {
-                    continue;
-                }
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 32fcC3
-        {
-            // get all functions for 32fcC3
-            std::vector<Function> func32fcC3;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32fcC3)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func32fcC3.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fcC2View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fcC2View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    if (conv.IsStatic())
+                    {
+                        continue;
+                    }
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 32fcC3
+            {
+                // get all functions for 32fcC3
+                std::vector<Function> func32fcC3;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32fcC3)
+                        {
+                            func32fcC3.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func32fcC3.size();
+                totalConverted += func32fcC3.size();
 
-            std::cout << "Processing " << func32fcC3.size() << " functions for 32fcC3." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func32fcC3.size() << " functions for 32fcC3." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func32fcC3)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func32fcC3)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fcC3View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fcC3View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 32fcC4
-        {
-            // get all functions for 32fcC4
-            std::vector<Function> func32fcC4;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32fcC4)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func32fcC4.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fcC3View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fcC3View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 32fcC4
+            {
+                // get all functions for 32fcC4
+                std::vector<Function> func32fcC4;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE32fcC4)
+                        {
+                            func32fcC4.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func32fcC4.size();
+                totalConverted += func32fcC4.size();
 
-            std::cout << "Processing " << func32fcC4.size() << " functions for 32fcC4." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func32fcC4.size() << " functions for 32fcC4." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func32fcC4)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func32fcC4)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fcC4View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fcC4View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-    }
-
-    // 64f
-    {
-        // 64fC1
-        {
-            // get all functions for 64fC1
-            std::vector<Function> func64fC1;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE64fC1)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func64fC1.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fcC4View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image32fcC4View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+        }
+
+        // 64f
+        {
+            // 64fC1
+            {
+                // get all functions for 64fC1
+                std::vector<Function> func64fC1;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE64fC1)
+                        {
+                            func64fC1.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func64fC1.size();
+                totalConverted += func64fC1.size();
 
-            std::cout << "Processing " << func64fC1.size() << " functions for 64fC1." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func64fC1.size() << " functions for 64fC1." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func64fC1)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func64fC1)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image64fC1View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image64fC1View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 64fC2
-        {
-            // get all functions for 64fC2
-            std::vector<Function> func64fC2;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE64fC2)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func64fC2.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image64fC1View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image64fC1View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 64fC2
+            {
+                // get all functions for 64fC2
+                std::vector<Function> func64fC2;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE64fC2)
+                        {
+                            func64fC2.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func64fC2.size();
+                totalConverted += func64fC2.size();
 
-            std::cout << "Processing " << func64fC2.size() << " functions for 64fC2." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func64fC2.size() << " functions for 64fC2." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func64fC2)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func64fC2)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image64fC2View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image64fC2View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                if (conv.IsStatic())
-                {
-                    continue;
-                }
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 64fC3
-        {
-            // get all functions for 64fC3
-            std::vector<Function> func64fC3;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE64fC3)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func64fC3.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image64fC2View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image64fC2View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    if (conv.IsStatic())
+                    {
+                        continue;
+                    }
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 64fC3
+            {
+                // get all functions for 64fC3
+                std::vector<Function> func64fC3;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE64fC3)
+                        {
+                            func64fC3.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func64fC3.size();
+                totalConverted += func64fC3.size();
 
-            std::cout << "Processing " << func64fC3.size() << " functions for 64fC3." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func64fC3.size() << " functions for 64fC3." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func64fC3)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func64fC3)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image64fC3View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image64fC3View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 64fC4
-        {
-            // get all functions for 64fC4
-            std::vector<Function> func64fC4;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE64fC4 ||
-                        NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE64fC4A)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func64fC4.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image64fC3View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image64fC3View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 64fC4
+            {
+                // get all functions for 64fC4
+                std::vector<Function> func64fC4;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE64fC4 ||
+                            NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE64fC4A)
+                        {
+                            func64fC4.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func64fC4.size();
+                totalConverted += func64fC4.size();
 
-            std::cout << "Processing " << func64fC4.size() << " functions for 64fC4." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func64fC4.size() << " functions for 64fC4." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func64fC4)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func64fC4)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image64fC4View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image64fC4View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-    }
-
-    // 16f
-    {
-        // 16fC1
-        {
-            // get all functions for 16fC1
-            std::vector<Function> func16fC1;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16fC1)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func16fC1.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image64fC4View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image64fC4View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+        }
+
+        // 16f
+        {
+            // 16fC1
+            {
+                // get all functions for 16fC1
+                std::vector<Function> func16fC1;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16fC1)
+                        {
+                            func16fC1.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func16fC1.size();
+                totalConverted += func16fC1.size();
 
-            std::cout << "Processing " << func16fC1.size() << " functions for 16fC1." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func16fC1.size() << " functions for 16fC1." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func16fC1)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func16fC1)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16fC1View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16fC1View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 16fC2
-        {
-            // get all functions for 16fC2
-            std::vector<Function> func16fC2;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16fC2)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func16fC2.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16fC1View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16fC1View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 16fC2
+            {
+                // get all functions for 16fC2
+                std::vector<Function> func16fC2;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16fC2)
+                        {
+                            func16fC2.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func16fC2.size();
+                totalConverted += func16fC2.size();
 
-            std::cout << "Processing " << func16fC2.size() << " functions for 16fC2." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func16fC2.size() << " functions for 16fC2." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func16fC2)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func16fC2)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16fC2View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16fC2View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                if (conv.IsStatic())
-                {
-                    continue;
-                }
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 16fC3
-        {
-            // get all functions for 16fC3
-            std::vector<Function> func16fC3;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16fC3)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func16fC3.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16fC2View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16fC2View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    if (conv.IsStatic())
+                    {
+                        continue;
+                    }
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 16fC3
+            {
+                // get all functions for 16fC3
+                std::vector<Function> func16fC3;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16fC3)
+                        {
+                            func16fC3.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func16fC3.size();
+                totalConverted += func16fC3.size();
 
-            std::cout << "Processing " << func16fC3.size() << " functions for 16fC3." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func16fC3.size() << " functions for 16fC3." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func16fC3)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func16fC3)
                 {
-                    failed.push_back(func);
-                    continue;
-                }
-                converted.emplace_back(func);
-            }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16fC3View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16fC3View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
-        }
-
-        // 16fC4
-        {
-            // get all functions for 16fC4
-            std::vector<Function> func16fC4;
-            for (auto &elem : functionsNoCtxDoublets)
-            {
-                if (elem.category != "support") // we don't need malloc and free here
-                {
-                    if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16fC4 ||
-                        NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16fC4A)
+                    if (func.name.find("Batch") != std::string::npos)
                     {
-                        func16fC4.push_back(elem);
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
+                }
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16fC3View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16fC3View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
+            }
+
+            // 16fC4
+            {
+                // get all functions for 16fC4
+                std::vector<Function> func16fC4;
+                for (auto &elem : functionsNoCtxDoublets)
+                {
+                    if (elem.category != "support") // we don't need malloc and free here
+                    {
+                        if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16fC4 ||
+                            NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::PTE16fC4A)
+                        {
+                            func16fC4.push_back(elem);
+                        }
                     }
                 }
-            }
-            totalConverted += func16fC4.size();
+                totalConverted += func16fC4.size();
 
-            std::cout << "Processing " << func16fC4.size() << " functions for 16fC4." << std::endl;
-            std::vector<ConvertedFunction> converted;
+                std::cout << "Processing " << func16fC4.size() << " functions for 16fC4." << std::endl;
+                std::vector<ConvertedFunction> converted;
 
-            for (auto &func : func16fC4)
-            {
-                if (func.name.find("Batch") != std::string::npos)
+                for (auto &func : func16fC4)
                 {
-                    failed.push_back(func);
-                    continue;
+                    if (func.name.find("Batch") != std::string::npos)
+                    {
+                        failed.push_back(func);
+                        continue;
+                    }
+                    converted.emplace_back(func);
                 }
-                converted.emplace_back(func);
+
+                const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
+                const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
+                const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
+
+                std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16fC4View.h");
+                std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16fC4View.cpp");
+
+                const std::string imageTypeShort = converted[0].GetImageTypeShort();
+                const std::string toReplace      = "####";
+                const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
+                const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
+
+                header << headerHeader1;
+                header << imageDecl;
+                header << header2;
+
+                cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
+                cpp << imageHeaders;
+                cpp << cppHeader1;
+                cpp << nppHeaders;
+                cpp << cpp2;
+
+                for (auto &conv : converted)
+                {
+                    header << conv.ToStringHeader() << std::endl;
+                    cpp << conv.ToStringCpp() << std::endl;
+                }
+
+                header << headerFooter;
+                cpp << cppFooter;
             }
-
-            const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
-            const std::string imageHeaders = ConvertedFunction::GetNeededImageHeaders(converted);
-            const std::string imageDecl    = ConvertedFunction::GetNeededImageForwardDecl(converted);
-
-            std::ofstream header(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16fC4View.h");
-            std::ofstream cpp(std::filesystem::path(DEFAULT_OUT_DIR) / "image" / "image16fC4View.cpp");
-
-            const std::string imageTypeShort = converted[0].GetImageTypeShort();
-            const std::string toReplace      = "####";
-            const std::string header2        = ReplaceAll(headerHeader2, toReplace, imageTypeShort);
-            const std::string cpp2           = ReplaceAll(cppHeader2, toReplace, imageTypeShort);
-
-            header << headerHeader1;
-            header << imageDecl;
-            header << header2;
-
-            cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
-            cpp << imageHeaders;
-            cpp << cppHeader1;
-            cpp << nppHeaders;
-            cpp << cpp2;
-
-            for (auto &conv : converted)
-            {
-                header << conv.ToStringHeader() << std::endl;
-                cpp << conv.ToStringCpp() << std::endl;
-            }
-
-            header << headerFooter;
-            cpp << cppFooter;
         }
-    }
 
-    std::cout << "Not converted batch functions:" << std::endl;
+        std::cout << "Not converted batch functions:" << std::endl;
 
-    for (const auto &elem : failed)
-    {
-        std::cout << elem.name << std::endl;
-    }
-
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << "Unknown pixel type:" << std::endl;
-
-    // get all functions for unknown pixel type
-    std::vector<Function> unknown;
-    for (auto &elem : functionsNoCtxDoublets)
-    {
-        if (elem.category != "support") // we don't need malloc and free here
+        for (const auto &elem : failed)
         {
-            if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::Unknown)
+            std::cout << elem.name << std::endl;
+        }
+
+        std::cout << std::endl;
+        std::cout << std::endl;
+        std::cout << "Unknown pixel type:" << std::endl;
+
+        // get all functions for unknown pixel type
+        std::vector<Function> unknown;
+        for (auto &elem : functionsNoCtxDoublets)
+        {
+            if (elem.category != "support") // we don't need malloc and free here
             {
-                unknown.push_back(elem);
+                if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::Unknown)
+                {
+                    unknown.push_back(elem);
+                    std::cout << elem.name << std::endl;
+                }
+            }
+        }
+
+        std::cout << std::endl;
+        std::cout << std::endl;
+        std::cout << "Skipped support functions:" << std::endl;
+        // get all functions for support (just to count them)
+        std::vector<Function> support;
+        for (auto &elem : functionsNoCtxDoublets)
+        {
+            if (elem.category == "support")
+            {
+                support.push_back(elem);
                 std::cout << elem.name << std::endl;
             }
         }
-    }
 
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << "Skipped support functions:" << std::endl;
-    // get all functions for support (just to count them)
-    std::vector<Function> support;
-    for (auto &elem : functionsNoCtxDoublets)
-    {
-        if (elem.category == "support")
-        {
-            support.push_back(elem);
-            std::cout << elem.name << std::endl;
-        }
-    }
+        std::cout << std::endl;
+        std::cout << std::endl;
+        std::cout << "Didn't convert " << failed.size() << " functions for batch processing." << std::endl;
+        std::cout << "Unknown pixel type: " << unknown.size() << " functions." << std::endl;
+        std::cout << "Support functions: " << support.size() << std::endl;
+        std::cout << "Converted " << totalConverted << " functions." << std::endl;
 
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << "Didn't convert " << failed.size() << " functions for batch processing." << std::endl;
-    std::cout << "Unknown pixel type: " << unknown.size() << " functions." << std::endl;
-    std::cout << "Support functions: " << support.size() << std::endl;
-    std::cout << "Converted " << totalConverted << " functions." << std::endl;
-
-    std::cout << "Total number of functions:" << functionsNoCtxDoublets.size() << std::endl;
-    try
-    {
+        std::cout << "Total number of functions:" << functionsNoCtxDoublets.size() << std::endl;
     }
     catch (...)
     {

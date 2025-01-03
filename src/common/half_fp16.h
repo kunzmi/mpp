@@ -21,15 +21,17 @@ namespace opp
 class alignas(2) HalfFp16
 {
   private:
+    static constexpr bool BINARY = true; // additional argument for constructor to switch to binary
 #ifdef IS_HOST_COMPILER
-    half_float::half value{0.0f};
+    half_float::half value;
 #endif
 #ifdef IS_CUDA_COMPILER
-    __half value{};
+    __half value;
 #endif
 
   public:
-    HalfFp16() = default;
+    HalfFp16() noexcept = default;
+
 #ifdef IS_HOST_COMPILER
     explicit constexpr HalfFp16(half_float::half aHalf) : value(aHalf)
     {
@@ -122,9 +124,8 @@ class alignas(2) HalfFp16
     [[nodiscard]] inline constexpr static HalfFp16 FromUShort(ushort aUShort)
     {
         HalfFp16 ret;
-        ret.value = half_float::half(aUShort, true);
+        ret.value = half_float::half(aUShort, BINARY);
         return ret;
-        // return std::bit_cast<HalfFp16>(aUShort);
     }
 #endif
 
@@ -175,12 +176,7 @@ class alignas(2) HalfFp16
     /// </summary>
     DEVICE_CODE [[nodiscard]] inline HalfFp16 operator-() const
     {
-#ifdef IS_HOST_COMPILER
         return HalfFp16(-value);
-#endif
-#ifdef IS_CUDA_COMPILER
-        return HalfFp16(-value);
-#endif
     }
 
     /// <summary>
@@ -393,7 +389,7 @@ class alignas(2) HalfFp16
     DEVICE_CODE inline HalfFp16 &Min(const HalfFp16 &aOther)
     {
 #ifdef IS_HOST_COMPILER
-        *this = HalfFp16(std::min(value, aOther.value));
+        *this = HalfFp16(fmin(value, aOther.value));
 #endif
 #ifdef IS_CUDA_COMPILER
         value = __hmin(value, aOther.value);
@@ -407,7 +403,7 @@ class alignas(2) HalfFp16
     DEVICE_CODE [[nodiscard]] inline static HalfFp16 Min(const HalfFp16 &aLeft, const HalfFp16 &aRight)
     {
 #ifdef IS_HOST_COMPILER
-        return HalfFp16(std::min(aLeft.value, aRight.value));
+        return HalfFp16(fmin(aLeft.value, aRight.value));
 #endif
 #ifdef IS_CUDA_COMPILER
         return HalfFp16(__hmin(aLeft.value, aRight.value));
@@ -419,7 +415,7 @@ class alignas(2) HalfFp16
     DEVICE_CODE inline HalfFp16 &Max(const HalfFp16 &aOther)
     {
 #ifdef IS_HOST_COMPILER
-        *this = HalfFp16(std::max(value, aOther.value));
+        *this = HalfFp16(fmax(value, aOther.value));
 #endif
 #ifdef IS_CUDA_COMPILER
         value = __hmax(value, aOther.value);
@@ -433,7 +429,7 @@ class alignas(2) HalfFp16
     DEVICE_CODE [[nodiscard]] inline static HalfFp16 Max(const HalfFp16 &aLeft, const HalfFp16 &aRight)
     {
 #ifdef IS_HOST_COMPILER
-        return HalfFp16(std::max(aLeft.value, aRight.value));
+        return HalfFp16(fmax(aLeft.value, aRight.value));
 #endif
 #ifdef IS_CUDA_COMPILER
         return HalfFp16(__hmax(aLeft.value, aRight.value));
@@ -632,6 +628,34 @@ class alignas(2) HalfFp16
     DEVICE_ONLY_CODE [[nodiscard]] inline static HalfFp16 RoundZero(HalfFp16 aOther)
     {
         return HalfFp16(__int2half_rz(__half2int_rz(aOther.value)));
+    }
+#endif
+
+    DEVICE_CODE inline HalfFp16 GetSign()
+    {
+        constexpr ushort ONE_AS_HFLOAT = 0x3c00;
+        constexpr ushort SIGN_BIT      = 0x8000;
+        ushort hfloatbits              = *reinterpret_cast<ushort *>(&value);
+        hfloatbits &= SIGN_BIT;
+        hfloatbits |= ONE_AS_HFLOAT;
+        return *reinterpret_cast<HalfFp16 *>(&hfloatbits);
+    }
+
+#ifdef IS_CUDA_COMPILER
+    /// <summary>
+    /// </summary>
+    DEVICE_ONLY_CODE [[nodiscard]] inline static HalfFp16 Sin(HalfFp16 aOther)
+    {
+        return HalfFp16(hsin(aOther.value));
+    }
+#endif
+
+#ifdef IS_CUDA_COMPILER
+    /// <summary>
+    /// </summary>
+    DEVICE_ONLY_CODE [[nodiscard]] inline static HalfFp16 Cos(HalfFp16 aOther)
+    {
+        return HalfFp16(hcos(aOther.value));
     }
 #endif
 

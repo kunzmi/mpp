@@ -218,6 +218,34 @@ TEST_CASE("Pixel32fC4", "[Common]")
     minmax2 = Pixel32fC4(-20, 10, 40, 30);
     CHECK(minmax2.Min() == -20);
     CHECK(minmax1.Max() == 50);
+
+    Pixel32fC4 eqEps1(10, 20, -30, 40);
+    Pixel32fC4 eqEps2(10.001f, 20.001f, -30.001f, 40.001f);
+    CHECK(eqEps1 != eqEps2);
+    CHECK(Pixel32fC4::EqEps(eqEps1, eqEps2, 0.01f));
+    CHECK(Pixel32fC4::CompareEQEps(eqEps1, eqEps2, 0.01f) == Pixel8uC4(255));
+    CHECK_FALSE(Pixel32fC4::EqEps(eqEps1, eqEps2, 0.0001f));
+    CHECK(Pixel32fC4::CompareEQEps(eqEps1, eqEps2, 0.0001f) == Pixel8uC4(to_byte(0)));
+    eqEps1 = Pixel32fC4(numeric_limits<float>::infinity(), 20, -30, 40);
+    eqEps2 = Pixel32fC4(-numeric_limits<float>::infinity(), 20.001f, -30.001f, 40.001f);
+    CHECK(eqEps1 != eqEps2);
+    CHECK(Pixel32fC4::EqEps(eqEps1, eqEps2, 0.01f));
+    CHECK(Pixel32fC4::CompareEQEps(eqEps1, eqEps2, 0.01f) == Pixel8uC4(255));
+    eqEps1 = Pixel32fC4(numeric_limits<float>::infinity(), 20, -30, 40);
+    eqEps2 = Pixel32fC4(10.001f, 20.001f, -30.001f, 40.001f);
+    CHECK(eqEps1 != eqEps2);
+    CHECK_FALSE(Pixel32fC4::EqEps(eqEps1, eqEps2, 0.01f));
+    CHECK(Pixel32fC4::CompareEQEps(eqEps1, eqEps2, 0.01f) == Pixel8uC4(0, 255, 255, 255));
+    eqEps1 = Pixel32fC4(10, 20, -30, std::numeric_limits<float>::quiet_NaN());
+    eqEps2 = Pixel32fC4(10.001f, 20.001f, -30.001f, std::numeric_limits<float>::quiet_NaN());
+    CHECK(eqEps1 != eqEps2);
+    CHECK(Pixel32fC4::EqEps(eqEps1, eqEps2, 0.01f));
+    CHECK(Pixel32fC4::CompareEQEps(eqEps1, eqEps2, 0.01f) == Pixel8uC4(255));
+    eqEps1 = Pixel32fC4(10, 20, -30, 40);
+    eqEps2 = Pixel32fC4(10.001f, 20.001f, -30.001f, std::numeric_limits<float>::quiet_NaN());
+    CHECK(eqEps1 != eqEps2);
+    CHECK_FALSE(Pixel32fC4::EqEps(eqEps1, eqEps2, 0.01f));
+    CHECK(Pixel32fC4::CompareEQEps(eqEps1, eqEps2, 0.01f) == Pixel8uC4(255, 255, 255, 0));
 }
 
 TEST_CASE("Pixel32fC4_additionalMethods", "[Common]")
@@ -851,6 +879,25 @@ TEST_CASE("Pixel16uC4_alignment", "[Common]")
     }
 }
 
+TEST_CASE("Pixel8uC4_streams", "[Common]")
+{
+    std::string str = "3 4 5 6";
+    std::stringstream ss(str);
+
+    Pixel8uC4 pix;
+    ss >> pix;
+
+    CHECK(pix.x == 3);
+    CHECK(pix.y == 4);
+    CHECK(pix.z == 5);
+    CHECK(pix.w == 6);
+
+    std::stringstream ss2;
+    ss2 << pix;
+
+    CHECK(ss2.str() == "(3, 4, 5, 6)");
+}
+
 TEST_CASE("Pixel32sC4_streams", "[Common]")
 {
     std::string str = "3 4 5 6";
@@ -1124,6 +1171,34 @@ TEST_CASE("Pixel16fC4", "[Common]")
 
     CHECK(minmax2.Min() == -20);
     CHECK(minmax1.Max() == 50);
+
+    Pixel16fC4 eqEps1(10.0_hf, 20.0_hf, -30.0_hf, 40.0_hf);
+    Pixel16fC4 eqEps2(10.1_hf, 20.1_hf, -30.1_hf, 40.1_hf);
+    CHECK(eqEps1 != eqEps2);
+    CHECK(Pixel16fC4::EqEps(eqEps1, eqEps2, 0.2_hf));
+    CHECK(Pixel16fC4::CompareEQEps(eqEps1, eqEps2, 0.2_hf) == Pixel8uC4(255));
+    CHECK_FALSE(Pixel16fC4::EqEps(eqEps1, eqEps2, 0.01_hf));
+    CHECK(Pixel16fC4::CompareEQEps(eqEps1, eqEps2, 0.01_hf) == Pixel8uC4(to_byte(0)));
+    eqEps1 = Pixel16fC4(numeric_limits<HalfFp16>::infinity(), 20.0_hf, -30.0_hf, 40.0_hf);
+    eqEps2 = Pixel16fC4(-numeric_limits<HalfFp16>::infinity(), 20.1_hf, -30.1_hf, 40.1_hf);
+    CHECK(eqEps1 != eqEps2);
+    CHECK(Pixel16fC4::EqEps(eqEps1, eqEps2, 0.2_hf));
+    CHECK(Pixel16fC4::CompareEQEps(eqEps1, eqEps2, 0.2_hf) == Pixel8uC4(255));
+    eqEps1 = Pixel16fC4(numeric_limits<HalfFp16>::infinity(), 20.0_hf, -30.0_hf, 40.0_hf);
+    eqEps2 = Pixel16fC4(10.1_hf, 20.1_hf, -30.1_hf, 40.1_hf);
+    CHECK(eqEps1 != eqEps2);
+    CHECK_FALSE(Pixel16fC4::EqEps(eqEps1, eqEps2, 0.2_hf));
+    CHECK(Pixel16fC4::CompareEQEps(eqEps1, eqEps2, 0.2_hf) == Pixel8uC4(0, 255, 255, 255));
+    eqEps1 = Pixel16fC4(10.0_hf, 20.0_hf, -30.0_hf, numeric_limits<HalfFp16>::quiet_NaN());
+    eqEps2 = Pixel16fC4(10.1_hf, 20.1_hf, -30.1_hf, numeric_limits<HalfFp16>::quiet_NaN());
+    CHECK(eqEps1 != eqEps2);
+    CHECK(Pixel16fC4::EqEps(eqEps1, eqEps2, 0.2_hf));
+    CHECK(Pixel16fC4::CompareEQEps(eqEps1, eqEps2, 0.2_hf) == Pixel8uC4(255));
+    eqEps1 = Pixel16fC4(10.0_hf, 20.0_hf, -30.0_hf, 40.0_hf);
+    eqEps2 = Pixel16fC4(10.1_hf, 20.1_hf, -30.1_hf, numeric_limits<HalfFp16>::quiet_NaN());
+    CHECK(eqEps1 != eqEps2);
+    CHECK_FALSE(Pixel16fC4::EqEps(eqEps1, eqEps2, 0.2_hf));
+    CHECK(Pixel16fC4::CompareEQEps(eqEps1, eqEps2, 0.2_hf) == Pixel8uC4(255, 255, 255, 0));
 }
 
 TEST_CASE("Pixel16fC4_additionalMethods", "[Common]")
@@ -1520,6 +1595,34 @@ TEST_CASE("Pixel16bfC4", "[Common]")
 
     CHECK(minmax2.Min() == -20);
     CHECK(minmax1.Max() == 50);
+
+    Pixel16bfC4 eqEps1(10.0_bf, 20.0_bf, -30.0_bf, 15.0_bf);
+    Pixel16bfC4 eqEps2(10.1_bf, 20.1_bf, -30.1_bf, 15.1_bf);
+    CHECK(eqEps1 != eqEps2);
+    CHECK(Pixel16bfC4::EqEps(eqEps1, eqEps2, 0.2_bf));
+    CHECK(Pixel16bfC4::CompareEQEps(eqEps1, eqEps2, 0.2_bf) == Pixel8uC4(255));
+    CHECK_FALSE(Pixel16bfC4::EqEps(eqEps1, eqEps2, 0.01_bf));
+    CHECK(Pixel16bfC4::CompareEQEps(eqEps1, eqEps2, 0.01_bf) == Pixel8uC4(to_byte(0)));
+    eqEps1 = Pixel16bfC4(numeric_limits<BFloat16>::infinity(), 20.0_bf, -30.0_bf, 15.0_bf);
+    eqEps2 = Pixel16bfC4(-numeric_limits<BFloat16>::infinity(), 20.1_bf, -30.1_bf, 15.1_bf);
+    CHECK(eqEps1 != eqEps2);
+    CHECK(Pixel16bfC4::EqEps(eqEps1, eqEps2, 0.2_bf));
+    CHECK(Pixel16bfC4::CompareEQEps(eqEps1, eqEps2, 0.2_bf) == Pixel8uC4(255));
+    eqEps1 = Pixel16bfC4(numeric_limits<BFloat16>::infinity(), 20.0_bf, -30.0_bf, 15.0_bf);
+    eqEps2 = Pixel16bfC4(10.1_bf, 20.1_bf, -30.1_bf, 15.1_bf);
+    CHECK(eqEps1 != eqEps2);
+    CHECK_FALSE(Pixel16bfC4::EqEps(eqEps1, eqEps2, 0.2_bf));
+    CHECK(Pixel16bfC4::CompareEQEps(eqEps1, eqEps2, 0.2_bf) == Pixel8uC4(0, 255, 255, 255));
+    eqEps1 = Pixel16bfC4(10.0_bf, 20.0_bf, -30.0_bf, numeric_limits<BFloat16>::quiet_NaN());
+    eqEps2 = Pixel16bfC4(10.1_bf, 20.1_bf, -30.1_bf, numeric_limits<BFloat16>::quiet_NaN());
+    CHECK(eqEps1 != eqEps2);
+    CHECK(Pixel16bfC4::EqEps(eqEps1, eqEps2, 0.2_bf));
+    CHECK(Pixel16bfC4::CompareEQEps(eqEps1, eqEps2, 0.2_bf) == Pixel8uC4(255));
+    eqEps1 = Pixel16bfC4(10.0_bf, 20.0_bf, -30.0_bf, 15.0_bf);
+    eqEps2 = Pixel16bfC4(10.1_bf, 20.1_bf, -30.1_bf, numeric_limits<BFloat16>::quiet_NaN());
+    CHECK(eqEps1 != eqEps2);
+    CHECK_FALSE(Pixel16bfC4::EqEps(eqEps1, eqEps2, 0.2_bf));
+    CHECK(Pixel16bfC4::CompareEQEps(eqEps1, eqEps2, 0.2_bf) == Pixel8uC4(255, 255, 255, 0));
 }
 
 TEST_CASE("Pixel16bfC4_additionalMethods", "[Common]")
@@ -1808,10 +1911,10 @@ TEST_CASE("Pixel32fcC4", "[Common]")
     CHECK(sub1.w == Complex<float>(-2, -4));
 
     Pixel32fcC4 sub2 = 3 - t1;
-    CHECK(sub2.x == Complex<float>(3, 1));
-    CHECK(sub2.y == Complex<float>(2, -2));
-    CHECK(sub2.z == Complex<float>(1, 3));
-    CHECK(sub2.w == Complex<float>(0, -4));
+    CHECK(sub2.x == Complex<float>(3, -1));
+    CHECK(sub2.y == Complex<float>(2, +2));
+    CHECK(sub2.z == Complex<float>(1, -3));
+    CHECK(sub2.w == Complex<float>(0, +4));
 
     Pixel32fcC4 sub3 = t1 - 4;
     CHECK(sub3.x == Complex<float>(-4, 1));

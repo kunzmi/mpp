@@ -49,13 +49,14 @@ Image32fC2View Image32fC2View::GetView(const Border &aBorder) const
 
 //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 
-void Image32fC2View::Set(const Pixel32fC2 &aValue, const NppStreamContext &nppStreamCtx)
+Image32fC2View &Image32fC2View::Set(const Pixel32fC2 &aValue, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiSet_32f_C2R_Ctx(aValue.data(), reinterpret_cast<Npp32f *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image32fC2View::Copy(size_t aSrcChannel, Image32fC1View &pDst, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image32fC2View::Copy(size_t aSrcChannel, Image32fC1View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     if (aSrcChannel >= 2)
     {
@@ -64,29 +65,33 @@ void Image32fC2View::Copy(size_t aSrcChannel, Image32fC1View &pDst, const NppStr
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiCopy_32f_C2C1R_Ctx(reinterpret_cast<const Npp32f *>(PointerRoi()) + aSrcChannel, to_int(Pitch()), reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image32fC2View::ColorTwist(Image32fC2View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const
+Image32fC2View &Image32fC2View::ColorTwist(Image32fC2View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiColorTwist_32f_C2R_Ctx(reinterpret_cast<const Npp32f *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), aTwist, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image32fC2View::ColorTwist(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx)
+Image32fC2View &Image32fC2View::ColorTwist(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiColorTwist_32f_C2IR_Ctx(reinterpret_cast<Npp32f *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), aTwist, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image32fC2View::Filter(Image32fC2View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const
+Image32fC2View &Image32fC2View::Filter(Image32fC2View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiFilter_32f_C2R_Ctx(reinterpret_cast<const Npp32f *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pKernel.Pointer(), oKernelSize, oAnchor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image32fC2View::FilterBorder(Image32fC2View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image32fC2View &Image32fC2View::FilterBorder(Image32fC2View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -98,6 +103,7 @@ void Image32fC2View::FilterBorder(Image32fC2View &pDst, const cuda::DevVarView<f
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiFilterBorder_32f_C2R_Ctx(reinterpret_cast<const Npp32f *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pKernel.Pointer(), oKernelSize, oAnchor, eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
 void Image32fC2View::MaximumError(const Image32fC2View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const

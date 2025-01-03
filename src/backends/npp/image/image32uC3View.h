@@ -46,25 +46,25 @@ class Image32uC3View : public ImageView<Pixel32uC3>
 
 
     // NppStatus nppiSet_32u_C3R_Ctx(const Npp32u[3] aValue, Npp32u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Set(const Pixel32uC3 &aValue, const NppStreamContext &nppStreamCtx);
+    Image32uC3View &Set(const Pixel32uC3 &aValue, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiFloodFill_32u_C3IR_Ctx(Npp32u * pSrcDst, int nSrcDstStep, NppiPoint oSeed, const Npp32u[3] aNewValues, NppiNorm eNorm, NppiSize oSizeROI, NppiConnectedRegion * pConnectedRegion, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
-    void FloodFill(NppiPoint oSeed, const Pixel32uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
+    Image32uC3View &FloodFill(NppiPoint oSeed, const Pixel32uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiFloodFillBoundary_32u_C3IR_Ctx(Npp32u * pSrcDst, int nSrcDstStep, NppiPoint oSeed, const Npp32u[3] aNewValues, const Npp32u[3] aBoundaryValues, NppiNorm eNorm, NppiSize oSizeROI, NppiConnectedRegion * pConnectedRegion, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
-    void FloodFillBoundary(NppiPoint oSeed, const Pixel32uC3 &aNewValues, const Pixel32uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
+    Image32uC3View &FloodFillBoundary(NppiPoint oSeed, const Pixel32uC3 &aNewValues, const Pixel32uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiFloodFillRange_32u_C3IR_Ctx(Npp32u * pSrcDst, int nSrcDstStep, NppiPoint oSeed, Npp32u[3] aMin, Npp32u[3] aMax, const Npp32u[3] aNewValues, NppiNorm eNorm, NppiSize oSizeROI, NppiConnectedRegion * pConnectedRegion, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
-    void FloodFillRange(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
+    Image32uC3View &FloodFillRange(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiFloodFillRangeBoundary_32u_C3IR_Ctx(Npp32u * pSrcDst, int nSrcDstStep, NppiPoint oSeed, Npp32u[3] aMin, Npp32u[3] aMax, const Npp32u[3] aNewValues, const Npp32u[3] aBoundaryValues, NppiNorm eNorm, NppiSize oSizeROI, NppiConnectedRegion * pConnectedRegion, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
-    void FloodFillRangeBoundary(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, const Pixel32uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
+    Image32uC3View &FloodFillRangeBoundary(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, const Pixel32uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiFloodFillGradient_32u_C3IR_Ctx(Npp32u * pSrcDst, int nSrcDstStep, NppiPoint oSeed, Npp32u[3] aMin, Npp32u[3] aMax, const Npp32u[3] aNewValues, NppiNorm eNorm, NppiSize oSizeROI, NppiConnectedRegion * pConnectedRegion, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
-    void FloodFillGradient(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
+    Image32uC3View &FloodFillGradient(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiFloodFillGradientBoundary_32u_C3IR_Ctx(Npp32u * pSrcDst, int nSrcDstStep, NppiPoint oSeed, Npp32u[3] aMin, Npp32u[3] aMax, const Npp32u[3] aNewValues, const Npp32u[3] aBoundaryValues, NppiNorm eNorm, NppiSize oSizeROI, NppiConnectedRegion * pConnectedRegion, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
-    void FloodFillGradientBoundary(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, const Pixel32uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
+    Image32uC3View &FloodFillGradientBoundary(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, const Pixel32uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiDotProd_32u64f_C3R_Ctx(const Npp32u * pSrc1, int nSrc1Step, const Npp32u * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f[3] aDp, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
     void DotProd(const Image32uC3View &pSrc2, cuda::DevVarView<double> &aDp, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;

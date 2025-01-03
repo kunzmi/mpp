@@ -221,6 +221,13 @@ TEST_CASE("BFloat16", "[Common]")
     bf.Abs();
     CHECK(bf == BFloat16(16.0f));
 
+    bf = BFloat16(16.0f);
+    bf = bf.GetSign();
+    CHECK(bf == BFloat16(1.0f));
+    bf = BFloat16(-16.0f);
+    bf = bf.GetSign();
+    CHECK(bf == BFloat16(-1.0f));
+
     bf = BFloat16(0.0f);
     CHECK(bf == 0.0f);
 

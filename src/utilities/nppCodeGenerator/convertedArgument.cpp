@@ -151,7 +151,7 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
     }
     else if (aArgument->name == "pDst" && !mFunction.IsOutputPlanar())
     {
-        const std::string channelCount = std::to_string(mFunction.GetOutChannels());
+        const int channelCount = mFunction.GetOutChannels();
 
         if (aFunction.InnerFunction().name == "nppiLUTPalette_8u24u_C1R_Ctx" ||
             aFunction.InnerFunction().name == "nppiLUTPalette_16u24u_C1R_Ctx")
@@ -167,233 +167,29 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
         {
             mType = "cuda::DevVarView<float> &";
         }
-        else if (aArgument->type == "Npp8u *")
+        else if (aArgument->type == "Npp8u *" || aArgument->type == "Npp8s *" || aArgument->type == "Npp16u *" ||
+                 aArgument->type == "Npp16s *" || aArgument->type == "Npp16sc *" || aArgument->type == "Npp16f *" ||
+                 aArgument->type == "Npp32u *" || aArgument->type == "Npp32s *" || aArgument->type == "Npp32sc *" ||
+                 aArgument->type == "Npp32f *" || aArgument->type == "Npp32fc *" || aArgument->type == "Npp64f *")
         {
-            /*if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C3R")
-            {
-                mType = "Image8uC3View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C4R")
-            {
-                mType = "Image8uC4View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1AC4R")
-            {
-                mType = "Image8uC4View &";
-            }
-            else*/
-            {
-                mType = std::string("Image8uC") + channelCount + "View &";
-            }
+            mType = GetImageType(aArgument->type, channelCount);
         }
-        else if (aArgument->type == "Npp8s *")
+        else
         {
-            /*if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C3R")
-            {
-                mType = "Image8sC3View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C4R")
-            {
-                mType = "Image8sC4View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1AC4R")
-            {
-                mType = "Image8sC4View &";
-            }
-            else*/
-            {
-                mType = std::string("Image8sC") + channelCount + "View &";
-            }
+            mType = "Unknown";
         }
-        else if (aArgument->type == "Npp16u *")
+    }
+    else if (aArgument->name == "pSrcDst" && mIsSkippedInDeclaration)
+    {
+        // it is not really necessary to set this type, but it helps when setting the function return type:
+        const int channelCount = mFunction.GetOutChannels();
+
+        if (aArgument->type == "Npp8u *" || aArgument->type == "Npp8s *" || aArgument->type == "Npp16u *" ||
+            aArgument->type == "Npp16s *" || aArgument->type == "Npp16sc *" || aArgument->type == "Npp16f *" ||
+            aArgument->type == "Npp32u *" || aArgument->type == "Npp32s *" || aArgument->type == "Npp32sc *" ||
+            aArgument->type == "Npp32f *" || aArgument->type == "Npp32fc *" || aArgument->type == "Npp64f *")
         {
-            /*if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C3R")
-            {
-                mType = "Image16uCC3View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C4R")
-            {
-                mType = "Image16uCC4View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1AC4R")
-            {
-                mType = "Image16uC4View &";
-            }
-            else*/
-            {
-                mType = std::string("Image16uC") + channelCount + "View &";
-            }
-        }
-        else if (aArgument->type == "Npp16s *")
-        {
-            /*if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C3R")
-            {
-                mType = "Image16sCC3View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C4R")
-            {
-                mType = "Image16sCC4View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1AC4R")
-            {
-                mType = "Image16sC4View &";
-            }
-            else*/
-            {
-                mType = std::string("Image16sC") + channelCount + "View &";
-            }
-        }
-        else if (aArgument->type == "Npp16sc *")
-        {
-            /*if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C3R")
-            {
-                mType = "Image16sCC3View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C4R")
-            {
-                mType = "Image16sCC4View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1AC4R")
-            {
-                mType = "Image16sC4View &";
-            }
-            else*/
-            {
-                mType = std::string("Image16scC") + channelCount + "View &";
-            }
-        }
-        else if (aArgument->type == "Npp16f *")
-        {
-            /*if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C3R")
-            {
-                mType = "Image16fCC3View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C4R")
-            {
-                mType = "Image16fCC4View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1AC4R")
-            {
-                mType = "Image16fC4View &";
-            }
-            else*/
-            {
-                mType = std::string("Image16fC") + channelCount + "View &";
-            }
-        }
-        else if (aArgument->type == "Npp32u *")
-        {
-            /*if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C3R")
-            {
-                mType = "Image32uCC3View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C4R")
-            {
-                mType = "Image32uCC4View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1AC4R")
-            {
-                mType = "Image32uC4View &";
-            }
-            else*/
-            {
-                mType = std::string("Image32uC") + channelCount + "View &";
-            }
-        }
-        else if (aArgument->type == "Npp32s *")
-        {
-            /*if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C3R")
-            {
-                mType = "Image32sCC3View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C4R")
-            {
-                mType = "Image32sCC4View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1AC4R")
-            {
-                mType = "Image32sC4View &";
-            }
-            else*/
-            {
-                mType = std::string("Image32sC") + channelCount + "View &";
-            }
-        }
-        else if (aArgument->type == "Npp32sc *")
-        {
-            /*if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C3R")
-            {
-                mType = "Image32sCC3View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C4R")
-            {
-                mType = "Image32sCC4View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1AC4R")
-            {
-                mType = "Image32sC4View &";
-            }
-            else*/
-            {
-                mType = std::string("Image32scC") + channelCount + "View &";
-            }
-        }
-        else if (aArgument->type == "Npp32f *")
-        {
-            /*if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C3R")
-            {
-                mType = "Image32fCC3View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C4R")
-            {
-                mType = "Image32fCC4View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1AC4R")
-            {
-                mType = "Image32fC4View &";
-            }
-            else*/
-            {
-                mType = std::string("Image32fC") + channelCount + "View &";
-            }
-        }
-        else if (aArgument->type == "Npp32fc *")
-        {
-            /*if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C3R")
-            {
-                mType = "Image32fCC3View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C4R")
-            {
-                mType = "Image32fCC4View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1AC4R")
-            {
-                mType = "Image32fC4View &";
-            }
-            else*/
-            {
-                mType = std::string("Image32fcC") + channelCount + "View &";
-            }
-        }
-        else if (aArgument->type == "Npp64f *")
-        {
-            /*if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C3R")
-            {
-                mType = "Image64fCC3View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1C4R")
-            {
-                mType = "Image64fCC4View &";
-            }
-            else if (NPPParser::GetChannelString(aFunction.InnerFunction().name) == "C1AC4R")
-            {
-                mType = "Image64fC4View &";
-            }
-            else*/
-            {
-                mType = std::string("Image64fC") + channelCount + "View &";
-            }
+            mType = GetImageType(aArgument->type, channelCount);
         }
         else
         {
@@ -1352,5 +1148,60 @@ std::string ConvertedArgument::ConvertNppType(const std::string &aNPPType)
         return newType;
     }
     return newType.substr(0, posNpp);
+}
+
+std::string ConvertedArgument::GetImageType(const std::string &aNPPType, int aChannelCount)
+{
+    const std::string channelCount = std::to_string(aChannelCount);
+
+    if (aNPPType == "Npp8u *")
+    {
+        return "Image8uC" + channelCount + "View &";
+    }
+    if (aNPPType == "Npp8s *")
+    {
+        return "Image8sC" + channelCount + "View &";
+    }
+    if (aNPPType == "Npp16u *")
+    {
+        return "Image16uC" + channelCount + "View &";
+    }
+    if (aNPPType == "Npp16s *")
+    {
+        return "Image16sC" + channelCount + "View &";
+    }
+    if (aNPPType == "Npp16sc *")
+    {
+        return "Image16scC" + channelCount + "View &";
+    }
+    if (aNPPType == "Npp16f *")
+    {
+        return "Image16fC" + channelCount + "View &";
+    }
+    if (aNPPType == "Npp32u *")
+    {
+        return "Image32uC" + channelCount + "View &";
+    }
+    if (aNPPType == "Npp32s *")
+    {
+        return "Image32sC" + channelCount + "View &";
+    }
+    if (aNPPType == "Npp32sc *")
+    {
+        return "Image32scC" + channelCount + "View &";
+    }
+    if (aNPPType == "Npp32f *")
+    {
+        return "Image32fC" + channelCount + "View &";
+    }
+    if (aNPPType == "Npp32fc *")
+    {
+        return "Image32fcC" + channelCount + "View &";
+    }
+    if (aNPPType == "Npp64f *")
+    {
+        return "Image64fC" + channelCount + "View &";
+    }
+    return "Unknown";
 }
 } // namespace opp::utilities::nppParser

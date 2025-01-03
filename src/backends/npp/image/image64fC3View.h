@@ -47,40 +47,40 @@ class Image64fC3View : public ImageView<Pixel64fC3>
 
 
     // NppStatus nppiCrossCorrFull_Norm_64f_C3R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, NppStreamContext nppStreamCtx)
-    void CrossCorrFull_Norm(const Image64fC3View &pTpl, Image64fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image64fC3View &CrossCorrFull_Norm(const Image64fC3View &pTpl, Image64fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrSame_Norm_64f_C3R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, NppStreamContext nppStreamCtx)
-    void CrossCorrSame_Norm(const Image64fC3View &pTpl, Image64fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image64fC3View &CrossCorrSame_Norm(const Image64fC3View &pTpl, Image64fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrValid_Norm_64f_C3R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, NppStreamContext nppStreamCtx)
-    void CrossCorrValid_Norm(const Image64fC3View &pTpl, Image64fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image64fC3View &CrossCorrValid_Norm(const Image64fC3View &pTpl, Image64fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrFull_NormLevel_64f_C3R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void CrossCorrFull_NormLevel(const Image64fC3View &pTpl, Image64fC3View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image64fC3View &CrossCorrFull_NormLevel(const Image64fC3View &pTpl, Image64fC3View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFullNormLevelGetBufferHostSize_64f_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t FullNormLevelGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrSame_NormLevel_64f_C3R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void CrossCorrSame_NormLevel(const Image64fC3View &pTpl, Image64fC3View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image64fC3View &CrossCorrSame_NormLevel(const Image64fC3View &pTpl, Image64fC3View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSameNormLevelGetBufferHostSize_64f_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t SameNormLevelGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrValid_NormLevel_64f_C3R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void CrossCorrValid_NormLevel(const Image64fC3View &pTpl, Image64fC3View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image64fC3View &CrossCorrValid_NormLevel(const Image64fC3View &pTpl, Image64fC3View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiValidNormLevelGetBufferHostSize_64f_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t ValidNormLevelGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrFull_NormLevelAdvanced_64f_C3R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, Npp8u * pDeviceBuffer, Npp8u * pAdvancedScratchBuffer, NppStreamContext nppStreamCtx)
-    void CrossCorrFull_NormLevelAdvanced(const Image64fC3View &pTpl, Image64fC3View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image64fC3View &CrossCorrFull_NormLevelAdvanced(const Image64fC3View &pTpl, Image64fC3View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrSame_NormLevelAdvanced_64f_C3R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, Npp8u * pDeviceBuffer, Npp8u * pAdvancedScratchBuffer, NppStreamContext nppStreamCtx)
-    void CrossCorrSame_NormLevelAdvanced(const Image64fC3View &pTpl, Image64fC3View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image64fC3View &CrossCorrSame_NormLevelAdvanced(const Image64fC3View &pTpl, Image64fC3View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrValid_NormLevelAdvanced_64f_C3R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, Npp8u * pDeviceBuffer, Npp8u * pAdvancedScratchBuffer, NppStreamContext nppStreamCtx)
-    void CrossCorrValid_NormLevelAdvanced(const Image64fC3View &pTpl, Image64fC3View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image64fC3View &CrossCorrValid_NormLevelAdvanced(const Image64fC3View &pTpl, Image64fC3View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumError_64f_C3R_Ctx(const Npp64f * pSrc1, int nSrc1Step, const Npp64f * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
     void MaximumError(const Image64fC3View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
@@ -107,19 +107,19 @@ class Image64fC3View : public ImageView<Pixel64fC3>
     [[nodiscard]] size_t AverageRelativeErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiResizeSqrPixel_64f_C3R_Ctx(const Npp64f * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp64f * pDst, int nDstStep, NppiRect oDstROI, double nXFactor, double nYFactor, double nXShift, double nYShift, int eInterpolation, NppStreamContext nppStreamCtx)
-    void ResizeSqrPixel(Image64fC3View &pDst, double nXFactor, double nYFactor, double nXShift, double nYShift, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image64fC3View &ResizeSqrPixel(Image64fC3View &pDst, double nXFactor, double nYFactor, double nXShift, double nYShift, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiResizeSqrPixel_64f_P3R_Ctx(const Npp64f *const[3] pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp64f *[3] pDst, int nDstStep, NppiRect oDstROI, double nXFactor, double nYFactor, double nXShift, double nYShift, int eInterpolation, NppStreamContext nppStreamCtx)
     static void ResizeSqrPixel(const Image64fC1View &aSrcChannel0, const Image64fC1View &aSrcChannel1, const Image64fC1View &aSrcChannel2, Image64fC1View &aDstChannel0, Image64fC1View &aDstChannel1, Image64fC1View &aDstChannel2, double nXFactor, double nYFactor, double nXShift, double nYShift, int eInterpolation, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiRemap_64f_C3R_Ctx(const Npp64f * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, const Npp64f * pXMap, int nXMapStep, const Npp64f * pYMap, int nYMapStep, Npp64f * pDst, int nDstStep, NppiSize oDstSizeROI, int eInterpolation, NppStreamContext nppStreamCtx)
-    void Remap(const Image64fC1View &pXMap, const Image64fC1View &pYMap, Image64fC3View &pDst, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image64fC3View &Remap(const Image64fC1View &pXMap, const Image64fC1View &pYMap, Image64fC3View &pDst, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiRemap_64f_P3R_Ctx(const Npp64f *const[3] pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, const Npp64f * pXMap, int nXMapStep, const Npp64f * pYMap, int nYMapStep, Npp64f *[3] pDst, int nDstStep, NppiSize oDstSizeROI, int eInterpolation, NppStreamContext nppStreamCtx)
     static void Remap(const Image64fC1View &aSrcChannel0, const Image64fC1View &aSrcChannel1, const Image64fC1View &aSrcChannel2, Image64fC1View &aDstChannel0, Image64fC1View &aDstChannel1, Image64fC1View &aDstChannel2, const Image64fC1View &pXMap, const Image64fC1View &pYMap, int eInterpolation, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiWarpAffine_64f_C3R_Ctx(const Npp64f * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp64f * pDst, int nDstStep, NppiRect oDstROI, const double[2][3] aCoeffs, int eInterpolation, NppStreamContext nppStreamCtx)
-    void WarpAffine(Image64fC3View &pDst, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image64fC3View &WarpAffine(Image64fC3View &pDst, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiWarpAffine_64f_P3R_Ctx(const Npp64f *[3] aSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp64f *[3] aDst, int nDstStep, NppiRect oDstROI, const double[2][3] aCoeffs, int eInterpolation, NppStreamContext nppStreamCtx)
     static void WarpAffine(const Image64fC1View &aSrcChannel0, const Image64fC1View &aSrcChannel1, const Image64fC1View &aSrcChannel2, Image64fC1View &aDstChannel0, Image64fC1View &aDstChannel1, Image64fC1View &aDstChannel2, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx);

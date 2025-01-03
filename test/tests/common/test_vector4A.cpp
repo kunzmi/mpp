@@ -736,6 +736,24 @@ TEST_CASE("Pixel16uC4_alignment", "[Common]")
     }
 }
 
+TEST_CASE("Pixel8uC4A_streams", "[Common]")
+{
+    std::string str = "3 4 5";
+    std::stringstream ss(str);
+
+    Pixel8uC4A pix;
+    ss >> pix;
+
+    CHECK(pix.x == 3);
+    CHECK(pix.y == 4);
+    CHECK(pix.z == 5);
+
+    std::stringstream ss2;
+    ss2 << pix;
+
+    CHECK(ss2.str() == "(3, 4, 5, A)");
+}
+
 TEST_CASE("Pixel32sC4A_streams", "[Common]")
 {
     std::string str = "3 4 5";
@@ -751,7 +769,7 @@ TEST_CASE("Pixel32sC4A_streams", "[Common]")
     std::stringstream ss2;
     ss2 << pix;
 
-    CHECK(ss2.str() == "(3, 4, 5)");
+    CHECK(ss2.str() == "(3, 4, 5, A)");
 }
 
 TEST_CASE("Pixel32fC4A_streams", "[Common]")
@@ -769,7 +787,7 @@ TEST_CASE("Pixel32fC4A_streams", "[Common]")
     std::stringstream ss2;
     ss2 << pix;
 
-    CHECK(ss2.str() == "(3.14, 2.7, 8.9)");
+    CHECK(ss2.str() == "(3.14, 2.7, 8.9, A)");
 }
 
 TEST_CASE("Axis4D", "[Common]")

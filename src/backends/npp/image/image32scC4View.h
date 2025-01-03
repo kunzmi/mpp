@@ -46,64 +46,64 @@ class Image32scC4View : public ImageView<Pixel32scC4>
 
 
     // NppStatus nppiSet_32sc_C4R_Ctx(const Npp32sc[4] aValue, Npp32sc * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Set(const Pixel32scC4 &aValue, const NppStreamContext &nppStreamCtx);
+    Image32scC4View &Set(const Pixel32scC4 &aValue, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSet_32sc_AC4R_Ctx(const Npp32sc[3] aValue, Npp32sc * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void SetA(const Pixel32scC3 &aValue, const NppStreamContext &nppStreamCtx);
+    Image32scC4View &SetA(const Pixel32scC3 &aValue, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiCopy_32sc_C4R_Ctx(const Npp32sc * pSrc, int nSrcStep, Npp32sc * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Copy(Image32scC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32scC4View &Copy(Image32scC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCopy_32sc_AC4R_Ctx(const Npp32sc * pSrc, int nSrcStep, Npp32sc * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void CopyA(Image32scC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32scC4View &CopyA(Image32scC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAddC_32sc_AC4RSfs_Ctx(const Npp32sc * pSrc1, int nSrc1Step, const Npp32sc[3] aConstants, Npp32sc * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void AddA(const Pixel32scC3 &aConstants, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image32scC4View &AddA(const Pixel32scC3 &aConstants, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAddC_32sc_AC4IRSfs_Ctx(const Npp32sc[3] aConstants, Npp32sc * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void AddA(const Pixel32scC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image32scC4View &AddA(const Pixel32scC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMulC_32sc_AC4RSfs_Ctx(const Npp32sc * pSrc1, int nSrc1Step, const Npp32sc[3] aConstants, Npp32sc * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void MulA(const Pixel32scC3 &aConstants, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image32scC4View &MulA(const Pixel32scC3 &aConstants, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMulC_32sc_AC4IRSfs_Ctx(const Npp32sc[3] aConstants, Npp32sc * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void MulA(const Pixel32scC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image32scC4View &MulA(const Pixel32scC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSubC_32sc_AC4RSfs_Ctx(const Npp32sc * pSrc1, int nSrc1Step, const Npp32sc[3] aConstants, Npp32sc * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void SubA(const Pixel32scC3 &aConstants, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image32scC4View &SubA(const Pixel32scC3 &aConstants, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSubC_32sc_AC4IRSfs_Ctx(const Npp32sc[3] aConstants, Npp32sc * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void SubA(const Pixel32scC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image32scC4View &SubA(const Pixel32scC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiDivC_32sc_AC4RSfs_Ctx(const Npp32sc * pSrc1, int nSrc1Step, const Npp32sc[3] aConstants, Npp32sc * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void DivA(const Pixel32scC3 &aConstants, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image32scC4View &DivA(const Pixel32scC3 &aConstants, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDivC_32sc_AC4IRSfs_Ctx(const Npp32sc[3] aConstants, Npp32sc * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void DivA(const Pixel32scC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image32scC4View &DivA(const Pixel32scC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAdd_32sc_AC4RSfs_Ctx(const Npp32sc * pSrc1, int nSrc1Step, const Npp32sc * pSrc2, int nSrc2Step, Npp32sc * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void AddA(const Image32scC4View &pSrc2, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image32scC4View &AddA(const Image32scC4View &pSrc2, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAdd_32sc_AC4IRSfs_Ctx(const Npp32sc * pSrc, int nSrcStep, Npp32sc * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void AddA(const Image32scC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image32scC4View &AddA(const Image32scC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMul_32sc_AC4RSfs_Ctx(const Npp32sc * pSrc1, int nSrc1Step, const Npp32sc * pSrc2, int nSrc2Step, Npp32sc * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void MulA(const Image32scC4View &pSrc2, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image32scC4View &MulA(const Image32scC4View &pSrc2, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMul_32sc_AC4IRSfs_Ctx(const Npp32sc * pSrc, int nSrcStep, Npp32sc * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void MulA(const Image32scC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image32scC4View &MulA(const Image32scC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSub_32sc_AC4RSfs_Ctx(const Npp32sc * pSrc1, int nSrc1Step, const Npp32sc * pSrc2, int nSrc2Step, Npp32sc * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void SubA(const Image32scC4View &pSrc2, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image32scC4View &SubA(const Image32scC4View &pSrc2, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSub_32sc_AC4IRSfs_Ctx(const Npp32sc * pSrc, int nSrcStep, Npp32sc * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void SubA(const Image32scC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image32scC4View &SubA(const Image32scC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiDiv_32sc_AC4RSfs_Ctx(const Npp32sc * pSrc1, int nSrc1Step, const Npp32sc * pSrc2, int nSrc2Step, Npp32sc * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void DivA(const Image32scC4View &pSrc2, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image32scC4View &DivA(const Image32scC4View &pSrc2, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDiv_32sc_AC4IRSfs_Ctx(const Npp32sc * pSrc, int nSrcStep, Npp32sc * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void DivA(const Image32scC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image32scC4View &DivA(const Image32scC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMaximumError_32sc_C4R_Ctx(const Npp32sc * pSrc1, int nSrc1Step, const Npp32sc * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
     void MaximumError(const Image32scC4View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;

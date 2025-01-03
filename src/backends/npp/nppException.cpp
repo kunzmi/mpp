@@ -7,24 +7,24 @@
 
 namespace opp::npp
 {
-NppException::NppException(NppStatus aNppStatus, const std::filesystem::path &aCodeFileName, int aLineNumber,
-                           const std::string &aFunctionName)
+NppException::NppException(NppStatus aNppStatus, [[maybe_unused]] const std::filesystem::path &aCodeFileName,
+                           [[maybe_unused]] int aLineNumber, [[maybe_unused]] const std::string &aFunctionName)
 {
-    const std::filesystem::path src          = "../../../";
-    const std::filesystem::path codeFileName = aCodeFileName.lexically_relative(src);
-
 #ifdef NDEBUG
-    if (codeFileName.empty() && aLineNumber > 0 && aFunctionName.empty())
-    {
-        // dummy to avoid warning because of unused arguments...
-    }
-
     std::stringstream ss;
     ss << "'" << ConvertErrorCodeToName(aNppStatus) << "' (" << aNppStatus << ") "
        << ConvertErrorCodeToMessage(aNppStatus) << std::endl;
 #else
+#ifdef PROJECT_SOURCE_DIR
+    const std::filesystem::path src          = PROJECT_SOURCE_DIR;
+    const std::filesystem::path codeFileName = aCodeFileName.lexically_relative(src);
+#else
+    const std::filesystem::path codeFileName = aCodeFileName;
+#endif
+
     std::stringstream ss;
-    ss << "Error in " << codeFileName.string() << " in function " << aFunctionName << " @ " << aLineNumber << std::endl
+    ss << "Error in " << codeFileName.generic_string() << " in function " << aFunctionName << " @ " << aLineNumber
+       << std::endl
        << "'" << ConvertErrorCodeToName(aNppStatus) << "' (" << aNppStatus << ") "
        << ConvertErrorCodeToMessage(aNppStatus) << std::endl;
 #endif
@@ -33,25 +33,25 @@ NppException::NppException(NppStatus aNppStatus, const std::filesystem::path &aC
 }
 
 NppException::NppException(NppStatus aNppStatus, const std::string &aMessage,
-                           const std::filesystem::path &aCodeFileName, int aLineNumber,
-                           const std::string &aFunctionName)
+                           [[maybe_unused]] const std::filesystem::path &aCodeFileName,
+                           [[maybe_unused]] int aLineNumber, [[maybe_unused]] const std::string &aFunctionName)
 {
-    const std::filesystem::path src          = "../../../";
-    const std::filesystem::path codeFileName = aCodeFileName.lexically_relative(src);
-
 #ifdef NDEBUG
-    if (codeFileName.empty() && aLineNumber > 0 && aFunctionName.empty())
-    {
-        // dummy to avoid warning because of unused arguments...
-    }
-
     std::stringstream ss;
     ss << "'" << ConvertErrorCodeToName(aNppStatus) << "' (" << aNppStatus << ") "
        << ConvertErrorCodeToMessage(aNppStatus) << std::endl
        << "Additional info: " << aMessage;
 #else
+#ifdef PROJECT_SOURCE_DIR
+    const std::filesystem::path src          = PROJECT_SOURCE_DIR;
+    const std::filesystem::path codeFileName = aCodeFileName.lexically_relative(src);
+#else
+    const std::filesystem::path codeFileName = aCodeFileName;
+#endif
+
     std::stringstream ss;
-    ss << "Error in " << codeFileName.string() << " in function " << aFunctionName << " @ " << aLineNumber << std::endl
+    ss << "Error in " << codeFileName.generic_string() << " in function " << aFunctionName << " @ " << aLineNumber
+       << std::endl
        << "'" << ConvertErrorCodeToName(aNppStatus) << "' (" << aNppStatus << ") "
        << ConvertErrorCodeToMessage(aNppStatus) << std::endl
        << "Additional info: " << aMessage;
@@ -60,23 +60,23 @@ NppException::NppException(NppStatus aNppStatus, const std::string &aMessage,
     What() = ss.str();
 }
 
-NppException::NppException(const std::string &aMessage, const std::filesystem::path &aCodeFileName, int aLineNumber,
-                           const std::string &aFunctionName)
+NppException::NppException(const std::string &aMessage, [[maybe_unused]] const std::filesystem::path &aCodeFileName,
+                           [[maybe_unused]] int aLineNumber, [[maybe_unused]] const std::string &aFunctionName)
 {
-    const std::filesystem::path src          = "../../../";
-    const std::filesystem::path codeFileName = aCodeFileName.lexically_relative(src);
-
 #ifdef NDEBUG
-    if (codeFileName.empty() && aLineNumber > 0 && aFunctionName.empty())
-    {
-        // dummy to avoid warning because of unused arguments...
-    }
-
     std::stringstream ss;
     ss << "Error message: " << aMessage;
 #else
+#ifdef PROJECT_SOURCE_DIR
+    const std::filesystem::path src          = PROJECT_SOURCE_DIR;
+    const std::filesystem::path codeFileName = aCodeFileName.lexically_relative(src);
+#else
+    const std::filesystem::path codeFileName = aCodeFileName;
+#endif
+
     std::stringstream ss;
-    ss << "Error in " << codeFileName.string() << " in function " << aFunctionName << " @ " << aLineNumber << std::endl
+    ss << "Error in " << codeFileName.generic_string() << " in function " << aFunctionName << " @ " << aLineNumber
+       << std::endl
        << "Error message: " << aMessage;
 #endif
 

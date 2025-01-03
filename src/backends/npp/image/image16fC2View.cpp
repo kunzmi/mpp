@@ -46,23 +46,26 @@ Image16fC2View Image16fC2View::GetView(const Border &aBorder) const
 
 //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 
-void Image16fC2View::Set(const Pixel32fC2 &aValues, const NppStreamContext &nppStreamCtx)
+Image16fC2View &Image16fC2View::Set(const Pixel32fC2 &aValues, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiSet_16f_C2R_Ctx(aValues.data(), reinterpret_cast<Npp16f *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image16fC2View::ColorTwist32f(Image16fC2View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const
+Image16fC2View &Image16fC2View::ColorTwist32f(Image16fC2View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiColorTwist32f_16f_C2R_Ctx(reinterpret_cast<const Npp16f *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), aTwist, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image16fC2View::ColorTwist32f(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx)
+Image16fC2View &Image16fC2View::ColorTwist32f(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiColorTwist32f_16f_C2IR_Ctx(reinterpret_cast<Npp16f *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), aTwist, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
 

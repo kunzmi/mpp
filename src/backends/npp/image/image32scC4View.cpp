@@ -47,142 +47,162 @@ Image32scC4View Image32scC4View::GetView(const Border &aBorder) const
 
 //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 
-void Image32scC4View::Set(const Pixel32scC4 &aValue, const NppStreamContext &nppStreamCtx)
+Image32scC4View &Image32scC4View::Set(const Pixel32scC4 &aValue, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiSet_32sc_C4R_Ctx(reinterpret_cast<const Npp32sc *>(aValue.data()), reinterpret_cast<Npp32sc *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image32scC4View::SetA(const Pixel32scC3 &aValue, const NppStreamContext &nppStreamCtx)
+Image32scC4View &Image32scC4View::SetA(const Pixel32scC3 &aValue, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiSet_32sc_AC4R_Ctx(reinterpret_cast<const Npp32sc *>(aValue.data()), reinterpret_cast<Npp32sc *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image32scC4View::Copy(Image32scC4View &pDst, const NppStreamContext &nppStreamCtx) const
+Image32scC4View &Image32scC4View::Copy(Image32scC4View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiCopy_32sc_C4R_Ctx(reinterpret_cast<const Npp32sc *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp32sc *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image32scC4View::CopyA(Image32scC4View &pDst, const NppStreamContext &nppStreamCtx) const
+Image32scC4View &Image32scC4View::CopyA(Image32scC4View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiCopy_32sc_AC4R_Ctx(reinterpret_cast<const Npp32sc *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp32sc *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image32scC4View::AddA(const Pixel32scC3 &aConstants, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image32scC4View &Image32scC4View::AddA(const Pixel32scC3 &aConstants, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiAddC_32sc_AC4RSfs_Ctx(reinterpret_cast<const Npp32sc *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32sc *>(aConstants.data()), reinterpret_cast<Npp32sc *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image32scC4View::AddA(const Pixel32scC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx)
+Image32scC4View &Image32scC4View::AddA(const Pixel32scC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiAddC_32sc_AC4IRSfs_Ctx(reinterpret_cast<const Npp32sc *>(aConstants.data()), reinterpret_cast<Npp32sc *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image32scC4View::MulA(const Pixel32scC3 &aConstants, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image32scC4View &Image32scC4View::MulA(const Pixel32scC3 &aConstants, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiMulC_32sc_AC4RSfs_Ctx(reinterpret_cast<const Npp32sc *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32sc *>(aConstants.data()), reinterpret_cast<Npp32sc *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image32scC4View::MulA(const Pixel32scC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx)
+Image32scC4View &Image32scC4View::MulA(const Pixel32scC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiMulC_32sc_AC4IRSfs_Ctx(reinterpret_cast<const Npp32sc *>(aConstants.data()), reinterpret_cast<Npp32sc *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image32scC4View::SubA(const Pixel32scC3 &aConstants, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image32scC4View &Image32scC4View::SubA(const Pixel32scC3 &aConstants, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiSubC_32sc_AC4RSfs_Ctx(reinterpret_cast<const Npp32sc *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32sc *>(aConstants.data()), reinterpret_cast<Npp32sc *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image32scC4View::SubA(const Pixel32scC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx)
+Image32scC4View &Image32scC4View::SubA(const Pixel32scC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiSubC_32sc_AC4IRSfs_Ctx(reinterpret_cast<const Npp32sc *>(aConstants.data()), reinterpret_cast<Npp32sc *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image32scC4View::DivA(const Pixel32scC3 &aConstants, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image32scC4View &Image32scC4View::DivA(const Pixel32scC3 &aConstants, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiDivC_32sc_AC4RSfs_Ctx(reinterpret_cast<const Npp32sc *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32sc *>(aConstants.data()), reinterpret_cast<Npp32sc *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image32scC4View::DivA(const Pixel32scC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx)
+Image32scC4View &Image32scC4View::DivA(const Pixel32scC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiDivC_32sc_AC4IRSfs_Ctx(reinterpret_cast<const Npp32sc *>(aConstants.data()), reinterpret_cast<Npp32sc *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image32scC4View::AddA(const Image32scC4View &pSrc2, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image32scC4View &Image32scC4View::AddA(const Image32scC4View &pSrc2, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiAdd_32sc_AC4RSfs_Ctx(reinterpret_cast<const Npp32sc *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32sc *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<Npp32sc *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image32scC4View::AddA(const Image32scC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx)
+Image32scC4View &Image32scC4View::AddA(const Image32scC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pSrc.ROI());
     nppSafeCallExt(nppiAdd_32sc_AC4IRSfs_Ctx(reinterpret_cast<const Npp32sc *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()), reinterpret_cast<Npp32sc *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src2: " << pSrc.ROI() << "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image32scC4View::MulA(const Image32scC4View &pSrc2, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image32scC4View &Image32scC4View::MulA(const Image32scC4View &pSrc2, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiMul_32sc_AC4RSfs_Ctx(reinterpret_cast<const Npp32sc *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32sc *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<Npp32sc *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image32scC4View::MulA(const Image32scC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx)
+Image32scC4View &Image32scC4View::MulA(const Image32scC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pSrc.ROI());
     nppSafeCallExt(nppiMul_32sc_AC4IRSfs_Ctx(reinterpret_cast<const Npp32sc *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()), reinterpret_cast<Npp32sc *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src2: " << pSrc.ROI() << "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image32scC4View::SubA(const Image32scC4View &pSrc2, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image32scC4View &Image32scC4View::SubA(const Image32scC4View &pSrc2, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiSub_32sc_AC4RSfs_Ctx(reinterpret_cast<const Npp32sc *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32sc *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<Npp32sc *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image32scC4View::SubA(const Image32scC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx)
+Image32scC4View &Image32scC4View::SubA(const Image32scC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pSrc.ROI());
     nppSafeCallExt(nppiSub_32sc_AC4IRSfs_Ctx(reinterpret_cast<const Npp32sc *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()), reinterpret_cast<Npp32sc *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src2: " << pSrc.ROI() << "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image32scC4View::DivA(const Image32scC4View &pSrc2, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image32scC4View &Image32scC4View::DivA(const Image32scC4View &pSrc2, Image32scC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiDiv_32sc_AC4RSfs_Ctx(reinterpret_cast<const Npp32sc *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32sc *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<Npp32sc *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
-void Image32scC4View::DivA(const Image32scC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx)
+Image32scC4View &Image32scC4View::DivA(const Image32scC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pSrc.ROI());
     nppSafeCallExt(nppiDiv_32sc_AC4IRSfs_Ctx(reinterpret_cast<const Npp32sc *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()), reinterpret_cast<Npp32sc *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src2: " << pSrc.ROI() << "ROI SrcDst: " << ROI());
+    return *this;
 }
 
 void Image32scC4View::MaximumError(const Image32scC4View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const

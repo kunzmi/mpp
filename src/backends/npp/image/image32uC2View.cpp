@@ -46,10 +46,11 @@ Image32uC2View Image32uC2View::GetView(const Border &aBorder) const
 
 //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 
-void Image32uC2View::Set(const Pixel32uC2 &aValue, const NppStreamContext &nppStreamCtx)
+Image32uC2View &Image32uC2View::Set(const Pixel32uC2 &aValue, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiSet_32u_C2R_Ctx(aValue.data(), reinterpret_cast<Npp32u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
 void Image32uC2View::MaximumError(const Image32uC2View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const

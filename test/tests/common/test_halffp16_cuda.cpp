@@ -37,12 +37,12 @@ TEST_CASE("HalfFp16 on Cuda", "[Common]")
     std::vector<HalfFp16> h_dataIn = {HalfFp16(0.4f),  HalfFp16(0.5f),   HalfFp16(0.6f),
                                       HalfFp16(1.5f),  HalfFp16(1.9f),   HalfFp16(-1.5f),
                                       HalfFp16(-2.5f), HalfFp16(-10.3f), HalfFp16(0.4f)};
-    std::vector<HalfFp16> h_dataOut(116);
-    std::vector<HalfFp16> h_dataOutRef(116);
+    std::vector<HalfFp16> h_dataOut(118);
+    std::vector<HalfFp16> h_dataOutRef(118);
     bool h_dataBool[14];
     bool h_dataBoolRef[14];
 
-    DevVar<HalfFp16> d_dataOut(116);
+    DevVar<HalfFp16> d_dataOut(118);
     DevVar<bool> d_dataBool(14);
 
     runtest_half_fp16_kernel(d_dataOut.Pointer(), d_dataBool.Pointer());
@@ -170,7 +170,15 @@ TEST_CASE("HalfFp16 on Cuda", "[Common]")
     temp.Abs();
     h_dataOutRef[offsetOut + 7] = temp;
 
-    offsetOut = 98;
+    temp                        = h_dataIn[3];
+    temp                        = temp.GetSign();
+    h_dataOutRef[offsetOut + 8] = temp;
+
+    temp                        = h_dataIn[5];
+    temp                        = temp.GetSign();
+    h_dataOutRef[offsetOut + 9] = temp;
+
+    offsetOut = 100;
 
     h_dataOutRef[offsetOut + 0]  = HalfFp16(0.0f);
     h_dataOutRef[offsetOut + 1]  = HalfFp16(-10.0f);
@@ -184,7 +192,7 @@ TEST_CASE("HalfFp16 on Cuda", "[Common]")
     h_dataOutRef[offsetOut + 9]  = HalfFp16(FLT_MIN);
     h_dataOutRef[offsetOut + 10] = HalfFp16(-0.0f);
 
-    offsetOut = 108;
+    offsetOut = 110;
     for (size_t i = 0; i < 8; i++)
     {
         h_dataOutRef[offsetOut + i] = h_dataIn[i];

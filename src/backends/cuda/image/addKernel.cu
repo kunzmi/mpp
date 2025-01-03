@@ -27,30 +27,21 @@ void InvokeAddSrcSrc(const SrcT *aSrc1, size_t pitchSrc1, const SrcT *aSrc2, siz
 {
     OPP_CUDA_REGISTER_TEMPALTE;
 
-    const dim3 BlockSize               = KernelConfiguration<sizeof(DstT)>::BlockSize;
-    constexpr int WarpAlignmentInBytes = KernelConfiguration<sizeof(DstT)>::WarpAlignmentInBytes;
-    constexpr size_t TupelSize         = KernelConfiguration<sizeof(DstT)>::TupelSize;
-    constexpr uint SharedMemory        = 0;
+    constexpr size_t TupelSize = KernelConfiguration<sizeof(DstT)>::TupelSize;
 
     using simdOP_t = simd::Add<Tupel<DstT, TupelSize>>;
     if constexpr (simdOP_t::has_simd)
     {
-        // Note: we have two SIMD versions for CUDA: SIMD over Vector4 and Vector2 types for (s)byte/(u)short and SIMD
-        // over Tupels for Vector1 and Vector2 types for (s)byte/(u)short. The Vector4/2 SIMD is activated using the
-        // same ComputeT as DstT in the instantiate macro.
-        // The Tupel-SIMD is activated here:
-
         // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
-        using addSrcSrc =
+        using addSrcSrcSIMD =
             SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoudingMode::None, DstT, simdOP_t>;
 
         Add<ComputeT> op;
         simdOP_t opSIMD;
 
-        addSrcSrc functor(aSrc1, pitchSrc1, aSrc2, pitchSrc2, op, opSIMD);
+        addSrcSrcSIMD functor(aSrc1, pitchSrc1, aSrc2, pitchSrc2, op, opSIMD);
 
-        InvokeForEachPixelKernel<SrcT, DstT, TupelSize, WarpAlignmentInBytes, addSrcSrc>(
-            BlockSize, SharedMemory, aStreamCtx.Stream, aDst, pitchDst, aSize, functor);
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, addSrcSrcSIMD>(aDst, pitchDst, aSize, aStreamCtx, functor);
     }
     else
     {
@@ -61,8 +52,7 @@ void InvokeAddSrcSrc(const SrcT *aSrc1, size_t pitchSrc1, const SrcT *aSrc2, siz
 
         addSrcSrc functor(aSrc1, pitchSrc1, aSrc2, pitchSrc2, op);
 
-        InvokeForEachPixelKernel<SrcT, DstT, TupelSize, WarpAlignmentInBytes, addSrcSrc>(
-            BlockSize, SharedMemory, aStreamCtx.Stream, aDst, pitchDst, aSize, functor);
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, addSrcSrc>(aDst, pitchDst, aSize, aStreamCtx, functor);
     }
 }
 

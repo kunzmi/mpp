@@ -47,46 +47,53 @@ Image32uC3View Image32uC3View::GetView(const Border &aBorder) const
 
 //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 
-void Image32uC3View::Set(const Pixel32uC3 &aValue, const NppStreamContext &nppStreamCtx)
+Image32uC3View &Image32uC3View::Set(const Pixel32uC3 &aValue, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiSet_32u_C3R_Ctx(aValue.data(), reinterpret_cast<Npp32u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image32uC3View::FloodFill(NppiPoint oSeed, const Pixel32uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
+Image32uC3View &Image32uC3View::FloodFill(NppiPoint oSeed, const Pixel32uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiFloodFill_32u_C3IR_Ctx(reinterpret_cast<Npp32u *>(PointerRoi()), to_int(Pitch()), oSeed, aNewValues.data(), eNorm, NppiSizeRoi(), pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image32uC3View::FloodFillBoundary(NppiPoint oSeed, const Pixel32uC3 &aNewValues, const Pixel32uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
+Image32uC3View &Image32uC3View::FloodFillBoundary(NppiPoint oSeed, const Pixel32uC3 &aNewValues, const Pixel32uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiFloodFillBoundary_32u_C3IR_Ctx(reinterpret_cast<Npp32u *>(PointerRoi()), to_int(Pitch()), oSeed, aNewValues.data(), aBoundaryValues.data(), eNorm, NppiSizeRoi(), pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image32uC3View::FloodFillRange(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
+Image32uC3View &Image32uC3View::FloodFillRange(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiFloodFillRange_32u_C3IR_Ctx(reinterpret_cast<Npp32u *>(PointerRoi()), to_int(Pitch()), oSeed, aMin.data(), aMax.data(), aNewValues.data(), eNorm, NppiSizeRoi(), pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image32uC3View::FloodFillRangeBoundary(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, const Pixel32uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
+Image32uC3View &Image32uC3View::FloodFillRangeBoundary(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, const Pixel32uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiFloodFillRangeBoundary_32u_C3IR_Ctx(reinterpret_cast<Npp32u *>(PointerRoi()), to_int(Pitch()), oSeed, aMin.data(), aMax.data(), aNewValues.data(), aBoundaryValues.data(), eNorm, NppiSizeRoi(), pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image32uC3View::FloodFillGradient(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
+Image32uC3View &Image32uC3View::FloodFillGradient(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiFloodFillGradient_32u_C3IR_Ctx(reinterpret_cast<Npp32u *>(PointerRoi()), to_int(Pitch()), oSeed, aMin.data(), aMax.data(), aNewValues.data(), eNorm, NppiSizeRoi(), pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image32uC3View::FloodFillGradientBoundary(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, const Pixel32uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
+Image32uC3View &Image32uC3View::FloodFillGradientBoundary(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, const Pixel32uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiFloodFillGradientBoundary_32u_C3IR_Ctx(reinterpret_cast<Npp32u *>(PointerRoi()), to_int(Pitch()), oSeed, aMin.data(), aMax.data(), aNewValues.data(), aBoundaryValues.data(), eNorm, NppiSizeRoi(), pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
 void Image32uC3View::DotProd(const Image32uC3View &pSrc2, cuda::DevVarView<double> &aDp, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const

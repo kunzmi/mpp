@@ -54,520 +54,520 @@ class Image8uC4View : public ImageView<Pixel8uC4>
 
 
     // NppStatus nppiSet_8u_C4R_Ctx(const Npp8u[4] aValue, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Set(const Pixel8uC4 &aValue, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Set(const Pixel8uC4 &aValue, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSet_8u_AC4R_Ctx(const Npp8u[3] aValue, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void SetA(const Pixel8uC3 &aValue, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &SetA(const Pixel8uC3 &aValue, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSet_8u_C4MR_Ctx(const Npp8u[4] aValue, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, int nMaskStep, NppStreamContext nppStreamCtx)
-    void Set(const Pixel8uC4 &aValue, const Image8uC1View &pMask, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Set(const Pixel8uC4 &aValue, const Image8uC1View &pMask, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSet_8u_AC4MR_Ctx(const Npp8u[3] aValue, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, int nMaskStep, NppStreamContext nppStreamCtx)
-    void SetA(const Pixel8uC3 &aValue, const Image8uC1View &pMask, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &SetA(const Pixel8uC3 &aValue, const Image8uC1View &pMask, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSet_8u_C4CR_Ctx(Npp8u nValue, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Set(size_t aDstChannel, const Pixel8uC1 &nValue, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Set(size_t aDstChannel, const Pixel8uC1 &nValue, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiCopy_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Copy(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Copy(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCopy_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void CopyA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CopyA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCopy_8u_C4MR_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, int nMaskStep, NppStreamContext nppStreamCtx)
-    void Copy(Image8uC4View &pDst, const Image8uC1View &pMask, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Copy(Image8uC4View &pDst, const Image8uC1View &pMask, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCopy_8u_AC4MR_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, int nMaskStep, NppStreamContext nppStreamCtx)
-    void CopyA(Image8uC4View &pDst, const Image8uC1View &pMask, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CopyA(Image8uC4View &pDst, const Image8uC1View &pMask, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCopy_8u_C4CR_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Copy(size_t aSrcChannel, size_t aDstChannel, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Copy(size_t aSrcChannel, size_t aDstChannel, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCopy_8u_C4C1R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Copy(size_t aSrcChannel, Image8uC1View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC1View &Copy(size_t aSrcChannel, Image8uC1View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCopy_8u_C4P4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u *const[4] aDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     void Copy(Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, Image8uC1View &aDstChannel3, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCopy_8u_P4C4R_Ctx(const Npp8u *const[4] aSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    static void Copy(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx);
+    static Image8uC4View &Copy(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiCopyConstBorder_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSizeROI, Npp8u * pDst, int nDstStep, NppiSize oDstSizeROI, int nTopBorderHeight, int nLeftBorderWidth, const Npp8u[4] aValue, NppStreamContext nppStreamCtx)
-    void CopyConstBorder(Image8uC4View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const Pixel8uC4 &aValue, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CopyConstBorder(Image8uC4View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const Pixel8uC4 &aValue, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCopyConstBorder_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSizeROI, Npp8u * pDst, int nDstStep, NppiSize oDstSizeROI, int nTopBorderHeight, int nLeftBorderWidth, const Npp8u[3] aValue, NppStreamContext nppStreamCtx)
-    void CopyConstBorderA(Image8uC4View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const Pixel8uC3 &aValue, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CopyConstBorderA(Image8uC4View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const Pixel8uC3 &aValue, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCopyReplicateBorder_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSizeROI, Npp8u * pDst, int nDstStep, NppiSize oDstSizeROI, int nTopBorderHeight, int nLeftBorderWidth, NppStreamContext nppStreamCtx)
-    void CopyReplicateBorder(Image8uC4View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CopyReplicateBorder(Image8uC4View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCopyReplicateBorder_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSizeROI, Npp8u * pDst, int nDstStep, NppiSize oDstSizeROI, int nTopBorderHeight, int nLeftBorderWidth, NppStreamContext nppStreamCtx)
-    void CopyReplicateBorderA(Image8uC4View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CopyReplicateBorderA(Image8uC4View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCopyWrapBorder_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSizeROI, Npp8u * pDst, int nDstStep, NppiSize oDstSizeROI, int nTopBorderHeight, int nLeftBorderWidth, NppStreamContext nppStreamCtx)
-    void CopyWrapBorder(Image8uC4View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CopyWrapBorder(Image8uC4View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCopyWrapBorder_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSizeROI, Npp8u * pDst, int nDstStep, NppiSize oDstSizeROI, int nTopBorderHeight, int nLeftBorderWidth, NppStreamContext nppStreamCtx)
-    void CopyWrapBorderA(Image8uC4View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CopyWrapBorderA(Image8uC4View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCopySubpix_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oDstSizeROI, Npp32f nDx, Npp32f nDy, NppStreamContext nppStreamCtx)
-    void CopySubpix(Image8uC4View &pDst, const Pixel32fC1 &nDx, const Pixel32fC1 &nDy, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CopySubpix(Image8uC4View &pDst, const Pixel32fC1 &nDx, const Pixel32fC1 &nDy, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCopySubpix_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oDstSizeROI, Npp32f nDx, Npp32f nDy, NppStreamContext nppStreamCtx)
-    void CopySubpixA(Image8uC4View &pDst, const Pixel32fC1 &nDx, const Pixel32fC1 &nDy, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CopySubpixA(Image8uC4View &pDst, const Pixel32fC1 &nDx, const Pixel32fC1 &nDy, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiConvert_8u16u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp16u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Convert(Image16uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16uC4View &Convert(Image16uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiConvert_8u16u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp16u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void ConvertA(Image16uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16uC4View &ConvertA(Image16uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiConvert_8u16s_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp16s * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Convert(Image16sC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16sC4View &Convert(Image16sC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiConvert_8u16s_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp16s * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void ConvertA(Image16sC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16sC4View &ConvertA(Image16sC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiConvert_8u32s_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp32s * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Convert(Image32sC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32sC4View &Convert(Image32sC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiConvert_8u32s_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp32s * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void ConvertA(Image32sC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32sC4View &ConvertA(Image32sC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiConvert_8u32f_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp32f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Convert(Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &Convert(Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiConvert_8u32f_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp32f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void ConvertA(Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &ConvertA(Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiScale_8u16u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp16u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Scale(Image16uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16uC4View &Scale(Image16uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiScale_8u16u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp16u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void ScaleA(Image16uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16uC4View &ScaleA(Image16uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiScale_8u16s_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp16s * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Scale(Image16sC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16sC4View &Scale(Image16sC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiScale_8u16s_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp16s * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void ScaleA(Image16sC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16sC4View &ScaleA(Image16sC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiScale_8u32s_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp32s * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Scale(Image32sC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32sC4View &Scale(Image32sC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiScale_8u32s_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp32s * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void ScaleA(Image32sC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32sC4View &ScaleA(Image32sC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiScale_8u32f_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp32f * pDst, int nDstStep, NppiSize oSizeROI, Npp32f nMin, Npp32f nMax, NppStreamContext nppStreamCtx)
-    void Scale(Image32fC4View &pDst, const Pixel32fC1 &nMin, const Pixel32fC1 &nMax, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &Scale(Image32fC4View &pDst, const Pixel32fC1 &nMin, const Pixel32fC1 &nMax, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiScale_8u32f_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp32f * pDst, int nDstStep, NppiSize oSizeROI, Npp32f nMin, Npp32f nMax, NppStreamContext nppStreamCtx)
-    void ScaleA(Image32fC4View &pDst, const Pixel32fC1 &nMin, const Pixel32fC1 &nMax, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &ScaleA(Image32fC4View &pDst, const Pixel32fC1 &nMin, const Pixel32fC1 &nMax, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiTranspose_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSrcROI, NppStreamContext nppStreamCtx)
-    void Transpose(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Transpose(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSwapChannels_8u_C4C3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const int[3] aDstOrder, NppStreamContext nppStreamCtx)
-    void SwapChannels(Image8uC3View &pDst, const int aDstOrder[3], const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &SwapChannels(Image8uC3View &pDst, const int aDstOrder[3], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSwapChannels_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const int[4] aDstOrder, NppStreamContext nppStreamCtx)
-    void SwapChannels(Image8uC4View &pDst, const int aDstOrder[4], const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &SwapChannels(Image8uC4View &pDst, const int aDstOrder[4], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSwapChannels_8u_C4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const int[4] aDstOrder, NppStreamContext nppStreamCtx)
-    void SwapChannels(const int aDstOrder[4], const NppStreamContext &nppStreamCtx);
+    Image8uC4View &SwapChannels(const int aDstOrder[4], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSwapChannels_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const int[3] aDstOrder, NppStreamContext nppStreamCtx)
-    void SwapChannelsA(Image8uC4View &pDst, const int aDstOrder[3], const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &SwapChannelsA(Image8uC4View &pDst, const int aDstOrder[3], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAddC_8u_AC4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u[3] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void AddA(const Pixel8uC3 &aConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &AddA(const Pixel8uC3 &aConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAddDeviceC_8u_AC4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void AddA(const cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &AddA(const cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAddC_8u_AC4IRSfs_Ctx(const Npp8u[3] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void AddA(const Pixel8uC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &AddA(const Pixel8uC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAddDeviceC_8u_AC4IRSfs_Ctx(const Npp8u * pConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void AddA(const cuda::DevVarView<Pixel8uC3> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &AddA(const cuda::DevVarView<Pixel8uC3> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAddC_8u_C4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u[4] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Add(const Pixel8uC4 &aConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Add(const Pixel8uC4 &aConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAddDeviceC_8u_C4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Add(const cuda::DevVarView<Pixel8uC4> &pConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Add(const cuda::DevVarView<Pixel8uC4> &pConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAddC_8u_C4IRSfs_Ctx(const Npp8u[4] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Add(const Pixel8uC4 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Add(const Pixel8uC4 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAddDeviceC_8u_C4IRSfs_Ctx(const Npp8u * pConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Add(const cuda::DevVarView<Pixel8uC4> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Add(const cuda::DevVarView<Pixel8uC4> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMulC_8u_AC4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u[3] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void MulA(const Pixel8uC3 &aConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &MulA(const Pixel8uC3 &aConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMulDeviceC_8u_AC4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void MulA(const cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &MulA(const cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMulC_8u_AC4IRSfs_Ctx(const Npp8u[3] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void MulA(const Pixel8uC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &MulA(const Pixel8uC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMulDeviceC_8u_AC4IRSfs_Ctx(const Npp8u * pConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void MulA(const cuda::DevVarView<Pixel8uC3> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &MulA(const cuda::DevVarView<Pixel8uC3> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMulC_8u_C4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u[4] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Mul(const Pixel8uC4 &aConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Mul(const Pixel8uC4 &aConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMulDeviceC_8u_C4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Mul(const cuda::DevVarView<Pixel8uC4> &pConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Mul(const cuda::DevVarView<Pixel8uC4> &pConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMulC_8u_C4IRSfs_Ctx(const Npp8u[4] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Mul(const Pixel8uC4 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Mul(const Pixel8uC4 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMulDeviceC_8u_C4IRSfs_Ctx(const Npp8u * pConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Mul(const cuda::DevVarView<Pixel8uC4> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Mul(const cuda::DevVarView<Pixel8uC4> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMulCScale_8u_AC4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u[3] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void MulScaleA(const Pixel8uC3 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &MulScaleA(const Pixel8uC3 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMulDeviceCScale_8u_AC4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void MulScaleA(const cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &MulScaleA(const cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMulCScale_8u_AC4IR_Ctx(const Npp8u[3] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void MulScaleA(const Pixel8uC3 &aConstants, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &MulScaleA(const Pixel8uC3 &aConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMulDeviceCScale_8u_AC4IR_Ctx(const Npp8u * pConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void MulScaleA(const cuda::DevVarView<Pixel8uC3> &pConstants, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &MulScaleA(const cuda::DevVarView<Pixel8uC3> &pConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMulCScale_8u_C4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u[4] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void MulScale(const Pixel8uC4 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &MulScale(const Pixel8uC4 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMulDeviceCScale_8u_C4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void MulScale(const cuda::DevVarView<Pixel8uC4> &pConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &MulScale(const cuda::DevVarView<Pixel8uC4> &pConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMulCScale_8u_C4IR_Ctx(const Npp8u[4] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void MulScale(const Pixel8uC4 &aConstants, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &MulScale(const Pixel8uC4 &aConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMulDeviceCScale_8u_C4IR_Ctx(const Npp8u * pConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void MulScale(const cuda::DevVarView<Pixel8uC4> &pConstants, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &MulScale(const cuda::DevVarView<Pixel8uC4> &pConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSubC_8u_AC4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u[3] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void SubA(const Pixel8uC3 &aConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &SubA(const Pixel8uC3 &aConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSubDeviceC_8u_AC4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void SubA(const cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &SubA(const cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSubC_8u_AC4IRSfs_Ctx(const Npp8u[3] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void SubA(const Pixel8uC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &SubA(const Pixel8uC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSubDeviceC_8u_AC4IRSfs_Ctx(const Npp8u * pConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void SubA(const cuda::DevVarView<Pixel8uC3> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &SubA(const cuda::DevVarView<Pixel8uC3> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSubC_8u_C4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u[4] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Sub(const Pixel8uC4 &aConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Sub(const Pixel8uC4 &aConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSubDeviceC_8u_C4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Sub(const cuda::DevVarView<Pixel8uC4> &pConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Sub(const cuda::DevVarView<Pixel8uC4> &pConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSubC_8u_C4IRSfs_Ctx(const Npp8u[4] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Sub(const Pixel8uC4 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Sub(const Pixel8uC4 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSubDeviceC_8u_C4IRSfs_Ctx(const Npp8u * pConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Sub(const cuda::DevVarView<Pixel8uC4> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Sub(const cuda::DevVarView<Pixel8uC4> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiDivC_8u_AC4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u[3] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void DivA(const Pixel8uC3 &aConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &DivA(const Pixel8uC3 &aConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDivDeviceC_8u_AC4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void DivA(const cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &DivA(const cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDivC_8u_AC4IRSfs_Ctx(const Npp8u[3] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void DivA(const Pixel8uC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &DivA(const Pixel8uC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiDivDeviceC_8u_AC4IRSfs_Ctx(const Npp8u * pConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void DivA(const cuda::DevVarView<Pixel8uC3> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &DivA(const cuda::DevVarView<Pixel8uC3> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiDivC_8u_C4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u[4] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Div(const Pixel8uC4 &aConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Div(const Pixel8uC4 &aConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDivDeviceC_8u_C4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Div(const cuda::DevVarView<Pixel8uC4> &pConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Div(const cuda::DevVarView<Pixel8uC4> &pConstants, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDivC_8u_C4IRSfs_Ctx(const Npp8u[4] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Div(const Pixel8uC4 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Div(const Pixel8uC4 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiDivDeviceC_8u_C4IRSfs_Ctx(const Npp8u * pConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Div(const cuda::DevVarView<Pixel8uC4> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Div(const cuda::DevVarView<Pixel8uC4> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAdd_8u_AC4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void AddA(const Image8uC4View &pSrc2, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &AddA(const Image8uC4View &pSrc2, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAdd_8u_AC4IRSfs_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void AddA(const Image8uC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &AddA(const Image8uC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAdd_8u_C4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Add(const Image8uC4View &pSrc2, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Add(const Image8uC4View &pSrc2, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAdd_8u_C4IRSfs_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Add(const Image8uC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Add(const Image8uC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMul_8u_AC4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void MulA(const Image8uC4View &pSrc2, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &MulA(const Image8uC4View &pSrc2, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMul_8u_AC4IRSfs_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void MulA(const Image8uC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &MulA(const Image8uC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMul_8u_C4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Mul(const Image8uC4View &pSrc2, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Mul(const Image8uC4View &pSrc2, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMul_8u_C4IRSfs_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Mul(const Image8uC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Mul(const Image8uC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMulScale_8u_AC4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void MulScaleA(const Image8uC4View &pSrc2, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &MulScaleA(const Image8uC4View &pSrc2, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMulScale_8u_AC4IR_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void MulScaleA(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &MulScaleA(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMulScale_8u_C4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void MulScale(const Image8uC4View &pSrc2, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &MulScale(const Image8uC4View &pSrc2, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMulScale_8u_C4IR_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void MulScale(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &MulScale(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSub_8u_AC4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void SubA(const Image8uC4View &pSrc2, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &SubA(const Image8uC4View &pSrc2, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSub_8u_AC4IRSfs_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void SubA(const Image8uC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &SubA(const Image8uC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSub_8u_C4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Sub(const Image8uC4View &pSrc2, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Sub(const Image8uC4View &pSrc2, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSub_8u_C4IRSfs_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Sub(const Image8uC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Sub(const Image8uC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiDiv_8u_AC4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void DivA(const Image8uC4View &pSrc2, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &DivA(const Image8uC4View &pSrc2, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDiv_8u_AC4IRSfs_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void DivA(const Image8uC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &DivA(const Image8uC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiDiv_8u_C4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Div(const Image8uC4View &pSrc2, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Div(const Image8uC4View &pSrc2, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDiv_8u_C4IRSfs_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Div(const Image8uC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Div(const Image8uC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiDiv_Round_8u_AC4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppRoundMode rndMode, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Div_RoundA(const Image8uC4View &pSrc2, Image8uC4View &pDst, NppRoundMode rndMode, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Div_RoundA(const Image8uC4View &pSrc2, Image8uC4View &pDst, NppRoundMode rndMode, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDiv_Round_8u_AC4IRSfs_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppRoundMode rndMode, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Div_RoundA(const Image8uC4View &pSrc, NppRoundMode rndMode, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Div_RoundA(const Image8uC4View &pSrc, NppRoundMode rndMode, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiDiv_Round_8u_C4RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppRoundMode rndMode, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Div_Round(const Image8uC4View &pSrc2, Image8uC4View &pDst, NppRoundMode rndMode, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Div_Round(const Image8uC4View &pSrc2, Image8uC4View &pDst, NppRoundMode rndMode, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDiv_Round_8u_C4IRSfs_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppRoundMode rndMode, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Div_Round(const Image8uC4View &pSrc, NppRoundMode rndMode, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Div_Round(const Image8uC4View &pSrc, NppRoundMode rndMode, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAbsDiff_8u_C4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void AbsDiff(const Image8uC4View &pSrc2, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &AbsDiff(const Image8uC4View &pSrc2, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSqr_8u_AC4RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void SqrA(Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &SqrA(Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSqr_8u_AC4IRSfs_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void SqrA(int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &SqrA(int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSqr_8u_C4RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Sqr(Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Sqr(Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSqr_8u_C4IRSfs_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void Sqr(int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Sqr(int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSqrt_8u_AC4RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void SqrtA(Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &SqrtA(Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSqrt_8u_AC4IRSfs_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void SqrtA(int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &SqrtA(int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAndC_8u_AC4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u[3] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void AndA(const Pixel8uC3 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &AndA(const Pixel8uC3 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAndC_8u_AC4IR_Ctx(const Npp8u[3] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void AndA(const Pixel8uC3 &aConstants, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &AndA(const Pixel8uC3 &aConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAndC_8u_C4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u[4] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void And(const Pixel8uC4 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &And(const Pixel8uC4 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAndC_8u_C4IR_Ctx(const Npp8u[4] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void And(const Pixel8uC4 &aConstants, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &And(const Pixel8uC4 &aConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiOrC_8u_AC4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u[3] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void OrA(const Pixel8uC3 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &OrA(const Pixel8uC3 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiOrC_8u_AC4IR_Ctx(const Npp8u[3] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void OrA(const Pixel8uC3 &aConstants, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &OrA(const Pixel8uC3 &aConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiOrC_8u_C4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u[4] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Or(const Pixel8uC4 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Or(const Pixel8uC4 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiOrC_8u_C4IR_Ctx(const Npp8u[4] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Or(const Pixel8uC4 &aConstants, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Or(const Pixel8uC4 &aConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiXorC_8u_AC4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u[3] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void XorA(const Pixel8uC3 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &XorA(const Pixel8uC3 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiXorC_8u_AC4IR_Ctx(const Npp8u[3] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void XorA(const Pixel8uC3 &aConstants, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &XorA(const Pixel8uC3 &aConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiXorC_8u_C4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u[4] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Xor(const Pixel8uC4 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Xor(const Pixel8uC4 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiXorC_8u_C4IR_Ctx(const Npp8u[4] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Xor(const Pixel8uC4 &aConstants, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Xor(const Pixel8uC4 &aConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiRShiftC_8u_AC4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp32u[3] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void RShiftA(const Pixel32uC3 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &RShiftA(const Pixel32uC3 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiRShiftC_8u_AC4IR_Ctx(const Npp32u[3] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void RShiftA(const Pixel32uC3 &aConstants, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &RShiftA(const Pixel32uC3 &aConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiRShiftC_8u_C4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp32u[4] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void RShift(const Pixel32uC4 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &RShift(const Pixel32uC4 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiRShiftC_8u_C4IR_Ctx(const Npp32u[4] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void RShift(const Pixel32uC4 &aConstants, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &RShift(const Pixel32uC4 &aConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiLShiftC_8u_AC4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp32u[3] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void LShiftA(const Pixel32uC3 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &LShiftA(const Pixel32uC3 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiLShiftC_8u_AC4IR_Ctx(const Npp32u[3] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void LShiftA(const Pixel32uC3 &aConstants, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &LShiftA(const Pixel32uC3 &aConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiLShiftC_8u_C4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp32u[4] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void LShift(const Pixel32uC4 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &LShift(const Pixel32uC4 &aConstants, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiLShiftC_8u_C4IR_Ctx(const Npp32u[4] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void LShift(const Pixel32uC4 &aConstants, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &LShift(const Pixel32uC4 &aConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAnd_8u_AC4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void AndA(const Image8uC4View &pSrc2, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &AndA(const Image8uC4View &pSrc2, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAnd_8u_AC4IR_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void AndA(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &AndA(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAnd_8u_C4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void And(const Image8uC4View &pSrc2, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &And(const Image8uC4View &pSrc2, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAnd_8u_C4IR_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void And(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &And(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiOr_8u_AC4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void OrA(const Image8uC4View &pSrc2, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &OrA(const Image8uC4View &pSrc2, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiOr_8u_AC4IR_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void OrA(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &OrA(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiOr_8u_C4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Or(const Image8uC4View &pSrc2, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Or(const Image8uC4View &pSrc2, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiOr_8u_C4IR_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Or(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Or(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiXor_8u_AC4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void XorA(const Image8uC4View &pSrc2, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &XorA(const Image8uC4View &pSrc2, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiXor_8u_AC4IR_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void XorA(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &XorA(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiXor_8u_C4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Xor(const Image8uC4View &pSrc2, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Xor(const Image8uC4View &pSrc2, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiXor_8u_C4IR_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Xor(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Xor(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiNot_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void NotA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &NotA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNot_8u_AC4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void NotA(const NppStreamContext &nppStreamCtx);
+    Image8uC4View &NotA(const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiNot_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Not(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Not(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNot_8u_C4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Not(const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Not(const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAlphaCompC_8u_C4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, Npp8u nAlpha1, const Npp8u * pSrc2, int nSrc2Step, Npp8u nAlpha2, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppiAlphaOp eAlphaOp, NppStreamContext nppStreamCtx)
-    void AlphaComp(const Pixel8uC1 &nAlpha1, const Image8uC4View &pSrc2, const Pixel8uC1 &nAlpha2, Image8uC4View &pDst, NppiAlphaOp eAlphaOp, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &AlphaComp(const Pixel8uC1 &nAlpha1, const Image8uC4View &pSrc2, const Pixel8uC1 &nAlpha2, Image8uC4View &pDst, NppiAlphaOp eAlphaOp, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAlphaCompC_8u_AC4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, Npp8u nAlpha1, const Npp8u * pSrc2, int nSrc2Step, Npp8u nAlpha2, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppiAlphaOp eAlphaOp, NppStreamContext nppStreamCtx)
-    void AlphaCompA(const Pixel8uC1 &nAlpha1, const Image8uC4View &pSrc2, const Pixel8uC1 &nAlpha2, Image8uC4View &pDst, NppiAlphaOp eAlphaOp, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &AlphaCompA(const Pixel8uC1 &nAlpha1, const Image8uC4View &pSrc2, const Pixel8uC1 &nAlpha2, Image8uC4View &pDst, NppiAlphaOp eAlphaOp, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAlphaPremulC_8u_C4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, Npp8u nAlpha1, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void AlphaPremul(const Pixel8uC1 &nAlpha1, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &AlphaPremul(const Pixel8uC1 &nAlpha1, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAlphaPremulC_8u_C4IR_Ctx(Npp8u nAlpha1, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void AlphaPremul(const Pixel8uC1 &nAlpha1, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &AlphaPremul(const Pixel8uC1 &nAlpha1, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAlphaPremulC_8u_AC4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, Npp8u nAlpha1, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void AlphaPremulA(const Pixel8uC1 &nAlpha1, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &AlphaPremulA(const Pixel8uC1 &nAlpha1, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAlphaPremulC_8u_AC4IR_Ctx(Npp8u nAlpha1, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void AlphaPremulA(const Pixel8uC1 &nAlpha1, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &AlphaPremulA(const Pixel8uC1 &nAlpha1, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAlphaComp_8u_AC4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppiAlphaOp eAlphaOp, NppStreamContext nppStreamCtx)
-    void AlphaCompA(const Image8uC4View &pSrc2, Image8uC4View &pDst, NppiAlphaOp eAlphaOp, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &AlphaCompA(const Image8uC4View &pSrc2, Image8uC4View &pDst, NppiAlphaOp eAlphaOp, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAlphaPremul_8u_AC4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void AlphaPremulA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &AlphaPremulA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAlphaPremul_8u_AC4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void AlphaPremulA(const NppStreamContext &nppStreamCtx);
+    Image8uC4View &AlphaPremulA(const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiRGBToYUV_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void RGBToYUVA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &RGBToYUVA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiRGBToYUV_8u_AC4P4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u *[4] pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     void RGBToYUVA(Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, Image8uC1View &aDstChannel3, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiBGRToYUV_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void BGRToYUVA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &BGRToYUVA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiBGRToYUV_8u_AC4P4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u *[4] pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     void BGRToYUVA(Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, Image8uC1View &aDstChannel3, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiYUVToRGB_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void YUVToRGBA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &YUVToRGBA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiYUVToBGR_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void YUVToBGRA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &YUVToBGRA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiBGRToYUV420_8u_AC4P3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u *[3] pDst, int[3] rDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     void BGRToYUV420A(Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiRGBToYCbCr_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void RGBToYCbCrA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &RGBToYCbCrA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiRGBToYCbCr_8u_AC4P3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u *[3] pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     void RGBToYCbCrA(Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiYCbCrToRGB_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void YCbCrToRGBA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &YCbCrToRGBA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiBGRToYCbCr422_8u_AC4C2R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void BGRToYCbCr422A(Image8uC2View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC2View &BGRToYCbCr422A(Image8uC2View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiBGRToYCbCr422_8u_AC4P3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u *[3] pDst, int[3] rDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     void BGRToYCbCr422A(Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiBGRToCbYCr422_8u_AC4C2R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void BGRToCbYCr422A(Image8uC2View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC2View &BGRToCbYCr422A(Image8uC2View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiBGRToCbYCr422_709HDTV_8u_AC4C2R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void BGRToCbYCr422_709HDTVA(Image8uC2View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC2View &BGRToCbYCr422_709HDTVA(Image8uC2View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiRGBToYCrCb420_8u_AC4P3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u *[3] pDst, int[3] rDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     void RGBToYCrCb420A(Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const NppStreamContext &nppStreamCtx) const;
@@ -600,22 +600,22 @@ class Image8uC4View : public ImageView<Pixel8uC4>
     void BGRToYCbCrA(Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, Image8uC1View &aDstChannel3, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiRGBToXYZ_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void RGBToXYZA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &RGBToXYZA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiXYZToRGB_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void XYZToRGBA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &XYZToRGBA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiRGBToLUV_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void RGBToLUVA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &RGBToLUVA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiLUVToRGB_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void LUVToRGBA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &LUVToRGBA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiRGBToYCC_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void RGBToYCA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &RGBToYCA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiYCCToRGB_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void YCCToRGBA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &YCCToRGBA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiYCCKToCMYK_JPEG_601_8u_P4R_Ctx(const Npp8u *[4] pSrc, int nSrcStep, Npp8u *[4] pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     static void YCCKToCMYK_JPEG_601(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, Image8uC1View &aDstChannel3, const NppStreamContext &nppStreamCtx);
@@ -624,28 +624,28 @@ class Image8uC4View : public ImageView<Pixel8uC4>
     static void CMYKOrYCCKToRGB_JPEG(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiCMYKOrYCCKToRGB_JPEG_8u_P4C3R_Ctx(const Npp8u *[4] pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    static void CMYKOrYCCKToRGB_JPEG(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC3View &pDst, const NppStreamContext &nppStreamCtx);
+    static Image8uC3View &CMYKOrYCCKToRGB_JPEG(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC3View &pDst, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiCMYKOrYCCKToBGR_JPEG_8u_P4P3R_Ctx(const Npp8u *[4] pSrc, int nSrcStep, Npp8u *[3] pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     static void CMYKOrYCCKToBGR_JPEG(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiCMYKOrYCCKToBGR_JPEG_8u_P4C3R_Ctx(const Npp8u *[4] pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    static void CMYKOrYCCKToBGR_JPEG(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC3View &pDst, const NppStreamContext &nppStreamCtx);
+    static Image8uC3View &CMYKOrYCCKToBGR_JPEG(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC3View &pDst, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiRGBToHLS_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void RGBToHLSA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &RGBToHLSA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiHLSToRGB_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void HLSToRGBA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &HLSToRGBA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiBGRToHLS_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void BGRToHLSA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &BGRToHLSA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiBGRToHLS_8u_AC4P4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u *[4] pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     void BGRToHLSA(Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, Image8uC1View &aDstChannel3, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiBGRToHLS_8u_AP4C4R_Ctx(const Npp8u *const[4] pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    static void BGRToHLSA(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx);
+    static Image8uC4View &BGRToHLSA(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiBGRToHLS_8u_AP4R_Ctx(const Npp8u *const[4] pSrc, int nSrcStep, Npp8u *[4] pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     static void BGRToHLSA(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, Image8uC1View &aDstChannel3, const NppStreamContext &nppStreamCtx);
@@ -657,370 +657,370 @@ class Image8uC4View : public ImageView<Pixel8uC4>
     static void HLSToBGRA(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, Image8uC1View &aDstChannel3, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiHLSToBGR_8u_AP4C4R_Ctx(const Npp8u *const[4] pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    static void HLSToBGRA(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx);
+    static Image8uC4View &HLSToBGRA(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiRGBToHSV_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void RGBToHSVA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &RGBToHSVA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiHSVToRGB_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void HSVToRGBA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &HSVToRGBA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiRGBToGray_8u_AC4C1R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void RGBToGrayA(Image8uC1View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC1View &RGBToGrayA(Image8uC1View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiColorToGray_8u_AC4C1R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f[3] aCoeffs, NppStreamContext nppStreamCtx)
-    void ColorToGrayA(Image8uC1View &pDst, const Pixel32fC3 &aCoeffs, const NppStreamContext &nppStreamCtx) const;
+    Image8uC1View &ColorToGrayA(Image8uC1View &pDst, const Pixel32fC3 &aCoeffs, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiColorToGray_8u_C4C1R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f[4] aCoeffs, NppStreamContext nppStreamCtx)
-    void ColorToGray(Image8uC1View &pDst, const Pixel32fC4 &aCoeffs, const NppStreamContext &nppStreamCtx) const;
+    Image8uC1View &ColorToGray(Image8uC1View &pDst, const Pixel32fC4 &aCoeffs, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiGammaFwd_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void GammaFwdA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &GammaFwdA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiGammaFwd_8u_AC4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void GammaFwdA(const NppStreamContext &nppStreamCtx);
+    Image8uC4View &GammaFwdA(const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiGammaInv_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void GammaInvA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &GammaInvA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiGammaInv_8u_AC4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void GammaInvA(const NppStreamContext &nppStreamCtx);
+    Image8uC4View &GammaInvA(const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiCompColorKey_8u_C4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, Npp8u[4] nColorKeyConst, NppStreamContext nppStreamCtx)
-    void CompColorKey(const Image8uC4View &pSrc2, Image8uC4View &pDst, Pixel8uC4 &nColorKeyConst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CompColorKey(const Image8uC4View &pSrc2, Image8uC4View &pDst, Pixel8uC4 &nColorKeyConst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAlphaCompColorKey_8u_AC4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, Npp8u nAlpha1, const Npp8u * pSrc2, int nSrc2Step, Npp8u nAlpha2, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, Npp8u[4] nColorKeyConst, NppiAlphaOp nppAlphaOp, NppStreamContext nppStreamCtx)
-    void AlphaCompColorKeyA(const Pixel8uC1 &nAlpha1, const Image8uC4View &pSrc2, const Pixel8uC1 &nAlpha2, Image8uC4View &pDst, Pixel8uC4 &nColorKeyConst, NppiAlphaOp nppAlphaOp, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &AlphaCompColorKeyA(const Pixel8uC1 &nAlpha1, const Image8uC4View &pSrc2, const Pixel8uC1 &nAlpha2, Image8uC4View &pDst, Pixel8uC4 &nColorKeyConst, NppiAlphaOp nppAlphaOp, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiColorTwist32f_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f[3][4] aTwist, NppStreamContext nppStreamCtx)
-    void ColorTwist32f(Image8uC4View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &ColorTwist32f(Image8uC4View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiColorTwist32f_8u_C4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp32f[3][4] aTwist, NppStreamContext nppStreamCtx)
-    void ColorTwist32f(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
+    Image8uC4View &ColorTwist32f(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiColorTwist32f_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f[3][4] aTwist, NppStreamContext nppStreamCtx)
-    void ColorTwist32fA(Image8uC4View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &ColorTwist32fA(Image8uC4View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiColorTwist32f_8u_AC4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp32f[3][4] aTwist, NppStreamContext nppStreamCtx)
-    void ColorTwist32fA(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
+    Image8uC4View &ColorTwist32fA(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiColorTwist32fC_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f[4][4] aTwist, const Npp32f[4] aConstants, NppStreamContext nppStreamCtx)
-    void ColorTwist32f(Image8uC4View &pDst, const Npp32f aTwist[4][4], const Pixel32fC4 &aConstants, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &ColorTwist32f(Image8uC4View &pDst, const Npp32f aTwist[4][4], const Pixel32fC4 &aConstants, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiColorTwist32fC_8u_C4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp32f[4][4] aTwist, const Npp32f[4] aConstants, NppStreamContext nppStreamCtx)
-    void ColorTwist32f(const Npp32f aTwist[4][4], const Pixel32fC4 &aConstants, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &ColorTwist32f(const Npp32f aTwist[4][4], const Pixel32fC4 &aConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiLUT_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32s *[4] pValues, const Npp32s *[4] pLevels, int[4] nLevels, NppStreamContext nppStreamCtx)
-    void LUT(Image8uC4View &pDst, cuda::DevVarView<int> pValues[4], cuda::DevVarView<int> pLevels[4], int nLevels[4], const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &LUT(Image8uC4View &pDst, cuda::DevVarView<int> pValues[4], cuda::DevVarView<int> pLevels[4], int nLevels[4], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiLUT_8u_C4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp32s *[4] pValues, const Npp32s *[4] pLevels, int[4] nLevels, NppStreamContext nppStreamCtx)
-    void LUT(cuda::DevVarView<int> pValues[4], cuda::DevVarView<int> pLevels[4], int nLevels[4], const NppStreamContext &nppStreamCtx);
+    Image8uC4View &LUT(cuda::DevVarView<int> pValues[4], cuda::DevVarView<int> pLevels[4], int nLevels[4], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiLUT_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32s *[3] pValues, const Npp32s *[3] pLevels, int[3] nLevels, NppStreamContext nppStreamCtx)
-    void LUTA(Image8uC4View &pDst, cuda::DevVarView<int> pValues[3], cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &LUTA(Image8uC4View &pDst, cuda::DevVarView<int> pValues[3], cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiLUT_8u_AC4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp32s *[3] pValues, const Npp32s *[3] pLevels, int[3] nLevels, NppStreamContext nppStreamCtx)
-    void LUTA(cuda::DevVarView<int> pValues[3], cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx);
+    Image8uC4View &LUTA(cuda::DevVarView<int> pValues[3], cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiLUT_Linear_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32s *[4] pValues, const Npp32s *[4] pLevels, int[4] nLevels, NppStreamContext nppStreamCtx)
-    void LUT_Linear(Image8uC4View &pDst, cuda::DevVarView<int> pValues[4], cuda::DevVarView<int> pLevels[4], int nLevels[4], const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &LUT_Linear(Image8uC4View &pDst, cuda::DevVarView<int> pValues[4], cuda::DevVarView<int> pLevels[4], int nLevels[4], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiLUT_Linear_8u_C4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp32s *[4] pValues, const Npp32s *[4] pLevels, int[4] nLevels, NppStreamContext nppStreamCtx)
-    void LUT_Linear(cuda::DevVarView<int> pValues[4], cuda::DevVarView<int> pLevels[4], int nLevels[4], const NppStreamContext &nppStreamCtx);
+    Image8uC4View &LUT_Linear(cuda::DevVarView<int> pValues[4], cuda::DevVarView<int> pLevels[4], int nLevels[4], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiLUT_Linear_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32s *[3] pValues, const Npp32s *[3] pLevels, int[3] nLevels, NppStreamContext nppStreamCtx)
-    void LUT_LinearA(Image8uC4View &pDst, cuda::DevVarView<int> pValues[3], cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &LUT_LinearA(Image8uC4View &pDst, cuda::DevVarView<int> pValues[3], cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiLUT_Linear_8u_AC4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp32s *[3] pValues, const Npp32s *[3] pLevels, int[3] nLevels, NppStreamContext nppStreamCtx)
-    void LUT_LinearA(cuda::DevVarView<int> pValues[3], cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx);
+    Image8uC4View &LUT_LinearA(cuda::DevVarView<int> pValues[3], cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiLUT_Cubic_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32s *[4] pValues, const Npp32s *[4] pLevels, int[4] nLevels, NppStreamContext nppStreamCtx)
-    void LUT_Cubic(Image8uC4View &pDst, cuda::DevVarView<int> pValues[4], cuda::DevVarView<int> pLevels[4], int nLevels[4], const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &LUT_Cubic(Image8uC4View &pDst, cuda::DevVarView<int> pValues[4], cuda::DevVarView<int> pLevels[4], int nLevels[4], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiLUT_Cubic_8u_C4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp32s *[4] pValues, const Npp32s *[4] pLevels, int[4] nLevels, NppStreamContext nppStreamCtx)
-    void LUT_Cubic(cuda::DevVarView<int> pValues[4], cuda::DevVarView<int> pLevels[4], int nLevels[4], const NppStreamContext &nppStreamCtx);
+    Image8uC4View &LUT_Cubic(cuda::DevVarView<int> pValues[4], cuda::DevVarView<int> pLevels[4], int nLevels[4], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiLUT_Cubic_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32s *[3] pValues, const Npp32s *[3] pLevels, int[3] nLevels, NppStreamContext nppStreamCtx)
-    void LUT_CubicA(Image8uC4View &pDst, cuda::DevVarView<int> pValues[3], cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &LUT_CubicA(Image8uC4View &pDst, cuda::DevVarView<int> pValues[3], cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiLUT_Cubic_8u_AC4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp32s *[3] pValues, const Npp32s *[3] pLevels, int[3] nLevels, NppStreamContext nppStreamCtx)
-    void LUT_CubicA(cuda::DevVarView<int> pValues[3], cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx);
+    Image8uC4View &LUT_CubicA(cuda::DevVarView<int> pValues[3], cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiLUT_Trilinear_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, Npp32u * pValues, Npp8u *[3] pLevels, int[3] aLevels, NppStreamContext nppStreamCtx)
-    void LUT_Trilinear(Image8uC4View &pDst, cuda::DevVarView<Pixel8uC4> pValues, Npp8u *pLevels[3], int aLevels[3], const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &LUT_Trilinear(Image8uC4View &pDst, cuda::DevVarView<Pixel8uC4> pValues, Npp8u *pLevels[3], int aLevels[3], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiLUT_Trilinear_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, Npp32u * pValues, Npp8u *[3] pLevels, int[3] aLevels, NppStreamContext nppStreamCtx)
-    void LUT_TrilinearA(Image8uC4View &pDst, cuda::DevVarView<Pixel8uC4> pValues, Npp8u *pLevels[3], int aLevels[3], const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &LUT_TrilinearA(Image8uC4View &pDst, cuda::DevVarView<Pixel8uC4> pValues, Npp8u *pLevels[3], int aLevels[3], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiLUT_Trilinear_8u_AC4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, Npp32u * pValues, Npp8u *[3] pLevels, int[3] aLevels, NppStreamContext nppStreamCtx)
-    void LUT_TrilinearA(cuda::DevVarView<Pixel8uC4> pValues, Npp8u *pLevels[3], int aLevels[3], const NppStreamContext &nppStreamCtx);
+    Image8uC4View &LUT_TrilinearA(cuda::DevVarView<Pixel8uC4> pValues, Npp8u *pLevels[3], int aLevels[3], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiLUTPalette_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u *[4] pTables, int nBitSize, NppStreamContext nppStreamCtx)
-    void LUTPalette(Image8uC4View &pDst, cuda::DevVarView<byte> pTables[4], int nBitSize, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &LUTPalette(Image8uC4View &pDst, cuda::DevVarView<byte> pTables[4], int nBitSize, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiLUTPalette_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u *[3] pTables, int nBitSize, NppStreamContext nppStreamCtx)
-    void LUTPaletteA(Image8uC4View &pDst, cuda::DevVarView<byte> pTables[3], int nBitSize, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &LUTPaletteA(Image8uC4View &pDst, cuda::DevVarView<byte> pTables[3], int nBitSize, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiThreshold_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u[3] rThresholds, NppCmpOp eComparisonOperation, NppStreamContext nppStreamCtx)
-    void ThresholdA(Image8uC4View &pDst, const Pixel8uC3 &rThresholds, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &ThresholdA(Image8uC4View &pDst, const Pixel8uC3 &rThresholds, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiThreshold_8u_AC4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp8u[3] rThresholds, NppCmpOp eComparisonOperation, NppStreamContext nppStreamCtx)
-    void ThresholdA(const Pixel8uC3 &rThresholds, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &ThresholdA(const Pixel8uC3 &rThresholds, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiThreshold_GT_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u[3] rThresholds, NppStreamContext nppStreamCtx)
-    void Threshold_GTA(Image8uC4View &pDst, const Pixel8uC3 &rThresholds, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Threshold_GTA(Image8uC4View &pDst, const Pixel8uC3 &rThresholds, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiThreshold_GT_8u_AC4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp8u[3] rThresholds, NppStreamContext nppStreamCtx)
-    void Threshold_GTA(const Pixel8uC3 &rThresholds, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Threshold_GTA(const Pixel8uC3 &rThresholds, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiThreshold_LT_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u[3] rThresholds, NppStreamContext nppStreamCtx)
-    void Threshold_LTA(Image8uC4View &pDst, const Pixel8uC3 &rThresholds, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Threshold_LTA(Image8uC4View &pDst, const Pixel8uC3 &rThresholds, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiThreshold_LT_8u_AC4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp8u[3] rThresholds, NppStreamContext nppStreamCtx)
-    void Threshold_LTA(const Pixel8uC3 &rThresholds, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Threshold_LTA(const Pixel8uC3 &rThresholds, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiThreshold_Val_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u[3] rThresholds, const Npp8u[3] rValues, NppCmpOp eComparisonOperation, NppStreamContext nppStreamCtx)
-    void Threshold_ValA(Image8uC4View &pDst, const Pixel8uC3 &rThresholds, const Pixel8uC3 &rValues, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Threshold_ValA(Image8uC4View &pDst, const Pixel8uC3 &rThresholds, const Pixel8uC3 &rValues, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiThreshold_Val_8u_AC4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp8u[3] rThresholds, const Npp8u[3] rValues, NppCmpOp eComparisonOperation, NppStreamContext nppStreamCtx)
-    void Threshold_ValA(const Pixel8uC3 &rThresholds, const Pixel8uC3 &rValues, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Threshold_ValA(const Pixel8uC3 &rThresholds, const Pixel8uC3 &rValues, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiThreshold_GTVal_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u[3] rThresholds, const Npp8u[3] rValues, NppStreamContext nppStreamCtx)
-    void Threshold_GTValA(Image8uC4View &pDst, const Pixel8uC3 &rThresholds, const Pixel8uC3 &rValues, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Threshold_GTValA(Image8uC4View &pDst, const Pixel8uC3 &rThresholds, const Pixel8uC3 &rValues, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiThreshold_GTVal_8u_AC4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp8u[3] rThresholds, const Npp8u[3] rValues, NppStreamContext nppStreamCtx)
-    void Threshold_GTValA(const Pixel8uC3 &rThresholds, const Pixel8uC3 &rValues, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Threshold_GTValA(const Pixel8uC3 &rThresholds, const Pixel8uC3 &rValues, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiThreshold_LTVal_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u[3] rThresholds, const Npp8u[3] rValues, NppStreamContext nppStreamCtx)
-    void Threshold_LTValA(Image8uC4View &pDst, const Pixel8uC3 &rThresholds, const Pixel8uC3 &rValues, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Threshold_LTValA(Image8uC4View &pDst, const Pixel8uC3 &rThresholds, const Pixel8uC3 &rValues, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiThreshold_LTVal_8u_AC4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp8u[3] rThresholds, const Npp8u[3] rValues, NppStreamContext nppStreamCtx)
-    void Threshold_LTValA(const Pixel8uC3 &rThresholds, const Pixel8uC3 &rValues, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Threshold_LTValA(const Pixel8uC3 &rThresholds, const Pixel8uC3 &rValues, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiThreshold_LTValGTVal_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u[3] rThresholdsLT, const Npp8u[3] rValuesLT, const Npp8u[3] rThresholdsGT, const Npp8u[3] rValuesGT, NppStreamContext nppStreamCtx)
-    void Threshold_LTValGTValA(Image8uC4View &pDst, const Pixel8uC3 &rThresholdsLT, const Pixel8uC3 &rValuesLT, const Pixel8uC3 &rThresholdsGT, const Pixel8uC3 &rValuesGT, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Threshold_LTValGTValA(Image8uC4View &pDst, const Pixel8uC3 &rThresholdsLT, const Pixel8uC3 &rValuesLT, const Pixel8uC3 &rThresholdsGT, const Pixel8uC3 &rValuesGT, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiThreshold_LTValGTVal_8u_AC4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp8u[3] rThresholdsLT, const Npp8u[3] rValuesLT, const Npp8u[3] rThresholdsGT, const Npp8u[3] rValuesGT, NppStreamContext nppStreamCtx)
-    void Threshold_LTValGTValA(const Pixel8uC3 &rThresholdsLT, const Pixel8uC3 &rValuesLT, const Pixel8uC3 &rThresholdsGT, const Pixel8uC3 &rValuesGT, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Threshold_LTValGTValA(const Pixel8uC3 &rThresholdsLT, const Pixel8uC3 &rValuesLT, const Pixel8uC3 &rThresholdsGT, const Pixel8uC3 &rValuesGT, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiCompare_8u_C4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppCmpOp eComparisonOperation, NppStreamContext nppStreamCtx)
-    void Compare(const Image8uC4View &pSrc2, Image8uC1View &pDst, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC1View &Compare(const Image8uC4View &pSrc2, Image8uC1View &pDst, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCompare_8u_AC4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppCmpOp eComparisonOperation, NppStreamContext nppStreamCtx)
-    void CompareA(const Image8uC4View &pSrc2, Image8uC1View &pDst, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC1View &CompareA(const Image8uC4View &pSrc2, Image8uC1View &pDst, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCompareC_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, const Npp8u * pConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppCmpOp eComparisonOperation, NppStreamContext nppStreamCtx)
-    void Compare(const cuda::DevVarView<Pixel8uC4> &pConstants, Image8uC1View &pDst, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC1View &Compare(const cuda::DevVarView<Pixel8uC4> &pConstants, Image8uC1View &pDst, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCompareC_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, const Npp8u * pConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppCmpOp eComparisonOperation, NppStreamContext nppStreamCtx)
-    void CompareA(const cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC1View &pDst, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC1View &CompareA(const cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC1View &pDst, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDilate_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    void Dilate(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Dilate(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDilate_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    void DilateA(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &DilateA(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDilateBorder_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void DilateBorder(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &DilateBorder(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiDilateBorder_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void DilateBorderA(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &DilateBorderA(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiDilate3x3_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Dilate3x3(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Dilate3x3(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDilate3x3_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Dilate3x3A(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Dilate3x3A(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDilate3x3Border_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void Dilate3x3Border(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &Dilate3x3Border(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiDilate3x3Border_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void Dilate3x3BorderA(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &Dilate3x3BorderA(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiErode_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    void Erode(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Erode(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiErode_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    void ErodeA(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &ErodeA(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiErodeBorder_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void ErodeBorder(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &ErodeBorder(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiErodeBorder_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void ErodeBorderA(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &ErodeBorderA(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiErode3x3_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Erode3x3(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Erode3x3(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiErode3x3_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Erode3x3A(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Erode3x3A(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiErode3x3Border_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void Erode3x3Border(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &Erode3x3Border(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiErode3x3Border_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void Erode3x3BorderA(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &Erode3x3BorderA(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiMorphGetBufferSize_8u_C4R(NppiSize oSizeROI, int * hpBufferSize)
     [[nodiscard]] size_t MorphGetBufferSize() const;
 
     // NppStatus nppiMorphCloseBorder_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, Npp8u * pBuffer, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void MorphCloseBorder(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &MorphCloseBorder(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiMorphOpenBorder_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, Npp8u * pBuffer, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void MorphOpenBorder(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &MorphOpenBorder(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiMorphTopHatBorder_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, Npp8u * pBuffer, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void MorphTopHatBorder(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &MorphTopHatBorder(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiMorphBlackHatBorder_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, Npp8u * pBuffer, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void MorphBlackHatBorder(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &MorphBlackHatBorder(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiMorphGradientBorder_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, Npp8u * pBuffer, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void MorphGradientBorder(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &MorphGradientBorder(Image8uC4View &pDst, const cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterColumn_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oROI, const Npp32s * pKernel, Npp32s nMaskSize, Npp32s nAnchor, Npp32s nDivisor, NppStreamContext nppStreamCtx)
-    void FilterColumn(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterColumn(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterColumn_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oROI, const Npp32s * pKernel, Npp32s nMaskSize, Npp32s nAnchor, Npp32s nDivisor, NppStreamContext nppStreamCtx)
-    void FilterColumnA(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterColumnA(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterColumnBorder_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const Npp32s * pKernel, Npp32s nMaskSize, Npp32s nAnchor, Npp32s nDivisor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterColumnBorder(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterColumnBorder(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterColumnBorder_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const Npp32s * pKernel, Npp32s nMaskSize, Npp32s nAnchor, Npp32s nDivisor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterColumnBorderA(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterColumnBorderA(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterColumn32f_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oROI, const Npp32f * pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppStreamContext nppStreamCtx)
-    void FilterColumn32f(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterColumn32f(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterColumn32f_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oROI, const Npp32f * pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppStreamContext nppStreamCtx)
-    void FilterColumn32fA(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterColumn32fA(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterColumnBorder32f_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterColumnBorder32f(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterColumnBorder32f(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterColumnBorder32f_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterColumnBorder32fA(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterColumnBorder32fA(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterRow_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oROI, const Npp32s * pKernel, Npp32s nMaskSize, Npp32s nAnchor, Npp32s nDivisor, NppStreamContext nppStreamCtx)
-    void FilterRow(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterRow(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterRow_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oROI, const Npp32s * pKernel, Npp32s nMaskSize, Npp32s nAnchor, Npp32s nDivisor, NppStreamContext nppStreamCtx)
-    void FilterRowA(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterRowA(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterRowBorder_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const Npp32s * pKernel, Npp32s nMaskSize, Npp32s nAnchor, Npp32s nDivisor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterRowBorder(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterRowBorder(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterRowBorder_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const Npp32s * pKernel, Npp32s nMaskSize, Npp32s nAnchor, Npp32s nDivisor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterRowBorderA(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterRowBorderA(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterRow32f_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oROI, const Npp32f * pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppStreamContext nppStreamCtx)
-    void FilterRow32f(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterRow32f(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterRow32f_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oROI, const Npp32f * pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppStreamContext nppStreamCtx)
-    void FilterRow32fA(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterRow32fA(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterRowBorder32f_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterRowBorder32f(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterRowBorder32f(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterRowBorder32f_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterRowBorder32fA(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterRowBorder32fA(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiSumWindowColumn_8u32f_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp32f * pDst, Npp32s nDstStep, NppiSize oROI, Npp32s nMaskSize, Npp32s nAnchor, NppStreamContext nppStreamCtx)
-    void SumWindowColumn(Image32fC4View &pDst, Npp32s nMaskSize, Npp32s nAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &SumWindowColumn(Image32fC4View &pDst, Npp32s nMaskSize, Npp32s nAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSumWindowRow_8u32f_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp32f * pDst, Npp32s nDstStep, NppiSize oROI, Npp32s nMaskSize, Npp32s nAnchor, NppStreamContext nppStreamCtx)
-    void SumWindowRow(Image32fC4View &pDst, Npp32s nMaskSize, Npp32s nAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &SumWindowRow(Image32fC4View &pDst, Npp32s nMaskSize, Npp32s nAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSumWindowColumnBorder_8u32f_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp32f * pDst, Npp32s nDstStep, NppiSize oROI, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void SumWindowColumnBorder(Image32fC4View &pDst, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image32fC4View &SumWindowColumnBorder(Image32fC4View &pDst, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiSumWindowRowBorder_8u32f_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp32f * pDst, Npp32s nDstStep, NppiSize oROI, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void SumWindowRowBorder(Image32fC4View &pDst, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image32fC4View &SumWindowRowBorder(Image32fC4View &pDst, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilter_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const Npp32s * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, Npp32s nDivisor, NppStreamContext nppStreamCtx)
-    void Filter(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const Pixel32sC1 &nDivisor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Filter(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const Pixel32sC1 &nDivisor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilter_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const Npp32s * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, Npp32s nDivisor, NppStreamContext nppStreamCtx)
-    void FilterA(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const Pixel32sC1 &nDivisor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterA(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const Pixel32sC1 &nDivisor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilter32f_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    void Filter32f(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Filter32f(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilter32f_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    void Filter32fA(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Filter32fA(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilter32f_8u16s_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp16s * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    void Filter32f(Image16sC4View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image16sC4View &Filter32f(Image16sC4View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilter32f_8u16s_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp16s * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    void Filter32fA(Image16sC4View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image16sC4View &Filter32fA(Image16sC4View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterBorder_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const Npp32s * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, Npp32s nDivisor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterBorder(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const Pixel32sC1 &nDivisor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterBorder(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const Pixel32sC1 &nDivisor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterBorder_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const Npp32s * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, Npp32s nDivisor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterBorderA(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const Pixel32sC1 &nDivisor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterBorderA(Image8uC4View &pDst, const cuda::DevVarView<int> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const Pixel32sC1 &nDivisor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterBorder32f_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterBorder32f(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterBorder32f(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterBorder32f_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterBorder32fA(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterBorder32fA(Image8uC4View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterBorder32f_8u16s_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp16s * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterBorder32f(Image16sC4View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image16sC4View &FilterBorder32f(Image16sC4View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterBorder32f_8u16s_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp16s * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterBorder32fA(Image16sC4View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image16sC4View &FilterBorder32fA(Image16sC4View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterBox_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    void FilterBox(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterBox(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterBox_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    void FilterBoxA(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterBoxA(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterBoxBorder_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterBoxBorder(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterBoxBorder(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterBoxBorder_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterBoxBorderA(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterBoxBorderA(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterBoxBorderAdvanced_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
-    void FilterBoxBorderAdvanced(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterBoxBorderAdvanced(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterMax_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    void FilterMax(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterMax(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterMax_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    void FilterMaxA(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterMaxA(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterMaxBorder_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterMaxBorder(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterMaxBorder(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterMaxBorder_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterMaxBorderA(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterMaxBorderA(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterMin_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    void FilterMin(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterMin(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterMin_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    void FilterMinA(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterMinA(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterMinBorder_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterMinBorder(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterMinBorder(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterMinBorder_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterMinBorderA(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterMinBorderA(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterMedian_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
-    void FilterMedian(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterMedian(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterMedian_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
-    void FilterMedianA(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterMedianA(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterMedianGetBufferSize_8u_C4R_Ctx(NppiSize oSizeROI, NppiSize oMaskSize, Npp32u * nBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t FilterMedianGetBufferSize(NppiSize oMaskSize, const NppStreamContext &nppStreamCtx) const;
@@ -1029,10 +1029,10 @@ class Image8uC4View : public ImageView<Pixel8uC4>
     [[nodiscard]] size_t FilterMedianGetBufferSizeA(NppiSize oMaskSize, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterMedianBorder_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, Npp8u * pBuffer, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterMedianBorder(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterMedianBorder(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterMedianBorder_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, Npp8u * pBuffer, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterMedianBorderA(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterMedianBorderA(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterMedianBorderGetBufferSize_8u_C4R_Ctx(NppiSize oSizeROI, NppiSize oMaskSize, Npp32u * nBufferSize, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t FilterMedianBorderGetBufferSize(NppiSize oMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx) const;
@@ -1041,154 +1041,154 @@ class Image8uC4View : public ImageView<Pixel8uC4>
     [[nodiscard]] size_t FilterMedianBorderGetBufferSizeA(NppiSize oMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterPrewittHoriz_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void FilterPrewittHoriz(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterPrewittHoriz(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterPrewittHoriz_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void FilterPrewittHorizA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterPrewittHorizA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterPrewittVert_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void FilterPrewittVert(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterPrewittVert(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterPrewittVert_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void FilterPrewittVertA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterPrewittVertA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterPrewittHorizBorder_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterPrewittHorizBorder(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterPrewittHorizBorder(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterPrewittHorizBorder_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterPrewittHorizBorderA(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterPrewittHorizBorderA(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterPrewittVertBorder_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterPrewittVertBorder(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterPrewittVertBorder(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterPrewittVertBorder_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterPrewittVertBorderA(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterPrewittVertBorderA(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterSobelHoriz_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void FilterSobelHoriz(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterSobelHoriz(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterSobelHoriz_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void FilterSobelHorizA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterSobelHorizA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterSobelVert_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void FilterSobelVert(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterSobelVert(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterSobelVert_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void FilterSobelVertA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterSobelVertA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterSobelHorizBorder_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterSobelHorizBorder(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterSobelHorizBorder(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterSobelHorizBorder_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterSobelHorizBorderA(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterSobelHorizBorderA(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterSobelVertBorder_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterSobelVertBorder(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterSobelVertBorder(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterSobelVertBorder_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterSobelVertBorderA(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterSobelVertBorderA(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterRobertsDown_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void FilterRobertsDown(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterRobertsDown(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterRobertsDown_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void FilterRobertsDownA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterRobertsDownA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterRobertsUp_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void FilterRobertsUp(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterRobertsUp(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterRobertsUp_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void FilterRobertsUpA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterRobertsUpA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterRobertsDownBorder_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterRobertsDownBorder(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterRobertsDownBorder(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterRobertsDownBorder_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterRobertsDownBorderA(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterRobertsDownBorderA(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterRobertsUpBorder_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterRobertsUpBorder(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterRobertsUpBorder(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterRobertsUpBorder_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterRobertsUpBorderA(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterRobertsUpBorderA(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterLaplace_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiMaskSize eMaskSize, NppStreamContext nppStreamCtx)
-    void FilterLaplace(Image8uC4View &pDst, NppiMaskSize eMaskSize, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterLaplace(Image8uC4View &pDst, NppiMaskSize eMaskSize, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterLaplace_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiMaskSize eMaskSize, NppStreamContext nppStreamCtx)
-    void FilterLaplaceA(Image8uC4View &pDst, NppiMaskSize eMaskSize, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterLaplaceA(Image8uC4View &pDst, NppiMaskSize eMaskSize, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterLaplaceBorder_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiMaskSize eMaskSize, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterLaplaceBorder(Image8uC4View &pDst, NppiMaskSize eMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterLaplaceBorder(Image8uC4View &pDst, NppiMaskSize eMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterLaplaceBorder_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiMaskSize eMaskSize, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterLaplaceBorderA(Image8uC4View &pDst, NppiMaskSize eMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterLaplaceBorderA(Image8uC4View &pDst, NppiMaskSize eMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterGauss_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiMaskSize eMaskSize, NppStreamContext nppStreamCtx)
-    void FilterGauss(Image8uC4View &pDst, NppiMaskSize eMaskSize, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterGauss(Image8uC4View &pDst, NppiMaskSize eMaskSize, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterGauss_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiMaskSize eMaskSize, NppStreamContext nppStreamCtx)
-    void FilterGaussA(Image8uC4View &pDst, NppiMaskSize eMaskSize, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterGaussA(Image8uC4View &pDst, NppiMaskSize eMaskSize, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterGaussAdvanced_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const int nFilterTaps, const Npp32f * pKernel, NppStreamContext nppStreamCtx)
-    void FilterGaussAdvanced(Image8uC4View &pDst, const int nFilterTaps, const cuda::DevVarView<float> &pKernel, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterGaussAdvanced(Image8uC4View &pDst, const int nFilterTaps, const cuda::DevVarView<float> &pKernel, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterGaussAdvanced_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const int nFilterTaps, const Npp32f * pKernel, NppStreamContext nppStreamCtx)
-    void FilterGaussAdvancedA(Image8uC4View &pDst, const int nFilterTaps, const cuda::DevVarView<float> &pKernel, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterGaussAdvancedA(Image8uC4View &pDst, const int nFilterTaps, const cuda::DevVarView<float> &pKernel, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterGaussBorder_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiMaskSize eMaskSize, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterGaussBorder(Image8uC4View &pDst, NppiMaskSize eMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterGaussBorder(Image8uC4View &pDst, NppiMaskSize eMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterGaussBorder_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiMaskSize eMaskSize, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterGaussBorderA(Image8uC4View &pDst, NppiMaskSize eMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterGaussBorderA(Image8uC4View &pDst, NppiMaskSize eMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterGaussAdvancedBorder_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const int nFilterTaps, const Npp32f * pKernel, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterGaussAdvancedBorder(Image8uC4View &pDst, const int nFilterTaps, const cuda::DevVarView<float> &pKernel, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterGaussAdvancedBorder(Image8uC4View &pDst, const int nFilterTaps, const cuda::DevVarView<float> &pKernel, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterGaussAdvancedBorder_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const int nFilterTaps, const Npp32f * pKernel, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterGaussAdvancedBorderA(Image8uC4View &pDst, const int nFilterTaps, const cuda::DevVarView<float> &pKernel, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterGaussAdvancedBorderA(Image8uC4View &pDst, const int nFilterTaps, const cuda::DevVarView<float> &pKernel, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterHighPass_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiMaskSize eMaskSize, NppStreamContext nppStreamCtx)
-    void FilterHighPass(Image8uC4View &pDst, NppiMaskSize eMaskSize, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterHighPass(Image8uC4View &pDst, NppiMaskSize eMaskSize, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterHighPass_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiMaskSize eMaskSize, NppStreamContext nppStreamCtx)
-    void FilterHighPassA(Image8uC4View &pDst, NppiMaskSize eMaskSize, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterHighPassA(Image8uC4View &pDst, NppiMaskSize eMaskSize, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterHighPassBorder_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiMaskSize eMaskSize, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterHighPassBorder(Image8uC4View &pDst, NppiMaskSize eMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterHighPassBorder(Image8uC4View &pDst, NppiMaskSize eMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterHighPassBorder_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiMaskSize eMaskSize, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterHighPassBorderA(Image8uC4View &pDst, NppiMaskSize eMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterHighPassBorderA(Image8uC4View &pDst, NppiMaskSize eMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterLowPass_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiMaskSize eMaskSize, NppStreamContext nppStreamCtx)
-    void FilterLowPass(Image8uC4View &pDst, NppiMaskSize eMaskSize, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterLowPass(Image8uC4View &pDst, NppiMaskSize eMaskSize, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterLowPass_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiMaskSize eMaskSize, NppStreamContext nppStreamCtx)
-    void FilterLowPassA(Image8uC4View &pDst, NppiMaskSize eMaskSize, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterLowPassA(Image8uC4View &pDst, NppiMaskSize eMaskSize, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterLowPassBorder_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiMaskSize eMaskSize, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterLowPassBorder(Image8uC4View &pDst, NppiMaskSize eMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterLowPassBorder(Image8uC4View &pDst, NppiMaskSize eMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterLowPassBorder_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiMaskSize eMaskSize, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterLowPassBorderA(Image8uC4View &pDst, NppiMaskSize eMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterLowPassBorderA(Image8uC4View &pDst, NppiMaskSize eMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterSharpen_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void FilterSharpen(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterSharpen(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterSharpen_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void FilterSharpenA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterSharpenA(Image8uC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterSharpenBorder_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterSharpenBorder(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterSharpenBorder(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterSharpenBorder_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterSharpenBorderA(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterSharpenBorderA(Image8uC4View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterUnsharpBorder_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, Npp32f nRadius, Npp32f nSigma, Npp32f nWeight, Npp32f nThreshold, NppiBorderType eBorderType, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void FilterUnsharpBorder(Image8uC4View &pDst, const Pixel32fC1 &nRadius, const Pixel32fC1 &nSigma, const Pixel32fC1 &nWeight, const Pixel32fC1 &nThreshold, NppiBorderType eBorderType, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterUnsharpBorder(Image8uC4View &pDst, const Pixel32fC1 &nRadius, const Pixel32fC1 &nSigma, const Pixel32fC1 &nWeight, const Pixel32fC1 &nThreshold, NppiBorderType eBorderType, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterUnsharpBorder_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, Npp32f nRadius, Npp32f nSigma, Npp32f nWeight, Npp32f nThreshold, NppiBorderType eBorderType, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void FilterUnsharpBorderA(Image8uC4View &pDst, const Pixel32fC1 &nRadius, const Pixel32fC1 &nSigma, const Pixel32fC1 &nWeight, const Pixel32fC1 &nThreshold, NppiBorderType eBorderType, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &FilterUnsharpBorderA(Image8uC4View &pDst, const Pixel32fC1 &nRadius, const Pixel32fC1 &nSigma, const Pixel32fC1 &nWeight, const Pixel32fC1 &nThreshold, NppiBorderType eBorderType, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterUnsharpGetBufferSize_8u_C4R(const Npp32f nRadius, const Npp32f nSigma, int * hpBufferSize)
     [[nodiscard]] size_t FilterUnsharpGetBufferSize(const Pixel32fC1 &nRadius, const Pixel32fC1 &nSigma) const;
@@ -1197,10 +1197,10 @@ class Image8uC4View : public ImageView<Pixel8uC4>
     [[nodiscard]] size_t FilterUnsharpGetBufferSizeA(const Pixel32fC1 &nRadius, const Pixel32fC1 &nSigma) const;
 
     // NppStatus nppiFilterWienerBorder_8u_C4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, Npp32f[4] aNoise, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterWienerBorder(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, Pixel32fC4 &aNoise, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterWienerBorder(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, Pixel32fC4 &aNoise, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterWienerBorder_8u_AC4R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, Npp32f[3] aNoise, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void FilterWienerBorderA(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, Pixel32fC3 &aNoise, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC4View &FilterWienerBorderA(Image8uC4View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, Pixel32fC3 &aNoise, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiSum_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSizeROI, Npp8u * pDeviceBuffer, Npp64f[3] aSum, NppStreamContext nppStreamCtx)
     void SumA(cuda::DevVarView<byte> &pDeviceBuffer, cuda::DevVarView<double> &aSum, const NppStreamContext &nppStreamCtx) const;
@@ -1419,16 +1419,16 @@ class Image8uC4View : public ImageView<Pixel8uC4>
     [[nodiscard]] size_t CountInRangeGetBufferHostSizeA(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaxEvery_8u_C4IR_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void MaxEvery(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &MaxEvery(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMaxEvery_8u_AC4IR_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void MaxEveryA(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &MaxEveryA(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMinEvery_8u_C4IR_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void MinEvery(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &MinEvery(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMinEvery_8u_AC4IR_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void MinEveryA(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &MinEveryA(const Image8uC4View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiHistogramEven_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSizeROI, Npp32s *[4] pHist, int[4] nLevels, Npp32s[4] nLowerLevel, Npp32s[4] nUpperLevel, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
     void HistogramEven(cuda::DevVarView<int> pHist[4], int nLevels[4], Pixel32sC4 &nLowerLevel, Pixel32sC4 &nUpperLevel, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx) const;
@@ -1455,88 +1455,88 @@ class Image8uC4View : public ImageView<Pixel8uC4>
     [[nodiscard]] size_t HistogramRangeGetBufferSizeA(int nLevels[3], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSqrDistanceFull_Norm_8u_C4RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp8u * pDst, int nDstStep, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void SqrDistanceFull_Norm(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &SqrDistanceFull_Norm(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSqrDistanceFull_Norm_8u_AC4RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp8u * pDst, int nDstStep, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void SqrDistanceFull_NormA(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &SqrDistanceFull_NormA(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSqrDistanceFull_Norm_8u32f_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, NppStreamContext nppStreamCtx)
-    void SqrDistanceFull_Norm(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &SqrDistanceFull_Norm(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSqrDistanceFull_Norm_8u32f_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, NppStreamContext nppStreamCtx)
-    void SqrDistanceFull_NormA(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &SqrDistanceFull_NormA(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSqrDistanceSame_Norm_8u_C4RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp8u * pDst, int nDstStep, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void SqrDistanceSame_Norm(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &SqrDistanceSame_Norm(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSqrDistanceSame_Norm_8u_AC4RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp8u * pDst, int nDstStep, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void SqrDistanceSame_NormA(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &SqrDistanceSame_NormA(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSqrDistanceSame_Norm_8u32f_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, NppStreamContext nppStreamCtx)
-    void SqrDistanceSame_Norm(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &SqrDistanceSame_Norm(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSqrDistanceSame_Norm_8u32f_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, NppStreamContext nppStreamCtx)
-    void SqrDistanceSame_NormA(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &SqrDistanceSame_NormA(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSqrDistanceValid_Norm_8u_C4RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp8u * pDst, int nDstStep, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void SqrDistanceValid_Norm(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &SqrDistanceValid_Norm(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSqrDistanceValid_Norm_8u_AC4RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp8u * pDst, int nDstStep, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void SqrDistanceValid_NormA(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &SqrDistanceValid_NormA(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSqrDistanceValid_Norm_8u32f_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, NppStreamContext nppStreamCtx)
-    void SqrDistanceValid_Norm(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &SqrDistanceValid_Norm(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSqrDistanceValid_Norm_8u32f_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, NppStreamContext nppStreamCtx)
-    void SqrDistanceValid_NormA(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &SqrDistanceValid_NormA(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrFull_Norm_8u_C4RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp8u * pDst, int nDstStep, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void CrossCorrFull_Norm(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CrossCorrFull_Norm(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrFull_Norm_8u_AC4RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp8u * pDst, int nDstStep, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void CrossCorrFull_NormA(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CrossCorrFull_NormA(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrFull_Norm_8u32f_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, NppStreamContext nppStreamCtx)
-    void CrossCorrFull_Norm(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &CrossCorrFull_Norm(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrFull_Norm_8u32f_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, NppStreamContext nppStreamCtx)
-    void CrossCorrFull_NormA(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &CrossCorrFull_NormA(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrSame_Norm_8u_C4RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp8u * pDst, int nDstStep, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void CrossCorrSame_Norm(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CrossCorrSame_Norm(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrSame_Norm_8u_AC4RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp8u * pDst, int nDstStep, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void CrossCorrSame_NormA(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CrossCorrSame_NormA(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrSame_Norm_8u32f_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, NppStreamContext nppStreamCtx)
-    void CrossCorrSame_Norm(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &CrossCorrSame_Norm(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrSame_Norm_8u32f_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, NppStreamContext nppStreamCtx)
-    void CrossCorrSame_NormA(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &CrossCorrSame_NormA(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrValid_Norm_8u_C4RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp8u * pDst, int nDstStep, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void CrossCorrValid_Norm(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CrossCorrValid_Norm(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrValid_Norm_8u_AC4RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp8u * pDst, int nDstStep, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void CrossCorrValid_NormA(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CrossCorrValid_NormA(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrValid_Norm_8u32f_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, NppStreamContext nppStreamCtx)
-    void CrossCorrValid_Norm(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &CrossCorrValid_Norm(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrValid_Norm_8u32f_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, NppStreamContext nppStreamCtx)
-    void CrossCorrValid_NormA(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &CrossCorrValid_NormA(const Image8uC4View &pTpl, Image32fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrFull_NormLevel_8u_C4RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp8u * pDst, int nDstStep, int nScaleFactor, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void CrossCorrFull_NormLevel(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CrossCorrFull_NormLevel(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrFull_NormLevel_8u_AC4RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp8u * pDst, int nDstStep, int nScaleFactor, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void CrossCorrFull_NormLevelA(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CrossCorrFull_NormLevelA(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrFull_NormLevel_8u32f_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void CrossCorrFull_NormLevel(const Image8uC4View &pTpl, Image32fC4View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &CrossCorrFull_NormLevel(const Image8uC4View &pTpl, Image32fC4View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrFull_NormLevel_8u32f_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void CrossCorrFull_NormLevelA(const Image8uC4View &pTpl, Image32fC4View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &CrossCorrFull_NormLevelA(const Image8uC4View &pTpl, Image32fC4View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFullNormLevelGetBufferHostSize_8u_C4RSfs_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t FullNormLevelGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -1551,16 +1551,16 @@ class Image8uC4View : public ImageView<Pixel8uC4>
     [[nodiscard]] size_t FullNormLevelGetBufferHostSizeAFloat(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrSame_NormLevel_8u_C4RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp8u * pDst, int nDstStep, int nScaleFactor, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void CrossCorrSame_NormLevel(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CrossCorrSame_NormLevel(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrSame_NormLevel_8u_AC4RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp8u * pDst, int nDstStep, int nScaleFactor, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void CrossCorrSame_NormLevelA(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CrossCorrSame_NormLevelA(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrSame_NormLevel_8u32f_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void CrossCorrSame_NormLevel(const Image8uC4View &pTpl, Image32fC4View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &CrossCorrSame_NormLevel(const Image8uC4View &pTpl, Image32fC4View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrSame_NormLevel_8u32f_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void CrossCorrSame_NormLevelA(const Image8uC4View &pTpl, Image32fC4View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &CrossCorrSame_NormLevelA(const Image8uC4View &pTpl, Image32fC4View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSameNormLevelGetBufferHostSize_8u_C4RSfs_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t SameNormLevelGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -1575,16 +1575,16 @@ class Image8uC4View : public ImageView<Pixel8uC4>
     [[nodiscard]] size_t SameNormLevelGetBufferHostSizeAFloat(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrValid_NormLevel_8u_C4RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp8u * pDst, int nDstStep, int nScaleFactor, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void CrossCorrValid_NormLevel(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CrossCorrValid_NormLevel(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrValid_NormLevel_8u_AC4RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp8u * pDst, int nDstStep, int nScaleFactor, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void CrossCorrValid_NormLevelA(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &CrossCorrValid_NormLevelA(const Image8uC4View &pTpl, Image8uC4View &pDst, int nScaleFactor, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrValid_NormLevel_8u32f_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void CrossCorrValid_NormLevel(const Image8uC4View &pTpl, Image32fC4View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &CrossCorrValid_NormLevel(const Image8uC4View &pTpl, Image32fC4View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrValid_NormLevel_8u32f_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void CrossCorrValid_NormLevelA(const Image8uC4View &pTpl, Image32fC4View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &CrossCorrValid_NormLevelA(const Image8uC4View &pTpl, Image32fC4View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiValidNormLevelGetBufferHostSize_8u_C4RSfs_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t ValidNormLevelGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -1599,13 +1599,13 @@ class Image8uC4View : public ImageView<Pixel8uC4>
     [[nodiscard]] size_t ValidNormLevelGetBufferHostSizeAFloat(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrFull_NormLevelAdvanced_8u32f_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, Npp8u * pDeviceBuffer, Npp8u * pAdvancedScratchBuffer, NppStreamContext nppStreamCtx)
-    void CrossCorrFull_NormLevelAdvanced(const Image8uC4View &pTpl, Image32fC4View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &CrossCorrFull_NormLevelAdvanced(const Image8uC4View &pTpl, Image32fC4View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrSame_NormLevelAdvanced_8u32f_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, Npp8u * pDeviceBuffer, Npp8u * pAdvancedScratchBuffer, NppStreamContext nppStreamCtx)
-    void CrossCorrSame_NormLevelAdvanced(const Image8uC4View &pTpl, Image32fC4View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &CrossCorrSame_NormLevelAdvanced(const Image8uC4View &pTpl, Image32fC4View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrValid_NormLevelAdvanced_8u32f_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, Npp8u * pDeviceBuffer, Npp8u * pAdvancedScratchBuffer, NppStreamContext nppStreamCtx)
-    void CrossCorrValid_NormLevelAdvanced(const Image8uC4View &pTpl, Image32fC4View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image32fC4View &CrossCorrValid_NormLevelAdvanced(const Image8uC4View &pTpl, Image32fC4View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiQualityIndex_8u32f_AC4R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, NppiSize oRoiSize, Npp32f * pDst, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
     void QualityIndexA(const Image8uC4View &pSrc2, NppiSize oRoiSize, cuda::DevVarView<float> &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
@@ -1638,100 +1638,100 @@ class Image8uC4View : public ImageView<Pixel8uC4>
     [[nodiscard]] size_t AverageRelativeErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiResizeSqrPixel_8u_C4R_Ctx(const Npp8u * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp8u * pDst, int nDstStep, NppiRect oDstROI, double nXFactor, double nYFactor, double nXShift, double nYShift, int eInterpolation, NppStreamContext nppStreamCtx)
-    void ResizeSqrPixel(Image8uC4View &pDst, double nXFactor, double nYFactor, double nXShift, double nYShift, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &ResizeSqrPixel(Image8uC4View &pDst, double nXFactor, double nYFactor, double nXShift, double nYShift, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiResizeSqrPixel_8u_AC4R_Ctx(const Npp8u * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp8u * pDst, int nDstStep, NppiRect oDstROI, double nXFactor, double nYFactor, double nXShift, double nYShift, int eInterpolation, NppStreamContext nppStreamCtx)
-    void ResizeSqrPixelA(Image8uC4View &pDst, double nXFactor, double nYFactor, double nXShift, double nYShift, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &ResizeSqrPixelA(Image8uC4View &pDst, double nXFactor, double nYFactor, double nXShift, double nYShift, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiResizeSqrPixel_8u_P4R_Ctx(const Npp8u *const[4] pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp8u *[4] pDst, int nDstStep, NppiRect oDstROI, double nXFactor, double nYFactor, double nXShift, double nYShift, int eInterpolation, NppStreamContext nppStreamCtx)
     static void ResizeSqrPixel(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, Image8uC1View &aDstChannel3, double nXFactor, double nYFactor, double nXShift, double nYShift, int eInterpolation, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiResize_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiRect oSrcRectROI, Npp8u * pDst, int nDstStep, NppiSize oDstSize, NppiRect oDstRectROI, int eInterpolation, NppStreamContext nppStreamCtx)
-    void Resize(Image8uC4View &pDst, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Resize(Image8uC4View &pDst, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiResize_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiRect oSrcRectROI, Npp8u * pDst, int nDstStep, NppiSize oDstSize, NppiRect oDstRectROI, int eInterpolation, NppStreamContext nppStreamCtx)
-    void ResizeA(Image8uC4View &pDst, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &ResizeA(Image8uC4View &pDst, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiResize_8u_P4R_Ctx(const Npp8u *[4] pSrc, int nSrcStep, NppiSize oSrcSize, NppiRect oSrcRectROI, Npp8u *[4] pDst, int nDstStep, NppiSize oDstSize, NppiRect oDstRectROI, int eInterpolation, NppStreamContext nppStreamCtx)
     static void Resize(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, Image8uC1View &aDstChannel3, int eInterpolation, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiRemap_8u_C4R_Ctx(const Npp8u * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, const Npp32f * pXMap, int nXMapStep, const Npp32f * pYMap, int nYMapStep, Npp8u * pDst, int nDstStep, NppiSize oDstSizeROI, int eInterpolation, NppStreamContext nppStreamCtx)
-    void Remap(const Image32fC1View &pXMap, const Image32fC1View &pYMap, Image8uC4View &pDst, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Remap(const Image32fC1View &pXMap, const Image32fC1View &pYMap, Image8uC4View &pDst, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiRemap_8u_AC4R_Ctx(const Npp8u * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, const Npp32f * pXMap, int nXMapStep, const Npp32f * pYMap, int nYMapStep, Npp8u * pDst, int nDstStep, NppiSize oDstSizeROI, int eInterpolation, NppStreamContext nppStreamCtx)
-    void RemapA(const Image32fC1View &pXMap, const Image32fC1View &pYMap, Image8uC4View &pDst, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &RemapA(const Image32fC1View &pXMap, const Image32fC1View &pYMap, Image8uC4View &pDst, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiRemap_8u_P4R_Ctx(const Npp8u *const[4] pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, const Npp32f * pXMap, int nXMapStep, const Npp32f * pYMap, int nYMapStep, Npp8u *[4] pDst, int nDstStep, NppiSize oDstSizeROI, int eInterpolation, NppStreamContext nppStreamCtx)
     static void Remap(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, Image8uC1View &aDstChannel3, const Image32fC1View &pXMap, const Image32fC1View &pYMap, int eInterpolation, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiRotate_8u_C4R_Ctx(const Npp8u * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp8u * pDst, int nDstStep, NppiRect oDstROI, double nAngle, double nShiftX, double nShiftY, int eInterpolation, NppStreamContext nppStreamCtx)
-    void Rotate(Image8uC4View &pDst, double nAngle, double nShiftX, double nShiftY, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Rotate(Image8uC4View &pDst, double nAngle, double nShiftX, double nShiftY, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiRotate_8u_AC4R_Ctx(const Npp8u * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp8u * pDst, int nDstStep, NppiRect oDstROI, double nAngle, double nShiftX, double nShiftY, int eInterpolation, NppStreamContext nppStreamCtx)
-    void RotateA(Image8uC4View &pDst, double nAngle, double nShiftX, double nShiftY, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &RotateA(Image8uC4View &pDst, double nAngle, double nShiftX, double nShiftY, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMirror_8u_C4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oROI, NppiAxis flip, NppStreamContext nppStreamCtx)
-    void Mirror(Image8uC4View &pDst, NppiAxis flip, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &Mirror(Image8uC4View &pDst, NppiAxis flip, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMirror_8u_C4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oROI, NppiAxis flip, NppStreamContext nppStreamCtx)
-    void Mirror(NppiAxis flip, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &Mirror(NppiAxis flip, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMirror_8u_AC4R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oROI, NppiAxis flip, NppStreamContext nppStreamCtx)
-    void MirrorA(Image8uC4View &pDst, NppiAxis flip, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &MirrorA(Image8uC4View &pDst, NppiAxis flip, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMirror_8u_AC4IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oROI, NppiAxis flip, NppStreamContext nppStreamCtx)
-    void MirrorA(NppiAxis flip, const NppStreamContext &nppStreamCtx);
+    Image8uC4View &MirrorA(NppiAxis flip, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiWarpAffine_8u_C4R_Ctx(const Npp8u * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp8u * pDst, int nDstStep, NppiRect oDstROI, const double[2][3] aCoeffs, int eInterpolation, NppStreamContext nppStreamCtx)
-    void WarpAffine(Image8uC4View &pDst, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &WarpAffine(Image8uC4View &pDst, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiWarpAffine_8u_AC4R_Ctx(const Npp8u * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp8u * pDst, int nDstStep, NppiRect oDstROI, const double[2][3] aCoeffs, int eInterpolation, NppStreamContext nppStreamCtx)
-    void WarpAffineA(Image8uC4View &pDst, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &WarpAffineA(Image8uC4View &pDst, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiWarpAffine_8u_P4R_Ctx(const Npp8u *[4] pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp8u *[4] pDst, int nDstStep, NppiRect oDstROI, const double[2][3] aCoeffs, int eInterpolation, NppStreamContext nppStreamCtx)
     static void WarpAffine(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, Image8uC1View &aDstChannel3, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiWarpAffineBack_8u_C4R_Ctx(const Npp8u * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp8u * pDst, int nDstStep, NppiRect oDstROI, const double[2][3] aCoeffs, int eInterpolation, NppStreamContext nppStreamCtx)
-    void WarpAffineBack(Image8uC4View &pDst, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &WarpAffineBack(Image8uC4View &pDst, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiWarpAffineBack_8u_AC4R_Ctx(const Npp8u * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp8u * pDst, int nDstStep, NppiRect oDstROI, const double[2][3] aCoeffs, int eInterpolation, NppStreamContext nppStreamCtx)
-    void WarpAffineBackA(Image8uC4View &pDst, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &WarpAffineBackA(Image8uC4View &pDst, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiWarpAffineBack_8u_P4R_Ctx(const Npp8u *[4] pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp8u *[4] pDst, int nDstStep, NppiRect oDstROI, const double[2][3] aCoeffs, int eInterpolation, NppStreamContext nppStreamCtx)
     static void WarpAffineBack(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, Image8uC1View &aDstChannel3, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiWarpAffineQuad_8u_C4R_Ctx(const Npp8u * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, const double[4][2] aSrcQuad, Npp8u * pDst, int nDstStep, NppiRect oDstROI, const double[4][2] aDstQuad, int eInterpolation, NppStreamContext nppStreamCtx)
-    void WarpAffineQuad(const double aSrcQuad[4][2], Image8uC4View &pDst, const double aDstQuad[4][2], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &WarpAffineQuad(const double aSrcQuad[4][2], Image8uC4View &pDst, const double aDstQuad[4][2], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiWarpAffineQuad_8u_AC4R_Ctx(const Npp8u * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, const double[4][2] aSrcQuad, Npp8u * pDst, int nDstStep, NppiRect oDstROI, const double[4][2] aDstQuad, int eInterpolation, NppStreamContext nppStreamCtx)
-    void WarpAffineQuadA(const double aSrcQuad[4][2], Image8uC4View &pDst, const double aDstQuad[4][2], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &WarpAffineQuadA(const double aSrcQuad[4][2], Image8uC4View &pDst, const double aDstQuad[4][2], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiWarpAffineQuad_8u_P4R_Ctx(const Npp8u *[4] pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, const double[4][2] aSrcQuad, Npp8u *[4] pDst, int nDstStep, NppiRect oDstROI, const double[4][2] aDstQuad, int eInterpolation, NppStreamContext nppStreamCtx)
     static void WarpAffineQuad(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, Image8uC1View &aDstChannel3, const double aSrcQuad[4][2], const double aDstQuad[4][2], int eInterpolation, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiWarpPerspective_8u_C4R_Ctx(const Npp8u * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp8u * pDst, int nDstStep, NppiRect oDstROI, const double[3][3] aCoeffs, int eInterpolation, NppStreamContext nppStreamCtx)
-    void WarpPerspective(Image8uC4View &pDst, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &WarpPerspective(Image8uC4View &pDst, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiWarpPerspective_8u_AC4R_Ctx(const Npp8u * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp8u * pDst, int nDstStep, NppiRect oDstROI, const double[3][3] aCoeffs, int eInterpolation, NppStreamContext nppStreamCtx)
-    void WarpPerspectiveA(Image8uC4View &pDst, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &WarpPerspectiveA(Image8uC4View &pDst, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiWarpPerspective_8u_P4R_Ctx(const Npp8u *[4] pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp8u *[4] pDst, int nDstStep, NppiRect oDstROI, const double[3][3] aCoeffs, int eInterpolation, NppStreamContext nppStreamCtx)
     static void WarpPerspective(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, Image8uC1View &aDstChannel3, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiWarpPerspectiveBack_8u_C4R_Ctx(const Npp8u * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp8u * pDst, int nDstStep, NppiRect oDstROI, const double[3][3] aCoeffs, int eInterpolation, NppStreamContext nppStreamCtx)
-    void WarpPerspectiveBack(Image8uC4View &pDst, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &WarpPerspectiveBack(Image8uC4View &pDst, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiWarpPerspectiveBack_8u_AC4R_Ctx(const Npp8u * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp8u * pDst, int nDstStep, NppiRect oDstROI, const double[3][3] aCoeffs, int eInterpolation, NppStreamContext nppStreamCtx)
-    void WarpPerspectiveBackA(Image8uC4View &pDst, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &WarpPerspectiveBackA(Image8uC4View &pDst, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiWarpPerspectiveBack_8u_P4R_Ctx(const Npp8u *[4] pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp8u *[4] pDst, int nDstStep, NppiRect oDstROI, const double[3][3] aCoeffs, int eInterpolation, NppStreamContext nppStreamCtx)
     static void WarpPerspectiveBack(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, Image8uC1View &aDstChannel3, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiWarpPerspectiveQuad_8u_C4R_Ctx(const Npp8u * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, const double[4][2] aSrcQuad, Npp8u * pDst, int nDstStep, NppiRect oDstROI, const double[4][2] aDstQuad, int eInterpolation, NppStreamContext nppStreamCtx)
-    void WarpPerspectiveQuad(const double aSrcQuad[4][2], Image8uC4View &pDst, const double aDstQuad[4][2], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &WarpPerspectiveQuad(const double aSrcQuad[4][2], Image8uC4View &pDst, const double aDstQuad[4][2], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiWarpPerspectiveQuad_8u_AC4R_Ctx(const Npp8u * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, const double[4][2] aSrcQuad, Npp8u * pDst, int nDstStep, NppiRect oDstROI, const double[4][2] aDstQuad, int eInterpolation, NppStreamContext nppStreamCtx)
-    void WarpPerspectiveQuadA(const double aSrcQuad[4][2], Image8uC4View &pDst, const double aDstQuad[4][2], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &WarpPerspectiveQuadA(const double aSrcQuad[4][2], Image8uC4View &pDst, const double aDstQuad[4][2], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiWarpPerspectiveQuad_8u_P4R_Ctx(const Npp8u *[4] pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, const double[4][2] aSrcQuad, Npp8u *[4] pDst, int nDstStep, NppiRect oDstROI, const double[4][2] aDstQuad, int eInterpolation, NppStreamContext nppStreamCtx)
     static void WarpPerspectiveQuad(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, const Image8uC1View &aSrcChannel3, Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, Image8uC1View &aDstChannel3, const double aSrcQuad[4][2], const double aDstQuad[4][2], int eInterpolation, const NppStreamContext &nppStreamCtx);

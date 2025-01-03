@@ -256,6 +256,14 @@ template <> struct numeric_limits<float>
     {
         return 16777216.0f;
     }
+    [[nodiscard]] static constexpr DEVICE_CODE float infinity() noexcept
+    {
+        return std::numeric_limits<float>::infinity();
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE float quiet_NaN() noexcept
+    {
+        return std::numeric_limits<float>::quiet_NaN();
+    }
 };
 
 template <> struct numeric_limits<double>
@@ -282,6 +290,14 @@ template <> struct numeric_limits<double>
     {
         return 9007199254740992.0;
     }
+    [[nodiscard]] static constexpr DEVICE_CODE double infinity() noexcept
+    {
+        return std::numeric_limits<double>::infinity();
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE double quiet_NaN() noexcept
+    {
+        return std::numeric_limits<double>::quiet_NaN();
+    }
 };
 
 // 16 bit half precision floating point types
@@ -289,25 +305,33 @@ template <> struct numeric_limits<HalfFp16>
 {
     [[nodiscard]] static constexpr DEVICE_CODE HalfFp16 min() noexcept
     {
-        return HalfFp16::FromUShort(ushort(0x0400));
+        return HalfFp16::FromUShort(static_cast<ushort>(0x0400));
     }
     [[nodiscard]] static constexpr DEVICE_CODE HalfFp16 max() noexcept
     {
-        return HalfFp16::FromUShort(ushort(0x7BFF));
+        return HalfFp16::FromUShort(static_cast<ushort>(0x7BFF));
     }
     [[nodiscard]] static constexpr DEVICE_CODE HalfFp16 lowest() noexcept
     {
-        return HalfFp16::FromUShort(ushort(0xFBFF));
+        return HalfFp16::FromUShort(static_cast<ushort>(0xFBFF));
     }
     // minimum exact integer in float = -(2^11) = -2048
     [[nodiscard]] static constexpr DEVICE_CODE HalfFp16 minExact() noexcept
     {
-        return HalfFp16::FromUShort(ushort(0xE800));
+        return HalfFp16::FromUShort(static_cast<ushort>(0xE800));
     }
     // maximum exact integer in float = 2^11 = 2048
     [[nodiscard]] static constexpr DEVICE_CODE HalfFp16 maxExact() noexcept
     {
-        return HalfFp16::FromUShort(ushort(0x6800));
+        return HalfFp16::FromUShort(static_cast<ushort>(0x6800));
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE HalfFp16 infinity() noexcept
+    {
+        return HalfFp16::FromUShort(static_cast<ushort>(0x7c00));
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE HalfFp16 quiet_NaN() noexcept
+    {
+        return HalfFp16::FromUShort(static_cast<ushort>(0x7e00));
     }
 };
 
@@ -316,25 +340,33 @@ template <> struct numeric_limits<BFloat16>
 {
     [[nodiscard]] static constexpr DEVICE_CODE BFloat16 min() noexcept
     {
-        return BFloat16::FromUShort(ushort(0x0400));
+        return BFloat16::FromUShort(static_cast<ushort>(0x0400));
     }
     [[nodiscard]] static constexpr DEVICE_CODE BFloat16 max() noexcept
     {
-        return BFloat16::FromUShort(ushort(0x7F7F));
+        return BFloat16::FromUShort(static_cast<ushort>(0x7F7F));
     }
     [[nodiscard]] static constexpr DEVICE_CODE BFloat16 lowest() noexcept
     {
-        return BFloat16::FromUShort(ushort(0xFF7F));
+        return BFloat16::FromUShort(static_cast<ushort>(0xFF7F));
     }
     // minimum exact integer in float = -(2^8) = -256
     [[nodiscard]] static constexpr DEVICE_CODE BFloat16 minExact() noexcept
     {
-        return BFloat16::FromUShort(ushort(0xC380));
+        return BFloat16::FromUShort(static_cast<ushort>(0xC380));
     }
     // maximum exact integer in float = 2^9 = 256
     [[nodiscard]] static constexpr DEVICE_CODE BFloat16 maxExact() noexcept
     {
-        return BFloat16::FromUShort(ushort(0x4380));
+        return BFloat16::FromUShort(static_cast<ushort>(0x4380));
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE BFloat16 infinity() noexcept
+    {
+        return BFloat16::FromUShort(static_cast<ushort>(0x7f80));
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE BFloat16 quiet_NaN() noexcept
+    {
+        return BFloat16::FromUShort(static_cast<ushort>(0x7fc0));
     }
 };
 

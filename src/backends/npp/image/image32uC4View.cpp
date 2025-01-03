@@ -47,24 +47,27 @@ Image32uC4View Image32uC4View::GetView(const Border &aBorder) const
 
 //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 
-void Image32uC4View::Set(const Pixel32uC4 &aValue, const NppStreamContext &nppStreamCtx)
+Image32uC4View &Image32uC4View::Set(const Pixel32uC4 &aValue, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiSet_32u_C4R_Ctx(aValue.data(), reinterpret_cast<Npp32u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image32uC4View::SetA(const Pixel32uC3 &aValue, const NppStreamContext &nppStreamCtx)
+Image32uC4View &Image32uC4View::SetA(const Pixel32uC3 &aValue, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiSet_32u_AC4R_Ctx(aValue.data(), reinterpret_cast<Npp32u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image32uC4View::AlphaCompA(const Image32uC4View &pSrc2, Image32uC4View &pDst, NppiAlphaOp eAlphaOp, const NppStreamContext &nppStreamCtx) const
+Image32uC4View &Image32uC4View::AlphaCompA(const Image32uC4View &pSrc2, Image32uC4View &pDst, NppiAlphaOp eAlphaOp, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiAlphaComp_32u_AC4R_Ctx(reinterpret_cast<const Npp32u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<Npp32u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), eAlphaOp, nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
 void Image32uC4View::DotProd(const Image32uC4View &pSrc2, cuda::DevVarView<double> &aDp, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const

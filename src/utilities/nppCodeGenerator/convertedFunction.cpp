@@ -1141,6 +1141,29 @@ ConvertedFunction::ConvertedFunction(const Function &aFunction)
     {
         mName += "Int64";
     }
+
+    if (outputImages.size() == 1 && mReturnType == "void")
+    {
+        // if we only have only one output image, use that as return value
+        if (outputImages[0]->Name() == "pDst" && !outputImages[0]->IsSkippedInDeclaration() &&
+            outputImages[0]->Type()[outputImages[0]->Type().size() - 1] == '&')
+        {
+            mReturnType = outputImages[0]->Type();
+            std::stringstream ss;
+            ss << "    return pDst;" << std::endl;
+            mCallFooter += ss.str();
+        }
+
+        if ((outputImages[0]->Name() == "pSrcDst" || outputImages[0]->Name() == "pDst") &&
+            outputImages[0]->IsSkippedInDeclaration() &&
+            outputImages[0]->Type()[outputImages[0]->Type().size() - 1] == '&')
+        {
+            mReturnType = outputImages[0]->Type();
+            std::stringstream ss;
+            ss << "    return *this;" << std::endl;
+            mCallFooter += ss.str();
+        }
+    }
 }
 std::string ConvertedFunction::ToStringHeader() const
 {
@@ -1168,11 +1191,16 @@ std::string ConvertedFunction::ToStringHeader() const
     {
         ss << "static ";
     }
-    if (mReturnType != "void")
+    if (mReturnType != "void" && mReturnType[mReturnType.size() - 1] != '&')
     {
         ss << "[[nodiscard]] ";
     }
-    ss << mReturnType << " " << mName << "(";
+    ss << mReturnType;
+    if (mReturnType[mReturnType.size() - 1] != '&')
+    {
+        ss << " ";
+    }
+    ss << mName << "(";
     bool isFirstArg = true;
     for (const auto &arg : mArguments)
     {
@@ -1207,7 +1235,12 @@ std::string ConvertedFunction::ToStringCpp() const
 {
     std::stringstream ss;
 
-    ss << mReturnType << " " << mImageViewType << "::" << mName << "(";
+    ss << mReturnType;
+    if (mReturnType[mReturnType.size() - 1] != '&')
+    {
+        ss << " ";
+    }
+    ss << mImageViewType << "::" << mName << "(";
     bool isFirstArg = true;
     for (const auto &arg : mArguments)
     {

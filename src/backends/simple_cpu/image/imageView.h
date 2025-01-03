@@ -1,7 +1,10 @@
 #pragma once
-
 #include <backends/cuda/image/imageView.h>
+#include <backends/simple_cpu/image/forEachPixel.h>
+#include <backends/simple_cpu/image/forEachPixelMasked.h>
+#include <common/arithmetic/binary_operators.h>
 #include <common/defines.h>
+#include <common/image/functors/srcSrcFunctor.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
@@ -9,6 +12,7 @@
 #include <common/image/size2D.h>
 #include <common/image/sizePitched.h>
 #include <common/safeCast.h>
+#include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
 #include <cstddef>
 #include <vector>
@@ -20,37 +24,38 @@ template <PixelType T> class ImageView
 {
   public:
     // With this iterator we can use a simple foreach-loop over the imageView to iterate through the pixels
-    struct iterator
+    template <bool isConst> struct _iterator
     {
       private:
         Vec2i mPixel;
-        ImageView &mImgView;
+        std::conditional_t<isConst, const ImageView &, ImageView &> mImgView;
 
       public:
-        iterator(const Vec2i &aPixel, ImageView &aImgView) : mPixel(aPixel), mImgView(aImgView)
+        _iterator(const Vec2i &aPixel, std::conditional_t<isConst, const ImageView &, ImageView &> aImgView)
+            : mPixel(aPixel), mImgView(aImgView)
         {
         }
 
-        iterator() = default;
+        _iterator() = default;
 
-        ~iterator() = default;
+        ~_iterator() = default;
 
-        iterator(const iterator &)     = default;
-        iterator(iterator &&) noexcept = default;
+        _iterator(const _iterator &)     = default;
+        _iterator(_iterator &&) noexcept = default;
 
-        iterator &operator=(const iterator &)     = default;
-        iterator &operator=(iterator &&) noexcept = default;
+        _iterator &operator=(const _iterator &)     = default;
+        _iterator &operator=(_iterator &&) noexcept = default;
 
         using iterator_category = std::random_access_iterator_tag;
         using value_type        = T;
         using difference_type   = std::ptrdiff_t;
-        using pointer           = T *;
+        using pointer           = std::conditional_t<isConst, const T *, T *>;
         // By setting the reference type to the iterator itself, foreach-loops allow us the access to the iterator
         // and we have the information of the current pixel coordinate. To access the actual pixel value, we use the
         // Value() method.
-        using reference = ImageView<T>::iterator &;
+        using reference = ImageView<T>::_iterator<isConst> &;
 
-        iterator &operator++()
+        _iterator &operator++()
         {
             mPixel.x++;
             if (mPixel.x > mImgView.mRoi.LastX())
@@ -60,7 +65,7 @@ template <PixelType T> class ImageView
             }
             return *this;
         }
-        iterator &operator--()
+        _iterator &operator--()
         {
             mPixel.x--;
             if (mPixel.x < mImgView.mRoi.FirstX())
@@ -71,25 +76,25 @@ template <PixelType T> class ImageView
             return *this;
         }
 
-        iterator operator++(int) &
+        _iterator operator++(int) &
         {
-            iterator ret = *this;
+            _iterator ret = *this;
             operator++();
             return ret;
         }
-        iterator operator--(int) &
+        _iterator operator--(int) &
         {
-            iterator ret = *this;
+            _iterator ret = *this;
             operator--();
             return ret;
         }
 
-        [[nodiscard]] bool operator==(iterator const &aOther) const
+        [[nodiscard]] bool operator==(_iterator const &aOther) const
         {
             return std::addressof(mImgView) == std::addressof(aOther.mImgView) && mPixel == aOther.mPixel;
         }
 
-        [[nodiscard]] bool operator!=(iterator const &aOther) const
+        [[nodiscard]] bool operator!=(_iterator const &aOther) const
         {
             return std::addressof(mImgView) != std::addressof(aOther.mImgView) || mPixel != aOther.mPixel;
         }
@@ -97,7 +102,6 @@ template <PixelType T> class ImageView
         reference operator*()
         {
             return *this;
-            // return *gotoPtr(mImgView.mPtr, mImgView.mPitch, mPixel.x, mPixel.y);
         }
 
         pointer operator->()
@@ -122,20 +126,19 @@ template <PixelType T> class ImageView
                 x += mImgView.mRoi.width;
                 y--;
             }
-            iterator ret = *this;
-            ret.mPixel.x = x;
-            ret.mPixel.y = y;
+            _iterator ret = *this;
+            ret.mPixel.x  = x;
+            ret.mPixel.y  = y;
             return ret;
-            // return *gotoPtr(mImgView.mPtr, mImgView.mPitch, x, y);
         }
 
-        [[nodiscard]] difference_type operator-(const iterator &aRhs) const
+        [[nodiscard]] difference_type operator-(const _iterator &aRhs) const
         {
             return difference_type(mPixel.y - aRhs.mPixel.y) * difference_type(mImgView.mRoi.width) +
                    difference_type(mPixel.x - aRhs.mPixel.x);
         }
 
-        [[nodiscard]] iterator &operator+=(difference_type aRhs)
+        [[nodiscard]] _iterator &operator+=(difference_type aRhs)
         {
             difference_type diffY = aRhs / mImgView.mRoi.width;
             difference_type diffX = aRhs - (diffY * mImgView.mRoi.width);
@@ -154,7 +157,7 @@ template <PixelType T> class ImageView
             }
             return *this;
         }
-        [[nodiscard]] iterator &operator-=(difference_type aRhs)
+        [[nodiscard]] _iterator &operator-=(difference_type aRhs)
         {
             difference_type diffY = aRhs / mImgView.mRoi.width;
             difference_type diffX = aRhs - (diffY * mImgView.mRoi.width);
@@ -174,9 +177,9 @@ template <PixelType T> class ImageView
             return *this;
         }
 
-        [[nodiscard]] iterator operator+(difference_type aRhs) const
+        [[nodiscard]] _iterator operator+(difference_type aRhs) const
         {
-            iterator ret(*this);
+            _iterator ret(*this);
             difference_type diffY = aRhs / mImgView.mRoi.width;
             difference_type diffX = aRhs - (diffY * mImgView.mRoi.width);
             ret.mPixel.x += to_int(diffX);
@@ -194,9 +197,9 @@ template <PixelType T> class ImageView
             }
             return ret;
         }
-        [[nodiscard]] iterator operator-(difference_type aRhs) const
+        [[nodiscard]] _iterator operator-(difference_type aRhs) const
         {
-            iterator ret(*this);
+            _iterator ret(*this);
             difference_type diffY = aRhs / mImgView.mRoi.width;
             difference_type diffX = aRhs - (diffY * mImgView.mRoi.width);
             ret.mPixel.x -= to_int(diffX);
@@ -214,9 +217,9 @@ template <PixelType T> class ImageView
             }
             return ret;
         }
-        friend iterator operator+(difference_type aLhs, const iterator &aRhs)
+        friend _iterator operator+(difference_type aLhs, const _iterator &aRhs)
         {
-            iterator ret(aRhs);
+            _iterator ret(aRhs);
             difference_type diffY = aLhs / ret.mImgView.mRoi.width;
             difference_type diffX = aLhs - (diffY * ret.mImgView.mRoi.width);
             ret.mPixel.x += to_int(diffX);
@@ -234,9 +237,9 @@ template <PixelType T> class ImageView
             }
             return ret;
         }
-        friend iterator operator-(difference_type aLhs, const iterator &aRhs)
+        friend _iterator operator-(difference_type aLhs, const _iterator &aRhs)
         {
-            iterator ret(aRhs);
+            _iterator ret(aRhs);
             difference_type diffY = aLhs / ret.mImgView.mRoi.width;
             difference_type diffX = aLhs - (diffY * ret.mImgView.mRoi.width);
             ret.mPixel.x -= to_int(diffX);
@@ -255,7 +258,7 @@ template <PixelType T> class ImageView
             return ret;
         }
 
-        [[nodiscard]] bool operator>(const iterator &aRhs) const
+        [[nodiscard]] bool operator>(const _iterator &aRhs) const
         {
             if (mPixel.y > aRhs.mPixel.y)
             {
@@ -267,7 +270,7 @@ template <PixelType T> class ImageView
             }
             return mPixel.x > aRhs.mPixel.x;
         }
-        [[nodiscard]] bool operator<(const iterator &aRhs) const
+        [[nodiscard]] bool operator<(const _iterator &aRhs) const
         {
             if (mPixel.y < aRhs.mPixel.y)
             {
@@ -279,7 +282,7 @@ template <PixelType T> class ImageView
             }
             return mPixel.x < aRhs.mPixel.x;
         }
-        [[nodiscard]] bool operator>=(const iterator &aRhs) const
+        [[nodiscard]] bool operator>=(const _iterator &aRhs) const
         {
             if (mPixel.y > aRhs.mPixel.y)
             {
@@ -291,7 +294,7 @@ template <PixelType T> class ImageView
             }
             return mPixel.x >= aRhs.mPixel.x;
         }
-        [[nodiscard]] bool operator<=(const iterator &aRhs) const
+        [[nodiscard]] bool operator<=(const _iterator &aRhs) const
         {
             if (mPixel.y < aRhs.mPixel.y)
             {
@@ -315,12 +318,17 @@ template <PixelType T> class ImageView
         }
 
         T &Value()
+            requires(!isConst)
         {
             return *gotoPtr(mImgView.mPtr, mImgView.mPitch, mPixel.x, mPixel.y);
         }
     };
 
+    using iterator       = _iterator<false>;
+    using const_iterator = _iterator<true>;
+
     friend iterator;
+    friend const_iterator;
 
   public:
     /// <summary>
@@ -576,6 +584,26 @@ template <PixelType T> class ImageView
         return iterator({mRoi.FirstX(), mRoi.LastY() + 1}, *this);
     }
 
+    const_iterator begin() const
+    {
+        return cbegin();
+    }
+
+    const_iterator end() const
+    {
+        return cend();
+    }
+
+    const_iterator cbegin() const
+    {
+        return const_iterator(mRoi.FirstPixel(), *this);
+    }
+
+    const_iterator cend() const
+    {
+        return const_iterator({mRoi.FirstX(), mRoi.LastY() + 1}, *this);
+    }
+
     /// <summary>
     /// Copy from host to device memory
     /// </summary>
@@ -651,16 +679,16 @@ template <PixelType T> class ImageView
         {
             return false;
         }
-
-        auto iter = begin();
-        for (const auto &elem : aOther)
+        auto iterSrc1 = cbegin();
+        for (const auto &elemSrc2 : aOther)
         {
-            if (elem != *iter)
+            if (elemSrc2.Value() != iterSrc1.Value())
             {
                 return false;
             }
-            ++iter;
+            ++iterSrc1;
         }
+
         return true;
     }
 
@@ -669,7 +697,7 @@ template <PixelType T> class ImageView
     /// false if ROI size differs.
     /// </summary>
     bool IsSimilar(const ImageView<T> &aOther, remove_vector_t<T> aMaxDiff) const
-        requires FloatingVectorType<T>
+        requires RealOrComplexFloatingVector<T>
     {
         if (aOther.SizeRoi() != SizeRoi())
         {
@@ -678,17 +706,34 @@ template <PixelType T> class ImageView
 
         T limit(aMaxDiff);
 
-        auto iter = begin();
-        for (const auto &elem : aOther)
+        auto iterSrc1 = cbegin();
+        for (const auto &elemSrc2 : aOther)
         {
-            T diff = T::Abs(elem - *iter);
+            T diff = T::Abs(elemSrc2.Value() - iterSrc1.Value());
             if (!(diff < limit))
             {
                 return false;
             }
-            ++iter;
+            ++iterSrc1;
         }
         return true;
+    }
+
+    ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+    {
+        checkSameSize(ROI(), aSrc2.ROI());
+        checkSameSize(ROI(), aDst.ROI());
+
+        using ComputeT = default_compute_type_for_t<T>;
+
+        // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
+        using addSrcSrc = SrcSrcFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::None>;
+
+        opp::Add<ComputeT> op;
+        addSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
+
+        forEachPixel(aDst, functor);
+        return aDst;
     }
 };
 } // namespace opp::image::cpuSimple

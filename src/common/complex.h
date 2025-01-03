@@ -5,6 +5,7 @@
 #include "safeCast.h"
 #include <cmath>
 #include <common/numberTypes.h>
+#include <common/utilities.h>
 #include <complex>
 #include <concepts>
 #include <iostream>
@@ -37,6 +38,14 @@ namespace opp
 
 // forward declaration
 template <Number T> struct Vector2;
+template <RealSignedNumber T> struct Complex;
+
+using c_short    = Complex<short>;
+using c_int      = Complex<int>;
+using c_float    = Complex<float>;
+using c_double   = Complex<double>;
+using c_HalfFp16 = Complex<HalfFp16>;
+using c_BFloat16 = Complex<BFloat16>;
 
 /// <summary>
 /// Our own definition of a complex number, that we can use on device and host
@@ -50,9 +59,7 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// <summary>
     /// Default constructor does not initialize the members
     /// </summary>
-    DEVICE_CODE Complex() noexcept
-    {
-    }
+    Complex() noexcept = default;
 
     /// <summary>
     /// Initializes complex number with only real part, imag = 0
@@ -272,6 +279,51 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
   public:
 #pragma region Operators
     // No operators for < or > as complex numbers have no ordering
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns true if each element comparison is true
+    /// </summary>
+    [[nodiscard]] static bool EqEps(Complex aLeft, Complex aRight, T aEpsilon)
+        requires NativeFloatingPoint<T> && HostCode<T>
+    {
+        MakeNANandINFValid(aLeft.real, aRight.real);
+        MakeNANandINFValid(aLeft.imag, aRight.imag);
+
+        bool res = std::abs(aLeft.real - aRight.real) <= aEpsilon;
+        res &= std::abs(aLeft.imag - aRight.imag) <= aEpsilon;
+        return res;
+    }
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns true if each element comparison is true
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static bool EqEps(Complex aLeft, Complex aRight, T aEpsilon)
+        requires NativeFloatingPoint<T> && DeviceCode<T>
+    {
+        MakeNANandINFValid(aLeft.real, aRight.real);
+        MakeNANandINFValid(aLeft.imag, aRight.imag);
+
+        bool res = abs(aLeft.real - aRight.real) <= aEpsilon;
+        res &= abs(aLeft.imag - aRight.imag) <= aEpsilon;
+        return res;
+    }
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns true if each element comparison is true
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static bool EqEps(Complex aLeft, Complex aRight, T aEpsilon)
+        requires Is16BitFloat<T>
+    {
+        MakeNANandINFValid(aLeft.real, aRight.real);
+        MakeNANandINFValid(aLeft.imag, aRight.imag);
+
+        bool res = T::Abs(aLeft.real - aRight.real) <= aEpsilon;
+        res &= T::Abs(aLeft.imag - aRight.imag) <= aEpsilon;
+        return res;
+    }
 
     /// <summary>
     /// Returns true if each element comparison is true
@@ -600,7 +652,202 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
 #pragma endregion
 
 #pragma region Methods
+#pragma region Exp
     /// <summary>
+    /// Complex exponential
+    /// </summary>
+    Complex &Exp()
+        requires HostCode<T> && NativeNumber<T>
+    {
+        const T e_real   = std::exp(real);
+        const T cos_imag = std::cos(imag);
+        const T sin_imag = std::sin(imag);
+        real             = e_real * cos_imag;
+        imag             = e_real * sin_imag;
+        return *this;
+    }
+
+    /// <summary>
+    /// Complex exponential
+    /// </summary>
+    Complex &Exp()
+        requires HostCode<T> && Is16BitFloat<T>
+    {
+        const T e_real   = T(std::exp(static_cast<float>(real)));
+        const T cos_imag = T(std::cos(static_cast<float>(imag)));
+        const T sin_imag = T(std::sin(static_cast<float>(imag)));
+        real             = static_cast<T>(e_real * cos_imag);
+        imag             = static_cast<T>(e_real * sin_imag);
+        return *this;
+    }
+
+    /// <summary>
+    /// Complex exponential
+    /// </summary>
+    DEVICE_CODE Complex &Exp()
+        requires DeviceCode<T> && NativeFloatingPoint<T>
+    {
+        const T e_real = exp(real);
+        T cos_imag;
+        T sin_imag;
+
+        sincos(imag, &sin_imag, &cos_imag);
+        real = e_real * cos_imag;
+        imag = e_real * sin_imag;
+        return *this;
+    }
+    /// <summary>
+    /// Complex exponential
+    /// </summary>
+    DEVICE_CODE Complex &Exp()
+        requires DeviceCode<T> && Is16BitFloat<T>
+    {
+        const T e_real   = T::Exp(real);
+        const T cos_imag = T::Cos(imag);
+        const T sin_imag = T::Sin(imag);
+        real             = e_real * cos_imag;
+        imag             = e_real * sin_imag;
+        return *this;
+    }
+
+    /// <summary>
+    /// Complex exponential
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Complex Exp(const Complex &aVec)
+        requires RealFloatingPoint<T>
+    {
+        Complex ret = aVec;
+        ret.Exp();
+        return ret;
+    }
+#pragma endregion
+
+#pragma region Log
+    /// <summary>
+    /// Complex natural logarithm
+    /// </summary>
+    Complex &Ln()
+        requires HostCode<T> && NativeFloatingPoint<T>
+    {
+        const T log_real = std::log(Magnitude()); // don't modify the real value before computing angle
+        imag             = Angle();
+        real             = log_real;
+        return *this;
+    }
+
+    /// <summary>
+    /// Complex natural logarithm
+    /// </summary>
+    DEVICE_CODE Complex &Ln()
+        requires NonNativeNumber<T>
+    {
+        const T log_real = T::Ln(Magnitude()); // don't modify the real value before computing angle
+        imag             = Angle();
+        real             = log_real;
+        return *this;
+    }
+
+    /// <summary>
+    /// Complex natural logarithm
+    /// </summary>
+    DEVICE_CODE Complex &Ln()
+        requires DeviceCode<T> && NativeFloatingPoint<T>
+    {
+        const T log_real = log(Magnitude()); // don't modify the real value before computing angle
+        imag             = Angle();
+        real             = log_real;
+        return *this;
+    }
+
+    /// <summary>
+    /// Complex natural logarithm
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Complex Ln(const Complex &aVec)
+        requires RealFloatingPoint<T>
+    {
+        Complex ret = aVec;
+        ret.Ln();
+        return ret;
+    }
+#pragma endregion
+
+#pragma region Sqr
+    /// <summary>
+    /// Complex square
+    /// </summary>
+    DEVICE_CODE Complex &Sqr()
+    {
+        *this = *this * *this;
+        return *this;
+    }
+
+    /// <summary>
+    /// Complex square
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Complex Sqr(const Complex &aVec)
+    {
+        return aVec * aVec;
+    }
+#pragma endregion
+
+#pragma region Sqrt
+    /// <summary>
+    /// Complex square root
+    /// </summary>
+    Complex &Sqrt()
+        requires HostCode<T> && NativeFloatingPoint<T>
+    {
+        T mag            = Magnitude();
+        const T sqr_real = std::sqrt((mag + real) * static_cast<T>(0.5));
+        const T sqr_imag = GetSign(imag) * std::sqrt((mag - real) * static_cast<T>(0.5));
+
+        real = sqr_real;
+        imag = sqr_imag;
+        return *this;
+    }
+
+    /// <summary>
+    /// Complex square root
+    /// </summary>
+    DEVICE_CODE Complex &Sqrt()
+        requires NonNativeNumber<T>
+    {
+        T mag            = Magnitude();
+        const T sqr_real = T::Sqrt((mag + real) * static_cast<T>(0.5));
+        const T sqr_imag = imag.GetSign() * T::Sqrt((mag - real) * static_cast<T>(0.5));
+
+        real = sqr_real;
+        imag = sqr_imag;
+        return *this;
+    }
+
+    /// <summary>
+    /// Complex square root
+    /// </summary>
+    DEVICE_CODE Complex &Sqrt()
+        requires DeviceCode<T> && NativeFloatingPoint<T>
+    {
+        T mag            = Magnitude();
+        const T sqr_real = sqrt((mag + real) * static_cast<T>(0.5));
+        const T sqr_imag = GetSign(imag) * sqrt((mag - real) * static_cast<T>(0.5));
+
+        real = sqr_real;
+        imag = sqr_imag;
+        return *this;
+    }
+
+    /// <summary>
+    /// Complex square root
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Complex Sqrt(const Complex &aVec)
+        requires RealFloatingPoint<T>
+    {
+        Complex ret = aVec;
+        ret.Sqrt();
+        return ret;
+    }
+#pragma endregion
+    /*/// <summary>
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE Complex<T> &AbsDiff(const Complex<T> &aOther)
@@ -612,7 +859,7 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     }
 
     /// <summary>
-    /// Element wise bitwise Xor
+    /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Complex<T> AbsDiff(const Complex<T> &aLeft, const Complex<T> &aRight)
         requires HostCode<T> && NativeNumber<T>
@@ -686,7 +933,7 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
         ret.real = T::Abs(aLeft.real - aRight.real);
         ret.imag = T::Abs(aLeft.imag - aRight.imag);
         return ret;
-    }
+    }*/
 
     /// <summary>
     /// Conjugate complex
@@ -702,7 +949,7 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Complex<T> Conj(const Complex<T> &aValue)
     {
-        return {aValue.real, -aValue.imag};
+        return {aValue.real, static_cast<T>(-aValue.imag)};
     }
 
     /// <summary>
@@ -729,7 +976,7 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     }
 
     /// <summary>
-    /// Complex magnitude
+    /// Complex magnitude |a+bi|
     /// </summary>
     DEVICE_CODE [[nodiscard]] T Magnitude() const
         requires DeviceCode<T> && NativeFloatingPoint<T>
@@ -738,7 +985,7 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     }
 
     /// <summary>
-    /// Complex magnitude
+    /// Complex magnitude |a+bi|
     /// </summary>
     [[nodiscard]] T Magnitude() const
         requires HostCode<T> && NativeFloatingPoint<T>
@@ -747,7 +994,7 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     }
 
     /// <summary>
-    /// Complex magnitude
+    /// Complex magnitude |a+bi|
     /// </summary>
     DEVICE_CODE [[nodiscard]] T Magnitude() const
         requires NonNativeNumber<T>
@@ -756,12 +1003,40 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     }
 
     /// <summary>
-    /// Complex magnitude squared
+    /// Complex magnitude squared |a+bi|^2
     /// </summary>
     DEVICE_CODE [[nodiscard]] T MagnitudeSqr() const
         requires RealFloatingPoint<T>
     {
         return real * real + imag * imag;
+    }
+
+    /// <summary>
+    /// Angle between real and imaginary of a complex number (atan2(image, real))
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] T Angle() const
+        requires DeviceCode<T> && NativeFloatingPoint<T>
+    {
+        return atan2(imag, real);
+    }
+
+    /// <summary>
+    /// Angle between real and imaginary of a complex number (atan2(image, real))
+    /// </summary>
+    [[nodiscard]] T Angle() const
+        requires HostCode<T> && NativeFloatingPoint<T>
+    {
+        return std::atan2(imag, real);
+    }
+
+    /// <summary>
+    /// Angle between real and imaginary of a complex number (atan2(image, real))
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] T Angle() const
+        requires NonNativeNumber<T>
+    {
+        // cast bfloat16 and hfloat16 to float for atan2:
+        return static_cast<T>(atan2f(static_cast<float>(imag), static_cast<float>(real)));
     }
 
     /// <summary>
@@ -1035,17 +1310,6 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     }
 
     /// <summary>
-    /// Element wise round() and return as integer
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static Complex<int> RoundI(const Complex<T> &aValue)
-        requires RealFloatingPoint<T>
-    {
-        Complex<T> ret = aValue;
-        ret.Round();
-        return Complex<int>(ret);
-    }
-
-    /// <summary>
     /// Element wise round()
     /// </summary>
     DEVICE_CODE Complex<T> &Round()
@@ -1087,17 +1351,6 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
         Complex<T> ret = aValue;
         ret.Floor();
         return ret;
-    }
-
-    /// <summary>
-    /// Element wise floor() and return as integer
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static Complex<int> FloorI(const Complex<T> &aValue)
-        requires RealFloatingPoint<T>
-    {
-        Complex<T> ret = aValue;
-        ret.Floor();
-        return Complex<int>(ret);
     }
 
     /// <summary>
@@ -1152,17 +1405,6 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
         Complex<T> ret = aValue;
         ret.Ceil();
         return ret;
-    }
-
-    /// <summary>
-    /// Element wise ceil() and return as integer
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static Complex<int> CeilI(const Complex<T> &aValue)
-        requires RealFloatingPoint<T>
-    {
-        Complex<T> ret = aValue;
-        ret.Ceil();
-        return Complex<int>(ret);
     }
 
     /// <summary>
@@ -1226,8 +1468,8 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     DEVICE_CODE Complex<T> &RoundNearest()
         requires DeviceCode<T> && NativeFloatingPoint<T>
     {
-        real = __float2int_rn(real);
-        imag = __float2int_rn(imag);
+        real = rint(real);
+        imag = rint(imag);
         return *this;
     }
 
@@ -1281,8 +1523,8 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     DEVICE_CODE Complex<T> &RoundZero()
         requires DeviceCode<T> && NativeFloatingPoint<T>
     {
-        real = __float2int_rz(real);
-        imag = __float2int_rz(imag);
+        real = trunc(real);
+        imag = trunc(imag);
         return *this;
     }
 
@@ -1341,7 +1583,7 @@ template <typename T, typename T2>
 DEVICE_CODE Complex<T> operator-(T2 aLeft, const Complex<T> &aRight)
     requires RealSignedNumber<T2>
 {
-    return Complex<T>{static_cast<T>(aLeft - aRight.real), aRight.imag};
+    return Complex<T>{static_cast<T>(aLeft - aRight.real), static_cast<T>(-aRight.imag)};
 }
 
 template <typename T, typename T2>
@@ -1375,7 +1617,7 @@ DEVICE_CODE Complex<T> operator/(T2 aLeft, const Complex<T> &aRight)
 
 template <HostCode T2> std::ostream &operator<<(std::ostream &aOs, const Complex<T2> &aVec)
 {
-    aOs << aVec.real;
+    aOs << '(' << aVec.real;
 
     if (aVec.imag < 0)
     {
@@ -1385,12 +1627,13 @@ template <HostCode T2> std::ostream &operator<<(std::ostream &aOs, const Complex
     {
         aOs << " + " << aVec.imag << 'i';
     }
+    aOs << ')';
     return aOs;
 }
 
 template <HostCode T2> std::wostream &operator<<(std::wostream &aOs, const Complex<T2> &aVec)
 {
-    aOs << aVec.real;
+    aOs << '(' << aVec.real;
 
     if (aVec.imag < 0)
     {
@@ -1400,6 +1643,7 @@ template <HostCode T2> std::wostream &operator<<(std::wostream &aOs, const Compl
     {
         aOs << " + " << aVec.imag << 'i';
     }
+    aOs << ')';
     return aOs;
 }
 
@@ -1413,5 +1657,33 @@ template <HostCode T2> std::wistream &operator>>(std::wistream &aIs, Complex<T2>
 {
     aIs >> aVec.real >> aVec.imag;
     return aIs;
+}
+
+// complex literal: gives a complex number with real part 0 and imaginary part being the number before _i when opp
+// namespace is used
+inline Complex<float> operator""_i(long double aValue)
+{
+    return Complex(0.0f, static_cast<float>(aValue));
+}
+
+// complex literal: gives a complex number with real part 0 and imaginary part being the number before _i when opp
+// namespace is used
+inline Complex<int> operator""_i(unsigned long long int aValue)
+{
+    return Complex(0, static_cast<int>(aValue));
+}
+
+// complex literal: gives a complex number with real part 0 and imaginary part being the number before _ih when opp
+// namespace is used (HalfFp16-complex)
+inline Complex<HalfFp16> operator""_ih(long double aValue)
+{
+    return Complex(static_cast<HalfFp16>(0.0f), static_cast<HalfFp16>(static_cast<float>(aValue)));
+}
+
+// complex literal: gives a complex number with real part 0 and imaginary part being the number before _ih when opp
+// namespace is used (HalfFp16-complex)
+inline Complex<BFloat16> operator""_ib(long double aValue)
+{
+    return Complex(static_cast<BFloat16>(0.0f), static_cast<BFloat16>(static_cast<float>(aValue)));
 }
 } // namespace opp

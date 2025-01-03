@@ -1,4 +1,5 @@
 #pragma once
+#include <ostream>
 
 namespace opp
 {
@@ -85,4 +86,91 @@ enum class RoudingMode
     /// </summary>
     None
 };
+
+template <RoudingMode T> struct rouding_mode_name
+{
+    static constexpr char value[] = "Unknown";
+};
+template <> struct rouding_mode_name<RoudingMode::NearestTiesToEven>
+{
+    static constexpr char value[] = "NearestTiesToEven";
+};
+template <> struct rouding_mode_name<RoudingMode::NearestTiesAwayFromZero>
+{
+    static constexpr char value[] = "NearestTiesAwayFromZero";
+};
+template <> struct rouding_mode_name<RoudingMode::TowardZero>
+{
+    static constexpr char value[] = "TowardZero";
+};
+template <> struct rouding_mode_name<RoudingMode::TowardNegativeInfinity>
+{
+    static constexpr char value[] = "TowardNegativeInfinity";
+};
+template <> struct rouding_mode_name<RoudingMode::TowardPositiveInfinity>
+{
+    static constexpr char value[] = "TowardPositiveInfinity";
+};
+template <> struct rouding_mode_name<RoudingMode::None>
+{
+    static constexpr char value[] = "None";
+};
+
+inline std::ostream &operator<<(std::ostream &aOs, const RoudingMode &aRoudingMode)
+{
+    switch (aRoudingMode)
+    {
+        case RoudingMode::NearestTiesToEven:
+            aOs << rouding_mode_name<RoudingMode::NearestTiesToEven>::value;
+            break;
+        case RoudingMode::NearestTiesAwayFromZero:
+            aOs << rouding_mode_name<RoudingMode::NearestTiesAwayFromZero>::value;
+            break;
+        case RoudingMode::TowardZero:
+            aOs << rouding_mode_name<RoudingMode::TowardZero>::value;
+            break;
+        case RoudingMode::TowardNegativeInfinity:
+            aOs << rouding_mode_name<RoudingMode::TowardNegativeInfinity>::value;
+            break;
+        case RoudingMode::TowardPositiveInfinity:
+            aOs << rouding_mode_name<RoudingMode::TowardPositiveInfinity>::value;
+            break;
+        case RoudingMode::None:
+            aOs << rouding_mode_name<RoudingMode::None>::value;
+            break;
+        default:
+            aOs << "Unknown";
+            break;
+    }
+    return aOs;
+}
+
+inline std::wostream &operator<<(std::wostream &aOs, const RoudingMode &aRoudingMode)
+{
+    switch (aRoudingMode)
+    {
+        case RoudingMode::NearestTiesToEven:
+            aOs << rouding_mode_name<RoudingMode::NearestTiesToEven>::value;
+            break;
+        case RoudingMode::NearestTiesAwayFromZero:
+            aOs << rouding_mode_name<RoudingMode::NearestTiesAwayFromZero>::value;
+            break;
+        case RoudingMode::TowardZero:
+            aOs << rouding_mode_name<RoudingMode::TowardZero>::value;
+            break;
+        case RoudingMode::TowardNegativeInfinity:
+            aOs << rouding_mode_name<RoudingMode::TowardNegativeInfinity>::value;
+            break;
+        case RoudingMode::TowardPositiveInfinity:
+            aOs << rouding_mode_name<RoudingMode::TowardPositiveInfinity>::value;
+            break;
+        case RoudingMode::None:
+            aOs << rouding_mode_name<RoudingMode::None>::value;
+            break;
+        default:
+            aOs << "Unknown";
+            break;
+    }
+    return aOs;
+}
 } // namespace opp

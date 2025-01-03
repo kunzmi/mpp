@@ -221,6 +221,13 @@ TEST_CASE("HalfFp16", "[Common]")
     bf.Abs();
     CHECK(bf == HalfFp16(16.0f));
 
+    bf = HalfFp16(16.0f);
+    bf = bf.GetSign();
+    CHECK(bf == HalfFp16(1.0f));
+    bf = HalfFp16(-16.0f);
+    bf = bf.GetSign();
+    CHECK(bf == HalfFp16(-1.0f));
+
     bf = HalfFp16(0.0f);
     CHECK(bf == 0.0f);
 

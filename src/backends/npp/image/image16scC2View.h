@@ -46,10 +46,10 @@ class Image16scC2View : public ImageView<Pixel16scC2>
 
 
     // NppStatus nppiSet_16sc_C2R_Ctx(const Npp16sc[2] aValue, Npp16sc * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Set(const Pixel16scC2 &aValue, const NppStreamContext &nppStreamCtx);
+    Image16scC2View &Set(const Pixel16scC2 &aValue, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiCopy_16sc_C2R_Ctx(const Npp16sc * pSrc, int nSrcStep, Npp16sc * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Copy(Image16scC2View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image16scC2View &Copy(Image16scC2View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumError_16sc_C2R_Ctx(const Npp16sc * pSrc1, int nSrc1Step, const Npp16sc * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
     void MaximumError(const Image16scC2View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;

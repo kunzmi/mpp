@@ -631,6 +631,23 @@ TEST_CASE("Pixel16uC2_alignment", "[Common]")
     }
 }
 
+TEST_CASE("Pixel8uC2_streams", "[Common]")
+{
+    std::string str = "3 4";
+    std::stringstream ss(str);
+
+    Pixel8uC2 pix;
+    ss >> pix;
+
+    CHECK(pix.x == 3);
+    CHECK(pix.y == 4);
+
+    std::stringstream ss2;
+    ss2 << pix;
+
+    CHECK(ss2.str() == "(3, 4)");
+}
+
 TEST_CASE("Pixel32sC2_streams", "[Common]")
 {
     std::string str = "3 4";

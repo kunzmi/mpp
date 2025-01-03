@@ -46,10 +46,10 @@ class Image32fcC2View : public ImageView<Pixel32fcC2>
 
 
     // NppStatus nppiSet_32fc_C2R_Ctx(const Npp32fc[2] aValue, Npp32fc * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Set(const Pixel32fcC2 &aValue, const NppStreamContext &nppStreamCtx);
+    Image32fcC2View &Set(const Pixel32fcC2 &aValue, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiCopy_32fc_C2R_Ctx(const Npp32fc * pSrc, int nSrcStep, Npp32fc * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Copy(Image32fcC2View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fcC2View &Copy(Image32fcC2View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumError_32fc_C2R_Ctx(const Npp32fc * pSrc1, int nSrc1Step, const Npp32fc * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
     void MaximumError(const Image32fcC2View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;

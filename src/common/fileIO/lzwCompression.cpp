@@ -14,8 +14,8 @@ void LZWDecoder::Reset()
 {
     for (uint code = 0; code <= 255; code++) // NOLINT
     {
-        dec_codetab[code].value     = byte(code);
-        dec_codetab[code].firstchar = byte(code);
+        dec_codetab[code].value     = static_cast<byte>(code);
+        dec_codetab[code].firstchar = static_cast<byte>(code);
         dec_codetab[code].length    = 1;
         dec_codetab[code].next      = nullptr;
     }
@@ -68,7 +68,7 @@ bool LZWDecoder::Decode(byte *aData, size_t aSize, void *aDecoded)
             {
                 break;
             }
-            *op = byte(code);
+            *op = static_cast<byte>(code);
             op++;
             occ--;
             oldcodep = dec_codetab + code;
@@ -134,7 +134,7 @@ bool LZWDecoder::Decode(byte *aData, size_t aSize, void *aDecoded)
         }
         else
         {
-            *op = byte(code);
+            *op = static_cast<byte>(code);
             op++;
             occ--;
         }

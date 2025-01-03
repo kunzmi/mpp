@@ -47,8 +47,8 @@ template <RoudingMode roundingMode, typename T> struct RoundFunctor
         }
     }
 
-    DEVICE_CODE void operator()(T &aVec)
-        requires RealOrCompleIntVector<T>
+    DEVICE_CODE void operator()(T & /*aVec*/)
+        requires RealOrComplexIntVector<T>
     { // NOP
     }
 };

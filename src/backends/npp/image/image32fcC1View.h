@@ -47,58 +47,58 @@ class Image32fcC1View : public ImageView<Pixel32fcC1>
 
 
     // NppStatus nppiSet_32fc_C1R_Ctx(const Npp32fc oValue, Npp32fc * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Set(const Pixel32fcC1 &oValue, const NppStreamContext &nppStreamCtx);
+    Image32fcC1View &Set(const Pixel32fcC1 &oValue, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiCopy_32fc_C1R_Ctx(const Npp32fc * pSrc, int nSrcStep, Npp32fc * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Copy(Image32fcC1View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fcC1View &Copy(Image32fcC1View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAddC_32fc_C1R_Ctx(const Npp32fc * pSrc1, int nSrc1Step, const Npp32fc nConstant, Npp32fc * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Add(const Pixel32fcC1 &nConstant, Image32fcC1View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fcC1View &Add(const Pixel32fcC1 &nConstant, Image32fcC1View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAddC_32fc_C1IR_Ctx(const Npp32fc nConstant, Npp32fc * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Add(const Pixel32fcC1 &nConstant, const NppStreamContext &nppStreamCtx);
+    Image32fcC1View &Add(const Pixel32fcC1 &nConstant, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMulC_32fc_C1R_Ctx(const Npp32fc * pSrc1, int nSrc1Step, const Npp32fc nConstant, Npp32fc * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Mul(const Pixel32fcC1 &nConstant, Image32fcC1View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fcC1View &Mul(const Pixel32fcC1 &nConstant, Image32fcC1View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMulC_32fc_C1IR_Ctx(const Npp32fc nConstant, Npp32fc * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Mul(const Pixel32fcC1 &nConstant, const NppStreamContext &nppStreamCtx);
+    Image32fcC1View &Mul(const Pixel32fcC1 &nConstant, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSubC_32fc_C1R_Ctx(const Npp32fc * pSrc1, int nSrc1Step, const Npp32fc nConstant, Npp32fc * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Sub(const Pixel32fcC1 &nConstant, Image32fcC1View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fcC1View &Sub(const Pixel32fcC1 &nConstant, Image32fcC1View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSubC_32fc_C1IR_Ctx(const Npp32fc nConstant, Npp32fc * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Sub(const Pixel32fcC1 &nConstant, const NppStreamContext &nppStreamCtx);
+    Image32fcC1View &Sub(const Pixel32fcC1 &nConstant, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiDivC_32fc_C1R_Ctx(const Npp32fc * pSrc1, int nSrc1Step, const Npp32fc nConstant, Npp32fc * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Div(const Pixel32fcC1 &nConstant, Image32fcC1View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fcC1View &Div(const Pixel32fcC1 &nConstant, Image32fcC1View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDivC_32fc_C1IR_Ctx(const Npp32fc nConstant, Npp32fc * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Div(const Pixel32fcC1 &nConstant, const NppStreamContext &nppStreamCtx);
+    Image32fcC1View &Div(const Pixel32fcC1 &nConstant, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAdd_32fc_C1R_Ctx(const Npp32fc * pSrc1, int nSrc1Step, const Npp32fc * pSrc2, int nSrc2Step, Npp32fc * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Add(const Image32fcC1View &pSrc2, Image32fcC1View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fcC1View &Add(const Image32fcC1View &pSrc2, Image32fcC1View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAdd_32fc_C1IR_Ctx(const Npp32fc * pSrc, int nSrcStep, Npp32fc * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Add(const Image32fcC1View &pSrc, const NppStreamContext &nppStreamCtx);
+    Image32fcC1View &Add(const Image32fcC1View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMul_32fc_C1R_Ctx(const Npp32fc * pSrc1, int nSrc1Step, const Npp32fc * pSrc2, int nSrc2Step, Npp32fc * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Mul(const Image32fcC1View &pSrc2, Image32fcC1View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fcC1View &Mul(const Image32fcC1View &pSrc2, Image32fcC1View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMul_32fc_C1IR_Ctx(const Npp32fc * pSrc, int nSrcStep, Npp32fc * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Mul(const Image32fcC1View &pSrc, const NppStreamContext &nppStreamCtx);
+    Image32fcC1View &Mul(const Image32fcC1View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSub_32fc_C1R_Ctx(const Npp32fc * pSrc1, int nSrc1Step, const Npp32fc * pSrc2, int nSrc2Step, Npp32fc * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Sub(const Image32fcC1View &pSrc2, Image32fcC1View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fcC1View &Sub(const Image32fcC1View &pSrc2, Image32fcC1View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSub_32fc_C1IR_Ctx(const Npp32fc * pSrc, int nSrcStep, Npp32fc * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Sub(const Image32fcC1View &pSrc, const NppStreamContext &nppStreamCtx);
+    Image32fcC1View &Sub(const Image32fcC1View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiDiv_32fc_C1R_Ctx(const Npp32fc * pSrc1, int nSrc1Step, const Npp32fc * pSrc2, int nSrc2Step, Npp32fc * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Div(const Image32fcC1View &pSrc2, Image32fcC1View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fcC1View &Div(const Image32fcC1View &pSrc2, Image32fcC1View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDiv_32fc_C1IR_Ctx(const Npp32fc * pSrc, int nSrcStep, Npp32fc * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Div(const Image32fcC1View &pSrc, const NppStreamContext &nppStreamCtx);
+    Image32fcC1View &Div(const Image32fcC1View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMaximumError_32fc_C1R_Ctx(const Npp32fc * pSrc1, int nSrc1Step, const Npp32fc * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
     void MaximumError(const Image32fcC1View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
@@ -125,10 +125,10 @@ class Image32fcC1View : public ImageView<Pixel32fcC1>
     [[nodiscard]] size_t AverageRelativeErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMagnitude_32fc32f_C1R_Ctx(const Npp32fc * pSrc, int nSrcStep, Npp32f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void Magnitude(Image32fC1View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fC1View &Magnitude(Image32fC1View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMagnitudeSqr_32fc32f_C1R_Ctx(const Npp32fc * pSrc, int nSrcStep, Npp32f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    void MagnitudeSqr(Image32fC1View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image32fC1View &MagnitudeSqr(Image32fC1View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     //NOLINTEND(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 };

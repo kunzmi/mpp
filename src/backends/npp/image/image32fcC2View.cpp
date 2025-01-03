@@ -46,17 +46,19 @@ Image32fcC2View Image32fcC2View::GetView(const Border &aBorder) const
 
 //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 
-void Image32fcC2View::Set(const Pixel32fcC2 &aValue, const NppStreamContext &nppStreamCtx)
+Image32fcC2View &Image32fcC2View::Set(const Pixel32fcC2 &aValue, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiSet_32fc_C2R_Ctx(reinterpret_cast<const Npp32fc *>(aValue.data()), reinterpret_cast<Npp32fc *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
+    return *this;
 }
 
-void Image32fcC2View::Copy(Image32fcC2View &pDst, const NppStreamContext &nppStreamCtx) const
+Image32fcC2View &Image32fcC2View::Copy(Image32fcC2View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiCopy_32fc_C2R_Ctx(reinterpret_cast<const Npp32fc *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp32fc *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
 }
 
 void Image32fcC2View::MaximumError(const Image32fcC2View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const

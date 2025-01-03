@@ -1,5 +1,6 @@
 #pragma once
 #include <backends/cuda/cudaException.h>
+#include <backends/cuda/image/configurations.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
