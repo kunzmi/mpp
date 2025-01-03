@@ -213,17 +213,6 @@ TEST_CASE("Complex<float>", "[Common]")
     CHECK(sqrt2.real == refsqrt.real());
     CHECK(sqrt2.imag == refsqrt.imag());
 
-    Complex<float> minmax1(10, 20);
-    Complex<float> minmax2(-20, 10);
-
-    CHECK(minmax1.Min(minmax2) == Complex<float>(-20, 10));
-    CHECK(minmax2.Min(minmax1) == Complex<float>(-20, 10));
-
-    minmax1 = Complex<float>(10, 20);
-    minmax2 = Complex<float>(-20, 10);
-    CHECK(minmax1.Max(minmax2) == Complex<float>(10, 20));
-    CHECK(minmax2.Max(minmax1) == Complex<float>(10, 20));
-
     Complex<float> conj(10, 20);
     Complex<float> conj2 = Complex<float>::Conj(conj);
     conj.Conj();
@@ -377,14 +366,6 @@ TEST_CASE("Complex<int>", "[Common]")
     Complex<int> minmax1(10, 20);
     Complex<int> minmax2(-20, 10);
 
-    CHECK(minmax1.Min(minmax2) == Complex<int>(-20, 10));
-    CHECK(minmax2.Min(minmax1) == Complex<int>(-20, 10));
-
-    minmax1 = Complex<int>(10, 20);
-    minmax2 = Complex<int>(-20, 10);
-    CHECK(minmax1.Max(minmax2) == Complex<int>(10, 20));
-    CHECK(minmax2.Max(minmax1) == Complex<int>(10, 20));
-
     Complex<int> fromFloat = Complex<float>(10.2f, 20.3f);
     CHECK(fromFloat.real == 10);
     CHECK(fromFloat.imag == 20);
@@ -520,14 +501,6 @@ TEST_CASE("Complex<short>", "[Common]")
 
     Complex<short> minmax1(10, 20);
     Complex<short> minmax2(-20, 10);
-
-    CHECK(minmax1.Min(minmax2) == Complex<short>(-20, 10));
-    CHECK(minmax2.Min(minmax1) == Complex<short>(-20, 10));
-
-    minmax1 = Complex<short>(10, 20);
-    minmax2 = Complex<short>(-20, 10);
-    CHECK(minmax1.Max(minmax2) == Complex<short>(10, 20));
-    CHECK(minmax2.Max(minmax1) == Complex<short>(10, 20));
 
     Complex<short> fromFloat = Complex<float>(10.4f, 20.9f);
     CHECK(fromFloat.real == 10);
@@ -723,14 +696,6 @@ TEST_CASE("Complex<BFloat16>", "[Common]")
 
     Complex<BFloat16> minmax1(10.0_bf, 20.0_bf);
     Complex<BFloat16> minmax2(-20.0_bf, 10.0_bf);
-
-    CHECK((minmax1.Min(minmax2)) == (Complex<BFloat16>(-20.0_bf, 10.0_bf)));
-    CHECK(minmax2.Min(minmax1) == Complex<BFloat16>(-20.0_bf, 10.0_bf));
-
-    minmax1 = Complex<BFloat16>(10.0_bf, 20.0_bf);
-    minmax2 = Complex<BFloat16>(-20.0_bf, 10.0_bf);
-    CHECK(minmax1.Max(minmax2) == Complex<BFloat16>(10.0_bf, 20.0_bf));
-    CHECK(minmax2.Max(minmax1) == Complex<BFloat16>(10.0_bf, 20.0_bf));
 
     Complex<BFloat16> conj(10.0_bf, 20.0_bf);
     Complex<BFloat16> conj2 = Complex<BFloat16>::Conj(conj);
@@ -943,14 +908,6 @@ TEST_CASE("Complex<HalfFp16>", "[Common]")
 
     Complex<HalfFp16> minmax1(10.0_hf, 20.0_hf);
     Complex<HalfFp16> minmax2(-20.0_hf, 10.0_hf);
-
-    CHECK(minmax1.Min(minmax2) == Complex<HalfFp16>(-20.0_hf, 10.0_hf));
-    CHECK(minmax2.Min(minmax1) == Complex<HalfFp16>(-20.0_hf, 10.0_hf));
-
-    minmax1 = Complex<HalfFp16>(10.0_hf, 20.0_hf);
-    minmax2 = Complex<HalfFp16>(-20.0_hf, 10.0_hf);
-    CHECK(minmax1.Max(minmax2) == Complex<HalfFp16>(10.0_hf, 20.0_hf));
-    CHECK(minmax2.Max(minmax1) == Complex<HalfFp16>(10.0_hf, 20.0_hf));
 
     Complex<HalfFp16> conj(10.0_hf, 20.0_hf);
     Complex<HalfFp16> conj2 = Complex<HalfFp16>::Conj(conj);

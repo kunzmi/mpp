@@ -194,6 +194,15 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     }
 
     /// <summary>
+    /// Initializes vector to all components = aVal (avoid confusion with the array constructor)
+    /// </summary>
+    DEVICE_CODE Vector4(int aVal) noexcept
+        requires(!IsInt<T>)
+        : x(static_cast<T>(aVal)), y(static_cast<T>(aVal)), z(static_cast<T>(aVal)), w(static_cast<T>(aVal))
+    {
+    }
+
+    /// <summary>
     /// Initializes vector to all components = [aVal[0], aVal[1], aVal[2], aVal[3]]
     /// </summary>
     DEVICE_CODE Vector4(T aVal[4]) noexcept : x(aVal[0]), y(aVal[1]), z(aVal[2]), w(aVal[3])
@@ -2600,19 +2609,6 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
         return *this;
     }
 
-    /*/// <summary>
-    /// Element wise absolute difference (per element also for complex!)
-    /// </summary>
-    DEVICE_CODE Vector4<T> &AbsDiff(const Vector4<T> &aOther)
-        requires ComplexNumber<T>
-    {
-        x = T::AbsDiff(x, aOther.x);
-        y = T::AbsDiff(y, aOther.y);
-        z = T::AbsDiff(z, aOther.z);
-        w = T::AbsDiff(w, aOther.w);
-        return *this;
-    }*/
-
     /// <summary>
     /// Element wise absolute difference
     /// </summary>
@@ -2640,20 +2636,6 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
         ret.w = T::Abs(aLeft.w - aRight.w);
         return ret;
     }
-
-    /*/// <summary>
-    /// Element wise absolute difference
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector4<T> AbsDiff(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires ComplexFloatingPoint<T>
-    {
-        Vector4<T> ret;
-        ret.x = T::AbsDiff(aLeft.x, aRight.x);
-        ret.y = T::AbsDiff(aLeft.y, aRight.y);
-        ret.z = T::AbsDiff(aLeft.z, aRight.z);
-        ret.w = T::AbsDiff(aLeft.w, aRight.w);
-        return ret;
-    }*/
 
     /// <summary>
     /// Element wise absolute difference
@@ -2897,22 +2879,25 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise clamp to value range
     /// </summary>
     DEVICE_CODE Vector4<T> &Clamp(T aMinVal, T aMaxVal)
-        requires NonNativeNumber<T>
+        requires NonNativeNumber<T> && (!ComplexNumber<T>)
     {
-        if constexpr (ComplexFloatingPoint<T>)
-        {
-            float checka = aMinVal.real;
-            float checkb = aMinVal.imag;
-            float checkc = aMaxVal.real;
-            float checkd = aMaxVal.imag;
-            if (checka == checkb && checkb == checkc)
-            {
-            }
-        }
         x = T::Max(aMinVal, T::Min(x, aMaxVal));
         y = T::Max(aMinVal, T::Min(y, aMaxVal));
         z = T::Max(aMinVal, T::Min(z, aMaxVal));
         w = T::Max(aMinVal, T::Min(w, aMaxVal));
+        return *this;
+    }
+
+    /// <summary>
+    /// Component wise clamp to value range
+    /// </summary>
+    DEVICE_CODE Vector4<T> &Clamp(complex_basetype_t<T> aMinVal, complex_basetype_t<T> aMaxVal)
+        requires ComplexNumber<T>
+    {
+        x.Clamp(aMinVal, aMaxVal);
+        y.Clamp(aMinVal, aMaxVal);
+        z.Clamp(aMinVal, aMaxVal);
+        w.Clamp(aMinVal, aMaxVal);
         return *this;
     }
 
@@ -3041,7 +3026,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise minimum
     /// </summary>
     DEVICE_CODE Vector4<T> &Min(const Vector4<T> &aRight)
-        requires NonNativeNumber<T>
+        requires NonNativeNumber<T> && (!ComplexNumber<T>) && (HostCode<T> || (DeviceCode<T> && !EnableSIMD<T>))
     {
         x.Min(aRight.x);
         y.Min(aRight.y);
@@ -3152,7 +3137,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise minimum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Min(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires NonNativeNumber<T>
+        requires NonNativeNumber<T> && (!ComplexNumber<T>) && (HostCode<T> || (DeviceCode<T> && !EnableSIMD<T>))
     {
         return Vector4<T>{T::Min(aLeft.x, aRight.x), T::Min(aLeft.y, aRight.y), T::Min(aLeft.z, aRight.z),
                           T::Min(aLeft.w, aRight.w)};
@@ -3171,7 +3156,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns the minimum component of the vector
     /// </summary>
     DEVICE_CODE [[nodiscard]] T Min() const
-        requires NonNativeNumber<T>
+        requires NonNativeNumber<T> && (!ComplexNumber<T>)
     {
         return T::Min(T::Min(x, y), T::Min(z, w));
     }
@@ -3289,7 +3274,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise maximum
     /// </summary>
     DEVICE_CODE Vector4<T> &Max(const Vector4<T> &aRight)
-        requires NonNativeNumber<T>
+        requires NonNativeNumber<T> && (!ComplexNumber<T>) && (HostCode<T> || (DeviceCode<T> && !EnableSIMD<T>))
     {
         x.Max(aRight.x);
         y.Max(aRight.y);
@@ -3400,7 +3385,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// Component wise maximum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Max(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires NonNativeNumber<T>
+        requires NonNativeNumber<T> && (!ComplexNumber<T>) && (HostCode<T> || (DeviceCode<T> && !EnableSIMD<T>))
     {
         return Vector4<T>{T::Max(aLeft.x, aRight.x), T::Max(aLeft.y, aRight.y), T::Max(aLeft.z, aRight.z),
                           T::Max(aLeft.w, aRight.w)};
@@ -3419,7 +3404,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// Returns the maximum component of the vector
     /// </summary>
     DEVICE_CODE [[nodiscard]] T Max() const
-        requires NonNativeNumber<T>
+        requires NonNativeNumber<T> && (!ComplexNumber<T>)
     {
         return T::Max(T::Max(x, y), T::Max(z, w));
     }

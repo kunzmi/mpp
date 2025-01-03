@@ -3,7 +3,9 @@
 #include <cfloat>
 #include <climits>
 #include <common/bfloat16.h>
+#include <common/complex.h>
 #include <common/half_fp16.h>
+#include <common/numberTypes.h>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
@@ -377,6 +379,11 @@ template <typename TFrom, typename TTo> struct numeric_limits_conversion
     {
         return static_cast<TFrom>(numeric_limits<TTo>::min());
     }
+    [[nodiscard]] static constexpr DEVICE_CODE TFrom min() noexcept
+        requires RealUnsignedIntegral<TFrom>
+    {
+        return static_cast<TFrom>(0);
+    }
     [[nodiscard]] static constexpr DEVICE_CODE TFrom max() noexcept
     {
         return static_cast<TFrom>(numeric_limits<TTo>::max());
@@ -385,14 +392,42 @@ template <typename TFrom, typename TTo> struct numeric_limits_conversion
     {
         return static_cast<TFrom>(numeric_limits<TTo>::lowest());
     }
+    [[nodiscard]] static constexpr DEVICE_CODE TFrom lowest() noexcept
+        requires RealUnsignedIntegral<TFrom>
+    {
+        return static_cast<TFrom>(0);
+    }
     [[nodiscard]] static constexpr DEVICE_CODE TFrom minExact() noexcept
     {
         return static_cast<TFrom>(numeric_limits<TTo>::minExact());
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE TFrom minExact() noexcept
+        requires RealUnsignedIntegral<TFrom>
+    {
+        return static_cast<TFrom>(0);
     }
     [[nodiscard]] static constexpr DEVICE_CODE TFrom maxExact() noexcept
     {
         return static_cast<TFrom>(numeric_limits<TTo>::maxExact());
     }
+};
+
+// ignore complex
+template <typename TFrom, typename TTo>
+struct numeric_limits_conversion<Complex<TFrom>, Complex<TTo>> : numeric_limits_conversion<TFrom, TTo>
+{
+};
+
+// ignore complex
+template <typename TFrom, typename TTo>
+struct numeric_limits_conversion<Complex<TFrom>, TTo> : numeric_limits_conversion<TFrom, TTo>
+{
+};
+
+// ignore complex
+template <typename TFrom, typename TTo>
+struct numeric_limits_conversion<TFrom, Complex<TTo>> : numeric_limits_conversion<TFrom, TTo>
+{
 };
 
 // numeric limits when converting from one type to another, especially 16-Bit floats have some restrictions

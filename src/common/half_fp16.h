@@ -108,6 +108,9 @@ class alignas(2) HalfFp16
         ret.value = __half(__nv_half_raw(aUShort));
         return ret;
     }
+
+    friend bool DEVICE_CODE isnan(HalfFp16);
+    friend bool DEVICE_CODE isinf(HalfFp16);
 #endif
 
     DEVICE_CODE inline operator float() const
@@ -695,4 +698,15 @@ inline HalfFp16 operator"" _hf(long double aValue)
 {
     return HalfFp16(static_cast<float>(aValue));
 }
+
+#ifdef IS_CUDA_COMPILER
+DEVICE_CODE bool isnan(HalfFp16 aVal)
+{
+    return __hisnan(aVal.value);
+}
+DEVICE_CODE bool isinf(HalfFp16 aVal)
+{
+    return __hisinf(aVal.value);
+}
+#endif
 } // namespace opp

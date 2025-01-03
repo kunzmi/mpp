@@ -1,5 +1,6 @@
 #pragma once
 #include "defines.h"
+#include "numberTypes.h"
 #include "numeric_limits.h"
 #include <type_traits>
 
@@ -12,6 +13,24 @@ class BFloat16;
 
 // by default, no clamping needed
 template <typename TFrom, typename TTo> struct need_saturation_clamp : std::false_type
+{
+};
+
+// ignore complex
+template <typename TFrom, typename TTo>
+struct need_saturation_clamp<Complex<TFrom>, Complex<TTo>> : need_saturation_clamp<TFrom, TTo>
+{
+};
+
+// ignore complex
+template <typename TFrom, typename TTo>
+struct need_saturation_clamp<Complex<TFrom>, TTo> : need_saturation_clamp<TFrom, TTo>
+{
+};
+
+// ignore complex
+template <typename TFrom, typename TTo>
+struct need_saturation_clamp<TFrom, Complex<TTo>> : need_saturation_clamp<TFrom, TTo>
 {
 };
 

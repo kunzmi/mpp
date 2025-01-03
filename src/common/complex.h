@@ -317,8 +317,8 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     DEVICE_CODE [[nodiscard]] static bool EqEps(Complex aLeft, Complex aRight, T aEpsilon)
         requires Is16BitFloat<T>
     {
-        MakeNANandINFValid(aLeft.real, aRight.real);
-        MakeNANandINFValid(aLeft.imag, aRight.imag);
+        /*MakeNANandINFValid(aLeft.real, aRight.real);
+        MakeNANandINFValid(aLeft.imag, aRight.imag);*/
 
         bool res = T::Abs(aLeft.real - aRight.real) <= aEpsilon;
         res &= T::Abs(aLeft.imag - aRight.imag) <= aEpsilon;
@@ -618,7 +618,16 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// </summary>
     DEVICE_CODE Complex &operator/=(const Complex &aOther)
     {
-        T denom    = aOther.real * aOther.real + aOther.imag * aOther.imag;
+        T denom = aOther.real * aOther.real + aOther.imag * aOther.imag;
+        if constexpr (RealIntegral<T>)
+        { // floats will denormalize to inf, but likely just an overflow
+            if (denom == T(0))
+            {
+                real = 0;
+                imag = 0;
+                return *this;
+            }
+        }
         T tempReal = real * aOther.real + imag * aOther.imag;
         T tempImag = imag * aOther.real - real * aOther.imag;
         real       = tempReal / denom;
@@ -631,7 +640,16 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// </summary>
     DEVICE_CODE Complex &DivInv(const Complex &aOther)
     {
-        T denom    = real * real + imag * imag;
+        T denom = real * real + imag * imag;
+        if constexpr (RealIntegral<T>)
+        { // floats will denormalize to inf, but likely just an overflow
+            if (denom == T(0))
+            {
+                real = 0;
+                imag = 0;
+                return *this;
+            }
+        }
         T tempReal = aOther.real * real + aOther.imag * imag;
         T tempImag = aOther.imag * real - aOther.real * imag;
         real       = tempReal / denom;
@@ -644,7 +662,14 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// </summary>
     DEVICE_CODE [[nodiscard]] Complex operator/(const Complex &aOther) const
     {
-        T denom    = aOther.real * aOther.real + aOther.imag * aOther.imag;
+        T denom = aOther.real * aOther.real + aOther.imag * aOther.imag;
+        if constexpr (RealIntegral<T>)
+        { // floats will denormalize to inf, but likely just an overflow
+            if (denom == T(0))
+            {
+                return {static_cast<T>(0), static_cast<T>(0)};
+            }
+        }
         T tempReal = real * aOther.real + imag * aOther.imag;
         T tempImag = imag * aOther.real - real * aOther.imag;
         return {static_cast<T>(tempReal / denom), static_cast<T>(tempImag / denom)};
@@ -1094,211 +1119,6 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     }
 
     /// <summary>
-    /// Complex minimum
-    /// </summary>
-    Complex<T> &Min(const Complex<T> &aRight)
-        requires HostCode<T> && NativeNumber<T>
-    {
-        real = std::min(real, aRight.real);
-        imag = std::min(imag, aRight.imag);
-        return *this;
-    }
-
-    /// <summary>
-    /// Complex minimum
-    /// </summary>
-    DEVICE_CODE Complex<T> &Min(const Complex<T> &aRight)
-        requires DeviceCode<T> && NativeNumber<T>
-    {
-        real = min(real, aRight.real);
-        imag = min(imag, aRight.imag);
-        return *this;
-    }
-
-    /// <summary>
-    /// Complex minimum
-    /// </summary>
-    DEVICE_CODE Complex<T> &Min(const Complex<T> &aRight)
-        requires NonNativeNumber<T>
-    {
-        real.Min(aRight.real);
-        imag.Min(aRight.imag);
-        return *this;
-    }
-
-    /// <summary>
-    /// Complex minimum (SIMD)
-    /// </summary>
-    DEVICE_CODE Complex<T> &Min(const Complex<T> &aOther)
-        requires IsShort<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
-    {
-        *this = FromUint(__vmins2(*this, aOther));
-        return *this;
-    }
-
-    /// <summary>
-    /// Complex minimum (SIMD)
-    /// </summary>
-    DEVICE_CODE Complex<T> &Min(const Complex<T> &aOther)
-        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
-    {
-        *this = FromNV16BitFloat(__hmin2(*this, aOther));
-        return *this;
-    }
-
-    /// <summary>
-    /// Complex minimum
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static Complex<T> Min(const Complex<T> &aLeft, const Complex<T> &aRight)
-        requires DeviceCode<T> && NativeNumber<T>
-    {
-        return Complex<T>{static_cast<T>(min(aLeft.real, aRight.real)), static_cast<T>(min(aLeft.imag, aRight.imag))};
-    }
-
-    /// <summary>
-    /// Complex minimum
-    /// </summary>
-    [[nodiscard]] static Complex<T> Min(const Complex<T> &aLeft, const Complex<T> &aRight)
-        requires HostCode<T> && NativeNumber<T>
-    {
-        return Complex<T>{std::min(aLeft.real, aRight.real), std::min(aLeft.imag, aRight.imag)};
-    }
-
-    /// <summary>
-    /// Complex minimum
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static Complex<T> Min(const Complex<T> &aLeft, const Complex<T> &aRight)
-        requires NonNativeNumber<T>
-    {
-        return Complex<T>{T::Min(aLeft.real, aRight.real), T::Min(aLeft.imag, aRight.imag)};
-    }
-
-    /// <summary>
-    /// Complex minimum (SIMD)
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> Min(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires IsShort<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
-    {
-        return FromUint(__vmins2(aLeft, aRight));
-    }
-
-    /// <summary>
-    /// Complex minimum (SIMD)
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector2<T> Min(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
-    {
-        return FromNV16BitFloat(__hmin2(aLeft, aRight));
-    }
-
-    /// <summary>
-    /// Complex maximum
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] Complex<T> Max(const Complex<T> &aRight) const
-        requires DeviceCode<T> && NativeNumber<T>
-    {
-        return Complex<T>{static_cast<T>(max(real, aRight.real)), static_cast<T>(max(imag, aRight.imag))};
-    }
-
-    /// <summary>
-    /// Complex maximum
-    /// </summary>
-    Complex<T> &Max(const Complex<T> &aRight)
-        requires HostCode<T> && NativeNumber<T>
-    {
-        real = std::max(real, aRight.real);
-        imag = std::max(imag, aRight.imag);
-        return *this;
-    }
-
-    /// <summary>
-    /// Complex maximum
-    /// </summary>
-    DEVICE_CODE Complex<T> &Max(const Complex<T> &aRight)
-        requires DeviceCode<T> && NativeNumber<T>
-    {
-        real = max(real, aRight.real);
-        imag = max(imag, aRight.imag);
-        return *this;
-    }
-
-    /// <summary>
-    /// Complex maximum
-    /// </summary>
-    DEVICE_CODE Complex<T> &Max(const Complex<T> &aRight)
-        requires NonNativeNumber<T>
-    {
-        real.Max(aRight.real);
-        imag.Max(aRight.imag);
-        return *this;
-    }
-
-    /// <summary>
-    /// Complex maximum (SIMD)
-    /// </summary>
-    DEVICE_CODE Complex<T> &Max(const Complex<T> &aOther)
-        requires IsShort<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
-    {
-        *this = FromUint(__vmaxs2(*this, aOther));
-        return *this;
-    }
-
-    /// <summary>
-    /// Complex maximum (SIMD)
-    /// </summary>
-    DEVICE_CODE Complex<T> &Max(const Complex<T> &aOther)
-        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
-    {
-        *this = FromNV16BitFloat(__hmax2(*this, aOther));
-        return *this;
-    }
-
-    /// <summary>
-    /// Complex maximum
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static Complex<T> Max(const Complex<T> &aLeft, const Complex<T> &aRight)
-        requires DeviceCode<T> && NativeNumber<T>
-    {
-        return Complex<T>{static_cast<T>(max(aLeft.real, aRight.real)), static_cast<T>(max(aLeft.imag, aRight.imag))};
-    }
-
-    /// <summary>
-    /// Complex maximum
-    /// </summary>
-    [[nodiscard]] static Complex<T> Max(const Complex<T> &aLeft, const Complex<T> &aRight)
-        requires HostCode<T> && NativeNumber<T>
-    {
-        return Complex<T>{std::max(aLeft.real, aRight.real), std::max(aLeft.imag, aRight.imag)};
-    }
-
-    /// <summary>
-    /// Complex maximum
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static Complex<T> Max(const Complex<T> &aLeft, const Complex<T> &aRight)
-        requires NonNativeNumber<T>
-    {
-        return Complex<T>{T::Max(aLeft.real, aRight.real), T::Max(aLeft.imag, aRight.imag)};
-    }
-
-    /// <summary>
-    /// Complex maximum (SIMD)
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static Complex<T> Max(const Complex<T> &aLeft, const Complex<T> &aRight)
-        requires IsShort<T> && NativeNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
-    {
-        return FromUint(__vmaxs2(aLeft, aRight));
-    }
-
-    /// <summary>
-    /// Complex maximum (SIMD)
-    /// </summary>
-    DEVICE_CODE [[nodiscard]] static Complex<T> Max(const Complex<T> &aLeft, const Complex<T> &aRight)
-        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
-    {
-        return FromNV16BitFloat(__hmax2(aLeft, aRight));
-    }
-
-    /// <summary>
     /// Element wise round()
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Complex<T> Round(const Complex<T> &aValue)
@@ -1610,6 +1430,13 @@ DEVICE_CODE Complex<T> operator/(T2 aLeft, const Complex<T> &aRight)
 {
     const T leftReal = static_cast<T>(aLeft);
     const T denom    = aRight.real * aRight.real + aRight.imag * aRight.imag;
+    if constexpr (RealIntegral<T>)
+    { // floats will denormalize to inf, but likely just an overflow
+        if (denom == T(0))
+        {
+            return {static_cast<T>(0), static_cast<T>(0)};
+        }
+    }
     const T tempReal = leftReal * aRight.real;
     const T tempImag = -leftReal * aRight.imag;
     return {static_cast<T>(tempReal / denom), static_cast<T>(tempImag / denom)}; // complex division

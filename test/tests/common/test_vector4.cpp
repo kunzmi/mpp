@@ -2035,30 +2035,6 @@ TEST_CASE("Pixel32fcC4", "[Common]")
     CHECK(div5.y == difv7.y);
     CHECK(div5.z == difv7.z);
     CHECK(div5.w == difv7.w);
-
-    Pixel32fcC4 minmax1(10, 20, -10, 50);
-    Pixel32fcC4 minmax2(-20, 10, 40, 30);
-
-    CHECK(Pixel32fcC4::Min(minmax1, minmax2) == Pixel32fcC4(-20, 10, -10, 30));
-    CHECK(Pixel32fcC4::Min(minmax2, minmax1) == Pixel32fcC4(-20, 10, -10, 30));
-
-    CHECK(Pixel32fcC4::Max(minmax1, minmax2) == Pixel32fcC4(10, 20, 40, 50));
-    CHECK(Pixel32fcC4::Max(minmax2, minmax1) == Pixel32fcC4(10, 20, 40, 50));
-
-    minmax1 = Pixel32fcC4(10, 20, -10, 50);
-    minmax2 = Pixel32fcC4(-20, 10, 40, 30);
-    CHECK(minmax1.Min(minmax2) == Pixel32fcC4(-20, 10, -10, 30));
-    CHECK(minmax2.Min(minmax1) == Pixel32fcC4(-20, 10, -10, 30));
-
-    minmax1 = Pixel32fcC4(10, 20, -10, 50);
-    minmax2 = Pixel32fcC4(-20, 10, 40, 30);
-    CHECK(minmax1.Max(minmax2) == Pixel32fcC4(10, 20, 40, 50));
-    CHECK(minmax2.Max(minmax1) == Pixel32fcC4(10, 20, 40, 50));
-
-    minmax1 = Pixel32fcC4(10, 20, -10, 50);
-    minmax2 = Pixel32fcC4(-20, 10, 40, 30);
-    CHECK(minmax2.Min().real == -20);
-    CHECK(minmax1.Max().real == 50);
 }
 
 TEST_CASE("Pixel32fcC4_additionalMethods", "[Common]")

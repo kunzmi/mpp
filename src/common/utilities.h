@@ -67,6 +67,9 @@ template <opp::RealFloatingPoint T> DEVICE_CODE void MakeNANandINFValid(T &aLeft
 #ifdef IS_HOST_COMPILER
     using namespace std;
 #endif
+#ifdef IS_CUDA_COMPILER
+    using namespace opp;
+#endif
 
     if (isnan(aLeft) || isinf(aLeft))
     {

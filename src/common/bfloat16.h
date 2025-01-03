@@ -35,6 +35,8 @@ class alignas(2) BFloat16
     DEVICE_CODE explicit constexpr BFloat16(ushort aUShort, bool /*aBinary*/) : value(__nv_bfloat16_raw{aUShort})
     {
     }
+    friend bool DEVICE_CODE isnan(BFloat16);
+    friend bool DEVICE_CODE isinf(BFloat16);
 #endif
 
   public:
@@ -863,4 +865,15 @@ inline BFloat16 operator"" _bf(long double aValue)
 {
     return BFloat16(float(aValue));
 }
+
+#ifdef IS_CUDA_COMPILER
+DEVICE_CODE bool isnan(BFloat16 aVal)
+{
+    return __hisnan(aVal.value);
+}
+DEVICE_CODE bool isinf(BFloat16 aVal)
+{
+    return __hisinf(aVal.value);
+}
+#endif
 } // namespace opp
