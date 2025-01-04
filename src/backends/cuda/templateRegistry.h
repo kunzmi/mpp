@@ -33,36 +33,21 @@ inline std::vector<std::string> &GetTemplateInstances()
 
 // we cannot directly use char* or string as a template parameter, so use this constexpr wrapper for function name,
 // SrcT, computeT and DstT
-template <size_t A, size_t B, size_t C, size_t D> struct KernelNameWrapper
+template <size_t sizeKernelName, size_t sizeSrcType, size_t sizeCompType, size_t sizeDstType> struct KernelNameWrapper
 {
-    constexpr KernelNameWrapper(const char (&aKernelName)[A], const char (&aSrcName)[B], const char (&aCompName)[C],
-                                const char (&aDstName)[D])
+    constexpr KernelNameWrapper(const char (&aKernelName)[sizeKernelName], const char (&aSrcType)[sizeSrcType],
+                                const char (&aCompType)[sizeCompType], const char (&aDstType)[sizeDstType])
     {
-        for (size_t i = 0; i < A; i++)
-        {
-            kernelName[i] = aKernelName[i];
-        }
-
-        for (size_t i = 0; i < B; i++)
-        {
-            srcType[i] = aSrcName[i];
-        }
-
-        for (size_t i = 0; i < C; i++)
-        {
-            compType[i] = aCompName[i];
-        }
-
-        for (size_t i = 0; i < D; i++)
-        {
-            dstType[i] = aDstName[i];
-        }
+        std::copy(aKernelName, aKernelName + sizeKernelName, kernelName);
+        std::copy(aSrcType, aSrcType + sizeSrcType, srcType);
+        std::copy(aCompType, aCompType + sizeCompType, compType);
+        std::copy(aDstType, aDstType + sizeDstType, dstType);
     }
 
-    char kernelName[A];
-    char srcType[B];
-    char compType[C];
-    char dstType[D];
+    char kernelName[sizeKernelName];
+    char srcType[sizeSrcType];
+    char compType[sizeCompType];
+    char dstType[sizeDstType];
 };
 
 template <KernelNameWrapper name> struct TemplateRegistry

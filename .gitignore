@@ -4,6 +4,7 @@
 
 # build folders
 [Bb]uild/
+[Bb]uildDebug/
 out/
 
 # Visual Studio 2015 cache/options directory

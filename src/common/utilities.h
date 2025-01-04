@@ -1,10 +1,10 @@
 #pragma once
 
 #include "defines.h"
+#include "numberTypes.h"
+#include "numeric_limits.h"
 #include <cfloat>
 #include <cmath>
-#include <common/numberTypes.h>
-#include <common/numeric_limits.h>
 #include <numbers>
 
 DEVICE_CODE constexpr opp::uint DIV_UP(opp::uint aValue, opp::uint aDiv)
@@ -60,6 +60,11 @@ DEVICE_CODE inline double GetSign(double aDoubleVal)
     doublebits &= SIGN_BIT;
     doublebits |= ONE_AS_DOUBLE;
     return *reinterpret_cast<double *>(&doublebits);
+}
+
+namespace opp
+{
+template <typename T> struct numeric_limits;
 }
 
 template <opp::RealFloatingPoint T> DEVICE_CODE void MakeNANandINFValid(T &aLeft, T &aRight)

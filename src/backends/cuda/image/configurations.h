@@ -5,6 +5,18 @@
 
 namespace opp::image::cuda
 {
+// allow named config names in template
+template <size_t sizeConfigName> struct ConfigNameWrapper
+{
+    constexpr ConfigNameWrapper(const char (&aConfigName)[sizeConfigName])
+    {
+        std::copy(aConfigName, aConfigName + sizeConfigName, configName);
+    }
+
+    char configName[sizeConfigName];
+};
+
+// cuda's dim3 is not constexpr
 struct ConstExprDim3
 {
     // implicit conversion
@@ -22,24 +34,56 @@ struct ConstExprDim3
     uint z;
 };
 
-constexpr ConstExprDim3 DefaultBlockSize()
+// Block size for kernel launch
+template <ConfigNameWrapper ConfigName, int hardwareMajor = 0, int hardwareMinor = 0> struct ConfigBlockSize
 {
-    return {32, 8, 1};
-}
-
-struct DefaultConfiguration
+    static constexpr ConstExprDim3 value{32, 8, 1};
+};
+template <> struct ConfigBlockSize<"Default">
 {
-    static constexpr ConstExprDim3 BlockSize{32, 8, 1};
-    static constexpr int WarpAlignmentInBytes{64};
+    static constexpr ConstExprDim3 value{32, 8, 1};
 };
 
-template <size_t typeSize, int hardwareMajor = 0, int hardwareMinor = 0, int configVersion = 0>
-struct KernelConfiguration
+// Warp alignment, the size in bytes a warp should be aligned to
+template <ConfigNameWrapper ConfigName, int hardwareMajor = 0, int hardwareMinor = 0> struct ConfigWarpAlignment
 {
-    static constexpr ConstExprDim3 BlockSize{DefaultConfiguration::BlockSize};
-    static constexpr int WarpAlignmentInBytes{DefaultConfiguration::WarpAlignmentInBytes};
-    static constexpr size_t TupelSize{typeSize == 1 ? 8 : typeSize == 2 ? 4 : typeSize == 4 ? 2 : 1};
+    static constexpr int value = 64;
 };
+template <> struct ConfigWarpAlignment<"Default">
+{
+    static constexpr int value = 64;
+};
+
+// The tupel size to use for a given type size
+template <ConfigNameWrapper ConfigName, size_t typeSize, int hardwareMajor = 0, int hardwareMinor = 0>
+struct ConfigTupelSize
+{
+    static constexpr size_t value{typeSize == 1 ? 8 : typeSize == 2 ? 4 : typeSize == 4 ? 2 : 1};
+};
+template <size_t typeSize> struct ConfigTupelSize<"Default", typeSize>
+{
+    // assuming 64 byte warp alignment
+    static constexpr size_t value{typeSize == 1 ? 8 : typeSize == 2 ? 4 : typeSize == 4 ? 2 : 1};
+};
+
+// constexpr ConstExprDim3 DefaultBlockSize()
+//{
+//     return {32, 8, 1};
+// }
+//
+// struct DefaultConfiguration
+//{
+//     static constexpr ConstExprDim3 BlockSize{32, 8, 1};
+//     static constexpr int WarpAlignmentInBytes{64};
+// };
+//
+// template <size_t typeSize, int hardwareMajor = 0, int hardwareMinor = 0, int configVersion = 0>
+// struct KernelConfiguration
+//{
+//     static constexpr ConstExprDim3 BlockSize{DefaultConfiguration::BlockSize};
+//     static constexpr int WarpAlignmentInBytes{DefaultConfiguration::WarpAlignmentInBytes};
+//     static constexpr size_t TupelSize{typeSize == 1 ? 8 : typeSize == 2 ? 4 : typeSize == 4 ? 2 : 1};
+// };
 
 // template <size_t typeSize> struct KernelConfiguration<typeSize, 0, 0, 0>
 //{

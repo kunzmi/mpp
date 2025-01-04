@@ -7,6 +7,7 @@
 #include "safeCast.h"
 #include "vector_typetraits.h"
 #include <cmath>
+#include <common/utilities.h>
 #include <concepts>
 #include <iostream>
 #include <type_traits>
@@ -70,19 +71,18 @@ template <Number T> struct alignas(sizeof(T)) Vector1
     }
 
     /// <summary>
-    /// Initializes vector to all components = [aVal[0]]
+    /// Initializes vector to all components = aVal (especially when set to 0)
     /// </summary>
-    DEVICE_CODE Vector1(T aVal[1]) noexcept : x(aVal[0])
+    DEVICE_CODE Vector1(int aVal) noexcept
+        requires(!IsInt<T>)
+        : x(static_cast<T>(aVal))
     {
     }
 
     /// <summary>
-    /// Initializes vector to all components = aVal with cast to T
-    /// Note: this constructor avoids confusion for integral types when initialising to 0 as it could also be a nullptr
+    /// Initializes vector to all components = [aVal[0]]
     /// </summary>
-    DEVICE_CODE Vector1(int aVal) noexcept
-        requires NativeIntegral<T> && (!IsInt<T>)
-        : x(T(aVal))
+    DEVICE_CODE explicit Vector1(T aVal[1]) noexcept : x(aVal[0])
     {
     }
 
@@ -132,6 +132,53 @@ template <Number T> struct alignas(sizeof(T)) Vector1
     // don't use space-ship operator as it returns true if any comparison returns true.
     // But NPP only returns true if all channels fulfill the comparison.
     // auto operator<=>(const Vector1 &) const = default;
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns true if each element comparison is true
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static bool EqEps(Vector1 aLeft, Vector1 aRight, T aEpsilon)
+        requires NativeFloatingPoint<T> && HostCode<T>
+    {
+        MakeNANandINFValid(aLeft.x, aRight.x);
+
+        return std::abs(aLeft.x - aRight.x) <= aEpsilon;
+    }
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns true if each element comparison is true
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static bool EqEps(Vector1 aLeft, Vector1 aRight, T aEpsilon)
+        requires NativeFloatingPoint<T> && DeviceCode<T>
+    {
+        MakeNANandINFValid(aLeft.x, aRight.x);
+
+        return abs(aLeft.x - aRight.x) <= aEpsilon;
+    }
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns true if each element comparison is true
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static bool EqEps(Vector1 aLeft, Vector1 aRight, T aEpsilon)
+        requires Is16BitFloat<T>
+    {
+        MakeNANandINFValid(aLeft.x, aRight.x);
+
+        return T::Abs(aLeft.x - aRight.x) <= aEpsilon;
+    }
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns true if each element comparison is true
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static bool EqEps(const Vector1 &aLeft, const Vector1 &aRight,
+                                                complex_basetype_t<T> aEpsilon)
+        requires ComplexFloatingPoint<T>
+    {
+        return T::EqEps(aLeft.x, aRight.x, aEpsilon);
+    }
 
     /// <summary>
     /// Returns true if each element comparison is true
@@ -355,6 +402,7 @@ template <Number T> struct alignas(sizeof(T)) Vector1
             case Axis1D::X:
                 return x;
         }
+        return x;
     }
 
     /// <summary>
@@ -879,7 +927,7 @@ template <Number T> struct alignas(sizeof(T)) Vector1
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE Vector1<T> &AbsDiff(const Vector1<T> &aOther)
-        requires NonNativeNumber<T>
+        requires RealSignedNumber<T> && NonNativeNumber<T>
     {
         x = T::Abs(x - aOther.x);
         return *this;
@@ -889,7 +937,7 @@ template <Number T> struct alignas(sizeof(T)) Vector1
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector1<T> AbsDiff(const Vector1<T> &aLeft, const Vector1<T> &aRight)
-        requires NonNativeNumber<T>
+        requires RealSignedNumber<T> && NonNativeNumber<T>
     {
         Vector1<T> ret;
         ret.x = T::Abs(aLeft.x - aRight.x);
@@ -931,6 +979,7 @@ template <Number T> struct alignas(sizeof(T)) Vector1
     /// Conjugate complex multiplication: aLeft * conj(aRight) per element
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector1<T> ConjMul(const Vector1<T> &aLeft, const Vector1<T> &aRight)
+        requires ComplexNumber<T>
     {
         return {T::ConjMul(aLeft.x, aRight.x)};
     }
@@ -994,9 +1043,19 @@ template <Number T> struct alignas(sizeof(T)) Vector1
     /// Component wise clamp to value range
     /// </summary>
     DEVICE_CODE Vector1<T> &Clamp(T aMinVal, T aMaxVal)
-        requires NonNativeNumber<T>
+        requires NonNativeNumber<T> && (!ComplexNumber<T>)
     {
         x = T::Max(aMinVal, T::Min(x, aMaxVal));
+        return *this;
+    }
+
+    /// <summary>
+    /// Component wise clamp to value range
+    /// </summary>
+    DEVICE_CODE Vector1<T> &Clamp(complex_basetype_t<T> aMinVal, complex_basetype_t<T> aMaxVal)
+        requires ComplexNumber<T>
+    {
+        x.Clamp(aMinVal, aMaxVal);
         return *this;
     }
 
@@ -1037,7 +1096,7 @@ template <Number T> struct alignas(sizeof(T)) Vector1
     /// Component wise minimum
     /// </summary>
     DEVICE_CODE Vector1<T> &Min(const Vector1<T> &aRight)
-        requires NonNativeNumber<T>
+        requires NonNativeNumber<T> && (!ComplexNumber<T>)
     {
         x.Min(aRight.x);
         return *this;
@@ -1075,7 +1134,7 @@ template <Number T> struct alignas(sizeof(T)) Vector1
     /// Component wise minimum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector1<T> Min(const Vector1<T> &aLeft, const Vector1<T> &aRight)
-        requires NonNativeNumber<T>
+        requires NonNativeNumber<T> && (!ComplexNumber<T>)
     {
         return Vector1<T>{T::Min(aLeft.x, aRight.x)};
     }
@@ -1106,7 +1165,7 @@ template <Number T> struct alignas(sizeof(T)) Vector1
     /// Component wise maximum
     /// </summary>
     DEVICE_CODE Vector1<T> &Max(const Vector1<T> &aRight)
-        requires NonNativeNumber<T>
+        requires NonNativeNumber<T> && (!ComplexNumber<T>)
     {
         x.Max(aRight.x);
         return *this;
@@ -1134,7 +1193,7 @@ template <Number T> struct alignas(sizeof(T)) Vector1
     /// Component wise maximum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector1<T> Max(const Vector1<T> &aLeft, const Vector1<T> &aRight)
-        requires NonNativeNumber<T>
+        requires NonNativeNumber<T> && (!ComplexNumber<T>)
     {
         return Vector1<T>{T::Max(aLeft.x, aRight.x)};
     }
@@ -1367,14 +1426,69 @@ template <Number T> struct alignas(sizeof(T)) Vector1
     }
 #pragma endregion
 
-#pragma region Compare
+#pragma region Compare per element
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns 0xFF per element for true, 0x00 for false
+    /// </summary>
+    [[nodiscard]] static Vector1<byte> CompareEQEps(Vector1<T> aLeft, Vector1<T> aRight, T aEpsilon)
+        requires NativeFloatingPoint<T> && HostCode<T>
+    {
+        MakeNANandINFValid(aLeft.x, aRight.x);
+
+        Vector1<byte> ret;
+        ret.x = static_cast<byte>(static_cast<int>(std::abs(aLeft.x - aRight.x) <= aEpsilon) * TRUE_VALUE);
+        return ret;
+    }
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns 0xFF per element for true, 0x00 for false
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector1<byte> CompareEQEps(Vector1<T> aLeft, Vector1<T> aRight, T aEpsilon)
+        requires NativeFloatingPoint<T> && DeviceCode<T>
+    {
+        MakeNANandINFValid(aLeft.x, aRight.x);
+
+        Vector1<byte> ret;
+        ret.x = static_cast<byte>(static_cast<int>(abs(aLeft.x - aRight.x) <= aEpsilon) * TRUE_VALUE);
+        return ret;
+    }
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns 0xFF per element for true, 0x00 for false
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector1<byte> CompareEQEps(Vector1<T> aLeft, Vector1<T> aRight, T aEpsilon)
+        requires Is16BitFloat<T>
+    {
+        MakeNANandINFValid(aLeft.x, aRight.x);
+
+        Vector1<byte> ret;
+        ret.x = static_cast<byte>(static_cast<int>(T::Abs(aLeft.x - aRight.x) <= aEpsilon) * TRUE_VALUE);
+        return ret;
+    }
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns 0xFF per element for true, 0x00 for false
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector1<byte> CompareEQEps(const Vector1<T> &aLeft, const Vector1<T> &aRight,
+                                                                complex_basetype_t<T> aEpsilon)
+        requires ComplexFloatingPoint<T>
+    {
+        Vector1<byte> ret;
+        ret.x = static_cast<byte>(static_cast<int>(T::EqEps(aLeft.x, aRight.x, aEpsilon)) * TRUE_VALUE);
+        return ret;
+    }
+
     /// <summary>
     /// Element wise comparison equal, returns 0xFF per element for true, 0x00 for false
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector1<byte> CompareEQ(const Vector1<T> &aLeft, const Vector1<T> &aRight)
     {
         Vector1<byte> ret;
-        ret.x = byte(aLeft.x == aRight.x) * TRUE_VALUE;
+        ret.x = static_cast<byte>(static_cast<int>(aLeft.x == aRight.x) * TRUE_VALUE);
         return ret;
     }
 
@@ -1385,7 +1499,7 @@ template <Number T> struct alignas(sizeof(T)) Vector1
         requires RealNumber<T>
     {
         Vector1<byte> ret;
-        ret.x = byte(aLeft.x >= aRight.x) * TRUE_VALUE;
+        ret.x = static_cast<byte>(static_cast<int>(aLeft.x >= aRight.x) * TRUE_VALUE);
         return ret;
     }
 
@@ -1396,7 +1510,7 @@ template <Number T> struct alignas(sizeof(T)) Vector1
         requires RealNumber<T>
     {
         Vector1<byte> ret;
-        ret.x = byte(aLeft.x > aRight.x) * TRUE_VALUE;
+        ret.x = static_cast<byte>(static_cast<int>(aLeft.x > aRight.x) * TRUE_VALUE);
         return ret;
     }
 
@@ -1407,7 +1521,7 @@ template <Number T> struct alignas(sizeof(T)) Vector1
         requires RealNumber<T>
     {
         Vector1<byte> ret;
-        ret.x = byte(aLeft.x <= aRight.x) * TRUE_VALUE;
+        ret.x = static_cast<byte>(static_cast<int>(aLeft.x <= aRight.x) * TRUE_VALUE);
         return ret;
     }
 
@@ -1418,7 +1532,7 @@ template <Number T> struct alignas(sizeof(T)) Vector1
         requires RealNumber<T>
     {
         Vector1<byte> ret;
-        ret.x = byte(aLeft.x < aRight.x) * TRUE_VALUE;
+        ret.x = static_cast<byte>(static_cast<int>(aLeft.x < aRight.x) * TRUE_VALUE);
         return ret;
     }
 
@@ -1426,10 +1540,9 @@ template <Number T> struct alignas(sizeof(T)) Vector1
     /// Element wise comparison not equal, returns 0xFF per element for true, 0x00 for false
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector1<byte> CompareNEQ(const Vector1<T> &aLeft, const Vector1<T> &aRight)
-        requires RealNumber<T>
     {
         Vector1<byte> ret;
-        ret.x = byte(aLeft.x != aRight.x) * TRUE_VALUE;
+        ret.x = static_cast<byte>(static_cast<int>(aLeft.x != aRight.x) * TRUE_VALUE);
         return ret;
     }
 #pragma endregion

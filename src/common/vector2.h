@@ -7,6 +7,7 @@
 #include "safeCast.h"
 #include "vector_typetraits.h"
 #include <cmath>
+#include <common/utilities.h>
 #include <concepts>
 #include <iostream>
 #include <type_traits>
@@ -37,11 +38,6 @@ namespace opp
 {
 
 // forward declaration:
-namespace image
-{
-class Size2D;
-}
-
 template <Number T> struct Vector1;
 template <Number T> struct Vector2;
 template <Number T> struct Vector3;
@@ -105,9 +101,18 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     }
 
     /// <summary>
+    /// Initializes vector to all components = aVal (especially when set to 0)
+    /// </summary>
+    DEVICE_CODE Vector2(int aVal) noexcept
+        requires(!IsInt<T>)
+        : x(static_cast<T>(aVal)), y(static_cast<T>(aVal))
+    {
+    }
+
+    /// <summary>
     /// Initializes vector to all components = [aVal[0], aVal[1]]
     /// </summary>
-    DEVICE_CODE Vector2(T aVal[2]) noexcept : x(aVal[0]), y(aVal[1])
+    DEVICE_CODE explicit Vector2(T aVal[2]) noexcept : x(aVal[0]), y(aVal[1])
     {
     }
 
@@ -116,6 +121,15 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// </summary>
     DEVICE_CODE Vector2(T aX, T aY) noexcept : x(aX), y(aY)
     {
+    }
+
+    /// <summary>
+    /// Usefull constructor for SIMD instructions
+    /// </summary>
+    DEVICE_CODE static Vector2 FromUint(const uint &aUint) noexcept
+        requires TwoBytesSizeType<T>
+    {
+        return Vector2(*reinterpret_cast<const Vector2<T> *>(&aUint));
     }
 
     /// <summary>
@@ -211,15 +225,6 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// <summary>
     /// Usefull constructor for SIMD instructions
     /// </summary>
-    DEVICE_CODE static Vector2 FromUint(const uint &aUint) noexcept
-        requires TwoBytesSizeType<T>
-    {
-        return Vector2(*reinterpret_cast<const Vector2<T> *>(&aUint));
-    }
-
-    /// <summary>
-    /// Usefull constructor for SIMD instructions
-    /// </summary>
     DEVICE_CODE static Vector2 FromNV16BitFloat(const nv_bfloat162 &aNVBfloat2) noexcept
         requires IsBFloat16<T> && CUDA_ONLY<T>
     {
@@ -304,6 +309,64 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     // don't use space-ship operator as it returns true if any comparison returns true.
     // But NPP only returns true if all channels fulfill the comparison.
     // auto operator<=>(const Vector2 &) const = default;
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns true if each element comparison is true
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static bool EqEps(Vector2 aLeft, Vector2 aRight, T aEpsilon)
+        requires NativeFloatingPoint<T> && HostCode<T>
+    {
+        MakeNANandINFValid(aLeft.x, aRight.x);
+        MakeNANandINFValid(aLeft.y, aRight.y);
+
+        bool res = std::abs(aLeft.x - aRight.x) <= aEpsilon;
+        res &= std::abs(aLeft.y - aRight.y) <= aEpsilon;
+        return res;
+    }
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns true if each element comparison is true
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static bool EqEps(Vector2 aLeft, Vector2 aRight, T aEpsilon)
+        requires NativeFloatingPoint<T> && DeviceCode<T>
+    {
+        MakeNANandINFValid(aLeft.x, aRight.x);
+        MakeNANandINFValid(aLeft.y, aRight.y);
+
+        bool res = abs(aLeft.x - aRight.x) <= aEpsilon;
+        res &= abs(aLeft.y - aRight.y) <= aEpsilon;
+        return res;
+    }
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns true if each element comparison is true
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static bool EqEps(Vector2 aLeft, Vector2 aRight, T aEpsilon)
+        requires Is16BitFloat<T>
+    {
+        MakeNANandINFValid(aLeft.x, aRight.x);
+        MakeNANandINFValid(aLeft.y, aRight.y);
+
+        bool res = T::Abs(aLeft.x - aRight.x) <= aEpsilon;
+        res &= T::Abs(aLeft.y - aRight.y) <= aEpsilon;
+        return res;
+    }
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns true if each element comparison is true
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static bool EqEps(const Vector2 &aLeft, const Vector2 &aRight,
+                                                complex_basetype_t<T> aEpsilon)
+        requires ComplexFloatingPoint<T>
+    {
+        bool res = T::EqEps(aLeft.x, aRight.x, aEpsilon);
+        res &= T::EqEps(aLeft.y, aRight.y, aEpsilon);
+        return res;
+    }
 
     /// <summary>
     /// Returns true if each element comparison is true
@@ -546,7 +609,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Negation (SIMD)
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector2 operator-() const
-        requires IsShort<T> && RealSignedNumber<T> && CUDA_ONLY<T>
+        requires IsShort<T> && RealSignedNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromUint(__vnegss2(*this));
     }
@@ -555,7 +618,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Negation (SIMD)
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector2 operator-() const
-        requires Is16BitFloat<T> && RealSignedNumber<T> && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && RealSignedNumber<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromNV16BitFloat(__hneg2(*this));
     }
@@ -584,7 +647,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise addition SIMD
     /// </summary>
     DEVICE_CODE Vector2 &operator+=(const Vector2 &aOther)
-        requires IsUShort<T> && CUDA_ONLY<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromUint(__vaddus2(*this, aOther));
         return *this;
@@ -594,7 +657,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise addition SIMD
     /// </summary>
     DEVICE_CODE Vector2 &operator+=(const Vector2 &aOther)
-        requires IsShort<T> && CUDA_ONLY<T>
+        requires IsShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromUint(__vaddss2(*this, aOther));
         return *this;
@@ -604,7 +667,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise addition SIMD
     /// </summary>
     DEVICE_CODE Vector2 &operator+=(const Vector2 &aOther)
-        requires Is16BitFloat<T> && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromNV16BitFloat(__hadd2(*this, aOther));
         return *this;
@@ -622,7 +685,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise addition SIMD
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector2 operator+(const Vector2 &aOther) const
-        requires IsUShort<T> && CUDA_ONLY<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromUint(__vaddus2(*this, aOther));
     }
@@ -631,7 +694,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise addition SIMD
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector2 operator+(const Vector2 &aOther) const
-        requires IsShort<T> && CUDA_ONLY<T>
+        requires IsShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromUint(__vaddss2(*this, aOther));
     }
@@ -640,7 +703,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise addition SIMD
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector2 operator+(const Vector2 &aOther) const
-        requires Is16BitFloat<T> && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromNV16BitFloat(__hadd2(*this, aOther));
     }
@@ -669,7 +732,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise subtraction SIMD
     /// </summary>
     DEVICE_CODE Vector2 &operator-=(const Vector2 &aOther)
-        requires IsUShort<T> && CUDA_ONLY<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromUint(__vsubus2(*this, aOther));
         return *this;
@@ -679,7 +742,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise subtraction SIMD
     /// </summary>
     DEVICE_CODE Vector2 &operator-=(const Vector2 &aOther)
-        requires IsShort<T> && CUDA_ONLY<T>
+        requires IsShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromUint(__vsubss2(*this, aOther));
         return *this;
@@ -689,7 +752,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise subtraction SIMD
     /// </summary>
     DEVICE_CODE Vector2 &operator-=(const Vector2 &aOther)
-        requires Is16BitFloat<T> && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromNV16BitFloat(__hsub2(*this, aOther));
         return *this;
@@ -709,7 +772,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise subtraction SIMD (inverted inplace sub: this = aOther - this)
     /// </summary>
     DEVICE_CODE Vector2 &SubInv(const Vector2 &aOther)
-        requires IsUShort<T> && CUDA_ONLY<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromUint(__vsubus2(aOther, *this));
         return *this;
@@ -719,7 +782,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise subtraction SIMD (inverted inplace sub: this = aOther - this)
     /// </summary>
     DEVICE_CODE Vector2 &SubInv(const Vector2 &aOther)
-        requires IsShort<T> && CUDA_ONLY<T>
+        requires IsShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromUint(__vsubss2(aOther, *this));
         return *this;
@@ -729,7 +792,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise subtraction SIMD (inverted inplace sub: this = aOther - this)
     /// </summary>
     DEVICE_CODE Vector2 &SubInv(const Vector2 &aOther)
-        requires Is16BitFloat<T> && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromNV16BitFloat(__hsub2(aOther, *this));
         return *this;
@@ -747,7 +810,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise subtraction SIMD
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector2 operator-(const Vector2 &aOther) const
-        requires IsUShort<T> && CUDA_ONLY<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromUint(__vsubus2(*this, aOther));
     }
@@ -756,7 +819,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise subtraction SIMD
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector2 operator-(const Vector2 &aOther) const
-        requires IsShort<T> && CUDA_ONLY<T>
+        requires IsShort<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromUint(__vsubss2(*this, aOther));
     }
@@ -765,7 +828,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise subtraction SIMD
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector2 operator-(const Vector2 &aOther) const
-        requires Is16BitFloat<T> && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromNV16BitFloat(__hsub2(*this, aOther));
     }
@@ -794,7 +857,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise multiplication SIMD
     /// </summary>
     DEVICE_CODE Vector2 &operator*=(const Vector2 &aOther)
-        requires Is16BitFloat<T> && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromNV16BitFloat(__hmul2(*this, aOther));
         return *this;
@@ -812,7 +875,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise multiplication SIMD
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector2 operator*(const Vector2 &aOther) const
-        requires Is16BitFloat<T> && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromNV16BitFloat(__hmul2(*this, aOther));
     }
@@ -841,7 +904,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise division SIMD
     /// </summary>
     DEVICE_CODE Vector2 &operator/=(const Vector2 &aOther)
-        requires Is16BitFloat<T> && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromNV16BitFloat(__h2div(*this, aOther));
         return *this;
@@ -861,7 +924,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise division SIMD (inverted inplace div: this = aOther / this)
     /// </summary>
     DEVICE_CODE Vector2 &DivInv(const Vector2 &aOther)
-        requires Is16BitFloat<T> && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         *this = FromNV16BitFloat(__h2div(aOther, *this));
         return *this;
@@ -879,7 +942,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise division SIMD
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector2 operator/(const Vector2 &aOther) const
-        requires Is16BitFloat<T> && CUDA_ONLY<T>
+        requires Is16BitFloat<T> && CUDA_ONLY<T> && EnableSIMD<T>
     {
         return FromNV16BitFloat(__h2div(*this, aOther));
     }
@@ -929,6 +992,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
             case Axis2D::Y:
                 return y;
         }
+        return x;
     }
 
     /// <summary>
@@ -1361,7 +1425,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// <summary>
     /// Element wise square root
     /// </summary>
-    Vector2<T> &Sqrt()
+    DEVICE_CODE Vector2<T> &Sqrt()
         requires(HostCode<T> || (!EnableSIMD<T>)) && NonNativeNumber<T> || ComplexFloatingPoint<T>
     {
         x = T::Sqrt(x);
@@ -1536,7 +1600,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Abs(const Vector2<T> &aVec)
-        requires NonNativeNumber<T>
+        requires RealSignedNumber<T> && NonNativeNumber<T>
     {
         Vector2<T> ret;
         ret.x = T::Abs(aVec.x);
@@ -1573,7 +1637,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute difference (SIMD)
     /// </summary>
     DEVICE_CODE Vector2<T> &AbsDiff(const Vector2<T> &aOther)
-        requires IsShort<T> && CUDA_ONLY<T> && NativeNumber<T>
+        requires IsShort<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         *this = FromUint(__vabsdiffs2(*this, aOther));
         return *this;
@@ -1583,7 +1647,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute difference (SIMD)
     /// </summary>
     DEVICE_CODE Vector2<T> &AbsDiff(const Vector2<T> &aOther)
-        requires IsUShort<T> && CUDA_ONLY<T> && NativeNumber<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         *this = FromUint(__vabsdiffu2(*this, aOther));
         return *this;
@@ -1616,7 +1680,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> AbsDiff(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires IsShort<T> && CUDA_ONLY<T> && NativeNumber<T>
+        requires IsShort<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         return FromUint(__vabsdiffs2(aLeft, aRight));
     }
@@ -1625,7 +1689,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> AbsDiff(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires IsUShort<T> && CUDA_ONLY<T> && NativeNumber<T>
+        requires IsUShort<T> && CUDA_ONLY<T> && NativeNumber<T> && EnableSIMD<T>
     {
         return FromUint(__vabsdiffu2(aLeft, aRight));
     }
@@ -1634,7 +1698,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE Vector2<T> &AbsDiff(const Vector2<T> &aOther)
-        requires NonNativeNumber<T>
+        requires RealSignedNumber<T> && NonNativeNumber<T>
     {
         x = T::Abs(x - aOther.x);
         y = T::Abs(y - aOther.y);
@@ -1645,7 +1709,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> AbsDiff(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires NonNativeNumber<T>
+        requires RealSignedNumber<T> && NonNativeNumber<T>
     {
         Vector2<T> ret;
         ret.x = T::Abs(aLeft.x - aRight.x);
@@ -1690,6 +1754,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Conjugate complex multiplication: aLeft * conj(aRight) per element
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> ConjMul(const Vector2<T> &aLeft, const Vector2<T> &aRight)
+        requires ComplexNumber<T>
     {
         return {T::ConjMul(aLeft.x, aRight.x), T::ConjMul(aLeft.y, aRight.y)};
     }
@@ -1758,10 +1823,21 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise clamp to value range
     /// </summary>
     DEVICE_CODE Vector2<T> &Clamp(T aMinVal, T aMaxVal)
-        requires NonNativeNumber<T>
+        requires NonNativeNumber<T> && (!ComplexNumber<T>)
     {
         x = T::Max(aMinVal, T::Min(x, aMaxVal));
         y = T::Max(aMinVal, T::Min(y, aMaxVal));
+        return *this;
+    }
+
+    /// <summary>
+    /// Component wise clamp to value range
+    /// </summary>
+    DEVICE_CODE Vector2<T> &Clamp(complex_basetype_t<T> aMinVal, complex_basetype_t<T> aMaxVal)
+        requires ComplexNumber<T>
+    {
+        x.Clamp(aMinVal, aMaxVal);
+        y.Clamp(aMinVal, aMaxVal);
         return *this;
     }
 
@@ -1833,7 +1909,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise minimum
     /// </summary>
     Vector2<T> &Min(const Vector2<T> &aOther)
-        requires HostCode<T>
+        requires HostCode<T> && NativeNumber<T>
     {
         x = std::min(x, aOther.x);
         y = std::min(y, aOther.y);
@@ -1844,7 +1920,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise minimum
     /// </summary>
     DEVICE_CODE Vector2<T> &Min(const Vector2<T> &aRight)
-        requires NonNativeNumber<T>
+        requires NonNativeNumber<T> && (!ComplexNumber<T>) && (HostCode<T> || (DeviceCode<T> && !EnableSIMD<T>))
     {
         x.Min(aRight.x);
         y.Min(aRight.y);
@@ -1900,7 +1976,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise minimum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Min(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires NonNativeNumber<T> && HostCode<T>
+        requires NonNativeNumber<T> && (!ComplexNumber<T>) && (HostCode<T> || (DeviceCode<T> && !EnableSIMD<T>))
     {
         return Vector2<T>{T::Min(aLeft.x, aRight.x), T::Min(aLeft.y, aRight.y)};
     }
@@ -1918,7 +1994,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns the minimum component of the vector
     /// </summary>
     DEVICE_CODE [[nodiscard]] T Min() const
-        requires NonNativeNumber<T>
+        requires NonNativeNumber<T> && (!ComplexNumber<T>)
     {
         return T::Min(x, y);
     }
@@ -1990,7 +2066,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise maximum
     /// </summary>
     DEVICE_CODE Vector2<T> &Max(const Vector2<T> &aRight)
-        requires NonNativeNumber<T>
+        requires NonNativeNumber<T> && (!ComplexNumber<T>) && (HostCode<T> || (DeviceCode<T> && !EnableSIMD<T>))
     {
         x.Max(aRight.x);
         y.Max(aRight.y);
@@ -2046,7 +2122,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Component wise maximum
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<T> Max(const Vector2<T> &aLeft, const Vector2<T> &aRight)
-        requires NonNativeNumber<T>
+        requires NonNativeNumber<T> && (!ComplexNumber<T>) && (HostCode<T> || (DeviceCode<T> && !EnableSIMD<T>))
     {
         return Vector2<T>{T::Max(aLeft.x, aRight.x), T::Max(aLeft.y, aRight.y)};
     }
@@ -2064,7 +2140,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// Returns the maximum component of the vector
     /// </summary>
     DEVICE_CODE [[nodiscard]] T Max() const
-        requires NonNativeNumber<T>
+        requires NonNativeNumber<T> && (!ComplexNumber<T>)
     {
         return T::Max(x, y);
     }
@@ -2361,15 +2437,77 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     }
 #pragma endregion
 
-#pragma region Compare
+#pragma region Compare per element
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns 0xFF per element for true, 0x00 for false
+    /// </summary>
+    [[nodiscard]] static Vector2<byte> CompareEQEps(Vector2<T> aLeft, Vector2<T> aRight, T aEpsilon)
+        requires NativeFloatingPoint<T> && HostCode<T>
+    {
+        MakeNANandINFValid(aLeft.x, aRight.x);
+        MakeNANandINFValid(aLeft.y, aRight.y);
+
+        Vector2<byte> ret;
+        ret.x = static_cast<byte>(static_cast<int>(std::abs(aLeft.x - aRight.x) <= aEpsilon) * TRUE_VALUE);
+        ret.y = static_cast<byte>(static_cast<int>(std::abs(aLeft.y - aRight.y) <= aEpsilon) * TRUE_VALUE);
+        return ret;
+    }
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns 0xFF per element for true, 0x00 for false
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector2<byte> CompareEQEps(Vector2<T> aLeft, Vector2<T> aRight, T aEpsilon)
+        requires NativeFloatingPoint<T> && DeviceCode<T>
+    {
+        MakeNANandINFValid(aLeft.x, aRight.x);
+        MakeNANandINFValid(aLeft.y, aRight.y);
+
+        Vector2<byte> ret;
+        ret.x = static_cast<byte>(static_cast<int>(abs(aLeft.x - aRight.x) <= aEpsilon) * TRUE_VALUE);
+        ret.y = static_cast<byte>(static_cast<int>(abs(aLeft.y - aRight.y) <= aEpsilon) * TRUE_VALUE);
+        return ret;
+    }
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns 0xFF per element for true, 0x00 for false
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector2<byte> CompareEQEps(Vector2<T> aLeft, Vector2<T> aRight, T aEpsilon)
+        requires Is16BitFloat<T>
+    {
+        MakeNANandINFValid(aLeft.x, aRight.x);
+        MakeNANandINFValid(aLeft.y, aRight.y);
+
+        Vector2<byte> ret;
+        ret.x = static_cast<byte>(static_cast<int>(T::Abs(aLeft.x - aRight.x) <= aEpsilon) * TRUE_VALUE);
+        ret.y = static_cast<byte>(static_cast<int>(T::Abs(aLeft.y - aRight.y) <= aEpsilon) * TRUE_VALUE);
+        return ret;
+    }
+
+    /// <summary>
+    /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
+    /// the element, returns 0xFF per element for true, 0x00 for false
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector2<byte> CompareEQEps(const Vector2<T> &aLeft, const Vector2<T> &aRight,
+                                                                complex_basetype_t<T> aEpsilon)
+        requires ComplexFloatingPoint<T>
+    {
+        Vector2<byte> ret;
+        ret.x = static_cast<byte>(static_cast<int>(T::EqEps(aLeft.x, aRight.x, aEpsilon)) * TRUE_VALUE);
+        ret.y = static_cast<byte>(static_cast<int>(T::EqEps(aLeft.y, aRight.y, aEpsilon)) * TRUE_VALUE);
+        return ret;
+    }
+
     /// <summary>
     /// Element wise comparison equal, returns 0xFF per element for true, 0x00 for false
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector2<byte> CompareEQ(const Vector2<T> &aLeft, const Vector2<T> &aRight)
     {
         Vector2<byte> ret;
-        ret.x = byte(aLeft.x == aRight.x) * TRUE_VALUE;
-        ret.y = byte(aLeft.y == aRight.y) * TRUE_VALUE;
+        ret.x = static_cast<byte>(static_cast<int>(aLeft.x == aRight.x) * TRUE_VALUE);
+        ret.y = static_cast<byte>(static_cast<int>(aLeft.y == aRight.y) * TRUE_VALUE);
         return ret;
     }
 
@@ -2380,8 +2518,8 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
         requires RealNumber<T>
     {
         Vector2<byte> ret;
-        ret.x = byte(aLeft.x >= aRight.x) * TRUE_VALUE;
-        ret.y = byte(aLeft.y >= aRight.y) * TRUE_VALUE;
+        ret.x = static_cast<byte>(static_cast<int>(aLeft.x >= aRight.x) * TRUE_VALUE);
+        ret.y = static_cast<byte>(static_cast<int>(aLeft.y >= aRight.y) * TRUE_VALUE);
         return ret;
     }
 
@@ -2392,8 +2530,8 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
         requires RealNumber<T>
     {
         Vector2<byte> ret;
-        ret.x = byte(aLeft.x > aRight.x) * TRUE_VALUE;
-        ret.y = byte(aLeft.y > aRight.y) * TRUE_VALUE;
+        ret.x = static_cast<byte>(static_cast<int>(aLeft.x > aRight.x) * TRUE_VALUE);
+        ret.y = static_cast<byte>(static_cast<int>(aLeft.y > aRight.y) * TRUE_VALUE);
         return ret;
     }
 
@@ -2404,8 +2542,8 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
         requires RealNumber<T>
     {
         Vector2<byte> ret;
-        ret.x = byte(aLeft.x <= aRight.x) * TRUE_VALUE;
-        ret.y = byte(aLeft.y <= aRight.y) * TRUE_VALUE;
+        ret.x = static_cast<byte>(static_cast<int>(aLeft.x <= aRight.x) * TRUE_VALUE);
+        ret.y = static_cast<byte>(static_cast<int>(aLeft.y <= aRight.y) * TRUE_VALUE);
         return ret;
     }
 
@@ -2416,8 +2554,8 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
         requires RealNumber<T>
     {
         Vector2<byte> ret;
-        ret.x = byte(aLeft.x < aRight.x) * TRUE_VALUE;
-        ret.y = byte(aLeft.y < aRight.y) * TRUE_VALUE;
+        ret.x = static_cast<byte>(static_cast<int>(aLeft.x < aRight.x) * TRUE_VALUE);
+        ret.y = static_cast<byte>(static_cast<int>(aLeft.y < aRight.y) * TRUE_VALUE);
         return ret;
     }
 
@@ -2427,8 +2565,8 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     DEVICE_CODE [[nodiscard]] static Vector2<byte> CompareNEQ(const Vector2<T> &aLeft, const Vector2<T> &aRight)
     {
         Vector2<byte> ret;
-        ret.x = byte(aLeft.x != aRight.x) * TRUE_VALUE;
-        ret.y = byte(aLeft.y != aRight.y) * TRUE_VALUE;
+        ret.x = static_cast<byte>(static_cast<int>(aLeft.x != aRight.x) * TRUE_VALUE);
+        ret.y = static_cast<byte>(static_cast<int>(aLeft.y != aRight.y) * TRUE_VALUE);
         return ret;
     }
 #pragma endregion

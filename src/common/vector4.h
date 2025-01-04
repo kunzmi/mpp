@@ -194,7 +194,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     }
 
     /// <summary>
-    /// Initializes vector to all components = aVal (avoid confusion with the array constructor)
+    /// Initializes vector to all components = aVal (especially when set to 0)
     /// </summary>
     DEVICE_CODE Vector4(int aVal) noexcept
         requires(!IsInt<T>)
@@ -205,7 +205,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Initializes vector to all components = [aVal[0], aVal[1], aVal[2], aVal[3]]
     /// </summary>
-    DEVICE_CODE Vector4(T aVal[4]) noexcept : x(aVal[0]), y(aVal[1]), z(aVal[2]), w(aVal[3])
+    DEVICE_CODE explicit Vector4(T aVal[4]) noexcept : x(aVal[0]), y(aVal[1]), z(aVal[2]), w(aVal[3])
     {
     }
 
@@ -222,6 +222,9 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     DEVICE_CODE Vector4(const Vector3<T> &aVec3, T aAlpha) noexcept : x(aVec3.x), y(aVec3.y), z(aVec3.z), w(aAlpha)
     {
     }
+
+    // implemented in Vector4A.h to avoid cyclic includes:
+    DEVICE_CODE explicit Vector4(const Vector4A<T> &aVec3) noexcept;
 
     /// <summary>
     /// Usefull constructor for SIMD instructions
@@ -362,9 +365,6 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     Vector4(Vector4 &&) noexcept                 = default;
     Vector4 &operator=(const Vector4 &) noexcept = default;
     Vector4 &operator=(Vector4 &&) noexcept      = default;
-
-    // implemented in Vector4A.h to avoid cyclic includes:
-    Vector4 &operator=(const Vector4A<T> &) noexcept;
 
   private:
     // if we make those converters public we will get in trouble with some T constructors / operators
@@ -2571,7 +2571,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> Abs(const Vector4<T> &aVec)
-        requires NonNativeNumber<T>
+        requires RealSignedNumber<T> && NonNativeNumber<T>
     {
         Vector4<T> ret;
         ret.x = T::Abs(aVec.x);
@@ -2600,7 +2600,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute difference (per element also for complex!)
     /// </summary>
     DEVICE_CODE Vector4<T> &AbsDiff(const Vector4<T> &aOther)
-        requires Is16BitFloat<T>
+        requires RealSignedNumber<T> && NonNativeNumber<T>
     {
         x = T::Abs(x - aOther.x);
         y = T::Abs(y - aOther.y);
@@ -2627,7 +2627,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> AbsDiff(const Vector4<T> &aLeft, const Vector4<T> &aRight)
-        requires Is16BitFloat<T>
+        requires RealSignedNumber<T> && NonNativeNumber<T>
     {
         Vector4<T> ret;
         ret.x = T::Abs(aLeft.x - aRight.x);
@@ -2800,6 +2800,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// Conjugate complex multiplication: aLeft * conj(aRight) per element
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4<T> ConjMul(const Vector4<T> &aLeft, const Vector4<T> &aRight)
+        requires ComplexNumber<T>
     {
         return {T::ConjMul(aLeft.x, aRight.x), T::ConjMul(aLeft.y, aRight.y), T::ConjMul(aLeft.z, aRight.z),
                 T::ConjMul(aLeft.w, aRight.w)};

@@ -69,6 +69,7 @@ function(set_project_warnings project_name)
      -Wduplicated-branches # warn if if / else branches have duplicated code
      -Wlogical-op # warn about logical operations being used where bitwise were probably wanted
      -Wuseless-cast # warn if you perform a cast to the same type
+     -Wno-psabi # don't warn for the note: "the ABI for passing parameters with 32-byte alignment has changed in GCC 4.6"
   )
 
   if(MSVC)

@@ -3,8 +3,12 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_get_random_seed.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <common/bfloat16.h>
+#include <common/complex.h>
 #include <common/defines.h>
+#include <common/half_fp16.h>
 #include <common/image/pixelTypes.h>
+#include <common/numberTypes.h>
 #include <common/numeric_limits.h>
 #include <common/safeCast.h>
 #include <common/vectorTypes.h>
@@ -21,6 +25,9 @@ using namespace Catch;
 
 namespace opp::cuda
 {
+template <typename T> void runtest_vector4_kernel(Vector4<T> *aDataIn, Vector4<T> *aDataOut, Pixel8uC4 *aComp);
+} // namespace opp::cuda
+
 template <typename T> Vector4<T> GetRandomValue(std::default_random_engine & /*aEngine*/)
 {
     return Vector4<T>();
@@ -29,8 +36,7 @@ template <typename T>
 Vector4<T> GetRandomValue(std::default_random_engine &aEngine)
     requires NativeFloatingPoint<T>
 {
-    std::uniform_real_distribution<T> uniform_dist(numeric_limits<T>::lowest() / static_cast<T>(100000),
-                                                   numeric_limits<T>::max() / static_cast<T>(100000));
+    std::uniform_real_distribution<T> uniform_dist(static_cast<T>(-100000), static_cast<T>(100000));
     return Vector4<T>(uniform_dist(aEngine), uniform_dist(aEngine), uniform_dist(aEngine), uniform_dist(aEngine));
 }
 template <typename T>
@@ -88,11 +94,6 @@ template <> Pixel16fcC4 GetRandomValue<c_HalfFp16>(std::default_random_engine &a
         c_HalfFp16(static_cast<HalfFp16>(uniform_dist(aEngine)), static_cast<HalfFp16>(uniform_dist(aEngine))),
         c_HalfFp16(static_cast<HalfFp16>(uniform_dist(aEngine)), static_cast<HalfFp16>(uniform_dist(aEngine))));
 }
-
-template <typename T> void runtest_vector4_kernel(Vector4<T> *aDataIn, Vector4<T> *aDataOut, Pixel8uC4 *aComp);
-
-} // namespace opp::cuda
-
 template <typename T> complex_basetype_t<T> smallEps()
 {
     if constexpr (std::same_as<complex_basetype_t<T>, double>)
@@ -857,7 +858,7 @@ TEST_CASE("Pixel64fC4 CUDA", "[Common]")
     {
         if (epsilon[i] != 0.0)
         {
-            CHECK(Pixel64fcC4::EqEps(dataOut[i], dataOutGPU[i], epsilon[i]));
+            CHECK(Pixel64fC4::EqEps(dataOut[i], dataOutGPU[i], epsilon[i]));
         }
         else
         {

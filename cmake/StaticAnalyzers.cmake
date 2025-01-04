@@ -20,7 +20,6 @@ endif()
 
 if(ENABLE_CLANG_TIDY)
   find_program(CLANGTIDY NAMES clang-tidy-18 clang-tidy HINTS ${CLANGTIDY_HINT_DIR})
-    message("CLANGTIDY: ${CLANGTIDY}")
   if(CLANGTIDY)
     if(MSVC)
 	  #MSVC needs extra exception parameter EHsc

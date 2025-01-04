@@ -27,7 +27,7 @@ void InvokeAddSrcSrc(const SrcT *aSrc1, size_t pitchSrc1, const SrcT *aSrc2, siz
 {
     OPP_CUDA_REGISTER_TEMPALTE;
 
-    constexpr size_t TupelSize = KernelConfiguration<sizeof(DstT)>::TupelSize;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
     using simdOP_t = simd::Add<Tupel<DstT, TupelSize>>;
     if constexpr (simdOP_t::has_simd)

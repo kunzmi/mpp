@@ -177,4 +177,26 @@ void InvokeForEachPixelMaskedKernel(const dim3 &aBlockSize, uint aSharedMemory, 
                                              << " SharedMemory: " << aSharedMemory << " Stream: " << aStream
                                              << " Tupel size: " << TupelSize);
 }
+
+template <typename DstT, size_t TupelSize, typename funcType>
+void InvokeForEachPixelMaskedKernelDefault(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aDst, size_t pitchDst,
+                                           const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx,
+                                           const funcType &aFunc)
+{
+    if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
+    {
+        const dim3 BlockSize               = ConfigBlockSize<"Default">::value;
+        constexpr int WarpAlignmentInBytes = ConfigWarpAlignment<"Default">::value;
+        constexpr uint SharedMemory        = 0;
+
+        InvokeForEachPixelMaskedKernel<DstT, TupelSize, WarpAlignmentInBytes, funcType>(
+            BlockSize, SharedMemory, aStreamCtx.Stream, aMask, aPitchMask, aDst, pitchDst, aSize, aFunc);
+    }
+    else
+    {
+        throw CUDAUNSUPPORTED(forEachPixelMaskedKernel,
+                              "Trying to execute on a platform with an unsupported compute capability: "
+                                  << aStreamCtx.ComputeCapabilityMajor << "." << aStreamCtx.ComputeCapabilityMinor);
+    }
+}
 } // namespace opp::image::cuda

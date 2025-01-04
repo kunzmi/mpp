@@ -4,7 +4,10 @@
 #include "needSaturationClamp.h"
 #include "safeCast.h"
 #include <cmath>
+#include <common/bfloat16.h>
+#include <common/half_fp16.h>
 #include <common/numberTypes.h>
+#include <common/numeric_limits.h>
 #include <common/utilities.h>
 #include <complex>
 #include <concepts>
@@ -39,6 +42,7 @@ namespace opp
 // forward declaration
 template <Number T> struct Vector2;
 template <RealSignedNumber T> struct Complex;
+template <typename TFrom, typename TTo> struct numeric_limits_conversion;
 
 using c_short    = Complex<short>;
 using c_int      = Complex<int>;
@@ -65,6 +69,15 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// Initializes complex number with only real part, imag = 0
     /// </summary>
     DEVICE_CODE Complex(T aVal) noexcept : real(aVal), imag(static_cast<T>(0))
+    {
+    }
+
+    /// <summary>
+    /// Initializes complex number with only real part, imag = 0 (avoid confusion with the array constructor)
+    /// </summary>
+    DEVICE_CODE Complex(int aVal) noexcept
+        requires(!IsInt<T>)
+        : real(static_cast<T>(aVal)), imag(static_cast<T>(0))
     {
     }
 
@@ -317,8 +330,8 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     DEVICE_CODE [[nodiscard]] static bool EqEps(Complex aLeft, Complex aRight, T aEpsilon)
         requires Is16BitFloat<T>
     {
-        /*MakeNANandINFValid(aLeft.real, aRight.real);
-        MakeNANandINFValid(aLeft.imag, aRight.imag);*/
+        MakeNANandINFValid(aLeft.real, aRight.real);
+        MakeNANandINFValid(aLeft.imag, aRight.imag);
 
         bool res = T::Abs(aLeft.real - aRight.real) <= aEpsilon;
         res &= T::Abs(aLeft.imag - aRight.imag) <= aEpsilon;

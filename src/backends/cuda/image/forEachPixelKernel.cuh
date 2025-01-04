@@ -151,12 +151,21 @@ template <typename DstT, size_t TupelSize, typename funcType>
 void InvokeForEachPixelKernelDefault(DstT *aDst, size_t pitchDst, const Size2D &aSize,
                                      const opp::cuda::StreamCtx &aStreamCtx, const funcType &aFunc)
 {
-    const dim3 BlockSize               = KernelConfiguration<sizeof(DstT)>::BlockSize;
-    constexpr int WarpAlignmentInBytes = KernelConfiguration<sizeof(DstT)>::WarpAlignmentInBytes;
-    constexpr uint SharedMemory        = 0;
+    if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
+    {
+        const dim3 BlockSize               = ConfigBlockSize<"Default">::value;
+        constexpr int WarpAlignmentInBytes = ConfigWarpAlignment<"Default">::value;
+        constexpr uint SharedMemory        = 0;
 
-    InvokeForEachPixelKernel<DstT, TupelSize, WarpAlignmentInBytes, funcType>(
-        BlockSize, SharedMemory, aStreamCtx.Stream, aDst, pitchDst, aSize, aFunc);
+        InvokeForEachPixelKernel<DstT, TupelSize, WarpAlignmentInBytes, funcType>(
+            BlockSize, SharedMemory, aStreamCtx.Stream, aDst, pitchDst, aSize, aFunc);
+    }
+    else
+    {
+        throw CUDAUNSUPPORTED(forEachPixelKernel,
+                              "Trying to execute on a platform with an unsupported compute capability: "
+                                  << aStreamCtx.ComputeCapabilityMajor << "." << aStreamCtx.ComputeCapabilityMinor);
+    }
 }
 
 } // namespace cuda

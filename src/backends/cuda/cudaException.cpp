@@ -90,4 +90,32 @@ CudaException::CudaException(const std::string &aMessage, [[maybe_unused]] const
     What() = ss.str();
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+CudaUnsupportedException::CudaUnsupportedException(const std::string &aKernelName, const std::string &aMessage,
+                                                   [[maybe_unused]] const std::filesystem::path &aCodeFileName,
+                                                   [[maybe_unused]] int aLineNumber,
+                                                   [[maybe_unused]] const std::string &aFunctionName)
+    : OPPException(aMessage), mKernelName(aKernelName)
+{
+#ifdef NDEBUG
+    std::stringstream ss;
+    ss << "Kernel name: " << aKernelName << std::endl << "Error message: " << aMessage;
+#else
+#ifdef PROJECT_SOURCE_DIR
+    const std::filesystem::path src          = PROJECT_SOURCE_DIR;
+    const std::filesystem::path codeFileName = aCodeFileName.lexically_relative(src);
+#else
+    const std::filesystem::path codeFileName = aCodeFileName;
+#endif
+
+    std::stringstream ss;
+    ss << "Unsupported Cuda platform error in " << codeFileName.generic_string() << " in function " << aFunctionName
+       << " @ " << aLineNumber << std::endl
+       << "Kernel name: " << aKernelName << std::endl
+       << "Error message: " << aMessage;
+#endif
+
+    What() = ss.str();
+}
+
 } // namespace opp::cuda

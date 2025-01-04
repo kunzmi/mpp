@@ -1,5 +1,6 @@
 #pragma once
 #include <common/defines.h>
+#include <common/numeric_limits.h>
 #include <concepts>
 #ifdef IS_CUDA_COMPILER
 #include <cuda_fp16.h>
@@ -709,4 +710,92 @@ DEVICE_CODE bool isinf(HalfFp16 aVal)
     return __hisinf(aVal.value);
 }
 #endif
+
+// 16 bit half precision floating point types
+template <> struct numeric_limits<HalfFp16>
+{
+    [[nodiscard]] static constexpr DEVICE_CODE HalfFp16 min() noexcept
+    {
+        return HalfFp16::FromUShort(static_cast<ushort>(0x0400));
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE HalfFp16 max() noexcept
+    {
+        return HalfFp16::FromUShort(static_cast<ushort>(0x7BFF));
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE HalfFp16 lowest() noexcept
+    {
+        return HalfFp16::FromUShort(static_cast<ushort>(0xFBFF));
+    }
+    // minimum exact integer in float = -(2^11) = -2048
+    [[nodiscard]] static constexpr DEVICE_CODE HalfFp16 minExact() noexcept
+    {
+        return HalfFp16::FromUShort(static_cast<ushort>(0xE800));
+    }
+    // maximum exact integer in float = 2^11 = 2048
+    [[nodiscard]] static constexpr DEVICE_CODE HalfFp16 maxExact() noexcept
+    {
+        return HalfFp16::FromUShort(static_cast<ushort>(0x6800));
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE HalfFp16 infinity() noexcept
+    {
+        return HalfFp16::FromUShort(static_cast<ushort>(0x7c00));
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE HalfFp16 quiet_NaN() noexcept
+    {
+        return HalfFp16::FromUShort(static_cast<ushort>(0x7e00));
+    }
+};
+
+// numeric limits when converting from one type to another, especially 16-Bit floats have some restrictions
+template <typename TTo> struct numeric_limits_conversion<HalfFp16, TTo>
+{
+    // HalfFp16 does not have a constexpr constructor on cuda device...
+    [[nodiscard]] static const DEVICE_CODE HalfFp16 min() noexcept
+    {
+        return static_cast<HalfFp16>(numeric_limits<TTo>::min());
+    }
+    [[nodiscard]] static const DEVICE_CODE HalfFp16 max() noexcept
+    {
+        return static_cast<HalfFp16>(numeric_limits<TTo>::max());
+    }
+    [[nodiscard]] static const DEVICE_CODE HalfFp16 lowest() noexcept
+    {
+        return static_cast<HalfFp16>(numeric_limits<TTo>::lowest());
+    }
+    [[nodiscard]] static const DEVICE_CODE HalfFp16 minExact() noexcept
+    {
+        return static_cast<HalfFp16>(numeric_limits<TTo>::minExact());
+    }
+    [[nodiscard]] static const DEVICE_CODE HalfFp16 maxExact() noexcept
+    {
+        return static_cast<HalfFp16>(numeric_limits<TTo>::maxExact());
+    }
+};
+
+template <> struct numeric_limits_conversion<HalfFp16, short>
+{
+    [[nodiscard]] static const DEVICE_CODE HalfFp16 min() noexcept
+    {
+        return static_cast<HalfFp16>(numeric_limits<short>::min());
+    }
+    [[nodiscard]] static const DEVICE_CODE HalfFp16 max() noexcept
+    {
+        // special case for half floats: the maximum value of short is slightly larger than the closest exact
+        // integer in HalfFp16, and as we use round to nearest, the clamping would result in a too large number.
+        // Thus for HalfFp16 and short, we clamp to the exact integer smaller than short::max(), i.e. 32752
+        return HalfFp16::FromUShort(0x77FF); // = 32752
+    }
+    [[nodiscard]] static const DEVICE_CODE HalfFp16 lowest() noexcept
+    {
+        return static_cast<HalfFp16>(numeric_limits<short>::lowest());
+    }
+    [[nodiscard]] static const DEVICE_CODE HalfFp16 minExact() noexcept
+    {
+        return static_cast<HalfFp16>(numeric_limits<short>::minExact());
+    }
+    [[nodiscard]] static const DEVICE_CODE HalfFp16 maxExact() noexcept
+    {
+        return static_cast<HalfFp16>(numeric_limits<short>::maxExact());
+    }
+};
 } // namespace opp

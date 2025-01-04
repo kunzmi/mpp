@@ -1898,7 +1898,7 @@ TEST_CASE("Pixel32fcC4", "[Common]")
     CHECK(add4.z == Complex<float>(8, 6));
     CHECK(add4.w == Complex<float>(10, -8));
 
-    add4 += 3;
+    add4 += 3.0f + 0_i;
     CHECK(add4.x == Complex<float>(7, 2));
     CHECK(add4.y == Complex<float>(9, -4));
     CHECK(add4.z == Complex<float>(11, 6));
@@ -1929,7 +1929,7 @@ TEST_CASE("Pixel32fcC4", "[Common]")
     CHECK(sub4.z == Complex<float>(4, 0));
     CHECK(sub4.w == Complex<float>(4, 0));
 
-    sub4 -= 3;
+    sub4 -= 3.0f + 0_i;
     CHECK(sub4.x == Complex<float>(1, 0));
     CHECK(sub4.y == Complex<float>(1, 0));
     CHECK(sub4.z == Complex<float>(1, 0));
@@ -1970,7 +1970,7 @@ TEST_CASE("Pixel32fcC4", "[Common]")
     CHECK(mul4.z == Complex<float>(-68, 576));
     CHECK(mul4.w == Complex<float>(-28, 96));
 
-    mul4 *= 3;
+    mul4 *= 3.0f + 0_i;
     CHECK(mul4.x == Complex<float>(-108, 480));
     CHECK(mul4.y == Complex<float>(-156, 1008));
     CHECK(mul4.z == Complex<float>(-204, 1728));
@@ -2017,7 +2017,7 @@ TEST_CASE("Pixel32fcC4", "[Common]")
     CHECK(div4.w.real == Approx(-2.720000029f).margin(0.001));
     CHECK(div4.w.imag == Approx(0.959999979f).margin(0.001));
 
-    div4 /= 3;
+    div4 /= 3.0f + 0_i;
     CHECK(div4.x.real == Approx(1.626016259f).margin(0.001));
     CHECK(div4.x.imag == Approx(-0.032520324f).margin(0.001));
     CHECK(div4.y.real == Approx(-0.21960786f).margin(0.001));

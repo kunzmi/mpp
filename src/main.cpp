@@ -20,7 +20,7 @@
 // #include <common/vectorTypes.h>
 
 #include <backends/cuda/image/addKernel.h>
-// #include <backends/cuda/image/configurations.h>
+#include <backends/cuda/image/configurations.h>
 //
 #include <backends/cuda/devVar.h>
 #include <backends/cuda/devVarView.h>
@@ -56,10 +56,6 @@ void fun(Pixel8uC4 aTest)
 
 int main()
 {
-    constexpr bool ttt = need_saturation_clamp_v<float, c_short>;
-
-    numeric_limits_conversion<c_float, c_short>::max();
-
     /*
     constexpr bool val1 = std::is_trivially_assignable_v<Pixel32fC4, Pixel32fC4>;
     constexpr bool val2 = std::is_trivially_constructible_v<Pixel32fC2>;

@@ -30,6 +30,26 @@ class CudaException : public OPPException
     CudaException &operator=(const CudaException &) = delete;
     CudaException &operator=(CudaException &&)      = delete;
 };
+
+/// <summary>
+/// CudaUnsupported is thrown when we try to execute a kernel on an unsupported hardware version.
+/// </summary>
+class CudaUnsupportedException : public OPPException
+{
+  private:
+    std::string mKernelName;
+
+  public:
+    CudaUnsupportedException(const std::string &aKernelName, const std::string &aMessage,
+                             const std::filesystem::path &aCodeFileName, int aLineNumber,
+                             const std::string &aFunctionName);
+    ~CudaUnsupportedException() noexcept override = default;
+
+    CudaUnsupportedException(CudaUnsupportedException &&)                 = default;
+    CudaUnsupportedException(const CudaUnsupportedException &)            = default;
+    CudaUnsupportedException &operator=(const CudaUnsupportedException &) = delete;
+    CudaUnsupportedException &operator=(CudaUnsupportedException &&)      = delete;
+};
 } // namespace opp::cuda
 
 /// <summary>
@@ -70,7 +90,7 @@ inline void __cudaSafeCall(cudaError_t aErr, const std::string &aMessage, const 
     }
 
 #define CUDAEXCEPTION(msg)                                                                                             \
-    (cuda::CudaException((std::ostringstream() << msg).str(), __FILE__, __LINE__, __PRETTY_FUNCTION__))
+    (opp::cuda::CudaException((std::ostringstream() << msg).str(), __FILE__, __LINE__, __PRETTY_FUNCTION__))
 
 #define peekAndCheckLastCudaError(msg)                                                                                 \
     {                                                                                                                  \
@@ -91,6 +111,10 @@ inline void __cudaSafeCall(cudaError_t aErr, const std::string &aMessage, const 
                                            __PRETTY_FUNCTION__);                                                       \
         }                                                                                                              \
     }
+
+#define CUDAUNSUPPORTED(kernelName, msg)                                                                               \
+    (opp::cuda::CudaUnsupportedException((#kernelName), (std::ostringstream() << msg).str(), __FILE__, __LINE__,       \
+                                         __PRETTY_FUNCTION__))
 // NOLINTEND
 
 /// <summary>
