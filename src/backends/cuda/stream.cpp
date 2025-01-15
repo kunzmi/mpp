@@ -1,3 +1,6 @@
+#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
+#if OPP_ENABLE_CUDA_CORE
+
 #include "cudaException.h"
 #include "event.h"
 #include "stream.h"
@@ -116,3 +119,4 @@ const Stream Stream::PerThread(cudaStreamPerThread); // NOLINT(cppcoreguidelines
 
 #include <common/disableWarningsEnd.h>
 } // namespace opp::cuda
+#endif // OPP_ENABLE_CUDA_CORE

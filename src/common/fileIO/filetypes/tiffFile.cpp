@@ -1,5 +1,5 @@
-#include "bigTiffImageFileDirectory.h"
 #include "tiffFile.h"
+#include "bigTiffImageFileDirectory.h"
 #include "tiffImageFileDirectory.h"
 #include <algorithm>
 #include <array>
@@ -2700,7 +2700,7 @@ void TIFFFile::WriteTIFF(const std::filesystem::path &aFileName, int aDimX, int 
     tiff.mImageFileDirectories.push_back(std::make_shared<ImageFileDirectory>(
         to_uint(aDimX), to_uint(aDimY), aPixelSize, to_ushort(tiff.mBitsPerSample), to_ushort(tiff.mSamplesPerPixel),
         tiff.mSampleFormat, false, tiff.mPhotometricInterpretation, diffEncoded,
-        std::vector<uint>(uint(compressedSize))));
+        std::vector<uint>{uint(compressedSize)}));
 
     tiff.OpenFileForWriting(FileOpenMode::EraseOldFile);
 

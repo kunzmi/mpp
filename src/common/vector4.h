@@ -5,8 +5,9 @@
 #include "numberTypes.h"
 #include "numeric_limits.h"
 #include "safeCast.h"
-#include "vector_typetraits.h"
+#include "staticCast.h"
 #include "vector3.h" //for additional constructor from Vector3<T>
+#include "vector_typetraits.h"
 #include <cmath>
 #include <common/utilities.h>
 #include <concepts>
@@ -189,14 +190,14 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Initializes vector to all components = aVal
     /// </summary>
-    DEVICE_CODE Vector4(T aVal) noexcept : x(aVal), y(aVal), z(aVal), w(aVal)
+    DEVICE_CODE constexpr Vector4(T aVal) noexcept : x(aVal), y(aVal), z(aVal), w(aVal)
     {
     }
 
     /// <summary>
     /// Initializes vector to all components = aVal (especially when set to 0)
     /// </summary>
-    DEVICE_CODE Vector4(int aVal) noexcept
+    DEVICE_CODE constexpr Vector4(int aVal) noexcept
         requires(!IsInt<T>)
         : x(static_cast<T>(aVal)), y(static_cast<T>(aVal)), z(static_cast<T>(aVal)), w(static_cast<T>(aVal))
     {
@@ -205,26 +206,27 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Initializes vector to all components = [aVal[0], aVal[1], aVal[2], aVal[3]]
     /// </summary>
-    DEVICE_CODE explicit Vector4(T aVal[4]) noexcept : x(aVal[0]), y(aVal[1]), z(aVal[2]), w(aVal[3])
+    DEVICE_CODE constexpr explicit Vector4(T aVal[4]) noexcept : x(aVal[0]), y(aVal[1]), z(aVal[2]), w(aVal[3])
     {
     }
 
     /// <summary>
     /// Initializes vector to [aX, aY, aZ, aW]
     /// </summary>
-    DEVICE_CODE Vector4(T aX, T aY, T aZ, T aW) noexcept : x(aX), y(aY), z(aZ), w(aW)
+    DEVICE_CODE constexpr Vector4(T aX, T aY, T aZ, T aW) noexcept : x(aX), y(aY), z(aZ), w(aW)
     {
     }
 
     /// <summary>
     /// Usefull constructor if we want a Vector4 from 3 channel pixel Vector3 and one alpha channel
     /// </summary>
-    DEVICE_CODE Vector4(const Vector3<T> &aVec3, T aAlpha) noexcept : x(aVec3.x), y(aVec3.y), z(aVec3.z), w(aAlpha)
+    DEVICE_CODE constexpr Vector4(const Vector3<T> &aVec3, T aAlpha) noexcept
+        : x(aVec3.x), y(aVec3.y), z(aVec3.z), w(aAlpha)
     {
     }
 
     // implemented in Vector4A.h to avoid cyclic includes:
-    DEVICE_CODE explicit Vector4(const Vector4A<T> &aVec3) noexcept;
+    DEVICE_CODE constexpr explicit Vector4(const Vector4A<T> &aVec4A) noexcept;
 
     /// <summary>
     /// Usefull constructor for SIMD instructions
@@ -270,17 +272,17 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
         {
             Vector4<T2> temp(aVec);
             temp.template ClampToTargetType<T>();
-            x = static_cast<T>(temp.x);
-            y = static_cast<T>(temp.y);
-            z = static_cast<T>(temp.z);
-            w = static_cast<T>(temp.w);
+            x = StaticCast<T2, T>(temp.x);
+            y = StaticCast<T2, T>(temp.y);
+            z = StaticCast<T2, T>(temp.z);
+            w = StaticCast<T2, T>(temp.w);
         }
         else
         {
-            x = static_cast<T>(aVec.x);
-            y = static_cast<T>(aVec.y);
-            z = static_cast<T>(aVec.z);
-            w = static_cast<T>(aVec.w);
+            x = StaticCast<T2, T>(aVec.x);
+            y = StaticCast<T2, T>(aVec.y);
+            z = StaticCast<T2, T>(aVec.z);
+            w = StaticCast<T2, T>(aVec.w);
         }
     }
 
@@ -301,10 +303,10 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
         {
             aVec.template ClampToTargetType<T>();
         }
-        x = static_cast<T>(aVec.x);
-        y = static_cast<T>(aVec.y);
-        z = static_cast<T>(aVec.z);
-        w = static_cast<T>(aVec.w);
+        x = StaticCast<T2, T>(aVec.x);
+        y = StaticCast<T2, T>(aVec.y);
+        z = StaticCast<T2, T>(aVec.z);
+        w = StaticCast<T2, T>(aVec.w);
     }
 
     /// <summary>
@@ -1746,7 +1748,8 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// </summary>
     template <Number T2> [[nodiscard]] static Vector4<T> DEVICE_CODE Convert(const Vector4<T2> &aVec)
     {
-        return {static_cast<T>(aVec.x), static_cast<T>(aVec.y), static_cast<T>(aVec.z), static_cast<T>(aVec.w)};
+        return {StaticCast<T2, T>(aVec.x), StaticCast<T2, T>(aVec.y), StaticCast<T2, T>(aVec.z),
+                StaticCast<T2, T>(aVec.w)};
     }
 #pragma endregion
 

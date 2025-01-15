@@ -1,9 +1,15 @@
-add_library(backends.cuda 
+if (OPP_ENABLE_CUDA_CORE)
+
+set(filesForbackends.cuda 
 	cudaException.cpp
 	event.cpp
 	stream.cpp
-	streamCtx.cpp
-	)
+)
+if(OPP_ENABLE_CUDA_BACKEND)
+	set(filesForbackends.cuda ${filesForbackends.cuda} streamCtx.cpp)
+endif()
+
+add_library(backends.cuda ${filesForbackends.cuda})
 	
 target_include_directories(backends.cuda  PUBLIC 
 						   ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
@@ -16,5 +22,8 @@ target_link_libraries(backends.cuda PRIVATE
 target_link_libraries(backends.cuda PUBLIC  
 						common
 						)
+endif()
 
+if(OPP_ENABLE_CUDA_BACKEND)
 add_subdirectory(image)
+endif()

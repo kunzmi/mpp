@@ -114,9 +114,6 @@ ImageFileDirectory::ImageFileDirectory(uint aWidth, uint aHeight, double aPixelS
     mEntries.push_back(std::make_shared<IFDImageWidth>(aWidth));
     mEntries.push_back(std::make_shared<IFDImageLength>(aHeight));
     mEntries.push_back(std::make_shared<IFDBitsPerSample>(aBitPerSample));
-    mEntries.push_back(std::make_shared<IFDSampleFormat>(aSampleFormat));
-    mEntries.push_back(std::make_shared<IFDPlanarConfiguration>(aPlanar ? TIFFPlanarConfigurartion::Planar
-                                                                        : TIFFPlanarConfigurartion::Chunky));
     mEntries.push_back(std::make_shared<IFDCompression>(TIFFCompression::NoCompression));
     mEntries.push_back(std::make_shared<IFDPhotometricInterpretation>(aPhotometricInterpretation));
     mEntries.push_back(std::make_shared<IFDStripOffsets>(aPlanar ? to_size_t(aSamplesPerPixel) : 1UL));
@@ -137,8 +134,11 @@ ImageFileDirectory::ImageFileDirectory(uint aWidth, uint aHeight, double aPixelS
     mEntries.push_back(std::make_shared<IFDStripByteCounts>(std::move(byteCounts)));
     mEntries.push_back(std::make_shared<IFDXResolution>(pixelSize));
     mEntries.push_back(std::make_shared<IFDYResolution>(pixelSize));
+    mEntries.push_back(std::make_shared<IFDPlanarConfiguration>(aPlanar ? TIFFPlanarConfigurartion::Planar
+                                                                        : TIFFPlanarConfigurartion::Chunky));
     mEntries.push_back(std::make_shared<IFDResolutionUnit>(TIFFResolutionUnit::Inch));
     mEntries.push_back(std::make_shared<IFDSoftware>(FILE_CREATED_BY));
+    mEntries.push_back(std::make_shared<IFDSampleFormat>(aSampleFormat));
     mEntryCount = to_ushort(mEntries.size());
 }
 
@@ -156,12 +156,7 @@ ImageFileDirectory::ImageFileDirectory(uint aWidth, uint aHeight, double aPixelS
     mEntries.push_back(std::make_shared<IFDImageWidth>(aWidth));
     mEntries.push_back(std::make_shared<IFDImageLength>(aHeight));
     mEntries.push_back(std::make_shared<IFDBitsPerSample>(aBitPerSample));
-    mEntries.push_back(std::make_shared<IFDSampleFormat>(aSampleFormat));
-    mEntries.push_back(std::make_shared<IFDPlanarConfiguration>(aPlanar ? TIFFPlanarConfigurartion::Planar
-                                                                        : TIFFPlanarConfigurartion::Chunky));
     mEntries.push_back(std::make_shared<IFDCompression>(TIFFCompression::Deflate));
-    mEntries.push_back(std::make_shared<IFDDifferencingPredictor>(
-        aDifference ? TIFFDifferencingPredictor::HorizontalDifferencing : TIFFDifferencingPredictor::None));
     mEntries.push_back(std::make_shared<IFDPhotometricInterpretation>(aPhotometricInterpretation));
     mEntries.push_back(std::make_shared<IFDStripOffsets>(aPlanar ? to_size_t(aSamplesPerPixel) : 1UL));
     mEntries.push_back(std::make_shared<IFDSamplesPerPixel>(aSamplesPerPixel));
@@ -169,8 +164,13 @@ ImageFileDirectory::ImageFileDirectory(uint aWidth, uint aHeight, double aPixelS
     mEntries.push_back(std::make_shared<IFDStripByteCounts>(std::move(aCompressedSize)));
     mEntries.push_back(std::make_shared<IFDXResolution>(pixelSize));
     mEntries.push_back(std::make_shared<IFDYResolution>(pixelSize));
+    mEntries.push_back(std::make_shared<IFDPlanarConfiguration>(aPlanar ? TIFFPlanarConfigurartion::Planar
+                                                                        : TIFFPlanarConfigurartion::Chunky));
     mEntries.push_back(std::make_shared<IFDResolutionUnit>(TIFFResolutionUnit::Inch));
     mEntries.push_back(std::make_shared<IFDSoftware>(FILE_CREATED_BY));
+    mEntries.push_back(std::make_shared<IFDDifferencingPredictor>(
+        aDifference ? TIFFDifferencingPredictor::HorizontalDifferencing : TIFFDifferencingPredictor::None));
+    mEntries.push_back(std::make_shared<IFDSampleFormat>(aSampleFormat));
     mEntryCount = to_ushort(mEntries.size());
 }
 

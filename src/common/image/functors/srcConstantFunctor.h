@@ -9,8 +9,8 @@
 #include <common/opp_defs.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
-#include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
+#include <common/vector_typetraits.h>
 #include <concepts>
 
 // disable warning for pragma unroll when compiling with host compiler:
@@ -82,7 +82,7 @@ struct SrcConstantFunctor : public ImageFunctor<false>
 
 #pragma region run SIMD on pixel tupel
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
-        requires std::same_as<ComputeT_SIMD, DstT>
+        requires std::same_as<ComputeT_SIMD, Tupel<DstT, tupelSize>>
     {
         static_assert(OpSIMD.has_simd, "Trying to run a SIMD operation that is not implemented for this type.");
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);

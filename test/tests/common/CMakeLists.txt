@@ -11,6 +11,13 @@ target_include_directories(common_test_bfloat16_cuda_kernel  PUBLIC
 						   ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
 						   ${PROJECT_SOURCE_DIR}/src
 						  )
+						  
+add_library(common_test_typecast_cuda_kernel test_typecast_kernel.cu)
+target_link_libraries(common_test_typecast_cuda_kernel PRIVATE project_options)
+target_include_directories(common_test_typecast_cuda_kernel  PUBLIC 
+						   ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
+						   ${PROJECT_SOURCE_DIR}/src
+						  )
 
 add_library(common_test_vector1_cuda_kernel test_vector1_kernel.cu)
 target_link_libraries(common_test_vector1_cuda_kernel PRIVATE project_options)
@@ -54,6 +61,8 @@ addCatchTest(test_halffp16.cpp "common" "HalfFP16")
 addCatchTest(test_halffp16_cuda.cpp "common;common_test_halffp16_cuda_kernel;backends.cuda" "HalfFP16Cuda")
 addCatchTest(test_safeCast.cpp "common" "SafeCast")
 addCatchTest(test_tupel.cpp "common" "Tupel")
+addCatchTest(test_typecast.cpp "common" "Typecast")
+addCatchTest(test_typecast_cuda.cpp "common;common_test_typecast_cuda_kernel;backends.cuda" "TypecastCuda")
 addCatchTest(test_vector1.cpp "common" "Vector1")
 addCatchTest(test_vector1_cuda.cpp "common;common_test_vector1_cuda_kernel;backends.cuda" "Vector1Cuda")
 addCatchTest(test_vector2.cpp "common" "Vector2")

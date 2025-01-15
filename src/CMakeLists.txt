@@ -7,18 +7,27 @@ add_executable(dummy_test
 				main.cpp
 				)
 
-
-target_include_directories(dummy_test PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
-target_link_libraries(dummy_test PUBLIC  
-
+set(linkListForDummyTest 
 						common
 						common.fileIO
 						common.image
-						backends.cuda
-						backends.cuda.image
+)
+if(OPP_ENABLE_CUDA_CORE)
+	set(linkListForDummyTest ${linkListForDummyTest} backends.cuda)
+endif()
+if(OPP_ENABLE_CUDA_BACKEND)
+	set(linkListForDummyTest ${linkListForDummyTest} backends.cuda.image)
+endif()
+if(OPP_ENABLE_NPP_BACKEND)
+	set(linkListForDummyTest ${linkListForDummyTest} 
 						#backends.npp
 						#backends.npp.image
-)
+	)
+endif()
+
+target_include_directories(dummy_test PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
+target_link_libraries(dummy_test PUBLIC  ${linkListForDummyTest})
+
 target_link_libraries(dummy_test PRIVATE  
 						project_options
 						project_warnings)

@@ -1,3 +1,6 @@
+#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
+#if OPP_ENABLE_NPP_BACKEND
+
 #include "nppException.h"
 #include <filesystem>
 #include <nppdefs.h>
@@ -83,3 +86,4 @@ NppException::NppException(const std::string &aMessage, [[maybe_unused]] const s
     What() = ss.str();
 }
 } // namespace opp::npp
+#endif // OPP_ENABLE_NPP_BACKEND

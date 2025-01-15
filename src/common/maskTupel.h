@@ -7,8 +7,10 @@
 namespace opp
 {
 
+#ifndef IS_CUDA_COMPILER
 // declare the CUDA intrinsic used later
 uint __vaddus4(uint, uint);
+#endif
 
 /// <summary>
 /// A spezialised Tupel for masks.
@@ -26,18 +28,18 @@ template <std::size_t size> struct MaskTupel : public Tupel<byte, size>
     MaskTupel &operator=(const MaskTupel &)     = default;
     MaskTupel &operator=(MaskTupel &&) noexcept = default;
 
-    MaskTupel(const Tupel<byte, size> &aOther) : Tupel<byte, size>(aOther)
+    DEVICE_CODE MaskTupel(const Tupel<byte, size> &aOther) : Tupel<byte, size>(aOther)
     {
     }
-    MaskTupel(Tupel<byte, size> &&aOther) noexcept : Tupel<byte, size>(aOther)
+    DEVICE_CODE MaskTupel(Tupel<byte, size> &&aOther) noexcept : Tupel<byte, size>(aOther)
     {
     }
 
-    MaskTupel &operator=(const Tupel<byte, size> &aOther)
+    DEVICE_CODE MaskTupel &operator=(const Tupel<byte, size> &aOther)
     {
         Tupel<byte, size>::value = aOther.value;
     }
-    MaskTupel &operator=(Tupel<byte, size> &&aOther) noexcept
+    DEVICE_CODE MaskTupel &operator=(Tupel<byte, size> &&aOther) noexcept
     {
         Tupel<byte, size>::value = aOther.value;
     }
@@ -162,7 +164,7 @@ template <std::size_t size> struct MaskTupel : public Tupel<byte, size>
     /// default implementation
     /// </summary>
     bool DEVICE_CODE AreAllTrue()
-        requires(size == 4)
+        requires(size == 4) && (!(EnableSIMD<byte> && CUDA_ONLY<byte>))
     {
         return Tupel<byte, size>::value[0] != static_cast<byte>(0) &&
                Tupel<byte, size>::value[1] != static_cast<byte>(0) &&
@@ -176,7 +178,7 @@ template <std::size_t size> struct MaskTupel : public Tupel<byte, size>
     /// </summary>
     bool DEVICE_ONLY_CODE AreAllTrue()
         requires(size == 4) && //
-                CUDA_ONLY<byte> && DeviceCode<byte>
+                CUDA_ONLY<byte> && EnableSIMD<byte>
     {
         uint &ui = *reinterpret_cast<uint *>(this);
         uint res = __vaddus4(ui, 0xFEFEFEFE); // add 254 to each byte with saturation
@@ -190,7 +192,7 @@ template <std::size_t size> struct MaskTupel : public Tupel<byte, size>
     /// </summary>
     bool DEVICE_ONLY_CODE AreAllTrue()
         requires(size == 8) && //
-                CUDA_ONLY<byte>
+                CUDA_ONLY<byte> && EnableSIMD<byte>
     {
         uint &ui  = *reinterpret_cast<uint *>(this);
         uint res1 = __vaddus4(ui, 0xFEFEFEFE); // add 254 to each byte with saturation
@@ -210,7 +212,7 @@ template <std::size_t size> struct MaskTupel : public Tupel<byte, size>
     /// default implementation
     /// </summary>
     bool DEVICE_CODE AreAllTrue()
-        requires(size >= 8)
+        requires(size >= 8) && (!(EnableSIMD<byte> && CUDA_ONLY<byte>))
     {
         bool res = Tupel<byte, size>::value[0] > 0;
 #pragma unroll

@@ -1,3 +1,5 @@
+if (OPP_ENABLE_NPP_BACKEND)
+
 add_library(backends.npp 
 	nppException.cpp
 	)
@@ -11,8 +13,8 @@ target_link_libraries(backends.npp PRIVATE
 						project_warnings						
 						)
 target_link_libraries(backends.npp PUBLIC  
-						backends.cuda
-						backends.cuda.image
+						backends.cuda  # for device variable and cuda stuff
+
 						common
 						common.image 
 						
@@ -30,3 +32,4 @@ target_link_libraries(backends.npp PUBLIC
 						)
 
 add_subdirectory(image)
+endif() # OPP_ENABLE_NPP_BACKEND

@@ -1,4 +1,7 @@
 #pragma once
+#include <common/moduleEnabler.h>
+#if OPP_ENABLE_NPP_BACKEND
+#include <common/image/pixelTypeEnabler.h>
 
 #include "image32fcC1View.h"
 #include "image32fcC2View.h"
@@ -83,3 +86,4 @@ class Image32fcC4 : public Image32fcC4View
     Image32fcC4 &operator=(Image32fcC4 &&aOther) noexcept;
 };
 } // namespace opp::image::npp
+#endif // OPP_ENABLE_NPP_BACKEND

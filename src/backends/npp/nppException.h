@@ -1,4 +1,8 @@
 #pragma once
+#include <common/moduleEnabler.h>
+#if OPP_ENABLE_NPP_BACKEND
+#include <common/image/pixelTypeEnabler.h>
+
 #include <common/exception.h>
 #include <filesystem>
 #include <nppdefs.h>
@@ -353,3 +357,5 @@ inline void __nppSafeCall(NppStatus aErr, const std::string &aMessage, const cha
     (opp::npp::NppException((std::ostringstream() << msg).str(), __FILE__, __LINE__, __PRETTY_FUNCTION__))
 
 // NOLINTEND
+
+#endif // OPP_ENABLE_NPP_BACKEND

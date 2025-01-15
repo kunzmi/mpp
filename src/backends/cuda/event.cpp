@@ -1,3 +1,6 @@
+#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
+#if OPP_ENABLE_CUDA_CORE
+
 #include "cudaException.h"
 #include "event.h"
 #include "stream.h"
@@ -135,3 +138,4 @@ float operator-(const Event &aEventStart, const Event &aEventEnd)
     return Event::ElapsedTime(aEventStart, aEventEnd);
 }
 } // namespace opp::cuda
+#endif // OPP_ENABLE_CUDA_CORE

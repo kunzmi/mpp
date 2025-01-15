@@ -1,3 +1,6 @@
+#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
+#if OPP_ENABLE_CUDA_CORE
+
 #include "cudaException.h"
 #include <common/exception.h>
 #include <cuda_runtime_api.h>
@@ -119,3 +122,4 @@ CudaUnsupportedException::CudaUnsupportedException(const std::string &aKernelNam
 }
 
 } // namespace opp::cuda
+#endif // OPP_ENABLE_CUDA_CORE

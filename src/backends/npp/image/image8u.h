@@ -1,4 +1,7 @@
 #pragma once
+#include <common/moduleEnabler.h>
+#if OPP_ENABLE_NPP_BACKEND
+#include <common/image/pixelTypeEnabler.h>
 
 #include "image8uC1View.h"
 #include "image8uC2View.h"
@@ -83,3 +86,4 @@ class Image8uC4 : public Image8uC4View
     Image8uC4 &operator=(Image8uC4 &&aOther) noexcept;
 };
 } // namespace opp::image::npp
+#endif // OPP_ENABLE_NPP_BACKEND

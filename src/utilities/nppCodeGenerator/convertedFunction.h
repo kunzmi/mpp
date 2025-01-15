@@ -67,16 +67,16 @@ class ConvertedFunction
 
     inline static const std::map<std::string, std::string> sHeaders =
         std::map<std::string, std::string>( // NOLINT(cert-err58-cpp)
-            {{"support", "#include <nppi_support_functions.h>"},
-             {"data exchange and initialization", "#include <nppi_data_exchange_and_initialization.h>"},
-             {"arithmetic and logical", "#include <nppi_arithmetic_and_logical_operations.h>"},
-             {"color conversion", "#include <nppi_color_conversion.h>"},
-             {"threshold and compare", "#include <nppi_threshold_and_compare_operations.h>"},
-             {"morphological", "#include <nppi_morphological_operations.h>"},
-             {"filtering", "#include <nppi_filtering_functions.h>"},
-             {"statistics", "#include <nppi_statistics_functions.h>"},
-             {"linear transforms", "#include <nppi_linear_transforms.h>"},
-             {"geometry transforms", "#include <nppi_geometry_transforms.h>"}});
+            {{"support", "#include <nppi_support_functions.h> //NOLINT"},
+             {"data exchange and initialization", "#include <nppi_data_exchange_and_initialization.h> //NOLINT"},
+             {"arithmetic and logical", "#include <nppi_arithmetic_and_logical_operations.h> //NOLINT"},
+             {"color conversion", "#include <nppi_color_conversion.h> //NOLINT"},
+             {"threshold and compare", "#include <nppi_threshold_and_compare_operations.h> //NOLINT"},
+             {"morphological", "#include <nppi_morphological_operations.h> //NOLINT"},
+             {"filtering", "#include <nppi_filtering_functions.h> //NOLINT"},
+             {"statistics", "#include <nppi_statistics_functions.h> //NOLINT"},
+             {"linear transforms", "#include <nppi_linear_transforms.h> //NOLINT"},
+             {"geometry transforms", "#include <nppi_geometry_transforms.h> //NOLINT"}});
 
   public:
     explicit ConvertedFunction(const Function &aFunction);

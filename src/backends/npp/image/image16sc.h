@@ -1,4 +1,7 @@
 #pragma once
+#include <common/moduleEnabler.h>
+#if OPP_ENABLE_NPP_BACKEND
+#include <common/image/pixelTypeEnabler.h>
 
 #include "image16scC1View.h"
 #include "image16scC2View.h"
@@ -83,3 +86,4 @@ class Image16scC4 : public Image16scC4View
     Image16scC4 &operator=(Image16scC4 &&aOther) noexcept;
 };
 } // namespace opp::image::npp
+#endif // OPP_ENABLE_NPP_BACKEND

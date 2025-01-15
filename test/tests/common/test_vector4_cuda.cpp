@@ -11,7 +11,7 @@
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
 #include <common/safeCast.h>
-#include <common/vectorTypes.h>
+#include <common/vector4.h>
 #include <cstddef>
 #include <cstdint>
 #include <math.h>
@@ -148,7 +148,7 @@ void fillData(std::vector<Vector4<T>> &aDataIn, std::vector<Vector4<T>> &aDataOu
               std::vector<complex_basetype_t<T>> &aEpsilon)
 {
     std::default_random_engine e1(Catch::getSeed());
-    // std::default_random_engine e1(3351725616UL);
+    // std::default_random_engine e1(347616927UL);
 
     // Create random values:
     for (auto &elem : aDataIn)
@@ -384,7 +384,7 @@ void fillData(std::vector<Vector4<T>> &aDataIn, std::vector<Vector4<T>> &aDataOu
             }
             if constexpr (std::same_as<float, complex_basetype_t<T>>)
             {
-                T factor(10.0f);
+                T factor(10000.0f);
                 aDataIn[counterIn] /= factor;
                 aDataIn[counterIn + 1] /= factor;
             }
@@ -900,6 +900,12 @@ TEST_CASE("Pixel32fC4 CUDA", "[Common]")
     {
         if (epsilon[i] != 0.0f)
         {
+            if (!Pixel32fC4::EqEps(dataOut[i], dataOutGPU[i], epsilon[i]))
+            {
+                std::cout << dataOut[i] << std::endl;
+                std::cout << dataOutGPU[i] << std::endl;
+                std::cout << "Index wrong: " << i << std::endl;
+            }
             CHECK(Pixel32fC4::EqEps(dataOut[i], dataOutGPU[i], epsilon[i]));
         }
         else
@@ -1059,10 +1065,6 @@ TEST_CASE("Pixel32uC4 CUDA", "[Common]")
 
     for (size_t i = 0; i < dataOut.size(); i++)
     {
-        if (dataOut[i] != dataOutGPU[i])
-        {
-            std::cout << "Index wrong: " << i << std::endl;
-        }
         CHECK(dataOut[i] == dataOutGPU[i]);
     }
     for (size_t i = 0; i < dataComp.size(); i++)

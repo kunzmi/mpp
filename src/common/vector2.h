@@ -5,6 +5,7 @@
 #include "numberTypes.h"
 #include "numeric_limits.h"
 #include "safeCast.h"
+#include "staticCast.h"
 #include "vector_typetraits.h"
 #include <cmath>
 #include <common/utilities.h>
@@ -96,14 +97,14 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// <summary>
     /// Initializes vector to all components = aVal
     /// </summary>
-    DEVICE_CODE Vector2(T aVal) noexcept : x(aVal), y(aVal)
+    DEVICE_CODE constexpr Vector2(T aVal) noexcept : x(aVal), y(aVal)
     {
     }
 
     /// <summary>
     /// Initializes vector to all components = aVal (especially when set to 0)
     /// </summary>
-    DEVICE_CODE Vector2(int aVal) noexcept
+    DEVICE_CODE constexpr Vector2(int aVal) noexcept
         requires(!IsInt<T>)
         : x(static_cast<T>(aVal)), y(static_cast<T>(aVal))
     {
@@ -112,14 +113,14 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// <summary>
     /// Initializes vector to all components = [aVal[0], aVal[1]]
     /// </summary>
-    DEVICE_CODE explicit Vector2(T aVal[2]) noexcept : x(aVal[0]), y(aVal[1])
+    DEVICE_CODE constexpr explicit Vector2(T aVal[2]) noexcept : x(aVal[0]), y(aVal[1])
     {
     }
 
     /// <summary>
     /// Initializes vector to [aX, aY]
     /// </summary>
-    DEVICE_CODE Vector2(T aX, T aY) noexcept : x(aX), y(aY)
+    DEVICE_CODE constexpr Vector2(T aX, T aY) noexcept : x(aX), y(aY)
     {
     }
 
@@ -143,13 +144,13 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
         {
             Vector2<T2> temp(aVec);
             temp.template ClampToTargetType<T>();
-            x = static_cast<T>(temp.x);
-            y = static_cast<T>(temp.y);
+            x = StaticCast<T2, T>(temp.x);
+            y = StaticCast<T2, T>(temp.y);
         }
         else
         {
-            x = static_cast<T>(aVec.x);
-            y = static_cast<T>(aVec.y);
+            x = StaticCast<T2, T>(aVec.x);
+            y = StaticCast<T2, T>(aVec.y);
         }
     }
 
@@ -170,8 +171,8 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
         {
             aVec.template ClampToTargetType<T>();
         }
-        x = static_cast<T>(aVec.x);
-        y = static_cast<T>(aVec.y);
+        x = StaticCast<T2, T>(aVec.x);
+        y = StaticCast<T2, T>(aVec.y);
     }
 
     /// <summary>
@@ -1019,7 +1020,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
     /// </summary>
     template <Number T2> [[nodiscard]] static Vector2<T> DEVICE_CODE Convert(const Vector2<T2> &aVec)
     {
-        return {static_cast<T>(aVec.x), static_cast<T>(aVec.y)};
+        return {StaticCast<T2, T>(aVec.x), StaticCast<T2, T>(aVec.y)};
     }
 #pragma endregion
 

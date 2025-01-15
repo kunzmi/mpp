@@ -5,9 +5,10 @@
 #include "numberTypes.h"
 #include "numeric_limits.h"
 #include "safeCast.h"
-#include "vector_typetraits.h"
+#include "staticCast.h"
 #include "vector3.h" //for additional constructor from Vector3<T>
 #include "vector4.h"
+#include "vector_typetraits.h"
 #include <cmath>
 #include <common/utilities.h>
 #include <concepts>
@@ -138,14 +139,14 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     /// <summary>
     /// Initializes vector to all components = aVal, except w
     /// </summary>
-    DEVICE_CODE Vector4A(T aVal) noexcept : x(aVal), y(aVal), z(aVal)
+    DEVICE_CODE constexpr Vector4A(T aVal) noexcept : x(aVal), y(aVal), z(aVal)
     {
     }
 
     /// <summary>
     /// Initializes vector to all components = aVal, except w (especially when set to 0)
     /// </summary>
-    DEVICE_CODE Vector4A(int aVal) noexcept
+    DEVICE_CODE constexpr Vector4A(int aVal) noexcept
         requires(!IsInt<T>)
         : x(static_cast<T>(aVal)), y(static_cast<T>(aVal)), z(static_cast<T>(aVal))
     {
@@ -154,35 +155,35 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     /// <summary>
     /// Initializes vector to all components = [aVal[0], aVal[1], aVal[2]], w remains unitialized
     /// </summary>
-    DEVICE_CODE explicit Vector4A(T aVal[3]) noexcept : x(aVal[0]), y(aVal[1]), z(aVal[2])
+    DEVICE_CODE constexpr explicit Vector4A(T aVal[3]) noexcept : x(aVal[0]), y(aVal[1]), z(aVal[2])
     {
     }
 
     /// <summary>
     /// Initializes vector to [aX, aY, aZ], w remains unitialized
     /// </summary>
-    DEVICE_CODE Vector4A(T aX, T aY, T aZ) noexcept : x(aX), y(aY), z(aZ)
+    DEVICE_CODE constexpr Vector4A(T aX, T aY, T aZ) noexcept : x(aX), y(aY), z(aZ)
     {
     }
 
     /// <summary>
     /// Usefull constructor if we want a Vector4A from 3 channel pixel Vector3, w remains unitialized
     /// </summary>
-    DEVICE_CODE Vector4A(const Vector3<T> &aVec3) noexcept : x(aVec3.x), y(aVec3.y), z(aVec3.z)
+    DEVICE_CODE constexpr Vector4A(const Vector3<T> &aVec3) noexcept : x(aVec3.x), y(aVec3.y), z(aVec3.z)
     {
     }
 
     /// <summary>
     /// Usefull constructor if we want a Vector4A from 4 channel pixel Vector4
     /// </summary>
-    DEVICE_CODE Vector4A(const Vector4<T> &aVec4) noexcept : x(aVec4.x), y(aVec4.y), z(aVec4.z)
+    DEVICE_CODE constexpr Vector4A(const Vector4<T> &aVec4) noexcept : x(aVec4.x), y(aVec4.y), z(aVec4.z)
     {
     }
 
     /// <summary>
     /// Usefull constructor if we want a Vector4A from 4 channel pixel Vector4
     /// </summary>
-    DEVICE_CODE Vector4A(const Vector4<T> &aVec4) noexcept
+    DEVICE_CODE constexpr Vector4A(const Vector4<T> &aVec4) noexcept
         requires ByteSizeType<T> || TwoBytesSizeType<T>
         : x(aVec4.x), y(aVec4.y), z(aVec4.z), w(aVec4.w)
     {
@@ -225,23 +226,23 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
         {
             Vector4A<T2> temp(aVec);
             temp.template ClampToTargetType<T>();
-            x = static_cast<T>(temp.x);
-            y = static_cast<T>(temp.y);
-            z = static_cast<T>(temp.z);
+            x = StaticCast<T2, T>(temp.x);
+            y = StaticCast<T2, T>(temp.y);
+            z = StaticCast<T2, T>(temp.z);
             if constexpr (sizeof(T) <= 2)
             {
                 // if the entire size is 32 or 64 bit, it is likely that the compiler will just do a one word copy
-                w = static_cast<T>(temp.w);
+                w = StaticCast<T2, T>(temp.w);
             }
         }
         else
         {
-            x = static_cast<T>(aVec.x);
-            y = static_cast<T>(aVec.y);
-            z = static_cast<T>(aVec.z);
+            x = StaticCast<T2, T>(aVec.x);
+            y = StaticCast<T2, T>(aVec.y);
+            z = StaticCast<T2, T>(aVec.z);
             if constexpr (sizeof(T) <= 2)
             {
-                w = static_cast<T>(aVec.w);
+                w = StaticCast<T2, T>(aVec.w);
             }
         }
     }
@@ -263,12 +264,12 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
         {
             aVec.template ClampToTargetType<T>();
         }
-        x = static_cast<T>(aVec.x);
-        y = static_cast<T>(aVec.y);
-        z = static_cast<T>(aVec.z);
+        x = StaticCast<T2, T>(aVec.x);
+        y = StaticCast<T2, T>(aVec.y);
+        z = StaticCast<T2, T>(aVec.z);
         if constexpr (sizeof(T) <= 2)
         {
-            w = static_cast<T>(aVec.w);
+            w = StaticCast<T2, T>(aVec.w);
         }
     }
 
@@ -1707,7 +1708,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     /// </summary>
     template <Number T2> [[nodiscard]] static Vector4A<T> DEVICE_CODE Convert(const Vector4A<T2> &aVec)
     {
-        return {static_cast<T>(aVec.x), static_cast<T>(aVec.y), static_cast<T>(aVec.z)};
+        return {StaticCast<T2, T>(aVec.x), StaticCast<T2, T>(aVec.y), StaticCast<T2, T>(aVec.z)};
     }
 #pragma endregion
 
@@ -4356,7 +4357,7 @@ std::wistream &operator>>(std::wistream &aIs, Vector4A<T2> &aVec)
     return aIs;
 }
 
-template <Number T> Vector4<T>::Vector4(const Vector4A<T> &aOther) noexcept
+template <Number T> constexpr Vector4<T>::Vector4(const Vector4A<T> &aOther) noexcept
 {
     x = aOther.x;
     y = aOther.y;

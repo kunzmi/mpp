@@ -1,4 +1,7 @@
 #pragma once
+#include <common/moduleEnabler.h>
+#if OPP_ENABLE_NPP_BACKEND
+#include <common/image/pixelTypeEnabler.h>
 
 #include <backends/cuda/cudaException.h>
 #include <backends/npp/nppException.h>
@@ -651,3 +654,4 @@ template <PixelType T> class ImageView
     }
 };
 } // namespace opp::image::npp
+#endif // OPP_ENABLE_NPP_BACKEND

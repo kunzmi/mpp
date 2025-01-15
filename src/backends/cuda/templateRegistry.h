@@ -1,6 +1,7 @@
 #pragma once
 #include <common/defines.h>
 #include <common/image/pixelTypes.h>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -15,19 +16,38 @@ namespace opp::cuda
 #ifndef OPP_CUDA_TEMPLATE_REGISTRY_IS_ACTIVE
 // empty define so that nothing is done
 #define OPP_CUDA_REGISTER_TEMPALTE
+#define OPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE
 #endif
 
 #ifdef OPP_CUDA_TEMPLATE_REGISTRY_IS_ACTIVE
 
 #define OPP_CUDA_REGISTER_TEMPALTE                                                                                     \
-    constexpr opp::cuda::KernelNameWrapper kernelName(__PRETTY_FUNCTION__, opp::image::pixel_type_name<SrcT>::value,   \
+    constexpr opp::cuda::KernelNameWrapper kernelName(__func__, opp::image::pixel_type_name<SrcT>::value,              \
                                                       opp::image::pixel_type_name<ComputeT>::value,                    \
                                                       opp::image::pixel_type_name<DstT>::value);                       \
     const void *_ = &opp::cuda::TemplateRegistry<kernelName>::sInstance;
 
-inline std::vector<std::string> &GetTemplateInstances()
+#define OPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE                                                                        \
+    constexpr opp::cuda::KernelNameWrapper kernelName(__func__, opp::image::pixel_type_name<DstT>::value,              \
+                                                      opp::image::pixel_type_name<DstT>::value,                        \
+                                                      opp::image::pixel_type_name<DstT>::value);                       \
+    const void *_ = &opp::cuda::TemplateRegistry<kernelName>::sInstance;
+
+struct oppTemplateInstance
 {
-    static std::vector<std::string> templates;
+    std::string srcType;
+    std::string computeType;
+    std::string dstType;
+
+    oppTemplateInstance(const char *aSrcT, const char *aComputeT, const char *aDstT)
+        : srcType(aSrcT), computeType(aComputeT), dstType(aDstT)
+    {
+    }
+};
+
+inline std::map<std::string, std::vector<oppTemplateInstance>> &GetTemplateInstances()
+{
+    static std::map<std::string, std::vector<oppTemplateInstance>> templates;
     return templates;
 }
 
@@ -55,37 +75,14 @@ template <KernelNameWrapper name> struct TemplateRegistry
     TemplateRegistry()
     {
         std::string finalName(name.kernelName);
-        const std::string srcT("SrcT");
-        const std::string computeT("ComputeT");
-        const std::string dstT("DstT");
 
-        std::string srcType(name.srcType);
-        std::string computeType(name.compType);
-        std::string dstType(name.dstType);
-
-        // replace all SrcT etc by their actual type names:
-        size_t pos = finalName.find(srcT);
-        while (pos != std::string::npos)
+        // remove the "Invoke" part of the name, if it exists, as we just want the simple name
+        size_t pos = finalName.find("Invoke", 0);
+        if (pos == 0)
         {
-            finalName.replace(pos, srcT.size(), srcType);
-            pos = finalName.find(srcT, pos + srcType.size());
+            finalName = finalName.substr(6);
         }
-
-        pos = finalName.find(computeT);
-        while (pos != std::string::npos)
-        {
-            finalName.replace(pos, computeT.size(), computeType);
-            pos = finalName.find(computeT, pos + computeType.size());
-        }
-
-        pos = finalName.find(dstT);
-        while (pos != std::string::npos)
-        {
-            finalName.replace(pos, dstT.size(), dstType);
-            pos = finalName.find(dstT, pos + dstType.size());
-        }
-
-        GetTemplateInstances().push_back(finalName);
+        GetTemplateInstances()[finalName].emplace_back(name.srcType, name.compType, name.dstType);
     }
     // static class member, initialized before main()
     static TemplateRegistry sInstance;

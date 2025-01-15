@@ -4,7 +4,19 @@
 #include <backends/simple_cpu/image/forEachPixelMasked.h>
 #include <common/arithmetic/binary_operators.h>
 #include <common/defines.h>
+#include <common/image/functors/constantFunctor.h>
+#include <common/image/functors/inplaceConstantFunctor.h>
+#include <common/image/functors/inplaceConstantScaleFunctor.h>
+#include <common/image/functors/inplaceDevConstantFunctor.h>
+#include <common/image/functors/inplaceDevConstantScaleFunctor.h>
+#include <common/image/functors/inplaceSrcFunctor.h>
+#include <common/image/functors/inplaceSrcScaleFunctor.h>
+#include <common/image/functors/srcConstantFunctor.h>
+#include <common/image/functors/srcConstantScaleFunctor.h>
+#include <common/image/functors/srcDevConstantFunctor.h>
+#include <common/image/functors/srcDevConstantScaleFunctor.h>
 #include <common/image/functors/srcSrcFunctor.h>
+#include <common/image/functors/srcSrcScaleFunctor.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
@@ -12,8 +24,8 @@
 #include <common/image/size2D.h>
 #include <common/image/sizePitched.h>
 #include <common/safeCast.h>
-#include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
+#include <common/vector_typetraits.h>
 #include <cstddef>
 #include <vector>
 
@@ -719,7 +731,29 @@ template <PixelType T> class ImageView
         return true;
     }
 
+#pragma region Data initialisation
+    ImageView<T> &Set(const T &aConst)
+    {
+        using setC = ConstantFunctor<1, T>;
+        setC functor(aConst);
+        forEachPixel(*this, functor);
+
+        return *this;
+    }
+
+    ImageView<T> &Set(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+    {
+        using setC = ConstantFunctor<1, T>;
+        setC functor(aConst);
+        forEachPixel(aMask, *this, functor);
+
+        return *this;
+    }
+#pragma endregion
+
+#pragma region Arithmetic functions
     ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+        requires RealOrComplexFloatingVector<T>
     {
         checkSameSize(ROI(), aSrc2.ROI());
         checkSameSize(ROI(), aDst.ROI());
@@ -735,5 +769,273 @@ template <PixelType T> class ImageView
         forEachPixel(aDst, functor);
         return aDst;
     }
+
+    ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>
+    {
+        checkSameSize(ROI(), aSrc2.ROI());
+        checkSameSize(ROI(), aDst.ROI());
+
+        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+
+        using ComputeT = default_compute_type_for_t<T>;
+
+        using addSrcSrcScale =
+            SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::NearestTiesAwayFromZero>;
+
+        opp::Add<ComputeT> op;
+        addSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
+
+        forEachPixel(aDst, functor);
+        return aDst;
+    }
+
+    ImageView<T> &Add(const T &aConst, ImageView<T> &aDst)
+        requires RealOrComplexFloatingVector<T>
+    {
+        checkSameSize(ROI(), aDst.ROI());
+
+        using ComputeT = default_compute_type_for_t<T>;
+
+        // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
+        using addSrcC = SrcConstantFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::None>;
+
+        opp::Add<ComputeT> op;
+        addSrcC functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op);
+
+        forEachPixel(aDst, functor);
+        return aDst;
+    }
+
+    ImageView<T> &Add(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>
+    {
+        checkSameSize(ROI(), aDst.ROI());
+
+        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+
+        using ComputeT = default_compute_type_for_t<T>;
+
+        using addSrcCScale =
+            SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::NearestTiesAwayFromZero>;
+
+        opp::Add<ComputeT> op;
+        addSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
+
+        forEachPixel(aDst, functor);
+        return aDst;
+    }
+
+    ImageView<T> &Add(const ImageView<T> &aSrc2)
+        requires RealOrComplexFloatingVector<T>
+    {
+        checkSameSize(ROI(), aSrc2.ROI());
+
+        using ComputeT = default_compute_type_for_t<T>;
+
+        // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
+        using addInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::None>;
+
+        opp::Add<ComputeT> op;
+        addInplaceSrc functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op);
+
+        forEachPixel(*this, functor);
+        return *this;
+    }
+
+    ImageView<T> &Add(const ImageView<T> &aSrc2, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>
+    {
+        checkSameSize(ROI(), aSrc2.ROI());
+
+        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+
+        using ComputeT = default_compute_type_for_t<T>;
+
+        using addInplaceSrcScale =
+            InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::NearestTiesAwayFromZero>;
+
+        opp::Add<ComputeT> op;
+        addInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
+
+        forEachPixel(*this, functor);
+        return *this;
+    }
+
+    ImageView<T> &Add(const T &aConst)
+        requires RealOrComplexFloatingVector<T>
+    {
+        using ComputeT = default_compute_type_for_t<T>;
+
+        // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
+        using addInplaceC = InplaceConstantFunctor<1, ComputeT, T, opp::Add<ComputeT>, RoudingMode::None>;
+
+        opp::Add<ComputeT> op;
+        addInplaceC functor(static_cast<ComputeT>(aConst), op);
+
+        forEachPixel(*this, functor);
+        return *this;
+    }
+
+    ImageView<T> &Add(const T &aConst, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>
+    {
+        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+
+        using ComputeT = default_compute_type_for_t<T>;
+
+        using addInplaceCScale =
+            InplaceConstantScaleFunctor<1, ComputeT, T, opp::Add<ComputeT>, RoudingMode::NearestTiesAwayFromZero>;
+
+        opp::Add<ComputeT> op;
+        addInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
+
+        forEachPixel(*this, functor);
+        return *this;
+    }
+
+    ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+        requires RealOrComplexFloatingVector<T>
+    {
+        checkSameSize(ROI(), aSrc2.ROI());
+        checkSameSize(ROI(), aDst.ROI());
+
+        using ComputeT = default_compute_type_for_t<T>;
+
+        // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
+        using addSrcSrc = SrcSrcFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::None>;
+
+        opp::Add<ComputeT> op;
+        addSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
+
+        forEachPixel(aMask, aDst, functor);
+        return aDst;
+    }
+
+    ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                      int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>
+    {
+        checkSameSize(ROI(), aSrc2.ROI());
+        checkSameSize(ROI(), aDst.ROI());
+
+        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+
+        using ComputeT = default_compute_type_for_t<T>;
+
+        using addSrcSrcScale =
+            SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::NearestTiesAwayFromZero>;
+
+        opp::Add<ComputeT> op;
+        addSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
+
+        forEachPixel(aMask, aDst, functor);
+        return aDst;
+    }
+
+    ImageView<T> &Add(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+        requires RealOrComplexFloatingVector<T>
+    {
+        checkSameSize(ROI(), aDst.ROI());
+
+        using ComputeT = default_compute_type_for_t<T>;
+
+        // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
+        using addSrcC = SrcConstantFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::None>;
+
+        opp::Add<ComputeT> op;
+        addSrcC functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op);
+
+        forEachPixel(aMask, aDst, functor);
+        return aDst;
+    }
+
+    ImageView<T> &Add(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>
+    {
+        checkSameSize(ROI(), aDst.ROI());
+
+        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+
+        using ComputeT = default_compute_type_for_t<T>;
+
+        using addSrcCScale =
+            SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::NearestTiesAwayFromZero>;
+
+        opp::Add<ComputeT> op;
+        addSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
+
+        forEachPixel(aMask, aDst, functor);
+        return aDst;
+    }
+
+    ImageView<T> &Add(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
+        requires RealOrComplexFloatingVector<T>
+    {
+        checkSameSize(ROI(), aSrc2.ROI());
+
+        using ComputeT = default_compute_type_for_t<T>;
+
+        // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
+        using addInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::None>;
+
+        opp::Add<ComputeT> op;
+        addInplaceSrc functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op);
+
+        forEachPixel(aMask, *this, functor);
+        return *this;
+    }
+
+    ImageView<T> &Add(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>
+    {
+        checkSameSize(ROI(), aSrc2.ROI());
+
+        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+
+        using ComputeT = default_compute_type_for_t<T>;
+
+        using addInplaceSrcScale =
+            InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::NearestTiesAwayFromZero>;
+
+        opp::Add<ComputeT> op;
+        addInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
+
+        forEachPixel(aMask, *this, functor);
+        return *this;
+    }
+
+    ImageView<T> &Add(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+        requires RealOrComplexFloatingVector<T>
+    {
+        using ComputeT = default_compute_type_for_t<T>;
+
+        // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
+        using addInplaceC = InplaceConstantFunctor<1, ComputeT, T, opp::Add<ComputeT>, RoudingMode::None>;
+
+        opp::Add<ComputeT> op;
+        addInplaceC functor(static_cast<ComputeT>(aConst), op);
+
+        forEachPixel(aMask, *this, functor);
+        return *this;
+    }
+
+    ImageView<T> &Add(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>
+    {
+        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+
+        using ComputeT = default_compute_type_for_t<T>;
+
+        using addInplaceCScale =
+            InplaceConstantScaleFunctor<1, ComputeT, T, opp::Add<ComputeT>, RoudingMode::NearestTiesAwayFromZero>;
+
+        opp::Add<ComputeT> op;
+        addInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
+
+        forEachPixel(aMask, *this, functor);
+        return *this;
+    }
+#pragma endregion
 };
 } // namespace opp::image::cpuSimple

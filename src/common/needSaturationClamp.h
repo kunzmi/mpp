@@ -80,9 +80,9 @@ template <> struct need_saturation_clamp<ushort, sbyte> : std::true_type
 template <> struct need_saturation_clamp<ushort, short> : std::true_type
 {
 };
-template <> struct need_saturation_clamp<ushort, HalfFp16> : std::true_type
-{ // max value of ushort is slightly larger than max value of HalfFp16
-};
+// template <> struct need_saturation_clamp<ushort, HalfFp16> : std::true_type
+//{ // max value of ushort is slightly larger than max value of HalfFp16
+// };
 
 // from int to other
 template <> struct need_saturation_clamp<int, byte> : std::true_type
@@ -103,9 +103,9 @@ template <> struct need_saturation_clamp<int, uint> : std::true_type
 template <> struct need_saturation_clamp<int, ulong64> : std::true_type
 {
 };
-template <> struct need_saturation_clamp<int, HalfFp16> : std::true_type
-{
-};
+// template <> struct need_saturation_clamp<int, HalfFp16> : std::true_type
+//{
+// };
 
 // from uint to other
 template <> struct need_saturation_clamp<uint, byte> : std::true_type
@@ -123,9 +123,9 @@ template <> struct need_saturation_clamp<uint, ushort> : std::true_type
 template <> struct need_saturation_clamp<uint, int> : std::true_type
 {
 };
-template <> struct need_saturation_clamp<uint, HalfFp16> : std::true_type
-{
-};
+// template <> struct need_saturation_clamp<uint, HalfFp16> : std::true_type
+//{
+// };
 
 // from long64 to other
 template <> struct need_saturation_clamp<long64, byte> : std::true_type
@@ -149,9 +149,9 @@ template <> struct need_saturation_clamp<long64, uint> : std::true_type
 template <> struct need_saturation_clamp<long64, ulong64> : std::true_type
 {
 };
-template <> struct need_saturation_clamp<long64, HalfFp16> : std::true_type
-{
-};
+// template <> struct need_saturation_clamp<long64, HalfFp16> : std::true_type
+//{
+// };
 
 // from ulong64 to other
 template <> struct need_saturation_clamp<ulong64, byte> : std::true_type
@@ -175,116 +175,116 @@ template <> struct need_saturation_clamp<ulong64, uint> : std::true_type
 template <> struct need_saturation_clamp<ulong64, long64> : std::true_type
 {
 };
-template <> struct need_saturation_clamp<ulong64, HalfFp16> : std::true_type
-{
-};
+// template <> struct need_saturation_clamp<ulong64, HalfFp16> : std::true_type
+//{
+// };
 
 // from float to other
-template <> struct need_saturation_clamp<float, byte> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<float, sbyte> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<float, short> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<float, ushort> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<float, int> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<float, uint> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<float, long64> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<float, ulong64> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<float, HalfFp16> : std::true_type
-{
-};
+// template <> struct need_saturation_clamp<float, byte> : std::true_type
+//{
+//};
+// template <> struct need_saturation_clamp<float, sbyte> : std::true_type
+//{
+//};
+// template <> struct need_saturation_clamp<float, short> : std::true_type
+//{
+//};
+// template <> struct need_saturation_clamp<float, ushort> : std::true_type
+//{
+//};
+// template <> struct need_saturation_clamp<float, int> : std::true_type
+//{
+// };
+// template <> struct need_saturation_clamp<float, uint> : std::true_type
+//{
+// };
+// template <> struct need_saturation_clamp<float, long64> : std::true_type
+//{
+// };
+// template <> struct need_saturation_clamp<float, ulong64> : std::true_type
+//{
+// };
+// template <> struct need_saturation_clamp<float, HalfFp16> : std::true_type
+//{
+//};
 
 // from double to other
-template <> struct need_saturation_clamp<double, byte> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<double, sbyte> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<double, short> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<double, ushort> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<double, int> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<double, uint> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<double, long64> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<double, ulong64> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<double, HalfFp16> : std::true_type
-{
-};
+// template <> struct need_saturation_clamp<double, byte> : std::true_type
+//{
+//};
+// template <> struct need_saturation_clamp<double, sbyte> : std::true_type
+//{
+//};
+// template <> struct need_saturation_clamp<double, short> : std::true_type
+//{
+//};
+// template <> struct need_saturation_clamp<double, ushort> : std::true_type
+//{
+//};
+// template <> struct need_saturation_clamp<double, int> : std::true_type
+//{
+// };
+// template <> struct need_saturation_clamp<double, uint> : std::true_type
+//{
+// };
+// template <> struct need_saturation_clamp<double, long64> : std::true_type
+//{
+// };
+// template <> struct need_saturation_clamp<double, ulong64> : std::true_type
+//{
+// };
+// template <> struct need_saturation_clamp<double, HalfFp16> : std::true_type
+//{
+//};
 
-// from HalfFp16 to other
-template <> struct need_saturation_clamp<HalfFp16, byte> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<HalfFp16, sbyte> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<HalfFp16, ushort> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<HalfFp16, short> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<HalfFp16, uint> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<HalfFp16, ulong64> : std::true_type
-{
-};
+//// from HalfFp16 to other
+// template <> struct need_saturation_clamp<HalfFp16, byte> : std::true_type
+//{
+// };
+// template <> struct need_saturation_clamp<HalfFp16, sbyte> : std::true_type
+//{
+// };
+// template <> struct need_saturation_clamp<HalfFp16, ushort> : std::true_type
+//{
+// };
+// template <> struct need_saturation_clamp<HalfFp16, short> : std::true_type
+//{
+// };
+// template <> struct need_saturation_clamp<HalfFp16, uint> : std::true_type
+//{
+// };
+// template <> struct need_saturation_clamp<HalfFp16, ulong64> : std::true_type
+//{
+// };
 
-// from BFloat16 to other
-template <> struct need_saturation_clamp<BFloat16, byte> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<BFloat16, sbyte> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<BFloat16, short> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<BFloat16, ushort> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<BFloat16, int> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<BFloat16, uint> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<BFloat16, long64> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<BFloat16, ulong64> : std::true_type
-{
-};
-template <> struct need_saturation_clamp<BFloat16, HalfFp16> : std::true_type
-{
-};
+//// from BFloat16 to other
+// template <> struct need_saturation_clamp<BFloat16, byte> : std::true_type
+//{
+// };
+// template <> struct need_saturation_clamp<BFloat16, sbyte> : std::true_type
+//{
+// };
+// template <> struct need_saturation_clamp<BFloat16, short> : std::true_type
+//{
+// };
+// template <> struct need_saturation_clamp<BFloat16, ushort> : std::true_type
+//{
+// };
+// template <> struct need_saturation_clamp<BFloat16, int> : std::true_type
+//{
+// };
+// template <> struct need_saturation_clamp<BFloat16, uint> : std::true_type
+//{
+// };
+// template <> struct need_saturation_clamp<BFloat16, long64> : std::true_type
+//{
+// };
+// template <> struct need_saturation_clamp<BFloat16, ulong64> : std::true_type
+//{
+// };
+// template <> struct need_saturation_clamp<BFloat16, HalfFp16> : std::true_type
+//{
+// };
 
 template <typename TFrom, typename TTo>
 inline constexpr bool need_saturation_clamp_v = need_saturation_clamp<TFrom, TTo>::value;

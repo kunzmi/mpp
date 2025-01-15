@@ -1,6 +1,12 @@
 #pragma once
+#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
+#if OPP_ENABLE_CUDA_BACKEND
 
 #include <backends/cuda/cudaException.h>
+#include <backends/cuda/devVarView.h>
+#include <backends/cuda/image/arithmetic/arithmeticKernel.h>
+#include <backends/cuda/image/arithmetic/dataInitKernel.h>
+#include <backends/cuda/streamCtx.h>
 #include <common/defines.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
@@ -18,6 +24,7 @@ namespace opp::image::cuda
 
 template <PixelType T> class ImageView
 {
+#pragma region Constructors
   public:
     /// <summary>
     /// Type size in bytes of one pixel in one channel.
@@ -105,7 +112,9 @@ template <PixelType T> class ImageView
 
     ImageView &operator=(const ImageView &)     = default;
     ImageView &operator=(ImageView &&) noexcept = default;
+#pragma endregion
 
+#pragma region Basics and Copy to device/host
     /// <summary>
     /// Base pointer to image data.
     /// </summary>
@@ -419,5 +428,357 @@ template <PixelType T> class ImageView
         cudaSafeCall(cudaMemcpy2D(dest, aDestPitch, mPtrRoi, mPitch, WidthRoiInBytes(), to_size_t(HeightRoi()),
                                   cudaMemcpyDeviceToHost));
     }
+#pragma endregion
+
+#pragma region Data initialisation
+    ImageView<T> &Set(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    {
+        InvokeSetC(aConst, PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
+
+        return *this;
+    }
+
+    ImageView<T> &Set(const opp::cuda::DevVarView<T> &aConst,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    {
+        InvokeSetDevC(aConst.Pointer(), PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
+
+        return *this;
+    }
+
+    ImageView<T> &Set(const T &aConst, const ImageView<Pixel8uC1> &aMask,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    {
+        checkSameSize(ROI(), aMask.ROI());
+        InvokeSetCMask(aMask.PointerRoi(), aMask.Pitch(), aConst, PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
+
+        return *this;
+    }
+
+    ImageView<T> &Set(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    {
+        checkSameSize(ROI(), aMask.ROI());
+        InvokeSetDevCMask(aMask.PointerRoi(), aMask.Pitch(), aConst.Pointer(), PointerRoi(), Pitch(), SizeRoi(),
+                          aStreamCtx);
+
+        return *this;
+    }
+#pragma endregion
+
+#pragma region Arithmetic functions
+
+    ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexFloatingVector<T>
+    {
+        checkSameSize(ROI(), aSrc2.ROI());
+        checkSameSize(ROI(), aDst.ROI());
+
+        InvokeAddSrcSrc(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
+                        SizeRoi(), aStreamCtx);
+
+        return aDst;
+    }
+
+    ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexIntVector<T>
+    {
+        checkSameSize(ROI(), aSrc2.ROI());
+        checkSameSize(ROI(), aDst.ROI());
+
+        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+
+        InvokeAddSrcSrcScale(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
+                             scaleFactorFloat, SizeRoi(), aStreamCtx);
+
+        return aDst;
+    }
+
+    ImageView<T> &Add(const T &aConst, ImageView<T> &aDst,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexFloatingVector<T>
+    {
+        checkSameSize(ROI(), aDst.ROI());
+
+        InvokeAddSrcC(PointerRoi(), Pitch(), aConst, aDst.PointerRoi(), aDst.Pitch(), SizeRoi(), aStreamCtx);
+
+        return aDst;
+    }
+
+    ImageView<T> &Add(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexIntVector<T>
+    {
+        checkSameSize(ROI(), aDst.ROI());
+
+        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+
+        InvokeAddSrcCScale(PointerRoi(), Pitch(), aConst, aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat, SizeRoi(),
+                           aStreamCtx);
+
+        return aDst;
+    }
+
+    ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexFloatingVector<T>
+    {
+        checkSameSize(ROI(), aDst.ROI());
+
+        InvokeAddSrcDevC(PointerRoi(), Pitch(), aConst.Pointer(), aDst.PointerRoi(), aDst.Pitch(), SizeRoi(),
+                         aStreamCtx);
+
+        return aDst;
+    }
+
+    ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexIntVector<T>
+    {
+        checkSameSize(ROI(), aDst.ROI());
+
+        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+
+        InvokeAddSrcDevCScale(PointerRoi(), Pitch(), aConst.Pointer(), aDst.PointerRoi(), aDst.Pitch(),
+                              scaleFactorFloat, SizeRoi(), aStreamCtx);
+
+        return aDst;
+    }
+
+    ImageView<T> &Add(const ImageView<T> &aSrc2,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexFloatingVector<T>
+    {
+        checkSameSize(ROI(), aSrc2.ROI());
+
+        InvokeAddInplaceSrc(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), SizeRoi(), aStreamCtx);
+
+        return *this;
+    }
+
+    ImageView<T> &Add(const ImageView<T> &aSrc2, int aScaleFactor = 0,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexIntVector<T>
+    {
+        checkSameSize(ROI(), aSrc2.ROI());
+
+        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+
+        InvokeAddInplaceSrcScale(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), scaleFactorFloat, SizeRoi(),
+                                 aStreamCtx);
+
+        return *this;
+    }
+
+    ImageView<T> &Add(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexFloatingVector<T>
+    {
+        InvokeAddInplaceC(PointerRoi(), Pitch(), aConst, SizeRoi(), aStreamCtx);
+
+        return *this;
+    }
+
+    ImageView<T> &Add(const T &aConst, int aScaleFactor = 0,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexIntVector<T>
+    {
+        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+
+        InvokeAddInplaceCScale(PointerRoi(), Pitch(), aConst, scaleFactorFloat, SizeRoi(), aStreamCtx);
+
+        return *this;
+    }
+
+    ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexFloatingVector<T>
+    {
+        InvokeAddInplaceDevC(PointerRoi(), Pitch(), aConst.Pointer(), SizeRoi(), aStreamCtx);
+
+        return *this;
+    }
+
+    ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst, int aScaleFactor = 0,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexIntVector<T>
+    {
+        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+
+        InvokeAddInplaceDevCScale(PointerRoi(), Pitch(), aConst.Pointer(), scaleFactorFloat, SizeRoi(), aStreamCtx);
+
+        return *this;
+    }
+
+    ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexFloatingVector<T>
+    {
+        checkSameSize(ROI(), aSrc2.ROI());
+        checkSameSize(ROI(), aDst.ROI());
+        checkSameSize(ROI(), aMask.ROI());
+
+        InvokeAddSrcSrcMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
+                            aDst.PointerRoi(), aDst.Pitch(), SizeRoi(), aStreamCtx);
+
+        return aDst;
+    }
+
+    ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                      int aScaleFactor                       = 0,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexIntVector<T>
+    {
+        checkSameSize(ROI(), aSrc2.ROI());
+        checkSameSize(ROI(), aDst.ROI());
+        checkSameSize(ROI(), aMask.ROI());
+
+        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+
+        InvokeAddSrcSrcScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aSrc2.PointerRoi(),
+                                 aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat, SizeRoi(),
+                                 aStreamCtx);
+
+        return aDst;
+    }
+
+    ImageView<T> &Add(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexFloatingVector<T>
+    {
+        checkSameSize(ROI(), aDst.ROI());
+        checkSameSize(ROI(), aMask.ROI());
+
+        InvokeAddSrcCMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst, aDst.PointerRoi(),
+                          aDst.Pitch(), SizeRoi(), aStreamCtx);
+
+        return aDst;
+    }
+
+    ImageView<T> &Add(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexIntVector<T>
+    {
+        checkSameSize(ROI(), aDst.ROI());
+        checkSameSize(ROI(), aMask.ROI());
+
+        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+
+        InvokeAddSrcCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst, aDst.PointerRoi(),
+                               aDst.Pitch(), scaleFactorFloat, SizeRoi(), aStreamCtx);
+
+        return aDst;
+    }
+
+    ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexFloatingVector<T>
+    {
+        checkSameSize(ROI(), aDst.ROI());
+        checkSameSize(ROI(), aMask.ROI());
+
+        InvokeAddSrcDevCMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst.Pointer(),
+                             aDst.PointerRoi(), aDst.Pitch(), SizeRoi(), aStreamCtx);
+
+        return aDst;
+    }
+
+    ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                      int aScaleFactor                       = 0,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexIntVector<T>
+    {
+        checkSameSize(ROI(), aDst.ROI());
+        checkSameSize(ROI(), aMask.ROI());
+
+        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+
+        InvokeAddSrcDevCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst.Pointer(),
+                                  aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat, SizeRoi(), aStreamCtx);
+
+        return aDst;
+    }
+
+    ImageView<T> &Add(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexFloatingVector<T>
+    {
+        checkSameSize(ROI(), aSrc2.ROI());
+        checkSameSize(ROI(), aMask.ROI());
+
+        InvokeAddInplaceSrcMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aSrc2.PointerRoi(),
+                                aSrc2.Pitch(), SizeRoi(), aStreamCtx);
+
+        return *this;
+    }
+
+    ImageView<T> &Add(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexIntVector<T>
+    {
+        checkSameSize(ROI(), aSrc2.ROI());
+        checkSameSize(ROI(), aMask.ROI());
+
+        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+
+        InvokeAddInplaceSrcScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aSrc2.PointerRoi(),
+                                     aSrc2.Pitch(), scaleFactorFloat, SizeRoi(), aStreamCtx);
+
+        return *this;
+    }
+
+    ImageView<T> &Add(const T &aConst, const ImageView<Pixel8uC1> &aMask,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexFloatingVector<T>
+    {
+        checkSameSize(ROI(), aMask.ROI());
+
+        InvokeAddInplaceCMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst, SizeRoi(), aStreamCtx);
+
+        return *this;
+    }
+
+    ImageView<T> &Add(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexIntVector<T>
+    {
+        checkSameSize(ROI(), aMask.ROI());
+
+        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+
+        InvokeAddInplaceCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst, scaleFactorFloat,
+                                   SizeRoi(), aStreamCtx);
+
+        return *this;
+    }
+
+    ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexFloatingVector<T>
+    {
+        checkSameSize(ROI(), aMask.ROI());
+
+        InvokeAddInplaceDevCMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst.Pointer(), SizeRoi(),
+                                 aStreamCtx);
+
+        return *this;
+    }
+
+    ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexIntVector<T>
+    {
+        checkSameSize(ROI(), aMask.ROI());
+
+        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+
+        InvokeAddInplaceDevCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst.Pointer(),
+                                      scaleFactorFloat, SizeRoi(), aStreamCtx);
+
+        return *this;
+    }
+#pragma endregion
 };
 } // namespace opp::image::cuda
+#endif // OPP_ENABLE_CUDA_BACKEND

@@ -1,13 +1,18 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <cmath>
+#include <common/complex.h>
 #include <common/defines.h>
+#include <common/exception.h>
+#include <common/half_fp16.h>
 #include <common/image/pixelTypes.h>
+#include <common/needSaturationClamp.h>
 #include <common/numeric_limits.h>
-#include <common/safeCast.h>
-#include <common/vectorTypes.h>
-#include <cstddef>
+#include <common/vector2.h>
 #include <cstdint>
-#include <math.h>
+#include <iosfwd>
+#include <string>
+#include <vector>
 
 using namespace opp;
 using namespace opp::image;
@@ -41,6 +46,11 @@ TEST_CASE("Pixel32fC2", "[Common]")
     CHECK(t2.x == 5);
     CHECK(t2.y == 5);
     CHECK(c2 != t2);
+
+    Pixel32fC2 neg = -t1;
+    CHECK(neg.x == 0);
+    CHECK(neg.y == -1);
+    CHECK(t1 == -neg);
 
     Pixel32fC2 add1 = t1 + t2;
     CHECK(add1.x == 5);
@@ -255,33 +265,33 @@ TEST_CASE("Pixel32fC2_additionalMethods", "[Common]")
 
     Pixel32fC2 clampByte(float(numeric_limits<byte>::max()) + 1, float(numeric_limits<byte>::min()) - 1);
     clampByte.template ClampToTargetType<byte>();
-    CHECK(clampByte.x == 255);
-    CHECK(clampByte.y == 0);
+    CHECK(clampByte.x == 256);
+    CHECK(clampByte.y == -1);
 
     Pixel32fC2 clampShort(float(numeric_limits<short>::max()) + 1, float(numeric_limits<short>::min()) - 1);
     clampShort.template ClampToTargetType<short>();
-    CHECK(clampShort.x == 32767);
-    CHECK(clampShort.y == -32768);
+    CHECK(clampShort.x == 32768);
+    CHECK(clampShort.y == -32769);
 
     Pixel32fC2 clampSByte(float(numeric_limits<sbyte>::max()) + 1, float(numeric_limits<sbyte>::min()) - 1);
     clampSByte.template ClampToTargetType<sbyte>();
-    CHECK(clampSByte.x == 127);
-    CHECK(clampSByte.y == -128);
+    CHECK(clampSByte.x == 128);
+    CHECK(clampSByte.y == -129);
 
     Pixel32fC2 clampUShort(float(numeric_limits<ushort>::max()) + 1, float(numeric_limits<ushort>::min()) - 1);
     clampUShort.template ClampToTargetType<ushort>();
-    CHECK(clampUShort.x == 65535);
-    CHECK(clampUShort.y == 0);
+    CHECK(clampUShort.x == 65536);
+    CHECK(clampUShort.y == -1);
 
     Pixel32fC2 clampInt(float(numeric_limits<int>::max()) + 1000, float(numeric_limits<int>::min()) - 1000);
     clampInt.template ClampToTargetType<int>();
-    CHECK(clampInt.x == 2147483520); // a bit smaller than max int
-    CHECK(clampInt.y == -2147483648);
+    CHECK(clampInt.x == 2147484672.0f);
+    CHECK(clampInt.y == -2147484672.0f);
 
     Pixel32fC2 clampUInt(float(numeric_limits<uint>::max()) + 1000, float(numeric_limits<uint>::min()) - 1000);
     clampUInt.template ClampToTargetType<uint>();
-    CHECK(clampUInt.x == 0xffffffffUL);
-    CHECK(clampUInt.y == 0);
+    CHECK(clampUInt.x == 4294968320.0f);
+    CHECK(clampUInt.y == -1000.0f);
 }
 
 TEST_CASE("Pixel32sC2", "[Common]")
@@ -944,44 +954,264 @@ TEST_CASE("Pixel16fC2_additionalMethods", "[Common]")
     Pixel16fC2 clampByte(HalfFp16(float(numeric_limits<byte>::max()) + 1),
                          HalfFp16(float(numeric_limits<byte>::min()) - 1));
     clampByte.template ClampToTargetType<byte>();
-    CHECK(clampByte.x == 255);
-    CHECK(clampByte.y == 0);
+    CHECK(clampByte.x == 256);
+    CHECK(clampByte.y == -1);
 
     Pixel16fC2 clampShort(HalfFp16(float(numeric_limits<short>::max()) + 1),
                           HalfFp16(float(numeric_limits<short>::min()) - 1));
     clampShort.template ClampToTargetType<short>();
-    CHECK(clampShort.x == 32752);
+    CHECK(clampShort.x == 32768);
     CHECK(clampShort.y == -32768);
 
     Pixel16fC2 clampSByte(HalfFp16(float(numeric_limits<sbyte>::max()) + 1),
                           HalfFp16(float(numeric_limits<sbyte>::min()) - 1));
     clampSByte.template ClampToTargetType<sbyte>();
-    CHECK(clampSByte.x == 127);
-    CHECK(clampSByte.y == -128);
+    CHECK(clampSByte.x == 128);
+    CHECK(clampSByte.y == -129);
 
     Pixel16fC2 clampUShort(HalfFp16(0.0f), HalfFp16(float(numeric_limits<ushort>::min()) - 1));
 
     clampUShort.template ClampToTargetType<ushort>();
     CHECK(clampUShort.x == 0);
-    CHECK(clampUShort.y == 0);
+    CHECK(clampUShort.y == -1);
 
     CHECK_FALSE(need_saturation_clamp_v<HalfFp16, int>);
 
-    CHECK(need_saturation_clamp_v<HalfFp16, uint>);
+    CHECK_FALSE(need_saturation_clamp_v<HalfFp16, uint>);
     Pixel16fC2 clampUInt(HalfFp16(0), HalfFp16(float(numeric_limits<uint>::min()) - 1000));
 
     clampUInt.template ClampToTargetType<uint>();
     CHECK(clampUInt.x == 0);
-    CHECK(clampUInt.y == 0);
+    CHECK(clampUInt.y == -1000);
 
     Pixel32fC2 clampFloatToFp16(float(numeric_limits<int>::min()) - 1000.0f, //
                                 float(numeric_limits<int>::max()) + 1000.0f);
 
     clampFloatToFp16.template ClampToTargetType<HalfFp16>();
-    CHECK(clampFloatToFp16.x == -65504);
-    CHECK(clampFloatToFp16.y == 65504);
+    CHECK(clampFloatToFp16.x == -2147484672.0f);
+    CHECK(clampFloatToFp16.y == 2147484672.0f);
 
     Pixel16fC2 fromFromFloat(clampFloatToFp16);
-    CHECK(fromFromFloat.x == -65504);
-    CHECK(fromFromFloat.y == 65504);
+    CHECK(fromFromFloat.x == -INFINITY);
+    CHECK(fromFromFloat.y == INFINITY);
+}
+
+TEST_CASE("Pixel32fcC2", "[Common]")
+{
+    // check size:
+    CHECK(sizeof(Pixel32fcC2) == 4 * sizeof(float));
+
+    Complex<float> arr[2] = {Complex<float>(4, 2), Complex<float>(5, -2)};
+    Pixel32fcC2 t0(arr);
+    CHECK(t0.x == Complex<float>(4, 2));
+    CHECK(t0.y == Complex<float>(5, -2));
+
+    Pixel32fcC2 t1(Complex<float>(0, 1), Complex<float>(1, -2));
+    CHECK(t1.x == Complex<float>(0, 1));
+    CHECK(t1.y == Complex<float>(1, -2));
+
+    Pixel32fcC2 c(t1);
+    CHECK(c.x == Complex<float>(0, 1));
+    CHECK(c.y == Complex<float>(1, -2));
+    CHECK(c == t1);
+
+    Pixel32fcC2 c2 = t1;
+    CHECK(c2.x == Complex<float>(0, 1));
+    CHECK(c2.y == Complex<float>(1, -2));
+    CHECK(c2 == t1);
+
+    Pixel32fcC2 t2(5);
+    CHECK(t2.x == Complex<float>(5, 0));
+    CHECK(t2.y == Complex<float>(5, 0));
+    CHECK(c2 != t2);
+
+    Pixel32fcC2 neg = -t1;
+    CHECK(neg.x == -1_i);
+    CHECK(neg.y == -1 + 2_i);
+    CHECK(t1 == -neg);
+
+    Pixel32fcC2 add1 = t1 + t2;
+    CHECK(add1.x == Complex<float>(5, 1));
+    CHECK(add1.y == Complex<float>(6, -2));
+
+    Pixel32fcC2 add2 = 3 + t1;
+    CHECK(add2.x == Complex<float>(3, 1));
+    CHECK(add2.y == Complex<float>(4, -2));
+
+    Pixel32fcC2 add3 = t1 + 4;
+    CHECK(add3.x == Complex<float>(4, 1));
+    CHECK(add3.y == Complex<float>(5, -2));
+
+    Pixel32fcC2 add4 = t1;
+    add4 += add3;
+    CHECK(add4.x == Complex<float>(4, 2));
+    CHECK(add4.y == Complex<float>(6, -4));
+
+    add4 += 3.0f + 0_i;
+    CHECK(add4.x == Complex<float>(7, 2));
+    CHECK(add4.y == Complex<float>(9, -4));
+
+    Pixel32fcC2 sub1 = t1 - t2;
+    CHECK(sub1.x == Complex<float>(-5, 1));
+    CHECK(sub1.y == Complex<float>(-4, -2));
+
+    Pixel32fcC2 sub2 = 3 - t1;
+    CHECK(sub2.x == Complex<float>(3, -1));
+    CHECK(sub2.y == Complex<float>(2, +2));
+
+    Pixel32fcC2 sub3 = t1 - 4;
+    CHECK(sub3.x == Complex<float>(-4, 1));
+    CHECK(sub3.y == Complex<float>(-3, -2));
+
+    Pixel32fcC2 sub4 = t1;
+    sub4 -= sub3;
+    CHECK(sub4.x == Complex<float>(4, 0));
+    CHECK(sub4.y == Complex<float>(4, 0));
+
+    sub4 -= 3.0f + 0_i;
+    CHECK(sub4.x == Complex<float>(1, 0));
+    CHECK(sub4.y == Complex<float>(1, 0));
+
+    Pixel32fcC2 sub5 = t1;
+    Pixel32fcC2 sub6(9, 8);
+    sub5.SubInv(sub6);
+    CHECK(sub5.x == Complex<float>(9, -1));
+    CHECK(sub5.y == Complex<float>(7, 2));
+
+    t1               = Pixel32fcC2(Complex<float>(4, 5), Complex<float>(6, 7));
+    t2               = Pixel32fcC2(Complex<float>(5, 6), Complex<float>(7, -8));
+    Pixel32fcC2 mul1 = t1 * t2;
+    CHECK(mul1.x == Complex<float>(-10, 49));
+    CHECK(mul1.y == Complex<float>(98, 1));
+
+    Pixel32fcC2 mul2 = 3 * t1;
+    CHECK(mul2.x == Complex<float>(12, 15));
+    CHECK(mul2.y == Complex<float>(18, 21));
+
+    Pixel32fcC2 mul3 = t1 * 4;
+    CHECK(mul3.x == Complex<float>(16, 20));
+    CHECK(mul3.y == Complex<float>(24, 28));
+
+    Pixel32fcC2 mul4 = t1;
+    mul4 *= mul3;
+    CHECK(mul4.x == Complex<float>(-36, 160));
+    CHECK(mul4.y == Complex<float>(-52, 336));
+
+    mul4 *= 3.0f + 0_i;
+    CHECK(mul4.x == Complex<float>(-108, 480));
+    CHECK(mul4.y == Complex<float>(-156, 1008));
+
+    Pixel32fcC2 div1 = t1 / t2;
+    CHECK(div1.x.real == Approx(0.819672108f).margin(0.001));
+    CHECK(div1.x.imag == Approx(0.016393442f).margin(0.001));
+    CHECK(div1.y.real == Approx(-0.123893805f).margin(0.001));
+    CHECK(div1.y.imag == Approx(0.85840708f).margin(0.001));
+
+    Pixel32fcC2 div2 = 3 / t1;
+    CHECK(div2.x.real == Approx(0.292682916f).margin(0.001));
+    CHECK(div2.x.imag == Approx(-0.365853667f).margin(0.001));
+    CHECK(div2.y.real == Approx(0.211764708f).margin(0.001));
+    CHECK(div2.y.imag == Approx(-0.247058824f).margin(0.001));
+
+    Pixel32fcC2 div3 = t1 / 4;
+    CHECK(div3.x.real == Approx(1).margin(0.001));
+    CHECK(div3.x.imag == Approx(1.25).margin(0.001));
+    CHECK(div3.y.real == Approx(1.5).margin(0.001));
+    CHECK(div3.y.imag == Approx(1.75).margin(0.001));
+
+    Pixel32fcC2 div4 = t2;
+    div4 /= div3;
+    CHECK(div4.x.real == Approx(4.878048897f).margin(0.001));
+    CHECK(div4.x.imag == Approx(-0.097560972f).margin(0.001));
+    CHECK(div4.y.real == Approx(-0.65882355f).margin(0.001));
+    CHECK(div4.y.imag == Approx(-4.564705849f).margin(0.001));
+
+    div4 /= 3.0f + 0_i;
+    CHECK(div4.x.real == Approx(1.626016259f).margin(0.001));
+    CHECK(div4.x.imag == Approx(-0.032520324f).margin(0.001));
+    CHECK(div4.y.real == Approx(-0.21960786f).margin(0.001));
+    CHECK(div4.y.imag == Approx(-1.521568656f).margin(0.001));
+
+    Pixel32fcC2 div5 = t1;
+    Pixel32fcC2 div6(9, 8);
+    Pixel32fcC2 difv7 = div6 / div5;
+    div5.DivInv(div6);
+    CHECK(div5.x == difv7.x);
+    CHECK(div5.y == difv7.y);
+
+    Pixel32fcC2 conj1 = t1;
+    Pixel32fcC2 conj2 = Pixel32fcC2::Conj(t1);
+    conj1.Conj();
+    CHECK(conj1.x == 4 - 5_i);
+    CHECK(conj1.y == 6 - 7_i);
+    CHECK(conj2.x == 4 - 5_i);
+    CHECK(conj2.y == 6 - 7_i);
+
+    conj1 = t1;
+    conj1.ConjMul(t2);
+    conj2 = Pixel32fcC2::ConjMul(t1, t2);
+    CHECK(conj1.x == 50 + 1_i);
+    CHECK(conj1.y == -14 + 97_i);
+    CHECK(conj2.x == 50 + 1_i);
+    CHECK(conj2.y == -14 + 97_i);
+}
+
+TEST_CASE("Pixel32fcC2_additionalMethods", "[Common]")
+{
+    Pixel32fcC2 roundA(Complex<float>(0.4f, 0.5f), Complex<float>(0.6f, 1.5f));
+    Pixel32fcC2 round2A = Pixel32fcC2::Round(roundA);
+    roundA.Round();
+    CHECK(round2A == roundA);
+    CHECK(roundA.x.real == 0.0f);
+    CHECK(roundA.x.imag == 1.0f);
+    CHECK(roundA.y.real == 1.0f);
+    CHECK(roundA.y.imag == 2.0f);
+
+    Pixel32fcC2 floorA(Complex<float>(0.4f, 0.5f), Complex<float>(0.6f, 1.5f));
+    Pixel32fcC2 floor2A = Pixel32fcC2::Floor(floorA);
+    floorA.Floor();
+    CHECK(floor2A == floorA);
+    CHECK(floorA.x.real == 0.0f);
+    CHECK(floorA.x.imag == 0.0f);
+    CHECK(floorA.y.real == 0.0f);
+    CHECK(floorA.y.imag == 1.0f);
+
+    Pixel32fcC2 ceilA(Complex<float>(0.4f, 0.5f), Complex<float>(0.6f, 1.5f));
+    Pixel32fcC2 ceil2A = Pixel32fcC2::Ceil(ceilA);
+    ceilA.Ceil();
+    CHECK(ceil2A == ceilA);
+    CHECK(ceilA.x.real == 1.0f);
+    CHECK(ceilA.x.imag == 1.0f);
+    CHECK(ceilA.y.real == 1.0f);
+    CHECK(ceilA.y.imag == 2.0f);
+
+    Pixel32fcC2 zeroA(Complex<float>(0.4f, 0.5f), Complex<float>(0.6f, 1.5f));
+    Pixel32fcC2 zero2A = Pixel32fcC2::RoundZero(zeroA);
+    zeroA.RoundZero();
+    CHECK(zero2A == zeroA);
+    CHECK(zeroA.x.real == 0.0f);
+    CHECK(zeroA.x.imag == 0.0f);
+    CHECK(zeroA.y.real == 0.0f);
+    CHECK(zeroA.y.imag == 1.0f);
+
+    Pixel32fcC2 nearestA(Complex<float>(0.4f, 0.5f), Complex<float>(0.6f, 1.5f));
+    Pixel32fcC2 nearest2A = Pixel32fcC2::RoundNearest(nearestA);
+    nearestA.RoundNearest();
+    CHECK(nearest2A == nearestA);
+    CHECK(nearestA.x.real == 0.0f);
+    CHECK(nearestA.x.imag == 0.0f);
+    CHECK(nearestA.y.real == 1.0f);
+    CHECK(nearestA.y.imag == 2.0f);
+
+    // Not vector does the value clampling but the complex type!
+    Pixel32fcC2 clampToShort(float(numeric_limits<short>::max()) + 1, float(numeric_limits<short>::min()) - 1);
+    Pixel16scC2 clampShort(clampToShort);
+    CHECK(clampShort.x.real == 32767);
+    CHECK(clampShort.y.real == -32768);
+
+    Pixel32fcC2 clampToInt(float(numeric_limits<int>::max()) + 1000, float(numeric_limits<int>::min()) - 1000);
+
+    Pixel32scC2 clampInt(clampToInt);
+    CHECK(clampInt.x.real == 2147483647);
+    CHECK(clampInt.y.real == -2147483648);
 }

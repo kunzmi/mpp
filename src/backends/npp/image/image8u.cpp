@@ -1,3 +1,7 @@
+#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
+#if OPP_ENABLE_NPP_BACKEND
+#include <common/image/pixelTypeEnabler.h> //NOLINT(misc-include-cleaner)
+
 #include "image8u.h"
 #include "image8uC1View.h"
 #include "image8uC2View.h"
@@ -270,3 +274,4 @@ Image8uC4 &Image8uC4::operator=(Image8uC4 &&aOther) noexcept
 }
 
 } // namespace opp::image::npp
+#endif // OPP_ENABLE_NPP_BACKEND

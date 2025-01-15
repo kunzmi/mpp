@@ -364,32 +364,31 @@ struct numeric_limits_conversion<TFrom, Complex<TTo>> : numeric_limits_conversio
 {
 };
 
-template <> struct numeric_limits_conversion<float, int>
-{
-    // BFloat16 does not have a constexpr constructor on cuda device...
-    [[nodiscard]] static constexpr DEVICE_CODE float min() noexcept
-    {
-        return static_cast<float>(numeric_limits<int>::min());
-    }
-    [[nodiscard]] static DEVICE_CODE float max() noexcept
-    {
-        // special case for floats to int: the maximum value of int is slightly smaller than the closest exact
-        // integer in float, and as we use round to nearest, the clamping would result in a too large number.
-        // Thus for float and int, we clamp to the next integer smaller than int::max(), i.e. 2147483520
-        return 2147483520.0f;
-    }
-    [[nodiscard]] static DEVICE_CODE float lowest() noexcept
-    {
-        return static_cast<float>(numeric_limits<int>::lowest());
-    }
-    [[nodiscard]] static DEVICE_CODE float minExact() noexcept
-    {
-        return static_cast<float>(numeric_limits<int>::minExact());
-    }
-    [[nodiscard]] static DEVICE_CODE float maxExact() noexcept
-    {
-        return static_cast<float>(numeric_limits<int>::maxExact());
-    }
-};
+// template <> struct numeric_limits_conversion<float, int>
+//{
+//     [[nodiscard]] static constexpr DEVICE_CODE float min() noexcept
+//     {
+//         return static_cast<float>(numeric_limits<int>::min());
+//     }
+//     [[nodiscard]] static DEVICE_CODE float max() noexcept
+//     {
+//         // special case for floats to int: the maximum value of int is slightly smaller than the closest exact
+//         // integer in float, and as we use round to nearest, the clamping would result in a too large number.
+//         // Thus for float and int, we clamp to the next integer smaller than int::max(), i.e. 2147483520
+//         return 2147483520.0f;
+//     }
+//     [[nodiscard]] static DEVICE_CODE float lowest() noexcept
+//     {
+//         return static_cast<float>(numeric_limits<int>::lowest());
+//     }
+//     [[nodiscard]] static DEVICE_CODE float minExact() noexcept
+//     {
+//         return static_cast<float>(numeric_limits<int>::minExact());
+//     }
+//     [[nodiscard]] static DEVICE_CODE float maxExact() noexcept
+//     {
+//         return static_cast<float>(numeric_limits<int>::maxExact());
+//     }
+// };
 
 } // namespace opp

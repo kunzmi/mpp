@@ -1,4 +1,7 @@
 #pragma once
+#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
+#if OPP_ENABLE_CUDA_BACKEND
+
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/streamCtx.h>
@@ -11,13 +14,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-#include <iostream>
-
-namespace opp
-{
-namespace image
-{
-namespace cuda
+namespace opp::image::cuda
 {
 /// <summary>
 /// runs aOp on every pixel of an image. Inplace and outplace operation, no mask.
@@ -168,6 +165,5 @@ void InvokeForEachPixelKernelDefault(DstT *aDst, size_t pitchDst, const Size2D &
     }
 }
 
-} // namespace cuda
-} // namespace image
-} // namespace opp
+} // namespace opp::image::cuda
+#endif // OPP_ENABLE_CUDA_BACKEND

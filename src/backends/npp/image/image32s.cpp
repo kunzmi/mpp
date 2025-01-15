@@ -1,3 +1,7 @@
+#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
+#if OPP_ENABLE_NPP_BACKEND
+#include <common/image/pixelTypeEnabler.h> //NOLINT(misc-include-cleaner)
+
 #include "image32s.h"
 #include "image32sC1View.h"
 #include "image32sC2View.h"
@@ -270,3 +274,4 @@ Image32sC4 &Image32sC4::operator=(Image32sC4 &&aOther) noexcept
 }
 
 } // namespace opp::image::npp
+#endif // OPP_ENABLE_NPP_BACKEND

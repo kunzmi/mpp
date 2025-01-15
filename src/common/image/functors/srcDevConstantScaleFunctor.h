@@ -48,7 +48,7 @@ struct SrcDevConstantScaleFunctor : public ImageFunctor<false>
     {
     }
 
-    SrcDevConstantScaleFunctor(const SrcT *aSrc1, size_t aSrcPitch1, ComputeT *aConstant, operation aOp,
+    SrcDevConstantScaleFunctor(const SrcT *aSrc1, size_t aSrcPitch1, const SrcT *aConstant, operation aOp,
                                scalefactor_t<ComputeT> aScaleFactor)
         : Src1(aSrc1), SrcPitch1(aSrcPitch1), Constant(aConstant), ScaleFactor(aScaleFactor), Op(aOp)
     {

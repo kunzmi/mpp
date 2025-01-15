@@ -197,6 +197,33 @@ class alignas(2) BFloat16
 #endif
     }
 
+#ifdef IS_CUDA_COMPILER
+    DEVICE_CODE inline operator int() const
+    {
+        return __bfloat162int_rz(value);
+    }
+    DEVICE_CODE inline operator uint() const
+    {
+        return __bfloat162uint_rz(value);
+    }
+    DEVICE_CODE inline operator short() const
+    {
+        return __bfloat162short_rz(value);
+    }
+    DEVICE_CODE inline operator ushort() const
+    {
+        return __bfloat162ushort_rz(value);
+    }
+    DEVICE_CODE inline operator byte() const
+    {
+        return __bfloat162uchar_rz(value);
+    }
+    DEVICE_CODE inline operator sbyte() const
+    {
+        return __bfloat162char_rz(value);
+    }
+#endif
+
     /// <summary>
     /// </summary>
     DEVICE_CODE [[nodiscard]] inline bool operator<(BFloat16 aOther) const
@@ -623,7 +650,23 @@ class alignas(2) BFloat16
         *this = BFloat16(std::round(static_cast<float>(*this)));
 #endif
 #ifdef IS_CUDA_COMPILER
-        *this = BFloat16(round(static_cast<float>(value)));
+        //// it seems there is no "round" function for bfloats, so implement it here:
+        // constexpr ushort O_Point_5_AS_BFLOAT = 0x3f00;
+        // constexpr ushort SIGN_BIT            = 0x8000;
+        // ushort bfloatbits                    = *reinterpret_cast<ushort *>(&value);
+        // bfloatbits &= SIGN_BIT;
+        // bfloatbits |= O_Point_5_AS_BFLOAT;
+
+        //// add 0.5 to a positive value, -0.5 to a negative value and then round towards zero:
+        // BFloat16 onehalf = *reinterpret_cast<BFloat16 *>(&bfloatbits);
+        //*this += onehalf;
+
+        // value = htrunc(value);
+        //
+        //   the above code is wrong as the addition is round to nearest even but needs to be round towards zero,
+        //   which is only available for sm_90 and later. So lets stick to conversion to float32...
+
+        value = round(static_cast<float>(value));
 #endif
         return *this;
     }
@@ -637,7 +680,8 @@ class alignas(2) BFloat16
         return BFloat16(std::round(static_cast<float>(aOther)));
 #endif
 #ifdef IS_CUDA_COMPILER
-        return BFloat16(round(static_cast<float>(aOther.value)));
+        aOther.Round();
+        return aOther;
 #endif
     }
 
@@ -656,7 +700,7 @@ class alignas(2) BFloat16
     /// </summary>
     DEVICE_ONLY_CODE inline BFloat16 &Floor()
     {
-        value = __int2bfloat16_rd(__bfloat162int_rd(value));
+        value = hfloor(value);
         return *this;
     }
 #endif
@@ -677,7 +721,7 @@ class alignas(2) BFloat16
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] inline static BFloat16 Floor(BFloat16 aOther)
     {
-        return BFloat16(__int2bfloat16_rd(__bfloat162int_rd(aOther.value)));
+        return BFloat16(hfloor(aOther.value));
     }
 #endif
 
@@ -696,7 +740,7 @@ class alignas(2) BFloat16
     /// </summary>
     DEVICE_ONLY_CODE inline BFloat16 &Ceil()
     {
-        value = __int2bfloat16_ru(__bfloat162int_ru(value));
+        value = hceil(value);
         return *this;
     }
 #endif
@@ -717,7 +761,7 @@ class alignas(2) BFloat16
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] inline static BFloat16 Ceil(BFloat16 aOther)
     {
-        return BFloat16(__int2bfloat16_ru(__bfloat162int_ru(aOther.value)));
+        return BFloat16(hceil(aOther.value));
     }
 #endif
 
@@ -740,7 +784,7 @@ class alignas(2) BFloat16
     /// </summary>
     DEVICE_ONLY_CODE inline BFloat16 &RoundNearest()
     {
-        value = __int2bfloat16_rn(__bfloat162int_rn(value));
+        value = hrint(value);
         return *this;
     }
 #endif
@@ -763,7 +807,7 @@ class alignas(2) BFloat16
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] inline static BFloat16 RoundNearest(BFloat16 aOther)
     {
-        return BFloat16(__int2bfloat16_rn(__bfloat162int_rn(aOther.value)));
+        return BFloat16(hrint(aOther.value));
     }
 #endif
 
@@ -784,7 +828,7 @@ class alignas(2) BFloat16
     /// </summary>
     DEVICE_ONLY_CODE inline BFloat16 &RoundZero()
     {
-        value = __int2bfloat16_rz(__bfloat162int_rz(value));
+        value = htrunc(value);
         return *this;
     }
 #endif
@@ -805,7 +849,7 @@ class alignas(2) BFloat16
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] inline static BFloat16 RoundZero(BFloat16 aOther)
     {
-        return BFloat16(__int2bfloat16_rz(__bfloat162int_rz(aOther.value)));
+        return BFloat16(htrunc(aOther.value));
     }
 #endif
 
@@ -868,11 +912,11 @@ inline BFloat16 operator"" _bf(long double aValue)
 }
 
 #ifdef IS_CUDA_COMPILER
-DEVICE_CODE bool isnan(BFloat16 aVal)
+DEVICE_CODE inline bool isnan(BFloat16 aVal)
 {
     return __hisnan(aVal.value);
 }
-DEVICE_CODE bool isinf(BFloat16 aVal)
+DEVICE_CODE inline bool isinf(BFloat16 aVal)
 {
     return __hisinf(aVal.value);
 }
@@ -898,7 +942,7 @@ template <> struct numeric_limits<BFloat16>
     {
         return BFloat16::FromUShort(static_cast<ushort>(0xC380));
     }
-    // maximum exact integer in float = 2^9 = 256
+    // maximum exact integer in float = 2^8 = 256
     [[nodiscard]] static constexpr DEVICE_CODE BFloat16 maxExact() noexcept
     {
         return BFloat16::FromUShort(static_cast<ushort>(0x4380));
@@ -913,85 +957,85 @@ template <> struct numeric_limits<BFloat16>
     }
 };
 
-// numeric limits when converting from one type to another, especially 16-Bit floats have some restrictions
-template <typename TTo> struct numeric_limits_conversion<BFloat16, TTo>
-{
-    // Does not have a constexpr constructor on cuda device...
-    [[nodiscard]] static const DEVICE_CODE BFloat16 min() noexcept
-    {
-        return static_cast<BFloat16>(numeric_limits<TTo>::min());
-    }
-    [[nodiscard]] static const DEVICE_CODE BFloat16 max() noexcept
-    {
-        return static_cast<BFloat16>(numeric_limits<TTo>::max());
-    }
-    [[nodiscard]] static const DEVICE_CODE BFloat16 lowest() noexcept
-    {
-        return static_cast<BFloat16>(numeric_limits<TTo>::lowest());
-    }
-    [[nodiscard]] static const DEVICE_CODE BFloat16 minExact() noexcept
-    {
-        return static_cast<BFloat16>(numeric_limits<TTo>::minExact());
-    }
-    [[nodiscard]] static const DEVICE_CODE BFloat16 maxExact() noexcept
-    {
-        return static_cast<BFloat16>(numeric_limits<TTo>::maxExact());
-    }
-};
-
-template <> struct numeric_limits_conversion<BFloat16, short>
-{
-    // BFloat16 does not have a constexpr constructor on cuda device...
-    [[nodiscard]] static const DEVICE_CODE BFloat16 min() noexcept
-    {
-        return static_cast<BFloat16>(numeric_limits<short>::min());
-    }
-    [[nodiscard]] static const DEVICE_CODE BFloat16 max() noexcept
-    {
-        // special case for half floats: the maximum value of short is slightly smaller than the closest exact
-        // integer in BFloat16, and as we use round to nearest, the clamping would result in a too large number.
-        // Thus for BFloat16 and short, we clamp to the next integer smaller than short::max(), i.e. 32640
-        return BFloat16::FromUShort(0x46FF); // = 32640
-    }
-    [[nodiscard]] static const DEVICE_CODE BFloat16 lowest() noexcept
-    {
-        return static_cast<BFloat16>(numeric_limits<short>::lowest());
-    }
-    [[nodiscard]] static const DEVICE_CODE BFloat16 minExact() noexcept
-    {
-        return static_cast<BFloat16>(numeric_limits<short>::minExact());
-    }
-    [[nodiscard]] static const DEVICE_CODE BFloat16 maxExact() noexcept
-    {
-        return static_cast<BFloat16>(numeric_limits<short>::maxExact());
-    }
-};
-
-template <> struct numeric_limits_conversion<BFloat16, ushort>
-{
-    [[nodiscard]] static const DEVICE_CODE BFloat16 min() noexcept
-    {
-        return static_cast<BFloat16>(numeric_limits<ushort>::min());
-    }
-    [[nodiscard]] static const DEVICE_CODE BFloat16 max() noexcept
-    {
-        // special case for half floats: the maximum value of ushort is slightly smaller than the closest exact
-        // integer in BFloat16, and as we use round to nearest, the clamping would result in a too large number.
-        // Thus for BFloat16 and short, we clamp to the next integer smaller than ushort::max(), i.e. 65280
-        return BFloat16::FromUShort(0x477f); // = 65280
-    }
-    [[nodiscard]] static const DEVICE_CODE BFloat16 lowest() noexcept
-    {
-        return static_cast<BFloat16>(numeric_limits<ushort>::lowest());
-    }
-    [[nodiscard]] static const DEVICE_CODE BFloat16 minExact() noexcept
-    {
-        return static_cast<BFloat16>(numeric_limits<ushort>::minExact());
-    }
-    [[nodiscard]] static const DEVICE_CODE BFloat16 maxExact() noexcept
-    {
-        return static_cast<BFloat16>(numeric_limits<ushort>::maxExact());
-    }
-};
+//// numeric limits when converting from one type to another, especially 16-Bit floats have some restrictions
+// template <typename TTo> struct numeric_limits_conversion<BFloat16, TTo>
+//{
+//     // Does not have a constexpr constructor on cuda device...
+//     [[nodiscard]] static const DEVICE_CODE BFloat16 min() noexcept
+//     {
+//         return static_cast<BFloat16>(numeric_limits<TTo>::min());
+//     }
+//     [[nodiscard]] static const DEVICE_CODE BFloat16 max() noexcept
+//     {
+//         return static_cast<BFloat16>(numeric_limits<TTo>::max());
+//     }
+//     [[nodiscard]] static const DEVICE_CODE BFloat16 lowest() noexcept
+//     {
+//         return static_cast<BFloat16>(numeric_limits<TTo>::lowest());
+//     }
+//     [[nodiscard]] static const DEVICE_CODE BFloat16 minExact() noexcept
+//     {
+//         return static_cast<BFloat16>(numeric_limits<TTo>::minExact());
+//     }
+//     [[nodiscard]] static const DEVICE_CODE BFloat16 maxExact() noexcept
+//     {
+//         return static_cast<BFloat16>(numeric_limits<TTo>::maxExact());
+//     }
+// };
+//
+// template <> struct numeric_limits_conversion<BFloat16, short>
+//{
+//     // BFloat16 does not have a constexpr constructor on cuda device...
+//     [[nodiscard]] static const DEVICE_CODE BFloat16 min() noexcept
+//     {
+//         return static_cast<BFloat16>(numeric_limits<short>::min());
+//     }
+//     [[nodiscard]] static const DEVICE_CODE BFloat16 max() noexcept
+//     {
+//         // special case for half floats: the maximum value of short is slightly smaller than the closest exact
+//         // integer in BFloat16, and as we use round to nearest, the clamping would result in a too large number.
+//         // Thus for BFloat16 and short, we clamp to the next integer smaller than short::max(), i.e. 32640
+//         return BFloat16::FromUShort(0x46FF); // = 32640
+//     }
+//     [[nodiscard]] static const DEVICE_CODE BFloat16 lowest() noexcept
+//     {
+//         return static_cast<BFloat16>(numeric_limits<short>::lowest());
+//     }
+//     [[nodiscard]] static const DEVICE_CODE BFloat16 minExact() noexcept
+//     {
+//         return static_cast<BFloat16>(numeric_limits<short>::minExact());
+//     }
+//     [[nodiscard]] static const DEVICE_CODE BFloat16 maxExact() noexcept
+//     {
+//         return static_cast<BFloat16>(numeric_limits<short>::maxExact());
+//     }
+// };
+//
+// template <> struct numeric_limits_conversion<BFloat16, ushort>
+//{
+//     [[nodiscard]] static const DEVICE_CODE BFloat16 min() noexcept
+//     {
+//         return static_cast<BFloat16>(numeric_limits<ushort>::min());
+//     }
+//     [[nodiscard]] static const DEVICE_CODE BFloat16 max() noexcept
+//     {
+//         // special case for half floats: the maximum value of ushort is slightly smaller than the closest exact
+//         // integer in BFloat16, and as we use round to nearest, the clamping would result in a too large number.
+//         // Thus for BFloat16 and short, we clamp to the next integer smaller than ushort::max(), i.e. 65280
+//         return BFloat16::FromUShort(0x477f); // = 65280
+//     }
+//     [[nodiscard]] static const DEVICE_CODE BFloat16 lowest() noexcept
+//     {
+//         return static_cast<BFloat16>(numeric_limits<ushort>::lowest());
+//     }
+//     [[nodiscard]] static const DEVICE_CODE BFloat16 minExact() noexcept
+//     {
+//         return static_cast<BFloat16>(numeric_limits<ushort>::minExact());
+//     }
+//     [[nodiscard]] static const DEVICE_CODE BFloat16 maxExact() noexcept
+//     {
+//         return static_cast<BFloat16>(numeric_limits<ushort>::maxExact());
+//     }
+// };
 
 } // namespace opp

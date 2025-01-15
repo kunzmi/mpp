@@ -1,4 +1,7 @@
 #pragma once
+#include <common/moduleEnabler.h>
+#if OPP_ENABLE_CUDA_CORE
+
 #include "cudaException.h"
 #include <common/defines.h>
 #include <cuda_runtime_api.h>
@@ -137,3 +140,4 @@ class Stream
   private:
 };
 } // namespace opp::cuda
+#endif // OPP_ENABLE_CUDA_CORE

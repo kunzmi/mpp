@@ -1,4 +1,8 @@
 #pragma once
+#include <common/moduleEnabler.h>
+#if OPP_ENABLE_CUDA_BACKEND
+
+#include <backends/cuda/stream.h>
 #include <common/defines.h>
 #include <cuda_runtime_api.h>
 #include <driver_types.h>
@@ -71,6 +75,19 @@ class StreamCtxSingleton
     /// If a new cuda context gets bound to the CPU thread, this StreamCtx gets invalid and must be updated!
     /// </summary>
     /// <returns></returns>
-    static StreamCtx &Get();
+    [[nodiscard]] static const StreamCtx &Get();
+
+    /// <summary>
+    /// Reinitializes the stream context to the new current Cuda context
+    /// </summary>
+    /// <returns></returns>
+    static void UpdateContext();
+
+    /// <summary>
+    /// Sets the given cuda stream as the new default stream to the stream context
+    /// </summary>
+    /// <returns></returns>
+    static void SetStream(const Stream &aStream);
 };
 } // namespace opp::cuda
+#endif // OPP_ENABLE_CUDA_BACKEND

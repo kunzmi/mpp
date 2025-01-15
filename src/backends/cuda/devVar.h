@@ -1,6 +1,9 @@
 #pragma once
-#include "cudaException.h"
+#include <common/moduleEnabler.h>
+#if OPP_ENABLE_CUDA_CORE
+
 #include "DevVarView.h"
+#include "cudaException.h"
 #include <common/defines.h>
 #include <cuda_runtime_api.h>
 
@@ -61,3 +64,4 @@ template <typename T> class DevVar : public DevVarView<T>
 };
 
 } // namespace opp::cuda
+#endif // OPP_ENABLE_CUDA_CORE

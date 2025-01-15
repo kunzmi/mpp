@@ -1,13 +1,17 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <cmath>
+#include <common/complex.h>
 #include <common/defines.h>
+#include <common/exception.h>
+#include <common/half_fp16.h>
 #include <common/image/pixelTypes.h>
+#include <common/needSaturationClamp.h>
 #include <common/numeric_limits.h>
-#include <common/safeCast.h>
-#include <common/vectorTypes.h>
-#include <cstddef>
-#include <cstdint>
-#include <math.h>
+#include <common/vector3.h>
+#include <iosfwd>
+#include <string>
+#include <vector>
 
 using namespace opp;
 using namespace opp::image;
@@ -46,6 +50,12 @@ TEST_CASE("Pixel32fC3", "[Common]")
     CHECK(t2.y == 5);
     CHECK(t2.z == 5);
     CHECK(c2 != t2);
+
+    Pixel32fC3 neg = -t1;
+    CHECK(neg.x == 0);
+    CHECK(neg.y == -1);
+    CHECK(neg.z == -2);
+    CHECK(t1 == -neg);
 
     Pixel32fC3 add1 = t1 + t2;
     CHECK(add1.x == 5);
@@ -297,43 +307,43 @@ TEST_CASE("Pixel32fC3_additionalMethods", "[Common]")
     Pixel32fC3 clampByte(float(numeric_limits<byte>::max()) + 1, float(numeric_limits<byte>::min()) - 1,
                          float(numeric_limits<byte>::min()));
     clampByte.template ClampToTargetType<byte>();
-    CHECK(clampByte.x == 255);
-    CHECK(clampByte.y == 0);
+    CHECK(clampByte.x == 256);
+    CHECK(clampByte.y == -1);
     CHECK(clampByte.z == 0);
 
     Pixel32fC3 clampShort(float(numeric_limits<short>::max()) + 1, float(numeric_limits<short>::min()) - 1,
                           float(numeric_limits<short>::min()));
     clampShort.template ClampToTargetType<short>();
-    CHECK(clampShort.x == 32767);
-    CHECK(clampShort.y == -32768);
+    CHECK(clampShort.x == 32768);
+    CHECK(clampShort.y == -32769);
     CHECK(clampShort.z == -32768);
 
     Pixel32fC3 clampSByte(float(numeric_limits<sbyte>::max()) + 1, float(numeric_limits<sbyte>::min()) - 1,
                           float(numeric_limits<sbyte>::min()));
     clampSByte.template ClampToTargetType<sbyte>();
-    CHECK(clampSByte.x == 127);
-    CHECK(clampSByte.y == -128);
+    CHECK(clampSByte.x == 128);
+    CHECK(clampSByte.y == -129);
     CHECK(clampSByte.z == -128);
 
     Pixel32fC3 clampUShort(float(numeric_limits<ushort>::max()) + 1, float(numeric_limits<ushort>::min()) - 1,
                            float(numeric_limits<ushort>::min()));
     clampUShort.template ClampToTargetType<ushort>();
-    CHECK(clampUShort.x == 65535);
-    CHECK(clampUShort.y == 0);
+    CHECK(clampUShort.x == 65536);
+    CHECK(clampUShort.y == -1);
     CHECK(clampUShort.z == 0);
 
     Pixel32fC3 clampInt(float(numeric_limits<int>::max()) + 1000, float(numeric_limits<int>::min()) - 1000,
                         float(numeric_limits<int>::min()));
     clampInt.template ClampToTargetType<int>();
-    CHECK(clampInt.x == 2147483520); // a bit smaller than max int
-    CHECK(clampInt.y == -2147483648);
+    CHECK(clampInt.x == 2147484672.0f);
+    CHECK(clampInt.y == -2147484672.0f);
     CHECK(clampInt.z == -2147483648);
 
     Pixel32fC3 clampUInt(float(numeric_limits<uint>::max()) + 1000, float(numeric_limits<uint>::min()) - 1000,
                          float(numeric_limits<uint>::min()));
     clampUInt.template ClampToTargetType<uint>();
-    CHECK(clampUInt.x == 0xffffffffUL);
-    CHECK(clampUInt.y == 0);
+    CHECK(clampUInt.x == 4294968320.0f);
+    CHECK(clampUInt.y == -1000.0f);
     CHECK(clampUInt.z == 0);
 }
 
@@ -1078,15 +1088,15 @@ TEST_CASE("Pixel16fC3_additionalMethods", "[Common]")
                          HalfFp16(float(numeric_limits<byte>::min()) - 1),
                          HalfFp16(float(numeric_limits<byte>::min())));
     clampByte.template ClampToTargetType<byte>();
-    CHECK(clampByte.x == 255);
-    CHECK(clampByte.y == 0);
+    CHECK(clampByte.x == 256);
+    CHECK(clampByte.y == -1);
     CHECK(clampByte.z == 0);
 
     Pixel16fC3 clampShort(HalfFp16(float(numeric_limits<short>::max()) + 1),
                           HalfFp16(float(numeric_limits<short>::min()) - 1),
                           HalfFp16(float(numeric_limits<short>::min())));
     clampShort.template ClampToTargetType<short>();
-    CHECK(clampShort.x == 32752);
+    CHECK(clampShort.x == 32768);
     CHECK(clampShort.y == -32768);
     CHECK(clampShort.z == -32768);
 
@@ -1094,8 +1104,8 @@ TEST_CASE("Pixel16fC3_additionalMethods", "[Common]")
                           HalfFp16(float(numeric_limits<sbyte>::min()) - 1),
                           HalfFp16(float(numeric_limits<sbyte>::min())));
     clampSByte.template ClampToTargetType<sbyte>();
-    CHECK(clampSByte.x == 127);
-    CHECK(clampSByte.y == -128);
+    CHECK(clampSByte.x == 128);
+    CHECK(clampSByte.y == -129);
     CHECK(clampSByte.z == -128);
 
     Pixel16fC3 clampUShort(HalfFp16(0.0f), HalfFp16(float(numeric_limits<ushort>::min()) - 1),
@@ -1103,18 +1113,18 @@ TEST_CASE("Pixel16fC3_additionalMethods", "[Common]")
 
     clampUShort.template ClampToTargetType<ushort>();
     CHECK(clampUShort.x == 0);
-    CHECK(clampUShort.y == 0);
+    CHECK(clampUShort.y == -1);
     CHECK(clampUShort.z == 0);
 
     CHECK_FALSE(need_saturation_clamp_v<HalfFp16, int>);
 
-    CHECK(need_saturation_clamp_v<HalfFp16, uint>);
+    CHECK_FALSE(need_saturation_clamp_v<HalfFp16, uint>);
     Pixel16fC3 clampUInt(HalfFp16(0), HalfFp16(float(numeric_limits<uint>::min()) - 1000),
                          HalfFp16(float(numeric_limits<uint>::min())));
 
     clampUInt.template ClampToTargetType<uint>();
     CHECK(clampUInt.x == 0);
-    CHECK(clampUInt.y == 0);
+    CHECK(clampUInt.y == -1000);
     CHECK(clampUInt.z == 0);
 
     Pixel32fC3 clampFloatToFp16(float(numeric_limits<int>::min()) - 1000.0f, //
@@ -1122,12 +1132,283 @@ TEST_CASE("Pixel16fC3_additionalMethods", "[Common]")
                                 float(numeric_limits<short>::min()));
 
     clampFloatToFp16.template ClampToTargetType<HalfFp16>();
-    CHECK(clampFloatToFp16.x == -65504);
-    CHECK(clampFloatToFp16.y == 65504);
+    CHECK(clampFloatToFp16.x == -2147484672.0f);
+    CHECK(clampFloatToFp16.y == 2147484672.0f);
     CHECK(clampFloatToFp16.z == -32768);
 
     Pixel16fC3 fromFromFloat(clampFloatToFp16);
-    CHECK(fromFromFloat.x == -65504);
-    CHECK(fromFromFloat.y == 65504);
+    CHECK(fromFromFloat.x == -INFINITY);
+    CHECK(fromFromFloat.y == INFINITY);
     CHECK(fromFromFloat.z == -32768);
+}
+
+TEST_CASE("Pixel32fcC3", "[Common]")
+{
+    // check size:
+    CHECK(sizeof(Pixel32fcC3) == 6 * sizeof(float));
+
+    Complex<float> arr[3] = {Complex<float>(4, 2), Complex<float>(5, -2), Complex<float>(6, 3)};
+    Pixel32fcC3 t0(arr);
+    CHECK(t0.x == Complex<float>(4, 2));
+    CHECK(t0.y == Complex<float>(5, -2));
+    CHECK(t0.z == Complex<float>(6, 3));
+
+    Pixel32fcC3 t1(Complex<float>(0, 1), Complex<float>(1, -2), Complex<float>(2, 3));
+    CHECK(t1.x == Complex<float>(0, 1));
+    CHECK(t1.y == Complex<float>(1, -2));
+    CHECK(t1.z == Complex<float>(2, 3));
+
+    Pixel32fcC3 c(t1);
+    CHECK(c.x == Complex<float>(0, 1));
+    CHECK(c.y == Complex<float>(1, -2));
+    CHECK(c.z == Complex<float>(2, 3));
+    CHECK(c == t1);
+
+    Pixel32fcC3 c2 = t1;
+    CHECK(c2.x == Complex<float>(0, 1));
+    CHECK(c2.y == Complex<float>(1, -2));
+    CHECK(c2.z == Complex<float>(2, 3));
+    CHECK(c2 == t1);
+
+    Pixel32fcC3 t2(5);
+    CHECK(t2.x == Complex<float>(5, 0));
+    CHECK(t2.y == Complex<float>(5, 0));
+    CHECK(t2.z == Complex<float>(5, 0));
+    CHECK(c2 != t2);
+
+    Pixel32fcC3 neg = -t1;
+    CHECK(neg.x == -1_i);
+    CHECK(neg.y == -1 + 2_i);
+    CHECK(neg.z == -2 - 3_i);
+    CHECK(t1 == -neg);
+
+    Pixel32fcC3 add1 = t1 + t2;
+    CHECK(add1.x == Complex<float>(5, 1));
+    CHECK(add1.y == Complex<float>(6, -2));
+    CHECK(add1.z == Complex<float>(7, 3));
+
+    Pixel32fcC3 add2 = 3 + t1;
+    CHECK(add2.x == Complex<float>(3, 1));
+    CHECK(add2.y == Complex<float>(4, -2));
+    CHECK(add2.z == Complex<float>(5, 3));
+
+    Pixel32fcC3 add3 = t1 + 4;
+    CHECK(add3.x == Complex<float>(4, 1));
+    CHECK(add3.y == Complex<float>(5, -2));
+    CHECK(add3.z == Complex<float>(6, 3));
+
+    Pixel32fcC3 add4 = t1;
+    add4 += add3;
+    CHECK(add4.x == Complex<float>(4, 2));
+    CHECK(add4.y == Complex<float>(6, -4));
+    CHECK(add4.z == Complex<float>(8, 6));
+
+    add4 += 3.0f + 0_i;
+    CHECK(add4.x == Complex<float>(7, 2));
+    CHECK(add4.y == Complex<float>(9, -4));
+    CHECK(add4.z == Complex<float>(11, 6));
+
+    Pixel32fcC3 sub1 = t1 - t2;
+    CHECK(sub1.x == Complex<float>(-5, 1));
+    CHECK(sub1.y == Complex<float>(-4, -2));
+    CHECK(sub1.z == Complex<float>(-3, 3));
+
+    Pixel32fcC3 sub2 = 3 - t1;
+    CHECK(sub2.x == Complex<float>(3, -1));
+    CHECK(sub2.y == Complex<float>(2, +2));
+    CHECK(sub2.z == Complex<float>(1, -3));
+
+    Pixel32fcC3 sub3 = t1 - 4;
+    CHECK(sub3.x == Complex<float>(-4, 1));
+    CHECK(sub3.y == Complex<float>(-3, -2));
+    CHECK(sub3.z == Complex<float>(-2, 3));
+
+    Pixel32fcC3 sub4 = t1;
+    sub4 -= sub3;
+    CHECK(sub4.x == Complex<float>(4, 0));
+    CHECK(sub4.y == Complex<float>(4, 0));
+    CHECK(sub4.z == Complex<float>(4, 0));
+
+    sub4 -= 3.0f + 0_i;
+    CHECK(sub4.x == Complex<float>(1, 0));
+    CHECK(sub4.y == Complex<float>(1, 0));
+    CHECK(sub4.z == Complex<float>(1, 0));
+
+    Pixel32fcC3 sub5 = t1;
+    Pixel32fcC3 sub6(9, 8, 7);
+    sub5.SubInv(sub6);
+    CHECK(sub5.x == Complex<float>(9, -1));
+    CHECK(sub5.y == Complex<float>(7, 2));
+    CHECK(sub5.z == Complex<float>(5, -3));
+
+    t1               = Pixel32fcC3(Complex<float>(4, 5), Complex<float>(6, 7), Complex<float>(8, 9));
+    t2               = Pixel32fcC3(Complex<float>(5, 6), Complex<float>(7, -8), Complex<float>(9, -5));
+    Pixel32fcC3 mul1 = t1 * t2;
+    CHECK(mul1.x == Complex<float>(-10, 49));
+    CHECK(mul1.y == Complex<float>(98, 1));
+    CHECK(mul1.z == Complex<float>(117, 41));
+
+    Pixel32fcC3 mul2 = 3 * t1;
+    CHECK(mul2.x == Complex<float>(12, 15));
+    CHECK(mul2.y == Complex<float>(18, 21));
+    CHECK(mul2.z == Complex<float>(24, 27));
+
+    Pixel32fcC3 mul3 = t1 * 4;
+    CHECK(mul3.x == Complex<float>(16, 20));
+    CHECK(mul3.y == Complex<float>(24, 28));
+    CHECK(mul3.z == Complex<float>(32, 36));
+
+    Pixel32fcC3 mul4 = t1;
+    mul4 *= mul3;
+    CHECK(mul4.x == Complex<float>(-36, 160));
+    CHECK(mul4.y == Complex<float>(-52, 336));
+    CHECK(mul4.z == Complex<float>(-68, 576));
+
+    mul4 *= 3.0f + 0_i;
+    CHECK(mul4.x == Complex<float>(-108, 480));
+    CHECK(mul4.y == Complex<float>(-156, 1008));
+    CHECK(mul4.z == Complex<float>(-204, 1728));
+
+    Pixel32fcC3 div1 = t1 / t2;
+    CHECK(div1.x.real == Approx(0.819672108f).margin(0.001));
+    CHECK(div1.x.imag == Approx(0.016393442f).margin(0.001));
+    CHECK(div1.y.real == Approx(-0.123893805f).margin(0.001));
+    CHECK(div1.y.imag == Approx(0.85840708f).margin(0.001));
+    CHECK(div1.z.real == Approx(0.254716992f).margin(0.001));
+    CHECK(div1.z.imag == Approx(1.141509414f).margin(0.001));
+
+    Pixel32fcC3 div2 = 3 / t1;
+    CHECK(div2.x.real == Approx(0.292682916f).margin(0.001));
+    CHECK(div2.x.imag == Approx(-0.365853667f).margin(0.001));
+    CHECK(div2.y.real == Approx(0.211764708f).margin(0.001));
+    CHECK(div2.y.imag == Approx(-0.247058824f).margin(0.001));
+    CHECK(div2.z.real == Approx(0.165517241f).margin(0.001));
+    CHECK(div2.z.imag == Approx(-0.186206892f).margin(0.001));
+
+    Pixel32fcC3 div3 = t1 / 4;
+    CHECK(div3.x.real == Approx(1).margin(0.001));
+    CHECK(div3.x.imag == Approx(1.25).margin(0.001));
+    CHECK(div3.y.real == Approx(1.5).margin(0.001));
+    CHECK(div3.y.imag == Approx(1.75).margin(0.001));
+    CHECK(div3.z.real == Approx(2).margin(0.001));
+    CHECK(div3.z.imag == Approx(2.25).margin(0.001));
+
+    Pixel32fcC3 div4 = t2;
+    div4 /= div3;
+    CHECK(div4.x.real == Approx(4.878048897f).margin(0.001));
+    CHECK(div4.x.imag == Approx(-0.097560972f).margin(0.001));
+    CHECK(div4.y.real == Approx(-0.65882355f).margin(0.001));
+    CHECK(div4.y.imag == Approx(-4.564705849f).margin(0.001));
+    CHECK(div4.z.real == Approx(0.744827569f).margin(0.001));
+    CHECK(div4.z.imag == Approx(-3.337930918f).margin(0.001));
+
+    div4 /= 3.0f + 0_i;
+    CHECK(div4.x.real == Approx(1.626016259f).margin(0.001));
+    CHECK(div4.x.imag == Approx(-0.032520324f).margin(0.001));
+    CHECK(div4.y.real == Approx(-0.21960786f).margin(0.001));
+    CHECK(div4.y.imag == Approx(-1.521568656f).margin(0.001));
+    CHECK(div4.z.real == Approx(0.248275861f).margin(0.001));
+    CHECK(div4.z.imag == Approx(-1.112643719f).margin(0.001));
+
+    Pixel32fcC3 div5 = t1;
+    Pixel32fcC3 div6(9, 8, 7);
+    Pixel32fcC3 difv7 = div6 / div5;
+    div5.DivInv(div6);
+    CHECK(div5.x == difv7.x);
+    CHECK(div5.y == difv7.y);
+    CHECK(div5.z == difv7.z);
+
+    Pixel32fcC3 conj1 = t1;
+    Pixel32fcC3 conj2 = Pixel32fcC3::Conj(t1);
+    conj1.Conj();
+    CHECK(conj1.x == 4 - 5_i);
+    CHECK(conj1.y == 6 - 7_i);
+    CHECK(conj1.z == 8 - 9_i);
+    CHECK(conj2.x == 4 - 5_i);
+    CHECK(conj2.y == 6 - 7_i);
+    CHECK(conj2.z == 8 - 9_i);
+
+    conj1 = t1;
+    conj1.ConjMul(t2);
+    conj2 = Pixel32fcC3::ConjMul(t1, t2);
+    CHECK(conj1.x == 50 + 1_i);
+    CHECK(conj1.y == -14 + 97_i);
+    CHECK(conj1.z == 27 + 121_i);
+    CHECK(conj2.x == 50 + 1_i);
+    CHECK(conj2.y == -14 + 97_i);
+    CHECK(conj2.z == 27 + 121_i);
+}
+
+TEST_CASE("Pixel32fcC3_additionalMethods", "[Common]")
+{
+    Pixel32fcC3 roundA(Complex<float>(0.4f, 0.5f), Complex<float>(0.6f, 1.5f), Complex<float>(1.9f, -1.5f));
+    Pixel32fcC3 round2A = Pixel32fcC3::Round(roundA);
+    roundA.Round();
+    CHECK(round2A == roundA);
+    CHECK(roundA.x.real == 0.0f);
+    CHECK(roundA.x.imag == 1.0f);
+    CHECK(roundA.y.real == 1.0f);
+    CHECK(roundA.y.imag == 2.0f);
+    CHECK(roundA.z.real == 2.0f);
+    CHECK(roundA.z.imag == -2.0f);
+
+    Pixel32fcC3 floorA(Complex<float>(0.4f, 0.5f), Complex<float>(0.6f, 1.5f), Complex<float>(1.9f, -1.5f));
+    Pixel32fcC3 floor2A = Pixel32fcC3::Floor(floorA);
+    floorA.Floor();
+    CHECK(floor2A == floorA);
+    CHECK(floorA.x.real == 0.0f);
+    CHECK(floorA.x.imag == 0.0f);
+    CHECK(floorA.y.real == 0.0f);
+    CHECK(floorA.y.imag == 1.0f);
+    CHECK(floorA.z.real == 1.0f);
+    CHECK(floorA.z.imag == -2.0f);
+
+    Pixel32fcC3 ceilA(Complex<float>(0.4f, 0.5f), Complex<float>(0.6f, 1.5f), Complex<float>(1.9f, -1.5f));
+    Pixel32fcC3 ceil2A = Pixel32fcC3::Ceil(ceilA);
+    ceilA.Ceil();
+    CHECK(ceil2A == ceilA);
+    CHECK(ceilA.x.real == 1.0f);
+    CHECK(ceilA.x.imag == 1.0f);
+    CHECK(ceilA.y.real == 1.0f);
+    CHECK(ceilA.y.imag == 2.0f);
+    CHECK(ceilA.z.real == 2.0f);
+    CHECK(ceilA.z.imag == -1.0f);
+
+    Pixel32fcC3 zeroA(Complex<float>(0.4f, 0.5f), Complex<float>(0.6f, 1.5f), Complex<float>(1.9f, -1.5f));
+    Pixel32fcC3 zero2A = Pixel32fcC3::RoundZero(zeroA);
+    zeroA.RoundZero();
+    CHECK(zero2A == zeroA);
+    CHECK(zeroA.x.real == 0.0f);
+    CHECK(zeroA.x.imag == 0.0f);
+    CHECK(zeroA.y.real == 0.0f);
+    CHECK(zeroA.y.imag == 1.0f);
+    CHECK(zeroA.z.real == 1.0f);
+    CHECK(zeroA.z.imag == -1.0f);
+
+    Pixel32fcC3 nearestA(Complex<float>(0.4f, 0.5f), Complex<float>(0.6f, 1.5f), Complex<float>(1.9f, -1.5f));
+    Pixel32fcC3 nearest2A = Pixel32fcC3::RoundNearest(nearestA);
+    nearestA.RoundNearest();
+    CHECK(nearest2A == nearestA);
+    CHECK(nearestA.x.real == 0.0f);
+    CHECK(nearestA.x.imag == 0.0f);
+    CHECK(nearestA.y.real == 1.0f);
+    CHECK(nearestA.y.imag == 2.0f);
+    CHECK(nearestA.z.real == 2.0f);
+    CHECK(nearestA.z.imag == -2.0f);
+
+    // Not vector does the value clampling but the complex type!
+    Pixel32fcC3 clampToShort(float(numeric_limits<short>::max()) + 1, float(numeric_limits<short>::min()) - 1,
+                             float(numeric_limits<short>::min()));
+    Pixel16scC3 clampShort(clampToShort);
+    CHECK(clampShort.x.real == 32767);
+    CHECK(clampShort.y.real == -32768);
+    CHECK(clampShort.z.real == -32768);
+
+    Pixel32fcC3 clampToInt(float(numeric_limits<int>::max()) + 1000, float(numeric_limits<int>::min()) - 1000,
+                           float(numeric_limits<int>::min()));
+
+    Pixel32scC3 clampInt(clampToInt);
+    CHECK(clampInt.x.real == 2147483647);
+    CHECK(clampInt.y.real == -2147483648);
+    CHECK(clampInt.z.real == -2147483648);
 }

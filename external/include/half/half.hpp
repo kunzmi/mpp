@@ -1536,7 +1536,7 @@ template <std::float_round_style R, bool E, bool I, typename T> T half2int(unsig
     unsigned int m = (value & 0x3FF) | 0x400;
     int32 i        = static_cast<int32>(
         (exp <= 0) ? (m << -exp)
-                          : ((m + ((R == std::round_to_nearest)            ? ((1 << (exp - 1)) - (~(m >> exp) & E))
+                   : ((m + ((R == std::round_to_nearest)            ? ((1 << (exp - 1)) - (~(m >> exp) & E))
                                    : (R == std::round_toward_infinity)     ? (((1 << exp) - 1) & ((value >> 15) - 1))
                                    : (R == std::round_toward_neg_infinity) ? (((1 << exp) - 1) & -(value >> 15))
                                                                            : 0)) >>
@@ -2330,6 +2330,33 @@ class half
     /// \exception FE_OVERFLOW, ...UNDERFLOW, ...INEXACT according to rounding
     explicit half(float rhs) : data_(static_cast<detail::uint16>(detail::float2half<round_style>(rhs)))
     {
+    }
+
+    /// Conversion constructor with round_style as parameter.
+    /// \param rhs float to convert
+    /// \param roundstyle rounding style to use
+    /// \exception FE_OVERFLOW, ...UNDERFLOW, ...INEXACT according to rounding
+    half(float rhs, std::float_round_style roundstyle)
+    {
+        switch (roundstyle)
+        {
+            case std::round_toward_zero:
+                data_ = static_cast<detail::uint16>(detail::float2half<std::round_toward_zero>(rhs));
+                break;
+            case std::round_to_nearest:
+                data_ = static_cast<detail::uint16>(detail::float2half<std::round_to_nearest>(rhs));
+                break;
+            case std::round_toward_infinity:
+                data_ = static_cast<detail::uint16>(detail::float2half<std::round_toward_infinity>(rhs));
+                break;
+            case std::round_toward_neg_infinity:
+                data_ = static_cast<detail::uint16>(detail::float2half<std::round_toward_neg_infinity>(rhs));
+                break;
+            default:
+                // default to default rounding mode:
+                data_ = static_cast<detail::uint16>(detail::float2half<round_style>(rhs));
+                break;
+        }
     }
 
     /// Conversion to single-precision.

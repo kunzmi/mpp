@@ -599,8 +599,13 @@ ConvertedFunction::ConvertedFunction(const Function &aFunction)
             }
             else
             {
-                inputImage->Call() = std::string("reinterpret_cast<") + inputImage->SrcArgument()->type + ">(" +
-                                     inputImage->Name() + ".PointerRoi())";
+                std::string type = inputImage->SrcArgument()->type;
+                if (type == "const Npp8u *const")
+                {
+                    type = "const Npp8u *";
+                }
+                inputImage->Call() =
+                    std::string("reinterpret_cast<") + type + ">(" + inputImage->Name() + ".PointerRoi())";
                 inputImage->LinkedArgument()->Call() = std::string("to_int(") + inputImage->Name() + ".Pitch())";
             }
         }
@@ -691,6 +696,10 @@ ConvertedFunction::ConvertedFunction(const Function &aFunction)
                 {
                     arg.Call() = "aSrcChannel0.NppiRectRoi()";
                 }
+            }
+            else if (inputImages.size() == 2 && IsInputPlanar() && mIsStatic && (arg.Name() == "oSizeROI"))
+            {
+                arg.Call() = "pSrcY.NppiSizeRoi()";
             }
             else if (arg.Name() == "oSizeROI" || arg.Name() == "oSrcSizeROI" || arg.Name() == "oSrcRoiSize" ||
                      arg.Name() == "oROI" || (arg.Name() == "oSrcROI" && mName == "Transpose") ||
@@ -1615,7 +1624,7 @@ std::string ConvertedFunction::GetNeededImageHeaders(const std::vector<Converted
     {
         std::string it = imageType;
         it[0]          = 'i'; // header start with small i...
-        ss << "#include \"" << it << ".h\"" << std::endl;
+        ss << "#include \"" << it << ".h\" //NOLINT" << std::endl;
     }
     return ss.str();
 }

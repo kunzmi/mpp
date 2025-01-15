@@ -5,6 +5,7 @@
 #include "numberTypes.h"
 #include "numeric_limits.h"
 #include "safeCast.h"
+#include "staticCast.h"
 #include "vector_typetraits.h"
 #include <cmath>
 #include <common/utilities.h>
@@ -66,14 +67,14 @@ template <Number T> struct alignas(sizeof(T)) Vector1
     /// <summary>
     /// Initializes vector to all components = aVal
     /// </summary>
-    DEVICE_CODE Vector1(T aVal) noexcept : x(aVal)
+    DEVICE_CODE constexpr Vector1(T aVal) noexcept : x(aVal)
     {
     }
 
     /// <summary>
     /// Initializes vector to all components = aVal (especially when set to 0)
     /// </summary>
-    DEVICE_CODE Vector1(int aVal) noexcept
+    DEVICE_CODE constexpr Vector1(int aVal) noexcept
         requires(!IsInt<T>)
         : x(static_cast<T>(aVal))
     {
@@ -82,7 +83,7 @@ template <Number T> struct alignas(sizeof(T)) Vector1
     /// <summary>
     /// Initializes vector to all components = [aVal[0]]
     /// </summary>
-    DEVICE_CODE explicit Vector1(T aVal[1]) noexcept : x(aVal[0])
+    DEVICE_CODE constexpr explicit Vector1(T aVal[1]) noexcept : x(aVal[0])
     {
     }
 
@@ -97,11 +98,11 @@ template <Number T> struct alignas(sizeof(T)) Vector1
         {
             Vector1<T2> temp(aVec);
             temp.template ClampToTargetType<T>();
-            x = static_cast<T>(temp.x);
+            x = StaticCast<T2, T>(temp.x);
         }
         else
         {
-            x = static_cast<T>(aVec.x);
+            x = StaticCast<T2, T>(aVec.x);
         }
     }
 
@@ -117,7 +118,7 @@ template <Number T> struct alignas(sizeof(T)) Vector1
         {
             aVec.template ClampToTargetType<T>();
         }
-        x = static_cast<T>(aVec.x);
+        x = StaticCast<T2, T>(aVec.x);
     }
 
     ~Vector1() = default;
@@ -425,7 +426,7 @@ template <Number T> struct alignas(sizeof(T)) Vector1
     /// </summary>
     template <Number T2> [[nodiscard]] static Vector1<T> DEVICE_CODE Convert(const Vector1<T2> &aVec)
     {
-        return {static_cast<T>(aVec.x)};
+        return {StaticCast<T2, T>(aVec.x)};
     }
 #pragma endregion
 

@@ -1,13 +1,21 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <cmath>
+#include <common/bfloat16.h>
+#include <common/complex.h>
 #include <common/defines.h>
+#include <common/exception.h>
+#include <common/half_fp16.h>
 #include <common/image/pixelTypes.h>
+#include <common/needSaturationClamp.h>
 #include <common/numeric_limits.h>
 #include <common/safeCast.h>
-#include <common/vectorTypes.h>
-#include <cstddef>
+#include <common/vector4.h>
 #include <cstdint>
-#include <math.h>
+#include <iosfwd>
+#include <limits>
+#include <string>
+#include <vector>
 
 using namespace opp;
 using namespace opp::image;
@@ -51,6 +59,13 @@ TEST_CASE("Pixel32fC4", "[Common]")
     CHECK(t2.z == 5);
     CHECK(t2.w == 5);
     CHECK(c2 != t2);
+
+    Pixel32fC4 neg = -t1;
+    CHECK(neg.x == 0);
+    CHECK(neg.y == -1);
+    CHECK(neg.z == -2);
+    CHECK(neg.w == -3);
+    CHECK(t1 == -neg);
 
     Pixel32fC4 add1 = t1 + t2;
     CHECK(add1.x == 5);
@@ -395,54 +410,54 @@ TEST_CASE("Pixel32fC4_additionalMethods", "[Common]")
     Pixel32fC4 clampByte(float(numeric_limits<byte>::max()) + 1, float(numeric_limits<byte>::min()) - 1,
                          float(numeric_limits<byte>::min()), float(numeric_limits<byte>::max()));
     clampByte.template ClampToTargetType<byte>();
-    CHECK(clampByte.x == 255);
-    CHECK(clampByte.y == 0);
+    CHECK(clampByte.x == 256);
+    CHECK(clampByte.y == -1);
     CHECK(clampByte.z == 0);
     CHECK(clampByte.w == 255);
 
     Pixel32fC4 clampShort(float(numeric_limits<short>::max()) + 1, float(numeric_limits<short>::min()) - 1,
                           float(numeric_limits<short>::min()), float(numeric_limits<short>::max()));
     clampShort.template ClampToTargetType<short>();
-    CHECK(clampShort.x == 32767);
-    CHECK(clampShort.y == -32768);
+    CHECK(clampShort.x == 32768);
+    CHECK(clampShort.y == -32769);
     CHECK(clampShort.z == -32768);
     CHECK(clampShort.w == 32767);
 
     Pixel32fC4 clampSByte(float(numeric_limits<sbyte>::max()) + 1, float(numeric_limits<sbyte>::min()) - 1,
                           float(numeric_limits<sbyte>::min()), float(numeric_limits<sbyte>::max()));
     clampSByte.template ClampToTargetType<sbyte>();
-    CHECK(clampSByte.x == 127);
-    CHECK(clampSByte.y == -128);
+    CHECK(clampSByte.x == 128);
+    CHECK(clampSByte.y == -129);
     CHECK(clampSByte.z == -128);
     CHECK(clampSByte.w == 127);
 
     Pixel32fC4 clampUShort(float(numeric_limits<ushort>::max()) + 1, float(numeric_limits<ushort>::min()) - 1,
                            float(numeric_limits<ushort>::min()), float(numeric_limits<ushort>::max()));
     clampUShort.template ClampToTargetType<ushort>();
-    CHECK(clampUShort.x == 65535);
-    CHECK(clampUShort.y == 0);
+    CHECK(clampUShort.x == 65536);
+    CHECK(clampUShort.y == -1);
     CHECK(clampUShort.z == 0);
     CHECK(clampUShort.w == 65535);
 
     Pixel32fC4 clampInt(float(numeric_limits<int>::max()) + 1000, float(numeric_limits<int>::min()) - 1000,
                         float(numeric_limits<int>::min()), float(numeric_limits<int>::max()));
     clampInt.template ClampToTargetType<int>();
-    CHECK(clampInt.x == 2147483520.0f);
-    CHECK(clampInt.y == -2147483648.0f);
+    CHECK(clampInt.x == 2147484672.0f);
+    CHECK(clampInt.y == -2147484672.0f);
     CHECK(clampInt.z == -2147483648.0f);
-    CHECK(clampInt.w == 2147483520.0f);
+    CHECK(clampInt.w == 2147483648.0f);
 
     Pixel32sC4 floatToInt(clampInt);
-    CHECK(floatToInt.x == 2147483520);
+    CHECK(floatToInt.x == 2147483647);
     CHECK(floatToInt.y == -2147483648);
     CHECK(floatToInt.z == -2147483648);
-    CHECK(floatToInt.w == 2147483520);
+    CHECK(floatToInt.w == 2147483647);
 
     Pixel32fC4 clampUInt(float(numeric_limits<uint>::max()) + 1000, float(numeric_limits<uint>::min()) - 1000,
                          float(numeric_limits<uint>::min()), float(numeric_limits<uint>::max()));
     clampUInt.template ClampToTargetType<uint>();
-    CHECK(clampUInt.x == 0xffffffffUL);
-    CHECK(clampUInt.y == 0);
+    CHECK(clampUInt.x == 4294968320);
+    CHECK(clampUInt.y == -1000);
     CHECK(clampUInt.z == 0);
     CHECK(clampUInt.w == 0xffffffffUL);
 }
@@ -1354,8 +1369,8 @@ TEST_CASE("Pixel16fC4_additionalMethods", "[Common]")
                          HalfFp16(float(numeric_limits<byte>::min()) - 1), HalfFp16(float(numeric_limits<byte>::min())),
                          HalfFp16(float(numeric_limits<byte>::max())));
     clampByte.template ClampToTargetType<byte>();
-    CHECK(clampByte.x == 255);
-    CHECK(clampByte.y == 0);
+    CHECK(clampByte.x == 256);
+    CHECK(clampByte.y == -1);
     CHECK(clampByte.z == 0);
     CHECK(clampByte.w == 255);
 
@@ -1363,17 +1378,17 @@ TEST_CASE("Pixel16fC4_additionalMethods", "[Common]")
                           HalfFp16(float(numeric_limits<short>::min()) - 1),
                           HalfFp16(float(numeric_limits<short>::min())), HalfFp16(float(numeric_limits<short>::max())));
     clampShort.template ClampToTargetType<short>();
-    CHECK(clampShort.x == 32752);
+    CHECK(clampShort.x == 32768);
     CHECK(clampShort.y == -32768);
     CHECK(clampShort.z == -32768);
-    CHECK(clampShort.w == 32752);
+    CHECK(clampShort.w == 32768);
 
     Pixel16fC4 clampSByte(HalfFp16(float(numeric_limits<sbyte>::max()) + 1),
                           HalfFp16(float(numeric_limits<sbyte>::min()) - 1),
                           HalfFp16(float(numeric_limits<sbyte>::min())), HalfFp16(float(numeric_limits<sbyte>::max())));
     clampSByte.template ClampToTargetType<sbyte>();
-    CHECK(clampSByte.x == 127);
-    CHECK(clampSByte.y == -128);
+    CHECK(clampSByte.x == 128);
+    CHECK(clampSByte.y == -129);
     CHECK(clampSByte.z == -128);
     CHECK(clampSByte.w == 127);
 
@@ -1384,20 +1399,20 @@ TEST_CASE("Pixel16fC4_additionalMethods", "[Common]")
                                                            // result in an inf
     clampUShort.template ClampToTargetType<ushort>();
     CHECK(clampUShort.x == 0);
-    CHECK(clampUShort.y == 0);
+    CHECK(clampUShort.y == -1);
     CHECK(clampUShort.z == 0);
     CHECK(clampUShort.w == 65504); // = HalfFp16::max()
 
     CHECK_FALSE(need_saturation_clamp_v<HalfFp16, int>);
 
-    CHECK(need_saturation_clamp_v<HalfFp16, uint>);
+    CHECK_FALSE(need_saturation_clamp_v<HalfFp16, uint>);
     Pixel16fC4 clampUInt(
         HalfFp16(0), HalfFp16(float(numeric_limits<uint>::min()) - 1000), HalfFp16(float(numeric_limits<uint>::min())),
         HalfFp16(float(numeric_limits<HalfFp16>::max()))); // UInt::max() is larger than HalfFp16::max() and would
                                                            // result in an inf
     clampUInt.template ClampToTargetType<uint>();
     CHECK(clampUInt.x == 0);
-    CHECK(clampUInt.y == 0);
+    CHECK(clampUInt.y == -1000);
     CHECK(clampUInt.z == 0);
     CHECK(clampUInt.w == 65504); // = HalfFp16::max()
 
@@ -1407,14 +1422,14 @@ TEST_CASE("Pixel16fC4_additionalMethods", "[Common]")
                                 float(numeric_limits<short>::max()));
 
     clampFloatToFp16.template ClampToTargetType<HalfFp16>();
-    CHECK(clampFloatToFp16.x == -65504);
-    CHECK(clampFloatToFp16.y == 65504);
+    CHECK(clampFloatToFp16.x == -2147484672);
+    CHECK(clampFloatToFp16.y == 2147484672);
     CHECK(clampFloatToFp16.z == -32768);
     CHECK(clampFloatToFp16.w == 32767);
 
     Pixel16fC4 fromFromFloat(clampFloatToFp16);
-    CHECK(fromFromFloat.x == -65504);
-    CHECK(fromFromFloat.y == 65504);
+    CHECK(fromFromFloat.x == -INFINITY);
+    CHECK(fromFromFloat.y == INFINITY);
     CHECK(fromFromFloat.z == -32768);
     CHECK(fromFromFloat.w == 32768); // 32767 gets rounded to 32768
 }
@@ -1778,8 +1793,8 @@ TEST_CASE("Pixel16bfC4_additionalMethods", "[Common]")
                           BFloat16(float(numeric_limits<byte>::min()) - 1),
                           BFloat16(float(numeric_limits<byte>::min())), BFloat16(float(numeric_limits<byte>::max())));
     clampByte.template ClampToTargetType<byte>();
-    CHECK(clampByte.x == 255.0f);
-    CHECK(clampByte.y == 0.0f);
+    CHECK(clampByte.x == 256.0f);
+    CHECK(clampByte.y == -1.0f);
     CHECK(clampByte.z == 0.0f);
     CHECK(clampByte.w == 255.0f);
 
@@ -1787,17 +1802,17 @@ TEST_CASE("Pixel16bfC4_additionalMethods", "[Common]")
         BFloat16(float(numeric_limits<short>::max()) + 1), BFloat16(float(numeric_limits<short>::min()) - 1),
         BFloat16(float(numeric_limits<short>::min())), BFloat16(float(numeric_limits<short>::max())));
     clampShort.template ClampToTargetType<short>();
-    CHECK(clampShort.x == 32640); // max value that we clamp BFloat to for shorts
+    CHECK(clampShort.x == 32768);
     CHECK(clampShort.y == -32768.0f);
     CHECK(clampShort.z == -32768.0f);
-    CHECK(clampShort.w == 32640);
+    CHECK(clampShort.w == 32768);
 
     Pixel16bfC4 clampSByte(
         BFloat16(float(numeric_limits<sbyte>::max()) + 1), BFloat16(float(numeric_limits<sbyte>::min()) - 1),
         BFloat16(float(numeric_limits<sbyte>::min())), BFloat16(float(numeric_limits<sbyte>::max())));
     clampSByte.template ClampToTargetType<sbyte>();
-    CHECK(clampSByte.x == 127.0f);
-    CHECK(clampSByte.y == -128.0f);
+    CHECK(clampSByte.x == 128.0f);
+    CHECK(clampSByte.y == -129.0f);
     CHECK(clampSByte.z == -128.0f);
     CHECK(clampSByte.w == 127.0f);
 
@@ -1805,10 +1820,10 @@ TEST_CASE("Pixel16bfC4_additionalMethods", "[Common]")
         BFloat16(float(numeric_limits<ushort>::max()) + 1), BFloat16(float(numeric_limits<ushort>::min()) - 1),
         BFloat16(float(numeric_limits<ushort>::min())), BFloat16(float(numeric_limits<ushort>::max())));
     clampUShort.template ClampToTargetType<ushort>();
-    CHECK(clampUShort.x == 65280); // max value that we clamp BFloat to for ushorts
-    CHECK(clampUShort.y == 0.0f);
+    CHECK(clampUShort.x == 65536);
+    CHECK(clampUShort.y == -1.0f);
     CHECK(clampUShort.z == 0.0f);
-    CHECK(clampUShort.w == 65280);
+    CHECK(clampUShort.w == 65536);
 
     Pixel16bfC4 clampInt(BFloat16(float(numeric_limits<int>::max()) + 16777216),
                          BFloat16(float(numeric_limits<int>::min()) - 16777216),
@@ -1819,8 +1834,8 @@ TEST_CASE("Pixel16bfC4_additionalMethods", "[Common]")
     float cech1 = 2147483639.0f;
     float cech2 = 2147483648.0f;
     CHECK(cech1 == cech2);
-    CHECK(clampInt.x == 2147483647.0f);
-    CHECK(clampInt.y == -2147483648.0f);
+    CHECK(clampInt.x == float(numeric_limits<int>::max()) + 16777216.0f);
+    CHECK(clampInt.y == float(numeric_limits<int>::min()) - 16777216.0f);
     CHECK(clampInt.z == -2147483648.0f);
     CHECK(clampInt.w == 2147483647.0f);
 
@@ -1828,8 +1843,8 @@ TEST_CASE("Pixel16bfC4_additionalMethods", "[Common]")
                           BFloat16(float(numeric_limits<uint>::min()) - 16777216 * 2),
                           BFloat16(float(numeric_limits<uint>::min())), BFloat16(float(numeric_limits<uint>::max())));
     clampUInt.template ClampToTargetType<uint>();
-    CHECK(clampUInt.x == float(0xffffffffUL));
-    CHECK(clampUInt.y == 0.0f);
+    CHECK(clampUInt.x == float(numeric_limits<uint>::max()) + 16777216.0f * 2.0f);
+    CHECK(clampUInt.y == float(numeric_limits<uint>::min()) - 16777216.0f * 2.0f);
     CHECK(clampUInt.z == 0.0f);
     CHECK(clampUInt.w == float(0xffffffffUL));
 }
@@ -1872,6 +1887,13 @@ TEST_CASE("Pixel32fcC4", "[Common]")
     CHECK(t2.z == Complex<float>(5, 0));
     CHECK(t2.w == Complex<float>(5, 0));
     CHECK(c2 != t2);
+
+    Pixel32fcC4 neg = -t1;
+    CHECK(neg.x == -1_i);
+    CHECK(neg.y == -1 + 2_i);
+    CHECK(neg.z == -2 - 3_i);
+    CHECK(neg.w == -3 + 4_i);
+    CHECK(t1 == -neg);
 
     Pixel32fcC4 add1 = t1 + t2;
     CHECK(add1.x == Complex<float>(5, 1));
@@ -2035,6 +2057,30 @@ TEST_CASE("Pixel32fcC4", "[Common]")
     CHECK(div5.y == difv7.y);
     CHECK(div5.z == difv7.z);
     CHECK(div5.w == difv7.w);
+
+    Pixel32fcC4 conj1 = t1;
+    Pixel32fcC4 conj2 = Pixel32fcC4::Conj(t1);
+    conj1.Conj();
+    CHECK(conj1.x == 4 - 5_i);
+    CHECK(conj1.y == 6 - 7_i);
+    CHECK(conj1.z == 8 - 9_i);
+    CHECK(conj1.w == -3 + 4_i);
+    CHECK(conj2.x == 4 - 5_i);
+    CHECK(conj2.y == 6 - 7_i);
+    CHECK(conj2.z == 8 - 9_i);
+    CHECK(conj2.w == -3 + 4_i);
+
+    conj1 = t1;
+    conj1.ConjMul(t2);
+    conj2 = Pixel32fcC4::ConjMul(t1, t2);
+    CHECK(conj1.x == 50 + 1_i);
+    CHECK(conj1.y == -14 + 97_i);
+    CHECK(conj1.z == 27 + 121_i);
+    CHECK(conj1.w == -17 - 6_i);
+    CHECK(conj2.x == 50 + 1_i);
+    CHECK(conj2.y == -14 + 97_i);
+    CHECK(conj2.z == 27 + 121_i);
+    CHECK(conj2.w == -17 - 6_i);
 }
 
 TEST_CASE("Pixel32fcC4_additionalMethods", "[Common]")
@@ -2122,8 +2168,8 @@ TEST_CASE("Pixel32fcC4_additionalMethods", "[Common]")
                            float(numeric_limits<int>::min()), float(numeric_limits<int>::max()));
 
     Pixel32scC4 clampInt(clampToInt);
-    CHECK(clampInt.x.real == 2147483520);
+    CHECK(clampInt.x.real == 2147483647);
     CHECK(clampInt.y.real == -2147483648);
     CHECK(clampInt.z.real == -2147483648);
-    CHECK(clampInt.w.real == 2147483520);
+    CHECK(clampInt.w.real == 2147483647);
 }

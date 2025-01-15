@@ -4,7 +4,6 @@
 #include <common/safeCast.h>
 #include <compare>
 #include <cstddef>
-#include <format>
 
 namespace opp::image
 {
@@ -45,17 +44,17 @@ template <int WarpAlignmentInBytes, int TupelSize> class ThreadSplit
     {
         if (WarpAlignmentInBytes % (to_int(sizeof(T) * TupelSize)) != 0)
         {
-            throw INVALIDARGUMENT(aPointer,
-                                  std::format("Bytes per warp ({}) is not a multiple of tupel size ({}) times pointer "
-                                              "data type size ({}). Impossible to fill warp with tupels.",
-                                              WarpAlignmentInBytes, TupelSize, sizeof(T)));
+            throw INVALIDARGUMENT(aPointer, "Bytes per warp (" << WarpAlignmentInBytes
+                                                               << ") is not a multiple of tupel size (" << TupelSize
+                                                               << ") times pointer data type size (" << sizeof(T)
+                                                               << "). Impossible to fill warp with tupels.");
         }
         if (WarpAlignmentInBytes % (to_int(sizeof(T))) != 0)
         {
-            throw INVALIDARGUMENT(WarpAlignmentInBytes,
-                                  std::format("Bytes per warp ({}) is not a multiple of pointer "
-                                              "data type size ({}). Impossible to fill warp with tupels.",
-                                              WarpAlignmentInBytes, sizeof(T)));
+            throw INVALIDARGUMENT(WarpAlignmentInBytes, "Bytes per warp ("
+                                                            << WarpAlignmentInBytes
+                                                            << ") is not a multiple of pointer data type size ("
+                                                            << sizeof(T) << "). Impossible to fill warp with tupels.");
         }
 
         int muted              = GetElementsLeft(aPointer, WarpAlignmentInBytes);
@@ -318,9 +317,9 @@ template <int WarpAlignmentInBytes, int TupelSize> class ThreadSplit
 
         if (offsetBytes % to_int(sizeof(T)) != 0)
         {
-            throw INVALIDARGUMENT(aPointer,
-                                  std::format("The given pointer value {} is not a multiple of its type size {}.",
-                                              ptrdiff_t(aPointer), sizeof(T)));
+            throw INVALIDARGUMENT(aPointer, "The given pointer value " << ptrdiff_t(aPointer)
+                                                                       << " is not a multiple of its type size "
+                                                                       << sizeof(T) << ".");
         }
 
         return std::abs(offsetBytes / to_int(sizeof(T)));
@@ -332,9 +331,9 @@ template <int WarpAlignmentInBytes, int TupelSize> class ThreadSplit
 
         if (offsetBytes % to_int(sizeof(T)) != 0)
         {
-            throw INVALIDARGUMENT(aPointer,
-                                  std::format("The given pointer value {} is not a multiple of its type size {}.",
-                                              ptrdiff_t(aPointer), sizeof(T)));
+            throw INVALIDARGUMENT(aPointer, "The given pointer value " << ptrdiff_t(aPointer)
+                                                                       << " is not a multiple of its type size "
+                                                                       << sizeof(T) << ".");
         }
 
         return offsetBytes / sizeof(T);

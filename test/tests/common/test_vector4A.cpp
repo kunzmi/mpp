@@ -1,13 +1,17 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <cmath>
 #include <common/defines.h>
+#include <common/exception.h>
+#include <common/half_fp16.h>
 #include <common/image/pixelTypes.h>
+#include <common/needSaturationClamp.h>
 #include <common/numeric_limits.h>
-#include <common/safeCast.h>
-#include <common/vectorTypes.h>
-#include <cstddef>
+#include <common/vector4.h>
 #include <cstdint>
-#include <math.h>
+#include <iosfwd>
+#include <string>
+#include <vector>
 
 using namespace opp;
 using namespace opp::image;
@@ -46,6 +50,12 @@ TEST_CASE("Pixel32fC4A", "[Common]")
     CHECK(t2.y == 5);
     CHECK(t2.z == 5);
     CHECK(c2 != t2);
+
+    Pixel32fC4A neg = -t1;
+    CHECK(neg.x == 0);
+    CHECK(neg.y == -1);
+    CHECK(neg.z == -2);
+    CHECK(t1 == -neg);
 
     Pixel32fC4A add1 = t1 + t2;
     CHECK(add1.x == 5);
@@ -301,43 +311,43 @@ TEST_CASE("Pixel32fC4A_additionalMethods", "[Common]")
     Pixel32fC4A clampByte(float(numeric_limits<byte>::max()) + 1, float(numeric_limits<byte>::min()) - 1,
                           float(numeric_limits<byte>::min()));
     clampByte.template ClampToTargetType<byte>();
-    CHECK(clampByte.x == 255);
-    CHECK(clampByte.y == 0);
+    CHECK(clampByte.x == 256);
+    CHECK(clampByte.y == -1);
     CHECK(clampByte.z == 0);
 
     Pixel32fC4A clampShort(float(numeric_limits<short>::max()) + 1, float(numeric_limits<short>::min()) - 1,
                            float(numeric_limits<short>::min()));
     clampShort.template ClampToTargetType<short>();
-    CHECK(clampShort.x == 32767);
-    CHECK(clampShort.y == -32768);
+    CHECK(clampShort.x == 32768);
+    CHECK(clampShort.y == -32769);
     CHECK(clampShort.z == -32768);
 
     Pixel32fC4A clampSByte(float(numeric_limits<sbyte>::max()) + 1, float(numeric_limits<sbyte>::min()) - 1,
                            float(numeric_limits<sbyte>::min()));
     clampSByte.template ClampToTargetType<sbyte>();
-    CHECK(clampSByte.x == 127);
-    CHECK(clampSByte.y == -128);
+    CHECK(clampSByte.x == 128);
+    CHECK(clampSByte.y == -129);
     CHECK(clampSByte.z == -128);
 
     Pixel32fC4A clampUShort(float(numeric_limits<ushort>::max()) + 1, float(numeric_limits<ushort>::min()) - 1,
                             float(numeric_limits<ushort>::min()));
     clampUShort.template ClampToTargetType<ushort>();
-    CHECK(clampUShort.x == 65535);
-    CHECK(clampUShort.y == 0);
+    CHECK(clampUShort.x == 65536);
+    CHECK(clampUShort.y == -1);
     CHECK(clampUShort.z == 0);
 
     Pixel32fC4A clampInt(float(numeric_limits<int>::max()) + 1000, float(numeric_limits<int>::min()) - 1000,
                          float(numeric_limits<int>::min()));
     clampInt.template ClampToTargetType<int>();
-    CHECK(clampInt.x == 2147483520); // a bit smaller than max int
-    CHECK(clampInt.y == -2147483648);
+    CHECK(clampInt.x == 2147484672.0f);
+    CHECK(clampInt.y == -2147484672.0f);
     CHECK(clampInt.z == -2147483648);
 
     Pixel32fC4A clampUInt(float(numeric_limits<uint>::max()) + 1000, float(numeric_limits<uint>::min()) - 1000,
                           float(numeric_limits<uint>::min()));
     clampUInt.template ClampToTargetType<uint>();
-    CHECK(clampUInt.x == 0xffffffffUL);
-    CHECK(clampUInt.y == 0);
+    CHECK(clampUInt.x == 4294968320.0f);
+    CHECK(clampUInt.y == -1000.0f);
     CHECK(clampUInt.z == 0);
 }
 
@@ -1095,15 +1105,15 @@ TEST_CASE("Pixel16fC4A_additionalMethods", "[Common]")
                           HalfFp16(float(numeric_limits<byte>::min()) - 1),
                           HalfFp16(float(numeric_limits<byte>::min())));
     clampByte.template ClampToTargetType<byte>();
-    CHECK(clampByte.x == 255);
-    CHECK(clampByte.y == 0);
+    CHECK(clampByte.x == 256);
+    CHECK(clampByte.y == -1);
     CHECK(clampByte.z == 0);
 
     Pixel16fC4A clampShort(HalfFp16(float(numeric_limits<short>::max()) + 1),
                            HalfFp16(float(numeric_limits<short>::min()) - 1),
                            HalfFp16(float(numeric_limits<short>::min())));
     clampShort.template ClampToTargetType<short>();
-    CHECK(clampShort.x == 32752);
+    CHECK(clampShort.x == 32768);
     CHECK(clampShort.y == -32768);
     CHECK(clampShort.z == -32768);
 
@@ -1111,8 +1121,8 @@ TEST_CASE("Pixel16fC4A_additionalMethods", "[Common]")
                            HalfFp16(float(numeric_limits<sbyte>::min()) - 1),
                            HalfFp16(float(numeric_limits<sbyte>::min())));
     clampSByte.template ClampToTargetType<sbyte>();
-    CHECK(clampSByte.x == 127);
-    CHECK(clampSByte.y == -128);
+    CHECK(clampSByte.x == 128);
+    CHECK(clampSByte.y == -129);
     CHECK(clampSByte.z == -128);
 
     Pixel16fC4A clampUShort(HalfFp16(0.0f), HalfFp16(float(numeric_limits<ushort>::min()) - 1),
@@ -1120,18 +1130,18 @@ TEST_CASE("Pixel16fC4A_additionalMethods", "[Common]")
 
     clampUShort.template ClampToTargetType<ushort>();
     CHECK(clampUShort.x == 0);
-    CHECK(clampUShort.y == 0);
+    CHECK(clampUShort.y == -1);
     CHECK(clampUShort.z == 0);
 
     CHECK_FALSE(need_saturation_clamp_v<HalfFp16, int>);
 
-    CHECK(need_saturation_clamp_v<HalfFp16, uint>);
+    CHECK_FALSE(need_saturation_clamp_v<HalfFp16, uint>);
     Pixel16fC4A clampUInt(HalfFp16(0), HalfFp16(float(numeric_limits<uint>::min()) - 1000),
                           HalfFp16(float(numeric_limits<uint>::min())));
 
     clampUInt.template ClampToTargetType<uint>();
     CHECK(clampUInt.x == 0);
-    CHECK(clampUInt.y == 0);
+    CHECK(clampUInt.y == -1000);
     CHECK(clampUInt.z == 0);
 
     Pixel32fC4A clampFloatToFp16(float(numeric_limits<int>::min()) - 1000.0f, //
@@ -1139,12 +1149,12 @@ TEST_CASE("Pixel16fC4A_additionalMethods", "[Common]")
                                  float(numeric_limits<short>::min()));
 
     clampFloatToFp16.template ClampToTargetType<HalfFp16>();
-    CHECK(clampFloatToFp16.x == -65504);
-    CHECK(clampFloatToFp16.y == 65504);
+    CHECK(clampFloatToFp16.x == -2147484672.0f);
+    CHECK(clampFloatToFp16.y == 2147484672.0f);
     CHECK(clampFloatToFp16.z == -32768);
 
     Pixel16fC4A fromFromFloat(clampFloatToFp16);
-    CHECK(fromFromFloat.x == -65504);
-    CHECK(fromFromFloat.y == 65504);
+    CHECK(fromFromFloat.x == -INFINITY);
+    CHECK(fromFromFloat.y == INFINITY);
     CHECK(fromFromFloat.z == -32768);
 }

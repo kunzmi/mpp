@@ -1,4 +1,7 @@
 #pragma once
+#include <common/moduleEnabler.h>
+#if OPP_ENABLE_CUDA_CORE
+
 #include <common/defines.h>
 #include <common/exception.h>
 #include <cuda_runtime_api.h>
@@ -134,3 +137,5 @@ inline std::wostream &operator<<(std::wostream &aOs, const dim3 &aDim3)
     aOs << '(' << aDim3.x << ", " << aDim3.y << ", " << aDim3.z << ')';
     return aOs;
 }
+
+#endif // OPP_ENABLE_CUDA_CORE

@@ -3,6 +3,7 @@
 #include "exception.h"
 #include "needSaturationClamp.h"
 #include "safeCast.h"
+#include "staticCast.h"
 #include <cmath>
 #include <common/bfloat16.h>
 #include <common/half_fp16.h>
@@ -125,13 +126,13 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
         {
             Complex<T2> temp(aCplx);
             temp.template ClampToTargetType<T>();
-            real = static_cast<T>(temp.real);
-            imag = static_cast<T>(temp.imag);
+            real = StaticCast<T2, T>(temp.real);
+            imag = StaticCast<T2, T>(temp.imag);
         }
         else
         {
-            real = static_cast<T>(aCplx.real);
-            imag = static_cast<T>(aCplx.imag);
+            real = StaticCast<T2, T>(aCplx.real);
+            imag = StaticCast<T2, T>(aCplx.imag);
         }
     }
 
@@ -147,8 +148,8 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
         {
             aVec.template ClampToTargetType<T>();
         }
-        real = static_cast<T>(aVec.real);
-        imag = static_cast<T>(aVec.imag);
+        real = StaticCast<T2, T>(aVec.real);
+        imag = StaticCast<T2, T>(aVec.imag);
     }
 
     /// <summary>

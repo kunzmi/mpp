@@ -351,7 +351,7 @@ void fillData(std::vector<Vector2<T>> &aDataIn, std::vector<Vector2<T>> &aDataOu
             }
             if constexpr (std::same_as<float, complex_basetype_t<T>>)
             {
-                T factor(10.0f);
+                T factor(10000.0f);
                 aDataIn[counterIn] /= factor;
                 aDataIn[counterIn + 1] /= factor;
             }

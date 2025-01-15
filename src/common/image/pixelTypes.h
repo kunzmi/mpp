@@ -771,7 +771,7 @@ template <> struct default_compute_type_for<Pixel64fC4A>
     using type = Pixel64fC4A;
 };
 
-// 64f
+// 64fc
 template <> struct default_compute_type_for<Pixel64fcC1>
 {
     using type = Pixel64fcC1;
@@ -832,81 +832,81 @@ template <> struct default_compute_type_for<Pixel32fcC4>
 // 16f
 template <> struct default_compute_type_for<Pixel16fC1>
 {
-    using type = Pixel32fC1;
+    using type = Pixel16fC1;
 };
 template <> struct default_compute_type_for<Pixel16fC2>
 {
-    using type = Pixel32fC2;
+    using type = Pixel16fC2;
 };
 template <> struct default_compute_type_for<Pixel16fC3>
 {
-    using type = Pixel32fC3;
+    using type = Pixel16fC3;
 };
 template <> struct default_compute_type_for<Pixel16fC4>
 {
-    using type = Pixel32fC4;
+    using type = Pixel16fC4;
 };
 template <> struct default_compute_type_for<Pixel16fC4A>
 {
-    using type = Pixel32fC4A;
+    using type = Pixel16fC4A;
 };
 
 // 16fc
 template <> struct default_compute_type_for<Pixel16fcC1>
 {
-    using type = Pixel32fcC1;
+    using type = Pixel16fcC1;
 };
 template <> struct default_compute_type_for<Pixel16fcC2>
 {
-    using type = Pixel32fcC2;
+    using type = Pixel16fcC2;
 };
 template <> struct default_compute_type_for<Pixel16fcC3>
 {
-    using type = Pixel32fcC3;
+    using type = Pixel16fcC3;
 };
 template <> struct default_compute_type_for<Pixel16fcC4>
 {
-    using type = Pixel32fcC4;
+    using type = Pixel16fcC4;
 };
 
 // 16bf
 template <> struct default_compute_type_for<Pixel16bfC1>
 {
-    using type = Pixel32fC1;
+    using type = Pixel16bfC1;
 };
 template <> struct default_compute_type_for<Pixel16bfC2>
 {
-    using type = Pixel32fC2;
+    using type = Pixel16bfC2;
 };
 template <> struct default_compute_type_for<Pixel16bfC3>
 {
-    using type = Pixel32fC3;
+    using type = Pixel16bfC3;
 };
 template <> struct default_compute_type_for<Pixel16bfC4>
 {
-    using type = Pixel32fC4;
+    using type = Pixel16bfC4;
 };
 template <> struct default_compute_type_for<Pixel16bfC4A>
 {
-    using type = Pixel32fC4A;
+    using type = Pixel16bfC4A;
 };
 
 // 16bfc
 template <> struct default_compute_type_for<Pixel16bfcC1>
 {
-    using type = Pixel32fcC1;
+    using type = Pixel16bfcC1;
 };
 template <> struct default_compute_type_for<Pixel16bfcC2>
 {
-    using type = Pixel32fcC2;
+    using type = Pixel16bfcC2;
 };
 template <> struct default_compute_type_for<Pixel16bfcC3>
 {
-    using type = Pixel32fcC3;
+    using type = Pixel16bfcC3;
 };
 template <> struct default_compute_type_for<Pixel16bfcC4>
 {
-    using type = Pixel32fcC4;
+    using type = Pixel16bfcC4;
 };
 
 // 32s -> 64f

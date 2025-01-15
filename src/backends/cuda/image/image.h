@@ -1,4 +1,6 @@
 #pragma once
+#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
+#if OPP_ENABLE_CUDA_BACKEND
 
 #include "imageView.h"
 #include <backends/cuda/cudaException.h>
@@ -83,3 +85,4 @@ template <PixelType T> class Image : public ImageView<T>
     }
 };
 } // namespace opp::image::cuda
+#endif // OPP_ENABLE_CUDA_BACKEND

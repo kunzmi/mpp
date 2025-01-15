@@ -54,7 +54,7 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
         mType = "const NppStreamContext &";
     }
     else if (aArgument->name == "pSrc1" || aArgument->name == "pSrc2" || aArgument->name == "pSrc" ||
-             aArgument->name == "pTpl")
+             aArgument->name == "pTpl" || aArgument->name == "pSrcY" || aArgument->name == "pSrcCbCr")
     {
         const std::string type         = ConvertNppType(aArgument->type);
         const std::string channelCount = std::to_string(mFunction.GetInChannels());

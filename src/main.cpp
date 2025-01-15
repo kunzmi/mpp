@@ -19,8 +19,10 @@
 // #include <common/vector4A.h>
 // #include <common/vectorTypes.h>
 
-#include <backends/cuda/image/addKernel.h>
+// #include<backends / cuda / image / arithmetic / add.cu>
+// #include <backends/cuda/image/arithmetic/add.h>
 #include <backends/cuda/image/configurations.h>
+// #include <backends/cuda/image/forEachPixelKernel.h>
 //
 #include <backends/cuda/devVar.h>
 #include <backends/cuda/devVarView.h>
@@ -43,19 +45,40 @@
 // #include <common/scratchBuffer.h>
 // #include <half/half.hpp>
 
+#include <common/image/pixelTypeEnabler.h>
 using namespace opp;
 using namespace opp::cuda;
 using namespace opp::image;
 using namespace opp::image::cuda;
 namespace cpu = opp::image::cpuSimple;
 
-void fun(Pixel8uC4 aTest)
-{
-    std::cout << "Test is: " << aTest << std::endl;
-}
-
 int main()
 {
+    half_float::half a(-3.14151689f, std::round_to_nearest);
+    half_float::half b(-3.14151689f, std::round_toward_zero);
+    half_float::half c(-3.14151689f, std::round_toward_infinity);
+    half_float::half d(-3.14151689f, std::round_toward_neg_infinity);
+
+    std::cout << a << std::endl;
+    std::cout << b << std::endl;
+    std::cout << c << std::endl;
+    std::cout << d << std::endl;
+
+    std::cout << -3.14151689f << std::endl;
+
+    float f     = 3.14061f;
+    BFloat16 a1 = BFloat16::FromFloat(f);
+    BFloat16 b1 = BFloat16::FromFloatTruncate(f);
+    BFloat16 c1 = BFloat16::FromFloat(-f);
+    BFloat16 d1 = BFloat16::FromFloatTruncate(-f);
+
+    std::cout << a1 << std::endl;
+    std::cout << b1 << std::endl;
+    std::cout << c1 << std::endl;
+    std::cout << d1 << std::endl;
+
+    std::cout << f << std::endl;
+
     /*
     constexpr bool val1 = std::is_trivially_assignable_v<Pixel32fC4, Pixel32fC4>;
     constexpr bool val2 = std::is_trivially_constructible_v<Pixel32fC2>;
@@ -102,22 +125,30 @@ int main()
 
             img2.Save(R"(C:\Users\kunz_\OneDrive\Desktop\Unbenannt-2.tif)");
         } */
-
     try
     {
+        std::cout << "Scalefactor 4 = " << GetScaleFactor(4) << std::endl;
+        std::cout << "Scalefactor 2 = " << GetScaleFactor(2) << std::endl;
+        std::cout << "Scalefactor 1 = " << GetScaleFactor(1) << std::endl;
+        std::cout << "Scalefactor 0 = " << GetScaleFactor(0) << std::endl;
+        std::cout << "Scalefactor -1 = " << GetScaleFactor(-1) << std::endl;
+        std::cout << "Scalefactor -2 = " << GetScaleFactor(-2) << std::endl;
+        std::cout << "Scalefactor -4 = " << GetScaleFactor(-4) << std::endl;
+
 #ifdef OPP_CUDA_TEMPLATE_REGISTRY_IS_ACTIVE
         auto reg = opp::cuda::GetTemplateInstances();
-        for (auto &elem : reg)
+        for (auto &[functionName, typeInstances] : reg)
         {
-            std::cout << elem << std::endl;
+            std::cout << "For kernel " << functionName << " (" << typeInstances.size() << "):\n";
+            for (const auto &type : typeInstances)
+            {
+                std::cout << "   <" << type.srcType << ", " << type.computeType << ", " << type.dstType << ">\n";
+            }
         }
+        std::cout << std::endl;
 #endif
-        std::cout << "Hello world! This is " << OPP_PROJECT_NAME << " version " << OPP_VERSION << "!" << std::endl;
 
-        /*DevVar<byte> buffer(1024);
-        std::vector<byte> hBuffer(1024);
-        DevVarView<byte> buffer2(buffer);
-        buffer << hBuffer;*/
+        std::cout << "Hello world! This is " << OPP_PROJECT_NAME << " version " << OPP_VERSION << "!" << std::endl;
 
         const std::filesystem::path baseDir = std::filesystem::path(PROJECT_SOURCE_DIR) / "test/testData";
 
@@ -126,26 +157,19 @@ int main()
         cpu::Image<Pixel8uC3> res(flower.SizeRoi());
         cpu::Image<Pixel8uC3> resGPU(flower.SizeRoi());
 
-        for (auto &pixelIterator : addToFlower)
-        {
-            pixelIterator.Value() = 40;
-        }
-        for (auto &pixelIterator : res)
-        {
-            pixelIterator.Value() = 255;
-        }
-        for (auto &pixelIterator : resGPU)
-        {
-            pixelIterator.Value() = 255;
-        }
+        addToFlower.Set(Pixel8uC3(40));
+        res.Set(Pixel8uC3(255));
 
         Image<Pixel8uC3> image1(flower.SizeRoi());
         Image<Pixel8uC3> image2(flower.SizeRoi());
         Image<Pixel8uC3> image3(flower.SizeRoi());
+        DevVar<Pixel8uC3> devConst(1);
+        Pixel8uC3 hConst(5, 6, 7);
+        devConst << hConst;
 
         flower >> image1;
-        addToFlower >> image2;
-        resGPU >> image3;
+        image2.Set(Pixel8uC3(40));
+        image3.Set(Pixel8uC3(255));
 
         flower.SetRoi(-20);
         addToFlower.SetRoi(-20);
@@ -154,11 +178,15 @@ int main()
         image2.SetRoi(-20);
         image3.SetRoi(-20);
 
-        opp::cuda::StreamCtx ctx = opp::cuda::StreamCtxSingleton::Get();
+        Pixel8uC3 constVal(4, 5, 6);
+        image1.Add(image2, 0);
+        image1.Add(constVal, 0);
+        /*image1.ResetRoi();
+        image3.ResetRoi();*/
+        image1.Add(devConst, image3, 0);
 
-        InvokeAddSrcSrc(image1.PointerRoi(), image1.Pitch(), image2.PointerRoi(), image2.Pitch(), image3.PointerRoi(),
-                        image3.Pitch(), image1.SizeRoi(), ctx);
-
+        addToFlower.Add(constVal);
+        addToFlower.Add(hConst);
         flower.Add(addToFlower, res);
 
         resGPU << image3;
@@ -170,14 +198,7 @@ int main()
         resGPU.ResetRoi();
         bool issame = res.IsIdentical(resGPU);
 
-        std::cout << "Images are identical: " << (issame ? "true" : "false") << std::endl;
-
-        /*InvokeAddSrcSrc(image1.PointerRoi(), image1.Pitch(), image2.PointerRoi(), image2.Pitch(), image3.PointerRoi(),
-                        image3.Pitch(), roi.Size(), ctx);
-
-        InvokeAddSrcSrc<Pixel8uC4, Pixel8uC4, Pixel8uC4>(image4.PointerRoi(), image4.Pitch(), image5.PointerRoi(),
-                                                         image5.Pitch(), image6.PointerRoi(), image6.Pitch(),
-                                                         roi.Size(), ctx);*/
+        std::cout << "Images are identical: " << std::boolalpha << issame << std::endl;
 
         std::cout << "Done!";
     }

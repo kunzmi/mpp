@@ -124,6 +124,33 @@ class alignas(2) HalfFp16
 #endif
     }
 
+#ifdef IS_CUDA_COMPILER
+    DEVICE_CODE inline operator int() const
+    {
+        return __half2int_rz(value);
+    }
+    DEVICE_CODE inline operator uint() const
+    {
+        return __half2uint_rz(value);
+    }
+    DEVICE_CODE inline operator short() const
+    {
+        return __half2short_rz(value);
+    }
+    DEVICE_CODE inline operator ushort() const
+    {
+        return __half2ushort_rz(value);
+    }
+    DEVICE_CODE inline operator byte() const
+    {
+        return __half2uchar_rz(value);
+    }
+    DEVICE_CODE inline operator sbyte() const
+    {
+        return __half2char_rz(value);
+    }
+#endif
+
 #ifdef IS_HOST_COMPILER
     [[nodiscard]] inline constexpr static HalfFp16 FromUShort(ushort aUShort)
     {
@@ -449,7 +476,22 @@ class alignas(2) HalfFp16
         value = half_float::round(value);
 #endif
 #ifdef IS_CUDA_COMPILER
-        value = round(float(value));
+        //// it seems there is no "round" function for half floats, so implement it here:
+        // constexpr ushort O_Point_5_AS_HFLOAT = 0x3800;
+        // constexpr ushort SIGN_BIT            = 0x8000;
+        // ushort hfloatbits                    = *reinterpret_cast<ushort *>(&value);
+        // hfloatbits &= SIGN_BIT;
+        // hfloatbits |= O_Point_5_AS_HFLOAT;
+
+        //// add 0.5 to a positive value, -0.5 to a negative value and then round towards zero:
+        // HalfFp16 onehalf = *reinterpret_cast<HalfFp16 *>(&hfloatbits);
+        //*this += onehalf;
+        // value = htrunc(value);
+
+        // the above code is wrong as the addition is round to nearest even but needs to be round towards zero,
+        // which is only available for sm_80 and later. So lets stick to conversion to float32...
+
+        value = round(static_cast<float>(value));
 #endif
         return *this;
     }
@@ -463,7 +505,8 @@ class alignas(2) HalfFp16
         return HalfFp16(half_float::round(aOther.value));
 #endif
 #ifdef IS_CUDA_COMPILER
-        return HalfFp16(round(float(aOther.value)));
+        aOther.Round();
+        return aOther;
 #endif
     }
 
@@ -482,7 +525,7 @@ class alignas(2) HalfFp16
     /// </summary>
     DEVICE_ONLY_CODE inline HalfFp16 &Floor()
     {
-        value = __int2half_rd(__half2int_rd(value));
+        value = hfloor(value);
         return *this;
     }
 #endif
@@ -503,7 +546,7 @@ class alignas(2) HalfFp16
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] inline static HalfFp16 Floor(HalfFp16 aOther)
     {
-        return HalfFp16(__int2half_rd(__half2int_rd(aOther.value)));
+        return HalfFp16(hfloor(aOther.value));
     }
 #endif
 
@@ -522,7 +565,7 @@ class alignas(2) HalfFp16
     /// </summary>
     DEVICE_ONLY_CODE inline HalfFp16 &Ceil()
     {
-        value = __int2half_ru(__half2int_ru(value));
+        value = hceil(value);
         return *this;
     }
 #endif
@@ -543,7 +586,7 @@ class alignas(2) HalfFp16
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] inline static HalfFp16 Ceil(HalfFp16 aOther)
     {
-        return HalfFp16(__int2half_ru(__half2int_ru(aOther.value)));
+        return HalfFp16(hceil(aOther.value));
     }
 #endif
 
@@ -566,7 +609,7 @@ class alignas(2) HalfFp16
     /// </summary>
     DEVICE_ONLY_CODE inline HalfFp16 &RoundNearest()
     {
-        value = __int2half_rn(__half2int_rn(value));
+        value = hrint(value);
         return *this;
     }
 #endif
@@ -589,7 +632,7 @@ class alignas(2) HalfFp16
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] inline static HalfFp16 RoundNearest(HalfFp16 aOther)
     {
-        return HalfFp16(__int2half_rn(__half2int_rn(aOther.value)));
+        return HalfFp16(hrint(aOther.value));
     }
 #endif
 
@@ -610,7 +653,7 @@ class alignas(2) HalfFp16
     /// </summary>
     DEVICE_ONLY_CODE inline HalfFp16 &RoundZero()
     {
-        value = __int2half_rz(__half2int_rz(value));
+        value = htrunc(value);
         return *this;
     }
 #endif
@@ -631,7 +674,7 @@ class alignas(2) HalfFp16
     /// </summary>
     DEVICE_ONLY_CODE [[nodiscard]] inline static HalfFp16 RoundZero(HalfFp16 aOther)
     {
-        return HalfFp16(__int2half_rz(__half2int_rz(aOther.value)));
+        return HalfFp16(htrunc(aOther.value));
     }
 #endif
 
@@ -701,11 +744,11 @@ inline HalfFp16 operator"" _hf(long double aValue)
 }
 
 #ifdef IS_CUDA_COMPILER
-DEVICE_CODE bool isnan(HalfFp16 aVal)
+DEVICE_CODE inline bool isnan(HalfFp16 aVal)
 {
     return __hisnan(aVal.value);
 }
-DEVICE_CODE bool isinf(HalfFp16 aVal)
+DEVICE_CODE inline bool isinf(HalfFp16 aVal)
 {
     return __hisinf(aVal.value);
 }
@@ -746,56 +789,56 @@ template <> struct numeric_limits<HalfFp16>
     }
 };
 
-// numeric limits when converting from one type to another, especially 16-Bit floats have some restrictions
-template <typename TTo> struct numeric_limits_conversion<HalfFp16, TTo>
-{
-    // HalfFp16 does not have a constexpr constructor on cuda device...
-    [[nodiscard]] static const DEVICE_CODE HalfFp16 min() noexcept
-    {
-        return static_cast<HalfFp16>(numeric_limits<TTo>::min());
-    }
-    [[nodiscard]] static const DEVICE_CODE HalfFp16 max() noexcept
-    {
-        return static_cast<HalfFp16>(numeric_limits<TTo>::max());
-    }
-    [[nodiscard]] static const DEVICE_CODE HalfFp16 lowest() noexcept
-    {
-        return static_cast<HalfFp16>(numeric_limits<TTo>::lowest());
-    }
-    [[nodiscard]] static const DEVICE_CODE HalfFp16 minExact() noexcept
-    {
-        return static_cast<HalfFp16>(numeric_limits<TTo>::minExact());
-    }
-    [[nodiscard]] static const DEVICE_CODE HalfFp16 maxExact() noexcept
-    {
-        return static_cast<HalfFp16>(numeric_limits<TTo>::maxExact());
-    }
-};
-
-template <> struct numeric_limits_conversion<HalfFp16, short>
-{
-    [[nodiscard]] static const DEVICE_CODE HalfFp16 min() noexcept
-    {
-        return static_cast<HalfFp16>(numeric_limits<short>::min());
-    }
-    [[nodiscard]] static const DEVICE_CODE HalfFp16 max() noexcept
-    {
-        // special case for half floats: the maximum value of short is slightly larger than the closest exact
-        // integer in HalfFp16, and as we use round to nearest, the clamping would result in a too large number.
-        // Thus for HalfFp16 and short, we clamp to the exact integer smaller than short::max(), i.e. 32752
-        return HalfFp16::FromUShort(0x77FF); // = 32752
-    }
-    [[nodiscard]] static const DEVICE_CODE HalfFp16 lowest() noexcept
-    {
-        return static_cast<HalfFp16>(numeric_limits<short>::lowest());
-    }
-    [[nodiscard]] static const DEVICE_CODE HalfFp16 minExact() noexcept
-    {
-        return static_cast<HalfFp16>(numeric_limits<short>::minExact());
-    }
-    [[nodiscard]] static const DEVICE_CODE HalfFp16 maxExact() noexcept
-    {
-        return static_cast<HalfFp16>(numeric_limits<short>::maxExact());
-    }
-};
+//// numeric limits when converting from one type to another, especially 16-Bit floats have some restrictions
+// template <typename TTo> struct numeric_limits_conversion<HalfFp16, TTo>
+//{
+//     // HalfFp16 does not have a constexpr constructor on cuda device...
+//     [[nodiscard]] static const DEVICE_CODE HalfFp16 min() noexcept
+//     {
+//         return static_cast<HalfFp16>(numeric_limits<TTo>::min());
+//     }
+//     [[nodiscard]] static const DEVICE_CODE HalfFp16 max() noexcept
+//     {
+//         return static_cast<HalfFp16>(numeric_limits<TTo>::max());
+//     }
+//     [[nodiscard]] static const DEVICE_CODE HalfFp16 lowest() noexcept
+//     {
+//         return static_cast<HalfFp16>(numeric_limits<TTo>::lowest());
+//     }
+//     [[nodiscard]] static const DEVICE_CODE HalfFp16 minExact() noexcept
+//     {
+//         return static_cast<HalfFp16>(numeric_limits<TTo>::minExact());
+//     }
+//     [[nodiscard]] static const DEVICE_CODE HalfFp16 maxExact() noexcept
+//     {
+//         return static_cast<HalfFp16>(numeric_limits<TTo>::maxExact());
+//     }
+// };
+//
+// template <> struct numeric_limits_conversion<HalfFp16, short>
+//{
+//     [[nodiscard]] static const DEVICE_CODE HalfFp16 min() noexcept
+//     {
+//         return static_cast<HalfFp16>(numeric_limits<short>::min());
+//     }
+//     [[nodiscard]] static const DEVICE_CODE HalfFp16 max() noexcept
+//     {
+//         // special case for half floats: the maximum value of short is slightly larger than the closest exact
+//         // integer in HalfFp16, and as we use round to nearest, the clamping would result in a too large number.
+//         // Thus for HalfFp16 and short, we clamp to the exact integer smaller than short::max(), i.e. 32752
+//         return HalfFp16::FromUShort(0x77FF); // = 32752
+//     }
+//     [[nodiscard]] static const DEVICE_CODE HalfFp16 lowest() noexcept
+//     {
+//         return static_cast<HalfFp16>(numeric_limits<short>::lowest());
+//     }
+//     [[nodiscard]] static const DEVICE_CODE HalfFp16 minExact() noexcept
+//     {
+//         return static_cast<HalfFp16>(numeric_limits<short>::minExact());
+//     }
+//     [[nodiscard]] static const DEVICE_CODE HalfFp16 maxExact() noexcept
+//     {
+//         return static_cast<HalfFp16>(numeric_limits<short>::maxExact());
+//     }
+// };
 } // namespace opp

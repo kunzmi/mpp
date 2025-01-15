@@ -1,4 +1,7 @@
 #pragma once
+#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
+#if OPP_ENABLE_CUDA_BACKEND
+
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/image/configurations.h>
 #include <common/image/gotoPtr.h>
@@ -19,8 +22,8 @@ namespace opp::image::cuda
 /// runs aOp on every pixel of an image. Inplace and outplace operation, with mask.
 /// </summary>
 template <int WarpAlignmentInBytes, int TupelSize, class DstT, class functor>
-__global__ void forEachPixelMaskedKernel(const Pixel8uC1 *__restrict__ aMask, size_t aPitchMask,
-                                         DstT *__restrict__ aDst, size_t aPitchDst, Size2D aSize,
+__global__ void forEachPixelMaskedKernel(const byte *__restrict__ aMask, size_t aPitchMask, DstT *__restrict__ aDst,
+                                         size_t aPitchDst, Size2D aSize,
                                          ThreadSplit<WarpAlignmentInBytes, TupelSize> aSplit, functor aOp)
 {
     int threadX = blockIdx.x * blockDim.x + threadIdx.x;
@@ -42,7 +45,7 @@ __global__ void forEachPixelMaskedKernel(const Pixel8uC1 *__restrict__ aMask, si
 
         if (aSplit.ThreadIsAlignedToWarp(threadX))
         {
-            Pixel8uC1 *pixelsMask          = gotoPtr(aMask, aPitchMask, pixelX, pixelY);
+            const byte *pixelsMask         = gotoPtr(aMask, aPitchMask, pixelX, pixelY);
             MaskTupel<TupelSize> maskTupel = MaskTupel<TupelSize>::Load(pixelsMask);
             if (maskTupel.AreAllFalse())
             {
@@ -116,8 +119,8 @@ __global__ void forEachPixelMaskedKernel(const Pixel8uC1 *__restrict__ aMask, si
         }
     }
 
-    Pixel8uC1 *pixelMask = gotoPtr(aMask, aPitchMask, pixelX, pixelY);
-    Pixel8uC1 mask       = *pixelMask;
+    const byte *pixelMask = gotoPtr(aMask, aPitchMask, pixelX, pixelY);
+    byte mask             = *pixelMask;
     if (!mask)
     {
         // nothing to do as mask deactivated the pixel
@@ -161,16 +164,16 @@ __global__ void forEachPixelMaskedKernel(const Pixel8uC1 *__restrict__ aMask, si
     return;
 }
 
-template <typename SrcT, typename DstT, size_t TupelSize, int WarpAlignmentInBytes, class funcType>
-void InvokeForEachPixelMaskedKernel(const dim3 &aBlockSize, uint aSharedMemory, cudaStream_t aStream,
-                                    const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aDst, size_t pitchDst,
-                                    const Size2D &aSize, const funcType &aOp)
+template <typename DstT, size_t TupelSize, int WarpAlignmentInBytes, class funcType>
+void InvokeForEachPixelMaskedKernel(const dim3 &aBlockSize, uint aSharedMemory, cudaStream_t aStream, const byte *aMask,
+                                    size_t aPitchMask, DstT *aDst, size_t pitchDst, const Size2D &aSize,
+                                    const funcType &aOp)
 {
     ThreadSplit<WarpAlignmentInBytes, TupelSize> ts(aDst, aSize.x);
 
     dim3 blocksPerGrid(DIV_UP(ts.Total(), aBlockSize.x), DIV_UP(aSize.y, aBlockSize.y), 1);
 
-    forEachPixelKernel<WarpAlignmentInBytes, TupelSize, DstT, funcType>
+    forEachPixelMaskedKernel<WarpAlignmentInBytes, TupelSize, DstT, funcType>
         <<<blocksPerGrid, aBlockSize, aSharedMemory, aStream>>>(aMask, aPitchMask, aDst, pitchDst, aSize, ts, aOp);
 
     peekAndCheckLastCudaError("Block size: " << aBlockSize << " Grid size: " << blocksPerGrid
@@ -190,7 +193,8 @@ void InvokeForEachPixelMaskedKernelDefault(const Pixel8uC1 *aMask, size_t aPitch
         constexpr uint SharedMemory        = 0;
 
         InvokeForEachPixelMaskedKernel<DstT, TupelSize, WarpAlignmentInBytes, funcType>(
-            BlockSize, SharedMemory, aStreamCtx.Stream, aMask, aPitchMask, aDst, pitchDst, aSize, aFunc);
+            BlockSize, SharedMemory, aStreamCtx.Stream, reinterpret_cast<const byte *>(aMask), aPitchMask, aDst,
+            pitchDst, aSize, aFunc);
     }
     else
     {
@@ -200,3 +204,4 @@ void InvokeForEachPixelMaskedKernelDefault(const Pixel8uC1 *aMask, size_t aPitch
     }
 }
 } // namespace opp::image::cuda
+#endif // OPP_ENABLE_CUDA_BACKEND

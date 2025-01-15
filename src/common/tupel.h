@@ -743,5 +743,338 @@ template <typename T, std::size_t size> struct alignas(size * sizeof(T)) Tupel
             static_assert(AlwaysFalse<T>::value, "Maximum Tupel size is 64.");
         }
     }
+
+    /// <summary>
+    /// Initializes a constant Tupel with all elements set to aValue
+    /// </summary>
+    static Tupel<T, size> DEVICE_CODE GetConstant(const T &aValue)
+        requires IsTupelSize<size>
+    {
+        Tupel<T, size> ret;
+
+        ret.value[0] = aValue;
+        if constexpr (size > 1)
+        {
+
+            ret.value[1] = aValue;
+        }
+        if constexpr (size > 2)
+        {
+
+            ret.value[2] = aValue;
+        }
+        if constexpr (size > 3)
+        {
+
+            ret.value[3] = aValue;
+        }
+        if constexpr (size > 4)
+        {
+
+            ret.value[4] = aValue;
+        }
+        if constexpr (size > 5)
+        {
+
+            ret.value[5] = aValue;
+        }
+        if constexpr (size > 6)
+        {
+
+            ret.value[6] = aValue;
+        }
+        if constexpr (size > 7)
+        {
+
+            ret.value[7] = aValue;
+        }
+        if constexpr (size > 8)
+        {
+
+            ret.value[8] = aValue;
+        }
+        if constexpr (size > 9)
+        {
+
+            ret.value[9] = aValue;
+        }
+        if constexpr (size > 10)
+        {
+
+            ret.value[10] = aValue;
+        }
+        if constexpr (size > 11)
+        {
+
+            ret.value[11] = aValue;
+        }
+        if constexpr (size > 12)
+        {
+
+            ret.value[12] = aValue;
+        }
+        if constexpr (size > 13)
+        {
+
+            ret.value[13] = aValue;
+        }
+        if constexpr (size > 14)
+        {
+
+            ret.value[14] = aValue;
+        }
+        if constexpr (size > 15)
+        {
+
+            ret.value[15] = aValue;
+        }
+        if constexpr (size > 16)
+        {
+
+            ret.value[16] = aValue;
+        }
+        if constexpr (size > 17)
+        {
+
+            ret.value[17] = aValue;
+        }
+        if constexpr (size > 18)
+        {
+
+            ret.value[18] = aValue;
+        }
+        if constexpr (size > 19)
+        {
+
+            ret.value[19] = aValue;
+        }
+        if constexpr (size > 20)
+        {
+
+            ret.value[20] = aValue;
+        }
+        if constexpr (size > 21)
+        {
+
+            ret.value[21] = aValue;
+        }
+        if constexpr (size > 22)
+        {
+
+            ret.value[22] = aValue;
+        }
+        if constexpr (size > 23)
+        {
+
+            ret.value[23] = aValue;
+        }
+        if constexpr (size > 24)
+        {
+
+            ret.value[24] = aValue;
+        }
+        if constexpr (size > 25)
+        {
+
+            ret.value[25] = aValue;
+        }
+        if constexpr (size > 26)
+        {
+
+            ret.value[26] = aValue;
+        }
+        if constexpr (size > 27)
+        {
+
+            ret.value[27] = aValue;
+        }
+        if constexpr (size > 28)
+        {
+
+            ret.value[28] = aValue;
+        }
+        if constexpr (size > 29)
+        {
+
+            ret.value[29] = aValue;
+        }
+        if constexpr (size > 30)
+        {
+
+            ret.value[30] = aValue;
+        }
+        if constexpr (size > 31)
+        {
+
+            ret.value[31] = aValue;
+        }
+        if constexpr (size > 32)
+        {
+
+            ret.value[32] = aValue;
+        }
+        if constexpr (size > 33)
+        {
+
+            ret.value[33] = aValue;
+        }
+        if constexpr (size > 34)
+        {
+
+            ret.value[34] = aValue;
+        }
+        if constexpr (size > 35)
+        {
+
+            ret.value[35] = aValue;
+        }
+        if constexpr (size > 36)
+        {
+
+            ret.value[36] = aValue;
+        }
+        if constexpr (size > 37)
+        {
+
+            ret.value[37] = aValue;
+        }
+        if constexpr (size > 38)
+        {
+
+            ret.value[38] = aValue;
+        }
+        if constexpr (size > 39)
+        {
+
+            ret.value[39] = aValue;
+        }
+        if constexpr (size > 40)
+        {
+
+            ret.value[40] = aValue;
+        }
+        if constexpr (size > 41)
+        {
+
+            ret.value[41] = aValue;
+        }
+        if constexpr (size > 42)
+        {
+
+            ret.value[42] = aValue;
+        }
+        if constexpr (size > 43)
+        {
+
+            ret.value[43] = aValue;
+        }
+        if constexpr (size > 44)
+        {
+
+            ret.value[44] = aValue;
+        }
+        if constexpr (size > 45)
+        {
+
+            ret.value[45] = aValue;
+        }
+        if constexpr (size > 46)
+        {
+
+            ret.value[46] = aValue;
+        }
+        if constexpr (size > 47)
+        {
+
+            ret.value[47] = aValue;
+        }
+        if constexpr (size > 48)
+        {
+
+            ret.value[48] = aValue;
+        }
+        if constexpr (size > 49)
+        {
+
+            ret.value[49] = aValue;
+        }
+        if constexpr (size > 50)
+        {
+
+            ret.value[50] = aValue;
+        }
+        if constexpr (size > 51)
+        {
+
+            ret.value[51] = aValue;
+        }
+        if constexpr (size > 52)
+        {
+
+            ret.value[52] = aValue;
+        }
+        if constexpr (size > 53)
+        {
+
+            ret.value[53] = aValue;
+        }
+        if constexpr (size > 54)
+        {
+
+            ret.value[54] = aValue;
+        }
+        if constexpr (size > 55)
+        {
+
+            ret.value[55] = aValue;
+        }
+        if constexpr (size > 56)
+        {
+
+            ret.value[56] = aValue;
+        }
+        if constexpr (size > 57)
+        {
+
+            ret.value[57] = aValue;
+        }
+        if constexpr (size > 58)
+        {
+
+            ret.value[58] = aValue;
+        }
+        if constexpr (size > 59)
+        {
+
+            ret.value[59] = aValue;
+        }
+        if constexpr (size > 60)
+        {
+
+            ret.value[60] = aValue;
+        }
+        if constexpr (size > 61)
+        {
+
+            ret.value[61] = aValue;
+        }
+        if constexpr (size > 62)
+        {
+
+            ret.value[62] = aValue;
+        }
+        if constexpr (size > 63)
+        {
+
+            ret.value[63] = aValue;
+        }
+        if constexpr (size > MAX_TUPEL_SIZE)
+        {
+            // shouldn't happen but let's stay on the safe side...
+            static_assert(AlwaysFalse<T>::value, "Maximum Tupel size is 64.");
+        }
+
+        return ret;
+    }
 };
 } // namespace opp
