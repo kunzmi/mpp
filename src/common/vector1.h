@@ -4,6 +4,7 @@
 #include "needSaturationClamp.h"
 #include "numberTypes.h"
 #include "numeric_limits.h"
+#include "opp_defs.h"
 #include "safeCast.h"
 #include "staticCast.h"
 #include "vector_typetraits.h"
@@ -119,6 +120,18 @@ template <Number T> struct alignas(sizeof(T)) Vector1
             aVec.template ClampToTargetType<T>();
         }
         x = StaticCast<T2, T>(aVec.x);
+    }
+
+    /// <summary>
+    /// Type conversion using CUDA intrinsics for float to BFloat/Halffloat and complex
+    /// </summary>
+    template <Number T2>
+    DEVICE_CODE Vector1(const Vector1<T2> &aVec, RoundingMode aRoundingMode) noexcept
+        requires((IsBFloat16<T> || IsHalfFp16<T>) && IsFloat<T2>) ||
+                ((std::same_as<Complex<HalfFp16>, T> || std::same_as<Complex<BFloat16>, T>) &&
+                 std::same_as<Complex<float>, T2>)
+    {
+        x = T(aVec.x, aRoundingMode);
     }
 
     ~Vector1() = default;
@@ -476,7 +489,7 @@ template <Number T> struct alignas(sizeof(T)) Vector1
     /// <summary>
     /// Element wise bitwise left shift
     /// </summary>
-    DEVICE_CODE Vector1<T> &LShift(const T &aOther)
+    DEVICE_CODE Vector1<T> &LShift(uint aOther)
         requires RealIntegral<T>
     {
         x = x << aOther;
@@ -486,7 +499,7 @@ template <Number T> struct alignas(sizeof(T)) Vector1
     /// <summary>
     /// Element wise bitwise left shift
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector1<T> LShift(const Vector1<T> &aLeft, const T &aRight)
+    DEVICE_CODE [[nodiscard]] static Vector1<T> LShift(const Vector1<T> &aLeft, uint aRight)
         requires RealIntegral<T>
     {
         Vector1<T> ret;
@@ -497,7 +510,7 @@ template <Number T> struct alignas(sizeof(T)) Vector1
     /// <summary>
     /// Element wise bitwise right shift
     /// </summary>
-    DEVICE_CODE Vector1<T> &RShift(const T &aOther)
+    DEVICE_CODE Vector1<T> &RShift(uint aOther)
         requires RealIntegral<T>
     {
         x = x >> aOther;
@@ -507,7 +520,7 @@ template <Number T> struct alignas(sizeof(T)) Vector1
     /// <summary>
     /// Element wise bitwise right shift
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector1<T> RShift(const Vector1<T> &aLeft, const T &aRight)
+    DEVICE_CODE [[nodiscard]] static Vector1<T> RShift(const Vector1<T> &aLeft, uint aRight)
         requires RealIntegral<T>
     {
         Vector1<T> ret;

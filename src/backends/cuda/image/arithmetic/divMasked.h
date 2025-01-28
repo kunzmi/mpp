@@ -1,0 +1,102 @@
+#pragma once
+#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
+#if OPP_ENABLE_CUDA_BACKEND
+
+#include <backends/cuda/streamCtx.h>
+#include <common/image/functors/imageFunctors.h>
+#include <common/image/pixelTypes.h>
+#include <common/image/size2D.h>
+#include <common/opp_defs.h>
+
+namespace opp::image::cuda
+{
+
+template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+void InvokeDivSrcSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aSrc1, size_t aPitchSrc1,
+                         const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
+                         const opp::cuda::StreamCtx &aStreamCtx);
+
+template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+void InvokeDivSrcSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aSrc1, size_t aPitchSrc1,
+                              const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst, size_t aPitchDst,
+                              scalefactor_t<ComputeT> aScaleFactor, opp::RoundingMode aRoundingMode, const Size2D &aSize,
+                              const opp::cuda::StreamCtx &aStreamCtx);
+
+template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+void InvokeDivSrcCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aSrc, size_t aPitchSrc,
+                       const SrcT &aConst, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
+                       const opp::cuda::StreamCtx &aStreamCtx);
+
+template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+void InvokeDivSrcCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aSrc, size_t aPitchSrc,
+                            const SrcT &aConst, DstT *aDst, size_t aPitchDst, scalefactor_t<ComputeT> aScaleFactor, opp::RoundingMode aRoundingMode,
+                            const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx);
+
+template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+void InvokeDivSrcDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aSrc, size_t aPitchSrc,
+                          const SrcT *aConst, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
+                          const opp::cuda::StreamCtx &aStreamCtx);
+
+template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+void InvokeDivSrcDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aSrc, size_t aPitchSrc,
+                               const SrcT *aConst, DstT *aDst, size_t aPitchDst, scalefactor_t<ComputeT> aScaleFactor, opp::RoundingMode aRoundingMode,
+                               const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx);
+
+template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+void InvokeDivInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
+                             const SrcT *aSrc2, size_t aPitchSrc2, const Size2D &aSize,
+                             const opp::cuda::StreamCtx &aStreamCtx);
+
+template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+void InvokeDivInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
+                                  const SrcT *aSrc2, size_t aPitchSrc2, scalefactor_t<ComputeT> aScaleFactor, opp::RoundingMode aRoundingMode,
+                                  const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx);
+
+template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+void InvokeDivInplaceCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
+                           const SrcT &aConst, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx);
+
+template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+void InvokeDivInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
+                                const SrcT &aConst, scalefactor_t<ComputeT> aScaleFactor, opp::RoundingMode aRoundingMode, const Size2D &aSize,
+                                const opp::cuda::StreamCtx &aStreamCtx);
+
+template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+void InvokeDivInplaceDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchDst,
+                              const SrcT *aConst, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx);
+
+template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+void InvokeDivInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchDst,
+                                   const SrcT *aConst, scalefactor_t<ComputeT> aScaleFactor, opp::RoundingMode aRoundingMode, const Size2D &aSize,
+                                   const opp::cuda::StreamCtx &aStreamCtx);
+
+template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+void InvokeDivInvInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
+                                const SrcT *aSrc2, size_t aPitchSrc2, const Size2D &aSize,
+                                const opp::cuda::StreamCtx &aStreamCtx);
+
+template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+void InvokeDivInvInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
+                                     const SrcT *aSrc2, size_t aPitchSrc2, scalefactor_t<ComputeT> aScaleFactor, opp::RoundingMode aRoundingMode,
+                                     const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx);
+
+template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+void InvokeDivInvInplaceCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
+                              const SrcT &aConst, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx);
+
+template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+void InvokeDivInvInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
+                                   const SrcT &aConst, scalefactor_t<ComputeT> aScaleFactor, opp::RoundingMode aRoundingMode, const Size2D &aSize,
+                                   const opp::cuda::StreamCtx &aStreamCtx);
+
+template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+void InvokeDivInvInplaceDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchDst,
+                                 const SrcT *aConst, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx);
+
+template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+void InvokeDivInvInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchDst,
+                                      const SrcT *aConst, scalefactor_t<ComputeT> aScaleFactor, opp::RoundingMode aRoundingMode, const Size2D &aSize,
+                                      const opp::cuda::StreamCtx &aStreamCtx);
+
+} // namespace opp::image::cuda
+#endif // OPP_ENABLE_CUDA_BACKEND

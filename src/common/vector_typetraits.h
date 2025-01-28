@@ -103,6 +103,9 @@ template <typename T>
 concept RealSignedVector = AnyVector<T> && RealSignedNumber<remove_vector_t<T>>;
 
 template <typename T>
+concept RealUnsignedVector = AnyVector<T> && RealUnsignedNumber<remove_vector_t<T>>;
+
+template <typename T>
 concept RealFloatingVector = AnyVector<T> && RealFloatingPoint<remove_vector_t<T>>;
 
 template <typename T>

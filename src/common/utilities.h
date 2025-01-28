@@ -88,19 +88,45 @@ DEVICE_CODE inline double GetSign(double aDoubleVal)
     return *reinterpret_cast<double *>(&doublebits);
 }
 
-template <typename T> struct numeric_limits;
-
-#ifdef IS_CUDA_COMPILER
 DEVICE_CODE inline bool isnan(float aFloat)
 {
+#ifdef IS_CUDA_COMPILER
     return ::isnan(aFloat);
+#endif
+#ifdef IS_HOST_COMPILER
+    return std::isnan(aFloat);
+#endif
 }
 DEVICE_CODE inline bool isinf(float aFloat)
 {
+#ifdef IS_CUDA_COMPILER
     return ::isinf(aFloat);
-}
 #endif
+#ifdef IS_HOST_COMPILER
+    return std::isinf(aFloat);
+#endif
+}
 
+DEVICE_CODE inline bool isnan(double aFloat)
+{
+#ifdef IS_CUDA_COMPILER
+    return ::isnan(aFloat);
+#endif
+#ifdef IS_HOST_COMPILER
+    return std::isnan(aFloat);
+#endif
+}
+DEVICE_CODE inline bool isinf(double aFloat)
+{
+#ifdef IS_CUDA_COMPILER
+    return ::isinf(aFloat);
+#endif
+#ifdef IS_HOST_COMPILER
+    return std::isinf(aFloat);
+#endif
+}
+
+template <typename T> struct numeric_limits;
 /// <summary>
 /// For floating point comparison: if both values are NAN or INF, we want to accept that both values are equal, if only
 /// one of the values is NAN or INF, the comparison should return false. For this we replace the actual NAN/INF by some
@@ -108,13 +134,6 @@ DEVICE_CODE inline bool isinf(float aFloat)
 /// </summary>
 template <RealFloatingPoint T> DEVICE_CODE void MakeNANandINFValid(T &aLeft, T &aRight)
 {
-#ifdef IS_HOST_COMPILER
-    using namespace std;
-#endif
-#ifdef IS_CUDA_COMPILER
-    using namespace opp;
-#endif
-
     if (isnan(aLeft) || isinf(aLeft))
     {
         if (isnan(aRight) || isinf(aRight))
@@ -141,6 +160,28 @@ template <RealFloatingPoint T> DEVICE_CODE void MakeNANandINFValid(T &aLeft, T &
             aRight = opp::numeric_limits<T>::max();
         }
     }
+}
+
+template <Number T>
+    requires RealFloatingPoint<T>
+DEVICE_CODE T GetAlphaAsFloat(T aValue)
+{
+    return aValue;
+}
+template <Number T>
+    requires RealIntegral<T> // byte, sybte, ushort and short
+DEVICE_CODE float GetAlphaAsFloat(T aValue)
+{
+    // Note: The results from NPP are not coherent. The result from AlphaComp with AlphaComposition::Over and an empty
+    // second image is not the same as AlphaPremul - but they should give same results. So instead of trying getting the
+    // exact same result as NPP we'll just do simple math as described in the IPP functions.
+    return (static_cast<float>(aValue)) / static_cast<float>(opp::numeric_limits<T>::max());
+}
+template <Number T>
+    requires RealIntegral<T> && FourBytesSizeType<T> // int32 and uint32
+DEVICE_CODE double GetAlphaAsFloat(T aValue)
+{
+    return (static_cast<double>(aValue)) / static_cast<double>(opp::numeric_limits<T>::max());
 }
 
 } // namespace opp

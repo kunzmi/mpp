@@ -4,6 +4,7 @@
 #include "needSaturationClamp.h"
 #include "numberTypes.h"
 #include "numeric_limits.h"
+#include "opp_defs.h"
 #include "safeCast.h"
 #include "staticCast.h"
 #include "vector_typetraits.h"
@@ -148,6 +149,20 @@ template <Number T> struct alignas(sizeof(T)) Vector3
         x = StaticCast<T2, T>(aVec.x);
         y = StaticCast<T2, T>(aVec.y);
         z = StaticCast<T2, T>(aVec.z);
+    }
+
+    /// <summary>
+    /// Type conversion using CUDA intrinsics for float to BFloat/Halffloat and complex
+    /// </summary>
+    template <Number T2>
+    DEVICE_CODE Vector3(const Vector3<T2> &aVec, RoundingMode aRoundingMode) noexcept
+        requires((IsBFloat16<T> || IsHalfFp16<T>) && IsFloat<T2>) ||
+                ((std::same_as<Complex<HalfFp16>, T> || std::same_as<Complex<BFloat16>, T>) &&
+                 std::same_as<Complex<float>, T2>)
+    {
+        x = T(aVec.x, aRoundingMode);
+        y = T(aVec.y, aRoundingMode);
+        z = T(aVec.z, aRoundingMode);
     }
 
     ~Vector3() = default;
@@ -587,7 +602,7 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise bitwise left shift
     /// </summary>
-    DEVICE_CODE Vector3<T> &LShift(const T &aOther)
+    DEVICE_CODE Vector3<T> &LShift(uint aOther)
         requires RealIntegral<T>
     {
         x = x << aOther;
@@ -599,7 +614,7 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise bitwise left shift
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector3<T> LShift(const Vector3<T> &aLeft, const T &aRight)
+    DEVICE_CODE [[nodiscard]] static Vector3<T> LShift(const Vector3<T> &aLeft, uint aRight)
         requires RealIntegral<T>
     {
         Vector3<T> ret;
@@ -612,7 +627,7 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise bitwise right shift
     /// </summary>
-    DEVICE_CODE Vector3<T> &RShift(const T &aOther)
+    DEVICE_CODE Vector3<T> &RShift(uint aOther)
         requires RealIntegral<T>
     {
         x = x >> aOther;
@@ -624,7 +639,7 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// <summary>
     /// Element wise bitwise right shift
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector3<T> RShift(const Vector3<T> &aLeft, const T &aRight)
+    DEVICE_CODE [[nodiscard]] static Vector3<T> RShift(const Vector3<T> &aLeft, uint aRight)
         requires RealIntegral<T>
     {
         Vector3<T> ret;

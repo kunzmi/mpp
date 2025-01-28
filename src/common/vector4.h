@@ -4,10 +4,11 @@
 #include "needSaturationClamp.h"
 #include "numberTypes.h"
 #include "numeric_limits.h"
+#include "opp_defs.h"
 #include "safeCast.h"
 #include "staticCast.h"
-#include "vector3.h" //for additional constructor from Vector3<T>
 #include "vector_typetraits.h"
+#include "vector3.h" //for additional constructor from Vector3<T>
 #include <cmath>
 #include <common/utilities.h>
 #include <concepts>
@@ -323,6 +324,39 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     }
 
     /// <summary>
+    /// Type conversion using CUDA intrinsics for float2 to BFloat2
+    /// </summary>
+    template <Number T2>
+    DEVICE_CODE Vector4(const Vector4<T2> &aVec, RoundingMode aRoundingMode) noexcept
+        requires IsBFloat16<T> && IsFloat<T2>
+    {
+        if constexpr (CUDA_ONLY<T>)
+        {
+            if (aRoundingMode == RoundingMode::NearestTiesToEven)
+            {
+                const float2 *aVecPtr = reinterpret_cast<const float2 *>(&aVec);
+                nv_bfloat162 *thisPtr = reinterpret_cast<nv_bfloat162 *>(this);
+                thisPtr[0]            = __float22bfloat162_rn(aVecPtr[0]);
+                thisPtr[1]            = __float22bfloat162_rn(aVecPtr[1]);
+            }
+            else
+            {
+                x = BFloat16(aVec.x, aRoundingMode);
+                y = BFloat16(aVec.y, aRoundingMode);
+                z = BFloat16(aVec.z, aRoundingMode);
+                w = BFloat16(aVec.w, aRoundingMode);
+            }
+        }
+        else
+        {
+            x = BFloat16(aVec.x, aRoundingMode);
+            y = BFloat16(aVec.y, aRoundingMode);
+            z = BFloat16(aVec.z, aRoundingMode);
+            w = BFloat16(aVec.w, aRoundingMode);
+        }
+    }
+
+    /// <summary>
     /// Type conversion using CUDA intrinsics for BFloat2 to float2
     /// </summary>
     template <Number T2>
@@ -346,6 +380,53 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
         half2 *thisPtr        = reinterpret_cast<half2 *>(this);
         thisPtr[0]            = __float22half2_rn(aVecPtr[0]);
         thisPtr[1]            = __float22half2_rn(aVecPtr[1]);
+    }
+
+    /// <summary>
+    /// Type conversion using CUDA intrinsics for float2 to half2
+    /// </summary>
+    template <Number T2>
+    DEVICE_CODE Vector4(const Vector4<T2> &aVec, RoundingMode aRoundingMode) noexcept
+        requires IsHalfFp16<T> && IsFloat<T2>
+    {
+        if constexpr (CUDA_ONLY<T>)
+        {
+            if (aRoundingMode == RoundingMode::NearestTiesToEven)
+            {
+                const float2 *aVecPtr = reinterpret_cast<const float2 *>(&aVec);
+                half2 *thisPtr        = reinterpret_cast<half2 *>(this);
+                thisPtr[0]            = __float22half2_rn(aVecPtr[0]);
+                thisPtr[1]            = __float22half2_rn(aVecPtr[1]);
+            }
+            else
+            {
+                x = HalfFp16(aVec.x, aRoundingMode);
+                y = HalfFp16(aVec.y, aRoundingMode);
+                z = HalfFp16(aVec.z, aRoundingMode);
+                w = HalfFp16(aVec.w, aRoundingMode);
+            }
+        }
+        else
+        {
+            x = HalfFp16(aVec.x, aRoundingMode);
+            y = HalfFp16(aVec.y, aRoundingMode);
+            z = HalfFp16(aVec.z, aRoundingMode);
+            w = HalfFp16(aVec.w, aRoundingMode);
+        }
+    }
+
+    /// <summary>
+    /// Type conversion for complex with rounding (only for float to bfloat/halffloat)
+    /// </summary>
+    template <Number T2>
+    DEVICE_CODE Vector4(const Vector4<T2> &aVec, RoundingMode aRoundingMode) noexcept
+        requires(std::same_as<Complex<HalfFp16>, T> || std::same_as<Complex<BFloat16>, T>) &&
+                std::same_as<Complex<float>, T2>
+    {
+        x = T(aVec.x, aRoundingMode);
+        y = T(aVec.y, aRoundingMode);
+        z = T(aVec.z, aRoundingMode);
+        w = T(aVec.w, aRoundingMode);
     }
 
     /// <summary>
@@ -1811,7 +1892,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Element wise bitwise left shift
     /// </summary>
-    DEVICE_CODE Vector4<T> &LShift(const T &aOther)
+    DEVICE_CODE Vector4<T> &LShift(uint aOther)
         requires RealIntegral<T>
     {
         x = x << aOther;
@@ -1824,7 +1905,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Element wise bitwise left shift
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector4<T> LShift(const Vector4<T> &aLeft, const T &aRight)
+    DEVICE_CODE [[nodiscard]] static Vector4<T> LShift(const Vector4<T> &aLeft, uint aRight)
         requires RealIntegral<T>
     {
         Vector4<T> ret;
@@ -1838,7 +1919,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Element wise bitwise right shift
     /// </summary>
-    DEVICE_CODE Vector4<T> &RShift(const T &aOther)
+    DEVICE_CODE Vector4<T> &RShift(uint aOther)
         requires RealIntegral<T>
     {
         x = x >> aOther;
@@ -1851,7 +1932,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
     /// <summary>
     /// Element wise bitwise right shift
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector4<T> RShift(const Vector4<T> &aLeft, const T &aRight)
+    DEVICE_CODE [[nodiscard]] static Vector4<T> RShift(const Vector4<T> &aLeft, uint aRight)
         requires RealIntegral<T>
     {
         Vector4<T> ret;

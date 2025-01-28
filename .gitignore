@@ -3,8 +3,7 @@
 *_autogen.h
 
 # build folders
-[Bb]uild/
-[Bb]uildDebug/
+[Bb]uild*/
 out/
 
 # Visual Studio 2015 cache/options directory

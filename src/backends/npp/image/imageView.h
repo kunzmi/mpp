@@ -13,6 +13,7 @@
 #include <common/image/size2D.h>
 #include <common/image/sizePitched.h>
 #include <common/safeCast.h>
+#include <common/vector_typetraits.h>
 #include <cstddef>
 #include <nppdefs.h>
 #include <nppi_filtering_functions.h>
@@ -37,7 +38,7 @@ template <PixelType T> class ImageView
     /// <summary>
     /// Channel count
     /// </summary>
-    static constexpr size_t ChannelCount = to_size_t(channel_count<T>::value);
+    static constexpr size_t ChannelCount = to_size_t(channel_count_v<T>);
 
   private:
     /// <summary>

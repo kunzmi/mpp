@@ -17,11 +17,11 @@
 namespace opp::image::cuda
 {
 /// <summary>
-/// runs aOp on every pixel of an image. Inplace and outplace operation, no mask.
+/// runs aFunctor on every pixel of an image. Inplace and outplace operation, no mask.
 /// </summary>
-template <int WarpAlignmentInBytes, int TupelSize, class DstT, typename functor>
+template <int WarpAlignmentInBytes, int TupelSize, class DstT, typename funcType>
 __global__ void forEachPixelKernel(DstT *__restrict__ aDst, size_t aPitchDst, Size2D aSize,
-                                   ThreadSplit<WarpAlignmentInBytes, TupelSize> aSplit, functor aOp)
+                                   ThreadSplit<WarpAlignmentInBytes, TupelSize> aSplit, funcType aFunctor)
 {
     int threadX = blockIdx.x * blockDim.x + threadIdx.x;
     int threadY = blockIdx.y * blockDim.y + threadIdx.y;
@@ -47,7 +47,7 @@ __global__ void forEachPixelKernel(DstT *__restrict__ aDst, size_t aPitchDst, Si
             DstT *pixelsOut = gotoPtr(aDst, aPitchDst, pixelX, pixelY);
 
             // load the destination pixel in case of inplace operation or we load the full pixel for alpha operations:
-            if constexpr (functor::DoLoadBeforeOp || //
+            if constexpr (funcType::DoLoadBeforeOp || //
                           (has_alpha_channel_v<DstT> && load_full_vector_for_alpha_v<DstT>))
             {
                 res = Tupel<DstT, TupelSize>::LoadAligned(pixelsOut);
@@ -64,7 +64,7 @@ __global__ void forEachPixelKernel(DstT *__restrict__ aDst, size_t aPitchDst, Si
             }
 
             // if we don't load the pixel anyhow but we still need just the alpha channel, load it:
-            if constexpr (!functor::DoLoadBeforeOp && //
+            if constexpr (!funcType::DoLoadBeforeOp && //
                           (has_alpha_channel_v<DstT> && !load_full_vector_for_alpha_v<DstT>))
             {
 #pragma unroll
@@ -74,7 +74,7 @@ __global__ void forEachPixelKernel(DstT *__restrict__ aDst, size_t aPitchDst, Si
                 }
             }
 
-            aOp(pixelX, pixelY, res);
+            aFunctor(pixelX, pixelY, res);
 
             // restore alpha channel values:
             if constexpr (has_alpha_channel_v<DstT>)
@@ -98,7 +98,7 @@ __global__ void forEachPixelKernel(DstT *__restrict__ aDst, size_t aPitchDst, Si
     DstT *pixelOut = gotoPtr(aDst, aPitchDst, pixelX, pixelY);
 
     // load the destination pixel in case of inplace operation or we load the full pixel for alpha operations:
-    if constexpr (functor::DoLoadBeforeOp || //
+    if constexpr (funcType::DoLoadBeforeOp || //
                   (has_alpha_channel_v<DstT> && load_full_vector_for_alpha_v<DstT>))
     {
         res = *pixelOut;
@@ -110,13 +110,13 @@ __global__ void forEachPixelKernel(DstT *__restrict__ aDst, size_t aPitchDst, Si
         }
     }
     // if we don't load the pixel anyhow but we still need just the alpha channel, load it:
-    if constexpr (!functor::DoLoadBeforeOp && //
+    if constexpr (!funcType::DoLoadBeforeOp && //
                   (has_alpha_channel_v<DstT> && !load_full_vector_for_alpha_v<DstT>))
     {
         alphaChannel = pixelOut->w;
     }
 
-    aOp(pixelX, pixelY, res);
+    aFunctor(pixelX, pixelY, res);
 
     // restore alpha channel value:
     if constexpr (has_alpha_channel_v<DstT>)
@@ -130,14 +130,14 @@ __global__ void forEachPixelKernel(DstT *__restrict__ aDst, size_t aPitchDst, Si
 
 template <typename DstT, size_t TupelSize, int WarpAlignmentInBytes, typename funcType>
 void InvokeForEachPixelKernel(const dim3 &aBlockSize, uint aSharedMemory, cudaStream_t aStream, DstT *aDst,
-                              size_t pitchDst, const Size2D &aSize, const funcType &aOp)
+                              size_t aPitchDst, const Size2D &aSize, const funcType &aFunctor)
 {
     ThreadSplit<WarpAlignmentInBytes, TupelSize> ts(aDst, aSize.x);
 
     dim3 blocksPerGrid(DIV_UP(ts.Total(), aBlockSize.x), DIV_UP(aSize.y, aBlockSize.y), 1);
 
     forEachPixelKernel<WarpAlignmentInBytes, TupelSize, DstT, funcType>
-        <<<blocksPerGrid, aBlockSize, aSharedMemory, aStream>>>(aDst, pitchDst, aSize, ts, aOp);
+        <<<blocksPerGrid, aBlockSize, aSharedMemory, aStream>>>(aDst, aPitchDst, aSize, ts, aFunctor);
 
     peekAndCheckLastCudaError("Block size: " << aBlockSize << " Grid size: " << blocksPerGrid
                                              << " SharedMemory: " << aSharedMemory << " Stream: " << aStream
@@ -145,7 +145,7 @@ void InvokeForEachPixelKernel(const dim3 &aBlockSize, uint aSharedMemory, cudaSt
 }
 
 template <typename DstT, size_t TupelSize, typename funcType>
-void InvokeForEachPixelKernelDefault(DstT *aDst, size_t pitchDst, const Size2D &aSize,
+void InvokeForEachPixelKernelDefault(DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                                      const opp::cuda::StreamCtx &aStreamCtx, const funcType &aFunc)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
@@ -155,7 +155,7 @@ void InvokeForEachPixelKernelDefault(DstT *aDst, size_t pitchDst, const Size2D &
         constexpr uint SharedMemory        = 0;
 
         InvokeForEachPixelKernel<DstT, TupelSize, WarpAlignmentInBytes, funcType>(
-            BlockSize, SharedMemory, aStreamCtx.Stream, aDst, pitchDst, aSize, aFunc);
+            BlockSize, SharedMemory, aStreamCtx.Stream, aDst, aPitchDst, aSize, aFunc);
     }
     else
     {

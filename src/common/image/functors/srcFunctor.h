@@ -9,8 +9,8 @@
 #include <common/opp_defs.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
-#include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
+#include <common/vector_typetraits.h>
 #include <concepts>
 
 // disable warning for pragma unroll when compiling with host compiler:
@@ -19,7 +19,7 @@
 namespace opp::image
 {
 /// <summary>
-/// Computes an output pixel from one src array -> dst pixel
+/// Computes an output pixel from one src array -&gt; dst pixel
 /// </summary>
 /// <typeparam name="SrcT"></typeparam>
 /// <typeparam name="ComputeT"></typeparam>
@@ -28,7 +28,7 @@ namespace opp::image
 /// <typeparam name="tupelSize"></typeparam>
 /// <typeparam name="roundingMode"></typeparam>
 template <size_t tupelSize, typename SrcT, typename ComputeT, typename DstT, typename operation,
-          RoudingMode roundingMode = RoudingMode::NearestTiesAwayFromZero, typename ComputeT_SIMD = voidType,
+          RoundingMode roundingMode = RoundingMode::NearestTiesAwayFromZero, typename ComputeT_SIMD = voidType,
           typename operation_SIMD = voidType>
 struct SrcFunctor : public ImageFunctor<false>
 {
@@ -39,6 +39,9 @@ struct SrcFunctor : public ImageFunctor<false>
     [[no_unique_address]] operation_SIMD OpSIMD;
 
     [[no_unique_address]] RoundFunctor<roundingMode, ComputeT> round;
+    [[no_unique_address]] RoundFunctor<
+        roundingMode, same_vector_size_different_type_t<ComputeT, complex_basetype_t<remove_vector_t<ComputeT>>>>
+        roundCplx2Real;
 
 #pragma region Constructors
     SrcFunctor()
@@ -64,7 +67,8 @@ struct SrcFunctor : public ImageFunctor<false>
     }
 
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
-        requires(!std::same_as<ComputeT, DstT>)
+        requires(!std::same_as<ComputeT, DstT>) && (!(ComplexVector<ComputeT> && RealVector<DstT>)) &&
+                (!(RealVector<ComputeT> && ComplexVector<DstT>))
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         ComputeT temp;
@@ -72,6 +76,28 @@ struct SrcFunctor : public ImageFunctor<false>
         round(temp); // NOP for integer ComputeT
         // DstT constructor will clamp temp to value range of DstT
         aDst = static_cast<DstT>(temp);
+    }
+
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+        requires(!std::same_as<ComputeT, DstT>) && ((ComplexVector<ComputeT> && RealVector<DstT>))
+    {
+        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+        same_vector_size_different_type_t<ComputeT, complex_basetype_t<remove_vector_t<ComputeT>>> temp;
+        Op(static_cast<ComputeT>(*pixelSrc1), temp);
+        if constexpr (!RealOrComplexFloatingVector<DstT>)
+        {
+            roundCplx2Real(temp); // NOP for integer ComputeT
+        }
+        // DstT constructor will clamp temp to value range of DstT
+        aDst = static_cast<DstT>(temp);
+    }
+
+    // Needed for the conversion real->Complex
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+        requires(!std::same_as<ComputeT, DstT>) && ((RealVector<ComputeT> && ComplexVector<DstT>))
+    {
+        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+        Op(*pixelSrc1, aDst);
     }
 #pragma endregion
 
@@ -106,7 +132,8 @@ struct SrcFunctor : public ImageFunctor<false>
 
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
         requires(!std::same_as<ComputeT, DstT>) && //
-                std::same_as<ComputeT_SIMD, voidType>
+                std::same_as<ComputeT_SIMD, voidType> && (!(ComplexVector<ComputeT> && RealVector<DstT>)) &&
+                (!(RealVector<ComputeT> && ComplexVector<DstT>))
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
 
@@ -120,6 +147,44 @@ struct SrcFunctor : public ImageFunctor<false>
             round(temp); // NOP for integer ComputeT
             // DstT constructor will clamp temp to value range of DstT
             aDst.value[i] = static_cast<DstT>(temp);
+        }
+    }
+
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+        requires(!std::same_as<ComputeT, DstT>) && //
+                std::same_as<ComputeT_SIMD, voidType> && ((ComplexVector<ComputeT> && RealVector<DstT>))
+    {
+        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+
+        Tupel<SrcT, tupelSize> tupelSrc1 = Tupel<SrcT, tupelSize>::Load(pixelSrc1);
+
+#pragma unroll
+        for (size_t i = 0; i < tupelSize; i++)
+        {
+            same_vector_size_different_type_t<ComputeT, complex_basetype_t<remove_vector_t<ComputeT>>> temp;
+            Op(static_cast<ComputeT>(tupelSrc1.value[i]), temp);
+            if constexpr (!RealOrComplexFloatingVector<DstT>)
+            {
+                roundCplx2Real(temp); // NOP for integer ComputeT
+            }
+            // DstT constructor will clamp temp to value range of DstT
+            aDst.value[i] = static_cast<DstT>(temp);
+        }
+    }
+
+    // Needed for the conversion real->Complex
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+        requires(!std::same_as<ComputeT, DstT>) && //
+                std::same_as<ComputeT_SIMD, voidType> && ((RealVector<ComputeT> && ComplexVector<DstT>))
+    {
+        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+
+        Tupel<SrcT, tupelSize> tupelSrc1 = Tupel<SrcT, tupelSize>::Load(pixelSrc1);
+
+#pragma unroll
+        for (size_t i = 0; i < tupelSize; i++)
+        {
+            Op(tupelSrc1.value[i], aDst.value[i]);
         }
     }
 #pragma endregion

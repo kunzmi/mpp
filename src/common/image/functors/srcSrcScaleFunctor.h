@@ -9,8 +9,8 @@
 #include <common/opp_defs.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
-#include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
+#include <common/vector_typetraits.h>
 #include <concepts>
 
 // disable warning for pragma unroll when compiling with host compiler:
@@ -19,7 +19,7 @@
 namespace opp::image
 {
 /// <summary>
-/// Computes an output pixel from two src arrays -> dst pixel with float scaling of result
+/// Computes an output pixel from two src arrays -&gt; dst pixel with float scaling of result
 /// </summary>
 /// <typeparam name="SrcT"></typeparam>
 /// <typeparam name="ComputeT"></typeparam>
@@ -28,7 +28,7 @@ namespace opp::image
 /// <typeparam name="tupelSize"></typeparam>
 /// <typeparam name="roundingMode"></typeparam>
 template <size_t tupelSize, typename SrcT, typename ComputeT, typename DstT, typename operation,
-          RoudingMode roundingMode = RoudingMode::NearestTiesAwayFromZero>
+          RoundingMode roundingMode = RoundingMode::NearestTiesAwayFromZero>
 struct SrcSrcScaleFunctor : public ImageFunctor<false>
 {
     const SrcT *RESTRICT Src1;

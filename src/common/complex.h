@@ -16,6 +16,7 @@
 #include <type_traits>
 
 #ifdef IS_CUDA_COMPILER
+#include "opp_defs.h"
 #include <cuda_bf16.h>
 #include <cuda_fp16.h>
 #include <vector_types.h>
@@ -165,6 +166,34 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     }
 
     /// <summary>
+    /// Type conversion using CUDA intrinsics for float2 to BFloat2
+    /// </summary>
+    template <Number T2>
+    DEVICE_CODE Complex(const Complex<T2> &aVec, RoundingMode aRoundingMode) noexcept
+        requires IsBFloat16<T> && IsFloat<T2>
+    {
+        if constexpr (CUDA_ONLY<T>)
+        {
+            if (aRoundingMode == RoundingMode::NearestTiesToEven)
+            {
+                const float2 *aVecPtr = reinterpret_cast<const float2 *>(&aVec);
+                nv_bfloat162 *thisPtr = reinterpret_cast<nv_bfloat162 *>(this);
+                *thisPtr              = __float22bfloat162_rn(*aVecPtr);
+            }
+            else
+            {
+                real = BFloat16(aVec.real, aRoundingMode);
+                imag = BFloat16(aVec.imag, aRoundingMode);
+            }
+        }
+        else
+        {
+            real = BFloat16(aVec.real, aRoundingMode);
+            imag = BFloat16(aVec.imag, aRoundingMode);
+        }
+    }
+
+    /// <summary>
     /// Type conversion using CUDA intrinsics for BFloat2 to float2
     /// </summary>
     template <IsBFloat16 T2>
@@ -181,11 +210,39 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// </summary>
     template <Number T2>
     DEVICE_CODE Complex(const Complex<T2> &aVec) noexcept
-        requires IsHalfFp16<T> && IsFloat<T2> && CUDA_ONLY<T>
+        requires IsHalfFp16<T> && IsFloat<T2>
     {
         const float2 *aVecPtr = reinterpret_cast<const float2 *>(&aVec);
         half2 *thisPtr        = reinterpret_cast<half2 *>(this);
         *thisPtr              = __float22half2_rn(*aVecPtr);
+    }
+
+    /// <summary>
+    /// Type conversion using CUDA intrinsics for float to half
+    /// </summary>
+    template <Number T2>
+    DEVICE_CODE Complex(const Complex<T2> &aVec, RoundingMode aRoundingMode) noexcept
+        requires IsHalfFp16<T> && IsFloat<T2> && CUDA_ONLY<T>
+    {
+        if constexpr (CUDA_ONLY<T>)
+        {
+            if (aRoundingMode == RoundingMode::NearestTiesToEven)
+            {
+                const float2 *aVecPtr = reinterpret_cast<const float2 *>(&aVec);
+                half2 *thisPtr        = reinterpret_cast<half2 *>(this);
+                *thisPtr              = __float22half2_rn(*aVecPtr);
+            }
+            else
+            {
+                real = HalfFp16(aVec.real, aRoundingMode);
+                imag = HalfFp16(aVec.imag, aRoundingMode);
+            }
+        }
+        else
+        {
+            real = HalfFp16(aVec.real, aRoundingMode);
+            imag = HalfFp16(aVec.imag, aRoundingMode);
+        }
     }
 
     /// <summary>
@@ -1527,4 +1584,40 @@ inline Complex<BFloat16> operator""_ib(long double aValue)
 {
     return Complex(static_cast<BFloat16>(0.0f), static_cast<BFloat16>(static_cast<float>(aValue)));
 }
+
+template <typename T> struct make_complex
+{
+    // default to int so that we get a valid Complex type in function defintions (otherwise it wouldn't compile)
+    using type = Complex<int>;
+};
+template <> struct make_complex<sbyte>
+{
+    using type = Complex<sbyte>;
+};
+template <> struct make_complex<short>
+{
+    using type = Complex<short>;
+};
+template <> struct make_complex<int>
+{
+    using type = Complex<int>;
+};
+template <> struct make_complex<HalfFp16>
+{
+    using type = Complex<HalfFp16>;
+};
+template <> struct make_complex<BFloat16>
+{
+    using type = Complex<BFloat16>;
+};
+template <> struct make_complex<float>
+{
+    using type = Complex<float>;
+};
+template <> struct make_complex<double>
+{
+    using type = Complex<double>;
+};
+
+template <typename T> using make_complex_t = typename make_complex<T>::type;
 } // namespace opp

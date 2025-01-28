@@ -745,6 +745,52 @@ template <typename T> using pixel_basetype_t = typename pixel_basetype<T>::type;
 template <typename T>
 concept PixelType = channel_count<T>::value > 0 && channel_count<T>::value <= 4;
 
+template <class T> inline constexpr int channel_count_v = channel_count<T>::value;
+
+// returns true if T is a Vector4A type with w as alpha channel
+template <typename T> struct has_alpha_channel : std::false_type
+{
+};
+template <typename T> struct has_alpha_channel<Vector4A<T>> : std::true_type
+{
+};
+template <class T> inline constexpr bool has_alpha_channel_v = has_alpha_channel<T>::value;
+
+template <typename T>
+concept SingleChannel = (channel_count_v<T> == 1);
+
+template <typename T>
+concept TwoChannel = (channel_count_v<T> == 2);
+
+template <typename T>
+concept ThreeChannel = (channel_count_v<T> == 3);
+
+template <typename T>
+concept FourChannel = (channel_count_v<T> == 4);
+
+template <typename T>
+concept FourChannelNoAlpha = (channel_count_v<T> == 4) && (!has_alpha_channel_v<T>);
+
+template <typename T>
+concept FourChannelAlpha = (channel_count_v<T> == 4) && (has_alpha_channel_v<T>);
+
+// indicates if it is better to load then entire vector4A for the alpha channel or just the single alpha channel
+template <typename T> struct load_full_vector_for_alpha : std::false_type
+{
+};
+// vector fragments smaller than 32 bit are anyway fetched as a 32 bit word, no need to slice things
+template <ByteSizeType T> struct load_full_vector_for_alpha<Vector4A<T>> : std::true_type
+{
+};
+// vector fragments smaller than 32 bit are anyway fetched as a 32 bit word, no need to slice things
+// this needs to be tested if it is better for 16 bit data types to load everything or just the alpha channel, or only z
+// and w?
+template <TwoBytesSizeType T> struct load_full_vector_for_alpha<Vector4A<T>> : std::true_type
+{
+};
+template <class T> inline constexpr bool load_full_vector_for_alpha_v = load_full_vector_for_alpha<T>::value;
+
+#pragma region Default compute type
 template <typename T> struct default_compute_type_for
 {
     using type = void;
@@ -1078,31 +1124,7 @@ template <> struct default_compute_type_for<Pixel8uC4A>
 };
 
 template <typename T> using default_compute_type_for_t = typename default_compute_type_for<T>::type;
-
-// returns true if T is a Vector4A type with w as alpha channel
-template <typename T> struct has_alpha_channel : std::false_type
-{
-};
-template <typename T> struct has_alpha_channel<Vector4A<T>> : std::true_type
-{
-};
-template <class T> inline constexpr bool has_alpha_channel_v = has_alpha_channel<T>::value;
-
-// indicates if it is better to load then entire vector4A for the alpha channel or just the single alpha channel
-template <typename T> struct load_full_vector_for_alpha : std::false_type
-{
-};
-// vector fragments smaller than 32 bit are anyway fetched as a 32 bit word, no need to slice things
-template <ByteSizeType T> struct load_full_vector_for_alpha<Vector4A<T>> : std::true_type
-{
-};
-// vector fragments smaller than 32 bit are anyway fetched as a 32 bit word, no need to slice things
-// this needs to be tested if it is better for 16 bit data types to load everything or just the alpha channel, or only z
-// and w?
-template <TwoBytesSizeType T> struct load_full_vector_for_alpha<Vector4A<T>> : std::true_type
-{
-};
-template <class T> inline constexpr bool load_full_vector_for_alpha_v = load_full_vector_for_alpha<T>::value;
+#pragma endregion
 
 #pragma region Link the type PixelType with the enum PixelType
 template <PixelTypeEnum pixelType> struct pixel_type

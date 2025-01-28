@@ -8,7 +8,7 @@ namespace opp::image
 /// <summary>
 /// A Border defines the number of border pixels on each side of a 2D roi
 /// Note: we avoid any absolute referencing like top/left or lower/right as an image can have any orientation. Instead
-/// we only reference lower X -> higher X according to the coordinate value.
+/// we only reference lower X -&gt; higher X according to the coordinate value.
 /// Note: in device code, only the value members are available.
 /// </summary>
 struct alignas(4 * sizeof(int)) Border

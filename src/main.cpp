@@ -7,11 +7,18 @@
 #include <cstddef>
 // #include <cuda_runtime_api.h>
 // #include <driver_types.h>
+#include <backends/cuda/image/arithmetic/addSquareProductWeightedOutputType.h>
+#include <common/arithmetic/binary_operators.h>
+#include <common/arithmetic/unary_operators.h>
+#include <common/image/channel.h>
+#include <common/image/channelList.h>
+#include <common/image/functors/srcPlanar2Functor.h>
+#include <common/image/functors/srcPlanar3Functor.h>
+#include <common/image/functors/srcPlanar4Functor.h>
+#include <common/image/functors/srcSingleChannelFunctor.h>
 #include <common/opp_defs.h>
 #include <iostream>
 #include <vector>
-
-#include <common/arithmetic/binary_operators.h>
 // #include <common/arithmetic/ternary_operators.h>
 // #include <common/arithmetic/unary_operators.h>
 // #include <common/image/pixelTypes.h>
@@ -28,10 +35,9 @@
 #include <backends/cuda/devVarView.h>
 #include <backends/cuda/image/image.h>
 #include <backends/cuda/image/imageView.h>
+#include <backends/cuda/image/imageView_dataExchangeAndInit_impl.h>
 #include <backends/cuda/streamCtx.h>
 #include <backends/cuda/templateRegistry.h>
-#include <backends/simple_cpu/image/forEachPixelMasked_impl.h>
-#include <backends/simple_cpu/image/forEachPixel_impl.h>
 #include <backends/simple_cpu/image/image.h>
 #include <backends/simple_cpu/image/imageView.h>
 #include <common/bfloat16.h>
@@ -45,7 +51,13 @@
 // #include <common/scratchBuffer.h>
 // #include <half/half.hpp>
 
+#include <common/arithmetic/binary_operators.h>
+
+#include "common/exception.h"
+#include "common/utilities.h"
 #include <common/image/pixelTypeEnabler.h>
+#include <filesystem>
+#include <ios>
 using namespace opp;
 using namespace opp::cuda;
 using namespace opp::image;
@@ -54,30 +66,10 @@ namespace cpu = opp::image::cpuSimple;
 
 int main()
 {
-    half_float::half a(-3.14151689f, std::round_to_nearest);
-    half_float::half b(-3.14151689f, std::round_toward_zero);
-    half_float::half c(-3.14151689f, std::round_toward_infinity);
-    half_float::half d(-3.14151689f, std::round_toward_neg_infinity);
-
-    std::cout << a << std::endl;
-    std::cout << b << std::endl;
-    std::cout << c << std::endl;
-    std::cout << d << std::endl;
-
-    std::cout << -3.14151689f << std::endl;
-
-    float f     = 3.14061f;
-    BFloat16 a1 = BFloat16::FromFloat(f);
-    BFloat16 b1 = BFloat16::FromFloatTruncate(f);
-    BFloat16 c1 = BFloat16::FromFloat(-f);
-    BFloat16 d1 = BFloat16::FromFloatTruncate(-f);
-
-    std::cout << a1 << std::endl;
-    std::cout << b1 << std::endl;
-    std::cout << c1 << std::endl;
-    std::cout << d1 << std::endl;
-
-    std::cout << f << std::endl;
+    Dup<Pixel8uC1, Pixel8uC4> dup;
+    Pixel8uC1 aIn(33);
+    Pixel8uC4 aOut;
+    dup(aIn, aOut);
 
     /*
     constexpr bool val1 = std::is_trivially_assignable_v<Pixel32fC4, Pixel32fC4>;
@@ -127,16 +119,16 @@ int main()
         } */
     try
     {
-        std::cout << "Scalefactor 4 = " << GetScaleFactor(4) << std::endl;
+        /*std::cout << "Scalefactor 4 = " << GetScaleFactor(4) << std::endl;
         std::cout << "Scalefactor 2 = " << GetScaleFactor(2) << std::endl;
         std::cout << "Scalefactor 1 = " << GetScaleFactor(1) << std::endl;
         std::cout << "Scalefactor 0 = " << GetScaleFactor(0) << std::endl;
         std::cout << "Scalefactor -1 = " << GetScaleFactor(-1) << std::endl;
         std::cout << "Scalefactor -2 = " << GetScaleFactor(-2) << std::endl;
-        std::cout << "Scalefactor -4 = " << GetScaleFactor(-4) << std::endl;
+        std::cout << "Scalefactor -4 = " << GetScaleFactor(-4) << std::endl;*/
 
 #ifdef OPP_CUDA_TEMPLATE_REGISTRY_IS_ACTIVE
-        auto reg = opp::cuda::GetTemplateInstances();
+        /*auto reg = opp::cuda::GetTemplateInstances();
         for (auto &[functionName, typeInstances] : reg)
         {
             std::cout << "For kernel " << functionName << " (" << typeInstances.size() << "):\n";
@@ -145,64 +137,93 @@ int main()
                 std::cout << "   <" << type.srcType << ", " << type.computeType << ", " << type.dstType << ">\n";
             }
         }
-        std::cout << std::endl;
+        std::cout << std::endl; */
 #endif
 
         std::cout << "Hello world! This is " << OPP_PROJECT_NAME << " version " << OPP_VERSION << "!" << std::endl;
 
         const std::filesystem::path baseDir = std::filesystem::path(PROJECT_SOURCE_DIR) / "test/testData";
 
-        auto flower = cpu::Image<Pixel8uC3>::Load(baseDir / "flower.tif");
-        cpu::Image<Pixel8uC3> addToFlower(flower.SizeRoi());
-        cpu::Image<Pixel8uC3> res(flower.SizeRoi());
-        cpu::Image<Pixel8uC3> resGPU(flower.SizeRoi());
+        auto cpu_flower = cpu::Image<Pixel8uC3>::Load(baseDir / "flower.tif");
+        cpu::Image<Pixel8uC3> cpu_addToFlower(cpu_flower.SizeRoi());
+        cpu::Image<Pixel8uC3> cpu_res(cpu_flower.SizeRoi());
+        cpu::Image<Pixel8uC3> resGPU(cpu_flower.SizeRoi());
 
-        addToFlower.Set(Pixel8uC3(40));
-        res.Set(Pixel8uC3(255));
+        cpu::Image<Pixel32fC3> conv(cpu_flower.SizeRoi());
 
-        Image<Pixel8uC3> image1(flower.SizeRoi());
-        Image<Pixel8uC3> image2(flower.SizeRoi());
-        Image<Pixel8uC3> image3(flower.SizeRoi());
+        Image<Pixel32fC1> u8test(128, 128);
+        Image<Pixel32fC1> u8test2(128, 128);
+        Image<Pixel32fcC1> u8test3(128, 128);
+        cpu::Image<Pixel32fC1> cpu_test(128, 128);
+        cpu::Image<Pixel32fC1> cpu_test2(128, 128);
+        cpu::Image<Pixel32fcC1> cpu_test3(128, 128);
+        cpu::Image<Pixel32fcC1> cpu_test4(128, 128);
+
+        u8test.Set(Pixel32fC1(12.1f));
+        u8test2.Set(Pixel32fC1(8.6f));
+        cpu_test.Set(Pixel32fC1(12.1f));
+        cpu_test2.Set(Pixel32fC1(8.6f));
+        u8test.MakeComplex(u8test2, u8test3).Conj();
+        cpu_test.MakeComplex(cpu_test2, cpu_test3).Conj();
+
+        // u8test2.ResetRoi();
+        cpu_test4 << u8test3;
+        cudaDeviceSynchronize();
+
+        // cpu_flower.Convert(conv);
+        // conv.Mul(2.0f);
+        //// conv.Div(2.0f);
+        // conv.Convert(cpu_res, RoundingMode::NearestTiesAwayFromZero);
+
+        // const bool isSame = cpu_flower.IsIdentical(cpu_res);
+
+        // cpu_res.Save(baseDir / "convCPU.tif");
+        // cpu_addToFlower.Set(Pixel8uC3(40));
+        // cpu_res.Set(Pixel8uC3(255));
+
+        Image<Pixel8uC3> gpu_flower(cpu_flower.SizeRoi());
+        Image<Pixel8uC3> gpu_addToFlower(cpu_flower.SizeRoi());
+        Image<Pixel8uC3> gpu_res(cpu_flower.SizeRoi());
         DevVar<Pixel8uC3> devConst(1);
         Pixel8uC3 hConst(5, 6, 7);
         devConst << hConst;
 
-        flower >> image1;
-        image2.Set(Pixel8uC3(40));
-        image3.Set(Pixel8uC3(255));
+        cpu_flower >> gpu_flower;
+        gpu_addToFlower.Set(Pixel8uC3(40));
+        gpu_res.Set(Pixel8uC3(255));
 
-        flower.SetRoi(-20);
-        addToFlower.SetRoi(-20);
-        res.SetRoi(-20);
-        image1.SetRoi(-20);
-        image2.SetRoi(-20);
-        image3.SetRoi(-20);
+        cpu_flower.SetRoi(-20);
+        cpu_addToFlower.SetRoi(-20);
+        cpu_res.SetRoi(-20);
+        gpu_flower.SetRoi(-20);
+        gpu_addToFlower.SetRoi(-20);
+        gpu_res.SetRoi(-20);
 
         Pixel8uC3 constVal(4, 5, 6);
-        image1.Add(image2, 0);
-        image1.Add(constVal, 0);
-        /*image1.ResetRoi();
-        image3.ResetRoi();*/
-        image1.Add(devConst, image3, 0);
+        gpu_flower.Add(gpu_addToFlower, 0);
+        gpu_flower.Add(constVal, 0);
+        gpu_flower.Add(devConst, gpu_res, 0);
+        gpu_res.Div(gpu_flower, -6, opp::RoundingMode::TowardPositiveInfinity);
 
-        addToFlower.Add(constVal);
-        addToFlower.Add(hConst);
-        flower.Add(addToFlower, res);
+        cpu_flower.Add(cpu_addToFlower);
+        cpu_flower.Add(constVal);
+        cpu_flower.Add(hConst, cpu_res);
+        cpu_res.Div(cpu_flower, -6, opp::RoundingMode::TowardPositiveInfinity);
 
-        resGPU << image3;
+        resGPU << gpu_res;
 
-        res.Save(baseDir / "resCPU.tif");
+        cpu_res.Save(baseDir / "resCPU.tif");
         resGPU.Save(baseDir / "resGPU.tif");
 
-        res.ResetRoi();
+        cpu_res.ResetRoi();
         resGPU.ResetRoi();
-        bool issame = res.IsIdentical(resGPU);
+        bool issame = cpu_res.IsIdentical(resGPU);
 
         std::cout << "Images are identical: " << std::boolalpha << issame << std::endl;
 
         std::cout << "Done!";
     }
-    catch (const opp::OPPException &ex)
+    catch (opp::OPPException &ex)
     {
         std::cout << ex.what();
     }

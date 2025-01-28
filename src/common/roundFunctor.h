@@ -7,37 +7,37 @@
 
 namespace opp
 {
-template <RoudingMode roundingMode, typename T> struct RoundFunctor
+template <RoundingMode roundingMode, typename T> struct RoundFunctor
 {
     DEVICE_CODE void operator()(T &aVec)
         requires RealOrComplexFloatingVector<T>
     {
-        if constexpr (roundingMode == RoudingMode::NearestTiesToEven)
+        if constexpr (roundingMode == RoundingMode::NearestTiesToEven)
         {
             aVec.RoundNearest();
             return;
         }
-        else if constexpr (roundingMode == RoudingMode::NearestTiesAwayFromZero)
+        else if constexpr (roundingMode == RoundingMode::NearestTiesAwayFromZero)
         {
             aVec.Round();
             return;
         }
-        else if constexpr (roundingMode == RoudingMode::TowardZero)
+        else if constexpr (roundingMode == RoundingMode::TowardZero)
         {
             aVec.RoundZero();
             return;
         }
-        else if constexpr (roundingMode == RoudingMode::TowardNegativeInfinity)
+        else if constexpr (roundingMode == RoundingMode::TowardNegativeInfinity)
         {
             aVec.Floor();
             return;
         }
-        else if constexpr (roundingMode == RoudingMode::TowardPositiveInfinity)
+        else if constexpr (roundingMode == RoundingMode::TowardPositiveInfinity)
         {
             aVec.Ceil();
             return;
         }
-        else if constexpr (roundingMode == RoudingMode::None)
+        else if constexpr (roundingMode == RoundingMode::None)
         {
             return;
         }

@@ -1,4 +1,6 @@
 #pragma once
+#include "exception.h"
+#include "opp_defs.h"
 #include <cmath>
 #include <common/defines.h>
 #include <common/numeric_limits.h>
@@ -36,9 +38,10 @@ class alignas(2) BFloat16
     DEVICE_CODE explicit constexpr BFloat16(ushort aUShort, bool /*aBinary*/) : value(__nv_bfloat16_raw{aUShort})
     {
     }
+#endif
+
     friend bool DEVICE_CODE isnan(BFloat16);
     friend bool DEVICE_CODE isinf(BFloat16);
-#endif
 
   public:
     BFloat16() noexcept = default;
@@ -46,6 +49,25 @@ class alignas(2) BFloat16
 #ifdef IS_HOST_COMPILER
     explicit constexpr BFloat16(float aFloat) : value(FromFloat(aFloat).value)
     {
+    }
+    DEVICE_CODE explicit BFloat16(float aFloat, RoundingMode aRoundingMode)
+    {
+        switch (aRoundingMode)
+        {
+            case opp::RoundingMode::NearestTiesToEven:
+                value = FromFloat(aFloat).value;
+                break;
+            case opp::RoundingMode::TowardZero:
+                value = FromFloatTruncate(aFloat).value;
+                break;
+            default:
+                throw INVALIDARGUMENT(aRoundingMode,
+                                      "Invalid rounding mode provided: "
+                                          << aRoundingMode
+                                          << ". Only NearestTiesToEven and TowardZero are supported in host code (on "
+                                             "CUDA devices also TowardNegativeInfinity and TowardPositiveInfinity).");
+                break;
+        }
     }
     explicit constexpr BFloat16(sbyte aVal) : value(FromFloat(static_cast<float>(aVal)).value)
     {
@@ -81,6 +103,27 @@ class alignas(2) BFloat16
     }
     DEVICE_CODE explicit BFloat16(float aFloat) : value(__float2bfloat16_rn(aFloat))
     {
+    }
+    DEVICE_CODE explicit BFloat16(float aFloat, RoundingMode aRoundingMode)
+    {
+        switch (aRoundingMode)
+        {
+            case opp::RoundingMode::NearestTiesToEven:
+                value = __float2bfloat16_rn(aFloat);
+                break;
+            case opp::RoundingMode::TowardZero:
+                value = __float2bfloat16_rz(aFloat);
+                break;
+            case opp::RoundingMode::TowardNegativeInfinity:
+                value = __float2bfloat16_rd(aFloat);
+                break;
+            case opp::RoundingMode::TowardPositiveInfinity:
+                value = __float2bfloat16_ru(aFloat);
+                break;
+            default:
+                // other rounding modes are not supported and must be catched in host code...
+                break;
+        }
     }
     DEVICE_CODE explicit BFloat16(sbyte aVal) : value(__short2bfloat16_rn(aVal))
     {
@@ -919,6 +962,17 @@ DEVICE_CODE inline bool isnan(BFloat16 aVal)
 DEVICE_CODE inline bool isinf(BFloat16 aVal)
 {
     return __hisinf(aVal.value);
+}
+#endif
+
+#ifdef IS_HOST_COMPILER
+DEVICE_CODE inline bool isnan(BFloat16 aVal)
+{
+    return std::isnan(static_cast<float>(aVal));
+}
+DEVICE_CODE inline bool isinf(BFloat16 aVal)
+{
+    return std::isinf(static_cast<float>(aVal));
 }
 #endif
 

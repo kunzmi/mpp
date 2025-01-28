@@ -1,12 +1,12 @@
 #pragma once
 #include <common/defines.h>
-#include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
+#include <common/vector_typetraits.h>
 #include <concepts>
 
 namespace opp
 {
-template <VectorType T> struct AddMul
+template <AnyVector T> struct AddProduct
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aSrcDst)
     {
@@ -14,9 +14,9 @@ template <VectorType T> struct AddMul
     }
 };
 
-template <VectorType T> struct AddWeighted
+template <AnyVector T> struct AddWeighted
 {
-    remove_vector_t<T> Alpha;
+    const remove_vector_t<T> Alpha;
 
     AddWeighted(remove_vector_t<T> aAlpha) : Alpha(aAlpha)
     {
@@ -24,11 +24,11 @@ template <VectorType T> struct AddWeighted
 
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aResult)
     {
-        aResult = aSrc1 * Alpha + aSrc2 * (1.0f - Alpha);
+        aResult = aSrc1 * Alpha + aSrc2 * (static_cast<remove_vector_t<T>>(1) - Alpha);
     }
     DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
     {
-        aSrcDst = aSrcDst * (1.0f - Alpha) + aSrc1 * Alpha;
+        aSrcDst = aSrcDst * (static_cast<remove_vector_t<T>>(1) - Alpha) + aSrc1 * Alpha;
     }
 };
 } // namespace opp

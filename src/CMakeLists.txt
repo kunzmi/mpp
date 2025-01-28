@@ -24,6 +24,9 @@ if(OPP_ENABLE_NPP_BACKEND)
 						#backends.npp.image
 	)
 endif()
+if(OPP_ENABLE_CPUSIMPLE_BACKEND)
+	set(linkListForDummyTest ${linkListForDummyTest} backends.simple_cpu)
+endif()
 
 target_include_directories(dummy_test PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 target_link_libraries(dummy_test PUBLIC  ${linkListForDummyTest})

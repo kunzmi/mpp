@@ -1,4 +1,6 @@
 #pragma once
+#include "exception.h"
+#include "opp_defs.h"
 #include <common/defines.h>
 #include <common/numeric_limits.h>
 #include <concepts>
@@ -40,6 +42,31 @@ class alignas(2) HalfFp16
     explicit HalfFp16(float aFloat) : value(aFloat)
     {
     }
+    DEVICE_CODE explicit HalfFp16(float aFloat, RoundingMode aRoundingMode)
+    {
+        switch (aRoundingMode)
+        {
+            case opp::RoundingMode::NearestTiesToEven:
+                value = half_float::half(aFloat, std::float_round_style::round_to_nearest);
+                break;
+            case opp::RoundingMode::TowardZero:
+                value = half_float::half(aFloat, std::float_round_style::round_toward_zero);
+                break;
+            case opp::RoundingMode::TowardNegativeInfinity:
+                value = half_float::half(aFloat, std::float_round_style::round_toward_neg_infinity);
+                break;
+            case opp::RoundingMode::TowardPositiveInfinity:
+                value = half_float::half(aFloat, std::float_round_style::round_toward_infinity);
+                break;
+            default:
+                throw INVALIDARGUMENT(aRoundingMode,
+                                      "Invalid rounding mode provided: "
+                                          << aRoundingMode
+                                          << ". Only NearestTiesToEven, TowardZero, TowardNegativeInfinity and "
+                                             "TowardPositiveInfinity are supported.");
+                break;
+        }
+    }
     explicit HalfFp16(double aDouble) : value(static_cast<float>(aDouble))
     {
     }
@@ -68,6 +95,27 @@ class alignas(2) HalfFp16
     }
     DEVICE_CODE explicit HalfFp16(float aFloat) : value(__float2half_rn(aFloat))
     {
+    }
+    DEVICE_CODE explicit HalfFp16(float aFloat, RoundingMode aRoundingMode)
+    {
+        switch (aRoundingMode)
+        {
+            case opp::RoundingMode::NearestTiesToEven:
+                value = __float2half_rn(aFloat);
+                break;
+            case opp::RoundingMode::TowardZero:
+                value = __float2half_rz(aFloat);
+                break;
+            case opp::RoundingMode::TowardNegativeInfinity:
+                value = __float2half_rd(aFloat);
+                break;
+            case opp::RoundingMode::TowardPositiveInfinity:
+                value = __float2half_ru(aFloat);
+                break;
+            default:
+                // other rounding modes are not supported and must be catched in host code...
+                break;
+        }
     }
     DEVICE_CODE explicit HalfFp16(double aDouble) : value(__double2half(aDouble))
     {
@@ -110,9 +158,9 @@ class alignas(2) HalfFp16
         return ret;
     }
 
+#endif
     friend bool DEVICE_CODE isnan(HalfFp16);
     friend bool DEVICE_CODE isinf(HalfFp16);
-#endif
 
     DEVICE_CODE inline operator float() const
     {
@@ -751,6 +799,17 @@ DEVICE_CODE inline bool isnan(HalfFp16 aVal)
 DEVICE_CODE inline bool isinf(HalfFp16 aVal)
 {
     return __hisinf(aVal.value);
+}
+#endif
+
+#ifdef IS_HOST_COMPILER
+DEVICE_CODE inline bool isnan(HalfFp16 aVal)
+{
+    return half_float::isnan(aVal.value);
+}
+DEVICE_CODE inline bool isinf(HalfFp16 aVal)
+{
+    return half_float::isinf(aVal.value);
 }
 #endif
 

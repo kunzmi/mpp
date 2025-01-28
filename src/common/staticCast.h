@@ -16,9 +16,11 @@ namespace opp
 /// Our own cast function that does mostly just a static cast. But for floating point to integer casts, behaviour is
 /// different depending on the platform: CUDA clamps float-to-int casts to the integer value range and NANs get flushed
 /// to zero by default. CPU/C++ code converts float values larger than int.max() to int.min() and NAN usually becomes
-/// int.min(), too. So for CPU we must emulate CUDA's behaviour...
+/// int.min(), too. So for CPU we must emulate CUDA's behaviour...<para/>
 /// Further to note is, that int.max() = 2147483647 and cannot be represented exactly by float32 and will give
-/// 2147483648, thus we cannot use the clamp to min/max feature implemented for Vector1..4
+/// 2147483648, thus we cannot use the clamp to min/max feature implemented for Vector1..4.</para>
+/// For floating point to integer casts, rounding towards zero (or truncation) is applied, other rounding modes must be
+/// applied to the floating point value before casting.
 /// </summary>
 template <typename TFrom, typename TTo> DEVICE_CODE TTo StaticCast(TFrom aValue)
 {
@@ -42,7 +44,7 @@ template <typename TFrom, typename TTo>
 DEVICE_CODE TTo StaticCast(TFrom aValue)
     requires RealIntegral<TTo> && RealFloatingPoint<TFrom> && HostCode<TTo>
 {
-    if (isnan(aValue))
+    if (std::isnan(aValue))
     {
         return 0; // flush NAN to 0
     }
@@ -61,20 +63,6 @@ DEVICE_CODE TTo StaticCast(TFrom aValue)
     }
     return static_cast<TTo>(aValue);
 }
-
-// template <typename TFrom, typename TTo>
-// DEVICE_CODE TTo StaticCast(TFrom aValue)
-//     requires IsHalfFp16<TTo> && RealFloatingPoint<TFrom> && HostCode<TTo>
-//{
-//     if (isinf(aValue))
-//     {
-//         // return inf as inf (+ and-)
-//         return static_cast<TTo>(aValue);
-//     }
-//     aValue = std::min(std::max(aValue, static_cast<TFrom>(numeric_limits<TTo>::lowest())),
-//                       static_cast<TFrom>(numeric_limits<TTo>::max()));
-//     return static_cast<TTo>(aValue);
-// }
 
 // It seems there is no intrinsic for (u)short/(s)byte that uses the same "clamp and cast" feature from standard
 // static_cast<int>(float). So for float to (u)short/(s)byte we have to use PTX inline so that value range is

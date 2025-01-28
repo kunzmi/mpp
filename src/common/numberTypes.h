@@ -61,6 +61,10 @@ concept NativeNumber = NativeFloatingPoint<T> || NativeIntegral<T>;
 template <typename T>
 concept RealSignedNumber = RealFloatingPoint<T> || RealSignedIntegral<T>;
 
+// floating point and unsigned integral types
+template <typename T>
+concept RealUnsignedNumber = RealFloatingPoint<T> || RealUnsignedIntegral<T>;
+
 // Now that we have real signed numbers, we can declare our complex type and according concepts:
 template <RealSignedNumber T> struct Complex;
 

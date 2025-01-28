@@ -49,9 +49,10 @@ void InvokeAddSrcSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *
         using simdOP_t = simd::Add<Tupel<DstT, TupelSize>>;
         if constexpr (simdOP_t::has_simd)
         {
+            using ComputeT_SIMD = add_simd_tupel_compute_type_for_t<SrcT>;
             // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
-            using addSrcSrcSIMD = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoudingMode::None,
-                                                ComputeT, simdOP_t>;
+            using addSrcSrcSIMD = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoundingMode::None,
+                                                ComputeT_SIMD, simdOP_t>;
 
             Add<ComputeT> op;
             simdOP_t opSIMD;
@@ -64,7 +65,7 @@ void InvokeAddSrcSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *
         else
         {
             // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
-            using addSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoudingMode::None>;
+            using addSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoundingMode::None>;
 
             Add<ComputeT> op;
 
@@ -77,9 +78,10 @@ void InvokeAddSrcSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *
 }
 
 #pragma region Instantiate
-// using add_compute_type_for_t for computeT including SIMD activation if possible
+// using add_simd_vector_compute_type_for_t for computeT including SIMD activation if possible
 #define Instantiate_For(typeSrcIsTypeDst)                                                                              \
-    template void InvokeAddSrcSrcMask<typeSrcIsTypeDst, add_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(   \
+    template void                                                                                                      \
+    InvokeAddSrcSrcMask<typeSrcIsTypeDst, add_simd_vector_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(     \
         const Pixel8uC1 *aMask, size_t aPitchMask, const typeSrcIsTypeDst *aSrc1, size_t aPitchSrc1,                   \
         const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2, typeSrcIsTypeDst *aDst, size_t aPitchDst,                    \
         const Size2D &aSize, const StreamCtx &aStreamCtx);
@@ -140,7 +142,7 @@ void InvokeAddSrcSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const S
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using addSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>,
-                                                  RoudingMode::NearestTiesAwayFromZero>;
+                                                  RoundingMode::NearestTiesAwayFromZero>;
 
         Add<ComputeT> op;
 
@@ -205,14 +207,15 @@ void InvokeAddSrcCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aS
         using simdOP_t = simd::Add<Tupel<DstT, TupelSize>>;
         if constexpr (simdOP_t::has_simd)
         {
+            using ComputeT_SIMD = add_simd_tupel_compute_type_for_t<SrcT>;
             // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
             using addSrcCSIMD = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>,
-                                                   RoudingMode::None, Tupel<ComputeT, TupelSize>, simdOP_t>;
+                                                   RoundingMode::None, Tupel<ComputeT_SIMD, TupelSize>, simdOP_t>;
 
             Add<ComputeT> op;
             simdOP_t opSIMD;
-            Tupel<ComputeT, TupelSize> tupelConstant =
-                Tupel<ComputeT, TupelSize>::GetConstant(static_cast<ComputeT>(aConst));
+            Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
+                Tupel<ComputeT_SIMD, TupelSize>::GetConstant(static_cast<ComputeT_SIMD>(aConst));
 
             addSrcCSIMD functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
 
@@ -222,7 +225,7 @@ void InvokeAddSrcCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aS
         else
         {
             // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
-            using addSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoudingMode::None>;
+            using addSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoundingMode::None>;
 
             Add<ComputeT> op;
 
@@ -235,9 +238,10 @@ void InvokeAddSrcCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aS
 }
 
 #pragma region Instantiate
-// using add_compute_type_for_t for computeT including SIMD activation if possible
+// using add_simd_vector_compute_type_for_t for computeT including SIMD activation if possible
 #define Instantiate_For(typeSrcIsTypeDst)                                                                              \
-    template void InvokeAddSrcCMask<typeSrcIsTypeDst, add_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(     \
+    template void                                                                                                      \
+    InvokeAddSrcCMask<typeSrcIsTypeDst, add_simd_vector_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(       \
         const Pixel8uC1 *aMask, size_t aPitchMask, const typeSrcIsTypeDst *aSrc, size_t aPitchSrc,                     \
         const typeSrcIsTypeDst &aConst, typeSrcIsTypeDst *aDst, size_t aPitchDst, const Size2D &aSize,                 \
         const StreamCtx &aStreamCtx);
@@ -297,7 +301,7 @@ void InvokeAddSrcCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const Src
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using addSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>,
-                                                     RoudingMode::NearestTiesAwayFromZero>;
+                                                     RoundingMode::NearestTiesAwayFromZero>;
 
         Add<ComputeT> op;
 
@@ -361,7 +365,7 @@ void InvokeAddSrcDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT 
 
         // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
         using addSrcDevC =
-            SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoudingMode::None>;
+            SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoundingMode::None>;
 
         Add<ComputeT> op;
 
@@ -436,7 +440,7 @@ void InvokeAddSrcDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using addSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>,
-                                                           RoudingMode::NearestTiesAwayFromZero>;
+                                                           RoundingMode::NearestTiesAwayFromZero>;
 
         Add<ComputeT> op;
 
@@ -500,9 +504,10 @@ void InvokeAddInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aS
         using simdOP_t = simd::Add<Tupel<DstT, TupelSize>>;
         if constexpr (simdOP_t::has_simd)
         {
+            using ComputeT_SIMD = add_simd_tupel_compute_type_for_t<SrcT>;
             // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
             using addInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>,
-                                                        RoudingMode::None, ComputeT, simdOP_t>;
+                                                        RoundingMode::None, ComputeT_SIMD, simdOP_t>;
 
             Add<ComputeT> op;
             simdOP_t opSIMD;
@@ -516,7 +521,7 @@ void InvokeAddInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aS
         {
             // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
             using addInplaceSrc =
-                InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoudingMode::None>;
+                InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoundingMode::None>;
 
             Add<ComputeT> op;
 
@@ -529,10 +534,10 @@ void InvokeAddInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aS
 }
 
 #pragma region Instantiate
-// using add_compute_type_for_t for computeT including SIMD activation if possible
+// using add_simd_vector_compute_type_for_t for computeT including SIMD activation if possible
 #define Instantiate_For(typeSrcIsTypeDst)                                                                              \
     template void                                                                                                      \
-    InvokeAddInplaceSrcMask<typeSrcIsTypeDst, add_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(             \
+    InvokeAddInplaceSrcMask<typeSrcIsTypeDst, add_simd_vector_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>( \
         const Pixel8uC1 *aMask, size_t aPitchMask, typeSrcIsTypeDst *aSrcDst, size_t aPitchSrcDst,                     \
         const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
@@ -591,7 +596,7 @@ void InvokeAddInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Dst
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using addInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>,
-                                                          RoudingMode::NearestTiesAwayFromZero>;
+                                                          RoundingMode::NearestTiesAwayFromZero>;
 
         Add<ComputeT> op;
 
@@ -655,14 +660,16 @@ void InvokeAddInplaceCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrc
         using simdOP_t = simd::Add<Tupel<DstT, TupelSize>>;
         if constexpr (simdOP_t::has_simd)
         {
+            using ComputeT_SIMD = add_simd_tupel_compute_type_for_t<SrcT>;
             // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
-            using addInplaceCSIMD = InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Add<ComputeT>,
-                                                           RoudingMode::None, Tupel<ComputeT, TupelSize>, simdOP_t>;
+            using addInplaceCSIMD =
+                InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Add<ComputeT>, RoundingMode::None,
+                                       Tupel<ComputeT_SIMD, TupelSize>, simdOP_t>;
 
             Add<ComputeT> op;
             simdOP_t opSIMD;
-            Tupel<ComputeT, TupelSize> tupelConstant =
-                Tupel<ComputeT, TupelSize>::GetConstant(static_cast<ComputeT>(aConst));
+            Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
+                Tupel<ComputeT_SIMD, TupelSize>::GetConstant(static_cast<ComputeT_SIMD>(aConst));
 
             addInplaceCSIMD functor(static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
 
@@ -673,7 +680,7 @@ void InvokeAddInplaceCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrc
         {
             // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
             using addInplaceC =
-                InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Add<ComputeT>, RoudingMode::None>;
+                InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Add<ComputeT>, RoundingMode::None>;
 
             Add<ComputeT> op;
 
@@ -686,9 +693,10 @@ void InvokeAddInplaceCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrc
 }
 
 #pragma region Instantiate
-// using add_compute_type_for_t for computeT including SIMD activation if possible
+// using add_simd_vector_compute_type_for_t for computeT including SIMD activation if possible
 #define Instantiate_For(typeSrcIsTypeDst)                                                                              \
-    template void InvokeAddInplaceCMask<typeSrcIsTypeDst, add_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>( \
+    template void                                                                                                      \
+    InvokeAddInplaceCMask<typeSrcIsTypeDst, add_simd_vector_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(   \
         const Pixel8uC1 *aMask, size_t aPitchMask, typeSrcIsTypeDst *aSrcDst, size_t aPitchSrcDst,                     \
         const typeSrcIsTypeDst &aConst, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
@@ -747,7 +755,7 @@ void InvokeAddInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using addInplaceCScale = InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Add<ComputeT>,
-                                                             RoudingMode::NearestTiesAwayFromZero>;
+                                                             RoundingMode::NearestTiesAwayFromZero>;
 
         Add<ComputeT> op;
 
@@ -809,7 +817,7 @@ void InvokeAddInplaceDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *a
 
         // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
         using addInplaceDevC =
-            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, opp::Add<ComputeT>, RoudingMode::None>;
+            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, opp::Add<ComputeT>, RoundingMode::None>;
 
         Add<ComputeT> op;
 
@@ -821,10 +829,10 @@ void InvokeAddInplaceDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *a
 }
 
 #pragma region Instantiate
-// using add_compute_type_for_t for computeT including SIMD activation if possible
+// using add_simd_vector_compute_type_for_t for computeT including SIMD activation if possible
 #define Instantiate_For(typeSrcIsTypeDst)                                                                              \
-    template void                                                                                                      \
-    InvokeAddInplaceDevCMask<typeSrcIsTypeDst, add_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(            \
+    template void InvokeAddInplaceDevCMask<typeSrcIsTypeDst, add_simd_vector_compute_type_for_t<typeSrcIsTypeDst>,     \
+                                           typeSrcIsTypeDst>(                                                          \
         const Pixel8uC1 *aMask, size_t aPitchMask, typeSrcIsTypeDst *aSrcDst, size_t aPitchSrcDst,                     \
         const typeSrcIsTypeDst *aConst, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
@@ -883,7 +891,7 @@ void InvokeAddInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using addInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Add<ComputeT>,
-                                                                   RoudingMode::NearestTiesAwayFromZero>;
+                                                                   RoundingMode::NearestTiesAwayFromZero>;
 
         Add<ComputeT> op;
 

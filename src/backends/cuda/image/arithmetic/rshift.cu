@@ -1,13 +1,16 @@
 #if OPP_ENABLE_CUDA_BACKEND
 
-#include "addMasked.h"
+#include "rshift.h"
 #include <backends/cuda/image/configurations.h>
-#include <backends/cuda/image/forEachPixelMaskedKernel.h>
+#include <backends/cuda/image/forEachPixelKernel.h>
+#include <backends/cuda/simd_operators/binary_operators.h>
+#include <backends/cuda/simd_operators/simd_types.h>
 #include <backends/cuda/streamCtx.h>
 #include <backends/cuda/templateRegistry.h>
+#include <common/arithmetic/binary_operators.h>
 #include <common/defines.h>
-#include <common/image/functors/constantFunctor.h>
-#include <common/image/functors/devConstantFunctor.h>
+#include <common/image/functors/inplaceFunctor.h>
+#include <common/image/functors/srcFunctor.h>
 #include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
@@ -22,30 +25,32 @@ using namespace opp::cuda;
 
 namespace opp::image::cuda
 {
-template <typename DstT>
-void InvokeSetCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const DstT &aConst, DstT *aDst, size_t aPitchDst,
-                    const Size2D &aSize, const StreamCtx &aStreamCtx)
+template <typename SrcDstT>
+void InvokeRShiftSrcC(const SrcDstT *aSrc, size_t aPitchSrc, uint aConst, SrcDstT *aDst, size_t aPitchDst,
+                      const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (oppEnablePixelType<SrcDstT> && oppEnableCudaBackend<SrcDstT>)
     {
+        using DstT = SrcDstT;
         OPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcDstT)>::value;
 
-        using setC = ConstantFunctor<TupelSize, DstT>;
+        using rshiftSrcC = SrcFunctor<TupelSize, SrcDstT, SrcDstT, SrcDstT, opp::RShift<SrcDstT>, RoundingMode::None>;
 
-        setC functor(aConst);
+        RShift<SrcDstT> op(aConst);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, setC>(aMask, aPitchMask, aDst, aPitchDst, aSize,
-                                                                     aStreamCtx, functor);
+        rshiftSrcC functor(aSrc, aPitchSrc, op);
+
+        InvokeForEachPixelKernelDefault<SrcDstT, TupelSize, rshiftSrcC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
 }
 
 #pragma region Instantiate
-#define Instantiate_For(typeDst)                                                                                       \
-    template void InvokeSetCMask<typeDst>(const Pixel8uC1 *aMask, size_t aPitchMask, const typeDst &aConst,            \
-                                          typeDst *aDst, size_t aPitchDst, const Size2D &aSize,                        \
-                                          const StreamCtx &aStreamCtx);
+#define Instantiate_For(typeSrcIsTypeDst)                                                                              \
+    template void InvokeRShiftSrcC<typeSrcIsTypeDst>(const typeSrcIsTypeDst *aSrc, size_t aPitchSrc, uint aConst,      \
+                                                     typeSrcIsTypeDst *aDst, size_t aPitchDst, const Size2D &aSize,    \
+                                                     const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlpha(type)                                                                                    \
     Instantiate_For(Pixel##type##C1);                                                                                  \
@@ -68,45 +73,38 @@ ForAllChannelsWithAlpha(16s);
 
 ForAllChannelsWithAlpha(32u);
 ForAllChannelsWithAlpha(32s);
-
-ForAllChannelsWithAlpha(16f);
-ForAllChannelsWithAlpha(16bf);
-ForAllChannelsWithAlpha(32f);
-ForAllChannelsWithAlpha(64f);
-
-ForAllChannelsNoAlpha(16sc);
-ForAllChannelsNoAlpha(32sc);
-ForAllChannelsNoAlpha(32fc);
 
 #undef Instantiate_For
 #undef ForAllChannelsWithAlpha
 #undef ForAllChannelsNoAlpha
 #pragma endregion
 
-template <typename DstT>
-void InvokeSetDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const DstT *aConst, DstT *aDst, size_t aPitchDst,
-                       const Size2D &aSize, const StreamCtx &aStreamCtx)
+template <typename SrcDstT>
+void InvokeRShiftInplaceC(SrcDstT *aSrcDst, size_t aPitchSrcDst, uint aConst, const Size2D &aSize,
+                          const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (oppEnablePixelType<SrcDstT> && oppEnableCudaBackend<SrcDstT>)
     {
+        using DstT = SrcDstT;
         OPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcDstT)>::value;
 
-        using setDevC = DevConstantFunctor<TupelSize, DstT>;
+        using rshiftInplaceC = InplaceFunctor<TupelSize, SrcDstT, SrcDstT, opp::RShift<SrcDstT>, RoundingMode::None>;
 
-        setDevC functor(aConst);
+        RShift<SrcDstT> op(aConst);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, setDevC>(aMask, aPitchMask, aDst, aPitchDst, aSize,
-                                                                        aStreamCtx, functor);
+        rshiftInplaceC functor(op);
+
+        InvokeForEachPixelKernelDefault<SrcDstT, TupelSize, rshiftInplaceC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
+                                                                            functor);
     }
 }
 
 #pragma region Instantiate
-#define Instantiate_For(typeDst)                                                                                       \
-    template void InvokeSetDevCMask<typeDst>(const Pixel8uC1 *aMask, size_t aPitchMask, const typeDst *aConst,         \
-                                             typeDst *aDst, size_t aPitchDst, const Size2D &aSize,                     \
-                                             const StreamCtx &aStreamCtx);
+#define Instantiate_For(typeSrcIsTypeDst)                                                                              \
+    template void InvokeRShiftInplaceC<typeSrcIsTypeDst>(typeSrcIsTypeDst * aSrcDst, size_t aPitchSrcDst, uint aConst, \
+                                                         const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlpha(type)                                                                                    \
     Instantiate_For(Pixel##type##C1);                                                                                  \
@@ -129,15 +127,6 @@ ForAllChannelsWithAlpha(16s);
 
 ForAllChannelsWithAlpha(32u);
 ForAllChannelsWithAlpha(32s);
-
-ForAllChannelsWithAlpha(16f);
-ForAllChannelsWithAlpha(16bf);
-ForAllChannelsWithAlpha(32f);
-ForAllChannelsWithAlpha(64f);
-
-ForAllChannelsNoAlpha(16sc);
-ForAllChannelsNoAlpha(32sc);
-ForAllChannelsNoAlpha(32fc);
 
 #undef Instantiate_For
 #undef ForAllChannelsWithAlpha

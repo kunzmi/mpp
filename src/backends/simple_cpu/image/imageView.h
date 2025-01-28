@@ -1,10 +1,13 @@
 #pragma once
 #include <backends/cuda/image/imageView.h>
-#include <backends/simple_cpu/image/forEachPixel.h>
-#include <backends/simple_cpu/image/forEachPixelMasked.h>
 #include <common/arithmetic/binary_operators.h>
+#include <common/bfloat16.h>
+#include <common/complex.h>
 #include <common/defines.h>
+#include <common/half_fp16.h>
+#include <common/image/border.h>
 #include <common/image/functors/constantFunctor.h>
+#include <common/image/functors/imageFunctors.h>
 #include <common/image/functors/inplaceConstantFunctor.h>
 #include <common/image/functors/inplaceConstantScaleFunctor.h>
 #include <common/image/functors/inplaceDevConstantFunctor.h>
@@ -23,10 +26,16 @@
 #include <common/image/roiException.h>
 #include <common/image/size2D.h>
 #include <common/image/sizePitched.h>
+#include <common/numberTypes.h>
+#include <common/opp_defs.h>
 #include <common/safeCast.h>
+#include <common/utilities.h>
 #include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <concepts>
 #include <cstddef>
+#include <iterator>
+#include <type_traits>
 #include <vector>
 
 namespace opp::image::cpuSimple
@@ -34,13 +43,15 @@ namespace opp::image::cpuSimple
 
 template <PixelType T> class ImageView
 {
+#pragma region Iterator
   public:
     // With this iterator we can use a simple foreach-loop over the imageView to iterate through the pixels
     template <bool isConst> struct _iterator
     {
       private:
-        Vec2i mPixel;
-        std::conditional_t<isConst, const ImageView &, ImageView &> mImgView;
+        Vec2i mPixel{0};
+        std::conditional_t<isConst, const ImageView &, ImageView &>
+            mImgView; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
 
       public:
         _iterator(const Vec2i &aPixel, std::conditional_t<isConst, const ImageView &, ImageView &> aImgView)
@@ -88,13 +99,13 @@ template <PixelType T> class ImageView
             return *this;
         }
 
-        _iterator operator++(int) &
+        _iterator operator++(int) & // NOLINT(cert-dcl21-cpp)
         {
             _iterator ret = *this;
             operator++();
             return ret;
         }
-        _iterator operator--(int) &
+        _iterator operator--(int) & // NOLINT(cert-dcl21-cpp)
         {
             _iterator ret = *this;
             operator--();
@@ -121,7 +132,7 @@ template <PixelType T> class ImageView
             return gotoPtr(mImgView.mPtr, mImgView.mPitch, mPixel.x, mPixel.y);
         }
 
-        [[nodiscard]] reference operator[](difference_type aRhs) const
+        [[nodiscard]] _iterator operator[](difference_type aRhs) const
         {
             difference_type diffY = aRhs / mImgView.mRoi.width;
             difference_type diffX = aRhs - (diffY * mImgView.mRoi.width);
@@ -319,12 +330,12 @@ template <PixelType T> class ImageView
             return mPixel.x <= aRhs.mPixel.x;
         }
 
-        const Vec2i &Pixel() const
+        [[nodiscard]] const Vec2i &Pixel() const
         {
             return mPixel;
         }
 
-        const T &Value() const
+        [[nodiscard]] const T &Value() const
         {
             return *gotoPtr(mImgView.mPtr, mImgView.mPitch, mPixel.x, mPixel.y);
         }
@@ -341,8 +352,14 @@ template <PixelType T> class ImageView
 
     friend iterator;
     friend const_iterator;
+    friend iterator operator+(iterator::difference_type aLhs, const iterator &aRhs);
+    friend iterator operator-(iterator::difference_type aLhs, const iterator &aRhs);
+    friend const_iterator operator+(const_iterator::difference_type aLhs, const const_iterator &aRhs);
+    friend const_iterator operator-(const_iterator::difference_type aLhs, const const_iterator &aRhs);
 
-  public:
+#pragma endregion
+
+#pragma region Constructors
     /// <summary>
     /// Type size in bytes of one pixel in one channel.
     /// </summary>
@@ -354,23 +371,23 @@ template <PixelType T> class ImageView
     /// <summary>
     /// Channel count
     /// </summary>
-    static constexpr size_t ChannelCount = to_size_t(channel_count<T>::value);
+    static constexpr size_t ChannelCount = to_size_t(channel_count_v<T>);
 
   private:
     /// <summary>
     /// Base pointer to image data.
     /// </summary>
-    T *mPtr;
+    T *mPtr{nullptr};
 
     /// <summary>
     /// Width in bytes of one image line + alignment bytes.
     /// </summary>
-    size_t mPitch;
+    size_t mPitch{0};
 
     /// <summary>
     /// Base pointer moved to actual ROI.
     /// </summary>
-    T *mPtrRoi;
+    T *mPtrRoi{nullptr};
 
     /// <summary>
     /// Size of the allocated image buffer (full ROI).
@@ -406,7 +423,7 @@ template <PixelType T> class ImageView
         return mRoi;
     }
 
-    ImageView(const Size2D &aSize) : mPtr(nullptr), mPitch(0), mPtrRoi(nullptr), mSizeAlloc(aSize), mRoi(0, 0, aSize)
+    explicit ImageView(const Size2D &aSize) : mSizeAlloc(aSize), mRoi(0, 0, aSize)
     {
     }
 
@@ -429,7 +446,9 @@ template <PixelType T> class ImageView
 
     ImageView &operator=(const ImageView &)     = default;
     ImageView &operator=(ImageView &&) noexcept = default;
+#pragma endregion
 
+#pragma region Basics and Copy to device/host
     [[nodiscard]] T &operator()(int aPixelX, int aPixelY)
     {
         return *gotoPtr(mPtrRoi, mPitch, aPixelX, aPixelY);
@@ -586,32 +605,32 @@ template <PixelType T> class ImageView
         mPtrRoi = mPtr;
     }
 
-    iterator begin()
+    [[nodiscard]] iterator begin()
     {
         return iterator(mRoi.FirstPixel(), *this);
     }
 
-    iterator end()
+    [[nodiscard]] iterator end()
     {
         return iterator({mRoi.FirstX(), mRoi.LastY() + 1}, *this);
     }
 
-    const_iterator begin() const
+    [[nodiscard]] const_iterator begin() const
     {
         return cbegin();
     }
 
-    const_iterator end() const
+    [[nodiscard]] const_iterator end() const
     {
         return cend();
     }
 
-    const_iterator cbegin() const
+    [[nodiscard]] const_iterator cbegin() const
     {
         return const_iterator(mRoi.FirstPixel(), *this);
     }
 
-    const_iterator cend() const
+    [[nodiscard]] const_iterator cend() const
     {
         return const_iterator({mRoi.FirstX(), mRoi.LastY() + 1}, *this);
     }
@@ -685,7 +704,7 @@ template <PixelType T> class ImageView
     /// <summary>
     /// Returns true, if size and pixel content is identical (inside the ROI). Returns false if ROI size differs.
     /// </summary>
-    bool IsIdentical(const ImageView<T> &aOther) const
+    [[nodiscard]] bool IsIdentical(const ImageView<T> &aOther) const
     {
         if (aOther.SizeRoi() != SizeRoi())
         {
@@ -708,8 +727,8 @@ template <PixelType T> class ImageView
     /// Returns true, if size is equal and pixel content is identical up to provided limit (inside the ROI). Returns
     /// false if ROI size differs.
     /// </summary>
-    bool IsSimilar(const ImageView<T> &aOther, remove_vector_t<T> aMaxDiff) const
-        requires RealOrComplexFloatingVector<T>
+    [[nodiscard]] bool IsSimilar(const ImageView<T> &aOther, remove_vector_t<T> aMaxDiff) const
+        requires RealFloatingVector<T>
     {
         if (aOther.SizeRoi() != SizeRoi())
         {
@@ -730,312 +749,559 @@ template <PixelType T> class ImageView
         }
         return true;
     }
+#pragma endregion
 
 #pragma region Data initialisation
-    ImageView<T> &Set(const T &aConst)
-    {
-        using setC = ConstantFunctor<1, T>;
-        setC functor(aConst);
-        forEachPixel(*this, functor);
+#pragma region Convert
+    /// <summary>
+    /// Convert Integer to Integer, Integer to float32/double, float32 to half-float16/bfloat16. Values are clamped to
+    /// maximum value range of destination type if needed, float to half or bfloat are rounding using
+    /// RoundingMode::NearestTiesToEven (real and complex).
+    /// </summary>
+    template <PixelType TTo>
+    ImageView<TTo> &Convert(ImageView<TTo> &aDst)
+        requires(!std::same_as<T, TTo>) &&
+                (RealOrComplexIntVector<T> || (std::same_as<complex_basetype_t<remove_vector_t<T>>, float> &&
+                                               (std::same_as<complex_basetype_t<remove_vector_t<TTo>>, BFloat16> ||
+                                                std::same_as<complex_basetype_t<remove_vector_t<TTo>>, HalfFp16>)));
 
-        return *this;
-    }
+    /// <summary>
+    /// Convert Floating point to Integer, float32 to half-float16/bfloat16. Values are clamped to
+    /// maximum value range of destination type if needed, using rounding mode as provided.
+    /// Note: For float32 to half16: RoundingMode::NearestTiesAwayFromZero is NOT supported, for float32 to BFloat, on
+    /// host only RoundingMode::NearestTiesToEven and RoundingMode::TowardZero are supported.
+    /// </summary>
+    template <PixelType TTo>
+    ImageView<TTo> &Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode)
+        requires(!std::same_as<T, TTo>) && RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Set(const T &aConst, const ImageView<Pixel8uC1> &aMask)
-    {
-        using setC = ConstantFunctor<1, T>;
-        setC functor(aConst);
-        forEachPixel(aMask, *this, functor);
+    /// <summary>
+    /// Convert with prior floating point scaling. Operation is SrcT -> float -> scale -> DstT
+    /// </summary>
+    template <PixelType TTo>
+    ImageView<TTo> &Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode, int aScaleFactor)
+        requires(!std::same_as<T, TTo>) && (!std::same_as<TTo, float>) && (!std::same_as<TTo, double>) &&
+                (!std::same_as<TTo, Complex<float>>) && (!std::same_as<TTo, Complex<double>>);
+#pragma endregion
+#pragma region Scale
+    /// <summary>
+    /// Convert witch scaling the pixel value from input type value range to ouput type value range using the
+    /// equation:<para/> dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
+    /// whith scaleFactor = (dstMaxRangeValue - dstMinRangeValue) / (srcMaxRangeValue - srcMinRangeValue).
+    /// </summary>
+    template <PixelType TTo>
+    ImageView<TTo> &Scale(ImageView<TTo> &aDst)
+        requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<T> && RealOrComplexIntVector<TTo>;
 
-        return *this;
-    }
+    /// <summary>
+    /// Convert witch scaling the pixel value from input type value range to provided ouput value range using the
+    /// equation:<para/> dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
+    /// whith scaleFactor = (dstMaxRangeValue - dstMinRangeValue) / (srcMaxRangeValue - srcMinRangeValue). Values
+    /// smaller or larger the output range are clamped to min or max value if necessary for integer output types.
+    /// </summary>
+    template <PixelType TTo>
+    ImageView<TTo> &Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax)
+        requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<T>;
+
+    /// <summary>
+    /// Convert witch scaling the pixel value from input type value range to provided ouput value range using the
+    /// equation:<para/> dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
+    /// whith scaleFactor = (dstMaxRangeValue - dstMinRangeValue) / (srcMaxRangeValue - srcMinRangeValue). Values
+    /// smaller or larger the output range are clamped to min or max value if necessary.
+    /// </summary>
+    template <PixelType TTo>
+    ImageView<TTo> &Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax)
+        requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<TTo>;
+
+    /// <summary>
+    /// Convert witch scaling the pixel value from input type value range to provided ouput value range using the
+    /// equation:<para/> dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
+    /// whith scaleFactor = (dstMaxRangeValue - dstMinRangeValue) / (srcMaxRangeValue - srcMinRangeValue). Values
+    /// smaller or larger the output range are clamped to min or max value if necessary for integer output types.
+    /// </summary>
+    template <PixelType TTo>
+    ImageView<TTo> &Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
+                          scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax)
+        requires(!std::same_as<T, TTo>);
+
+#pragma endregion
+#pragma region Set
+    ImageView<T> &Set(const T &aConst);
+
+    ImageView<T> &Set(const T &aConst, const ImageView<Pixel8uC1> &aMask);
+#pragma endregion
 #pragma endregion
 
 #pragma region Arithmetic functions
+#pragma region Add
     ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst)
-        requires RealOrComplexFloatingVector<T>
-    {
-        checkSameSize(ROI(), aSrc2.ROI());
-        checkSameSize(ROI(), aDst.ROI());
-
-        using ComputeT = default_compute_type_for_t<T>;
-
-        // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
-        using addSrcSrc = SrcSrcFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::None>;
-
-        opp::Add<ComputeT> op;
-        addSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
-
-        forEachPixel(aDst, functor);
-        return aDst;
-    }
+        requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0)
-        requires RealOrComplexIntVector<T>
-    {
-        checkSameSize(ROI(), aSrc2.ROI());
-        checkSameSize(ROI(), aDst.ROI());
-
-        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
-
-        using ComputeT = default_compute_type_for_t<T>;
-
-        using addSrcSrcScale =
-            SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::NearestTiesAwayFromZero>;
-
-        opp::Add<ComputeT> op;
-        addSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
-
-        forEachPixel(aDst, functor);
-        return aDst;
-    }
+        requires RealOrComplexIntVector<T>;
 
     ImageView<T> &Add(const T &aConst, ImageView<T> &aDst)
-        requires RealOrComplexFloatingVector<T>
-    {
-        checkSameSize(ROI(), aDst.ROI());
-
-        using ComputeT = default_compute_type_for_t<T>;
-
-        // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
-        using addSrcC = SrcConstantFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::None>;
-
-        opp::Add<ComputeT> op;
-        addSrcC functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op);
-
-        forEachPixel(aDst, functor);
-        return aDst;
-    }
+        requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &Add(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0)
-        requires RealOrComplexIntVector<T>
-    {
-        checkSameSize(ROI(), aDst.ROI());
-
-        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
-
-        using ComputeT = default_compute_type_for_t<T>;
-
-        using addSrcCScale =
-            SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::NearestTiesAwayFromZero>;
-
-        opp::Add<ComputeT> op;
-        addSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
-
-        forEachPixel(aDst, functor);
-        return aDst;
-    }
+        requires RealOrComplexIntVector<T>;
 
     ImageView<T> &Add(const ImageView<T> &aSrc2)
-        requires RealOrComplexFloatingVector<T>
-    {
-        checkSameSize(ROI(), aSrc2.ROI());
-
-        using ComputeT = default_compute_type_for_t<T>;
-
-        // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
-        using addInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::None>;
-
-        opp::Add<ComputeT> op;
-        addInplaceSrc functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op);
-
-        forEachPixel(*this, functor);
-        return *this;
-    }
+        requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &Add(const ImageView<T> &aSrc2, int aScaleFactor = 0)
-        requires RealOrComplexIntVector<T>
-    {
-        checkSameSize(ROI(), aSrc2.ROI());
-
-        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
-
-        using ComputeT = default_compute_type_for_t<T>;
-
-        using addInplaceSrcScale =
-            InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::NearestTiesAwayFromZero>;
-
-        opp::Add<ComputeT> op;
-        addInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
-
-        forEachPixel(*this, functor);
-        return *this;
-    }
+        requires RealOrComplexIntVector<T>;
 
     ImageView<T> &Add(const T &aConst)
-        requires RealOrComplexFloatingVector<T>
-    {
-        using ComputeT = default_compute_type_for_t<T>;
-
-        // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
-        using addInplaceC = InplaceConstantFunctor<1, ComputeT, T, opp::Add<ComputeT>, RoudingMode::None>;
-
-        opp::Add<ComputeT> op;
-        addInplaceC functor(static_cast<ComputeT>(aConst), op);
-
-        forEachPixel(*this, functor);
-        return *this;
-    }
+        requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &Add(const T &aConst, int aScaleFactor = 0)
-        requires RealOrComplexIntVector<T>
-    {
-        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
-
-        using ComputeT = default_compute_type_for_t<T>;
-
-        using addInplaceCScale =
-            InplaceConstantScaleFunctor<1, ComputeT, T, opp::Add<ComputeT>, RoudingMode::NearestTiesAwayFromZero>;
-
-        opp::Add<ComputeT> op;
-        addInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
-
-        forEachPixel(*this, functor);
-        return *this;
-    }
+        requires RealOrComplexIntVector<T>;
 
     ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
-        requires RealOrComplexFloatingVector<T>
-    {
-        checkSameSize(ROI(), aSrc2.ROI());
-        checkSameSize(ROI(), aDst.ROI());
-
-        using ComputeT = default_compute_type_for_t<T>;
-
-        // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
-        using addSrcSrc = SrcSrcFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::None>;
-
-        opp::Add<ComputeT> op;
-        addSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
-
-        forEachPixel(aMask, aDst, functor);
-        return aDst;
-    }
+        requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                       int aScaleFactor = 0)
-        requires RealOrComplexIntVector<T>
-    {
-        checkSameSize(ROI(), aSrc2.ROI());
-        checkSameSize(ROI(), aDst.ROI());
-
-        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
-
-        using ComputeT = default_compute_type_for_t<T>;
-
-        using addSrcSrcScale =
-            SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::NearestTiesAwayFromZero>;
-
-        opp::Add<ComputeT> op;
-        addSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
-
-        forEachPixel(aMask, aDst, functor);
-        return aDst;
-    }
+        requires RealOrComplexIntVector<T>;
 
     ImageView<T> &Add(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
-        requires RealOrComplexFloatingVector<T>
-    {
-        checkSameSize(ROI(), aDst.ROI());
-
-        using ComputeT = default_compute_type_for_t<T>;
-
-        // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
-        using addSrcC = SrcConstantFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::None>;
-
-        opp::Add<ComputeT> op;
-        addSrcC functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op);
-
-        forEachPixel(aMask, aDst, functor);
-        return aDst;
-    }
+        requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &Add(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
-        requires RealOrComplexIntVector<T>
-    {
-        checkSameSize(ROI(), aDst.ROI());
-
-        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
-
-        using ComputeT = default_compute_type_for_t<T>;
-
-        using addSrcCScale =
-            SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::NearestTiesAwayFromZero>;
-
-        opp::Add<ComputeT> op;
-        addSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
-
-        forEachPixel(aMask, aDst, functor);
-        return aDst;
-    }
+        requires RealOrComplexIntVector<T>;
 
     ImageView<T> &Add(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
-        requires RealOrComplexFloatingVector<T>
-    {
-        checkSameSize(ROI(), aSrc2.ROI());
-
-        using ComputeT = default_compute_type_for_t<T>;
-
-        // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
-        using addInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::None>;
-
-        opp::Add<ComputeT> op;
-        addInplaceSrc functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op);
-
-        forEachPixel(aMask, *this, functor);
-        return *this;
-    }
+        requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &Add(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
-        requires RealOrComplexIntVector<T>
-    {
-        checkSameSize(ROI(), aSrc2.ROI());
-
-        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
-
-        using ComputeT = default_compute_type_for_t<T>;
-
-        using addInplaceSrcScale =
-            InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoudingMode::NearestTiesAwayFromZero>;
-
-        opp::Add<ComputeT> op;
-        addInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
-
-        forEachPixel(aMask, *this, functor);
-        return *this;
-    }
+        requires RealOrComplexIntVector<T>;
 
     ImageView<T> &Add(const T &aConst, const ImageView<Pixel8uC1> &aMask)
-        requires RealOrComplexFloatingVector<T>
-    {
-        using ComputeT = default_compute_type_for_t<T>;
-
-        // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
-        using addInplaceC = InplaceConstantFunctor<1, ComputeT, T, opp::Add<ComputeT>, RoudingMode::None>;
-
-        opp::Add<ComputeT> op;
-        addInplaceC functor(static_cast<ComputeT>(aConst), op);
-
-        forEachPixel(aMask, *this, functor);
-        return *this;
-    }
+        requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &Add(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
-        requires RealOrComplexIntVector<T>
-    {
-        const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+        requires RealOrComplexIntVector<T>;
+#pragma endregion
+#pragma region Sub
+    ImageView<T> &Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+        requires RealOrComplexFloatingVector<T>;
 
-        using ComputeT = default_compute_type_for_t<T>;
+    ImageView<T> &Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>;
 
-        using addInplaceCScale =
-            InplaceConstantScaleFunctor<1, ComputeT, T, opp::Add<ComputeT>, RoudingMode::NearestTiesAwayFromZero>;
+    ImageView<T> &Sub(const T &aConst, ImageView<T> &aDst)
+        requires RealOrComplexFloatingVector<T>;
 
-        opp::Add<ComputeT> op;
-        addInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
+    ImageView<T> &Sub(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>;
 
-        forEachPixel(aMask, *this, functor);
-        return *this;
-    }
+    ImageView<T> &Sub(const ImageView<T> &aSrc2)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Sub(const ImageView<T> &aSrc2, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &Sub(const T &aConst)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Sub(const T &aConst, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &SubInv(const ImageView<T> &aSrc2)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &SubInv(const ImageView<T> &aSrc2, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &SubInv(const T &aConst)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &SubInv(const T &aConst, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                      int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &Sub(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Sub(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &Sub(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Sub(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &Sub(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Sub(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &SubInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &SubInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &SubInv(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &SubInv(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>;
+#pragma endregion
+#pragma region Mul
+    ImageView<T> &Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &Mul(const T &aConst, ImageView<T> &aDst)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Mul(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &Mul(const ImageView<T> &aSrc2)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Mul(const ImageView<T> &aSrc2, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &Mul(const T &aConst)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Mul(const T &aConst, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                      int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &Mul(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Mul(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &Mul(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Mul(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &Mul(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Mul(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+        requires RealOrComplexIntVector<T>;
+#pragma endregion
+#pragma region MulScale
+    ImageView<T> &MulScale(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+        requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
+
+    ImageView<T> &MulScale(const T &aConst, ImageView<T> &aDst)
+        requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
+
+    ImageView<T> &MulScale(const ImageView<T> &aSrc2)
+        requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
+
+    ImageView<T> &MulScale(const T &aConst)
+        requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
+
+    ImageView<T> &MulScale(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+        requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
+
+    ImageView<T> &MulScale(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+        requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
+
+    ImageView<T> &MulScale(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
+        requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
+
+    ImageView<T> &MulScale(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+        requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
+#pragma endregion
+#pragma region Div
+    ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0,
+                      RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &Div(const T &aConst, ImageView<T> &aDst)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Div(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
+                      RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &Div(const ImageView<T> &aSrc2)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Div(const ImageView<T> &aSrc2, int aScaleFactor = 0,
+                      RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &Div(const T &aConst)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Div(const T &aConst, int aScaleFactor = 0,
+                      RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &DivInv(const ImageView<T> &aSrc2)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &DivInv(const ImageView<T> &aSrc2, int aScaleFactor = 0,
+                         RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &DivInv(const T &aConst)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &DivInv(const T &aConst, int aScaleFactor = 0,
+                         RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                      int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &Div(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Div(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                      RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &Div(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Div(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                      RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &Div(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &Div(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                      RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &DivInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &DivInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                         RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+        requires RealOrComplexIntVector<T>;
+
+    ImageView<T> &DivInv(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<T> &DivInv(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                         RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+        requires RealOrComplexIntVector<T>;
+#pragma endregion
+
+#pragma region Abs
+    ImageView<T> &Abs(ImageView<T> &aDst)
+        requires RealSignedVector<T>;
+
+    ImageView<T> &Abs()
+        requires RealSignedVector<T>;
+#pragma endregion
+#pragma region AbsDiff
+    ImageView<T> &AbsDiff(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+        requires RealUnsignedVector<T>;
+
+    ImageView<T> &AbsDiff(const T &aConst, ImageView<T> &aDst)
+        requires RealUnsignedVector<T>;
+
+    ImageView<T> &AbsDiff(const ImageView<T> &aSrc2)
+        requires RealUnsignedVector<T>;
+
+    ImageView<T> &AbsDiff(const T &aConst)
+        requires RealUnsignedVector<T>;
+#pragma endregion
+#pragma region And
+    ImageView<T> &And(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+        requires RealIntVector<T>;
+
+    ImageView<T> &And(const T &aConst, ImageView<T> &aDst)
+        requires RealIntVector<T>;
+
+    ImageView<T> &And(const ImageView<T> &aSrc2)
+        requires RealIntVector<T>;
+
+    ImageView<T> &And(const T &aConst)
+        requires RealIntVector<T>;
+#pragma endregion
+#pragma region Not
+    ImageView<T> &Not(ImageView<T> &aDst)
+        requires RealIntVector<T>;
+
+    ImageView<T> &Not()
+        requires RealIntVector<T>;
+#pragma endregion
+#pragma region Exp
+    ImageView<T> &Exp(ImageView<T> &aDst)
+        requires RealOrComplexVector<T>;
+
+    ImageView<T> &Exp()
+        requires RealOrComplexVector<T>;
+#pragma endregion
+#pragma region Ln
+    ImageView<T> &Ln(ImageView<T> &aDst)
+        requires RealOrComplexVector<T>;
+
+    ImageView<T> &Ln()
+        requires RealOrComplexVector<T>;
+#pragma endregion
+#pragma region LShift
+    ImageView<T> &LShift(uint aConst, ImageView<T> &aDst)
+        requires RealIntVector<T>;
+    ImageView<T> &LShift(uint aConst)
+        requires RealIntVector<T>;
+#pragma endregion
+#pragma region Or
+    ImageView<T> &Or(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+        requires RealIntVector<T>;
+
+    ImageView<T> &Or(const T &aConst, ImageView<T> &aDst)
+        requires RealIntVector<T>;
+
+    ImageView<T> &Or(const ImageView<T> &aSrc2)
+        requires RealIntVector<T>;
+
+    ImageView<T> &Or(const T &aConst)
+        requires RealIntVector<T>;
+#pragma endregion
+#pragma region RShift
+    ImageView<T> &RShift(uint aConst, ImageView<T> &aDst)
+        requires RealIntVector<T>;
+    ImageView<T> &RShift(uint aConst)
+        requires RealIntVector<T>;
+#pragma endregion
+#pragma region Sqr
+    ImageView<T> &Sqr(ImageView<T> &aDst)
+        requires RealOrComplexVector<T>;
+
+    ImageView<T> &Sqr()
+        requires RealOrComplexVector<T>;
+#pragma endregion
+#pragma region Sqrt
+    ImageView<T> &Sqrt(ImageView<T> &aDst)
+        requires RealOrComplexVector<T>;
+
+    ImageView<T> &Sqrt()
+        requires RealOrComplexVector<T>;
+#pragma endregion
+#pragma region Xor
+    ImageView<T> &Xor(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+        requires RealIntVector<T>;
+
+    ImageView<T> &Xor(const T &aConst, ImageView<T> &aDst)
+        requires RealIntVector<T>;
+
+    ImageView<T> &Xor(const ImageView<T> &aSrc2)
+        requires RealIntVector<T>;
+
+    ImageView<T> &Xor(const T &aConst)
+        requires RealIntVector<T>;
+#pragma endregion
+
+#pragma region AlphaPremul
+    /// <summary>
+    /// Note: AlphaPremul does not exactly match the results from NPP for integer image types. NPP seems to scale the
+    /// integer value by T::max() and then does the multiplications/divisions as integers. Here we cast to float and
+    /// then round using RoundingMode::NearestTiesAwayFromZero (round()) which is nearly identical, but not exactly the
+    /// same for all values. Values may differ by 1.
+    /// </summary>
+    ImageView<T> &AlphaPremul(ImageView<T> &aDst)
+        requires FourChannelNoAlpha<T>;
+
+    ImageView<T> &AlphaPremul()
+        requires FourChannelNoAlpha<T>;
+
+    ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst)
+        requires RealFloatingVector<T>;
+
+    ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst)
+        requires RealIntVector<T>;
+
+    ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha)
+        requires RealFloatingVector<T>;
+
+    ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha)
+        requires RealIntVector<T>;
+#pragma endregion
+
+#pragma region AlphaComp
+    ImageView<T> &AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &aDst, AlphaCompositionOp aAlphaOp)
+        requires(!FourChannelAlpha<T>) && RealVector<T>;
+
+    ImageView<T> &AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &aDst, remove_vector_t<T> aAlpha1,
+                            remove_vector_t<T> aAlpha2, AlphaCompositionOp aAlphaOp)
+        requires RealVector<T>;
+#pragma endregion
+
+#pragma region Complex
+    ImageView<T> &ConjMul(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+        requires ComplexVector<T>;
+
+    ImageView<T> &ConjMul(const ImageView<T> &aSrc2)
+        requires ComplexVector<T>;
+
+    ImageView<T> &Conj(ImageView<T> &aDst)
+        requires ComplexVector<T>;
+
+    ImageView<T> &Conj()
+        requires ComplexVector<T>;
+
+    ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &Magnitude(
+        ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst)
+        requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>;
+
+    ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &MagnitudeSqr(
+        ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst)
+        requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>;
+
+    ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &Angle(
+        ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst)
+        requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>;
+
+    ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &Real(
+        ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst)
+        requires ComplexVector<T>;
+
+    ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &Imag(
+        ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst)
+        requires ComplexVector<T>;
+
+    ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &MakeComplex(
+        ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst)
+        requires RealSignedVector<T> && (!FourChannelAlpha<T>);
+
+    ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &MakeComplex(
+        const ImageView<T> &aSrcImag,
+        ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst)
+        requires RealSignedVector<T> && (!FourChannelAlpha<T>);
+#pragma endregion
 #pragma endregion
 };
 } // namespace opp::image::cpuSimple

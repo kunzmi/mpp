@@ -16,6 +16,7 @@ namespace opp::cuda
 #ifndef OPP_CUDA_TEMPLATE_REGISTRY_IS_ACTIVE
 // empty define so that nothing is done
 #define OPP_CUDA_REGISTER_TEMPALTE
+#define OPP_CUDA_REGISTER_TEMPALTE_SRC_DST
 #define OPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE
 #endif
 
@@ -27,9 +28,17 @@ namespace opp::cuda
                                                       opp::image::pixel_type_name<DstT>::value);                       \
     const void *_ = &opp::cuda::TemplateRegistry<kernelName>::sInstance;
 
+#define OPP_CUDA_REGISTER_TEMPALTE_SRC_DST                                                                             \
+    constexpr opp::cuda::KernelNameWrapper kernelName(__func__, opp::image::pixel_type_name<SrcT>::value, "",          \
+                                                      opp::image::pixel_type_name<DstT>::value);                       \
+    const void *_ = &opp::cuda::TemplateRegistry<kernelName>::sInstance;
+
 #define OPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE                                                                        \
-    constexpr opp::cuda::KernelNameWrapper kernelName(__func__, opp::image::pixel_type_name<DstT>::value,              \
-                                                      opp::image::pixel_type_name<DstT>::value,                        \
+    constexpr opp::cuda::KernelNameWrapper kernelName(__func__, "", "", opp::image::pixel_type_name<DstT>::value);     \
+    const void *_ = &opp::cuda::TemplateRegistry<kernelName>::sInstance;
+
+#define OPP_CUDA_REGISTER_TEMPALTE_COMPUTE_DST                                                                         \
+    constexpr opp::cuda::KernelNameWrapper kernelName(__func__, "", opp::image::pixel_type_name<ComputeT>::value,      \
                                                       opp::image::pixel_type_name<DstT>::value);                       \
     const void *_ = &opp::cuda::TemplateRegistry<kernelName>::sInstance;
 

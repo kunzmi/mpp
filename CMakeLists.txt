@@ -3,9 +3,15 @@ cmake_minimum_required(VERSION 3.16)
 if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
   set(CMAKE_CUDA_ARCHITECTURES 75)
 endif()
-set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --keep -g -G")
+#set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --keep -g -G")
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    #set(CMAKE_CUDA_FLAGS ${CMAKE_CUDA_FLAGS} "-g -G")  # enable cuda-gdb
+    set(CMAKE_CUDA_FLAGS ${CMAKE_CUDA_FLAGS} "-g -G")  # enable cuda-gdb
+endif()
+
+if (WIN32)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+	set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler=/bigobj")
+elseif (UNIX)
 endif()
 
 project(OPP VERSION 0.1.0 LANGUAGES CUDA CXX)

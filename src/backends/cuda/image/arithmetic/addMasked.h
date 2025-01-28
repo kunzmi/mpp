@@ -12,7 +12,7 @@
 namespace opp::image::cuda
 {
 
-template <typename SrcT, typename ComputeT = add_compute_type_for_t<SrcT>, typename DstT>
+template <typename SrcT, typename ComputeT = add_simd_vector_compute_type_for_t<SrcT>, typename DstT>
 void InvokeAddSrcSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aSrc1, size_t aPitchSrc1,
                          const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                          const opp::cuda::StreamCtx &aStreamCtx);
@@ -23,7 +23,7 @@ void InvokeAddSrcSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const S
                               scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize,
                               const opp::cuda::StreamCtx &aStreamCtx);
 
-template <typename SrcT, typename ComputeT = add_compute_type_for_t<SrcT>, typename DstT>
+template <typename SrcT, typename ComputeT = add_simd_vector_compute_type_for_t<SrcT>, typename DstT>
 void InvokeAddSrcCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aSrc, size_t aPitchSrc,
                        const SrcT &aConst, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                        const opp::cuda::StreamCtx &aStreamCtx);
@@ -43,7 +43,7 @@ void InvokeAddSrcDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const 
                                const SrcT *aConst, DstT *aDst, size_t aPitchDst, scalefactor_t<ComputeT> aScaleFactor,
                                const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx);
 
-template <typename SrcT, typename ComputeT = add_compute_type_for_t<SrcT>, typename DstT>
+template <typename SrcT, typename ComputeT = add_simd_vector_compute_type_for_t<SrcT>, typename DstT>
 void InvokeAddInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
                              const SrcT *aSrc2, size_t aPitchSrc2, const Size2D &aSize,
                              const opp::cuda::StreamCtx &aStreamCtx);
@@ -53,7 +53,7 @@ void InvokeAddInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Dst
                                   const SrcT *aSrc2, size_t aPitchSrc2, scalefactor_t<ComputeT> aScaleFactor,
                                   const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx);
 
-template <typename SrcT, typename ComputeT = add_compute_type_for_t<SrcT>, typename DstT>
+template <typename SrcT, typename ComputeT = add_simd_vector_compute_type_for_t<SrcT>, typename DstT>
 void InvokeAddInplaceCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
                            const SrcT &aConst, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx);
 

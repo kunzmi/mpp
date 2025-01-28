@@ -10,7 +10,7 @@
 
 namespace opp::cuda::simd
 {
-template <VectorType T> struct Neg
+template <typename T> struct Neg
 {
     static constexpr bool has_simd = IsSignedSimdType<T>;
 
@@ -87,7 +87,7 @@ template <VectorType T> struct Neg
     }
 };
 
-template <VectorType T> struct Abs
+template <typename T> struct Abs
 {
     static constexpr bool has_simd = IsSignedSimdType<T>;
 
@@ -164,7 +164,7 @@ template <VectorType T> struct Abs
     }
 };
 
-template <VectorType T> struct Exp
+template <typename T> struct Exp
 {
     static constexpr bool has_simd = IsNonNativeSimdType<T>;
 
@@ -205,7 +205,7 @@ template <VectorType T> struct Exp
     }
 };
 
-template <VectorType T> struct Ln
+template <typename T> struct Ln
 {
     static constexpr bool has_simd = IsNonNativeSimdType<T>;
 
@@ -246,7 +246,7 @@ template <VectorType T> struct Ln
     }
 };
 
-template <VectorType T> struct Sqrt
+template <typename T> struct Sqrt
 {
     static constexpr bool has_simd = IsNonNativeSimdType<T>;
 
@@ -287,7 +287,7 @@ template <VectorType T> struct Sqrt
     }
 };
 
-template <VectorType T> struct Floor
+template <typename T> struct Floor
 {
     static constexpr bool has_simd = IsNonNativeSimdType<T>;
 
@@ -328,7 +328,7 @@ template <VectorType T> struct Floor
     }
 };
 
-template <VectorType T> struct Ceil
+template <typename T> struct Ceil
 {
     static constexpr bool has_simd = IsNonNativeSimdType<T>;
 
@@ -369,7 +369,7 @@ template <VectorType T> struct Ceil
     }
 };
 
-template <VectorType T> struct RoundNearest
+template <typename T> struct RoundNearest
 {
     static constexpr bool has_simd = IsNonNativeSimdType<T>;
 
@@ -410,7 +410,7 @@ template <VectorType T> struct RoundNearest
     }
 };
 
-template <VectorType T> struct RoundZero
+template <typename T> struct RoundZero
 {
     static constexpr bool has_simd = IsNonNativeSimdType<T>;
 
@@ -448,6 +448,28 @@ template <VectorType T> struct RoundZero
 
         srcdst[0] = h2trunc(srcdst[0]);
         srcdst[1] = h2trunc(srcdst[1]);
+    }
+};
+
+template <typename TTo> struct Convert
+{
+    static constexpr bool has_simd = IsNonNativeSimdType<TTo>;
+
+    DEVICE_ONLY_CODE void operator()(const Tupel<Vector1<float>, 4> &aSrc1, TTo &aDst)
+        requires std::same_as<TTo, bfloat1_4>
+    {
+        const float2 *src1 = reinterpret_cast<const float2 *>(&aSrc1);
+        nv_bfloat162 *dst  = reinterpret_cast<nv_bfloat162 *>(&aDst);
+        dst[0]             = __float22bfloat162_rn(src1[0]);
+        dst[1]             = __float22bfloat162_rn(src1[1]);
+    }
+    DEVICE_ONLY_CODE void operator()(const Tupel<Vector1<float>, 4> &aSrc1, TTo &aDst)
+        requires std::same_as<TTo, hfloat1_4>
+    {
+        const float2 *src1 = reinterpret_cast<const float2 *>(&aSrc1);
+        half2 *dst         = reinterpret_cast<half2 *>(&aDst);
+        dst[0]             = __float22half2_rn(src1[0]);
+        dst[1]             = __float22half2_rn(src1[1]);
     }
 };
 } // namespace opp::cuda::simd
