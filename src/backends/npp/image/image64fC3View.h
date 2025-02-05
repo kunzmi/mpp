@@ -59,52 +59,52 @@ class Image64fC3View : public ImageView<Pixel64fC3>
     Image64fC3View &CrossCorrValid_Norm(const Image64fC3View &pTpl, Image64fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrFull_NormLevel_64f_C3R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    Image64fC3View &CrossCorrFull_NormLevel(const Image64fC3View &pTpl, Image64fC3View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image64fC3View &CrossCorrFull_NormLevel(const Image64fC3View &pTpl, Image64fC3View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFullNormLevelGetBufferHostSize_64f_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t FullNormLevelGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrSame_NormLevel_64f_C3R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    Image64fC3View &CrossCorrSame_NormLevel(const Image64fC3View &pTpl, Image64fC3View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image64fC3View &CrossCorrSame_NormLevel(const Image64fC3View &pTpl, Image64fC3View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSameNormLevelGetBufferHostSize_64f_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t SameNormLevelGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrValid_NormLevel_64f_C3R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    Image64fC3View &CrossCorrValid_NormLevel(const Image64fC3View &pTpl, Image64fC3View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image64fC3View &CrossCorrValid_NormLevel(const Image64fC3View &pTpl, Image64fC3View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiValidNormLevelGetBufferHostSize_64f_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t ValidNormLevelGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrFull_NormLevelAdvanced_64f_C3R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, Npp8u * pDeviceBuffer, Npp8u * pAdvancedScratchBuffer, NppStreamContext nppStreamCtx)
-    Image64fC3View &CrossCorrFull_NormLevelAdvanced(const Image64fC3View &pTpl, Image64fC3View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image64fC3View &CrossCorrFull_NormLevelAdvanced(const Image64fC3View &pTpl, Image64fC3View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrSame_NormLevelAdvanced_64f_C3R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, Npp8u * pDeviceBuffer, Npp8u * pAdvancedScratchBuffer, NppStreamContext nppStreamCtx)
-    Image64fC3View &CrossCorrSame_NormLevelAdvanced(const Image64fC3View &pTpl, Image64fC3View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image64fC3View &CrossCorrSame_NormLevelAdvanced(const Image64fC3View &pTpl, Image64fC3View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrValid_NormLevelAdvanced_64f_C3R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, Npp8u * pDeviceBuffer, Npp8u * pAdvancedScratchBuffer, NppStreamContext nppStreamCtx)
-    Image64fC3View &CrossCorrValid_NormLevelAdvanced(const Image64fC3View &pTpl, Image64fC3View &pDst, cuda::DevVarView<byte> &pDeviceBuffer, cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image64fC3View &CrossCorrValid_NormLevelAdvanced(const Image64fC3View &pTpl, Image64fC3View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumError_64f_C3R_Ctx(const Npp64f * pSrc1, int nSrc1Step, const Npp64f * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void MaximumError(const Image64fC3View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void MaximumError(const Image64fC3View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumErrorGetBufferHostSize_64f_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t MaximumErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAverageError_64f_C3R_Ctx(const Npp64f * pSrc1, int nSrc1Step, const Npp64f * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void AverageError(const Image64fC3View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void AverageError(const Image64fC3View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAverageErrorGetBufferHostSize_64f_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t AverageErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumRelativeError_64f_C3R_Ctx(const Npp64f * pSrc1, int nSrc1Step, const Npp64f * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void MaximumRelativeError(const Image64fC3View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void MaximumRelativeError(const Image64fC3View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumRelativeErrorGetBufferHostSize_64f_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t MaximumRelativeErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAverageRelativeError_64f_C3R_Ctx(const Npp64f * pSrc1, int nSrc1Step, const Npp64f * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void AverageRelativeError(const Image64fC3View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void AverageRelativeError(const Image64fC3View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAverageRelativeErrorGetBufferHostSize_64f_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t AverageRelativeErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;

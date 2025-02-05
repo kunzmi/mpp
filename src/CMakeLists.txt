@@ -36,4 +36,25 @@ target_link_libraries(dummy_test PRIVATE
 						project_warnings)
 
 						
+if (OPP_ENABLE_NPP_BACKEND AND OPP_ENABLE_CUDA_BACKEND AND OPP_ENABLE_CPUSIMPLE_BACKEND)
+add_executable(perfTest 
+				perfTest.cpp
+				)
+				
+target_include_directories(perfTest PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 
+target_link_libraries(perfTest PUBLIC  
+						common
+						common.fileIO
+						common.image
+						backends.cuda	
+						backends.cuda.image
+						backends.npp
+						backends.npp.image
+						backends.simple_cpu
+)
+
+target_link_libraries(perfTest PRIVATE  
+						project_options
+						project_warnings)
+endif()

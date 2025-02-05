@@ -62,31 +62,31 @@ class Image32fC2View : public ImageView<Pixel32fC2>
     Image32fC2View &ColorTwist(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiFilter_32f_C2R_Ctx(const Npp32f * pSrc, Npp32s nSrcStep, Npp32f * pDst, Npp32s nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    Image32fC2View &Filter(Image32fC2View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image32fC2View &Filter(Image32fC2View &pDst, const opp::cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterBorder_32f_C2R_Ctx(const Npp32f * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp32f * pDst, Npp32s nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    Image32fC2View &FilterBorder(Image32fC2View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image32fC2View &FilterBorder(Image32fC2View &pDst, const opp::cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiMaximumError_32f_C2R_Ctx(const Npp32f * pSrc1, int nSrc1Step, const Npp32f * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void MaximumError(const Image32fC2View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void MaximumError(const Image32fC2View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumErrorGetBufferHostSize_32f_C2R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t MaximumErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAverageError_32f_C2R_Ctx(const Npp32f * pSrc1, int nSrc1Step, const Npp32f * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void AverageError(const Image32fC2View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void AverageError(const Image32fC2View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAverageErrorGetBufferHostSize_32f_C2R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t AverageErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumRelativeError_32f_C2R_Ctx(const Npp32f * pSrc1, int nSrc1Step, const Npp32f * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void MaximumRelativeError(const Image32fC2View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void MaximumRelativeError(const Image32fC2View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumRelativeErrorGetBufferHostSize_32f_C2R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t MaximumRelativeErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAverageRelativeError_32f_C2R_Ctx(const Npp32f * pSrc1, int nSrc1Step, const Npp32f * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void AverageRelativeError(const Image32fC2View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void AverageRelativeError(const Image32fC2View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAverageRelativeErrorGetBufferHostSize_32f_C2R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t AverageRelativeErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;

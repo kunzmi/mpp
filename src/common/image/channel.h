@@ -7,6 +7,7 @@
 #include <common/vector3.h>
 #include <common/vector4.h>
 #include <common/vector4A.h>
+#include <iostream>
 
 namespace opp::image
 {
@@ -194,25 +195,33 @@ class Channel
         return static_cast<Axis4D>(mChannel);
     }
 
-    template <typename T> DEVICE_CODE inline bool IsInRange() const
+    template <typename T> [[nodiscard]] DEVICE_CODE inline bool IsInRange() const
     {
         static_assert(AlwaysFalse<T>::value,
                       "Calling IsInRange with an unsupported template parameter, use Axis1..4D or VectorX-types only.");
         return false;
     }
-    template <> [[nodiscard]] DEVICE_CODE inline bool IsInRange<Axis1D>() const
+    template <typename T>
+    [[nodiscard]] DEVICE_CODE inline bool IsInRange() const
+        requires std::same_as<T, Axis1D>
     {
         return mChannel == 0;
     }
-    template <> [[nodiscard]] DEVICE_CODE inline bool IsInRange<Axis2D>() const
+    template <typename T>
+    [[nodiscard]] DEVICE_CODE inline bool IsInRange() const
+        requires std::same_as<T, Axis2D>
     {
         return mChannel <= 1;
     }
-    template <> [[nodiscard]] DEVICE_CODE inline bool IsInRange<Axis3D>() const
+    template <typename T>
+    [[nodiscard]] DEVICE_CODE inline bool IsInRange() const
+        requires std::same_as<T, Axis3D>
     {
         return mChannel <= 2;
     }
-    template <> [[nodiscard]] DEVICE_CODE inline bool IsInRange<Axis4D>() const
+    template <typename T>
+    [[nodiscard]] DEVICE_CODE inline bool IsInRange() const
+        requires std::same_as<T, Axis4D>
     {
         return mChannel <= 3;
     }
@@ -241,7 +250,7 @@ class Channel
         return IsInRange<Axis4D>();
     }
 
-    [[nodiscard]] uint Value() const
+    [[nodiscard]] DEVICE_CODE uint Value() const
     {
         return mChannel;
     }
@@ -249,5 +258,17 @@ class Channel
   private:
     uint mChannel{0};
 };
+
+inline std::ostream &operator<<(std::ostream &aOs, const Channel &aChannel)
+{
+    aOs << aChannel.Value();
+    return aOs;
+}
+
+inline std::wostream &operator<<(std::wostream &aOs, const Channel &aChannel)
+{
+    aOs << aChannel.Value();
+    return aOs;
+}
 
 } // namespace opp::image

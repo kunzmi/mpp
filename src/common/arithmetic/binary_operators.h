@@ -185,7 +185,7 @@ template <AnyVector T> struct AddSqr
     }
 };
 
-template <AnyVector T> struct Min
+template <RealVector T> struct Min
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
     {
@@ -197,7 +197,7 @@ template <AnyVector T> struct Min
     }
 };
 
-template <AnyVector T> struct Max
+template <RealVector T> struct Max
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
     {
@@ -209,51 +209,65 @@ template <AnyVector T> struct Max
     }
 };
 
-template <AnyVector T> struct Eq
+template <RealOrComplexFloatingVector T> struct EqEps
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, bool &aDst)
+    complex_basetype_t<remove_vector_t<T>> eps;
+
+    EqEps(complex_basetype_t<remove_vector_t<T>> aEps) : eps(aEps)
     {
-        aDst = aSrc1 == aSrc2;
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst)
+    {
+        aDst = static_cast<byte>(static_cast<int>(T::EqEps(aSrc1, aSrc2, eps)) * TRUE_VALUE);
     }
 };
 
-template <AnyVector T> struct Ge
+template <AnyVector T> struct Eq
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, bool &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst)
     {
-        aDst = aSrc1 >= aSrc2;
+        aDst = static_cast<byte>(static_cast<int>(aSrc1 == aSrc2) * TRUE_VALUE);
+    }
+};
+
+template <RealVector T> struct Ge
+{
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst)
+    {
+        aDst = static_cast<byte>(static_cast<int>(aSrc1 >= aSrc2) * TRUE_VALUE);
     }
 };
 
 template <RealVector T> struct Gt
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, bool &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst)
     {
-        aDst = aSrc1 > aSrc2;
+        aDst = static_cast<byte>(static_cast<int>(aSrc1 > aSrc2) * TRUE_VALUE);
     }
 };
 
 template <RealVector T> struct Le
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, bool &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst)
     {
-        aDst = aSrc1 <= aSrc2;
+        aDst = static_cast<byte>(static_cast<int>(aSrc1 <= aSrc2) * TRUE_VALUE);
     }
 };
 
 template <RealVector T> struct Lt
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, bool &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst)
     {
-        aDst = aSrc1 < aSrc2;
+        aDst = static_cast<byte>(static_cast<int>(aSrc1 < aSrc2) * TRUE_VALUE);
     }
 };
 
 template <AnyVector T> struct NEq
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, bool &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst)
     {
-        aDst = aSrc1 != aSrc2;
+        aDst = static_cast<byte>(static_cast<int>(aSrc1 != aSrc2) * TRUE_VALUE);
     }
 };
 
@@ -265,7 +279,7 @@ template <AnyVector T> struct CompareEq
     }
 };
 
-template <AnyVector T> struct CompareGe
+template <RealVector T> struct CompareGe
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst)
     {

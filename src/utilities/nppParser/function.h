@@ -10,6 +10,11 @@ struct Argument
 {
     std::string type;
     std::string name;
+
+    bool operator==(const Argument &aOther) const
+    {
+        return type == aOther.type && name == aOther.name;
+    }
 };
 
 struct Function
@@ -18,6 +23,22 @@ struct Function
     std::string name;
     std::vector<Argument> arguments;
     std::string category;
+
+    bool operator==(const Function &aOther) const
+    {
+        if (arguments.size() != aOther.arguments.size())
+        {
+            return false;
+        }
+        for (size_t i = 0; i < arguments.size(); i++)
+        {
+            if (arguments[i] != aOther.arguments[i])
+            {
+                return false;
+            }
+        }
+        return returnType == aOther.returnType && name == aOther.name && category == aOther.category;
+    }
 };
 
 inline void to_json(nlohmann::json &aj, const Argument &aArgument)

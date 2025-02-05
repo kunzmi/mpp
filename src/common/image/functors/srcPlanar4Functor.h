@@ -9,9 +9,9 @@
 #include <common/opp_defs.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
+#include <common/vector_typetraits.h>
 #include <common/vector1.h>
 #include <common/vectorTypes.h>
-#include <common/vector_typetraits.h>
 #include <concepts>
 
 // disable warning for pragma unroll when compiling with host compiler:
@@ -67,8 +67,8 @@ struct SrcPlanar4Functor : public ImageFunctor<false>
         const SrcPlane *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
         const SrcPlane *pixelSrc3 = gotoPtr(Src3, SrcPitch3, aPixelX, aPixelY);
         const SrcPlane *pixelSrc4 = gotoPtr(Src4, SrcPitch4, aPixelX, aPixelY);
-        const SrcT pixelSrc(*pixelSrc1, *pixelSrc2, *pixelSrc3, *pixelSrc4);
-        Op(static_cast<ComputeT>(pixelSrc), aDst);
+        const ComputeT pixelSrc(pixelSrc1->x, pixelSrc2->x, pixelSrc3->x, pixelSrc4->x);
+        Op(pixelSrc, aDst);
     }
 
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
@@ -78,9 +78,9 @@ struct SrcPlanar4Functor : public ImageFunctor<false>
         const SrcPlane *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
         const SrcPlane *pixelSrc3 = gotoPtr(Src3, SrcPitch3, aPixelX, aPixelY);
         const SrcPlane *pixelSrc4 = gotoPtr(Src4, SrcPitch4, aPixelX, aPixelY);
-        const SrcT pixelSrc(*pixelSrc1, *pixelSrc2, *pixelSrc3, *pixelSrc4);
+        const ComputeT pixelSrc(pixelSrc1->x, pixelSrc2->x, pixelSrc3->x, pixelSrc4->x);
         ComputeT temp;
-        Op(static_cast<ComputeT>(pixelSrc), temp);
+        Op(pixelSrc, temp);
         round(temp); // NOP for integer ComputeT
         // DstT constructor will clamp temp to value range of DstT
         aDst = static_cast<DstT>(temp);
@@ -101,7 +101,7 @@ struct SrcPlanar4Functor : public ImageFunctor<false>
         Tupel<SrcPlane, tupelSize> tupelSrc3 = Tupel<SrcPlane, tupelSize>::Load(pixelSrc3);
         Tupel<SrcPlane, tupelSize> tupelSrc4 = Tupel<SrcPlane, tupelSize>::Load(pixelSrc4);
 
-        Tupel<SrcT, tupelSize> tupelSrc;
+        Tupel<ComputeT, tupelSize> tupelSrc;
 
 #pragma unroll
         for (size_t i = 0; i < tupelSize; i++)
@@ -115,7 +115,7 @@ struct SrcPlanar4Functor : public ImageFunctor<false>
 #pragma unroll
         for (size_t i = 0; i < tupelSize; i++)
         {
-            Op(static_cast<ComputeT>(tupelSrc.value[i]), aDst.value[i]);
+            Op(tupelSrc.value[i], aDst.value[i]);
         }
     }
 
@@ -132,7 +132,7 @@ struct SrcPlanar4Functor : public ImageFunctor<false>
         Tupel<SrcPlane, tupelSize> tupelSrc3 = Tupel<SrcPlane, tupelSize>::Load(pixelSrc3);
         Tupel<SrcPlane, tupelSize> tupelSrc4 = Tupel<SrcPlane, tupelSize>::Load(pixelSrc4);
 
-        Tupel<SrcT, tupelSize> tupelSrc;
+        Tupel<ComputeT, tupelSize> tupelSrc;
 
 #pragma unroll
         for (size_t i = 0; i < tupelSize; i++)
@@ -147,7 +147,7 @@ struct SrcPlanar4Functor : public ImageFunctor<false>
         for (size_t i = 0; i < tupelSize; i++)
         {
             ComputeT temp;
-            Op(static_cast<ComputeT>(tupelSrc.value[i]), temp);
+            Op(tupelSrc.value[i], temp);
             round(temp); // NOP for integer ComputeT
             // DstT constructor will clamp temp to value range of DstT
             aDst.value[i] = static_cast<DstT>(temp);

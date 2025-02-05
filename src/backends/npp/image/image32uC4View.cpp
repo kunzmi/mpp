@@ -18,6 +18,7 @@
 #include <common/safeCast.h>  //NOLINT
 #include <cstddef> //NOLINT
 #include <nppdefs.h>  //NOLINT
+#include <nppi_arithmetic_and_logical_operations.h> //NOLINT
 #include <nppi_data_exchange_and_initialization.h> //NOLINT
 #include <nppi_statistics_functions.h> //NOLINT
 
@@ -58,10 +59,33 @@ Image32uC4View &Image32uC4View::Set(const Pixel32uC4 &aValue, const NppStreamCon
     return *this;
 }
 
-void Image32uC4View::DotProd(const Image32uC4View &pSrc2, cuda::DevVarView<double> &aDp, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+Image32uC4View &Image32uC4View::SetA(const Pixel32uC3 &aValue, const NppStreamContext &nppStreamCtx)
+{
+    nppSafeCallExt(nppiSet_32u_AC4R_Ctx(aValue.data(), reinterpret_cast<Npp32u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
+                   "ROI SrcDst: " << ROI());
+    return *this;
+}
+
+Image32uC4View &Image32uC4View::AlphaCompA(const Image32uC4View &pSrc2, Image32uC4View &pDst, NppiAlphaOp eAlphaOp, const NppStreamContext &nppStreamCtx) const
+{
+    checkSameSize(ROI(), pSrc2.ROI());
+    checkSameSize(ROI(), pDst.ROI());
+    nppSafeCallExt(nppiAlphaComp_32u_AC4R_Ctx(reinterpret_cast<const Npp32u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<Npp32u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), eAlphaOp, nppStreamCtx),
+                   "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
+}
+
+void Image32uC4View::DotProd(const Image32uC4View &pSrc2, opp::cuda::DevVarView<double> &aDp, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiDotProd_32u64f_C4R_Ctx(reinterpret_cast<const Npp32u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), aDp.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+                   "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
+}
+
+void Image32uC4View::DotProdA(const Image32uC4View &pSrc2, opp::cuda::DevVarView<double> &aDp, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+{
+    checkSameSize(ROI(), pSrc2.ROI());
+    nppSafeCallExt(nppiDotProd_32u64f_AC4R_Ctx(reinterpret_cast<const Npp32u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), aDp.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
 }
 
@@ -72,7 +96,14 @@ size_t Image32uC4View::DotProdGetBufferHostSize(const NppStreamContext &nppStrea
     return retValue;
 }
 
-void Image32uC4View::MaximumError(const Image32uC4View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+size_t Image32uC4View::DotProdGetBufferHostSizeA(const NppStreamContext &nppStreamCtx) const
+{
+    size_t retValue = 0;
+    nppSafeCall(nppiDotProdGetBufferHostSize_32u64f_AC4R_Ctx(NppiSizeRoi(), &retValue, nppStreamCtx));
+    return retValue;
+}
+
+void Image32uC4View::MaximumError(const Image32uC4View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiMaximumError_32u_C4R_Ctx(reinterpret_cast<const Npp32u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
@@ -86,7 +117,7 @@ size_t Image32uC4View::MaximumErrorGetBufferHostSize(const NppStreamContext &npp
     return retValue;
 }
 
-void Image32uC4View::AverageError(const Image32uC4View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image32uC4View::AverageError(const Image32uC4View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiAverageError_32u_C4R_Ctx(reinterpret_cast<const Npp32u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
@@ -100,7 +131,7 @@ size_t Image32uC4View::AverageErrorGetBufferHostSize(const NppStreamContext &npp
     return retValue;
 }
 
-void Image32uC4View::MaximumRelativeError(const Image32uC4View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image32uC4View::MaximumRelativeError(const Image32uC4View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiMaximumRelativeError_32u_C4R_Ctx(reinterpret_cast<const Npp32u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
@@ -114,7 +145,7 @@ size_t Image32uC4View::MaximumRelativeErrorGetBufferHostSize(const NppStreamCont
     return retValue;
 }
 
-void Image32uC4View::AverageRelativeError(const Image32uC4View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image32uC4View::AverageRelativeError(const Image32uC4View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiAverageRelativeError_32u_C4R_Ctx(reinterpret_cast<const Npp32u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),

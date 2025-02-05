@@ -388,6 +388,7 @@ template <Number T> struct alignas(sizeof(T)) Vector1
             case Axis1D::X:
                 return x;
         }
+        return x;
     }
 
     /// <summary>

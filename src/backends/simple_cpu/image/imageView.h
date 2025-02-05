@@ -6,6 +6,7 @@
 #include <common/defines.h>
 #include <common/half_fp16.h>
 #include <common/image/border.h>
+#include <common/image/channel.h>
 #include <common/image/functors/constantFunctor.h>
 #include <common/image/functors/imageFunctors.h>
 #include <common/image/functors/inplaceConstantFunctor.h>
@@ -30,8 +31,9 @@
 #include <common/opp_defs.h>
 #include <common/safeCast.h>
 #include <common/utilities.h>
-#include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vector1.h>
+#include <common/vectorTypes.h>
 #include <concepts>
 #include <cstddef>
 #include <iterator>
@@ -352,10 +354,26 @@ template <PixelType T> class ImageView
 
     friend iterator;
     friend const_iterator;
+
+#ifdef _MSC_VER
     friend iterator operator+(iterator::difference_type aLhs, const iterator &aRhs);
     friend iterator operator-(iterator::difference_type aLhs, const iterator &aRhs);
     friend const_iterator operator+(const_iterator::difference_type aLhs, const const_iterator &aRhs);
     friend const_iterator operator-(const_iterator::difference_type aLhs, const const_iterator &aRhs);
+#elif __clang__
+    friend iterator operator+(iterator::difference_type aLhs, const iterator &aRhs);
+    friend iterator operator-(iterator::difference_type aLhs, const iterator &aRhs);
+    friend const_iterator operator+(const_iterator::difference_type aLhs, const const_iterator &aRhs);
+    friend const_iterator operator-(const_iterator::difference_type aLhs, const const_iterator &aRhs);
+#else
+    // thanks GCC... explicit template specialisation should be allowed in non-namespace scope, and visual C++ doesn't
+    // compile with that version, hence the ifdef
+    template <bool _isConst>
+    friend _iterator<_isConst> operator+(_iterator<_isConst>::difference_type aLhs, const _iterator<_isConst> &aRhs);
+    template <bool _isConst>
+    friend _iterator<_isConst> operator-(_iterator<_isConst>::difference_type aLhs, const _iterator<_isConst> &aRhs);
+
+#endif
 
 #pragma endregion
 
@@ -783,6 +801,101 @@ template <PixelType T> class ImageView
         requires(!std::same_as<T, TTo>) && (!std::same_as<TTo, float>) && (!std::same_as<TTo, double>) &&
                 (!std::same_as<TTo, Complex<float>>) && (!std::same_as<TTo, Complex<double>>);
 #pragma endregion
+#pragma region Copy
+    /// <summary>
+    /// Copy image.
+    /// </summary>
+    ImageView<T> &Copy(ImageView<T> &aDst);
+
+    /// <summary>
+    /// Copy image with mask. Pixels with mask == 0 remain untouched in destination image.
+    /// </summary>
+    ImageView<T> &Copy(ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask);
+
+    /// <summary>
+    /// Copy channel aSrcChannel to channel aDstChannel of aDst.
+    /// </summary>
+    template <PixelType TTo>
+    ImageView<TTo> &Copy(Channel aSrcChannel, ImageView<TTo> &aDst, Channel aDstChannel)
+        requires(vector_size_v<T> > 1) &&   //
+                (vector_size_v<TTo> > 1) && //
+                std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
+
+    /// <summary>
+    /// Copy this single channel image to channel aDstChannel of aDst.
+    /// </summary>
+    template <PixelType TTo>
+    ImageView<TTo> &Copy(ImageView<TTo> &aDst, Channel aDstChannel)
+        requires(vector_size_v<T> == 1) &&  //
+                (vector_size_v<TTo> > 1) && //
+                std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
+
+    /// <summary>
+    /// Copy channel aSrcChannel to single channel image aDst.
+    /// </summary>
+    template <PixelType TTo>
+    ImageView<TTo> &Copy(Channel aSrcChannel, ImageView<TTo> &aDst)
+        requires(vector_size_v<T> > 1) &&    //
+                (vector_size_v<TTo> == 1) && //
+                std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
+
+    /// <summary>
+    /// Copy packed image pixels to planar images.
+    /// </summary>
+    void Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
+              ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2)
+        requires(TwoChannel<T>);
+
+    /// <summary>
+    /// Copy packed image pixels to planar images.
+    /// </summary>
+    void Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
+              ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2,
+              ImageView<Vector1<remove_vector_t<T>>> &aDstChannel3)
+        requires(ThreeChannel<T>);
+
+    /// <summary>
+    /// Copy packed image pixels to planar images.
+    /// </summary>
+    void Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
+              ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2,
+              ImageView<Vector1<remove_vector_t<T>>> &aDstChannel3,
+              ImageView<Vector1<remove_vector_t<T>>> &aDstChannel4)
+        requires(FourChannelNoAlpha<T>);
+
+    /// <summary>
+    /// Copy planar image pixels to packed pixel image.
+    /// </summary>
+    static ImageView<T> &Copy(ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel1,
+                              ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel2, ImageView<T> &aDst)
+        requires(TwoChannel<T>);
+
+    /// <summary>
+    /// Copy planar image pixels to packed pixel image.
+    /// </summary>
+    static ImageView<T> &Copy(ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel1,
+                              ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel2,
+                              ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel3, ImageView<T> &aDst)
+        requires(ThreeChannel<T>);
+
+    /// <summary>
+    /// Copy planar image pixels to packed pixel image.
+    /// </summary>
+    static ImageView<T> &Copy(ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel1,
+                              ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel2,
+                              ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel3,
+                              ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel4, ImageView<T> &aDst)
+        requires(FourChannelNoAlpha<T>);
+#pragma endregion
+#pragma region Dup
+    /// <summary>
+    /// Duplicates a one channel image to all channels in a multi-channel image
+    /// </summary>
+    template <PixelType TTo>
+    ImageView<TTo> &Dup(ImageView<TTo> &aDst)
+        requires(vector_size_v<T> == 1) &&
+                (vector_size_v<TTo> > 1) && std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
+#pragma endregion
 #pragma region Scale
     /// <summary>
     /// Convert witch scaling the pixel value from input type value range to ouput type value range using the
@@ -829,6 +942,32 @@ template <PixelType T> class ImageView
     ImageView<T> &Set(const T &aConst);
 
     ImageView<T> &Set(const T &aConst, const ImageView<Pixel8uC1> &aMask);
+#pragma endregion
+#pragma region Swap Channel
+    /// <summary>
+    /// Swap channels
+    /// </summary>
+    template <PixelType TTo>
+    ImageView<TTo> &SwapChannel(ImageView<TTo> &aDst, const ChannelList<vector_active_size_v<TTo>> &aDstChannels)
+        requires((vector_active_size_v<TTo> <= vector_active_size_v<T>)) && //
+                (vector_size_v<T> >= 3) &&                                  //
+                (vector_size_v<TTo> >= 3) &&                                //
+                std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
+
+    /// <summary>
+    /// Swap channels (3-channel to 4-channel with additional value). If aDstChannels[i] == 3, channel i of aDst is set
+    /// to aValue, if aDstChannels[i] > 3, channel i of aDst is kept unchanged.
+    /// </summary>
+    template <PixelType TTo>
+    ImageView<TTo> &SwapChannel(ImageView<TTo> &aDst, const ChannelList<vector_active_size_v<TTo>> &aDstChannels,
+                                remove_vector_t<T> aValue)
+        requires(vector_size_v<T> == 3) &&          //
+                (vector_active_size_v<TTo> == 4) && //
+                std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
+#pragma endregion
+
+#pragma region FillRandom
+    ImageView<T> &FillRandom();
 #pragma endregion
 #pragma endregion
 
@@ -1301,6 +1440,71 @@ template <PixelType T> class ImageView
         const ImageView<T> &aSrcImag,
         ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst)
         requires RealSignedVector<T> && (!FourChannelAlpha<T>);
+#pragma endregion
+#pragma endregion
+
+#pragma region Statistics
+#pragma region MinEvery
+    ImageView<T> &MinEvery(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+        requires RealVector<T>;
+
+    ImageView<T> &MinEvery(const ImageView<T> &aSrc2)
+        requires RealVector<T>;
+#pragma endregion
+#pragma region MaxEvery
+    ImageView<T> &MaxEvery(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+        requires RealVector<T>;
+
+    ImageView<T> &MaxEvery(const ImageView<T> &aSrc2)
+        requires RealVector<T>;
+#pragma endregion
+#pragma endregion
+
+#pragma region Threshold and Compare
+#pragma region Compare
+    ImageView<Pixel8uC1> &Compare(const ImageView<T> &aSrc2, CompareOp aCompare, ImageView<Pixel8uC1> &aDst);
+
+    ImageView<Pixel8uC1> &Compare(const T &aConst, CompareOp aCompare, ImageView<Pixel8uC1> &aDst);
+
+    ImageView<Pixel8uC1> &CompareEqEps(const ImageView<T> &aSrc2, complex_basetype_t<remove_vector_t<T>> aEpsilon,
+                                       ImageView<Pixel8uC1> &aDst)
+        requires RealOrComplexFloatingVector<T>;
+
+    ImageView<Pixel8uC1> &CompareEqEps(const T &aConst, complex_basetype_t<remove_vector_t<T>> aEpsilon,
+                                       ImageView<Pixel8uC1> &aDst)
+        requires RealOrComplexFloatingVector<T>;
+#pragma endregion
+#pragma region Threshold
+    ImageView<T> &Threshold(const T &aThreshold, CompareOp aCompare, ImageView<T> &aDst)
+        requires RealVector<T>;
+    ImageView<T> &ThresholdLT(const T &aThreshold, ImageView<T> &aDst)
+        requires RealVector<T>;
+    ImageView<T> &ThresholdGT(const T &aThreshold, ImageView<T> &aDst)
+        requires RealVector<T>;
+    ImageView<T> &Threshold(const T &aThreshold, CompareOp aCompare)
+        requires RealVector<T>;
+    ImageView<T> &ThresholdLT(const T &aThreshold)
+        requires RealVector<T>;
+    ImageView<T> &ThresholdGT(const T &aThreshold)
+        requires RealVector<T>;
+
+    ImageView<T> &Threshold(const T &aThreshold, const T &aValue, CompareOp aCompare, ImageView<T> &aDst)
+        requires RealVector<T>;
+    ImageView<T> &ThresholdLT(const T &aThreshold, const T &aValue, ImageView<T> &aDst)
+        requires RealVector<T>;
+    ImageView<T> &ThresholdGT(const T &aThreshold, const T &aValue, ImageView<T> &aDst)
+        requires RealVector<T>;
+    ImageView<T> &Threshold(const T &aThreshold, const T &aValue, CompareOp aCompare)
+        requires RealVector<T>;
+    ImageView<T> &ThresholdLT(const T &aThreshold, const T &aValue)
+        requires RealVector<T>;
+    ImageView<T> &ThresholdGT(const T &aThreshold, const T &aValue)
+        requires RealVector<T>;
+    ImageView<T> &ThresholdLTGT(const T &aThresholdLT, const T &aValueLT, const T &aThresholdGT, const T &aValueGT,
+                                ImageView<T> &aDst)
+        requires RealVector<T>;
+    ImageView<T> &ThresholdLTGT(const T &aThresholdLT, const T &aValueLT, const T &aThresholdGT, const T &aValueGT)
+        requires RealVector<T>;
 #pragma endregion
 #pragma endregion
 };

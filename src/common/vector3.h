@@ -479,6 +479,7 @@ template <Number T> struct alignas(sizeof(T)) Vector3
             case Axis3D::Z:
                 return z;
         }
+        return x;
     }
 
     /// <summary>

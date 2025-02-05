@@ -18,8 +18,7 @@
 namespace opp::image::cuda
 {
 /// <summary>
-/// runs aFunctor on every pixel (only one channel of a multi-channel pixel) of an image. Inplace and outplace
-/// operation, no mask.
+/// runs aFunctor on every pixel (only one channel of a multi-channel pixel) of an image. no inplace operation, no mask.
 /// </summary>
 template <class DstT, typename funcType>
 __global__ void forEachPixelSingleChannelKernel(DstT *__restrict__ aDst, size_t aPitchDst, Channel aDstChannel,

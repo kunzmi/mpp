@@ -9,8 +9,8 @@
 #include <common/opp_defs.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
-#include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vectorTypes.h>
 #include <concepts>
 
 // disable warning for pragma unroll when compiling with host compiler:
@@ -28,7 +28,7 @@ namespace opp::image
 /// <typeparam name="tupelSize"></typeparam>
 /// <typeparam name="roundingMode"></typeparam>
 template <size_t tupelSize, typename SrcT, typename ComputeT, typename DstT, typename operation,
-          RoundingMode roundingMode = RoundingMode::NearestTiesAwayFromZero>
+          RoundingMode roundingMode = RoundingMode::NearestTiesAwayFromZero, bool SrcIsSameAsCompute = false>
 struct SrcDevConstantFunctor : public ImageFunctor<false>
 {
     const SrcT *RESTRICT Src1;
@@ -53,14 +53,21 @@ struct SrcDevConstantFunctor : public ImageFunctor<false>
 
 #pragma region run naive on one pixel
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
-        requires std::same_as<ComputeT, DstT>
+        requires std::same_as<ComputeT, DstT> && (!SrcIsSameAsCompute)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         Op(static_cast<ComputeT>(*pixelSrc1), static_cast<ComputeT>(*Constant), aDst);
     }
 
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
-        requires(!std::same_as<ComputeT, DstT>)
+        requires std::same_as<SrcT, ComputeT> && (SrcIsSameAsCompute)
+    {
+        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+        Op(static_cast<ComputeT>(*pixelSrc1), static_cast<ComputeT>(*Constant), aDst);
+    }
+
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+        requires(!std::same_as<ComputeT, DstT>) && (!SrcIsSameAsCompute)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         ComputeT temp;
@@ -73,7 +80,7 @@ struct SrcDevConstantFunctor : public ImageFunctor<false>
 
 #pragma region run sequential on pixel tupel
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
-        requires std::same_as<ComputeT, DstT>
+        requires std::same_as<ComputeT, DstT> && (!SrcIsSameAsCompute)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
 
@@ -89,7 +96,23 @@ struct SrcDevConstantFunctor : public ImageFunctor<false>
     }
 
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
-        requires(!std::same_as<ComputeT, DstT>)
+        requires std::same_as<SrcT, ComputeT> && (SrcIsSameAsCompute)
+    {
+        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+
+        Tupel<SrcT, tupelSize> tupelSrc1 = Tupel<SrcT, tupelSize>::Load(pixelSrc1);
+
+        ComputeT _constant = static_cast<ComputeT>(*Constant);
+
+#pragma unroll
+        for (size_t i = 0; i < tupelSize; i++)
+        {
+            Op(static_cast<ComputeT>(tupelSrc1.value[i]), _constant, aDst.value[i]);
+        }
+    }
+
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+        requires(!std::same_as<ComputeT, DstT>) && (!SrcIsSameAsCompute)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
 

@@ -119,6 +119,17 @@ int main()
         } */
     try
     {
+
+        EqEps<Vector4<float>> op(0.01f);
+
+        Pixel32fC4 aaIn(0, 240, 100, 190);
+        Pixel32fC4 aaaIn(0, 240.001f, 100, 190);
+        Pixel8uC1 testres;
+        op(aaIn, aaaIn, testres);
+
+        std::cout << aaIn << std::endl;
+        std::cout << testres << std::endl;
+
         /*std::cout << "Scalefactor 4 = " << GetScaleFactor(4) << std::endl;
         std::cout << "Scalefactor 2 = " << GetScaleFactor(2) << std::endl;
         std::cout << "Scalefactor 1 = " << GetScaleFactor(1) << std::endl;
@@ -149,25 +160,23 @@ int main()
         cpu::Image<Pixel8uC3> cpu_res(cpu_flower.SizeRoi());
         cpu::Image<Pixel8uC3> resGPU(cpu_flower.SizeRoi());
 
-        cpu::Image<Pixel32fC3> conv(cpu_flower.SizeRoi());
+        Image<Pixel8uC4> u8test(128, 128);
+        Image<Pixel8uC1> u8test2(128, 128);
+        Image<Pixel8uC4> u8test3(128, 128);
+        cpu::Image<Pixel8uC4> cpu_test(128, 128);
+        cpu::Image<Pixel8uC1> cpu_test2(128, 128);
+        cpu::Image<Pixel8uC4> cpu_test3(128, 128);
+        cpu::Image<Pixel32fC4> cpu_test4(128, 128);
+        cpu_test.FillRandom();
+        cpu_test4.FillRandom();
 
-        Image<Pixel32fC1> u8test(128, 128);
-        Image<Pixel32fC1> u8test2(128, 128);
-        Image<Pixel32fcC1> u8test3(128, 128);
-        cpu::Image<Pixel32fC1> cpu_test(128, 128);
-        cpu::Image<Pixel32fC1> cpu_test2(128, 128);
-        cpu::Image<Pixel32fcC1> cpu_test3(128, 128);
-        cpu::Image<Pixel32fcC1> cpu_test4(128, 128);
+        u8test.Set(Pixel8uC4(2, 4, 6, 8));
+        // u8test2.Set(Pixel8uC4(1, 3, 5, 7));
 
-        u8test.Set(Pixel32fC1(12.1f));
-        u8test2.Set(Pixel32fC1(8.6f));
-        cpu_test.Set(Pixel32fC1(12.1f));
-        cpu_test2.Set(Pixel32fC1(8.6f));
-        u8test.MakeComplex(u8test2, u8test3).Conj();
-        cpu_test.MakeComplex(cpu_test2, cpu_test3).Conj();
+        u8test.Copy(RGBA::G, u8test2);
 
         // u8test2.ResetRoi();
-        cpu_test4 << u8test3;
+        cpu_test2 << u8test2;
         cudaDeviceSynchronize();
 
         // cpu_flower.Convert(conv);

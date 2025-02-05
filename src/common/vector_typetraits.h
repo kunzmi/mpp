@@ -62,6 +62,28 @@ template <typename T> struct vector_size<Vector4A<T>> : std::integral_constant<i
 
 template <class T> inline constexpr int vector_size_v = vector_size<T>::value;
 
+// the number of channel components used for computations (3 for Vector4A, N for all others)
+template <typename T> struct vector_active_size : std::integral_constant<int, 0>
+{
+};
+template <typename T> struct vector_active_size<Vector1<T>> : std::integral_constant<int, 1>
+{
+};
+template <typename T> struct vector_active_size<Vector2<T>> : std::integral_constant<int, 2>
+{
+};
+template <typename T> struct vector_active_size<Vector3<T>> : std::integral_constant<int, 3>
+{
+};
+template <typename T> struct vector_active_size<Vector4<T>> : std::integral_constant<int, 4>
+{
+};
+template <typename T> struct vector_active_size<Vector4A<T>> : std::integral_constant<int, 3>
+{
+};
+
+template <class T> inline constexpr int vector_active_size_v = vector_active_size<T>::value;
+
 template <typename TVector, typename TOther> struct same_vector_size_different_type
 {
     using type = void;

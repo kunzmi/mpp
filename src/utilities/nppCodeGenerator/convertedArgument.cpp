@@ -165,7 +165,7 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
         }
         else if (aFunction.InnerFunction().name.find("QualityIndex") != std::string::npos)
         {
-            mType = "cuda::DevVarView<float> &";
+            mType = "opp::cuda::DevVarView<float> &";
         }
         else if (aArgument->type == "Npp8u *" || aArgument->type == "Npp8s *" || aArgument->type == "Npp16u *" ||
                  aArgument->type == "Npp16s *" || aArgument->type == "Npp16sc *" || aArgument->type == "Npp16f *" ||
@@ -300,15 +300,15 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
         }
         else if (aArgument->type == "const Npp8u *")
         {
-            mType = "const cuda::DevVarView<byte> &";
+            mType = "const opp::cuda::DevVarView<byte> &";
         }
         else if (aArgument->type == "const Npp32s *")
         {
-            mType = "const cuda::DevVarView<int> &";
+            mType = "const opp::cuda::DevVarView<int> &";
         }
         else if (aArgument->type == "const Npp32f *")
         {
-            mType = "const cuda::DevVarView<float> &";
+            mType = "const opp::cuda::DevVarView<float> &";
         }
         else
         {
@@ -319,15 +319,15 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
     {
         if (aArgument->type == "const Npp32s *")
         {
-            mType = "const cuda::DevVarView<int> &";
+            mType = "const opp::cuda::DevVarView<int> &";
         }
         else if (aArgument->type == "const Npp32f *")
         {
-            mType = "const cuda::DevVarView<float> &";
+            mType = "const opp::cuda::DevVarView<float> &";
         }
         else if (aArgument->type == "const Npp64f *")
         {
-            mType = "const cuda::DevVarView<double> &";
+            mType = "const opp::cuda::DevVarView<double> &";
         }
         else
         {
@@ -338,25 +338,25 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
     {
         if (aArgument->type == "const Npp32s *")
         {
-            mType = "const cuda::DevVarView<int> &";
+            mType = "const opp::cuda::DevVarView<int> &";
         }
         else if (aArgument->type == "const Npp32f *")
         {
-            mType = "const cuda::DevVarView<float> &";
+            mType = "const opp::cuda::DevVarView<float> &";
         }
         else if (aArgument->type == "const Npp32s *[3]" || aArgument->type == "const Npp32s *[4]")
         {
-            mType = "cuda::DevVarView<int>";
+            mType = "opp::cuda::DevVarView<int>";
             mCall = "pLevelsPtrList";
         }
         else if (aArgument->type == "Npp8u *[3]") // LUT_Trilinear
         {
-            /*mType = "cuda::DevVarView<byte>";
+            /*mType = "opp::cuda::DevVarView<byte>";
             mCall = "pLevelsPtrList";*/
         }
         else if (aArgument->type == "const Npp32f *[3]" || aArgument->type == "const Npp32f *[4]")
         {
-            mType = "cuda::DevVarView<float>";
+            mType = "opp::cuda::DevVarView<float>";
             mCall = "pLevelsPtrList";
         }
         else
@@ -368,12 +368,12 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
     {
         if (aArgument->type == "const Npp8u *[3]" || aArgument->type == "const Npp8u *[4]")
         {
-            mType = "cuda::DevVarView<byte>";
+            mType = "opp::cuda::DevVarView<byte>";
             mCall = "pTablesPtrList";
         }
         else if (aArgument->type == "const Npp16u *[3]" || aArgument->type == "const Npp16u *[4]")
         {
-            mType = "cuda::DevVarView<ushort>";
+            mType = "opp::cuda::DevVarView<ushort>";
             mCall = "pTablesPtrList";
         }
         else
@@ -385,24 +385,24 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
     {
         if (aArgument->type == "const Npp32s *")
         {
-            mType = "const cuda::DevVarView<int> &";
+            mType = "const opp::cuda::DevVarView<int> &";
         }
         else if (aArgument->type == "const Npp32f *")
         {
-            mType = "const cuda::DevVarView<float> &";
+            mType = "const opp::cuda::DevVarView<float> &";
         }
         else if (aArgument->type == "const Npp32s *[3]" || aArgument->type == "const Npp32s *[4]")
         {
-            mType = "cuda::DevVarView<int>";
+            mType = "opp::cuda::DevVarView<int>";
             mCall = "pValuesPtrList";
         }
         else if (aArgument->type == "Npp32u *") // LUT_Trilinear
         {
-            mType = "cuda::DevVarView<Pixel8uC4>";
+            mType = "opp::cuda::DevVarView<Pixel8uC4>";
         }
         else if (aArgument->type == "const Npp32f *[3]" || aArgument->type == "const Npp32f *[4]")
         {
-            mType = "cuda::DevVarView<float>";
+            mType = "opp::cuda::DevVarView<float>";
             mCall = "pValuesPtrList";
         }
         else
@@ -415,23 +415,23 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
         const std::string channel = NPPParser::GetTypeString(mFunction.InnerFunction().name);
         if (channel == "8u24u" || channel == "16u24u")
         {
-            mType = "const cuda::DevVarView<Pixel8uC3> &";
+            mType = "const opp::cuda::DevVarView<Pixel8uC3> &";
         }
         else if (channel == "8u32u" || channel == "16u32u")
         {
-            mType = "const cuda::DevVarView<Pixel8uC4> &";
+            mType = "const opp::cuda::DevVarView<Pixel8uC4> &";
         }
         else if (aArgument->type == "const Npp8u *")
         {
-            mType = "const cuda::DevVarView<Pixel8uC1> &";
+            mType = "const opp::cuda::DevVarView<Pixel8uC1> &";
         }
         else if (aArgument->type == "const Npp16u *")
         {
-            mType = "const cuda::DevVarView<Pixel16uC1> &";
+            mType = "const opp::cuda::DevVarView<Pixel16uC1> &";
         }
         else if (aArgument->type == "const Npp32u *")
         {
-            mType = "const cuda::DevVarView<Pixel32uC1> &";
+            mType = "const opp::cuda::DevVarView<Pixel32uC1> &";
         }
         else
         {
@@ -444,11 +444,11 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
     {
         if (aArgument->type == "Npp64f *")
         {
-            mType = "cuda::DevVarView<double> &";
+            mType = "opp::cuda::DevVarView<double> &";
         }
         else if (aArgument->type == "Npp64s *")
         {
-            mType = "cuda::DevVarView<long64> &";
+            mType = "opp::cuda::DevVarView<long64> &";
         }
         else
         {
@@ -460,12 +460,12 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
     {
         if (aArgument->type == "Npp64f[3]" || aArgument->type == "Npp64f[4]")
         {
-            mType = "cuda::DevVarView<double> &";
+            mType = "opp::cuda::DevVarView<double> &";
             mName = mName.substr(0, mName.size() - 3);
         }
         else if (aArgument->type == "Npp64s[3]" || aArgument->type == "Npp64s[4]")
         {
-            mType = "cuda::DevVarView<long64> &";
+            mType = "opp::cuda::DevVarView<long64> &";
             mName = mName.substr(0, mName.size() - 3);
         }
         else
@@ -478,7 +478,7 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
     {
         if (aArgument->type == "Npp32f *")
         {
-            mType = "cuda::DevVarView<float> &";
+            mType = "opp::cuda::DevVarView<float> &";
         }
         else
         {
@@ -491,35 +491,35 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
     {
         if (aArgument->type == "Npp8u *")
         {
-            mType = "cuda::DevVarView<byte> &";
+            mType = "opp::cuda::DevVarView<byte> &";
         }
         else if (aArgument->type == "Npp8s *")
         {
-            mType = "cuda::DevVarView<sbyte> &";
+            mType = "opp::cuda::DevVarView<sbyte> &";
         }
         else if (aArgument->type == "Npp16u *")
         {
-            mType = "cuda::DevVarView<ushort> &";
+            mType = "opp::cuda::DevVarView<ushort> &";
         }
         else if (aArgument->type == "Npp16s *")
         {
-            mType = "cuda::DevVarView<short> &";
+            mType = "opp::cuda::DevVarView<short> &";
         }
         else if (aArgument->type == "Npp32u *")
         {
-            mType = "cuda::DevVarView<uint> &";
+            mType = "opp::cuda::DevVarView<uint> &";
         }
         else if (aArgument->type == "Npp32s *")
         {
-            mType = "cuda::DevVarView<int> &";
+            mType = "opp::cuda::DevVarView<int> &";
         }
         else if (aArgument->type == "Npp32f *")
         {
-            mType = "cuda::DevVarView<float> &";
+            mType = "opp::cuda::DevVarView<float> &";
         }
         else if (aArgument->type == "Npp64f *")
         {
-            mType = "cuda::DevVarView<double> &";
+            mType = "opp::cuda::DevVarView<double> &";
         }
         else
         {
@@ -532,42 +532,42 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
     {
         if (aArgument->type == "Npp8u[3]" || aArgument->type == "Npp8u[4]")
         {
-            mType = "cuda::DevVarView<byte> &";
+            mType = "opp::cuda::DevVarView<byte> &";
             mName = mName.substr(0, mName.size() - 3);
         }
         else if (aArgument->type == "Npp8s[3]" || aArgument->type == "Npp8s[4]")
         {
-            mType = "cuda::DevVarView<sbyte> &";
+            mType = "opp::cuda::DevVarView<sbyte> &";
             mName = mName.substr(0, mName.size() - 3);
         }
         else if (aArgument->type == "Npp16u[3]" || aArgument->type == "Npp16u[4]")
         {
-            mType = "cuda::DevVarView<ushort> &";
+            mType = "opp::cuda::DevVarView<ushort> &";
             mName = mName.substr(0, mName.size() - 3);
         }
         else if (aArgument->type == "Npp16s[3]" || aArgument->type == "Npp16s[4]")
         {
-            mType = "cuda::DevVarView<short> &";
+            mType = "opp::cuda::DevVarView<short> &";
             mName = mName.substr(0, mName.size() - 3);
         }
         else if (aArgument->type == "Npp32u[3]" || aArgument->type == "Npp32u[4]")
         {
-            mType = "cuda::DevVarView<uint> &";
+            mType = "opp::cuda::DevVarView<uint> &";
             mName = mName.substr(0, mName.size() - 3);
         }
         else if (aArgument->type == "Npp32s[3]" || aArgument->type == "Npp32s[4]")
         {
-            mType = "cuda::DevVarView<int> &";
+            mType = "opp::cuda::DevVarView<int> &";
             mName = mName.substr(0, mName.size() - 3);
         }
         else if (aArgument->type == "Npp32f[3]" || aArgument->type == "Npp32f[4]")
         {
-            mType = "cuda::DevVarView<float> &";
+            mType = "opp::cuda::DevVarView<float> &";
             mName = mName.substr(0, mName.size() - 3);
         }
         else if (aArgument->type == "Npp64f[3]" || aArgument->type == "Npp64f[4]")
         {
-            mType = "cuda::DevVarView<double> &";
+            mType = "opp::cuda::DevVarView<double> &";
             mName = mName.substr(0, mName.size() - 3);
         }
         else
@@ -580,7 +580,7 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
     {
         if (aArgument->type == "int *" || aArgument->type == "int[3]" || aArgument->type == "int[4]")
         {
-            mType = "cuda::DevVarView<int> &";
+            mType = "opp::cuda::DevVarView<int> &";
             if (aArgument->type.find('[') != std::string::npos)
             {
                 mName = mName.substr(0, mName.size() - 3);
@@ -595,11 +595,11 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
     {
         if (aArgument->type == "Npp32s *")
         {
-            mType = "cuda::DevVarView<int> &";
+            mType = "opp::cuda::DevVarView<int> &";
         }
         else if (aArgument->type == "Npp32s *[3]" || aArgument->type == "Npp32s *[4]")
         {
-            mType = "cuda::DevVarView<int>";
+            mType = "opp::cuda::DevVarView<int>";
             mCall = "pHistPtrList";
         }
         else
@@ -611,7 +611,7 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
     {
         if (aArgument->type == "NppiPoint *")
         {
-            mType = "cuda::DevVarView<NppiPoint> &";
+            mType = "opp::cuda::DevVarView<NppiPoint> &";
         }
         else
         {
@@ -641,11 +641,11 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
     {
         if (aArgument->type == "Npp64f *")
         {
-            mType = "cuda::DevVarView<double> &";
+            mType = "opp::cuda::DevVarView<double> &";
         }
         else if (aArgument->type == "Npp64f[2]" || aArgument->type == "Npp64f[3]" || aArgument->type == "Npp64f[4]")
         {
-            mType = "cuda::DevVarView<double> &";
+            mType = "opp::cuda::DevVarView<double> &";
             mName = mName.substr(0, mName.find('['));
         }
         else
@@ -1033,31 +1033,43 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
     {
         if (aArgument->type.find("const") == std::string::npos)
         {
-            mType = "cuda::DevVarView<Pixel8uC1> &";
+            mType = "opp::cuda::DevVarView<Pixel8uC1> &";
         }
         else
         {
-            mType = "const cuda::DevVarView<Pixel8uC1> &";
+            mType = "const opp::cuda::DevVarView<Pixel8uC1> &";
         }
     }
     else if (aArgument->name == "pConstants" && aArgument->type.find('*') != std::string::npos)
     {
-        std::string conststr;
-        if (aArgument->type.find("const") != std::string::npos)
+        if (mFunction.Name().find("Compare") != std::string::npos)
         {
-            conststr = "const ";
+            int channels = mFunction.GetInChannels();
+            if (mFunction.IsAlphaIgnored())
+            {
+                channels = 3;
+            }
+            mType = "const Pixel" + mFunction.GetTypeString() + "C" + std::to_string(channels) + " &";
         }
-        int channels = mFunction.GetInChannels();
-        if (mFunction.IsAlphaIgnored())
+        else
         {
-            channels = 3;
+            std::string conststr;
+            if (aArgument->type.find("const") != std::string::npos)
+            {
+                conststr = "const ";
+            }
+            int channels = mFunction.GetInChannels();
+            if (mFunction.IsAlphaIgnored())
+            {
+                channels = 3;
+            }
+            mType = conststr + "opp::cuda::DevVarView<Pixel" + mFunction.GetTypeString() + "C" +
+                    std::to_string(channels) + "> &";
         }
-        mType =
-            conststr + "cuda::DevVarView<Pixel" + mFunction.GetTypeString() + "C" + std::to_string(channels) + "> &";
     }
     else if (aArgument->name.find("Buffer") != std::string::npos && aArgument->type == "Npp8u *")
     {
-        mType = "cuda::DevVarView<byte> &";
+        mType = "opp::cuda::DevVarView<byte> &";
     }
     else if (aArgument->name == "oDstROI" && mFunction.Name() == "ResizeAdvancedGetBufferHostSize")
     {

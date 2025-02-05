@@ -197,7 +197,7 @@ Image32fcC1View &Image32fcC1View::Div(const Image32fcC1View &pSrc, const NppStre
     return *this;
 }
 
-void Image32fcC1View::MaximumError(const Image32fcC1View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image32fcC1View::MaximumError(const Image32fcC1View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiMaximumError_32fc_C1R_Ctx(reinterpret_cast<const Npp32fc *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32fc *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
@@ -211,7 +211,7 @@ size_t Image32fcC1View::MaximumErrorGetBufferHostSize(const NppStreamContext &np
     return retValue;
 }
 
-void Image32fcC1View::AverageError(const Image32fcC1View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image32fcC1View::AverageError(const Image32fcC1View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiAverageError_32fc_C1R_Ctx(reinterpret_cast<const Npp32fc *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32fc *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
@@ -225,7 +225,7 @@ size_t Image32fcC1View::AverageErrorGetBufferHostSize(const NppStreamContext &np
     return retValue;
 }
 
-void Image32fcC1View::MaximumRelativeError(const Image32fcC1View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image32fcC1View::MaximumRelativeError(const Image32fcC1View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiMaximumRelativeError_32fc_C1R_Ctx(reinterpret_cast<const Npp32fc *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32fc *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
@@ -239,7 +239,7 @@ size_t Image32fcC1View::MaximumRelativeErrorGetBufferHostSize(const NppStreamCon
     return retValue;
 }
 
-void Image32fcC1View::AverageRelativeError(const Image32fcC1View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image32fcC1View::AverageRelativeError(const Image32fcC1View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiAverageRelativeError_32fc_C1R_Ctx(reinterpret_cast<const Npp32fc *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32fc *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),

@@ -25,7 +25,7 @@
 
 namespace opp::image::cuda
 {
-
+#pragma region Convert
 template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, const opp::cuda::StreamCtx &aStreamCtx)
@@ -82,7 +82,221 @@ ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundi
                             SizeRoi(), aStreamCtx);
     return aDst;
 }
+#pragma endregion
 
+#pragma region Copy
+/// <summary>
+/// Copy image.
+/// </summary>
+template <PixelType T> ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx)
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    InvokeCopy(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), SizeRoi(), aStreamCtx);
+
+    return aDst;
+}
+
+/// <summary>
+/// Copy image with mask. Pixels with mask == 0 remain untouched in destination image.
+/// </summary>
+template <PixelType T>
+ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                                 const opp::cuda::StreamCtx &aStreamCtx)
+{
+    checkSameSize(ROI(), aDst.ROI());
+    checkSameSize(ROI(), aMask.ROI());
+
+    InvokeCopyMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), SizeRoi(),
+                   aStreamCtx);
+
+    return aDst;
+}
+
+/// <summary>
+/// Copy channel aSrcChannel to channel aDstChannel of aDst.
+/// </summary>
+template <PixelType T>
+template <PixelType TTo>
+ImageView<TTo> &ImageView<T>::Copy(Channel aSrcChannel, ImageView<TTo> &aDst, Channel aDstChannel,
+                                   const opp::cuda::StreamCtx &aStreamCtx)
+    requires(vector_size_v<T> > 1) &&   //
+            (vector_size_v<TTo> > 1) && //
+            std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    InvokeCopyChannel(PointerRoi(), Pitch(), aSrcChannel, aDst.PointerRoi(), aDst.Pitch(), aDstChannel, SizeRoi(),
+                      aStreamCtx);
+
+    return aDst;
+}
+
+/// <summary>
+/// Copy this single channel image to channel aDstChannel of aDst.
+/// </summary>
+template <PixelType T>
+template <PixelType TTo>
+ImageView<TTo> &ImageView<T>::Copy(ImageView<TTo> &aDst, Channel aDstChannel, const opp::cuda::StreamCtx &aStreamCtx)
+    requires(vector_size_v<T> == 1) &&  //
+            (vector_size_v<TTo> > 1) && //
+            std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    InvokeCopyChannel(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aDstChannel, SizeRoi(), aStreamCtx);
+
+    return aDst;
+}
+
+/// <summary>
+/// Copy channel aSrcChannel to single channel image aDst.
+/// </summary>
+template <PixelType T>
+template <PixelType TTo>
+ImageView<TTo> &ImageView<T>::Copy(Channel aSrcChannel, ImageView<TTo> &aDst, const opp::cuda::StreamCtx &aStreamCtx)
+    requires(vector_size_v<T> > 1) &&    //
+            (vector_size_v<TTo> == 1) && //
+            std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    InvokeCopyChannel(PointerRoi(), Pitch(), aSrcChannel, aDst.PointerRoi(), aDst.Pitch(), SizeRoi(), aStreamCtx);
+
+    return aDst;
+}
+
+/// <summary>
+/// Copy packed image pixels to planar images.
+/// </summary>
+template <PixelType T>
+void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
+                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2, const opp::cuda::StreamCtx &aStreamCtx)
+    requires(TwoChannel<T>)
+{
+    checkSameSize(ROI(), aDstChannel1.ROI());
+    checkSameSize(ROI(), aDstChannel2.ROI());
+
+    InvokeCopyPlanar(PointerRoi(), Pitch(), aDstChannel1.PointerRoi(), aDstChannel1.Pitch(), aDstChannel2.PointerRoi(),
+                     aDstChannel2.Pitch(), SizeRoi(), aStreamCtx);
+}
+
+/// <summary>
+/// Copy packed image pixels to planar images.
+/// </summary>
+template <PixelType T>
+void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
+                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2,
+                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel3, const opp::cuda::StreamCtx &aStreamCtx)
+    requires(ThreeChannel<T>)
+{
+    checkSameSize(ROI(), aDstChannel1.ROI());
+    checkSameSize(ROI(), aDstChannel2.ROI());
+    checkSameSize(ROI(), aDstChannel3.ROI());
+
+    InvokeCopyPlanar(PointerRoi(), Pitch(), aDstChannel1.PointerRoi(), aDstChannel1.Pitch(), aDstChannel2.PointerRoi(),
+                     aDstChannel2.Pitch(), aDstChannel3.PointerRoi(), aDstChannel3.Pitch(), SizeRoi(), aStreamCtx);
+}
+
+/// <summary>
+/// Copy packed image pixels to planar images.
+/// </summary>
+template <PixelType T>
+void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
+                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2,
+                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel3,
+                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel4, const opp::cuda::StreamCtx &aStreamCtx)
+    requires(FourChannelNoAlpha<T>)
+{
+    checkSameSize(ROI(), aDstChannel1.ROI());
+    checkSameSize(ROI(), aDstChannel2.ROI());
+    checkSameSize(ROI(), aDstChannel3.ROI());
+    checkSameSize(ROI(), aDstChannel4.ROI());
+
+    InvokeCopyPlanar(PointerRoi(), Pitch(), aDstChannel1.PointerRoi(), aDstChannel1.Pitch(), aDstChannel2.PointerRoi(),
+                     aDstChannel2.Pitch(), aDstChannel3.PointerRoi(), aDstChannel3.Pitch(), aDstChannel4.PointerRoi(),
+                     aDstChannel4.Pitch(), SizeRoi(), aStreamCtx);
+}
+
+/// <summary>
+/// Copy planar image pixels to packed pixel image.
+/// </summary>
+template <PixelType T>
+ImageView<T> &ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel1,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel2, ImageView<T> &aDst,
+                                 const opp::cuda::StreamCtx &aStreamCtx)
+    requires(TwoChannel<T>)
+{
+    checkSameSize(aSrcChannel1.ROI(), aDst.ROI());
+    checkSameSize(aSrcChannel2.ROI(), aDst.ROI());
+
+    InvokeCopyPlanar(aSrcChannel1.PointerRoi(), aSrcChannel1.Pitch(), aSrcChannel2.PointerRoi(), aSrcChannel2.Pitch(),
+                     aDst.PointerRoi(), aDst.Pitch(), aDst.SizeRoi(), aStreamCtx);
+
+    return aDst;
+}
+
+/// <summary>
+/// Copy planar image pixels to packed pixel image.
+/// </summary>
+template <PixelType T>
+ImageView<T> &ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel1,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel2,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel3, ImageView<T> &aDst,
+                                 const opp::cuda::StreamCtx &aStreamCtx)
+    requires(ThreeChannel<T>)
+{
+    checkSameSize(aSrcChannel1.ROI(), aDst.ROI());
+    checkSameSize(aSrcChannel2.ROI(), aDst.ROI());
+    checkSameSize(aSrcChannel3.ROI(), aDst.ROI());
+
+    InvokeCopyPlanar(aSrcChannel1.PointerRoi(), aSrcChannel1.Pitch(), aSrcChannel2.PointerRoi(), aSrcChannel2.Pitch(),
+                     aSrcChannel3.PointerRoi(), aSrcChannel3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aDst.SizeRoi(),
+                     aStreamCtx);
+
+    return aDst;
+}
+
+/// <summary>
+/// Copy planar image pixels to packed pixel image.
+/// </summary>
+template <PixelType T>
+ImageView<T> &ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel1,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel2,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel3,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel4, ImageView<T> &aDst,
+                                 const opp::cuda::StreamCtx &aStreamCtx)
+    requires(FourChannelNoAlpha<T>)
+{
+    checkSameSize(aSrcChannel1.ROI(), aDst.ROI());
+    checkSameSize(aSrcChannel2.ROI(), aDst.ROI());
+    checkSameSize(aSrcChannel3.ROI(), aDst.ROI());
+    checkSameSize(aSrcChannel4.ROI(), aDst.ROI());
+
+    InvokeCopyPlanar(aSrcChannel1.PointerRoi(), aSrcChannel1.Pitch(), aSrcChannel2.PointerRoi(), aSrcChannel2.Pitch(),
+                     aSrcChannel3.PointerRoi(), aSrcChannel3.Pitch(), aSrcChannel4.PointerRoi(), aSrcChannel4.Pitch(),
+                     aDst.PointerRoi(), aDst.Pitch(), aDst.SizeRoi(), aStreamCtx);
+
+    return aDst;
+}
+#pragma endregion
+
+#pragma region Dup
+template <PixelType T>
+template <PixelType TTo>
+ImageView<TTo> &ImageView<T>::Dup(ImageView<TTo> &aDst, const opp::cuda::StreamCtx &aStreamCtx)
+    requires(vector_size_v<T> == 1) &&
+            (vector_size_v<TTo> > 1) && std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    InvokeDupSrc(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), SizeRoi(), aStreamCtx);
+
+    return aDst;
+}
+#pragma endregion
+
+#pragma region Scale
 // NOLINTBEGIN(bugprone-easily-swappable-parameters)
 template <PixelType T>
 template <PixelType TTo>
@@ -164,7 +378,9 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcM
     return aDst;
 }
 // NOLINTEND(bugprone-easily-swappable-parameters)
+#pragma endregion
 
+#pragma region Set
 template <PixelType T> ImageView<T> &ImageView<T>::Set(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx)
 {
     InvokeSetC(aConst, PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
@@ -200,6 +416,56 @@ ImageView<T> &ImageView<T>::Set(const opp::cuda::DevVarView<T> &aConst, const Im
 
     return *this;
 }
+#pragma endregion
+
+#pragma region Swap Channel
+/// <summary>
+/// Swap channels
+/// </summary>
+template <PixelType T>
+template <PixelType TTo>
+ImageView<TTo> &ImageView<T>::SwapChannel(ImageView<TTo> &aDst,
+                                          const ChannelList<vector_active_size_v<TTo>> &aDstChannels,
+                                          const opp::cuda::StreamCtx &aStreamCtx)
+    requires((vector_active_size_v<TTo> <= vector_active_size_v<T>)) && //
+            (vector_size_v<T> >= 3) &&                                  //
+            (vector_size_v<TTo> >= 3) &&                                //
+            std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
+{
+    checkSameSize(ROI(), aDst.ROI());
+    for (size_t i = 0; i < vector_active_size_v<TTo>; i++)
+    {
+        if (!aDstChannels.data()[i].template IsInRange<TTo>())
+        {
+            throw INVALIDARGUMENT(
+                aDstChannels, "Channel " << i << " in aDstChannels is out of range. Expected value in range 0.."
+                                         << vector_active_size_v<TTo> - 1 << " but got: " << aDstChannels.data()[i]);
+        }
+    }
+
+    InvokeSwapChannelSrc(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aDstChannels, SizeRoi(), aStreamCtx);
+
+    return aDst;
+}
+
+template <PixelType T>
+template <PixelType TTo>
+ImageView<TTo> &ImageView<T>::SwapChannel(ImageView<TTo> &aDst,
+                                          const ChannelList<vector_active_size_v<TTo>> &aDstChannels,
+                                          remove_vector_t<T> aValue,
+                                          const opp::cuda::StreamCtx &aStreamCtx)
+    requires(vector_size_v<T> == 3) &&          //
+            (vector_active_size_v<TTo> == 4) && //
+            std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    InvokeSwapChannelSrc(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aDstChannels, aValue, SizeRoi(),
+                         aStreamCtx);
+
+    return aDst;
+}
+#pragma endregion
 
 } // namespace opp::image::cuda
 #endif // OPP_ENABLE_CUDA_BACKEND

@@ -245,7 +245,7 @@ Image32sC1View &Image32sC1View::Add(const Pixel32sC1 &nConstant, Image32sC1View 
     return pDst;
 }
 
-Image32sC1View &Image32sC1View::Add(const cuda::DevVarView<Pixel8uC1> &pConstant, Image32sC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image32sC1View &Image32sC1View::Add(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, Image32sC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiAddDeviceC_32s_C1RSfs_Ctx(reinterpret_cast<const Npp32s *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32s *>(pConstant.Pointer()), reinterpret_cast<Npp32s *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
@@ -260,7 +260,7 @@ Image32sC1View &Image32sC1View::Add(const Pixel32sC1 &nConstant, int nScaleFacto
     return *this;
 }
 
-Image32sC1View &Image32sC1View::Add(const cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx)
+Image32sC1View &Image32sC1View::Add(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiAddDeviceC_32s_C1IRSfs_Ctx(reinterpret_cast<const Npp32s *>(pConstant.Pointer()), reinterpret_cast<Npp32s *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
@@ -275,7 +275,7 @@ Image32sC1View &Image32sC1View::Mul(const Pixel32sC1 &nConstant, Image32sC1View 
     return pDst;
 }
 
-Image32sC1View &Image32sC1View::Mul(const cuda::DevVarView<Pixel8uC1> &pConstant, Image32sC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image32sC1View &Image32sC1View::Mul(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, Image32sC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiMulDeviceC_32s_C1RSfs_Ctx(reinterpret_cast<const Npp32s *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32s *>(pConstant.Pointer()), reinterpret_cast<Npp32s *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
@@ -290,7 +290,7 @@ Image32sC1View &Image32sC1View::Mul(const Pixel32sC1 &nConstant, int nScaleFacto
     return *this;
 }
 
-Image32sC1View &Image32sC1View::Mul(const cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx)
+Image32sC1View &Image32sC1View::Mul(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiMulDeviceC_32s_C1IRSfs_Ctx(reinterpret_cast<const Npp32s *>(pConstant.Pointer()), reinterpret_cast<Npp32s *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
@@ -305,7 +305,7 @@ Image32sC1View &Image32sC1View::Sub(const Pixel32sC1 &nConstant, Image32sC1View 
     return pDst;
 }
 
-Image32sC1View &Image32sC1View::Sub(const cuda::DevVarView<Pixel8uC1> &pConstant, Image32sC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image32sC1View &Image32sC1View::Sub(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, Image32sC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiSubDeviceC_32s_C1RSfs_Ctx(reinterpret_cast<const Npp32s *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32s *>(pConstant.Pointer()), reinterpret_cast<Npp32s *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
@@ -320,7 +320,7 @@ Image32sC1View &Image32sC1View::Sub(const Pixel32sC1 &nConstant, int nScaleFacto
     return *this;
 }
 
-Image32sC1View &Image32sC1View::Sub(const cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx)
+Image32sC1View &Image32sC1View::Sub(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiSubDeviceC_32s_C1IRSfs_Ctx(reinterpret_cast<const Npp32s *>(pConstant.Pointer()), reinterpret_cast<Npp32s *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
@@ -335,7 +335,7 @@ Image32sC1View &Image32sC1View::Div(const Pixel32sC1 &nConstant, Image32sC1View 
     return pDst;
 }
 
-Image32sC1View &Image32sC1View::Div(const cuda::DevVarView<Pixel8uC1> &pConstant, Image32sC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image32sC1View &Image32sC1View::Div(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, Image32sC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiDivDeviceC_32s_C1RSfs_Ctx(reinterpret_cast<const Npp32s *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32s *>(pConstant.Pointer()), reinterpret_cast<Npp32s *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
@@ -350,7 +350,7 @@ Image32sC1View &Image32sC1View::Div(const Pixel32sC1 &nConstant, int nScaleFacto
     return *this;
 }
 
-Image32sC1View &Image32sC1View::Div(const cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx)
+Image32sC1View &Image32sC1View::Div(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiDivDeviceC_32s_C1IRSfs_Ctx(reinterpret_cast<const Npp32s *>(pConstant.Pointer()), reinterpret_cast<Npp32s *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
@@ -605,7 +605,7 @@ Image32sC1View &Image32sC1View::AlphaComp(const Image32sC1View &pSrc2, Image32sC
     return pDst;
 }
 
-Image32sC1View &Image32sC1View::Filter32f(Image32sC1View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const
+Image32sC1View &Image32sC1View::Filter32f(Image32sC1View &pDst, const opp::cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiFilter32f_32s_C1R_Ctx(reinterpret_cast<const Npp32s *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp32s *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pKernel.Pointer(), oKernelSize, oAnchor, nppStreamCtx),
@@ -613,7 +613,7 @@ Image32sC1View &Image32sC1View::Filter32f(Image32sC1View &pDst, const cuda::DevV
     return pDst;
 }
 
-Image32sC1View &Image32sC1View::FilterBorder32f(Image32sC1View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image32sC1View &Image32sC1View::FilterBorder32f(Image32sC1View &pDst, const opp::cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -628,7 +628,7 @@ Image32sC1View &Image32sC1View::FilterBorder32f(Image32sC1View &pDst, const cuda
     return pDst;
 }
 
-void Image32sC1View::Norm_Inf(cuda::DevVarView<double> &pNorm, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image32sC1View::Norm_Inf(opp::cuda::DevVarView<double> &pNorm, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     nppSafeCallExt(nppiNorm_Inf_32s_C1R_Ctx(reinterpret_cast<const Npp32s *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), pNorm.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI());
@@ -641,7 +641,7 @@ size_t Image32sC1View::NormInfGetBufferHostSize(const NppStreamContext &nppStrea
     return retValue;
 }
 
-void Image32sC1View::DotProd(const Image32sC1View &pSrc2, cuda::DevVarView<double> &pDp, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image32sC1View::DotProd(const Image32sC1View &pSrc2, opp::cuda::DevVarView<double> &pDp, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiDotProd_32s64f_C1R_Ctx(reinterpret_cast<const Npp32s *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32s *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pDp.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
@@ -671,7 +671,7 @@ void Image32sC1View::RectStdDev(const Image64fC1View &pSqr, Image32fC1View &pDst
                    "ROI Src: " << ROI() << "ROI pSqr: " << pSqr.ROI() << "ROI pDst: " << pDst.ROI());
 }
 
-void Image32sC1View::MaximumError(const Image32sC1View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image32sC1View::MaximumError(const Image32sC1View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiMaximumError_32s_C1R_Ctx(reinterpret_cast<const Npp32s *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32s *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
@@ -685,7 +685,7 @@ size_t Image32sC1View::MaximumErrorGetBufferHostSize(const NppStreamContext &npp
     return retValue;
 }
 
-void Image32sC1View::AverageError(const Image32sC1View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image32sC1View::AverageError(const Image32sC1View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiAverageError_32s_C1R_Ctx(reinterpret_cast<const Npp32s *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32s *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
@@ -699,7 +699,7 @@ size_t Image32sC1View::AverageErrorGetBufferHostSize(const NppStreamContext &npp
     return retValue;
 }
 
-void Image32sC1View::MaximumRelativeError(const Image32sC1View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image32sC1View::MaximumRelativeError(const Image32sC1View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiMaximumRelativeError_32s_C1R_Ctx(reinterpret_cast<const Npp32s *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32s *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
@@ -713,7 +713,7 @@ size_t Image32sC1View::MaximumRelativeErrorGetBufferHostSize(const NppStreamCont
     return retValue;
 }
 
-void Image32sC1View::AverageRelativeError(const Image32sC1View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image32sC1View::AverageRelativeError(const Image32sC1View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiAverageRelativeError_32s_C1R_Ctx(reinterpret_cast<const Npp32s *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32s *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),

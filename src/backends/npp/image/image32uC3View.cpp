@@ -59,49 +59,49 @@ Image32uC3View &Image32uC3View::Set(const Pixel32uC3 &aValue, const NppStreamCon
     return *this;
 }
 
-Image32uC3View &Image32uC3View::FloodFill(NppiPoint oSeed, const Pixel32uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
+Image32uC3View &Image32uC3View::FloodFill(NppiPoint oSeed, const Pixel32uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiFloodFill_32u_C3IR_Ctx(reinterpret_cast<Npp32u *>(PointerRoi()), to_int(Pitch()), oSeed, aNewValues.data(), eNorm, NppiSizeRoi(), pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image32uC3View &Image32uC3View::FloodFillBoundary(NppiPoint oSeed, const Pixel32uC3 &aNewValues, const Pixel32uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
+Image32uC3View &Image32uC3View::FloodFillBoundary(NppiPoint oSeed, const Pixel32uC3 &aNewValues, const Pixel32uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiFloodFillBoundary_32u_C3IR_Ctx(reinterpret_cast<Npp32u *>(PointerRoi()), to_int(Pitch()), oSeed, aNewValues.data(), aBoundaryValues.data(), eNorm, NppiSizeRoi(), pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image32uC3View &Image32uC3View::FloodFillRange(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
+Image32uC3View &Image32uC3View::FloodFillRange(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiFloodFillRange_32u_C3IR_Ctx(reinterpret_cast<Npp32u *>(PointerRoi()), to_int(Pitch()), oSeed, aMin.data(), aMax.data(), aNewValues.data(), eNorm, NppiSizeRoi(), pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image32uC3View &Image32uC3View::FloodFillRangeBoundary(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, const Pixel32uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
+Image32uC3View &Image32uC3View::FloodFillRangeBoundary(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, const Pixel32uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiFloodFillRangeBoundary_32u_C3IR_Ctx(reinterpret_cast<Npp32u *>(PointerRoi()), to_int(Pitch()), oSeed, aMin.data(), aMax.data(), aNewValues.data(), aBoundaryValues.data(), eNorm, NppiSizeRoi(), pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image32uC3View &Image32uC3View::FloodFillGradient(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
+Image32uC3View &Image32uC3View::FloodFillGradient(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiFloodFillGradient_32u_C3IR_Ctx(reinterpret_cast<Npp32u *>(PointerRoi()), to_int(Pitch()), oSeed, aMin.data(), aMax.data(), aNewValues.data(), eNorm, NppiSizeRoi(), pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image32uC3View &Image32uC3View::FloodFillGradientBoundary(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, const Pixel32uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
+Image32uC3View &Image32uC3View::FloodFillGradientBoundary(NppiPoint oSeed, Pixel32uC3 &aMin, Pixel32uC3 &aMax, const Pixel32uC3 &aNewValues, const Pixel32uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
 {
     nppSafeCallExt(nppiFloodFillGradientBoundary_32u_C3IR_Ctx(reinterpret_cast<Npp32u *>(PointerRoi()), to_int(Pitch()), oSeed, aMin.data(), aMax.data(), aNewValues.data(), aBoundaryValues.data(), eNorm, NppiSizeRoi(), pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-void Image32uC3View::DotProd(const Image32uC3View &pSrc2, cuda::DevVarView<double> &aDp, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image32uC3View::DotProd(const Image32uC3View &pSrc2, opp::cuda::DevVarView<double> &aDp, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiDotProd_32u64f_C3R_Ctx(reinterpret_cast<const Npp32u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), aDp.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
@@ -115,7 +115,7 @@ size_t Image32uC3View::DotProdGetBufferHostSize(const NppStreamContext &nppStrea
     return retValue;
 }
 
-void Image32uC3View::MaximumError(const Image32uC3View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image32uC3View::MaximumError(const Image32uC3View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiMaximumError_32u_C3R_Ctx(reinterpret_cast<const Npp32u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
@@ -129,7 +129,7 @@ size_t Image32uC3View::MaximumErrorGetBufferHostSize(const NppStreamContext &npp
     return retValue;
 }
 
-void Image32uC3View::AverageError(const Image32uC3View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image32uC3View::AverageError(const Image32uC3View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiAverageError_32u_C3R_Ctx(reinterpret_cast<const Npp32u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
@@ -143,7 +143,7 @@ size_t Image32uC3View::AverageErrorGetBufferHostSize(const NppStreamContext &npp
     return retValue;
 }
 
-void Image32uC3View::MaximumRelativeError(const Image32uC3View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image32uC3View::MaximumRelativeError(const Image32uC3View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiMaximumRelativeError_32u_C3R_Ctx(reinterpret_cast<const Npp32u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
@@ -157,7 +157,7 @@ size_t Image32uC3View::MaximumRelativeErrorGetBufferHostSize(const NppStreamCont
     return retValue;
 }
 
-void Image32uC3View::AverageRelativeError(const Image32uC3View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image32uC3View::AverageRelativeError(const Image32uC3View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiAverageRelativeError_32u_C3R_Ctx(reinterpret_cast<const Npp32u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp32u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),

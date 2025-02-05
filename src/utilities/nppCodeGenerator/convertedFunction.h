@@ -1,4 +1,5 @@
 #pragma once
+#include <json.h>
 #include <map>
 #include <string>
 #include <unordered_set>
@@ -172,6 +173,8 @@ class ConvertedFunction
     static std::string GetNeededImageHeaders(const std::vector<ConvertedFunction> &aFunctions);
     static std::string GetNeededImageForwardDecl(const std::vector<ConvertedFunction> &aFunctions);
 
+    friend void to_json(nlohmann::json &aj, const ConvertedFunction &aFunction);
+
   private:
     const Function &mFunction;
     std::string mReturnType;
@@ -185,5 +188,14 @@ class ConvertedFunction
     bool mIsConst;
     bool mIsMasked;
 };
+
+inline void to_json(nlohmann::json &aj, const ConvertedFunction &aFunction)
+{
+    aj = nlohmann::json{{"returnType", aFunction.mReturnType},
+                        {"name", aFunction.mName},
+                        {"arguments", aFunction.mArguments},
+                        {"header", aFunction.ToStringHeader()},
+                        {"original", aFunction.mFunction}};
+}
 
 } // namespace opp::utilities::nppParser

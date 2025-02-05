@@ -210,7 +210,7 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// </summary>
     template <Number T2>
     DEVICE_CODE Complex(const Complex<T2> &aVec) noexcept
-        requires IsHalfFp16<T> && IsFloat<T2>
+        requires IsHalfFp16<T> && IsFloat<T2> && CUDA_ONLY<T>
     {
         const float2 *aVecPtr = reinterpret_cast<const float2 *>(&aVec);
         half2 *thisPtr        = reinterpret_cast<half2 *>(this);

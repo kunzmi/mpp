@@ -9,8 +9,8 @@
 #include <common/opp_defs.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
-#include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vectorTypes.h>
 #include <concepts>
 
 // disable warning for pragma unroll when compiling with host compiler:
@@ -66,9 +66,18 @@ struct SrcFunctor : public ImageFunctor<false>
         Op(static_cast<ComputeT>(*pixelSrc1), aDst);
     }
 
+    // for copy sub-channel and dup (SrcT == ComputeT)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+        requires std::same_as<remove_vector_t<ComputeT>, remove_vector_t<DstT>> &&
+                 (vector_size_v<ComputeT> != vector_size_v<DstT>)
+    {
+        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+        Op(*pixelSrc1, aDst);
+    }
+
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
         requires(!std::same_as<ComputeT, DstT>) && (!(ComplexVector<ComputeT> && RealVector<DstT>)) &&
-                (!(RealVector<ComputeT> && ComplexVector<DstT>))
+                (!(RealVector<ComputeT> && ComplexVector<DstT>)) && (vector_size_v<ComputeT> == vector_size_v<DstT>)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         ComputeT temp;
@@ -130,10 +139,27 @@ struct SrcFunctor : public ImageFunctor<false>
         }
     }
 
+    // for copy sub-channel and dup (SrcT == ComputeT)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+        requires std::same_as<remove_vector_t<ComputeT>, remove_vector_t<DstT>> && //
+                 (vector_size_v<ComputeT> != vector_size_v<DstT>) &&               //
+                 std::same_as<ComputeT_SIMD, voidType>
+    {
+        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+
+        Tupel<SrcT, tupelSize> tupelSrc1 = Tupel<SrcT, tupelSize>::Load(pixelSrc1);
+
+#pragma unroll
+        for (size_t i = 0; i < tupelSize; i++)
+        {
+            Op(tupelSrc1.value[i], aDst.value[i]);
+        }
+    }
+
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
         requires(!std::same_as<ComputeT, DstT>) && //
                 std::same_as<ComputeT_SIMD, voidType> && (!(ComplexVector<ComputeT> && RealVector<DstT>)) &&
-                (!(RealVector<ComputeT> && ComplexVector<DstT>))
+                (!(RealVector<ComputeT> && ComplexVector<DstT>)) && (vector_size_v<ComputeT> == vector_size_v<DstT>)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
 

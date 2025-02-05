@@ -8,7 +8,9 @@
 #include <cstddef>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
+#include <json.h>
 #include <string>
 #include <utilities/nppParser/function.h>
 #include <utilities/nppParser/nppParser.h>
@@ -29,7 +31,8 @@ std::string ReplaceAll(std::string aSrc, const std::string &aToReplace, const st
 
 size_t processForPixelType(const std::vector<Function> &aFunctions, std::vector<Function> &aBatchFunction,
                            const std::string &aTypeString, opp::image::PixelTypeEnum aType,
-                           const std::string &aCondition)
+                           const std::string &aCondition, nlohmann::json &aJson,
+                           std::vector<Function> &aConversionCheck)
 {
     // get all functions for type
     std::vector<Function> functionsForType;
@@ -41,10 +44,57 @@ size_t processForPixelType(const std::vector<Function> &aFunctions, std::vector<
             {
                 functionsForType.push_back(elem);
             }
+            if (GetChannelCount(aType) == 4)
+            {
+                opp::image::PixelTypeEnum alphaType = opp::image::PixelTypeEnum::Unknown;
+                switch (aType)
+                {
+                    case opp::image::PixelTypeEnum::PTE64fC4:
+                        alphaType = opp::image::PixelTypeEnum::PTE64fC4A;
+                        break;
+                    case opp::image::PixelTypeEnum::PTE32fC4:
+                        alphaType = opp::image::PixelTypeEnum::PTE32fC4A;
+                        break;
+                    case opp::image::PixelTypeEnum::PTE16fC4:
+                        alphaType = opp::image::PixelTypeEnum::PTE16fC4A;
+                        break;
+                    case opp::image::PixelTypeEnum::PTE16bfC4:
+                        alphaType = opp::image::PixelTypeEnum::PTE16bfC4A;
+                        break;
+                    case opp::image::PixelTypeEnum::PTE32sC4:
+                        alphaType = opp::image::PixelTypeEnum::PTE32sC4A;
+                        break;
+                    case opp::image::PixelTypeEnum::PTE32uC4:
+                        alphaType = opp::image::PixelTypeEnum::PTE32uC4A;
+                        break;
+                    case opp::image::PixelTypeEnum::PTE16sC4:
+                        alphaType = opp::image::PixelTypeEnum::PTE16sC4A;
+                        break;
+                    case opp::image::PixelTypeEnum::PTE16uC4:
+                        alphaType = opp::image::PixelTypeEnum::PTE16uC4A;
+                        break;
+                    case opp::image::PixelTypeEnum::PTE8sC4:
+                        alphaType = opp::image::PixelTypeEnum::PTE8sC4A;
+                        break;
+                    case opp::image::PixelTypeEnum::PTE8uC4:
+                        alphaType = opp::image::PixelTypeEnum::PTE8uC4A;
+                        break;
+                    case opp::image::PixelTypeEnum::PTE16scC4:
+                        continue;
+                    case opp::image::PixelTypeEnum::PTE32scC4:
+                        continue;
+                    case opp::image::PixelTypeEnum::PTE32fcC4:
+                        continue;
+                    default:
+                        break;
+                }
+                if (NPPParser::GetPixelType(elem) == alphaType)
+                {
+                    functionsForType.push_back(elem);
+                }
+            }
         }
     }
-    const size_t totalConverted = functionsForType.size();
-
     std::cout << "Processing " << functionsForType.size() << " functions for " << aTypeString << "." << std::endl;
     std::vector<ConvertedFunction> converted;
 
@@ -66,6 +116,7 @@ size_t processForPixelType(const std::vector<Function> &aFunctions, std::vector<
             }
         }
         converted.emplace_back(func);
+        aConversionCheck.push_back(func);
     }
 
     const std::string nppHeaders   = ConvertedFunction::GetNeededNPPHeaders(converted);
@@ -110,7 +161,8 @@ size_t processForPixelType(const std::vector<Function> &aFunctions, std::vector<
     header << headerFooter;
     cpp << cppFooter;
 
-    return totalConverted;
+    aJson[aTypeString] = converted;
+    return converted.size();
 }
 
 int main()
@@ -150,7 +202,10 @@ int main()
         }*/
 
         std::vector<Function> batchFunc;
+        std::vector<Function> convertedFuncCheck;
         size_t totalConverted = 0;
+
+        nlohmann::json aj;
 
         // 8u
         {
@@ -160,7 +215,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE8uC1;
                 const std::string typeString         = "8uC1";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 8uC2
@@ -169,7 +225,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE8uC2;
                 const std::string typeString         = "8uC2";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 8uC3
@@ -178,7 +235,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE8uC3;
                 const std::string typeString         = "8uC3";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 8uC4
@@ -187,7 +245,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE8uC4;
                 const std::string typeString         = "8uC4";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
         }
 
@@ -199,7 +258,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE8sC1;
                 const std::string typeString         = "8sC1";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 8sC2
@@ -208,7 +268,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE8sC2;
                 const std::string typeString         = "8sC2";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 8sC3
@@ -217,7 +278,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE8sC3;
                 const std::string typeString         = "8sC3";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 8sC4
@@ -226,7 +288,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE8sC4;
                 const std::string typeString         = "8sC4";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
         }
 
@@ -238,7 +301,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16uC1;
                 const std::string typeString         = "16uC1";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 16uC2
@@ -247,7 +311,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16uC2;
                 const std::string typeString         = "16uC2";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 16uC3
@@ -256,7 +321,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16uC3;
                 const std::string typeString         = "16uC3";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 16uC4
@@ -265,7 +331,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16uC4;
                 const std::string typeString         = "16uC4";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
         }
 
@@ -277,7 +344,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16sC1;
                 const std::string typeString         = "16sC1";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 16sC2
@@ -286,7 +354,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16sC2;
                 const std::string typeString         = "16sC2";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 16sC3
@@ -295,7 +364,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16sC3;
                 const std::string typeString         = "16sC3";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 16sC4
@@ -304,7 +374,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16sC4;
                 const std::string typeString         = "16sC4";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
         }
 
@@ -316,7 +387,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16scC1;
                 const std::string typeString         = "16scC1";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 16scC2
@@ -325,7 +397,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16scC2;
                 const std::string typeString         = "16scC2";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 16scC3
@@ -334,7 +407,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16scC3;
                 const std::string typeString         = "16scC3";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 16scC4
@@ -343,7 +417,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16scC4;
                 const std::string typeString         = "16scC4";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
         }
 
@@ -355,7 +430,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32uC1;
                 const std::string typeString         = "32uC1";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 32uC2
@@ -364,7 +440,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32uC2;
                 const std::string typeString         = "32uC2";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 32uC3
@@ -373,7 +450,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32uC3;
                 const std::string typeString         = "32uC3";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 32uC4
@@ -382,7 +460,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32uC4;
                 const std::string typeString         = "32uC4";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
         }
 
@@ -394,7 +473,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32sC1;
                 const std::string typeString         = "32sC1";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 32sC2
@@ -403,7 +483,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32sC2;
                 const std::string typeString         = "32sC2";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 32sC3
@@ -412,7 +493,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32sC3;
                 const std::string typeString         = "32sC3";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 32sC4
@@ -421,7 +503,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32sC4;
                 const std::string typeString         = "32sC4";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
         }
 
@@ -433,7 +516,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32scC1;
                 const std::string typeString         = "32scC1";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 32scC2
@@ -442,7 +526,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32scC2;
                 const std::string typeString         = "32scC2";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 32scC3
@@ -451,7 +536,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32scC3;
                 const std::string typeString         = "32scC3";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 32scC4
@@ -460,7 +546,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32scC4;
                 const std::string typeString         = "32scC4";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
         }
 
@@ -472,7 +559,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32fC1;
                 const std::string typeString         = "32fC1";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 32fC2
@@ -481,7 +569,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32fC2;
                 const std::string typeString         = "32fC2";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 32fC3
@@ -490,7 +579,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32fC3;
                 const std::string typeString         = "32fC3";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 32fC4
@@ -499,7 +589,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32fC4;
                 const std::string typeString         = "32fC4";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
         }
 
@@ -511,7 +602,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32fcC1;
                 const std::string typeString         = "32fcC1";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 32fcC2
@@ -520,7 +612,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32fcC2;
                 const std::string typeString         = "32fcC2";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 32fcC3
@@ -529,7 +622,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32fcC3;
                 const std::string typeString         = "32fcC3";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 32fcC4
@@ -538,7 +632,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32fcC4;
                 const std::string typeString         = "32fcC4";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
         }
 
@@ -550,7 +645,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE64fC1;
                 const std::string typeString         = "64fC1";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 64fC2
@@ -559,7 +655,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE64fC2;
                 const std::string typeString         = "64fC2";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 64fC3
@@ -568,7 +665,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE64fC3;
                 const std::string typeString         = "64fC3";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 64fC4
@@ -577,7 +675,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE64fC4;
                 const std::string typeString         = "64fC4";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
         }
 
@@ -589,7 +688,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16fC1;
                 const std::string typeString         = "16fC1";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 16fC2
@@ -598,7 +698,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16fC2;
                 const std::string typeString         = "16fC2";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 16fC3
@@ -607,7 +708,8 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16fC3;
                 const std::string typeString         = "16fC3";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
 
             // 16fC4
@@ -616,10 +718,25 @@ int main()
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16fC4;
                 const std::string typeString         = "16fC4";
 
-                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition);
+                totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
+                                                      aj, convertedFuncCheck);
             }
         }
 
+        {
+            std::ofstream file(std::filesystem::path(DEFAULT_OUT_DIR) / "../../../nppFunctions.json");
+
+            if (file.fail())
+            {
+                std::cout << "Failed to write JSON file with NPP function definitions.";
+            }
+
+            file << std::setw(4);
+            file << aj;
+        }
+
+        std::cout << std::endl;
+        std::cout << std::endl;
         std::cout << "Not converted batch functions:" << std::endl;
 
         for (const auto &elem : batchFunc)
@@ -666,7 +783,7 @@ int main()
         std::cout << "Support functions: " << support.size() << std::endl;
         std::cout << "Converted " << totalConverted << " functions." << std::endl;
 
-        std::cout << "Total number of functions:" << functionsNoCtxDoublets.size() << std::endl;
+        std::cout << "Total number of functions: " << functionsNoCtxDoublets.size() << std::endl;
     }
     catch (...)
     {

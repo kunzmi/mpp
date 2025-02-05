@@ -7,8 +7,8 @@
 #include "opp_defs.h"
 #include "safeCast.h"
 #include "staticCast.h"
-#include "vector_typetraits.h"
 #include "vector3.h" //for additional constructor from Vector3<T>
+#include "vector_typetraits.h"
 #include <cmath>
 #include <common/utilities.h>
 #include <concepts>
@@ -1758,6 +1758,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
             case Axis4D::W:
                 return w;
         }
+        return x;
     }
 
     /// <summary>

@@ -1,11 +1,17 @@
 add_library(backends.cuda.image.dataExchangeAndInit 
 	convert.cu
 
+	copy.cu
+	copyMasked.cu
+	
+	dup.cu
+
 	scale.cu
 
 	set.cu
 	setMasked.cu
 
+	swapChannel.cu
 	)
 	
 target_include_directories(backends.cuda.image.dataExchangeAndInit  PUBLIC 

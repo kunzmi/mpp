@@ -1,14 +1,20 @@
 #pragma once
 #include <backends/simple_cpu/image/forEachPixel.h>
 #include <backends/simple_cpu/image/forEachPixelMasked.h>
+#include <backends/simple_cpu/image/forEachPixelPlanar.h>
+#include <backends/simple_cpu/image/forEachPixelSingleChannel.h>
 #include <backends/simple_cpu/image/imageView.h>
+#include <backends/simple_cpu/operator_random.h>
 #include <common/arithmetic/binary_operators.h>
+#include <common/arithmetic/unary_operators.h>
 #include <common/bfloat16.h>
 #include <common/complex.h>
 #include <common/defines.h>
 #include <common/exception.h>
 #include <common/half_fp16.h>
 #include <common/image/border.h>
+#include <common/image/channel.h>
+#include <common/image/channelList.h>
 #include <common/image/functors/constantFunctor.h>
 #include <common/image/functors/convertFunctor.h>
 #include <common/image/functors/convertScaleFunctor.h>
@@ -17,6 +23,7 @@
 #include <common/image/functors/inplaceConstantScaleFunctor.h>
 #include <common/image/functors/inplaceDevConstantFunctor.h>
 #include <common/image/functors/inplaceDevConstantScaleFunctor.h>
+#include <common/image/functors/inplaceFunctor.h>
 #include <common/image/functors/inplaceSrcFunctor.h>
 #include <common/image/functors/inplaceSrcScaleFunctor.h>
 #include <common/image/functors/scaleConversionFunctor.h>
@@ -24,7 +31,13 @@
 #include <common/image/functors/srcConstantScaleFunctor.h>
 #include <common/image/functors/srcDevConstantFunctor.h>
 #include <common/image/functors/srcDevConstantScaleFunctor.h>
+#include <common/image/functors/srcDstAsSrcFunctor.h>
+#include <common/image/functors/srcFunctor.h>
+#include <common/image/functors/srcPlanar2Functor.h>
+#include <common/image/functors/srcPlanar3Functor.h>
+#include <common/image/functors/srcPlanar4Functor.h>
 #include <common/image/functors/srcScaleFunctor.h>
+#include <common/image/functors/srcSingleChannelFunctor.h>
 #include <common/image/functors/srcSrcFunctor.h>
 #include <common/image/functors/srcSrcScaleFunctor.h>
 #include <common/image/gotoPtr.h>
@@ -39,6 +52,7 @@
 #include <common/safeCast.h>
 #include <common/utilities.h>
 #include <common/vector_typetraits.h>
+#include <common/vector1.h>
 #include <common/vectorTypes.h>
 #include <concepts>
 #include <cstddef>
@@ -47,7 +61,7 @@
 
 namespace opp::image::cpuSimple
 {
-
+#pragma region Convert
 template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst)
@@ -170,7 +184,276 @@ ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundi
 
     return aDst;
 }
+#pragma endregion
 
+#pragma region Copy
+/// <summary>
+/// Copy image.
+/// </summary>
+template <PixelType T> ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst)
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    using copySrc = SrcFunctor<1, T, T, T, opp::Copy<T, T>, RoundingMode::None>;
+
+    const opp::Copy<T, T> op;
+
+    const copySrc functor(PointerRoi(), Pitch(), op);
+    forEachPixel(aDst, functor);
+
+    return aDst;
+}
+
+/// <summary>
+/// Copy image with mask. Pixels with mask == 0 remain untouched in destination image.
+/// </summary>
+template <PixelType T> ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+{
+    checkSameSize(ROI(), aDst.ROI());
+    checkSameSize(ROI(), aMask.ROI());
+
+    using copySrc = SrcFunctor<1, T, T, T, opp::Copy<T, T>, RoundingMode::None>;
+
+    const opp::Copy<T, T> op;
+
+    const copySrc functor(PointerRoi(), Pitch(), op);
+    forEachPixel(aMask, aDst, functor);
+
+    return aDst;
+}
+
+/// <summary>
+/// Copy channel aSrcChannel to channel aDstChannel of aDst.
+/// </summary>
+template <PixelType T>
+template <PixelType TTo>
+ImageView<TTo> &ImageView<T>::Copy(Channel aSrcChannel, ImageView<TTo> &aDst, Channel aDstChannel)
+    requires(vector_size_v<T> > 1) &&   //
+            (vector_size_v<TTo> > 1) && //
+            std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    using ComputeT = Vector1<remove_vector_t<T>>;
+    using copySrc =
+        SrcSingleChannelFunctor<1, T, ComputeT, ComputeT, opp::Copy<ComputeT, ComputeT>, RoundingMode::None>;
+
+    const opp::Copy<ComputeT, ComputeT> op;
+
+    const copySrc functor(PointerRoi(), Pitch(), aSrcChannel, op);
+    forEachPixelSingleChannel(aDst, aDstChannel, functor);
+
+    return aDst;
+}
+
+/// <summary>
+/// Copy this single channel image to channel aDstChannel of aDst.
+/// </summary>
+template <PixelType T>
+template <PixelType TTo>
+ImageView<TTo> &ImageView<T>::Copy(ImageView<TTo> &aDst, Channel aDstChannel)
+    requires(vector_size_v<T> == 1) &&  //
+            (vector_size_v<TTo> > 1) && //
+            std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    using copySrc = SrcFunctor<1, T, T, T, opp::Copy<T, T>, RoundingMode::None>;
+
+    const opp::Copy<T, T> op;
+
+    const copySrc functor(PointerRoi(), Pitch(), op);
+    forEachPixelSingleChannel(aDst, aDstChannel, functor);
+
+    return aDst;
+}
+
+/// <summary>
+/// Copy channel aSrcChannel to single channel image aDst.
+/// </summary>
+template <PixelType T>
+template <PixelType TTo>
+ImageView<TTo> &ImageView<T>::Copy(Channel aSrcChannel, ImageView<TTo> &aDst)
+    requires(vector_size_v<T> > 1) &&    //
+            (vector_size_v<TTo> == 1) && //
+            std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    using ComputeT = Vector1<remove_vector_t<T>>;
+    using copySrc =
+        SrcSingleChannelFunctor<1, T, ComputeT, ComputeT, opp::Copy<ComputeT, ComputeT>, RoundingMode::None>;
+
+    const opp::Copy<ComputeT, ComputeT> op;
+
+    const copySrc functor(PointerRoi(), Pitch(), aSrcChannel, op);
+    forEachPixel(aDst, functor);
+
+    return aDst;
+}
+
+/// <summary>
+/// Copy packed image pixels to planar images.
+/// </summary>
+template <PixelType T>
+void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
+                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2)
+    requires(TwoChannel<T>)
+{
+    checkSameSize(ROI(), aDstChannel1.ROI());
+    checkSameSize(ROI(), aDstChannel2.ROI());
+
+    using copySrc = SrcFunctor<1, T, T, T, opp::Copy<T, T>, RoundingMode::None>;
+
+    const opp::Copy<T, T> op;
+
+    const copySrc functor(PointerRoi(), Pitch(), op);
+
+    forEachPixelPlanar(aDstChannel1, aDstChannel2, functor);
+}
+
+/// <summary>
+/// Copy packed image pixels to planar images.
+/// </summary>
+template <PixelType T>
+void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
+                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2,
+                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel3)
+    requires(ThreeChannel<T>)
+{
+    checkSameSize(ROI(), aDstChannel1.ROI());
+    checkSameSize(ROI(), aDstChannel2.ROI());
+    checkSameSize(ROI(), aDstChannel3.ROI());
+
+    using copySrc = SrcFunctor<1, T, T, T, opp::Copy<T, T>, RoundingMode::None>;
+
+    const opp::Copy<T, T> op;
+
+    const copySrc functor(PointerRoi(), Pitch(), op);
+
+    forEachPixelPlanar(aDstChannel1, aDstChannel2, aDstChannel3, functor);
+}
+
+/// <summary>
+/// Copy packed image pixels to planar images.
+/// </summary>
+template <PixelType T>
+void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
+                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2,
+                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel3,
+                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel4)
+    requires(FourChannelNoAlpha<T>)
+{
+    checkSameSize(ROI(), aDstChannel1.ROI());
+    checkSameSize(ROI(), aDstChannel2.ROI());
+    checkSameSize(ROI(), aDstChannel3.ROI());
+    checkSameSize(ROI(), aDstChannel4.ROI());
+
+    using copySrc = SrcFunctor<1, T, T, T, opp::Copy<T, T>, RoundingMode::None>;
+
+    const opp::Copy<T, T> op;
+
+    const copySrc functor(PointerRoi(), Pitch(), op);
+
+    forEachPixelPlanar(aDstChannel1, aDstChannel2, aDstChannel3, aDstChannel4, functor);
+}
+
+/// <summary>
+/// Copy planar image pixels to packed pixel image.
+/// </summary>
+template <PixelType T>
+ImageView<T> &ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel1,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel2, ImageView<T> &aDst)
+    requires(TwoChannel<T>)
+{
+    checkSameSize(aSrcChannel1.ROI(), aDst.ROI());
+    checkSameSize(aSrcChannel2.ROI(), aDst.ROI());
+
+    using copySrc = SrcPlanar2Functor<1, T, T, T, opp::Copy<T, T>, RoundingMode::None>;
+
+    const opp::Copy<T, T> op;
+
+    const copySrc functor(aSrcChannel1.PointerRoi(), aSrcChannel1.Pitch(), aSrcChannel2.PointerRoi(),
+                          aSrcChannel2.Pitch(), op);
+
+    forEachPixel(aDst, functor);
+
+    return aDst;
+}
+
+/// <summary>
+/// Copy planar image pixels to packed pixel image.
+/// </summary>
+template <PixelType T>
+ImageView<T> &ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel1,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel2,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel3, ImageView<T> &aDst)
+    requires(ThreeChannel<T>)
+{
+    checkSameSize(aSrcChannel1.ROI(), aDst.ROI());
+    checkSameSize(aSrcChannel2.ROI(), aDst.ROI());
+    checkSameSize(aSrcChannel3.ROI(), aDst.ROI());
+
+    using copySrc = SrcPlanar3Functor<1, T, T, T, opp::Copy<T, T>, RoundingMode::None>;
+
+    const opp::Copy<T, T> op;
+
+    const copySrc functor(aSrcChannel1.PointerRoi(), aSrcChannel1.Pitch(), aSrcChannel2.PointerRoi(),
+                          aSrcChannel2.Pitch(), aSrcChannel3.PointerRoi(), aSrcChannel3.Pitch(), op);
+
+    forEachPixel(aDst, functor);
+
+    return aDst;
+}
+
+/// <summary>
+/// Copy planar image pixels to packed pixel image.
+/// </summary>
+template <PixelType T>
+ImageView<T> &ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel1,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel2,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel3,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel4, ImageView<T> &aDst)
+    requires(FourChannelNoAlpha<T>)
+{
+    checkSameSize(aSrcChannel1.ROI(), aDst.ROI());
+    checkSameSize(aSrcChannel2.ROI(), aDst.ROI());
+    checkSameSize(aSrcChannel3.ROI(), aDst.ROI());
+    checkSameSize(aSrcChannel4.ROI(), aDst.ROI());
+
+    using copySrc = SrcPlanar4Functor<1, T, T, T, opp::Copy<T, T>, RoundingMode::None>;
+
+    const opp::Copy<T, T> op;
+
+    const copySrc functor(aSrcChannel1.PointerRoi(), aSrcChannel1.Pitch(), aSrcChannel2.PointerRoi(),
+                          aSrcChannel2.Pitch(), aSrcChannel3.PointerRoi(), aSrcChannel3.Pitch(),
+                          aSrcChannel4.PointerRoi(), aSrcChannel4.Pitch(), op);
+
+    forEachPixel(aDst, functor);
+
+    return aDst;
+}
+#pragma endregion
+
+#pragma region Dup
+template <PixelType T>
+template <PixelType TTo>
+ImageView<TTo> &ImageView<T>::Dup(ImageView<TTo> &aDst)
+    requires(vector_size_v<T> == 1) &&
+            (vector_size_v<TTo> > 1) && std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    using dupSrc = SrcFunctor<1, T, T, TTo, opp::Dup<T, TTo>, RoundingMode::None>;
+    const opp::Dup<T, TTo> op;
+    const dupSrc functor(PointerRoi(), Pitch(), op);
+    forEachPixel(aDst, functor);
+
+    return aDst;
+}
+#pragma endregion
+
+#pragma region Scale
 // NOLINTBEGIN(bugprone-easily-swappable-parameters)
 template <PixelType T>
 template <PixelType TTo>
@@ -268,7 +551,9 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcM
     return aDst;
 }
 // NOLINTEND(bugprone-easily-swappable-parameters)
+#pragma endregion
 
+#pragma region Set
 template <PixelType T> ImageView<T> &ImageView<T>::Set(const T &aConst)
 {
     using setC = ConstantFunctor<1, T>;
@@ -286,5 +571,75 @@ template <PixelType T> ImageView<T> &ImageView<T>::Set(const T &aConst, const Im
 
     return *this;
 }
+#pragma endregion
+
+#pragma region Swap Channel
+/// <summary>
+/// Swap channels
+/// </summary>
+template <PixelType T>
+template <PixelType TTo>
+ImageView<TTo> &ImageView<T>::SwapChannel(ImageView<TTo> &aDst,
+                                          const ChannelList<vector_active_size_v<TTo>> &aDstChannels)
+    requires((vector_active_size_v<TTo> <= vector_active_size_v<T>)) && //
+            (vector_size_v<T> >= 3) &&                                  //
+            (vector_size_v<TTo> >= 3) &&                                //
+            std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
+{
+    checkSameSize(ROI(), aDst.ROI());
+    for (size_t i = 0; i < vector_active_size_v<TTo>; i++)
+    {
+        if (!aDstChannels.data()[i].template IsInRange<TTo>())
+        {
+            throw INVALIDARGUMENT(
+                aDstChannels, "Channel " << i << " in aDstChannels is out of range. Expected value in range 0.."
+                                         << vector_active_size_v<TTo> - 1 << " but got: " << aDstChannels.data()[i]);
+        }
+    }
+
+    using swapChannelSrc = SrcFunctor<1, T, T, TTo, opp::SwapChannel<T, TTo>, RoundingMode::None>;
+
+    const opp::SwapChannel<T, TTo> op(aDstChannels);
+
+    const swapChannelSrc functor(PointerRoi(), Pitch(), op);
+
+    forEachPixel(aDst, functor);
+    return aDst;
+}
+
+template <PixelType T>
+template <PixelType TTo>
+ImageView<TTo> &ImageView<T>::SwapChannel(ImageView<TTo> &aDst,
+                                          const ChannelList<vector_active_size_v<TTo>> &aDstChannels,
+                                          remove_vector_t<T> aValue)
+    requires(vector_size_v<T> == 3) &&          //
+            (vector_active_size_v<TTo> == 4) && //
+            std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    using swapChannelSrcDstAsSrc = SrcDstAsSrcFunctor<1, T, TTo, opp::SwapChannel<T, TTo>>;
+
+    const opp::SwapChannel<T, TTo> op(aDstChannels, aValue);
+
+    const swapChannelSrcDstAsSrc functor(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), op);
+
+    forEachPixel(aDst, functor);
+    return aDst;
+}
+#pragma endregion
+
+#pragma region FillRandom
+template <PixelType T> ImageView<T> &ImageView<T>::FillRandom()
+{
+    using randomInplace = InplaceFunctor<1, T, T, opp::FillRandom<T>, RoundingMode::None>;
+
+    const opp::FillRandom<T> op;
+    const randomInplace functor(op);
+
+    forEachPixel(*this, functor);
+    return *this;
+}
+#pragma endregion
 
 } // namespace opp::image::cpuSimple

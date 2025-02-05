@@ -58,46 +58,5 @@ template <typename DstT, typename functor> void forEachPixel(ImageView<DstT> &aD
 
         pixelOut = res;
     }
-
-    // for (ImageView<DstT>::iterator it = aDst.begin(); it < aDst.end(); ++it)
-    //{
-    //     int pixelX = it.Pixel().x - aDst.ROI().x;
-    //     int pixelY = it.Pixel().y - aDst.ROI().y;
-
-    //    // will be optimized away as unused in case of no alpha channel:
-    //    pixel_basetype_t<DstT> alphaChannel;
-
-    //    DstT res;
-    //    DstT *pixelOut = &(*it);
-
-    //    // load the destination pixel in case of inplace operation or we load the full pixel for alpha operations:
-    //    if constexpr (functor::DoLoadBeforeOp || //
-    //                  (has_alpha_channel_v<DstT> && load_full_vector_for_alpha_v<DstT>))
-    //    {
-    //        res = *pixelOut;
-
-    //        // save alpha channel value seperatly:
-    //        if constexpr (has_alpha_channel_v<DstT>)
-    //        {
-    //            alphaChannel = res.w;
-    //        }
-    //    }
-    //    // if we don't load the pixel anyhow but we still need just the alpha channel, load it:
-    //    if constexpr (!functor::DoLoadBeforeOp && //
-    //                  (has_alpha_channel_v<DstT> && !load_full_vector_for_alpha_v<DstT>))
-    //    {
-    //        alphaChannel = pixelOut->w;
-    //    }
-
-    //    aOp(pixelX, pixelY, res);
-
-    //    // restore alpha channel value:
-    //    if constexpr (has_alpha_channel_v<DstT>)
-    //    {
-    //        res.w = alphaChannel;
-    //    }
-
-    //    *pixelOut = res;
-    //}
 }
 } // namespace opp::image::cpuSimple

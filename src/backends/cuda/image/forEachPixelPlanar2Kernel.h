@@ -92,8 +92,8 @@ __global__ void forEachPixelPlanar2Kernel(Vector1<remove_vector_t<DstT>> *__rest
     // load the destination pixel in case of inplace operation:
     if constexpr (funcType::DoLoadBeforeOp)
     {
-        res.x = *pixelOut1;
-        res.y = *pixelOut2;
+        res.x = pixelOut1->x;
+        res.y = pixelOut2->x;
     }
 
     aFunctor(pixelX, pixelY, res);

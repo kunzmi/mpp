@@ -382,8 +382,8 @@ struct SwapChannel<SrcT, DstT>
     }
 
     // In case that one DstOrder-value is > 3, i.e. undefined we leave the destination pixel value untouched. This then
-    // means that we have to load the value before hand from memory. Here the initial Dst-Value is unknown as Dst has
-    // been loaded from memory. Thus this operator() can only be called when all DstOrder-values are <= 3.
+    // means that we have to load the value before hand from memory. Here the initial Dst-Value is unknown as aDst has
+    // not been loaded from memory. Thus this operator() can only be called when all DstOrder-values are <= 3.
     DEVICE_CODE void operator()(const SrcT &aSrc1, DstT &aDst)
     {
         if (DstOrder[0].Value() == 3)
@@ -423,10 +423,10 @@ struct SwapChannel<SrcT, DstT>
         }
     }
 
-    // In case that one DstOrder-value is > 3, i.e. undefined we leave the destination pixel value untouched. This then
+    // In case that a DstOrder-value is > 3, i.e. undefined, we leave that destination pixel value untouched. This then
     // means that we have to load the value before hand from memory. To get this done, we use the Dst-array also as a
     // second source array and use a SrcSrcFunctor for the kernel.
-    DEVICE_CODE void operator()(const SrcT &aSrc1, DstT &aSrc2, DstT &aDst)
+    DEVICE_CODE void operator()(const SrcT &aSrc1, const DstT &aSrc2, DstT &aDst)
     {
         if (DstOrder[0].Value() <= 2)
         {
@@ -546,6 +546,136 @@ struct Copy<SrcT, DstT>
         requires opp::image::FourChannelNoAlpha<DstT>
     {
         aDst = DstT(aSrc1.x, aSrc2.x, aSrc3.x, aSrc4.x);
+    }
+};
+
+// due to the high number of constants, we put them all here in the operator and not in the functor...
+template <RealVector T> struct MinVal
+{
+    T Val;
+    T Threshold;
+    MinVal(T aVal, T aThreshold) : Val(aVal), Threshold(aThreshold)
+    {
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
+    {
+        aDst.x = aSrc1.x < Threshold.x ? Val.x : aSrc1.x;
+        if constexpr (vector_active_size_v<T> > 1)
+        {
+            aDst.y = aSrc1.y < Threshold.y ? Val.y : aSrc1.y;
+        }
+        if constexpr (vector_active_size_v<T> > 2)
+        {
+            aDst.z = aSrc1.z < Threshold.z ? Val.z : aSrc1.z;
+        }
+        if constexpr (vector_active_size_v<T> > 3)
+        {
+            aDst.w = aSrc1.w < Threshold.w ? Val.w : aSrc1.w;
+        }
+    }
+    DEVICE_CODE void operator()(T &aSrcDst)
+    {
+        aSrcDst.x = aSrcDst.x < Threshold.x ? Val.x : aSrcDst.x;
+        if constexpr (vector_active_size_v<T> > 1)
+        {
+            aSrcDst.y = aSrcDst.y < Threshold.y ? Val.y : aSrcDst.y;
+        }
+        if constexpr (vector_active_size_v<T> > 2)
+        {
+            aSrcDst.z = aSrcDst.z < Threshold.z ? Val.z : aSrcDst.z;
+        }
+        if constexpr (vector_active_size_v<T> > 3)
+        {
+            aSrcDst.w = aSrcDst.w < Threshold.w ? Val.w : aSrcDst.w;
+        }
+    }
+};
+
+template <RealVector T> struct MaxVal
+{
+    T Val;
+    T Threshold;
+    MaxVal(T aVal, T aThreshold) : Val(aVal), Threshold(aThreshold)
+    {
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
+    {
+        aDst.x = aSrc1.x > Threshold.x ? Val.x : aSrc1.x;
+        if constexpr (vector_active_size_v<T> > 1)
+        {
+            aDst.y = aSrc1.y > Threshold.y ? Val.y : aSrc1.y;
+        }
+        if constexpr (vector_active_size_v<T> > 2)
+        {
+            aDst.z = aSrc1.z > Threshold.z ? Val.z : aSrc1.z;
+        }
+        if constexpr (vector_active_size_v<T> > 3)
+        {
+            aDst.w = aSrc1.w > Threshold.w ? Val.w : aSrc1.w;
+        }
+    }
+    DEVICE_CODE void operator()(T &aSrcDst)
+    {
+        aSrcDst.x = aSrcDst.x > Threshold.x ? Val.x : aSrcDst.x;
+        if constexpr (vector_active_size_v<T> > 1)
+        {
+            aSrcDst.y = aSrcDst.y > Threshold.y ? Val.y : aSrcDst.y;
+        }
+        if constexpr (vector_active_size_v<T> > 2)
+        {
+            aSrcDst.z = aSrcDst.z > Threshold.z ? Val.z : aSrcDst.z;
+        }
+        if constexpr (vector_active_size_v<T> > 3)
+        {
+            aSrcDst.w = aSrcDst.w > Threshold.w ? Val.w : aSrcDst.w;
+        }
+    }
+};
+
+template <RealVector T> struct MinValMaxVal
+{
+    T MinVal;
+    T MinThreshold;
+    T MaxVal;
+    T MaxThreshold;
+    MinValMaxVal(T aMinVal, T aMinThreshold, T aMaxVal, T aMaxThreshold)
+        : MinVal(aMinVal), MinThreshold(aMinThreshold), MaxVal(aMaxVal), MaxThreshold(aMaxThreshold)
+    {
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
+    {
+        aDst.x = aSrc1.x < MinThreshold.x ? MinVal.x : (aSrc1.x > MaxThreshold.x ? MaxVal.x : aSrc1.x);
+        if constexpr (vector_active_size_v<T> > 1)
+        {
+            aDst.y = aSrc1.y < MinThreshold.y ? MinVal.y : (aSrc1.y > MaxThreshold.y ? MaxVal.y : aSrc1.y);
+        }
+        if constexpr (vector_active_size_v<T> > 2)
+        {
+            aDst.z = aSrc1.z < MinThreshold.z ? MinVal.z : (aSrc1.z > MaxThreshold.z ? MaxVal.z : aSrc1.z);
+        }
+        if constexpr (vector_active_size_v<T> > 3)
+        {
+            aDst.w = aSrc1.w < MinThreshold.w ? MinVal.w : (aSrc1.w > MaxThreshold.w ? MaxVal.w : aSrc1.w);
+        }
+    }
+    DEVICE_CODE void operator()(T &aSrcDst)
+    {
+        aSrcDst.x = aSrcDst.x < MinThreshold.x ? MinVal.x : (aSrcDst.x > MaxThreshold.x ? MaxVal.x : aSrcDst.x);
+        if constexpr (vector_active_size_v<T> > 1)
+        {
+            aSrcDst.y = aSrcDst.y < MinThreshold.y ? MinVal.y : (aSrcDst.y > MaxThreshold.y ? MaxVal.y : aSrcDst.y);
+        }
+        if constexpr (vector_active_size_v<T> > 2)
+        {
+            aSrcDst.z = aSrcDst.z < MinThreshold.z ? MinVal.z : (aSrcDst.z > MaxThreshold.z ? MaxVal.z : aSrcDst.z);
+        }
+        if constexpr (vector_active_size_v<T> > 3)
+        {
+            aSrcDst.w = aSrcDst.w < MinThreshold.w ? MinVal.w : (aSrcDst.w > MaxThreshold.w ? MaxVal.w : aSrcDst.w);
+        }
     }
 };
 } // namespace opp

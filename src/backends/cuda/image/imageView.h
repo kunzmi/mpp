@@ -134,7 +134,7 @@ template <PixelType T> class ImageView
         return mPtr;
     }
     /// <summary>
-    /// Base pointer moved to actual ROI.
+    /// Base pointer moved to first pixel of actual ROI.
     /// </summary>
     [[nodiscard]] T *PointerRoi() const
     {
@@ -273,7 +273,7 @@ template <PixelType T> class ImageView
     }
 
     /// <summary>
-    /// Copy from Host to device memory
+    /// Copy from Host to device memory (full image ignoring ROI)
     /// </summary>
     /// <param name="aHostSrc">Source</param>
     /// <param name="aHostStride">Size of one image line in bytes with padding (host image)</param>
@@ -288,7 +288,7 @@ template <PixelType T> class ImageView
     }
 
     /// <summary>
-    /// Copy from device to device memory
+    /// Copy from device to device memory (full image ignoring ROI)
     /// </summary>
     /// <param name="aDeviceSrc">Source</param>
     void CopyDeviceToDevice(const ImageView &aDeviceSrc)
@@ -303,7 +303,7 @@ template <PixelType T> class ImageView
     }
 
     /// <summary>
-    /// Copy from device to device memory
+    /// Copy from device to device memory (full image ignoring ROI)
     /// </summary>
     /// <param name="aDeviceSrc">Source</param>
     /// <param name="aSourcePitch">Pitch of aDeviceSrc</param>
@@ -318,7 +318,7 @@ template <PixelType T> class ImageView
     }
 
     /// <summary>
-    /// Copy data from device to host memory
+    /// Copy data from device to host memory (full image ignoring ROI)
     /// </summary>
     /// <param name="aHostDest">void* to destination in host memory</param>
     /// <param name="aHostStride">Size of one image line in bytes with padding</param>
@@ -333,7 +333,7 @@ template <PixelType T> class ImageView
     }
 
     /// <summary>
-    /// Copy from device to host memory
+    /// Copy from device to host memory (full image ignoring ROI)
     /// </summary>
     void operator>>(void *aDest) const
     {
@@ -341,7 +341,7 @@ template <PixelType T> class ImageView
     }
 
     /// <summary>
-    /// Copy from host to device memory
+    /// Copy from host to device memory (full image ignoring ROI)
     /// </summary>
     void operator<<(const void *aSource)
     {
@@ -349,7 +349,7 @@ template <PixelType T> class ImageView
     }
 
     /// <summary>
-    /// Copy from device to host memory
+    /// Copy from device to host memory (full image ignoring ROI)
     /// </summary>
     void CopyToHost(std::vector<T> &aHostDest) const
     {
@@ -357,7 +357,7 @@ template <PixelType T> class ImageView
     }
 
     /// <summary>
-    /// Copy from host to device memory
+    /// Copy from host to device memory (full image ignoring ROI)
     /// </summary>
     void CopyToDevice(const std::vector<T> &aHostSrc)
     {
@@ -365,7 +365,7 @@ template <PixelType T> class ImageView
     }
 
     /// <summary>
-    /// Copy from device to host memory
+    /// Copy from device to host memory (full image ignoring ROI)
     /// </summary>
     void operator>>(std::vector<T> &aHostDest) const
     {
@@ -373,7 +373,7 @@ template <PixelType T> class ImageView
     }
 
     /// <summary>
-    /// Copy from host to device memory
+    /// Copy from host to device memory (full image ignoring ROI)
     /// </summary>
     void operator<<(const std::vector<T> &aHostSrc)
     {
@@ -445,7 +445,7 @@ template <PixelType T> class ImageView
 #pragma region Convert
     /// <summary>
     /// Convert Integer to Integer, Integer to float32/double, float32 to half-float16/bfloat16. Values are clamped to
-    /// maximum value range of destination type if needed, float to half or bfloat are rounding using
+    /// maximum value range of destination type if needed, float to half or bfloat are rounded using
     /// RoundingMode::NearestTiesToEven (real and complex).
     /// </summary>
     template <PixelType TTo>
@@ -474,6 +474,113 @@ template <PixelType T> class ImageView
                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires(!std::same_as<T, TTo>) && (!std::same_as<TTo, float>) && (!std::same_as<TTo, double>) &&
                 (!std::same_as<TTo, Complex<float>>) && (!std::same_as<TTo, Complex<double>>);
+#pragma endregion
+#pragma region Copy
+    /// <summary>
+    /// Copy image.
+    /// </summary>
+    ImageView<T> &Copy(ImageView<T> &aDst,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
+
+    /// <summary>
+    /// Copy image with mask. Pixels with mask == 0 remain untouched in destination image.
+    /// </summary>
+    ImageView<T> &Copy(ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
+
+    /// <summary>
+    /// Copy channel aSrcChannel to channel aDstChannel of aDst.
+    /// </summary>
+    template <PixelType TTo>
+    ImageView<TTo> &Copy(Channel aSrcChannel, ImageView<TTo> &aDst, Channel aDstChannel,
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires(vector_size_v<T> > 1) &&   //
+                (vector_size_v<TTo> > 1) && //
+                std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
+
+    /// <summary>
+    /// Copy this single channel image to channel aDstChannel of aDst.
+    /// </summary>
+    template <PixelType TTo>
+    ImageView<TTo> &Copy(ImageView<TTo> &aDst, Channel aDstChannel,
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires(vector_size_v<T> == 1) &&  //
+                (vector_size_v<TTo> > 1) && //
+                std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
+
+    /// <summary>
+    /// Copy channel aSrcChannel to single channel image aDst.
+    /// </summary>
+    template <PixelType TTo>
+    ImageView<TTo> &Copy(Channel aSrcChannel, ImageView<TTo> &aDst,
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires(vector_size_v<T> > 1) &&    //
+                (vector_size_v<TTo> == 1) && //
+                std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
+
+    /// <summary>
+    /// Copy packed image pixels to planar images.
+    /// </summary>
+    void Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
+              ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2,
+              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires(TwoChannel<T>);
+
+    /// <summary>
+    /// Copy packed image pixels to planar images.
+    /// </summary>
+    void Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
+              ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2,
+              ImageView<Vector1<remove_vector_t<T>>> &aDstChannel3,
+              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires(ThreeChannel<T>);
+
+    /// <summary>
+    /// Copy packed image pixels to planar images.
+    /// </summary>
+    void Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
+              ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2,
+              ImageView<Vector1<remove_vector_t<T>>> &aDstChannel3,
+              ImageView<Vector1<remove_vector_t<T>>> &aDstChannel4,
+              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires(FourChannelNoAlpha<T>);
+
+    /// <summary>
+    /// Copy planar image pixels to packed pixel image.
+    /// </summary>
+    static ImageView<T> &Copy(ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel1,
+                              ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel2, ImageView<T> &aDst,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires(TwoChannel<T>);
+
+    /// <summary>
+    /// Copy planar image pixels to packed pixel image.
+    /// </summary>
+    static ImageView<T> &Copy(ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel1,
+                              ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel2,
+                              ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel3, ImageView<T> &aDst,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires(ThreeChannel<T>);
+
+    /// <summary>
+    /// Copy planar image pixels to packed pixel image.
+    /// </summary>
+    static ImageView<T> &Copy(ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel1,
+                              ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel2,
+                              ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel3,
+                              ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel4, ImageView<T> &aDst,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires(FourChannelNoAlpha<T>);
+#pragma endregion
+#pragma region Dup
+    /// <summary>
+    /// Duplicates a one channel image to all channels in a multi-channel image
+    /// </summary>
+    template <PixelType TTo>
+    ImageView<TTo> &Dup(ImageView<TTo> &aDst,
+                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires(vector_size_v<T> == 1) &&
+                (vector_size_v<TTo> > 1) && std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
 #pragma endregion
 #pragma region Scale
     /// <summary>
@@ -522,568 +629,1036 @@ template <PixelType T> class ImageView
 
 #pragma endregion
 #pragma region Set
+    /// <summary>
+    /// Set all pixels in current ROI to aConst
+    /// </summary>
     ImageView<T> &Set(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
 
+    /// <summary>
+    /// Set all pixels in current ROI to aConst
+    /// </summary>
     ImageView<T> &Set(const opp::cuda::DevVarView<T> &aConst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
 
+    /// <summary>
+    /// Set all pixels with aMask != 0 to aConst
+    /// </summary>
     ImageView<T> &Set(const T &aConst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
 
+    /// <summary>
+    /// Set all pixels with aMask != 0 to aConst
+    /// </summary>
     ImageView<T> &Set(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
+#pragma endregion
+#pragma region Swap Channel
+    /// <summary>
+    /// Swap channels
+    /// </summary>
+    template <PixelType TTo>
+    ImageView<TTo> &SwapChannel(ImageView<TTo> &aDst, const ChannelList<vector_active_size_v<TTo>> &aDstChannels,
+                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires((vector_active_size_v<TTo> <= vector_active_size_v<T>)) && //
+                (vector_size_v<T> >= 3) &&                                  //
+                (vector_size_v<TTo> >= 3) &&                                //
+                std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
+
+    /// <summary>
+    /// Swap channels (3-channel to 4-channel with additional value). If aDstChannels[i] == 3, channel i of aDst is set
+    /// to aValue, if aDstChannels[i] > 3, channel i of aDst is kept unchanged.
+    /// </summary>
+    template <PixelType TTo>
+    ImageView<TTo> &SwapChannel(ImageView<TTo> &aDst, const ChannelList<vector_active_size_v<TTo>> &aDstChannels,
+                                remove_vector_t<T> aValue,
+                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires(vector_size_v<T> == 3) &&          //
+                (vector_active_size_v<TTo> == 4) && //
+                std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
 #pragma endregion
 #pragma endregion
 
 #pragma region Arithmetic functions
 #pragma region Add
+    /// <summary>
+    /// aDst = this + aSrc2
+    /// </summary>
     ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this + aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// aDst = this + aConst
+    /// </summary>
     ImageView<T> &Add(const T &aConst, ImageView<T> &aDst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this + aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Add(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// aDst = this + aConst
+    /// </summary>
     ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this + aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this += aSrc2
+    /// </summary>
     ImageView<T> &Add(const ImageView<T> &aSrc2,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this += aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Add(const ImageView<T> &aSrc2, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this += aConst
+    /// </summary>
     ImageView<T> &Add(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this += aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Add(const T &aConst, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this += aConst
+    /// </summary>
     ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this += aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// aDst = this + aSrc2 for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this + aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
+    /// where aMask != 0
+    /// </summary>
     ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                       int aScaleFactor                       = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// aDst = this + aConst for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Add(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this + aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
+    /// where aMask != 0
+    /// </summary>
     ImageView<T> &Add(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// aDst = this + aConst for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this + aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
+    /// where aMask != 0
+    /// </summary>
     ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                       int aScaleFactor                       = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this += aSrc2, for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Add(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this += aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
+    /// aMask != 0
+    /// </summary>
     ImageView<T> &Add(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this += aConst, for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Add(const T &aConst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this += aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
+    /// aMask != 0
+    /// </summary>
     ImageView<T> &Add(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this += aConst, for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this += aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
+    /// aMask != 0
+    /// </summary>
     ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 #pragma endregion
 #pragma region Sub
+    /// <summary>
+    /// aDst = this - aSrc2
+    /// </summary>
     ImageView<T> &Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this + aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// aDst = this - aConst
+    /// </summary>
     ImageView<T> &Sub(const T &aConst, ImageView<T> &aDst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this - aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Sub(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// aDst = this - aConst
+    /// </summary>
     ImageView<T> &Sub(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this - aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Sub(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this -= aSrc2
+    /// </summary>
     ImageView<T> &Sub(const ImageView<T> &aSrc2,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this -= aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Sub(const ImageView<T> &aSrc2, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this -= aConst
+    /// </summary>
     ImageView<T> &Sub(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this -= aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Sub(const T &aConst, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this -= aConst
+    /// </summary>
     ImageView<T> &Sub(const opp::cuda::DevVarView<T> &aConst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this -= aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Sub(const opp::cuda::DevVarView<T> &aConst, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this = aSrc2 - this
+    /// </summary>
     ImageView<T> &SubInv(const ImageView<T> &aSrc2,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this = aSrc2 - this, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &SubInv(const ImageView<T> &aSrc2, int aScaleFactor = 0,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this = aConst - this
+    /// </summary>
     ImageView<T> &SubInv(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this = aConst - this, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &SubInv(const T &aConst, int aScaleFactor = 0,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this = aConst - this
+    /// </summary>
     ImageView<T> &SubInv(const opp::cuda::DevVarView<T> &aConst,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this = aConst - this, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &SubInv(const opp::cuda::DevVarView<T> &aConst, int aScaleFactor = 0,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// aDst = this - aConst for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this - aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
+    /// where aMask != 0
+    /// </summary>
     ImageView<T> &Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                       int aScaleFactor                       = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// aDst = this - aConst for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Sub(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this - aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
+    /// where aMask != 0
+    /// </summary>
     ImageView<T> &Sub(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// aDst = this - aConst for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Sub(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this - aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
+    /// where aMask != 0
+    /// </summary>
     ImageView<T> &Sub(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                       int aScaleFactor                       = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this -= aSrc2, for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Sub(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this -= aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
+    /// aMask != 0
+    /// </summary>
     ImageView<T> &Sub(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this -= aConst, for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Sub(const T &aConst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this -= aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
+    /// aMask != 0
+    /// </summary>
     ImageView<T> &Sub(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this -= aConst, for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Sub(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this -= aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
+    /// aMask != 0
+    /// </summary>
     ImageView<T> &Sub(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this = aSrc2 - this, for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &SubInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this = aSrc2 - this, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
+    /// where aMask != 0
+    /// </summary>
     ImageView<T> &SubInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this = aConst - this, for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &SubInv(const T &aConst, const ImageView<Pixel8uC1> &aMask,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this = aConst - this, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
+    /// where aMask != 0
+    /// </summary>
     ImageView<T> &SubInv(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this = aConst - this, for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &SubInv(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this = aConst - this, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
+    /// where aMask != 0
+    /// </summary>
     ImageView<T> &SubInv(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
                          int aScaleFactor                       = 0,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 #pragma endregion
 #pragma region Mul
+    /// <summary>
+    /// aDst = this * aSrc2
+    /// </summary>
     ImageView<T> &Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this * aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// aDst = this * aConst
+    /// </summary>
     ImageView<T> &Mul(const T &aConst, ImageView<T> &aDst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this * aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Mul(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// aDst = this * aConst
+    /// </summary>
     ImageView<T> &Mul(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this * aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Mul(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this *= aSrc2
+    /// </summary>
     ImageView<T> &Mul(const ImageView<T> &aSrc2,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this *= aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Mul(const ImageView<T> &aSrc2, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this *= aConst
+    /// </summary>
     ImageView<T> &Mul(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this *= aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Mul(const T &aConst, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this *= aConst
+    /// </summary>
     ImageView<T> &Mul(const opp::cuda::DevVarView<T> &aConst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this *= aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Mul(const opp::cuda::DevVarView<T> &aConst, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// aDst = this * aSrc2 for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this * aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
+    /// where aMask != 0
+    /// </summary>
     ImageView<T> &Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                       int aScaleFactor                       = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// aDst = this * aConst for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Mul(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this * aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
+    /// where aMask != 0
+    /// </summary>
     ImageView<T> &Mul(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// aDst = this * aConst for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Mul(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this * aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
+    /// where aMask != 0
+    /// </summary>
     ImageView<T> &Mul(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                       int aScaleFactor                       = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this *= aSrc2, for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Mul(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this *= aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
+    /// aMask != 0
+    /// </summary>
     ImageView<T> &Mul(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this *= aConst, for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Mul(const T &aConst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this *= aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
+    /// aMask != 0
+    /// </summary>
     ImageView<T> &Mul(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this *= aConst, for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Mul(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this *= aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
+    /// aMask != 0
+    /// </summary>
     ImageView<T> &Mul(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 #pragma endregion
 #pragma region MulScale
+    /// <summary>
+    /// aDst = this * aSrc2, then scales the result by the maximum value for the data bit width
+    /// </summary>
     ImageView<T> &MulScale(const ImageView<T> &aSrc2, ImageView<T> &aDst,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
+    /// <summary>
+    /// aDst = this * aConst, then scales the result by the maximum value for the data bit width
+    /// </summary>
     ImageView<T> &MulScale(const T &aConst, ImageView<T> &aDst,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
+    /// <summary>
+    /// aDst = this * aConst, then scales the result by the maximum value for the data bit width
+    /// </summary>
     ImageView<T> &MulScale(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
+    /// <summary>
+    /// aDst = this * aSrc2, then scales the result by the maximum value for the data bit width
+    /// </summary>
     ImageView<T> &MulScale(const ImageView<T> &aSrc2,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
+    /// <summary>
+    /// aDst = this * aConst, then scales the result by the maximum value for the data bit width
+    /// </summary>
     ImageView<T> &MulScale(const T &aConst,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
+    /// <summary>
+    /// aDst = this * aConst, then scales the result by the maximum value for the data bit width
+    /// </summary>
     ImageView<T> &MulScale(const opp::cuda::DevVarView<T> &aConst,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
+    /// <summary>
+    /// aDst = this * aSrc2, then scales the result by the maximum value for the data bit width, for all pixels where
+    /// aMask != 0
+    /// </summary>
     ImageView<T> &MulScale(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
+    /// <summary>
+    /// aDst = this * aConst, then scales the result by the maximum value for the data bit width, for all pixels where
+    /// aMask != 0
+    /// </summary>
     ImageView<T> &MulScale(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
+    /// <summary>
+    /// aDst = this * aConst, then scales the result by the maximum value for the data bit width, for all pixels where
+    /// aMask != 0
+    /// </summary>
     ImageView<T> &MulScale(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
                            const ImageView<Pixel8uC1> &aMask,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
+    /// <summary>
+    /// aDst = this * aSrc2, then scales the result by the maximum value for the data bit width, for all pixels where
+    /// aMask != 0
+    /// </summary>
     ImageView<T> &MulScale(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
+    /// <summary>
+    /// aDst = this * aConst, then scales the result by the maximum value for the data bit width, for all pixels where
+    /// aMask != 0
+    /// </summary>
     ImageView<T> &MulScale(const T &aConst, const ImageView<Pixel8uC1> &aMask,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
+    /// <summary>
+    /// aDst = this * aConst, then scales the result by the maximum value for the data bit width, for all pixels where
+    /// aMask != 0
+    /// </summary>
     ImageView<T> &MulScale(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 #pragma endregion
 #pragma region Div
+    /// <summary>
+    /// aDst = this / aSrc2
+    /// </summary>
     ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this / aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0,
                       RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// aDst = this / aConst
+    /// </summary>
     ImageView<T> &Div(const T &aConst, ImageView<T> &aDst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this / aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Div(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
                       RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// aDst = this / aConst
+    /// </summary>
     ImageView<T> &Div(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this / aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Div(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
                       RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this /= aSrc2
+    /// </summary>
     ImageView<T> &Div(const ImageView<T> &aSrc2,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this /= aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Div(const ImageView<T> &aSrc2, int aScaleFactor = 0,
                       RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this /= aConst
+    /// </summary>
     ImageView<T> &Div(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this /= aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Div(const T &aConst, int aScaleFactor = 0,
                       RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this /= aConst
+    /// </summary>
     ImageView<T> &Div(const opp::cuda::DevVarView<T> &aConst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this /= aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &Div(const opp::cuda::DevVarView<T> &aConst, int aScaleFactor = 0,
                       RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this = aSrc2 / this
+    /// </summary>
     ImageView<T> &DivInv(const ImageView<T> &aSrc2,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this = aSrc2 / this, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &DivInv(const ImageView<T> &aSrc2, int aScaleFactor = 0,
                          RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this = aConst / this
+    /// </summary>
     ImageView<T> &DivInv(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this = aConst / this, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &DivInv(const T &aConst, int aScaleFactor = 0,
                          RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this = aConst / this
+    /// </summary>
     ImageView<T> &DivInv(const opp::cuda::DevVarView<T> &aConst,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this = aConst / this, with floating point scaling factor with scale factor = 2^-aScaleFactor
+    /// </summary>
     ImageView<T> &DivInv(const opp::cuda::DevVarView<T> &aConst, int aScaleFactor = 0,
                          RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// aDst = this / aConst for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this / aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
+    /// where aMask != 0
+    /// </summary>
     ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                       int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// aDst = this / aConst for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Div(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this / aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
+    /// where aMask != 0
+    /// </summary>
     ImageView<T> &Div(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
                       RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// aDst = this / aConst for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Div(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// aDst = this / aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
+    /// where aMask != 0
+    /// </summary>
     ImageView<T> &Div(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                       int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this /= aSrc2, for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Div(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this /= aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
+    /// aMask != 0
+    /// </summary>
     ImageView<T> &Div(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
                       RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this /= aConst, for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Div(const T &aConst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this /= aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
+    /// aMask != 0
+    /// </summary>
     ImageView<T> &Div(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
                       RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this /= aConst, for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &Div(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this /= aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
+    /// aMask != 0
+    /// </summary>
     ImageView<T> &Div(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
                       RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this = aSrc2 / this, for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &DivInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this = aSrc2 / this, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
+    /// where aMask != 0
+    /// </summary>
     ImageView<T> &DivInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
                          RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this = aConst / this, for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &DivInv(const T &aConst, const ImageView<Pixel8uC1> &aMask,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this = aConst / this, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
+    /// where aMask != 0
+    /// </summary>
     ImageView<T> &DivInv(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
                          RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
+    /// <summary>
+    /// this = aConst / this, for all pixels where aMask != 0
+    /// </summary>
     ImageView<T> &DivInv(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
+    /// <summary>
+    /// this = aConst / this, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
+    /// where aMask != 0
+    /// </summary>
     ImageView<T> &DivInv(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
                          int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
@@ -1152,155 +1727,275 @@ template <PixelType T> class ImageView
 #pragma endregion
 
 #pragma region Abs
+    /// <summary>
+    /// aDst = abs(this)
+    /// </summary>
     ImageView<T> &Abs(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealSignedVector<T>;
 
+    /// <summary>
+    /// this = abs(this)
+    /// </summary>
     ImageView<T> &Abs(const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealSignedVector<T>;
 #pragma endregion
 #pragma region AbsDiff
+    /// <summary>
+    /// aDst = abs(this - aSrc2)
+    /// </summary>
     ImageView<T> &AbsDiff(const ImageView<T> &aSrc2, ImageView<T> &aDst,
                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealUnsignedVector<T>;
 
+    /// <summary>
+    /// aDst = abs(this - aConst)
+    /// </summary>
     ImageView<T> &AbsDiff(const T &aConst, ImageView<T> &aDst,
                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealUnsignedVector<T>;
 
+    /// <summary>
+    /// aDst = abs(this - aConst)
+    /// </summary>
     ImageView<T> &AbsDiff(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealUnsignedVector<T>;
 
+    /// <summary>
+    /// this = abs(this - aSrc2)
+    /// </summary>
     ImageView<T> &AbsDiff(const ImageView<T> &aSrc2,
                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealUnsignedVector<T>;
 
+    /// <summary>
+    /// this = abs(this - aConst)
+    /// </summary>
     ImageView<T> &AbsDiff(const T &aConst,
                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealUnsignedVector<T>;
 
+    /// <summary>
+    /// this = abs(this - aConst)
+    /// </summary>
     ImageView<T> &AbsDiff(const opp::cuda::DevVarView<T> &aConst,
                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealUnsignedVector<T>;
 #pragma endregion
 #pragma region And
+    /// <summary>
+    /// aDst = this & aSrc2 (bitwise AND)
+    /// </summary>
     ImageView<T> &And(const ImageView<T> &aSrc2, ImageView<T> &aDst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 
+    /// <summary>
+    /// aDst = this & aConst (bitwise AND)
+    /// </summary>
     ImageView<T> &And(const T &aConst, ImageView<T> &aDst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 
+    /// <summary>
+    /// aDst = this & aConst (bitwise AND)
+    /// </summary>
     ImageView<T> &And(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 
+    /// <summary>
+    /// this = this & aSrc2 (bitwise AND)
+    /// </summary>
     ImageView<T> &And(const ImageView<T> &aSrc2,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 
+    /// <summary>
+    /// this = this & aConst (bitwise AND)
+    /// </summary>
     ImageView<T> &And(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 
+    /// <summary>
+    /// this = this & aConst (bitwise AND)
+    /// </summary>
     ImageView<T> &And(const opp::cuda::DevVarView<T> &aConst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 #pragma endregion
 #pragma region Not
+    /// <summary>
+    /// aDst = ~this (bitwise NOT)
+    /// </summary>
     ImageView<T> &Not(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 
+    /// <summary>
+    /// this = ~this (bitwise NOT)
+    /// </summary>
     ImageView<T> &Not(const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 #pragma endregion
 #pragma region Exp
+    /// <summary>
+    /// aDst = exp(this) (exponential function)
+    /// </summary>
     ImageView<T> &Exp(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexVector<T>;
 
+    /// <summary>
+    /// this = exp(this) (exponential function)
+    /// </summary>
     ImageView<T> &Exp(const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexVector<T>;
 #pragma endregion
 #pragma region Ln
+    /// <summary>
+    /// aDst = log(this) (natural logarithm)
+    /// </summary>
     ImageView<T> &Ln(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexVector<T>;
 
+    /// <summary>
+    /// this = log(this) (natural logarithm)
+    /// </summary>
     ImageView<T> &Ln(const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexVector<T>;
 #pragma endregion
 #pragma region LShift
+    /// <summary>
+    /// aDst = this << aConst (left bitshift)
+    /// </summary>
     ImageView<T> &LShift(uint aConst, ImageView<T> &aDst,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
+    /// <summary>
+    /// this = this << aConst (left bitshift)
+    /// </summary>
     ImageView<T> &LShift(uint aConst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 #pragma endregion
 #pragma region Or
+    /// <summary>
+    /// aDst = this | aSrc2 (bitwise Or)
+    /// </summary>
     ImageView<T> &Or(const ImageView<T> &aSrc2, ImageView<T> &aDst,
                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 
+    /// <summary>
+    /// aDst = this | aConst (bitwise Or)
+    /// </summary>
     ImageView<T> &Or(const T &aConst, ImageView<T> &aDst,
                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 
+    /// <summary>
+    /// aDst = this | aConst (bitwise Or)
+    /// </summary>
     ImageView<T> &Or(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 
+    /// <summary>
+    /// this = this | aSrc2 (bitwise Or)
+    /// </summary>
     ImageView<T> &Or(const ImageView<T> &aSrc2,
                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 
+    /// <summary>
+    /// this = this | aConst (bitwise Or)
+    /// </summary>
     ImageView<T> &Or(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 
+    /// <summary>
+    /// this = this | aConst (bitwise Or)
+    /// </summary>
     ImageView<T> &Or(const opp::cuda::DevVarView<T> &aConst,
                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 #pragma endregion
 #pragma region RShift
+    /// <summary>
+    /// aDst = this >> aConst (right bitshift)
+    /// </summary>
     ImageView<T> &RShift(uint aConst, ImageView<T> &aDst,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
+    /// <summary>
+    /// this = this >> aConst (right bitshift)
+    /// </summary>
     ImageView<T> &RShift(uint aConst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 #pragma endregion
 #pragma region Sqr
+    /// <summary>
+    /// aDst = this * this (this^2)
+    /// </summary>
     ImageView<T> &Sqr(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexVector<T>;
 
+    /// <summary>
+    /// this = this * this (this^2)
+    /// </summary>
     ImageView<T> &Sqr(const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexVector<T>;
 #pragma endregion
 #pragma region Sqrt
+    /// <summary>
+    /// aDst = Sqrt(this) (square root function)
+    /// </summary>
     ImageView<T> &Sqrt(ImageView<T> &aDst,
                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexVector<T>;
 
+    /// <summary>
+    /// this = Sqrt(this) (square root function)
+    /// </summary>
     ImageView<T> &Sqrt(const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexVector<T>;
 #pragma endregion
 #pragma region Xor
+    /// <summary>
+    /// aDst = this ^ aSrc2 (bitwise Xor)
+    /// </summary>
     ImageView<T> &Xor(const ImageView<T> &aSrc2, ImageView<T> &aDst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 
+    /// <summary>
+    /// aDst = this ^ aConst (bitwise Xor)
+    /// </summary>
     ImageView<T> &Xor(const T &aConst, ImageView<T> &aDst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 
+    /// <summary>
+    /// aDst = this ^ aConst (bitwise Xor)
+    /// </summary>
     ImageView<T> &Xor(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 
+    /// <summary>
+    /// this = this ^ aSrc2 (bitwise Xor)
+    /// </summary>
     ImageView<T> &Xor(const ImageView<T> &aSrc2,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 
+    /// <summary>
+    /// this = this ^ aConst (bitwise Xor)
+    /// </summary>
     ImageView<T> &Xor(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 
+    /// <summary>
+    /// this = this ^ aConst (bitwise Xor)
+    /// </summary>
     ImageView<T> &Xor(const opp::cuda::DevVarView<T> &aConst,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
@@ -1308,6 +2003,7 @@ template <PixelType T> class ImageView
 
 #pragma region AlphaPremul
     /// <summary>
+    /// Premultiplies pixels of an image with alpha from fourth color channel.
     /// Note: AlphaPremul does not exactly match the results from NPP for integer image types. NPP seems to scale the
     /// integer value by T::max() and then does the multiplications/divisions as integers. Here we cast to float and
     /// then round using RoundingMode::NearestTiesAwayFromZero (round()) which is nearly identical, but not exactly the
@@ -1317,30 +2013,64 @@ template <PixelType T> class ImageView
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires FourChannelNoAlpha<T> && RealVector<T>;
 
+    /// <summary>
+    /// Premultiplies pixels of an image with alpha from fourth color channel.
+    /// Note: AlphaPremul does not exactly match the results from NPP for integer image types. NPP seems to scale the
+    /// integer value by T::max() and then does the multiplications/divisions as integers. Here we cast to float and
+    /// then round using RoundingMode::NearestTiesAwayFromZero (round()) which is nearly identical, but not exactly the
+    /// same for all values. Values may differ by 1.
+    /// </summary>
     ImageView<T> &AlphaPremul(const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires FourChannelNoAlpha<T> && RealVector<T>;
 
+    /// <summary>
+    /// Premultiplies pixels of an image with constant aAlpha value. aAlpha is expected in value range 0..1
+    /// </summary>
     ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealFloatingVector<T>;
 
+    /// <summary>
+    /// Premultiplies pixels of an image with constant aAlpha value.
+    /// Note: AlphaPremul does not exactly match the results from NPP for integer image types. NPP seems to scale the
+    /// integer value by T::max() and then does the multiplications/divisions as integers. Here we cast to float and
+    /// then round using RoundingMode::NearestTiesAwayFromZero (round()) which is nearly identical, but not exactly the
+    /// same for all values. Values may differ by 1.
+    /// </summary>
     ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 
+    /// <summary>
+    /// Premultiplies pixels of an image with constant aAlpha value. aAlpha is expected in value range 0..1
+    /// </summary>
     ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealFloatingVector<T>;
 
+    /// <summary>
+    /// Premultiplies pixels of an image with constant aAlpha value.
+    /// Note: AlphaPremul does not exactly match the results from NPP for integer image types. NPP seems to scale the
+    /// integer value by T::max() and then does the multiplications/divisions as integers. Here we cast to float and
+    /// then round using RoundingMode::NearestTiesAwayFromZero (round()) which is nearly identical, but not exactly the
+    /// same for all values. Values may differ by 1.
+    /// </summary>
     ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealIntVector<T>;
 #pragma endregion
 #pragma region AlphaComp
+    /// <summary>
+    /// Composite two images using alpha opacity values contained in each image. Last color channel is alpha channel, 1
+    /// channel images are treated as alpha channel only.
+    /// </summary>
     ImageView<T> &AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &aDst, AlphaCompositionOp aAlphaOp,
                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires(!FourChannelAlpha<T>) && RealVector<T>;
 
+    /// <summary>
+    /// Composite two images using constant alpha values.
+    /// </summary>
     ImageView<T> &AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &aDst, remove_vector_t<T> aAlpha1,
                             remove_vector_t<T> aAlpha2, AlphaCompositionOp aAlphaOp,
                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
@@ -1348,56 +2078,233 @@ template <PixelType T> class ImageView
 #pragma endregion
 
 #pragma region Complex
+    /// <summary>
+    /// aDst = this * conj(aSrc2) (complex conjugate multiplication)
+    /// </summary>
     ImageView<T> &ConjMul(const ImageView<T> &aSrc2, ImageView<T> &aDst,
                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ComplexVector<T>;
 
+    /// <summary>
+    /// this = this * conj(aSrc2) (complex conjugate multiplication)
+    /// </summary>
     ImageView<T> &ConjMul(const ImageView<T> &aSrc2,
                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ComplexVector<T>;
 
+    /// <summary>
+    /// aDst = conj(this) (complex conjugate)
+    /// </summary>
     ImageView<T> &Conj(ImageView<T> &aDst,
                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ComplexVector<T>;
 
+    /// <summary>
+    /// this = conj(this) (complex conjugate)
+    /// </summary>
     ImageView<T> &Conj(const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ComplexVector<T>;
 
+    /// <summary>
+    /// aDst = abs(this) (complex magnitude)
+    /// </summary>
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &Magnitude(
         ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>;
 
+    /// <summary>
+    /// aDst = abs(this)^2 (complex magnitude squared)
+    /// </summary>
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &MagnitudeSqr(
         ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>;
 
+    /// <summary>
+    /// aDst = angle(this) (complex angle, atan2(imag, real))
+    /// </summary>
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &Angle(
         ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>;
 
+    /// <summary>
+    /// aDst = this.real (real component of complex value)
+    /// </summary>
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &Real(
         ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ComplexVector<T>;
 
+    /// <summary>
+    /// aDst = this.imag (imaginary component of complex value)
+    /// </summary>
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &Imag(
         ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ComplexVector<T>;
 
+    /// <summary>
+    /// aDst.real = this, aDst.imag = 0 (converts real valued image to complex with imaginary part = 0)
+    /// </summary>
     ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &MakeComplex(
         ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealSignedVector<T> && (!FourChannelAlpha<T>);
 
+    /// <summary>
+    /// aDst.real = this, aDst.imag = aSrcImag (converts two real valued images to one complex image)
+    /// </summary>
     ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &MakeComplex(
         const ImageView<T> &aSrcImag,
         ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealSignedVector<T> && (!FourChannelAlpha<T>);
+#pragma endregion
+#pragma endregion
+
+#pragma region Statistics
+#pragma region MinEvery
+    /// <summary>
+    /// aDst = min(this, aSrc2) (minimum per pixel, per channel)
+    /// </summary>
+    ImageView<T> &MinEvery(const ImageView<T> &aSrc2, ImageView<T> &aDst,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+
+    /// <summary>
+    /// this = min(this, aSrc2) (minimum per pixel, per channel)
+    /// </summary>
+    ImageView<T> &MinEvery(const ImageView<T> &aSrc2,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+#pragma endregion
+#pragma region MaxEvery
+    /// <summary>
+    /// aDst = max(this, aSrc2) (maximum per pixel, per channel)
+    /// </summary>
+    ImageView<T> &MaxEvery(const ImageView<T> &aSrc2, ImageView<T> &aDst,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+
+    /// <summary>
+    /// this = max(this, aSrc2) (maximum per pixel, per channel)
+    /// </summary>
+    ImageView<T> &MaxEvery(const ImageView<T> &aSrc2,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+#pragma endregion
+#pragma endregion
+
+#pragma region Threshold and Compare
+#pragma region Compare
+    /// <summary>
+    /// aDst pixel is set to 255 if all color channels in this and aSrc2 fulfill aCompare, 0 otherwise.
+    /// </summary>
+    ImageView<Pixel8uC1> &Compare(const ImageView<T> &aSrc2, CompareOp aCompare, ImageView<Pixel8uC1> &aDst,
+                                  const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
+
+    /// <summary>
+    /// aDst pixel is set to 255 if all color channels in this and aConst fulfill aCompare, 0 otherwise.
+    /// </summary>
+    ImageView<Pixel8uC1> &Compare(const T &aConst, CompareOp aCompare, ImageView<Pixel8uC1> &aDst,
+                                  const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
+
+    /// <summary>
+    /// aDst pixel is set to 255 if all color channels in this and aConst fulfill aCompare, 0 otherwise.
+    /// </summary>
+    ImageView<Pixel8uC1> &Compare(const opp::cuda::DevVarView<T> &aConst, CompareOp aCompare,
+                                  ImageView<Pixel8uC1> &aDst,
+                                  const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
+
+    /// <summary>
+    /// aDst pixel is set to 255 if all color channels for abs(this - aSrc2) are &lt;= aEpsilon, 0 otherwise.
+    /// </summary>
+    ImageView<Pixel8uC1> &CompareEqEps(const ImageView<T> &aSrc2, complex_basetype_t<remove_vector_t<T>> aEpsilon,
+                                       ImageView<Pixel8uC1> &aDst,
+                                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexFloatingVector<T>;
+
+    /// <summary>
+    /// aDst pixel is set to 255 if all color channels for abs(this - aConst) are &lt;= aEpsilon, 0 otherwise.
+    /// </summary>
+    ImageView<Pixel8uC1> &CompareEqEps(const T &aConst, complex_basetype_t<remove_vector_t<T>> aEpsilon,
+                                       ImageView<Pixel8uC1> &aDst,
+                                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexFloatingVector<T>;
+
+    /// <summary>
+    /// aDst pixel is set to 255 if all color channels for abs(this - aConst) are &lt;= aEpsilon, 0 otherwise.
+    /// </summary>
+    ImageView<Pixel8uC1> &CompareEqEps(const opp::cuda::DevVarView<T> &aConst,
+                                       complex_basetype_t<remove_vector_t<T>> aEpsilon, ImageView<Pixel8uC1> &aDst,
+                                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexFloatingVector<T>;
+#pragma endregion
+#pragma region Threshold
+    ImageView<T> &Threshold(const T &aThreshold, CompareOp aCompare, ImageView<T> &aDst,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+    ImageView<T> &Threshold(const opp::cuda::DevVarView<T> &aThreshold, CompareOp aCompare, ImageView<T> &aDst,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+    ImageView<T> &ThresholdLT(const T &aThreshold, ImageView<T> &aDst,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+    ImageView<T> &ThresholdLT(const opp::cuda::DevVarView<T> &aThreshold, ImageView<T> &aDst,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+    ImageView<T> &ThresholdGT(const T &aThreshold, ImageView<T> &aDst,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+    ImageView<T> &ThresholdGT(const opp::cuda::DevVarView<T> &aThreshold, ImageView<T> &aDst,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+    ImageView<T> &Threshold(const T &aThreshold, CompareOp aCompare,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+    ImageView<T> &Threshold(const opp::cuda::DevVarView<T> &aThreshold, CompareOp aCompare,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+    ImageView<T> &ThresholdLT(const T &aThreshold,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+    ImageView<T> &ThresholdLT(const opp::cuda::DevVarView<T> &aThreshold,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+    ImageView<T> &ThresholdGT(const T &aThreshold,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+    ImageView<T> &ThresholdGT(const opp::cuda::DevVarView<T> &aThreshold,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+
+    ImageView<T> &Threshold(const T &aThreshold, const T &aValue, CompareOp aCompare, ImageView<T> &aDst,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+    ImageView<T> &ThresholdLT(const T &aThreshold, const T &aValue, ImageView<T> &aDst,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+    ImageView<T> &ThresholdGT(const T &aThreshold, const T &aValue, ImageView<T> &aDst,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+    ImageView<T> &Threshold(const T &aThreshold, const T &aValue, CompareOp aCompare,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+    ImageView<T> &ThresholdLT(const T &aThreshold, const T &aValue,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+    ImageView<T> &ThresholdGT(const T &aThreshold, const T &aValue,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+    ImageView<T> &ThresholdLTGT(const T &aThresholdLT, const T &aValueLT, const T &aThresholdGT, const T &aValueGT,
+                                ImageView<T> &aDst,
+                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+    ImageView<T> &ThresholdLTGT(const T &aThresholdLT, const T &aValueLT, const T &aThresholdGT, const T &aValueGT,
+                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
 #pragma endregion
 #pragma endregion
 };

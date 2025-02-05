@@ -1030,6 +1030,7 @@ template <Number T> struct alignas(2 * sizeof(T)) Vector2
             case Axis2D::Y:
                 return y;
         }
+        return x;
     }
 
     /// <summary>

@@ -1,12 +1,18 @@
 #include "imageView.h"
 #include "imageView_arithmetic_impl.h"          //NOLINT(misc-include-cleaner)
 #include "imageView_dataExchangeAndInit_impl.h" //NOLINT(misc-include-cleaner)
+#include "imageView_statistics_impl.h"          //NOLINT(misc-include-cleaner)
+#include "imageView_thresholdAndCompare_impl.h" //NOLINT(misc-include-cleaner)
 #include <backends/simple_cpu/image/forEachPixel.h>
-#include <backends/simple_cpu/image/forEachPixel_impl.h>       //NOLINT(misc-include-cleaner)
 #include <backends/simple_cpu/image/forEachPixelMasked.h>
 #include <backends/simple_cpu/image/forEachPixelMasked_impl.h> //NOLINT(misc-include-cleaner)
+#include <backends/simple_cpu/image/forEachPixelPlanar.h>
+#include <backends/simple_cpu/image/forEachPixelPlanar_impl.h> //NOLINT(misc-include-cleaner)
+#include <backends/simple_cpu/image/forEachPixelSingleChannel.h>
+#include <backends/simple_cpu/image/forEachPixelSingleChannel_impl.h> //NOLINT(misc-include-cleaner)
+#include <backends/simple_cpu/image/forEachPixel_impl.h>              //NOLINT(misc-include-cleaner)
 #include <common/image/pixelTypes.h>
-// #include <common/opp_defs.h>
+#include <common/opp_defs.h> //NOLINT(misc-include-cleaner)
 
 namespace opp::image::cpuSimple
 {
@@ -33,6 +39,51 @@ template ImageView<Pixel8uC3> &ImageView<Pixel32fC3>::Convert<Pixel8uC3>(ImageVi
                                                                          RoundingMode aRoundingMode);
 template ImageView<Pixel8uC3> &ImageView<Pixel32fC3>::Convert<Pixel8uC3>(ImageView<Pixel8uC3> &aDst,
                                                                          RoundingMode aRoundingMode, int aScaleFactor);
+
+template ImageView<Pixel8uC2> &ImageView<Pixel8uC2>::Copy<Pixel8uC2>(Channel aSrcChannel, ImageView<Pixel8uC2> &aDst,
+                                                                     Channel aDstChannel);
+template ImageView<Pixel8uC3> &ImageView<Pixel8uC2>::Copy<Pixel8uC3>(Channel aSrcChannel, ImageView<Pixel8uC3> &aDst,
+                                                                     Channel aDstChannel);
+template ImageView<Pixel8uC4> &ImageView<Pixel8uC2>::Copy<Pixel8uC4>(Channel aSrcChannel, ImageView<Pixel8uC4> &aDst,
+                                                                     Channel aDstChannel);
+
+template ImageView<Pixel8uC2> &ImageView<Pixel8uC3>::Copy<Pixel8uC2>(Channel aSrcChannel, ImageView<Pixel8uC2> &aDst,
+                                                                     Channel aDstChannel);
+template ImageView<Pixel8uC3> &ImageView<Pixel8uC3>::Copy<Pixel8uC3>(Channel aSrcChannel, ImageView<Pixel8uC3> &aDst,
+                                                                     Channel aDstChannel);
+template ImageView<Pixel8uC4> &ImageView<Pixel8uC3>::Copy<Pixel8uC4>(Channel aSrcChannel, ImageView<Pixel8uC4> &aDst,
+                                                                     Channel aDstChannel);
+
+template ImageView<Pixel8uC2> &ImageView<Pixel8uC4>::Copy<Pixel8uC2>(Channel aSrcChannel, ImageView<Pixel8uC2> &aDst,
+                                                                     Channel aDstChannel);
+template ImageView<Pixel8uC3> &ImageView<Pixel8uC4>::Copy<Pixel8uC3>(Channel aSrcChannel, ImageView<Pixel8uC3> &aDst,
+                                                                     Channel aDstChannel);
+template ImageView<Pixel8uC4> &ImageView<Pixel8uC4>::Copy<Pixel8uC4>(Channel aSrcChannel, ImageView<Pixel8uC4> &aDst,
+                                                                     Channel aDstChannel);
+
+template ImageView<Pixel8uC2> &ImageView<Pixel8uC1>::Copy<Pixel8uC2>(ImageView<Pixel8uC2> &aDst, Channel aDstChannel);
+template ImageView<Pixel8uC3> &ImageView<Pixel8uC1>::Copy<Pixel8uC3>(ImageView<Pixel8uC3> &aDst, Channel aDstChannel);
+template ImageView<Pixel8uC4> &ImageView<Pixel8uC1>::Copy<Pixel8uC4>(ImageView<Pixel8uC4> &aDst, Channel aDstChannel);
+
+template ImageView<Pixel8uC1> &ImageView<Pixel8uC2>::Copy<Pixel8uC1>(Channel aSrcChannel, ImageView<Pixel8uC1> &aDst);
+template ImageView<Pixel8uC1> &ImageView<Pixel8uC3>::Copy<Pixel8uC1>(Channel aSrcChannel, ImageView<Pixel8uC1> &aDst);
+template ImageView<Pixel8uC1> &ImageView<Pixel8uC4>::Copy<Pixel8uC1>(Channel aSrcChannel, ImageView<Pixel8uC1> &aDst);
+
+template ImageView<Pixel8uC3> &ImageView<Pixel8uC1>::Dup<Pixel8uC3>(ImageView<Pixel8uC3> &aDst);
+template ImageView<Pixel8uC4> &ImageView<Pixel8uC1>::Dup<Pixel8uC4>(ImageView<Pixel8uC4> &aDst);
+template ImageView<Pixel8uC4A> &ImageView<Pixel8uC1>::Dup<Pixel8uC4A>(ImageView<Pixel8uC4A> &aDst);
+
+template ImageView<Pixel8uC4> &ImageView<Pixel8uC3>::SwapChannel<Pixel8uC4>(
+    ImageView<Pixel8uC4> &aDst, const ChannelList<vector_active_size_v<Pixel8uC4>> &aDstChannels,
+    remove_vector_t<Pixel8uC3> aValue);
+template ImageView<Pixel8uC3> &ImageView<Pixel8uC4>::SwapChannel<Pixel8uC3>(
+    ImageView<Pixel8uC3> &aDst, const ChannelList<vector_active_size_v<Pixel8uC3>> &aDstChannels);
+template ImageView<Pixel8uC3> &ImageView<Pixel8uC3>::SwapChannel<Pixel8uC3>(
+    ImageView<Pixel8uC3> &aDst, const ChannelList<vector_active_size_v<Pixel8uC3>> &aDstChannels);
+template ImageView<Pixel8uC4> &ImageView<Pixel8uC4>::SwapChannel<Pixel8uC4>(
+    ImageView<Pixel8uC4> &aDst, const ChannelList<vector_active_size_v<Pixel8uC4>> &aDstChannels);
+template ImageView<Pixel8uC4A> &ImageView<Pixel8uC4A>::SwapChannel<Pixel8uC4A>(
+    ImageView<Pixel8uC4A> &aDst, const ChannelList<vector_active_size_v<Pixel8uC4A>> &aDstChannels);
 
 using Image32fC1View  = ImageView<Pixel32fC1>;
 using Image32fC2View  = ImageView<Pixel32fC2>;

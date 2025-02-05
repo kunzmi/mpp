@@ -1,4 +1,5 @@
 #pragma once
+#include <json.h>
 #include <string>
 #include <utilities/nppParser/function.h>
 #include <vector>
@@ -107,5 +108,10 @@ class ConvertedArgument
     static std::string ConvertNppType(const std::string &aNPPType);
     static std::string GetImageType(const std::string &aNPPType, int aChannelCount);
 };
+
+inline void to_json(nlohmann::json &aj, const ConvertedArgument &aArgument)
+{
+    aj = nlohmann::json{{"type", aArgument.Type()}, {"name", aArgument.Name()}};
+}
 
 } // namespace opp::utilities::nppParser

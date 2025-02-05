@@ -9,8 +9,8 @@
 #include <common/opp_defs.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
-#include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
+#include <common/vector_typetraits.h>
 #include <concepts>
 
 // disable warning for pragma unroll when compiling with host compiler:
@@ -29,7 +29,7 @@ namespace opp::image
 /// <typeparam name="roundingMode"></typeparam>
 template <size_t tupelSize, typename SrcT, typename ComputeT, typename DstT, typename operation,
           RoundingMode roundingMode = RoundingMode::NearestTiesAwayFromZero, typename ComputeT_SIMD = voidType,
-          typename operation_SIMD = voidType>
+          typename operation_SIMD = voidType, bool SrcIsSameAsCompute = false>
 struct SrcConstantFunctor : public ImageFunctor<false>
 {
     const SrcT *RESTRICT Src1;
@@ -62,14 +62,21 @@ struct SrcConstantFunctor : public ImageFunctor<false>
 
 #pragma region run naive on one pixel
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
-        requires std::same_as<ComputeT, DstT>
+        requires std::same_as<ComputeT, DstT> && (!SrcIsSameAsCompute)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         Op(static_cast<ComputeT>(*pixelSrc1), Constant, aDst);
     }
 
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
-        requires(!std::same_as<ComputeT, DstT>)
+        requires std::same_as<SrcT, ComputeT> && (SrcIsSameAsCompute)
+    {
+        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+        Op(static_cast<ComputeT>(*pixelSrc1), Constant, aDst);
+    }
+
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+        requires(!std::same_as<ComputeT, DstT>) && (!SrcIsSameAsCompute)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         ComputeT temp;
@@ -82,7 +89,7 @@ struct SrcConstantFunctor : public ImageFunctor<false>
 
 #pragma region run SIMD on pixel tupel
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
-        requires std::same_as<ComputeT_SIMD, Tupel<DstT, tupelSize>>
+        requires std::same_as<ComputeT_SIMD, Tupel<DstT, tupelSize>> && (!SrcIsSameAsCompute)
     {
         static_assert(OpSIMD.has_simd, "Trying to run a SIMD operation that is not implemented for this type.");
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
@@ -96,6 +103,21 @@ struct SrcConstantFunctor : public ImageFunctor<false>
 #pragma region run sequential on pixel tupel
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
         requires std::same_as<ComputeT, DstT> && //
+                 std::same_as<ComputeT_SIMD, voidType> && (!SrcIsSameAsCompute)
+    {
+        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+
+        Tupel<SrcT, tupelSize> tupelSrc1 = Tupel<SrcT, tupelSize>::Load(pixelSrc1);
+
+#pragma unroll
+        for (size_t i = 0; i < tupelSize; i++)
+        {
+            Op(static_cast<ComputeT>(tupelSrc1.value[i]), Constant, aDst.value[i]);
+        }
+    }
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+        requires std::same_as<SrcT, ComputeT> && //
+                 (SrcIsSameAsCompute) &&         //
                  std::same_as<ComputeT_SIMD, voidType>
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
@@ -111,7 +133,7 @@ struct SrcConstantFunctor : public ImageFunctor<false>
 
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
         requires(!std::same_as<ComputeT, DstT>) && //
-                std::same_as<ComputeT_SIMD, voidType>
+                std::same_as<ComputeT_SIMD, voidType> && (!SrcIsSameAsCompute)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
 

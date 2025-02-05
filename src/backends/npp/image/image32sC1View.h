@@ -124,49 +124,49 @@ class Image32sC1View : public ImageView<Pixel32sC1>
     Image32sC1View &Add(const Pixel32sC1 &nConstant, Image32sC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAddDeviceC_32s_C1RSfs_Ctx(const Npp32s * pSrc1, int nSrc1Step, const Npp32s * pConstant, Npp32s * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    Image32sC1View &Add(const cuda::DevVarView<Pixel8uC1> &pConstant, Image32sC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image32sC1View &Add(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, Image32sC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAddC_32s_C1IRSfs_Ctx(const Npp32s nConstant, Npp32s * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
     Image32sC1View &Add(const Pixel32sC1 &nConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAddDeviceC_32s_C1IRSfs_Ctx(const Npp32s * pConstant, Npp32s * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    Image32sC1View &Add(const cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image32sC1View &Add(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMulC_32s_C1RSfs_Ctx(const Npp32s * pSrc1, int nSrc1Step, const Npp32s nConstant, Npp32s * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
     Image32sC1View &Mul(const Pixel32sC1 &nConstant, Image32sC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMulDeviceC_32s_C1RSfs_Ctx(const Npp32s * pSrc1, int nSrc1Step, const Npp32s * pConstant, Npp32s * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    Image32sC1View &Mul(const cuda::DevVarView<Pixel8uC1> &pConstant, Image32sC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image32sC1View &Mul(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, Image32sC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMulC_32s_C1IRSfs_Ctx(const Npp32s nConstant, Npp32s * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
     Image32sC1View &Mul(const Pixel32sC1 &nConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMulDeviceC_32s_C1IRSfs_Ctx(const Npp32s * pConstant, Npp32s * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    Image32sC1View &Mul(const cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image32sC1View &Mul(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSubC_32s_C1RSfs_Ctx(const Npp32s * pSrc1, int nSrc1Step, const Npp32s nConstant, Npp32s * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
     Image32sC1View &Sub(const Pixel32sC1 &nConstant, Image32sC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSubDeviceC_32s_C1RSfs_Ctx(const Npp32s * pSrc1, int nSrc1Step, const Npp32s * pConstant, Npp32s * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    Image32sC1View &Sub(const cuda::DevVarView<Pixel8uC1> &pConstant, Image32sC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image32sC1View &Sub(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, Image32sC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSubC_32s_C1IRSfs_Ctx(const Npp32s nConstant, Npp32s * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
     Image32sC1View &Sub(const Pixel32sC1 &nConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSubDeviceC_32s_C1IRSfs_Ctx(const Npp32s * pConstant, Npp32s * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    Image32sC1View &Sub(const cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image32sC1View &Sub(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiDivC_32s_C1RSfs_Ctx(const Npp32s * pSrc1, int nSrc1Step, const Npp32s nConstant, Npp32s * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
     Image32sC1View &Div(const Pixel32sC1 &nConstant, Image32sC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDivDeviceC_32s_C1RSfs_Ctx(const Npp32s * pSrc1, int nSrc1Step, const Npp32s * pConstant, Npp32s * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    Image32sC1View &Div(const cuda::DevVarView<Pixel8uC1> &pConstant, Image32sC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image32sC1View &Div(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, Image32sC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDivC_32s_C1IRSfs_Ctx(const Npp32s nConstant, Npp32s * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
     Image32sC1View &Div(const Pixel32sC1 &nConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiDivDeviceC_32s_C1IRSfs_Ctx(const Npp32s * pConstant, Npp32s * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    Image32sC1View &Div(const cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image32sC1View &Div(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAdd_32s_C1RSfs_Ctx(const Npp32s * pSrc1, int nSrc1Step, const Npp32s * pSrc2, int nSrc2Step, Npp32s * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
     Image32sC1View &Add(const Image32sC1View &pSrc2, Image32sC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
@@ -259,19 +259,19 @@ class Image32sC1View : public ImageView<Pixel32sC1>
     Image32sC1View &AlphaComp(const Image32sC1View &pSrc2, Image32sC1View &pDst, NppiAlphaOp eAlphaOp, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilter32f_32s_C1R_Ctx(const Npp32s * pSrc, int nSrcStep, Npp32s * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    Image32sC1View &Filter32f(Image32sC1View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image32sC1View &Filter32f(Image32sC1View &pDst, const opp::cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterBorder32f_32s_C1R_Ctx(const Npp32s * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp32s * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    Image32sC1View &FilterBorder32f(Image32sC1View &pDst, const cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image32sC1View &FilterBorder32f(Image32sC1View &pDst, const opp::cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiNorm_Inf_32s_C1R_Ctx(const Npp32s * pSrc, int nSrcStep, NppiSize oSizeROI, Npp64f * pNorm, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void Norm_Inf(cuda::DevVarView<double> &pNorm, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void Norm_Inf(opp::cuda::DevVarView<double> &pNorm, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormInfGetBufferHostSize_32s_C1R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t NormInfGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDotProd_32s64f_C1R_Ctx(const Npp32s * pSrc1, int nSrc1Step, const Npp32s * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pDp, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void DotProd(const Image32sC1View &pSrc2, cuda::DevVarView<double> &pDp, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void DotProd(const Image32sC1View &pSrc2, opp::cuda::DevVarView<double> &pDp, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDotProdGetBufferHostSize_32s64f_C1R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t DotProdGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -283,25 +283,25 @@ class Image32sC1View : public ImageView<Pixel32sC1>
     void RectStdDev(const Image64fC1View &pSqr, Image32fC1View &pDst, NppiRect oRect, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumError_32s_C1R_Ctx(const Npp32s * pSrc1, int nSrc1Step, const Npp32s * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void MaximumError(const Image32sC1View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void MaximumError(const Image32sC1View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumErrorGetBufferHostSize_32s_C1R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t MaximumErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAverageError_32s_C1R_Ctx(const Npp32s * pSrc1, int nSrc1Step, const Npp32s * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void AverageError(const Image32sC1View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void AverageError(const Image32sC1View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAverageErrorGetBufferHostSize_32s_C1R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t AverageErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumRelativeError_32s_C1R_Ctx(const Npp32s * pSrc1, int nSrc1Step, const Npp32s * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void MaximumRelativeError(const Image32sC1View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void MaximumRelativeError(const Image32sC1View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumRelativeErrorGetBufferHostSize_32s_C1R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t MaximumRelativeErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAverageRelativeError_32s_C1R_Ctx(const Npp32s * pSrc1, int nSrc1Step, const Npp32s * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void AverageRelativeError(const Image32sC1View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void AverageRelativeError(const Image32sC1View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAverageRelativeErrorGetBufferHostSize_32s_C1R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t AverageRelativeErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;

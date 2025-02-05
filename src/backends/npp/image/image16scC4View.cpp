@@ -210,7 +210,7 @@ Image16scC4View &Image16scC4View::DivA(const Image16scC4View &pSrc, int nScaleFa
     return *this;
 }
 
-void Image16scC4View::MaximumError(const Image16scC4View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16scC4View::MaximumError(const Image16scC4View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiMaximumError_16sc_C4R_Ctx(reinterpret_cast<const Npp16sc *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16sc *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
@@ -224,7 +224,7 @@ size_t Image16scC4View::MaximumErrorGetBufferHostSize(const NppStreamContext &np
     return retValue;
 }
 
-void Image16scC4View::AverageError(const Image16scC4View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16scC4View::AverageError(const Image16scC4View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiAverageError_16sc_C4R_Ctx(reinterpret_cast<const Npp16sc *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16sc *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
@@ -238,7 +238,7 @@ size_t Image16scC4View::AverageErrorGetBufferHostSize(const NppStreamContext &np
     return retValue;
 }
 
-void Image16scC4View::MaximumRelativeError(const Image16scC4View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16scC4View::MaximumRelativeError(const Image16scC4View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiMaximumRelativeError_16sc_C4R_Ctx(reinterpret_cast<const Npp16sc *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16sc *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
@@ -252,7 +252,7 @@ size_t Image16scC4View::MaximumRelativeErrorGetBufferHostSize(const NppStreamCon
     return retValue;
 }
 
-void Image16scC4View::AverageRelativeError(const Image16scC4View &pSrc2, cuda::DevVarView<double> &pError, cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16scC4View::AverageRelativeError(const Image16scC4View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     nppSafeCallExt(nppiAverageRelativeError_16sc_C4R_Ctx(reinterpret_cast<const Npp16sc *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16sc *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
