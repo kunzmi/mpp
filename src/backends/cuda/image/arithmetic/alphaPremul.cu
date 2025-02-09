@@ -37,10 +37,11 @@ void InvokeAlphaPremulSrc(const SrcT *aSrc, size_t aPitchSrc, DstT *aDst, size_t
         using alphaPremulSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AlphaPremul<ComputeT>,
                                           RoundingMode::NearestTiesAwayFromZero>;
 
-        remove_vector_t<ComputeT> alphaScaleVal = static_cast<remove_vector_t<ComputeT>>(1);
+        remove_vector_t<ComputeT> alphaScaleVal{};
         if constexpr (RealIntVector<SrcT>)
         {
-            alphaScaleVal = static_cast<remove_vector_t<ComputeT>>(numeric_limits<remove_vector_t<SrcT>>::max());
+            alphaScaleVal = static_cast<remove_vector_t<ComputeT>>(1) /
+                            static_cast<remove_vector_t<ComputeT>>(numeric_limits<remove_vector_t<SrcT>>::max());
         }
 
         AlphaPremul<ComputeT> op(alphaScaleVal);
@@ -92,10 +93,11 @@ void InvokeAlphaPremulInplace(SrcDstT *aSrcDst, size_t aPitchSrcDst, const Size2
         using alphaPremulInplace = InplaceFunctor<TupelSize, ComputeT, DstT, opp::AlphaPremul<ComputeT>,
                                                   RoundingMode::NearestTiesAwayFromZero>;
 
-        remove_vector_t<ComputeT> alphaScaleVal = static_cast<remove_vector_t<ComputeT>>(1);
+        remove_vector_t<ComputeT> alphaScaleVal{};
         if constexpr (RealIntVector<SrcT>)
         {
-            alphaScaleVal = static_cast<remove_vector_t<ComputeT>>(numeric_limits<remove_vector_t<SrcT>>::max());
+            alphaScaleVal = static_cast<remove_vector_t<ComputeT>>(1) /
+                            static_cast<remove_vector_t<ComputeT>>(numeric_limits<remove_vector_t<SrcT>>::max());
         }
 
         AlphaPremul<ComputeT> op(alphaScaleVal);

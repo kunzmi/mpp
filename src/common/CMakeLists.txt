@@ -1,5 +1,13 @@
 add_library(common 
+	bfloat16.cpp
+	complex.cpp
 	exception.cpp
+	half_fp16.cpp
+	vector1.cpp
+	vector2.cpp
+	vector3.cpp
+	vector4.cpp
+	vector4A.cpp
 	)
 
 target_link_libraries(common PRIVATE  

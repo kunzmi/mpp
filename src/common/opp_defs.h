@@ -10,7 +10,7 @@ namespace opp
 /// to allow the user to specify the method by which fractional values are converted
 /// to integer values.
 /// </summary>
-enum class RoundingMode
+enum class RoundingMode // NOLINT(performance-enum-size)
 {
     /// <summary>
     /// Round to the nearest even integer.<para/>
@@ -181,7 +181,7 @@ inline std::wostream &operator<<(std::wostream &aOs, const RoundingMode &aRoundi
 /// <summary>
 /// Different Alpha compositing operations
 /// </summary>
-enum class AlphaCompositionOp
+enum class AlphaCompositionOp // NOLINT(performance-enum-size)
 {
     /// <summary>
     /// OVER compositing operation.<para/>
@@ -420,7 +420,7 @@ inline std::wostream &operator<<(std::wostream &aOs, const AlphaCompositionOp &a
 /// <summary>
 /// Bayer grid position registration
 /// </summary>
-enum class BayerGridPosition
+enum class BayerGridPosition // NOLINT(performance-enum-size)
 {
     /// <summary>
     /// Blue Green<para/>
@@ -520,7 +520,7 @@ inline std::wostream &operator<<(std::wostream &aOs, const BayerGridPosition &aB
 /// <summary>
 /// Mirror direction control
 /// </summary>
-enum class MirrorAxis
+enum class MirrorAxis // NOLINT(performance-enum-size)
 {
     /// <summary>
     /// Flip around horizontal axis in mirror function.
@@ -598,7 +598,7 @@ inline std::wostream &operator<<(std::wostream &aOs, const MirrorAxis &aMirrorAx
 /// <summary>
 /// Pixel comparison control values
 /// </summary>
-enum class CompareOp
+enum class CompareOp // NOLINT(performance-enum-size)
 {
     /// <summary>
     /// Returns true if the pixel value is &lt; than the value to compare with.
@@ -719,7 +719,7 @@ inline std::wostream &operator<<(std::wostream &aOs, const CompareOp &aCompareOp
 /// Border modes for image filtering<para/>
 /// Note: NPP currently only supports NPP_BORDER_REPLICATE, why we will base the enum values on IPP instead:
 /// </summary>
-enum class BorderType
+enum class BorderType // NOLINT(performance-enum-size)
 {
     /// <summary>
     /// Undefined image border type

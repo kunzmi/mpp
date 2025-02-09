@@ -42,20 +42,30 @@
 #include <backends/simple_cpu/image/imageView.h>
 #include <common/bfloat16.h>
 #include <common/complex.h>
+#include <common/complex_impl.h>
 #include <common/half_fp16.h>
 #include <common/image/pixelTypes.h>
 #include <common/numberTypes.h>
 #include <common/vector1.h>
+#include <common/vector1_impl.h>
 #include <common/vector2.h>
+#include <common/vector2_impl.h>
+#include <common/vector3.h>
+#include <common/vector3_impl.h>
+#include <common/vector4A_impl.h>
+#include <common/vector4_impl.h>
 #include <common/vectorTypes.h>
 // #include <common/scratchBuffer.h>
 // #include <half/half.hpp>
 
 #include <common/arithmetic/binary_operators.h>
 
+#include "common/defines.h"
 #include "common/exception.h"
 #include "common/utilities.h"
+#include "common/vector4.h"
 #include <common/image/pixelTypeEnabler.h>
+#include <cuda_runtime_api.h>
 #include <filesystem>
 #include <ios>
 using namespace opp;
@@ -66,11 +76,20 @@ namespace cpu = opp::image::cpuSimple;
 
 int main()
 {
-    Dup<Pixel8uC1, Pixel8uC4> dup;
-    Pixel8uC1 aIn(33);
-    Pixel8uC4 aOut;
-    dup(aIn, aOut);
+    opp::Vector1<c_double> var(1);
 
+    opp::Vector1<c_double> var2 = var + 1;
+
+    // opp::Vector1<c_double>::Ln(var);
+
+    var.Ln();
+
+    c_double cf(1, 2);
+    c_int ci(1, 2);
+
+    cf.Ln();
+    // c_double::Ln(cf);
+    // constexpr bool iscf = NonNativeFloatingPoint<BFloat16>;
     /*
     constexpr bool val1 = std::is_trivially_assignable_v<Pixel32fC4, Pixel32fC4>;
     constexpr bool val2 = std::is_trivially_constructible_v<Pixel32fC2>;
@@ -167,6 +186,8 @@ int main()
         cpu::Image<Pixel8uC1> cpu_test2(128, 128);
         cpu::Image<Pixel8uC4> cpu_test3(128, 128);
         cpu::Image<Pixel32fC4> cpu_test4(128, 128);
+        byte val[4] = {1, 2, 3, 4};
+        cpu_test.Add(Pixel8uC4(val));
         cpu_test.FillRandom();
         cpu_test4.FillRandom();
 

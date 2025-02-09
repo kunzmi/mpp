@@ -1,4 +1,6 @@
 #include "common/exception.h"
+#include "common/image/pixelTypes.h"
+#include <algorithm>
 #include <backends/cuda/devVar.h>
 #include <backends/cuda/devVarView.h>
 #include <backends/cuda/event.h>
@@ -19,6 +21,7 @@
 #include <ios>
 #include <iostream>
 #include <nppcore.h>
+#include <nppdefs.h>
 #include <numeric>
 #include <vector>
 

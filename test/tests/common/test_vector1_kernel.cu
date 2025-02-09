@@ -10,7 +10,7 @@
 #include <common/image/pixelTypes.h>
 #include <common/numberTypes.h>
 #include <common/vector1.h>
-#include <cuda_runtime.h>
+#include <common/vectorTypes_impl.h>
 #include <device_launch_parameters.h>
 
 using namespace opp::image;

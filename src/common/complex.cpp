@@ -1,0 +1,176 @@
+#include "complex.h"      //NOLINT
+#include "bfloat16.h"     //NOLINT(misc-include-cleaner)
+#include "complex_impl.h" //NOLINT(misc-include-cleaner)
+#include "defines.h"
+#include "half_fp16.h" //NOLINT(misc-include-cleaner)
+#include "opp_defs.h"  //NOLINT(misc-include-cleaner)
+
+// Note: we instantiate all complex types we support in OPP here, so that we only need to include the normal header file
+// in all host code
+
+namespace opp
+{
+template struct Complex<sbyte>;
+template struct Complex<short>;
+template struct Complex<int>;
+template struct Complex<long64>;
+template struct Complex<float>;
+template struct Complex<double>;
+template struct Complex<HalfFp16>;
+template struct Complex<BFloat16>;
+
+template Complex<sbyte>::Complex(const Complex<short> &) noexcept;
+template Complex<sbyte>::Complex(const Complex<int> &) noexcept;
+template Complex<sbyte>::Complex(const Complex<long64> &) noexcept;
+template Complex<sbyte>::Complex(const Complex<float> &) noexcept;
+template Complex<sbyte>::Complex(const Complex<double> &) noexcept;
+template Complex<sbyte>::Complex(const Complex<HalfFp16> &) noexcept;
+template Complex<sbyte>::Complex(const Complex<BFloat16> &) noexcept;
+
+template Complex<short>::Complex(const Complex<sbyte> &) noexcept;
+template Complex<short>::Complex(const Complex<int> &) noexcept;
+template Complex<short>::Complex(const Complex<long64> &) noexcept;
+template Complex<short>::Complex(const Complex<float> &) noexcept;
+template Complex<short>::Complex(const Complex<double> &) noexcept;
+template Complex<short>::Complex(const Complex<HalfFp16> &) noexcept;
+template Complex<short>::Complex(const Complex<BFloat16> &) noexcept;
+
+template Complex<int>::Complex(const Complex<sbyte> &) noexcept;
+template Complex<int>::Complex(const Complex<short> &) noexcept;
+template Complex<int>::Complex(const Complex<long64> &) noexcept;
+template Complex<int>::Complex(const Complex<float> &) noexcept;
+template Complex<int>::Complex(const Complex<double> &) noexcept;
+template Complex<int>::Complex(const Complex<HalfFp16> &) noexcept;
+template Complex<int>::Complex(const Complex<BFloat16> &) noexcept;
+
+template Complex<float>::Complex(const Complex<sbyte> &) noexcept;
+template Complex<float>::Complex(const Complex<short> &) noexcept;
+template Complex<float>::Complex(const Complex<int> &) noexcept;
+template Complex<float>::Complex(const Complex<long64> &) noexcept;
+template Complex<float>::Complex(const Complex<double> &) noexcept;
+template Complex<float>::Complex(const Complex<HalfFp16> &) noexcept;
+template Complex<float>::Complex(const Complex<BFloat16> &) noexcept;
+
+template Complex<double>::Complex(const Complex<sbyte> &) noexcept;
+template Complex<double>::Complex(const Complex<short> &) noexcept;
+template Complex<double>::Complex(const Complex<int> &) noexcept;
+template Complex<double>::Complex(const Complex<long64> &) noexcept;
+template Complex<double>::Complex(const Complex<float> &) noexcept;
+template Complex<double>::Complex(const Complex<HalfFp16> &) noexcept;
+template Complex<double>::Complex(const Complex<BFloat16> &) noexcept;
+
+template Complex<HalfFp16>::Complex(const Complex<sbyte> &) noexcept;
+template Complex<HalfFp16>::Complex(const Complex<short> &) noexcept;
+template Complex<HalfFp16>::Complex(const Complex<int> &) noexcept;
+template Complex<HalfFp16>::Complex(const Complex<long64> &) noexcept;
+template Complex<HalfFp16>::Complex(const Complex<float> &) noexcept;
+template Complex<HalfFp16>::Complex(const Complex<double> &) noexcept;
+template Complex<HalfFp16>::Complex(const Complex<BFloat16> &) noexcept;
+template Complex<HalfFp16>::Complex(const Complex<float> &, RoundingMode) noexcept;
+
+template Complex<BFloat16>::Complex(const Complex<sbyte> &) noexcept;
+template Complex<BFloat16>::Complex(const Complex<short> &) noexcept;
+template Complex<BFloat16>::Complex(const Complex<int> &) noexcept;
+template Complex<BFloat16>::Complex(const Complex<long64> &) noexcept;
+template Complex<BFloat16>::Complex(const Complex<float> &) noexcept;
+template Complex<BFloat16>::Complex(const Complex<double> &) noexcept;
+template Complex<BFloat16>::Complex(const Complex<HalfFp16> &) noexcept;
+template Complex<BFloat16>::Complex(const Complex<float> &, RoundingMode) noexcept;
+
+template Complex<sbyte>::Complex(Complex<short> &) noexcept;
+template Complex<sbyte>::Complex(Complex<int> &) noexcept;
+template Complex<sbyte>::Complex(Complex<long64> &) noexcept;
+template Complex<sbyte>::Complex(Complex<float> &) noexcept;
+template Complex<sbyte>::Complex(Complex<double> &) noexcept;
+template Complex<sbyte>::Complex(Complex<HalfFp16> &) noexcept;
+template Complex<sbyte>::Complex(Complex<BFloat16> &) noexcept;
+
+template Complex<short>::Complex(Complex<sbyte> &) noexcept;
+template Complex<short>::Complex(Complex<int> &) noexcept;
+template Complex<short>::Complex(Complex<long64> &) noexcept;
+template Complex<short>::Complex(Complex<float> &) noexcept;
+template Complex<short>::Complex(Complex<double> &) noexcept;
+template Complex<short>::Complex(Complex<HalfFp16> &) noexcept;
+template Complex<short>::Complex(Complex<BFloat16> &) noexcept;
+
+template Complex<int>::Complex(Complex<sbyte> &) noexcept;
+template Complex<int>::Complex(Complex<short> &) noexcept;
+template Complex<int>::Complex(Complex<long64> &) noexcept;
+template Complex<int>::Complex(Complex<float> &) noexcept;
+template Complex<int>::Complex(Complex<double> &) noexcept;
+template Complex<int>::Complex(Complex<HalfFp16> &) noexcept;
+template Complex<int>::Complex(Complex<BFloat16> &) noexcept;
+
+template Complex<float>::Complex(Complex<sbyte> &) noexcept;
+template Complex<float>::Complex(Complex<short> &) noexcept;
+template Complex<float>::Complex(Complex<int> &) noexcept;
+template Complex<float>::Complex(Complex<long64> &) noexcept;
+template Complex<float>::Complex(Complex<double> &) noexcept;
+template Complex<float>::Complex(Complex<HalfFp16> &) noexcept;
+template Complex<float>::Complex(Complex<BFloat16> &) noexcept;
+
+template Complex<double>::Complex(Complex<sbyte> &) noexcept;
+template Complex<double>::Complex(Complex<short> &) noexcept;
+template Complex<double>::Complex(Complex<int> &) noexcept;
+template Complex<double>::Complex(Complex<long64> &) noexcept;
+template Complex<double>::Complex(Complex<float> &) noexcept;
+template Complex<double>::Complex(Complex<HalfFp16> &) noexcept;
+template Complex<double>::Complex(Complex<BFloat16> &) noexcept;
+
+template Complex<HalfFp16>::Complex(Complex<sbyte> &) noexcept;
+template Complex<HalfFp16>::Complex(Complex<short> &) noexcept;
+template Complex<HalfFp16>::Complex(Complex<int> &) noexcept;
+template Complex<HalfFp16>::Complex(Complex<long64> &) noexcept;
+template Complex<HalfFp16>::Complex(Complex<float> &) noexcept;
+template Complex<HalfFp16>::Complex(Complex<double> &) noexcept;
+template Complex<HalfFp16>::Complex(Complex<BFloat16> &) noexcept;
+
+template Complex<BFloat16>::Complex(Complex<sbyte> &) noexcept;
+template Complex<BFloat16>::Complex(Complex<short> &) noexcept;
+template Complex<BFloat16>::Complex(Complex<int> &) noexcept;
+template Complex<BFloat16>::Complex(Complex<long64> &) noexcept;
+template Complex<BFloat16>::Complex(Complex<float> &) noexcept;
+template Complex<BFloat16>::Complex(Complex<double> &) noexcept;
+template Complex<BFloat16>::Complex(Complex<HalfFp16> &) noexcept;
+
+template std::ostream &operator<<(std::ostream &aOs, const opp::Complex<opp::sbyte> &aVec);
+template std::wostream &operator<<(std::wostream &aOs, const opp::Complex<opp::sbyte> &aVec);
+template std::istream &operator>>(std::istream &aIs, opp::Complex<opp::sbyte> &aVec);
+template std::wistream &operator>>(std::wistream &aIs, opp::Complex<opp::sbyte> &aVec);
+
+template std::ostream &operator<<(std::ostream &aOs, const opp::Complex<short> &aVec);
+template std::wostream &operator<<(std::wostream &aOs, const opp::Complex<short> &aVec);
+template std::istream &operator>>(std::istream &aIs, opp::Complex<short> &aVec);
+template std::wistream &operator>>(std::wistream &aIs, opp::Complex<short> &aVec);
+
+template std::ostream &operator<<(std::ostream &aOs, const opp::Complex<long64> &aVec);
+template std::wostream &operator<<(std::wostream &aOs, const opp::Complex<long64> &aVec);
+template std::istream &operator>>(std::istream &aIs, opp::Complex<long64> &aVec);
+template std::wistream &operator>>(std::wistream &aIs, opp::Complex<long64> &aVec);
+
+template std::ostream &operator<<(std::ostream &aOs, const opp::Complex<int> &aVec);
+template std::wostream &operator<<(std::wostream &aOs, const opp::Complex<int> &aVec);
+template std::istream &operator>>(std::istream &aIs, opp::Complex<int> &aVec);
+template std::wistream &operator>>(std::wistream &aIs, opp::Complex<int> &aVec);
+
+template std::ostream &operator<<(std::ostream &aOs, const opp::Complex<float> &aVec);
+template std::wostream &operator<<(std::wostream &aOs, const opp::Complex<float> &aVec);
+template std::istream &operator>>(std::istream &aIs, opp::Complex<float> &aVec);
+template std::wistream &operator>>(std::wistream &aIs, opp::Complex<float> &aVec);
+
+template std::ostream &operator<<(std::ostream &aOs, const opp::Complex<double> &aVec);
+template std::wostream &operator<<(std::wostream &aOs, const opp::Complex<double> &aVec);
+template std::istream &operator>>(std::istream &aIs, opp::Complex<double> &aVec);
+template std::wistream &operator>>(std::wistream &aIs, opp::Complex<double> &aVec);
+
+template std::ostream &operator<<(std::ostream &aOs, const opp::Complex<opp::HalfFp16> &aVec);
+template std::wostream &operator<<(std::wostream &aOs, const opp::Complex<opp::HalfFp16> &aVec);
+template std::istream &operator>>(std::istream &aIs, opp::Complex<opp::HalfFp16> &aVec);
+template std::wistream &operator>>(std::wistream &aIs, opp::Complex<opp::HalfFp16> &aVec);
+
+template std::ostream &operator<<(std::ostream &aOs, const opp::Complex<opp::BFloat16> &aVec);
+template std::wostream &operator<<(std::wostream &aOs, const opp::Complex<opp::BFloat16> &aVec);
+template std::istream &operator>>(std::istream &aIs, opp::Complex<opp::BFloat16> &aVec);
+template std::wistream &operator>>(std::wistream &aIs, opp::Complex<opp::BFloat16> &aVec);
+
+} // namespace opp

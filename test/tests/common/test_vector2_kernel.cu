@@ -10,6 +10,7 @@
 #include <common/image/pixelTypes.h>
 #include <common/numberTypes.h>
 #include <common/vector2.h>
+#include <common/vectorTypes_impl.h>
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 

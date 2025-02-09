@@ -1,6 +1,5 @@
 #pragma once
 #include <common/bfloat16.h>
-#include <common/complex_typetraits.h>
 #include <common/half_fp16.h>
 #include <common/image/pixelTypes.h>
 #include <common/vector_typetraits.h>

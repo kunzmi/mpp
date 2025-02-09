@@ -1,14 +1,17 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <common/Vector2.h>
+#include <common/Vector2_impl.h>
 #include <common/bfloat16.h>
 #include <common/complex.h>
 #include <common/defines.h>
 #include <common/half_fp16.h>
 #include <common/safeCast.h>
-#include <common/Vector2.h>
 #include <complex>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
+#include <math.h>
 #include <sstream>
 #include <string>
 

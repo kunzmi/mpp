@@ -1,4 +1,3 @@
-#include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <common/bfloat16.h>
 #include <common/defines.h>
@@ -7,7 +6,6 @@
 #include <cstdint>
 #include <math.h>
 #include <numeric>
-#include <vector>
 
 using namespace opp;
 using namespace Catch;

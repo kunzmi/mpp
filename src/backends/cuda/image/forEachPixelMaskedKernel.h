@@ -11,6 +11,7 @@
 #include <common/maskTupel.h>
 #include <common/tupel.h>
 #include <common/utilities.h>
+#include <common/vectorTypes_impl.h>
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 

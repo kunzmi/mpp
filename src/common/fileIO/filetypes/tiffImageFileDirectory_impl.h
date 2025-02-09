@@ -1,6 +1,14 @@
 #pragma once
+#include "tiffFile.h"
 #include "tiffImageFileDirectory.h"
+#include <common/defines.h>
+#include <common/fileIO/file.h>
+#include <common/safeCast.h>
 #include <cstring>
+#include <ios>
+#include <ostream>
+#include <string>
+#include <vector>
 
 namespace opp::fileIO::tiffTag
 {

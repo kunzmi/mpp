@@ -1,9 +1,12 @@
 #include <cfloat>
 #include <cmath>
 #include <common/bfloat16.h>
+#include <common/bfloat16_impl.h>
 #include <common/defines.h>
-#include <cuda_runtime.h>
 #include <device_launch_parameters.h>
+
+#ifndef IS_HOST_COMPILER
+#endif // !IS_HOST_COMPILER
 
 namespace opp
 {

@@ -286,8 +286,7 @@ template <RealVector T> struct AlphaPremul
 {
     const remove_vector_t<T> InvAlphaMax; // Inverse of the maximum value of the source or destination type
 
-    AlphaPremul(remove_vector_t<T> aMaxAlphaValue)
-        : InvAlphaMax(static_cast<remove_vector_t<T>>(1) / static_cast<remove_vector_t<T>>(aMaxAlphaValue))
+    AlphaPremul(remove_vector_t<T> aInvAlphaMax) : InvAlphaMax(aInvAlphaMax)
     {
     }
 
@@ -299,9 +298,28 @@ template <RealVector T> struct AlphaPremul
         aDst.y = aSrc1.y * alpha;
         aDst.z = aSrc1.z * alpha;
     }
+
+    DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
+        requires RealFloatingVector<T>
+    {
+        const remove_vector_t<T> alpha = aSrc1.w;
+
+        aDst.x = aSrc1.x * alpha;
+        aDst.y = aSrc1.y * alpha;
+        aDst.z = aSrc1.z * alpha;
+    }
     DEVICE_CODE void operator()(T &aSrcDst)
     {
         const remove_vector_t<T> alpha = aSrcDst.w * InvAlphaMax;
+
+        aSrcDst.x *= alpha;
+        aSrcDst.y *= alpha;
+        aSrcDst.z *= alpha;
+    }
+    DEVICE_CODE void operator()(T &aSrcDst)
+        requires RealFloatingVector<T>
+    {
+        const remove_vector_t<T> alpha = aSrcDst.w;
 
         aSrcDst.x *= alpha;
         aSrcDst.y *= alpha;

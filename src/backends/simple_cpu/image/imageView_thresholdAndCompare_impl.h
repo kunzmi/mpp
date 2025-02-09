@@ -409,7 +409,6 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::ThresholdLT(const T &aThreshold)
     requires RealVector<T>
 {
-    using SrcT                 = T;
     using ComputeT             = T;
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
@@ -424,7 +423,6 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::ThresholdGT(const T &aThreshold)
     requires RealVector<T>
 {
-    using SrcT                 = T;
     using ComputeT             = T;
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
@@ -512,7 +510,6 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::ThresholdLT(const T &aThreshold, const T &aValue)
     requires RealVector<T>
 {
-    using SrcT                 = T;
     using ComputeT             = T;
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
@@ -527,7 +524,6 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::ThresholdGT(const T &aThreshold, const T &aValue)
     requires RealVector<T>
 {
-    using SrcT                 = T;
     using ComputeT             = T;
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
@@ -561,7 +557,6 @@ ImageView<T> &ImageView<T>::ThresholdLTGT(const T &aThresholdLT, const T &aValue
                                           const T &aValueGT)
     requires RealVector<T>
 {
-    using SrcT                 = T;
     using ComputeT             = T;
     using DstT                 = T;
     constexpr size_t TupelSize = 1;

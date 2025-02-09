@@ -80,9 +80,7 @@ size_t processForPixelType(const std::vector<Function> &aFunctions, std::vector<
                         alphaType = opp::image::PixelTypeEnum::PTE8uC4A;
                         break;
                     case opp::image::PixelTypeEnum::PTE16scC4:
-                        continue;
                     case opp::image::PixelTypeEnum::PTE32scC4:
-                        continue;
                     case opp::image::PixelTypeEnum::PTE32fcC4:
                         continue;
                     default:

@@ -71,7 +71,10 @@ template <typename TFrom, typename TTo>
 DEVICE_ONLY_CODE TTo StaticCast(TFrom aValue)
     requires std::same_as<TTo, short> && std::same_as<TFrom, float> && CUDA_ONLY<TTo>
 {
-    short ret;
+    short ret; // NOLINT
+#ifdef IS_HOST_COMPILER
+    (void)aValue; // make clang tidy happy
+#endif
 #ifdef IS_CUDA_COMPILER
     asm("cvt.rzi.s16.f32 %0, %1;" : "=h"(ret) : "f"(aValue));
 #endif
@@ -82,7 +85,12 @@ template <typename TFrom, typename TTo>
 DEVICE_ONLY_CODE TTo StaticCast(TFrom aValue)
     requires std::same_as<TTo, ushort> && std::same_as<TFrom, float> && CUDA_ONLY<TTo>
 {
-    ushort ret;
+    ushort ret; // NOLINT
+#ifdef IS_HOST_COMPILER
+    if (aValue == 0)
+    { // make clang tidy happy
+    }
+#endif
 #ifdef IS_CUDA_COMPILER
     asm("cvt.rzi.u16.f32 %0, %1;" : "=h"(ret) : "f"(aValue));
 #endif
@@ -93,7 +101,12 @@ template <typename TFrom, typename TTo>
 DEVICE_ONLY_CODE TTo StaticCast(TFrom aValue)
     requires std::same_as<TTo, sbyte> && std::same_as<TFrom, float> && CUDA_ONLY<TTo>
 {
-    short ret; // there are no 8-bit registers...
+    short ret; // NOLINT there are no 8-bit registers...
+#ifdef IS_HOST_COMPILER
+    if (aValue == 0)
+    { // make clang tidy happy
+    }
+#endif
 #ifdef IS_CUDA_COMPILER
     asm("cvt.rzi.s8.f32 %0, %1;" : "=h"(ret) : "f"(aValue));
 #endif
@@ -104,7 +117,12 @@ template <typename TFrom, typename TTo>
 DEVICE_ONLY_CODE TTo StaticCast(TFrom aValue)
     requires std::same_as<TTo, byte> && std::same_as<TFrom, float> && CUDA_ONLY<TTo>
 {
-    ushort ret; // there are no 8-bit registers...
+    ushort ret; // NOLINT there are no 8-bit registers...
+#ifdef IS_HOST_COMPILER
+    if (aValue == 0)
+    { // make clang tidy happy
+    }
+#endif
 #ifdef IS_CUDA_COMPILER
     asm("cvt.rzi.u8.f32 %0, %1;" : "=h"(ret) : "f"(aValue));
 #endif
@@ -114,7 +132,12 @@ template <typename TFrom, typename TTo>
 DEVICE_ONLY_CODE TTo StaticCast(TFrom aValue)
     requires std::same_as<TTo, short> && std::same_as<TFrom, double> && CUDA_ONLY<TTo>
 {
-    short ret;
+    short ret; // NOLINT
+#ifdef IS_HOST_COMPILER
+    if (aValue == 0)
+    { // make clang tidy happy
+    }
+#endif
 #ifdef IS_CUDA_COMPILER
     asm("cvt.rzi.s16.f64 %0, %1;" : "=h"(ret) : "d"(aValue));
 #endif
@@ -125,7 +148,12 @@ template <typename TFrom, typename TTo>
 DEVICE_ONLY_CODE TTo StaticCast(TFrom aValue)
     requires std::same_as<TTo, ushort> && std::same_as<TFrom, double> && CUDA_ONLY<TTo>
 {
-    ushort ret;
+    ushort ret; // NOLINT
+#ifdef IS_HOST_COMPILER
+    if (aValue == 0)
+    { // make clang tidy happy
+    }
+#endif
 #ifdef IS_CUDA_COMPILER
     asm("cvt.rzi.u16.f64 %0, %1;" : "=h"(ret) : "d"(aValue));
 #endif
@@ -136,7 +164,12 @@ template <typename TFrom, typename TTo>
 DEVICE_ONLY_CODE TTo StaticCast(TFrom aValue)
     requires std::same_as<TTo, sbyte> && std::same_as<TFrom, double> && CUDA_ONLY<TTo>
 {
-    short ret; // there are no 8-bit registers...
+    short ret; // NOLINT there are no 8-bit registers...
+#ifdef IS_HOST_COMPILER
+    if (aValue == 0)
+    { // make clang tidy happy
+    }
+#endif
 #ifdef IS_CUDA_COMPILER
     asm("cvt.rzi.s8.f64 %0, %1;" : "=h"(ret) : "d"(aValue));
 #endif
@@ -147,7 +180,12 @@ template <typename TFrom, typename TTo>
 DEVICE_ONLY_CODE TTo StaticCast(TFrom aValue)
     requires std::same_as<TTo, byte> && std::same_as<TFrom, double> && CUDA_ONLY<TTo>
 {
-    ushort ret; // there are no 8-bit registers...
+    ushort ret; // NOLINT there are no 8-bit registers...
+#ifdef IS_HOST_COMPILER
+    if (aValue == 0)
+    { // make clang tidy happy
+    }
+#endif
 #ifdef IS_CUDA_COMPILER
     asm("cvt.rzi.u8.f64 %0, %1;" : "=h"(ret) : "d"(aValue));
 #endif

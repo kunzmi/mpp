@@ -249,19 +249,19 @@ template <> struct numeric_limits<float>
     // minimum exact integer in float = -(2^24)
     [[nodiscard]] static constexpr DEVICE_CODE float minExact() noexcept
     {
-        return -16777216.0f;
+        return -16777216.0f; // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
     }
     // maximum exact integer in float = 2^24
     [[nodiscard]] static constexpr DEVICE_CODE float maxExact() noexcept
     {
-        return 16777216.0f;
+        return 16777216.0f; // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
     }
     [[nodiscard]] static constexpr DEVICE_CODE float infinity() noexcept
     {
         return INFINITY;
         // std::numeric_limits<float>::infinity();
     }
-    [[nodiscard]] static constexpr DEVICE_CODE float quiet_NaN() noexcept
+    [[nodiscard]] static DEVICE_CODE float quiet_NaN() noexcept
     {
         return NAN;
         // std::numeric_limits<float>::quiet_NaN();
@@ -285,19 +285,19 @@ template <> struct numeric_limits<double>
     // minimum exact integer in double = -(2^53)
     [[nodiscard]] static constexpr DEVICE_CODE double minExact() noexcept
     {
-        return -9007199254740992.0;
+        return -9007199254740992.0; // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
     }
     // maximum exact integer in double = 2^53
     [[nodiscard]] static constexpr DEVICE_CODE double maxExact() noexcept
     {
-        return 9007199254740992.0;
+        return 9007199254740992.0; // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
     }
     [[nodiscard]] static constexpr DEVICE_CODE double infinity() noexcept
     {
         return INFINITY;
         // std::numeric_limits<double>::infinity();
     }
-    [[nodiscard]] static constexpr DEVICE_CODE double quiet_NaN() noexcept
+    [[nodiscard]] static DEVICE_CODE double quiet_NaN() noexcept
     {
         return NAN;
         // return std::numeric_limits<double>::quiet_NaN();

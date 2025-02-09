@@ -11,6 +11,7 @@
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
 #include <common/safeCast.h>
+#include <common/vector2.h>
 #include <common/vectorTypes.h>
 #include <cstddef>
 #include <cstdint>

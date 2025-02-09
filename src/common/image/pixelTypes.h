@@ -1,9 +1,8 @@
 #pragma once
 #include <common/complex.h>
-#include <common/complex_typetraits.h>
 #include <common/defines.h>
-#include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
+#include <common/vector_typetraits.h>
 #include <concepts>
 #include <ostream>
 

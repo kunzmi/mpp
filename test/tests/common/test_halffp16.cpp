@@ -1,5 +1,6 @@
-#include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <cfloat>
+#include <cmath>
 #include <common/defines.h>
 #include <common/half_fp16.h>
 #include <common/numeric_limits.h>
@@ -7,7 +8,7 @@
 #include <cstdint>
 #include <math.h>
 #include <numeric>
-#include <vector>
+#include <sstream>
 
 using namespace opp;
 using namespace Catch;

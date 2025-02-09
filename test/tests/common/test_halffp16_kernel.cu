@@ -2,6 +2,7 @@
 #include <cmath>
 #include <common/defines.h>
 #include <common/half_fp16.h>
+#include <common/half_fp16_impl.h>
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 

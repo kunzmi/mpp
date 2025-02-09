@@ -1,4 +1,5 @@
 #pragma once
+#include <common/defines.h>
 #include <common/vectorTypes.h>
 #include <istream>
 #include <ostream>
@@ -218,7 +219,7 @@ Vec3d operator*(const Vec3d &aLeft, const AffineTransformation &aRight);
 /// assuming vector is column vector and z element is 1<para/>
 /// Implemented in header so that we have this operator also on GPU
 /// </summary>
-inline Vec2d operator*(const AffineTransformation &aLeft, const Vec2d &aRight)
+DEVICE_CODE inline Vec2d operator*(const AffineTransformation &aLeft, const Vec2d &aRight)
 {
     return Vec2d{aLeft[0] * aRight.x + aLeft[1] * aRight.y + aLeft[2],
                  aLeft[3] * aRight.x + aLeft[4] * aRight.y + aLeft[5]};

@@ -5,6 +5,8 @@
 #include <cstddef>
 #include <type_traits>
 
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+
 namespace opp
 {
 // template <typename T_toTest, typename T_required>
@@ -14,7 +16,7 @@ template <typename T_From, typename T_FromShouldBe, typename T_To, typename T_To
 concept selectCase = std::same_as<T_FromShouldBe, T_From> && std::same_as<T_ToShouldBe, T_To>;
 
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires std::same_as<T_To, T_From>
 {
     return true;
@@ -217,7 +219,7 @@ DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
 
 // To = float
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, double, T_To, float>
 {
     // we don't check here and hope the that user knows what he's doing
@@ -250,25 +252,25 @@ DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
     return aValue <= 16777216; // maximum exact integer in float
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, short, T_To, float>
 {
     return true;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, ushort, T_To, float>
 {
     return true;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, sbyte, T_To, float>
 {
     return true;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, byte, T_To, float>
 {
     return true;
@@ -276,7 +278,7 @@ DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
 
 // To = double
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, float, T_To, double>
 {
     return true;
@@ -295,37 +297,37 @@ DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
     return aValue < 9007199254740993UL; // maximum exact integer in double
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, int, T_To, double>
 {
     return true;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, uint, T_To, double>
 {
     return true;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, short, T_To, double>
 {
     return true;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, ushort, T_To, double>
 {
     return true;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, sbyte, T_To, double>
 {
     return true;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, byte, T_To, double>
 {
     return true;
@@ -333,14 +335,14 @@ DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
 
 // To = long64
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, float, T_To, long64>
 {
     // ignore rounding errors
     return true;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, double, T_To, long64>
 {
     // ignore rounding errors
@@ -353,37 +355,37 @@ DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
     return aValue < 9223372036854775808ULL;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, int, T_To, long64>
 {
     return true;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, uint, T_To, long64>
 {
     return true;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, short, T_To, long64>
 {
     return true;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, ushort, T_To, long64>
 {
     return true;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, sbyte, T_To, long64>
 {
     return true;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, byte, T_To, long64>
 {
     return true;
@@ -391,14 +393,14 @@ DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
 
 // To = ulong64
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
-    requires(std::same_as<T_To, ulong64> && std::is_unsigned<T_From>::value && !std::same_as<T_To, T_From>)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
+    requires(std::same_as<T_To, ulong64> && std::is_unsigned_v<T_From> && !std::same_as<T_To, T_From>)
 {
     return true;
 }
 template <typename T_To, typename T_From>
 DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
-    requires(std::same_as<T_To, ulong64> && !std::is_unsigned<T_From>::value && !std::same_as<T_To, T_From>)
+    requires(std::same_as<T_To, ulong64> && !std::is_unsigned_v<T_From> && !std::same_as<T_To, T_From>)
 {
     return aValue >= 0;
 }
@@ -435,25 +437,25 @@ DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
     return aValue < 2147483648UL;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, short, T_To, int>
 {
     return true;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, ushort, T_To, int>
 {
     return true;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, sbyte, T_To, int>
 {
     return true;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, byte, T_To, int>
 {
     return true;
@@ -497,7 +499,7 @@ DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
     return aValue >= 0;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, ushort, T_To, uint>
 {
     return true;
@@ -509,7 +511,7 @@ DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
     return aValue >= 0;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, byte, T_To, uint>
 {
     return true;
@@ -559,13 +561,13 @@ DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
     return aValue < 32768;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, sbyte, T_To, short>
 {
     return true;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, byte, T_To, short>
 {
     return true;
@@ -621,7 +623,7 @@ DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
     return aValue >= 0;
 }
 template <typename T_To, typename T_From>
-DEVICE_CODE constexpr bool check_is_safe_cast(T_From aValue)
+DEVICE_CODE constexpr bool check_is_safe_cast(T_From /*aValue*/)
     requires selectCase<T_From, byte, T_To, ushort>
 {
     return true;
@@ -765,72 +767,74 @@ template <typename T_From> DEVICE_CODE constexpr double to_double(T_From aValue)
 }
 
 // int
-template <typename T_From> DEVICE_CODE constexpr inline int to_int(T_From aValue)
+template <typename T_From> DEVICE_CODE constexpr int to_int(T_From aValue)
 {
     assert(check_is_safe_cast<int>(aValue));
     return static_cast<int>(aValue);
 }
 
 // uint
-template <typename T_From> DEVICE_CODE constexpr inline uint to_uint(T_From aValue)
+template <typename T_From> DEVICE_CODE constexpr uint to_uint(T_From aValue)
 {
     assert(check_is_safe_cast<uint>(aValue));
     return static_cast<uint>(aValue);
 }
 
 // ulong64
-template <typename T_From> DEVICE_CODE constexpr inline ulong64 to_ulong64(T_From aValue)
+template <typename T_From> DEVICE_CODE constexpr ulong64 to_ulong64(T_From aValue)
 {
     assert(check_is_safe_cast<ulong64>(aValue));
     return static_cast<ulong64>(aValue);
 }
 
 // size_t (same as ulong64)
-template <typename T_From> DEVICE_CODE constexpr inline size_t to_size_t(T_From aValue)
+template <typename T_From> DEVICE_CODE constexpr size_t to_size_t(T_From aValue)
 {
     static_assert(sizeof(size_t) == 8);
 #ifdef __APPLE__
     static_assert(std::is_same<size_t, unsigned long int>::value);
 #else
-    static_assert(std::is_same<size_t, ulong64>::value);
+    static_assert(std::is_same_v<size_t, ulong64>);
 #endif
     assert(check_is_safe_cast<size_t>(aValue));
     return static_cast<size_t>(aValue);
 }
 
 // long64
-template <typename T_From> DEVICE_CODE constexpr inline long64 to_long64(T_From aValue)
+template <typename T_From> DEVICE_CODE constexpr long64 to_long64(T_From aValue)
 {
     assert(check_is_safe_cast<long64>(aValue));
     return static_cast<long64>(aValue);
 }
 
 // ushort
-template <typename T_From> DEVICE_CODE constexpr inline ushort to_ushort(T_From aValue)
+template <typename T_From> DEVICE_CODE constexpr ushort to_ushort(T_From aValue)
 {
     assert(check_is_safe_cast<ushort>(aValue));
     return static_cast<ushort>(aValue);
 }
 
 // short
-template <typename T_From> DEVICE_CODE constexpr inline short to_short(T_From aValue)
+template <typename T_From> DEVICE_CODE constexpr short to_short(T_From aValue)
 {
     assert(check_is_safe_cast<short>(aValue));
     return static_cast<short>(aValue);
 }
 
 // byte
-template <typename T_From> DEVICE_CODE constexpr inline byte to_byte(T_From aValue)
+template <typename T_From> DEVICE_CODE constexpr byte to_byte(T_From aValue)
 {
     assert(check_is_safe_cast<byte>(aValue));
     return static_cast<byte>(aValue);
 }
 
 // sbyte
-template <typename T_From> DEVICE_CODE constexpr inline sbyte to_sbyte(T_From aValue)
+template <typename T_From> DEVICE_CODE constexpr sbyte to_sbyte(T_From aValue)
 {
     assert(check_is_safe_cast<sbyte>(aValue));
     return static_cast<sbyte>(aValue);
 }
 
 } // namespace opp
+
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
