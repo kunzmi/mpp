@@ -36,9 +36,9 @@ void InvokeAngleSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPi
         using angleSrc =
             SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Angle<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
 
-        Angle<ComputeT> op;
+        const opp::Angle<ComputeT> op;
 
-        angleSrc functor(aSrc1, aPitchSrc1, op);
+        const angleSrc functor(aSrc1, aPitchSrc1, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, angleSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }

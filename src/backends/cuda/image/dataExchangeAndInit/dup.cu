@@ -35,9 +35,9 @@ void InvokeDupSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitc
 
         using dupSrc = SrcFunctor<TupelSize, SrcT, SrcT, DstT, opp::Dup<SrcT, DstT>, RoundingMode::None>;
 
-        Dup<SrcT, DstT> op;
+        const opp::Dup<SrcT, DstT> op;
 
-        dupSrc functor(aSrc1, aPitchSrc1, op);
+        const dupSrc functor(aSrc1, aPitchSrc1, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, dupSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }

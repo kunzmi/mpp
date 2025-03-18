@@ -123,20 +123,48 @@ template <PixelType T> class ImageView
 
     ImageView &operator=(const ImageView &)     = default;
     ImageView &operator=(ImageView &&) noexcept = default;
+
+    DEVICE_CODE operator ImageView<Vector4<remove_vector_t<T>>>() // NOLINT(hicpp-explicit-conversions)
+        requires FourChannelAlpha<T>
+    {
+        return ImageView<Vector4<remove_vector_t<T>>>(reinterpret_cast<Vector4<remove_vector_t<T>> *>(mPtr),
+                                                      SizePitched(mSizeAlloc, mPitch), mRoi);
+    }
+
+    DEVICE_CODE operator ImageView<Vector4A<remove_vector_t<T>>>() // NOLINT(hicpp-explicit-conversions)
+        requires FourChannelNoAlpha<T>
+    {
+        return ImageView<Vector4A<remove_vector_t<T>>>(reinterpret_cast<Vector4A<remove_vector_t<T>> *>(mPtr),
+                                                       SizePitched(mSizeAlloc, mPitch), mRoi);
+    }
 #pragma endregion
 
 #pragma region Basics and Copy to device/host
     /// <summary>
     /// Base pointer to image data.
     /// </summary>
-    [[nodiscard]] T *Pointer() const
+    [[nodiscard]] T *Pointer()
+    {
+        return mPtr;
+    }
+    /// <summary>
+    /// Base pointer to image data.
+    /// </summary>
+    [[nodiscard]] const T *Pointer() const
     {
         return mPtr;
     }
     /// <summary>
     /// Base pointer moved to first pixel of actual ROI.
     /// </summary>
-    [[nodiscard]] T *PointerRoi() const
+    [[nodiscard]] T *PointerRoi()
+    {
+        return mPtrRoi;
+    }
+    /// <summary>
+    /// Base pointer moved to first pixel of actual ROI.
+    /// </summary>
+    [[nodiscard]] const T *PointerRoi() const
     {
         return mPtrRoi;
     }
@@ -1398,7 +1426,7 @@ template <PixelType T> class ImageView
     /// aDst = this / aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor
     /// </summary>
     ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
+                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
@@ -1413,7 +1441,7 @@ template <PixelType T> class ImageView
     /// aDst = this / aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
     /// </summary>
     ImageView<T> &Div(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
+                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
@@ -1428,7 +1456,7 @@ template <PixelType T> class ImageView
     /// aDst = this / aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
     /// </summary>
     ImageView<T> &Div(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
+                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
@@ -1443,7 +1471,7 @@ template <PixelType T> class ImageView
     /// this /= aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor
     /// </summary>
     ImageView<T> &Div(const ImageView<T> &aSrc2, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
+                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
@@ -1457,7 +1485,7 @@ template <PixelType T> class ImageView
     /// this /= aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
     /// </summary>
     ImageView<T> &Div(const T &aConst, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
+                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
@@ -1472,7 +1500,7 @@ template <PixelType T> class ImageView
     /// this /= aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
     /// </summary>
     ImageView<T> &Div(const opp::cuda::DevVarView<T> &aConst, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
+                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
@@ -1487,7 +1515,7 @@ template <PixelType T> class ImageView
     /// this = aSrc2 / this, with floating point scaling factor with scale factor = 2^-aScaleFactor
     /// </summary>
     ImageView<T> &DivInv(const ImageView<T> &aSrc2, int aScaleFactor = 0,
-                         RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
+                         RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
@@ -1501,7 +1529,7 @@ template <PixelType T> class ImageView
     /// this = aConst / this, with floating point scaling factor with scale factor = 2^-aScaleFactor
     /// </summary>
     ImageView<T> &DivInv(const T &aConst, int aScaleFactor = 0,
-                         RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
+                         RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
@@ -1516,7 +1544,7 @@ template <PixelType T> class ImageView
     /// this = aConst / this, with floating point scaling factor with scale factor = 2^-aScaleFactor
     /// </summary>
     ImageView<T> &DivInv(const opp::cuda::DevVarView<T> &aConst, int aScaleFactor = 0,
-                         RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
+                         RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
@@ -1532,7 +1560,7 @@ template <PixelType T> class ImageView
     /// where aMask != 0
     /// </summary>
     ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero,
+                      int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
@@ -1548,7 +1576,7 @@ template <PixelType T> class ImageView
     /// where aMask != 0
     /// </summary>
     ImageView<T> &Div(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
+                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
@@ -1564,7 +1592,7 @@ template <PixelType T> class ImageView
     /// where aMask != 0
     /// </summary>
     ImageView<T> &Div(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero,
+                      int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
@@ -1580,7 +1608,7 @@ template <PixelType T> class ImageView
     /// aMask != 0
     /// </summary>
     ImageView<T> &Div(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
+                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
@@ -1596,7 +1624,7 @@ template <PixelType T> class ImageView
     /// aMask != 0
     /// </summary>
     ImageView<T> &Div(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
+                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
@@ -1612,7 +1640,7 @@ template <PixelType T> class ImageView
     /// aMask != 0
     /// </summary>
     ImageView<T> &Div(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
+                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
@@ -1628,7 +1656,7 @@ template <PixelType T> class ImageView
     /// where aMask != 0
     /// </summary>
     ImageView<T> &DivInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                         RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
+                         RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
@@ -1644,7 +1672,7 @@ template <PixelType T> class ImageView
     /// where aMask != 0
     /// </summary>
     ImageView<T> &DivInv(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                         RoundingMode aRoundingMode             = RoundingMode::NearestTiesAwayFromZero,
+                         RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
@@ -1660,7 +1688,7 @@ template <PixelType T> class ImageView
     /// where aMask != 0
     /// </summary>
     ImageView<T> &DivInv(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                         int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero,
+                         int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 #pragma endregion
@@ -1711,14 +1739,14 @@ template <PixelType T> class ImageView
         remove_vector_t<add_spw_output_for_t<T>> aAlpha, const ImageView<Pixel8uC1> &aMask,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
     /// <summary>
-    /// this = this * alpha + Src2 * (1 - alpha)
+    /// SrcDst = this * alpha + SrcDst * (1 - alpha)
     /// </summary>
     ImageView<add_spw_output_for_t<T>> &AddWeighted(
         ImageView<add_spw_output_for_t<T>> &aSrcDst, remove_vector_t<add_spw_output_for_t<T>> aAlpha,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
 
     /// <summary>
-    /// this = this * alpha + Src2 * (1 - alpha)
+    /// SrcDst = this * alpha + SrcDst * (1 - alpha)
     /// </summary>
     ImageView<add_spw_output_for_t<T>> &AddWeighted(
         ImageView<add_spw_output_for_t<T>> &aSrcDst, remove_vector_t<add_spw_output_for_t<T>> aAlpha,
@@ -2006,7 +2034,7 @@ template <PixelType T> class ImageView
     /// Premultiplies pixels of an image with alpha from fourth color channel.
     /// Note: AlphaPremul does not exactly match the results from NPP for integer image types. NPP seems to scale the
     /// integer value by T::max() and then does the multiplications/divisions as integers. Here we cast to float and
-    /// then round using RoundingMode::NearestTiesAwayFromZero (round()) which is nearly identical, but not exactly the
+    /// then round using RoundingMode::NearestTiesToEven which is nearly identical, but not exactly the
     /// same for all values. Values may differ by 1.
     /// </summary>
     ImageView<T> &AlphaPremul(ImageView<T> &aDst,
@@ -2017,7 +2045,7 @@ template <PixelType T> class ImageView
     /// Premultiplies pixels of an image with alpha from fourth color channel.
     /// Note: AlphaPremul does not exactly match the results from NPP for integer image types. NPP seems to scale the
     /// integer value by T::max() and then does the multiplications/divisions as integers. Here we cast to float and
-    /// then round using RoundingMode::NearestTiesAwayFromZero (round()) which is nearly identical, but not exactly the
+    /// then round using RoundingMode::NearestTiesToEven which is nearly identical, but not exactly the
     /// same for all values. Values may differ by 1.
     /// </summary>
     ImageView<T> &AlphaPremul(const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
@@ -2028,36 +2056,54 @@ template <PixelType T> class ImageView
     /// </summary>
     ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
-        requires RealFloatingVector<T>;
+        requires RealFloatingVector<T> && (!FourChannelAlpha<T>);
 
     /// <summary>
     /// Premultiplies pixels of an image with constant aAlpha value.
     /// Note: AlphaPremul does not exactly match the results from NPP for integer image types. NPP seems to scale the
     /// integer value by T::max() and then does the multiplications/divisions as integers. Here we cast to float and
-    /// then round using RoundingMode::NearestTiesAwayFromZero (round()) which is nearly identical, but not exactly the
+    /// then round using RoundingMode::NearestTiesToEven which is nearly identical, but not exactly the
     /// same for all values. Values may differ by 1.
     /// </summary>
     ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
-        requires RealIntVector<T>;
+        requires RealIntVector<T> && (!FourChannelAlpha<T>);
 
     /// <summary>
     /// Premultiplies pixels of an image with constant aAlpha value. aAlpha is expected in value range 0..1
     /// </summary>
     ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
-        requires RealFloatingVector<T>;
+        requires RealFloatingVector<T> && (!FourChannelAlpha<T>);
 
     /// <summary>
     /// Premultiplies pixels of an image with constant aAlpha value.
     /// Note: AlphaPremul does not exactly match the results from NPP for integer image types. NPP seems to scale the
     /// integer value by T::max() and then does the multiplications/divisions as integers. Here we cast to float and
-    /// then round using RoundingMode::NearestTiesAwayFromZero (round()) which is nearly identical, but not exactly the
+    /// then round using RoundingMode::NearestTiesToEven which is nearly identical, but not exactly the
     /// same for all values. Values may differ by 1.
     /// </summary>
     ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
-        requires RealIntVector<T>;
+        requires RealIntVector<T> && (!FourChannelAlpha<T>);
+
+    /// <summary>
+    /// Premultiplies pixels of an image with constant aAlpha value.
+    /// Note: AlphaPremul does not exactly match the results from NPP for integer image types. NPP seems to scale the
+    /// integer value by T::max() and then does the multiplications/divisions as integers. Here we cast to float and
+    /// then round using RoundingMode::NearestTiesToEven which is nearly identical, but not exactly the
+    /// same for all values. Values may differ by 1.
+    /// </summary>
+    ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires FourChannelAlpha<T>;
+
+    /// <summary>
+    /// Premultiplies pixels of an image with constant aAlpha value. aAlpha is expected in value range 0..1
+    /// </summary>
+    ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires FourChannelAlpha<T>;
 #pragma endregion
 #pragma region AlphaComp
     /// <summary>

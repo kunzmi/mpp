@@ -34,19 +34,12 @@ void InvokeAlphaPremulSrc(const SrcT *aSrc, size_t aPitchSrc, DstT *aDst, size_t
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using alphaPremulSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AlphaPremul<ComputeT>,
-                                          RoundingMode::NearestTiesAwayFromZero>;
+        using alphaPremulSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AlphaPremul<ComputeT, SrcT>,
+                                          RoundingMode::NearestTiesToEven>;
 
-        remove_vector_t<ComputeT> alphaScaleVal{};
-        if constexpr (RealIntVector<SrcT>)
-        {
-            alphaScaleVal = static_cast<remove_vector_t<ComputeT>>(1) /
-                            static_cast<remove_vector_t<ComputeT>>(numeric_limits<remove_vector_t<SrcT>>::max());
-        }
+        const opp::AlphaPremul<ComputeT, SrcT> op;
 
-        AlphaPremul<ComputeT> op(alphaScaleVal);
-
-        alphaPremulSrc functor(aSrc, aPitchSrc, op);
+        const alphaPremulSrc functor(aSrc, aPitchSrc, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaPremulSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -90,19 +83,12 @@ void InvokeAlphaPremulInplace(SrcDstT *aSrcDst, size_t aPitchSrcDst, const Size2
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using alphaPremulInplace = InplaceFunctor<TupelSize, ComputeT, DstT, opp::AlphaPremul<ComputeT>,
-                                                  RoundingMode::NearestTiesAwayFromZero>;
+        using alphaPremulInplace = InplaceFunctor<TupelSize, ComputeT, DstT, opp::AlphaPremul<ComputeT, SrcT>,
+                                                  RoundingMode::NearestTiesToEven>;
 
-        remove_vector_t<ComputeT> alphaScaleVal{};
-        if constexpr (RealIntVector<SrcT>)
-        {
-            alphaScaleVal = static_cast<remove_vector_t<ComputeT>>(1) /
-                            static_cast<remove_vector_t<ComputeT>>(numeric_limits<remove_vector_t<SrcT>>::max());
-        }
+        const opp::AlphaPremul<ComputeT, SrcT> op;
 
-        AlphaPremul<ComputeT> op(alphaScaleVal);
-
-        alphaPremulInplace functor(op);
+        const alphaPremulInplace functor(op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaPremulInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                              functor);
@@ -114,6 +100,102 @@ void InvokeAlphaPremulInplace(SrcDstT *aSrcDst, size_t aPitchSrcDst, const Size2
 #define Instantiate_For(typeSrcIsTypeDst)                                                                              \
     template void InvokeAlphaPremulInplace<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>>(            \
         typeSrcIsTypeDst * aDst, size_t aPitchDst, const Size2D &aSize, const StreamCtx &aStreamCtx);
+
+// we treat 4th channel as alpha channel, but don't need any pre-load of alpha
+Instantiate_For(Pixel8sC4);
+Instantiate_For(Pixel8uC4);
+
+Instantiate_For(Pixel16sC4);
+Instantiate_For(Pixel16uC4);
+
+Instantiate_For(Pixel32sC4);
+Instantiate_For(Pixel32uC4);
+
+Instantiate_For(Pixel16fC4);
+Instantiate_For(Pixel16bfC4);
+Instantiate_For(Pixel32fC4);
+Instantiate_For(Pixel64fC4);
+
+#undef Instantiate_For
+#pragma endregion
+
+template <typename SrcT, typename ComputeT, typename DstT>
+void InvokeAlphaPremulACSrc(const SrcT *aSrc, size_t aPitchSrc, DstT *aDst, size_t aPitchDst,
+                            remove_vector_t<SrcT> aAlpha, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+{
+    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    {
+        OPP_CUDA_REGISTER_TEMPALTE;
+
+        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+        using alphaPremulACSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AlphaPremulAC<ComputeT, SrcT>,
+                                            RoundingMode::NearestTiesToEven>;
+
+        const opp::AlphaPremulAC<ComputeT, SrcT> op(aAlpha);
+
+        const alphaPremulACSrc functor(aSrc, aPitchSrc, op);
+
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaPremulACSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+    }
+}
+
+#pragma region Instantiate
+// using default_compute_type_for_t for computeT
+#define Instantiate_For(typeSrcIsTypeDst)                                                                              \
+    template void                                                                                                      \
+    InvokeAlphaPremulACSrc<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(          \
+        const typeSrcIsTypeDst *aSrc, size_t aPitchSrc, typeSrcIsTypeDst *aDst, size_t aPitchDst,                      \
+        remove_vector_t<typeSrcIsTypeDst> aAlpha, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx);
+
+// we treat 4th channel as alpha channel, but don't need any pre-load of alpha
+Instantiate_For(Pixel8sC4);
+Instantiate_For(Pixel8uC4);
+
+Instantiate_For(Pixel16sC4);
+Instantiate_For(Pixel16uC4);
+
+Instantiate_For(Pixel32sC4);
+Instantiate_For(Pixel32uC4);
+
+Instantiate_For(Pixel16fC4);
+Instantiate_For(Pixel16bfC4);
+Instantiate_For(Pixel32fC4);
+Instantiate_For(Pixel64fC4);
+
+#undef Instantiate_For
+#pragma endregion
+
+template <typename SrcDstT, typename ComputeT>
+void InvokeAlphaPremulACInplace(SrcDstT *aSrcDst, size_t aPitchSrcDst, remove_vector_t<SrcDstT> aAlpha,
+                                const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+{
+    using SrcT = SrcDstT;
+    using DstT = SrcDstT;
+    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    {
+        OPP_CUDA_REGISTER_TEMPALTE;
+
+        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+        using alphaPremulACInplace = InplaceFunctor<TupelSize, ComputeT, DstT, opp::AlphaPremulAC<ComputeT, SrcT>,
+                                                    RoundingMode::NearestTiesToEven>;
+
+        const opp::AlphaPremulAC<ComputeT, SrcT> op(aAlpha);
+
+        const alphaPremulACInplace functor(op);
+
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaPremulACInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
+                                                                               functor);
+    }
+}
+
+#pragma region Instantiate
+// using default_compute_type_for_t for computeT
+#define Instantiate_For(typeSrcIsTypeDst)                                                                              \
+    template void InvokeAlphaPremulACInplace<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>>(          \
+        typeSrcIsTypeDst * aDst, size_t aPitchDst, remove_vector_t<typeSrcIsTypeDst> aAlpha, const Size2D &aSize,      \
+        const StreamCtx &aStreamCtx);
 
 // we treat 4th channel as alpha channel, but don't need any pre-load of alpha
 Instantiate_For(Pixel8sC4);

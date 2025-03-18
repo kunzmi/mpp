@@ -42,9 +42,9 @@ void InvokeThresholdLTSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aThre
         using thresholdSrcC =
             SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Max<ComputeT>, RoundingMode::None>;
 
-        Max<ComputeT> op;
+        const opp::Max<ComputeT> op;
 
-        thresholdSrcC functor(aSrc, aPitchSrc, aThreshold, op);
+        const thresholdSrcC functor(aSrc, aPitchSrc, aThreshold, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, thresholdSrcC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -95,9 +95,9 @@ void InvokeThresholdLTSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aT
         using thresholdSrcC =
             SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Max<ComputeT>, RoundingMode::None>;
 
-        Max<ComputeT> op;
+        const opp::Max<ComputeT> op;
 
-        thresholdSrcC functor(aSrc, aPitchSrc, aThreshold, op);
+        const thresholdSrcC functor(aSrc, aPitchSrc, aThreshold, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, thresholdSrcC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -148,9 +148,9 @@ void InvokeThresholdLTInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &a
         using thresholdInplaceC =
             InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Max<ComputeT>, RoundingMode::None>;
 
-        Max<ComputeT> op;
+        const opp::Max<ComputeT> op;
 
-        thresholdInplaceC functor(aThreshold, op);
+        const thresholdInplaceC functor(aThreshold, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, thresholdInplaceC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                             functor);
@@ -202,9 +202,9 @@ void InvokeThresholdLTInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT
         using thresholdInplaceC =
             InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, opp::Max<ComputeT>, RoundingMode::None>;
 
-        Max<ComputeT> op;
+        const opp::Max<ComputeT> op;
 
-        thresholdInplaceC functor(aThreshold, op);
+        const thresholdInplaceC functor(aThreshold, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, thresholdInplaceC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                             functor);
@@ -256,9 +256,9 @@ void InvokeThresholdGTSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aThre
         using thresholdSrcC =
             SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Min<ComputeT>, RoundingMode::None>;
 
-        Min<ComputeT> op;
+        const opp::Min<ComputeT> op;
 
-        thresholdSrcC functor(aSrc, aPitchSrc, aThreshold, op);
+        const thresholdSrcC functor(aSrc, aPitchSrc, aThreshold, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, thresholdSrcC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -309,9 +309,9 @@ void InvokeThresholdGTSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aT
         using thresholdSrcC =
             SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Min<ComputeT>, RoundingMode::None>;
 
-        Min<ComputeT> op;
+        const opp::Min<ComputeT> op;
 
-        thresholdSrcC functor(aSrc, aPitchSrc, aThreshold, op);
+        const thresholdSrcC functor(aSrc, aPitchSrc, aThreshold, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, thresholdSrcC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -362,9 +362,9 @@ void InvokeThresholdGTInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &a
         using thresholdInplaceC =
             InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Min<ComputeT>, RoundingMode::None>;
 
-        Min<ComputeT> op;
+        const opp::Min<ComputeT> op;
 
-        thresholdInplaceC functor(aThreshold, op);
+        const thresholdInplaceC functor(aThreshold, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, thresholdInplaceC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                             functor);
@@ -416,9 +416,9 @@ void InvokeThresholdGTInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT
         using thresholdInplaceC =
             InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, opp::Min<ComputeT>, RoundingMode::None>;
 
-        Min<ComputeT> op;
+        const opp::Min<ComputeT> op;
 
-        thresholdInplaceC functor(aThreshold, op);
+        const thresholdInplaceC functor(aThreshold, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, thresholdInplaceC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                             functor);
@@ -469,9 +469,9 @@ void InvokeThresholdLTValSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aT
 
         using thresholdSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::MaxVal<ComputeT>, RoundingMode::None>;
 
-        MaxVal<ComputeT> op(aValue, aThreshold);
+        const opp::MaxVal<ComputeT> op(aValue, aThreshold);
 
-        thresholdSrc functor(aSrc, aPitchSrc, op);
+        const thresholdSrc functor(aSrc, aPitchSrc, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, thresholdSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -522,9 +522,9 @@ void InvokeThresholdLTValInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT
 
         using thresholdInplace = InplaceFunctor<TupelSize, ComputeT, DstT, opp::MaxVal<ComputeT>, RoundingMode::None>;
 
-        MaxVal<ComputeT> op(aValue, aThreshold);
+        const opp::MaxVal<ComputeT> op(aValue, aThreshold);
 
-        thresholdInplace functor(op);
+        const thresholdInplace functor(op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, thresholdInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                            functor);
@@ -575,9 +575,9 @@ void InvokeThresholdGTValSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aT
 
         using thresholdSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::MinVal<ComputeT>, RoundingMode::None>;
 
-        MinVal<ComputeT> op(aValue, aThreshold);
+        const opp::MinVal<ComputeT> op(aValue, aThreshold);
 
-        thresholdSrc functor(aSrc, aPitchSrc, op);
+        const thresholdSrc functor(aSrc, aPitchSrc, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, thresholdSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -628,9 +628,9 @@ void InvokeThresholdGTValInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT
 
         using thresholdInplace = InplaceFunctor<TupelSize, ComputeT, DstT, opp::MinVal<ComputeT>, RoundingMode::None>;
 
-        MinVal<ComputeT> op(aValue, aThreshold);
+        const opp::MinVal<ComputeT> op(aValue, aThreshold);
 
-        thresholdInplace functor(op);
+        const thresholdInplace functor(op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, thresholdInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                            functor);
@@ -683,9 +683,9 @@ void InvokeThresholdLTValGTValSrcC(const SrcT *aSrc, size_t aPitchSrc, const Src
         using thresholdSrc =
             SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::MinValMaxVal<ComputeT>, RoundingMode::None>;
 
-        MinValMaxVal<ComputeT> op(aValueGT, aThresholdGT, aValueLT, aThresholdLT);
+        const opp::MinValMaxVal<ComputeT> op(aValueGT, aThresholdGT, aValueLT, aThresholdLT);
 
-        thresholdSrc functor(aSrc, aPitchSrc, op);
+        const thresholdSrc functor(aSrc, aPitchSrc, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, thresholdSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -738,9 +738,9 @@ void InvokeThresholdLTValGTValInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const
         using thresholdInplace =
             InplaceFunctor<TupelSize, ComputeT, DstT, opp::MinValMaxVal<ComputeT>, RoundingMode::None>;
 
-        MinValMaxVal<ComputeT> op(aValueGT, aThresholdGT, aValueLT, aThresholdLT);
+        const opp::MinValMaxVal<ComputeT> op(aValueGT, aThresholdGT, aValueLT, aThresholdLT);
 
-        thresholdInplace functor(op);
+        const thresholdInplace functor(op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, thresholdInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                            functor);

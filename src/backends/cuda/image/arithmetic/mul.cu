@@ -52,10 +52,10 @@ void InvokeMulSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, si
             using mulSrcSrcSIMD = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>, RoundingMode::None,
                                                 ComputeT, simdOP_t>;
 
-            Mul<ComputeT> op;
-            simdOP_t opSIMD;
+            const opp::Mul<ComputeT> op;
+            const simdOP_t opSIMD;
 
-            mulSrcSrcSIMD functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, opSIMD);
+            const mulSrcSrcSIMD functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, opSIMD);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, mulSrcSrcSIMD>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                             functor);
@@ -65,9 +65,9 @@ void InvokeMulSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, si
             // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
             using mulSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>, RoundingMode::None>;
 
-            Mul<ComputeT> op;
+            const opp::Mul<ComputeT> op;
 
-            mulSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+            const mulSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, mulSrcSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
         }
@@ -75,9 +75,10 @@ void InvokeMulSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, si
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT including SIMD activation if possible
+// using default_ext_compute_type_for_t for computeT including SIMD activation if possible
 #define Instantiate_For(typeSrcIsTypeDst)                                                                              \
-    template void InvokeMulSrcSrc<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(   \
+    template void                                                                                                      \
+    InvokeMulSrcSrc<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(             \
         const typeSrcIsTypeDst *aSrc1, size_t aPitchSrc1, const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,            \
         typeSrcIsTypeDst *aDst, size_t aPitchDst, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
@@ -135,25 +136,25 @@ void InvokeMulSrcSrcScale(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using mulSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>,
-                                                  RoundingMode::NearestTiesAwayFromZero>;
+        using mulSrcSrcScale =
+            SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
-        Mul<ComputeT> op;
+        const opp::Mul<ComputeT> op;
 
-        mulSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
+        const mulSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, mulSrcSrcScale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT without SIMD
+// using default_ext_compute_type_for_t for computeT without SIMD
 #define Instantiate_For(typeSrcIsTypeDst)                                                                              \
     template void                                                                                                      \
-    InvokeMulSrcSrcScale<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(            \
+    InvokeMulSrcSrcScale<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(        \
         const typeSrcIsTypeDst *aSrc1, size_t aPitchSrc1, const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,            \
         typeSrcIsTypeDst *aDst, size_t aPitchDst,                                                                      \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, const Size2D &aSize,                 \
+        scalefactor_t<default_ext_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, const Size2D &aSize,             \
         const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlpha(type)                                                                                    \
@@ -203,12 +204,12 @@ void InvokeMulSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT 
             using mulSrcCSIMD = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>,
                                                    RoundingMode::None, Tupel<ComputeT, TupelSize>, simdOP_t>;
 
-            Mul<ComputeT> op;
-            simdOP_t opSIMD;
-            Tupel<ComputeT, TupelSize> tupelConstant =
+            const opp::Mul<ComputeT> op;
+            const simdOP_t opSIMD;
+            const Tupel<ComputeT, TupelSize> tupelConstant =
                 Tupel<ComputeT, TupelSize>::GetConstant(static_cast<ComputeT>(aConst));
 
-            mulSrcCSIMD functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
+            const mulSrcCSIMD functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, mulSrcCSIMD>(aDst, aPitchDst, aSize, aStreamCtx, functor);
         }
@@ -217,9 +218,9 @@ void InvokeMulSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT 
             // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
             using mulSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>, RoundingMode::None>;
 
-            Mul<ComputeT> op;
+            const opp::Mul<ComputeT> op;
 
-            mulSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
+            const mulSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, mulSrcC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
         }
@@ -227,9 +228,9 @@ void InvokeMulSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT 
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT including SIMD activation if possible
+// using default_ext_compute_type_for_t for computeT including SIMD activation if possible
 #define Instantiate_For(typeSrcIsTypeDst)                                                                              \
-    template void InvokeMulSrcC<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(     \
+    template void InvokeMulSrcC<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>( \
         const typeSrcIsTypeDst *aSrc, size_t aPitchSrc, const typeSrcIsTypeDst &aConst, typeSrcIsTypeDst *aDst,        \
         size_t aPitchDst, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
@@ -287,23 +288,23 @@ void InvokeMulSrcCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using mulSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>,
-                                                     RoundingMode::NearestTiesAwayFromZero>;
+                                                     RoundingMode::NearestTiesToEven>;
 
-        Mul<ComputeT> op;
+        const opp::Mul<ComputeT> op;
 
-        mulSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
+        const mulSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, mulSrcCScale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT without SIMD
+// using default_ext_compute_type_for_t for computeT without SIMD
 #define Instantiate_For(typeSrcIsTypeDst)                                                                              \
     template void                                                                                                      \
-    InvokeMulSrcCScale<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(              \
+    InvokeMulSrcCScale<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(          \
         const typeSrcIsTypeDst *aSrc, size_t aPitchSrc, const typeSrcIsTypeDst &aConst, typeSrcIsTypeDst *aDst,        \
-        size_t aPitchDst, scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor,                    \
+        size_t aPitchDst, scalefactor_t<default_ext_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor,                \
         const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlpha(type)                                                                                    \
@@ -350,18 +351,19 @@ void InvokeMulSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst, Ds
         using mulSrcDevC =
             SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>, RoundingMode::None>;
 
-        Mul<ComputeT> op;
+        const opp::Mul<ComputeT> op;
 
-        mulSrcDevC functor(aSrc, aPitchSrc, aConst, op);
+        const mulSrcDevC functor(aSrc, aPitchSrc, aConst, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, mulSrcDevC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT including SIMD activation if possible
+// using default_ext_compute_type_for_t for computeT including SIMD activation if possible
 #define Instantiate_For(typeSrcIsTypeDst)                                                                              \
-    template void InvokeMulSrcDevC<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(  \
+    template void                                                                                                      \
+    InvokeMulSrcDevC<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(            \
         const typeSrcIsTypeDst *aSrc, size_t aPitchSrc, const typeSrcIsTypeDst *aConst, typeSrcIsTypeDst *aDst,        \
         size_t aPitchDst, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
@@ -419,23 +421,23 @@ void InvokeMulSrcDevCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aCons
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using mulSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>,
-                                                           RoundingMode::NearestTiesAwayFromZero>;
+                                                           RoundingMode::NearestTiesToEven>;
 
-        Mul<ComputeT> op;
+        const opp::Mul<ComputeT> op;
 
-        mulSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
+        const mulSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, mulSrcDevCScale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT without SIMD
+// using default_ext_compute_type_for_t for computeT without SIMD
 #define Instantiate_For(typeSrcIsTypeDst)                                                                              \
     template void                                                                                                      \
-    InvokeMulSrcDevCScale<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(           \
+    InvokeMulSrcDevCScale<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(       \
         const typeSrcIsTypeDst *aSrc, size_t aPitchSrc, const typeSrcIsTypeDst *aConst, typeSrcIsTypeDst *aDst,        \
-        size_t aPitchDst, scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor,                    \
+        size_t aPitchDst, scalefactor_t<default_ext_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor,                \
         const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlpha(type)                                                                                    \
@@ -485,10 +487,10 @@ void InvokeMulInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, 
             using mulInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>,
                                                         RoundingMode::None, ComputeT, simdOP_t>;
 
-            Mul<ComputeT> op;
-            simdOP_t opSIMD;
+            const opp::Mul<ComputeT> op;
+            const simdOP_t opSIMD;
 
-            mulInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
+            const mulInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, mulInplaceSrcSIMD>(aSrcDst, aPitchSrcDst, aSize,
                                                                                 aStreamCtx, functor);
@@ -499,9 +501,9 @@ void InvokeMulInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, 
             using mulInplaceSrc =
                 InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>, RoundingMode::None>;
 
-            Mul<ComputeT> op;
+            const opp::Mul<ComputeT> op;
 
-            mulInplaceSrc functor(aSrc2, aPitchSrc2, op);
+            const mulInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, mulInplaceSrc>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                             functor);
@@ -510,10 +512,10 @@ void InvokeMulInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, 
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT including SIMD activation if possible
+// using default_ext_compute_type_for_t for computeT including SIMD activation if possible
 #define Instantiate_For(typeSrcIsTypeDst)                                                                              \
     template void                                                                                                      \
-    InvokeMulInplaceSrc<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(             \
+    InvokeMulInplaceSrc<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(         \
         typeSrcIsTypeDst * aSrcDst, size_t aPitchSrcDst, const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,             \
         const Size2D &aSize, const StreamCtx &aStreamCtx);
 
@@ -571,11 +573,11 @@ void InvokeMulInplaceSrcScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aS
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using mulInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>,
-                                                          RoundingMode::NearestTiesAwayFromZero>;
+                                                          RoundingMode::NearestTiesToEven>;
 
-        Mul<ComputeT> op;
+        const opp::Mul<ComputeT> op;
 
-        mulInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
+        const mulInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, mulInplaceSrcScale>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                              functor);
@@ -583,12 +585,12 @@ void InvokeMulInplaceSrcScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aS
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT without SIMD
+// using default_ext_compute_type_for_t for computeT without SIMD
 #define Instantiate_For(typeSrcIsTypeDst)                                                                              \
     template void                                                                                                      \
-    InvokeMulInplaceSrcScale<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(        \
+    InvokeMulInplaceSrcScale<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(    \
         typeSrcIsTypeDst * aSrcDst, size_t aPitchSrcDst, const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,             \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, const Size2D &aSize,                 \
+        scalefactor_t<default_ext_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, const Size2D &aSize,             \
         const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlpha(type)                                                                                    \
@@ -638,12 +640,12 @@ void InvokeMulInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, c
             using mulInplaceCSIMD = InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Mul<ComputeT>,
                                                            RoundingMode::None, Tupel<ComputeT, TupelSize>, simdOP_t>;
 
-            Mul<ComputeT> op;
-            simdOP_t opSIMD;
-            Tupel<ComputeT, TupelSize> tupelConstant =
+            const opp::Mul<ComputeT> op;
+            const simdOP_t opSIMD;
+            const Tupel<ComputeT, TupelSize> tupelConstant =
                 Tupel<ComputeT, TupelSize>::GetConstant(static_cast<ComputeT>(aConst));
 
-            mulInplaceCSIMD functor(static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
+            const mulInplaceCSIMD functor(static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, mulInplaceCSIMD>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                               functor);
@@ -654,9 +656,9 @@ void InvokeMulInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, c
             using mulInplaceC =
                 InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Mul<ComputeT>, RoundingMode::None>;
 
-            Mul<ComputeT> op;
+            const opp::Mul<ComputeT> op;
 
-            mulInplaceC functor(static_cast<ComputeT>(aConst), op);
+            const mulInplaceC functor(static_cast<ComputeT>(aConst), op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, mulInplaceC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                           functor);
@@ -665,9 +667,10 @@ void InvokeMulInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, c
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT including SIMD activation if possible
+// using default_ext_compute_type_for_t for computeT including SIMD activation if possible
 #define Instantiate_For(typeSrcIsTypeDst)                                                                              \
-    template void InvokeMulInplaceC<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>( \
+    template void                                                                                                      \
+    InvokeMulInplaceC<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(           \
         typeSrcIsTypeDst * aSrcDst, size_t aPitchSrcDst, const typeSrcIsTypeDst &aConst, const Size2D &aSize,          \
         const StreamCtx &aStreamCtx);
 
@@ -724,12 +727,12 @@ void InvokeMulInplaceCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aCon
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using mulInplaceCScale = InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Mul<ComputeT>,
-                                                             RoundingMode::NearestTiesAwayFromZero>;
+        using mulInplaceCScale =
+            InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
-        Mul<ComputeT> op;
+        const opp::Mul<ComputeT> op;
 
-        mulInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
+        const mulInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, mulInplaceCScale>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                            functor);
@@ -737,12 +740,12 @@ void InvokeMulInplaceCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aCon
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT without SIMD
+// using default_ext_compute_type_for_t for computeT without SIMD
 #define Instantiate_For(typeSrcIsTypeDst)                                                                              \
     template void                                                                                                      \
-    InvokeMulInplaceCScale<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(          \
+    InvokeMulInplaceCScale<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(      \
         typeSrcIsTypeDst * aSrcDst, size_t aPitchSrcDst, const typeSrcIsTypeDst &aConst,                               \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, const Size2D &aSize,                 \
+        scalefactor_t<default_ext_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, const Size2D &aSize,             \
         const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlpha(type)                                                                                    \
@@ -789,9 +792,9 @@ void InvokeMulInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aConst
         using mulInplaceDevC =
             InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, opp::Mul<ComputeT>, RoundingMode::None>;
 
-        Mul<ComputeT> op;
+        const opp::Mul<ComputeT> op;
 
-        mulInplaceDevC functor(aConst, op);
+        const mulInplaceDevC functor(aConst, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, mulInplaceDevC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                          functor);
@@ -799,10 +802,10 @@ void InvokeMulInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aConst
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT including SIMD activation if possible
+// using default_ext_compute_type_for_t for computeT including SIMD activation if possible
 #define Instantiate_For(typeSrcIsTypeDst)                                                                              \
     template void                                                                                                      \
-    InvokeMulInplaceDevC<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(            \
+    InvokeMulInplaceDevC<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(        \
         typeSrcIsTypeDst * aSrcDst, size_t aPitchSrcDst, const typeSrcIsTypeDst *aConst, const Size2D &aSize,          \
         const StreamCtx &aStreamCtx);
 
@@ -860,11 +863,11 @@ void InvokeMulInplaceDevCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *a
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using mulInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Mul<ComputeT>,
-                                                                   RoundingMode::NearestTiesAwayFromZero>;
+                                                                   RoundingMode::NearestTiesToEven>;
 
-        Mul<ComputeT> op;
+        const opp::Mul<ComputeT> op;
 
-        mulInplaceDevCScale functor(aConst, op, aScaleFactor);
+        const mulInplaceDevCScale functor(aConst, op, aScaleFactor);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, mulInplaceDevCScale>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                               functor);
@@ -872,12 +875,12 @@ void InvokeMulInplaceDevCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *a
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT without SIMD
+// using default_ext_compute_type_for_t for computeT without SIMD
 #define Instantiate_For(typeSrcIsTypeDst)                                                                              \
     template void                                                                                                      \
-    InvokeMulInplaceDevCScale<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(       \
+    InvokeMulInplaceDevCScale<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(   \
         typeSrcIsTypeDst * aSrcDst, size_t aPitchSrcDst, const typeSrcIsTypeDst *aConst,                               \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, const Size2D &aSize,                 \
+        scalefactor_t<default_ext_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, const Size2D &aSize,             \
         const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlpha(type)                                                                                    \

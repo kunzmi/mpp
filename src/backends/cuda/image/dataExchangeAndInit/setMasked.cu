@@ -34,7 +34,7 @@ void InvokeSetCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const DstT &aCons
 
         using setC = ConstantFunctor<TupelSize, DstT>;
 
-        setC functor(aConst);
+        const setC functor(aConst);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, setC>(aMask, aPitchMask, aDst, aPitchDst, aSize,
                                                                      aStreamCtx, functor);
@@ -95,7 +95,7 @@ void InvokeSetDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const DstT *aC
 
         using setDevC = DevConstantFunctor<TupelSize, DstT>;
 
-        setDevC functor(aConst);
+        const setDevC functor(aConst);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, setDevC>(aMask, aPitchMask, aDst, aPitchDst, aSize,
                                                                         aStreamCtx, functor);

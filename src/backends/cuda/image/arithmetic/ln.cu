@@ -38,23 +38,24 @@ void InvokeLnSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitch
         using simdOP_t = simd::Ln<Tupel<DstT, TupelSize>>;
         if constexpr (simdOP_t::has_simd)
         {
-            using lnSrcSIMD =
-                SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Ln<ComputeT>, RoundingMode::None, ComputeT, simdOP_t>;
+            using lnSrcSIMD = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Ln<ComputeT>,
+                                         RoundingMode::NearestTiesToEven, ComputeT, simdOP_t>;
 
-            Ln<ComputeT> op;
-            simdOP_t opSIMD;
+            const opp::Ln<ComputeT> op;
+            const simdOP_t opSIMD;
 
-            lnSrcSIMD functor(aSrc1, aPitchSrc1, op, opSIMD);
+            const lnSrcSIMD functor(aSrc1, aPitchSrc1, op, opSIMD);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, lnSrcSIMD>(aDst, aPitchDst, aSize, aStreamCtx, functor);
         }
         else
         {
-            using lnSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Ln<ComputeT>, RoundingMode::None>;
+            using lnSrc =
+                SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Ln<ComputeT>, RoundingMode::NearestTiesToEven>;
 
-            Ln<ComputeT> op;
+            const opp::Ln<ComputeT> op;
 
-            lnSrc functor(aSrc1, aPitchSrc1, op);
+            const lnSrc functor(aSrc1, aPitchSrc1, op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, lnSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
         }
@@ -116,24 +117,25 @@ void InvokeLnInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, co
         using simdOP_t = simd::Ln<Tupel<DstT, TupelSize>>;
         if constexpr (simdOP_t::has_simd)
         {
-            using lnInplaceSIMD =
-                InplaceFunctor<TupelSize, ComputeT, DstT, opp::Ln<ComputeT>, RoundingMode::None, ComputeT, simdOP_t>;
+            using lnInplaceSIMD = InplaceFunctor<TupelSize, ComputeT, DstT, opp::Ln<ComputeT>,
+                                                 RoundingMode::NearestTiesToEven, ComputeT, simdOP_t>;
 
-            Ln<ComputeT> op;
-            simdOP_t opSIMD;
+            const opp::Ln<ComputeT> op;
+            const simdOP_t opSIMD;
 
-            lnInplaceSIMD functor(op, opSIMD);
+            const lnInplaceSIMD functor(op, opSIMD);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, lnInplaceSIMD>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                             functor);
         }
         else
         {
-            using lnInplace = InplaceFunctor<TupelSize, ComputeT, DstT, opp::Ln<ComputeT>, RoundingMode::None>;
+            using lnInplace =
+                InplaceFunctor<TupelSize, ComputeT, DstT, opp::Ln<ComputeT>, RoundingMode::NearestTiesToEven>;
 
-            Ln<ComputeT> op;
+            const opp::Ln<ComputeT> op;
 
-            lnInplace functor(op);
+            const lnInplace functor(op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, lnInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                         functor);

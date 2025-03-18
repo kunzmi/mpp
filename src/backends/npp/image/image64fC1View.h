@@ -40,12 +40,12 @@ class Image64fC1View : public ImageView<Pixel64fC1>
     /// <summary>
     /// Returns a new Image64fC1View with the new ROI
     /// </summary>
-    [[nodiscard]] Image64fC1View GetView(const Roi &aRoi) const;
+    [[nodiscard]] Image64fC1View GetView(const Roi &aRoi);
 
     /// <summary>
     /// Returns a new ImageView with the current ROI adapted by aBorder
     /// </summary>
-    [[nodiscard]] Image64fC1View GetView(const Border &aBorder = Border()) const;
+    [[nodiscard]] Image64fC1View GetView(const Border &aBorder = Border());
 
     //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 #if OPPi_ENABLE_DOUBLE_TYPE && OPPi_ENABLE_ONE_CHANNEL
@@ -78,10 +78,10 @@ class Image64fC1View : public ImageView<Pixel64fC1>
     void DistanceTransformAbsPBA(const Pixel64fC1 &nMinSiteValue, const Pixel64fC1 &nMaxSiteValue, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16uC1View &pDstVoronoiAbsoluteManhattanDistances, Image64fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAntialiasingDeviceBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSignedDistanceTransformPBA_64f_C1R_Ctx(Npp64f * pSrc, int nSrcStep, Npp64f nCutoffValue, Npp64f nSubPixelXShift, Npp64f nSubPixelYShift, Npp16s * pDstVoronoi, int nDstVoronoiStep, Npp16s * pDstVoronoiIndices, int nDstVoronoiIndicesStep, Npp16s * pDstVoronoiRelativeManhattanDistances, int nDstVoronoiRelativeManhattanDistancesStep, Npp64f * pDstTransform, int nDstTransformStep, NppiSize oSizeROI, Npp8u * pDeviceBuffer, Npp8u * pAntialiasingDeviceBuffer, NppStreamContext nppStreamCtx)
-    void SignedDistanceTransformPBA(const Pixel64fC1 &nCutoffValue, const Pixel64fC1 &nSubPixelXShift, const Pixel64fC1 &nSubPixelYShift, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16sC1View &pDstVoronoiRelativeManhattanDistances, Image64fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAntialiasingDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void SignedDistanceTransformPBA(const Pixel64fC1 &nCutoffValue, const Pixel64fC1 &nSubPixelXShift, const Pixel64fC1 &nSubPixelYShift, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16sC1View &pDstVoronoiRelativeManhattanDistances, Image64fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAntialiasingDeviceBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSignedDistanceTransformAbsPBA_64f_C1R_Ctx(Npp64f * pSrc, int nSrcStep, Npp64f nCutoffValue, Npp64f nSubPixelXShift, Npp64f nSubPixelYShift, Npp16s * pDstVoronoi, int nDstVoronoiStep, Npp16s * pDstVoronoiIndices, int nDstVoronoiIndicesStep, Npp16u * pDstVoronoiAbsoluteManhattanDistances, int nDstVoronoiAbsoluteManhattanDistancesStep, Npp64f * pDstTransform, int nDstTransformStep, NppiSize oSizeROI, Npp8u * pDeviceBuffer, Npp8u * pAntialiasingDeviceBuffer, NppStreamContext nppStreamCtx)
-    void SignedDistanceTransformAbsPBA(const Pixel64fC1 &nCutoffValue, const Pixel64fC1 &nSubPixelXShift, const Pixel64fC1 &nSubPixelYShift, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16uC1View &pDstVoronoiAbsoluteManhattanDistances, Image64fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAntialiasingDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void SignedDistanceTransformAbsPBA(const Pixel64fC1 &nCutoffValue, const Pixel64fC1 &nSubPixelXShift, const Pixel64fC1 &nSubPixelYShift, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16uC1View &pDstVoronoiAbsoluteManhattanDistances, Image64fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAntialiasingDeviceBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiCrossCorrFull_Norm_64f_C1R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, NppStreamContext nppStreamCtx)
     Image64fC1View &CrossCorrFull_Norm(const Image64fC1View &pTpl, Image64fC1View &pDst, const NppStreamContext &nppStreamCtx) const;

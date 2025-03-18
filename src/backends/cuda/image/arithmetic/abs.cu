@@ -42,10 +42,10 @@ void InvokeAbsSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitc
             using absSrcSIMD    = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Abs<ComputeT>, RoundingMode::None,
                                              ComputeT_SIMD, simdOP_t>;
 
-            Abs<ComputeT> op;
-            simdOP_t opSIMD;
+            const opp::Abs<ComputeT> op;
+            const simdOP_t opSIMD;
 
-            absSrcSIMD functor(aSrc1, aPitchSrc1, op, opSIMD);
+            const absSrcSIMD functor(aSrc1, aPitchSrc1, op, opSIMD);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, absSrcSIMD>(aDst, aPitchDst, aSize, aStreamCtx, functor);
         }
@@ -53,9 +53,9 @@ void InvokeAbsSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitc
         {
             using absSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Abs<ComputeT>, RoundingMode::None>;
 
-            Abs<ComputeT> op;
+            const opp::Abs<ComputeT> op;
 
-            absSrc functor(aSrc1, aPitchSrc1, op);
+            const absSrc functor(aSrc1, aPitchSrc1, op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, absSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
         }
@@ -108,10 +108,10 @@ void InvokeAbsInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, c
             using absInplaceSIMD = InplaceFunctor<TupelSize, ComputeT, DstT, opp::Abs<ComputeT>, RoundingMode::None,
                                                   ComputeT_SIMD, simdOP_t>;
 
-            Abs<ComputeT> op;
-            simdOP_t opSIMD;
+            const opp::Abs<ComputeT> op;
+            const simdOP_t opSIMD;
 
-            absInplaceSIMD functor(op, opSIMD);
+            const absInplaceSIMD functor(op, opSIMD);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, absInplaceSIMD>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                              functor);
@@ -120,9 +120,9 @@ void InvokeAbsInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, c
         {
             using absInplace = InplaceFunctor<TupelSize, ComputeT, DstT, opp::Abs<ComputeT>, RoundingMode::None>;
 
-            Abs<ComputeT> op;
+            const opp::Abs<ComputeT> op;
 
-            absInplace functor(op);
+            const absInplace functor(op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, absInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                          functor);

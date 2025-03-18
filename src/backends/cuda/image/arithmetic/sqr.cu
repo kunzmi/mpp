@@ -37,9 +37,9 @@ void InvokeSqrSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitc
 
         using sqrSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sqr<ComputeT>, RoundingMode::None>;
 
-        Sqr<ComputeT> op;
+        const opp::Sqr<ComputeT> op;
 
-        sqrSrc functor(aSrc1, aPitchSrc1, op);
+        const sqrSrc functor(aSrc1, aPitchSrc1, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, sqrSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -99,9 +99,9 @@ void InvokeSqrInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, c
 
         using sqrInplace = InplaceFunctor<TupelSize, ComputeT, DstT, opp::Sqr<ComputeT>, RoundingMode::None>;
 
-        Sqr<ComputeT> op;
+        const opp::Sqr<ComputeT> op;
 
-        sqrInplace functor(op);
+        const sqrInplace functor(op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, sqrInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
     }

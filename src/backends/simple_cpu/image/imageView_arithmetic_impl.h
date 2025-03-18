@@ -1,8 +1,10 @@
 #pragma once
+#include <backends/simple_cpu/image/addSquareProductWeightedOutputType.h>
 #include <backends/simple_cpu/image/forEachPixel.h>
 #include <backends/simple_cpu/image/forEachPixelMasked.h>
 #include <backends/simple_cpu/image/imageView.h>
 #include <common/arithmetic/binary_operators.h>
+#include <common/arithmetic/ternary_operators.h>
 #include <common/arithmetic/unary_operators.h>
 #include <common/complex.h>
 #include <common/defines.h>
@@ -16,6 +18,7 @@
 #include <common/image/functors/inplaceFunctor.h>
 #include <common/image/functors/inplaceSrcFunctor.h>
 #include <common/image/functors/inplaceSrcScaleFunctor.h>
+#include <common/image/functors/inplaceSrcSrcFunctor.h>
 #include <common/image/functors/srcConstantFunctor.h>
 #include <common/image/functors/srcConstantScaleFunctor.h>
 #include <common/image/functors/srcDevConstantFunctor.h>
@@ -34,12 +37,14 @@
 #include <common/opp_defs.h>
 #include <common/safeCast.h>
 #include <common/utilities.h>
-#include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
+#include <common/vector_typetraits.h>
 #include <concepts>
 #include <cstddef>
 #include <type_traits>
 #include <vector>
+
+// NOLINTBEGIN(clang-diagnostic-double-promotion)
 
 namespace opp::image::cpuSimple
 {
@@ -74,8 +79,7 @@ ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    using addSrcSrcScale =
-        SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+    using addSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Add<ComputeT> op;
     const addSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
@@ -113,7 +117,7 @@ ImageView<T> &ImageView<T>::Add(const T &aConst, ImageView<T> &aDst, int aScaleF
     using ComputeT = default_compute_type_for_t<T>;
 
     using addSrcCScale =
-        SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Add<ComputeT> op;
     const addSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
@@ -151,7 +155,7 @@ ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, int aScaleFactor)
     using ComputeT = default_compute_type_for_t<T>;
 
     using addInplaceSrcScale =
-        InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Add<ComputeT> op;
     const addInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
@@ -185,7 +189,7 @@ ImageView<T> &ImageView<T>::Add(const T &aConst, int aScaleFactor)
     using ComputeT = default_compute_type_for_t<T>;
 
     using addInplaceCScale =
-        InplaceConstantScaleFunctor<1, ComputeT, T, opp::Add<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceConstantScaleFunctor<1, ComputeT, T, opp::Add<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Add<ComputeT> op;
     const addInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
@@ -225,8 +229,7 @@ ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, c
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    using addSrcSrcScale =
-        SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+    using addSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Add<ComputeT> op;
     const addSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
@@ -265,7 +268,7 @@ ImageView<T> &ImageView<T>::Add(const T &aConst, ImageView<T> &aDst, const Image
     using ComputeT = default_compute_type_for_t<T>;
 
     using addSrcCScale =
-        SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Add<ComputeT> op;
     const addSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
@@ -303,7 +306,7 @@ ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, const ImageView<Pixel
     using ComputeT = default_compute_type_for_t<T>;
 
     using addInplaceSrcScale =
-        InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Add<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Add<ComputeT> op;
     const addInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
@@ -337,7 +340,7 @@ ImageView<T> &ImageView<T>::Add(const T &aConst, const ImageView<Pixel8uC1> &aMa
     using ComputeT = default_compute_type_for_t<T>;
 
     using addInplaceCScale =
-        InplaceConstantScaleFunctor<1, ComputeT, T, opp::Add<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceConstantScaleFunctor<1, ComputeT, T, opp::Add<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Add<ComputeT> op;
     const addInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
@@ -378,8 +381,7 @@ ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    using subSrcSrcScale =
-        SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Sub<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+    using subSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Sub<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Sub<ComputeT> op;
     const subSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
@@ -417,7 +419,7 @@ ImageView<T> &ImageView<T>::Sub(const T &aConst, ImageView<T> &aDst, int aScaleF
     using ComputeT = default_compute_type_for_t<T>;
 
     using subSrcCScale =
-        SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Sub<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Sub<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Sub<ComputeT> op;
     const subSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
@@ -455,7 +457,7 @@ ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, int aScaleFactor)
     using ComputeT = default_compute_type_for_t<T>;
 
     using subInplaceSrcScale =
-        InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Sub<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Sub<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Sub<ComputeT> op;
     const subInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
@@ -489,7 +491,7 @@ ImageView<T> &ImageView<T>::Sub(const T &aConst, int aScaleFactor)
     using ComputeT = default_compute_type_for_t<T>;
 
     using subInplaceCScale =
-        InplaceConstantScaleFunctor<1, ComputeT, T, opp::Sub<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceConstantScaleFunctor<1, ComputeT, T, opp::Sub<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Sub<ComputeT> op;
     const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
@@ -527,7 +529,7 @@ ImageView<T> &ImageView<T>::SubInv(const ImageView<T> &aSrc2, int aScaleFactor)
     using ComputeT = default_compute_type_for_t<T>;
 
     using subInplaceSrcScale =
-        InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::SubInv<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::SubInv<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::SubInv<ComputeT> op;
     const subInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
@@ -561,7 +563,7 @@ ImageView<T> &ImageView<T>::SubInv(const T &aConst, int aScaleFactor)
     using ComputeT = default_compute_type_for_t<T>;
 
     using subInplaceCScale =
-        InplaceConstantScaleFunctor<1, ComputeT, T, opp::SubInv<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceConstantScaleFunctor<1, ComputeT, T, opp::SubInv<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::SubInv<ComputeT> op;
     const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
@@ -601,8 +603,7 @@ ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, c
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    using subSrcSrcScale =
-        SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Sub<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+    using subSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Sub<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Sub<ComputeT> op;
     const subSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
@@ -641,7 +642,7 @@ ImageView<T> &ImageView<T>::Sub(const T &aConst, ImageView<T> &aDst, const Image
     using ComputeT = default_compute_type_for_t<T>;
 
     using subSrcCScale =
-        SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Sub<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Sub<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Sub<ComputeT> op;
     const subSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
@@ -679,7 +680,7 @@ ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, const ImageView<Pixel
     using ComputeT = default_compute_type_for_t<T>;
 
     using subInplaceSrcScale =
-        InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Sub<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Sub<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Sub<ComputeT> op;
     const subInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
@@ -713,7 +714,7 @@ ImageView<T> &ImageView<T>::Sub(const T &aConst, const ImageView<Pixel8uC1> &aMa
     using ComputeT = default_compute_type_for_t<T>;
 
     using subInplaceCScale =
-        InplaceConstantScaleFunctor<1, ComputeT, T, opp::Sub<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceConstantScaleFunctor<1, ComputeT, T, opp::Sub<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Sub<ComputeT> op;
     const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
@@ -751,7 +752,7 @@ ImageView<T> &ImageView<T>::SubInv(const ImageView<T> &aSrc2, const ImageView<Pi
     using ComputeT = default_compute_type_for_t<T>;
 
     using subInplaceSrcScale =
-        InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::SubInv<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::SubInv<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::SubInv<ComputeT> op;
     const subInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
@@ -785,7 +786,7 @@ ImageView<T> &ImageView<T>::SubInv(const T &aConst, const ImageView<Pixel8uC1> &
     using ComputeT = default_compute_type_for_t<T>;
 
     using subInplaceCScale =
-        InplaceConstantScaleFunctor<1, ComputeT, T, opp::SubInv<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceConstantScaleFunctor<1, ComputeT, T, opp::SubInv<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::SubInv<ComputeT> op;
     const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
@@ -803,7 +804,7 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst)
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aDst.ROI());
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
     // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
     using mulSrcSrc = SrcSrcFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::None>;
@@ -824,10 +825,9 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
 
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
-    using mulSrcSrcScale =
-        SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+    using mulSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Mul<ComputeT> op;
     const mulSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
@@ -842,7 +842,7 @@ ImageView<T> &ImageView<T>::Mul(const T &aConst, ImageView<T> &aDst)
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
     // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
     using mulSrcC = SrcConstantFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::None>;
@@ -862,10 +862,10 @@ ImageView<T> &ImageView<T>::Mul(const T &aConst, ImageView<T> &aDst, int aScaleF
 
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
     using mulSrcCScale =
-        SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Mul<ComputeT> op;
     const mulSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
@@ -880,7 +880,7 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2)
 {
     checkSameSize(ROI(), aSrc2.ROI());
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
     // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
     using mulInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::None>;
@@ -900,10 +900,10 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, int aScaleFactor)
 
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
     using mulInplaceSrcScale =
-        InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Mul<ComputeT> op;
     const mulInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
@@ -916,7 +916,7 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::Mul(const T &aConst)
     requires RealOrComplexFloatingVector<T>
 {
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
     // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
     using mulInplaceC = InplaceConstantFunctor<1, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::None>;
@@ -934,10 +934,10 @@ ImageView<T> &ImageView<T>::Mul(const T &aConst, int aScaleFactor)
 {
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
     using mulInplaceCScale =
-        InplaceConstantScaleFunctor<1, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceConstantScaleFunctor<1, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Mul<ComputeT> op;
     const mulInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
@@ -953,7 +953,7 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, c
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aDst.ROI());
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
     // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
     using mulSrcSrc = SrcSrcFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::None>;
@@ -975,10 +975,9 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, c
 
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
-    using mulSrcSrcScale =
-        SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+    using mulSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Mul<ComputeT> op;
     const mulSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
@@ -993,7 +992,7 @@ ImageView<T> &ImageView<T>::Mul(const T &aConst, ImageView<T> &aDst, const Image
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
     // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
     using mulSrcC = SrcConstantFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::None>;
@@ -1014,10 +1013,10 @@ ImageView<T> &ImageView<T>::Mul(const T &aConst, ImageView<T> &aDst, const Image
 
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
     using mulSrcCScale =
-        SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Mul<ComputeT> op;
     const mulSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
@@ -1032,7 +1031,7 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, const ImageView<Pixel
 {
     checkSameSize(ROI(), aSrc2.ROI());
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
     // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
     using mulInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::None>;
@@ -1052,10 +1051,10 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, const ImageView<Pixel
 
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
     using mulInplaceSrcScale =
-        InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Mul<ComputeT> op;
     const mulInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
@@ -1068,7 +1067,7 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::Mul(const T &aConst, const ImageView<Pixel8uC1> &aMask)
     requires RealOrComplexFloatingVector<T>
 {
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
     // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
     using mulInplaceC = InplaceConstantFunctor<1, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::None>;
@@ -1086,10 +1085,10 @@ ImageView<T> &ImageView<T>::Mul(const T &aConst, const ImageView<Pixel8uC1> &aMa
 {
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
     using mulInplaceCScale =
-        InplaceConstantScaleFunctor<1, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceConstantScaleFunctor<1, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Mul<ComputeT> op;
     const mulInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
@@ -1109,10 +1108,9 @@ ImageView<T> &ImageView<T>::MulScale(const ImageView<T> &aSrc2, ImageView<T> &aD
 
     constexpr float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
-    using mulSrcSrcScale =
-        SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+    using mulSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Mul<ComputeT> op;
     const mulSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
@@ -1129,10 +1127,10 @@ ImageView<T> &ImageView<T>::MulScale(const T &aConst, ImageView<T> &aDst)
 
     constexpr float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
     using mulSrcCScale =
-        SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Mul<ComputeT> op;
     const mulSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
@@ -1149,10 +1147,10 @@ ImageView<T> &ImageView<T>::MulScale(const ImageView<T> &aSrc2)
 
     constexpr float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
     using mulInplaceSrcScale =
-        InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Mul<ComputeT> op;
     const mulInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
@@ -1167,10 +1165,10 @@ ImageView<T> &ImageView<T>::MulScale(const T &aConst)
 {
     constexpr float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
     using mulInplaceCScale =
-        InplaceConstantScaleFunctor<1, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceConstantScaleFunctor<1, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Mul<ComputeT> op;
     const mulInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
@@ -1188,10 +1186,9 @@ ImageView<T> &ImageView<T>::MulScale(const ImageView<T> &aSrc2, ImageView<T> &aD
 
     constexpr float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
-    using mulSrcSrcScale =
-        SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+    using mulSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Mul<ComputeT> op;
     const mulSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
@@ -1208,10 +1205,10 @@ ImageView<T> &ImageView<T>::MulScale(const T &aConst, ImageView<T> &aDst, const 
 
     constexpr float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
     using mulSrcCScale =
-        SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Mul<ComputeT> op;
     const mulSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
@@ -1228,10 +1225,10 @@ ImageView<T> &ImageView<T>::MulScale(const ImageView<T> &aSrc2, const ImageView<
 
     constexpr float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
     using mulInplaceSrcScale =
-        InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Mul<ComputeT> op;
     const mulInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
@@ -1246,10 +1243,10 @@ ImageView<T> &ImageView<T>::MulScale(const T &aConst, const ImageView<Pixel8uC1>
 {
     constexpr float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
 
-    using ComputeT = default_compute_type_for_t<T>;
+    using ComputeT = default_ext_compute_type_for_t<T>;
 
     using mulInplaceCScale =
-        InplaceConstantScaleFunctor<1, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceConstantScaleFunctor<1, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Mul<ComputeT> op;
     const mulInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
@@ -1269,9 +1266,9 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst)
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divSrcSrc = SrcSrcFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::None>;
+    using divSrcSrc = SrcSrcFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::None>;
 
-    const opp::Div<ComputeT> op;
+    const opp::Div<ComputeT, T> op;
     const divSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
     forEachPixel(aDst, functor);
@@ -1295,8 +1292,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
         case opp::RoundingMode::NearestTiesToEven:
         {
             using divSrcSrcScale =
-                SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::NearestTiesToEven>;
-            const opp::Div<ComputeT> op;
+                SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::NearestTiesToEven>;
+            const opp::Div<ComputeT, T> op;
             const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op,
                                          scaleFactorFloat);
             forEachPixel(aDst, functor);
@@ -1305,8 +1302,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
         case opp::RoundingMode::NearestTiesAwayFromZero:
         {
             using divSrcSrcScale =
-                SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
-            const opp::Div<ComputeT> op;
+                SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::NearestTiesAwayFromZero>;
+            const opp::Div<ComputeT, T> op;
             const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op,
                                          scaleFactorFloat);
             forEachPixel(aDst, functor);
@@ -1314,8 +1311,9 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
         break;
         case opp::RoundingMode::TowardZero:
         {
-            using divSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardZero>;
-            const opp::Div<ComputeT> op;
+            using divSrcSrcScale =
+                SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::TowardZero>;
+            const opp::Div<ComputeT, T> op;
             const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op,
                                          scaleFactorFloat);
             forEachPixel(aDst, functor);
@@ -1324,8 +1322,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
         case opp::RoundingMode::TowardNegativeInfinity:
         {
             using divSrcSrcScale =
-                SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardNegativeInfinity>;
-            const opp::Div<ComputeT> op;
+                SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::TowardNegativeInfinity>;
+            const opp::Div<ComputeT, T> op;
             const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op,
                                          scaleFactorFloat);
             forEachPixel(aDst, functor);
@@ -1334,8 +1332,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
         case opp::RoundingMode::TowardPositiveInfinity:
         {
             using divSrcSrcScale =
-                SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardPositiveInfinity>;
-            const opp::Div<ComputeT> op;
+                SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::TowardPositiveInfinity>;
+            const opp::Div<ComputeT, T> op;
             const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op,
                                          scaleFactorFloat);
             forEachPixel(aDst, functor);
@@ -1356,9 +1354,9 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst)
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divSrcC = SrcConstantFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::None>;
+    using divSrcC = SrcConstantFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::None>;
 
-    const opp::Div<ComputeT> op;
+    const opp::Div<ComputeT, T> op;
     const divSrcC functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op);
 
     forEachPixel(aDst, functor);
@@ -1380,17 +1378,17 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, int aScaleF
         case opp::RoundingMode::NearestTiesToEven:
         {
             using divSrcCScale =
-                SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::NearestTiesToEven>;
-            const opp::Div<ComputeT> op;
+                SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::NearestTiesToEven>;
+            const opp::Div<ComputeT, T> op;
             const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(aDst, functor);
         }
         break;
         case opp::RoundingMode::NearestTiesAwayFromZero:
         {
-            using divSrcCScale =
-                SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
-            const opp::Div<ComputeT> op;
+            using divSrcCScale = SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>,
+                                                         RoundingMode::NearestTiesAwayFromZero>;
+            const opp::Div<ComputeT, T> op;
             const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(aDst, functor);
         }
@@ -1398,8 +1396,8 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, int aScaleF
         case opp::RoundingMode::TowardZero:
         {
             using divSrcCScale =
-                SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardZero>;
-            const opp::Div<ComputeT> op;
+                SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::TowardZero>;
+            const opp::Div<ComputeT, T> op;
             const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(aDst, functor);
         }
@@ -1407,8 +1405,8 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, int aScaleF
         case opp::RoundingMode::TowardNegativeInfinity:
         {
             using divSrcCScale =
-                SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardNegativeInfinity>;
-            const opp::Div<ComputeT> op;
+                SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::TowardNegativeInfinity>;
+            const opp::Div<ComputeT, T> op;
             const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(aDst, functor);
         }
@@ -1416,8 +1414,8 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, int aScaleF
         case opp::RoundingMode::TowardPositiveInfinity:
         {
             using divSrcCScale =
-                SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardPositiveInfinity>;
-            const opp::Div<ComputeT> op;
+                SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::TowardPositiveInfinity>;
+            const opp::Div<ComputeT, T> op;
             const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(aDst, functor);
         }
@@ -1436,9 +1434,9 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2)
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::None>;
+    using divInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::None>;
 
-    const opp::Div<ComputeT> op;
+    const opp::Div<ComputeT, T> op;
     const divInplaceSrc functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
     forEachPixel(*this, functor);
@@ -1460,8 +1458,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, int aScaleFactor, Rou
         case opp::RoundingMode::NearestTiesToEven:
         {
             using divInplaceSrcScale =
-                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::NearestTiesToEven>;
-            const opp::Div<ComputeT> op;
+                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::NearestTiesToEven>;
+            const opp::Div<ComputeT, T> op;
             const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
             forEachPixel(*this, functor);
         }
@@ -1469,8 +1467,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, int aScaleFactor, Rou
         case opp::RoundingMode::NearestTiesAwayFromZero:
         {
             using divInplaceSrcScale =
-                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
-            const opp::Div<ComputeT> op;
+                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::NearestTiesAwayFromZero>;
+            const opp::Div<ComputeT, T> op;
             const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
             forEachPixel(*this, functor);
         }
@@ -1478,8 +1476,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, int aScaleFactor, Rou
         case opp::RoundingMode::TowardZero:
         {
             using divInplaceSrcScale =
-                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardZero>;
-            const opp::Div<ComputeT> op;
+                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::TowardZero>;
+            const opp::Div<ComputeT, T> op;
             const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
             forEachPixel(*this, functor);
         }
@@ -1487,8 +1485,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, int aScaleFactor, Rou
         case opp::RoundingMode::TowardNegativeInfinity:
         {
             using divInplaceSrcScale =
-                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardNegativeInfinity>;
-            const opp::Div<ComputeT> op;
+                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::TowardNegativeInfinity>;
+            const opp::Div<ComputeT, T> op;
             const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
             forEachPixel(*this, functor);
         }
@@ -1496,8 +1494,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, int aScaleFactor, Rou
         case opp::RoundingMode::TowardPositiveInfinity:
         {
             using divInplaceSrcScale =
-                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardPositiveInfinity>;
-            const opp::Div<ComputeT> op;
+                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::TowardPositiveInfinity>;
+            const opp::Div<ComputeT, T> op;
             const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
             forEachPixel(*this, functor);
         }
@@ -1514,9 +1512,9 @@ ImageView<T> &ImageView<T>::Div(const T &aConst)
 {
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divInplaceC = InplaceConstantFunctor<1, ComputeT, T, opp::Div<ComputeT>, RoundingMode::None>;
+    using divInplaceC = InplaceConstantFunctor<1, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::None>;
 
-    const opp::Div<ComputeT> op;
+    const opp::Div<ComputeT, T> op;
     const divInplaceC functor(static_cast<ComputeT>(aConst), op);
 
     forEachPixel(*this, functor);
@@ -1536,17 +1534,17 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, int aScaleFactor, RoundingMode 
         case opp::RoundingMode::NearestTiesToEven:
         {
             using divInplaceCScale =
-                InplaceConstantScaleFunctor<1, ComputeT, T, opp::Div<ComputeT>, RoundingMode::NearestTiesToEven>;
-            const opp::Div<ComputeT> op;
+                InplaceConstantScaleFunctor<1, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::NearestTiesToEven>;
+            const opp::Div<ComputeT, T> op;
             const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(*this, functor);
         }
         break;
         case opp::RoundingMode::NearestTiesAwayFromZero:
         {
-            using divInplaceCScale =
-                InplaceConstantScaleFunctor<1, ComputeT, T, opp::Div<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
-            const opp::Div<ComputeT> op;
+            using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, opp::Div<ComputeT, T>,
+                                                                 RoundingMode::NearestTiesAwayFromZero>;
+            const opp::Div<ComputeT, T> op;
             const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(*this, functor);
         }
@@ -1554,26 +1552,26 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, int aScaleFactor, RoundingMode 
         case opp::RoundingMode::TowardZero:
         {
             using divInplaceCScale =
-                InplaceConstantScaleFunctor<1, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardZero>;
-            const opp::Div<ComputeT> op;
+                InplaceConstantScaleFunctor<1, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::TowardZero>;
+            const opp::Div<ComputeT, T> op;
             const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(*this, functor);
         }
         break;
         case opp::RoundingMode::TowardNegativeInfinity:
         {
-            using divInplaceCScale =
-                InplaceConstantScaleFunctor<1, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardNegativeInfinity>;
-            const opp::Div<ComputeT> op;
+            using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, opp::Div<ComputeT, T>,
+                                                                 RoundingMode::TowardNegativeInfinity>;
+            const opp::Div<ComputeT, T> op;
             const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(*this, functor);
         }
         break;
         case opp::RoundingMode::TowardPositiveInfinity:
         {
-            using divInplaceCScale =
-                InplaceConstantScaleFunctor<1, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardPositiveInfinity>;
-            const opp::Div<ComputeT> op;
+            using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, opp::Div<ComputeT, T>,
+                                                                 RoundingMode::TowardPositiveInfinity>;
+            const opp::Div<ComputeT, T> op;
             const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(*this, functor);
         }
@@ -1593,9 +1591,9 @@ ImageView<T> &ImageView<T>::DivInv(const ImageView<T> &aSrc2)
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT>, RoundingMode::None>;
+    using divInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT, T>, RoundingMode::None>;
 
-    const opp::DivInv<ComputeT> op;
+    const opp::DivInv<ComputeT, T> op;
     const divInplaceSrc functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
     forEachPixel(*this, functor);
@@ -1617,17 +1615,17 @@ ImageView<T> &ImageView<T>::DivInv(const ImageView<T> &aSrc2, int aScaleFactor, 
         case opp::RoundingMode::NearestTiesToEven:
         {
             using divInplaceSrcScale =
-                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT>, RoundingMode::NearestTiesToEven>;
-            const opp::DivInv<ComputeT> op;
+                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT, T>, RoundingMode::NearestTiesToEven>;
+            const opp::DivInv<ComputeT, T> op;
             const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
             forEachPixel(*this, functor);
         }
         break;
         case opp::RoundingMode::NearestTiesAwayFromZero:
         {
-            using divInplaceSrcScale =
-                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
-            const opp::DivInv<ComputeT> op;
+            using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT, T>,
+                                                              RoundingMode::NearestTiesAwayFromZero>;
+            const opp::DivInv<ComputeT, T> op;
             const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
             forEachPixel(*this, functor);
         }
@@ -1635,26 +1633,26 @@ ImageView<T> &ImageView<T>::DivInv(const ImageView<T> &aSrc2, int aScaleFactor, 
         case opp::RoundingMode::TowardZero:
         {
             using divInplaceSrcScale =
-                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT>, RoundingMode::TowardZero>;
-            const opp::DivInv<ComputeT> op;
+                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT, T>, RoundingMode::TowardZero>;
+            const opp::DivInv<ComputeT, T> op;
             const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
             forEachPixel(*this, functor);
         }
         break;
         case opp::RoundingMode::TowardNegativeInfinity:
         {
-            using divInplaceSrcScale =
-                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT>, RoundingMode::TowardNegativeInfinity>;
-            const opp::DivInv<ComputeT> op;
+            using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT, T>,
+                                                              RoundingMode::TowardNegativeInfinity>;
+            const opp::DivInv<ComputeT, T> op;
             const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
             forEachPixel(*this, functor);
         }
         break;
         case opp::RoundingMode::TowardPositiveInfinity:
         {
-            using divInplaceSrcScale =
-                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT>, RoundingMode::TowardPositiveInfinity>;
-            const opp::DivInv<ComputeT> op;
+            using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT, T>,
+                                                              RoundingMode::TowardPositiveInfinity>;
+            const opp::DivInv<ComputeT, T> op;
             const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
             forEachPixel(*this, functor);
         }
@@ -1672,9 +1670,9 @@ ImageView<T> &ImageView<T>::DivInv(const T &aConst)
 {
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divInplaceC = InplaceConstantFunctor<1, ComputeT, T, opp::DivInv<ComputeT>, RoundingMode::None>;
+    using divInplaceC = InplaceConstantFunctor<1, ComputeT, T, opp::DivInv<ComputeT, T>, RoundingMode::None>;
 
-    const opp::DivInv<ComputeT> op;
+    const opp::DivInv<ComputeT, T> op;
     const divInplaceC functor(static_cast<ComputeT>(aConst), op);
 
     forEachPixel(*this, functor);
@@ -1694,17 +1692,17 @@ ImageView<T> &ImageView<T>::DivInv(const T &aConst, int aScaleFactor, RoundingMo
         case opp::RoundingMode::NearestTiesToEven:
         {
             using divInplaceCScale =
-                InplaceConstantScaleFunctor<1, ComputeT, T, opp::DivInv<ComputeT>, RoundingMode::NearestTiesToEven>;
-            const opp::DivInv<ComputeT> op;
+                InplaceConstantScaleFunctor<1, ComputeT, T, opp::DivInv<ComputeT, T>, RoundingMode::NearestTiesToEven>;
+            const opp::DivInv<ComputeT, T> op;
             const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(*this, functor);
         }
         break;
         case opp::RoundingMode::NearestTiesAwayFromZero:
         {
-            using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, opp::DivInv<ComputeT>,
+            using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, opp::DivInv<ComputeT, T>,
                                                                  RoundingMode::NearestTiesAwayFromZero>;
-            const opp::DivInv<ComputeT> op;
+            const opp::DivInv<ComputeT, T> op;
             const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(*this, functor);
         }
@@ -1712,26 +1710,26 @@ ImageView<T> &ImageView<T>::DivInv(const T &aConst, int aScaleFactor, RoundingMo
         case opp::RoundingMode::TowardZero:
         {
             using divInplaceCScale =
-                InplaceConstantScaleFunctor<1, ComputeT, T, opp::DivInv<ComputeT>, RoundingMode::TowardZero>;
-            const opp::DivInv<ComputeT> op;
+                InplaceConstantScaleFunctor<1, ComputeT, T, opp::DivInv<ComputeT, T>, RoundingMode::TowardZero>;
+            const opp::DivInv<ComputeT, T> op;
             const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(*this, functor);
         }
         break;
         case opp::RoundingMode::TowardNegativeInfinity:
         {
-            using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, opp::DivInv<ComputeT>,
+            using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, opp::DivInv<ComputeT, T>,
                                                                  RoundingMode::TowardNegativeInfinity>;
-            const opp::DivInv<ComputeT> op;
+            const opp::DivInv<ComputeT, T> op;
             const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(*this, functor);
         }
         break;
         case opp::RoundingMode::TowardPositiveInfinity:
         {
-            using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, opp::DivInv<ComputeT>,
+            using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, opp::DivInv<ComputeT, T>,
                                                                  RoundingMode::TowardPositiveInfinity>;
-            const opp::DivInv<ComputeT> op;
+            const opp::DivInv<ComputeT, T> op;
             const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(*this, functor);
         }
@@ -1751,9 +1749,9 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, c
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divSrcSrc = SrcSrcFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::None>;
+    using divSrcSrc = SrcSrcFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::None>;
 
-    const opp::Div<ComputeT> op;
+    const opp::Div<ComputeT, T> op;
     const divSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
     forEachPixel(aMask, aDst, functor);
@@ -1777,8 +1775,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, c
         case opp::RoundingMode::NearestTiesToEven:
         {
             using divSrcSrcScale =
-                SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::NearestTiesToEven>;
-            const opp::Div<ComputeT> op;
+                SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::NearestTiesToEven>;
+            const opp::Div<ComputeT, T> op;
             const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op,
                                          scaleFactorFloat);
             forEachPixel(aMask, aDst, functor);
@@ -1787,8 +1785,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, c
         case opp::RoundingMode::NearestTiesAwayFromZero:
         {
             using divSrcSrcScale =
-                SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
-            const opp::Div<ComputeT> op;
+                SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::NearestTiesAwayFromZero>;
+            const opp::Div<ComputeT, T> op;
             const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op,
                                          scaleFactorFloat);
             forEachPixel(aMask, aDst, functor);
@@ -1796,8 +1794,9 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, c
         break;
         case opp::RoundingMode::TowardZero:
         {
-            using divSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardZero>;
-            const opp::Div<ComputeT> op;
+            using divSrcSrcScale =
+                SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::TowardZero>;
+            const opp::Div<ComputeT, T> op;
             const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op,
                                          scaleFactorFloat);
             forEachPixel(aMask, aDst, functor);
@@ -1806,8 +1805,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, c
         case opp::RoundingMode::TowardNegativeInfinity:
         {
             using divSrcSrcScale =
-                SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardNegativeInfinity>;
-            const opp::Div<ComputeT> op;
+                SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::TowardNegativeInfinity>;
+            const opp::Div<ComputeT, T> op;
             const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op,
                                          scaleFactorFloat);
             forEachPixel(aMask, aDst, functor);
@@ -1816,8 +1815,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, c
         case opp::RoundingMode::TowardPositiveInfinity:
         {
             using divSrcSrcScale =
-                SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardPositiveInfinity>;
-            const opp::Div<ComputeT> op;
+                SrcSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::TowardPositiveInfinity>;
+            const opp::Div<ComputeT, T> op;
             const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op,
                                          scaleFactorFloat);
             forEachPixel(aMask, aDst, functor);
@@ -1837,9 +1836,9 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, const Image
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divSrcC = SrcConstantFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::None>;
+    using divSrcC = SrcConstantFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::None>;
 
-    const opp::Div<ComputeT> op;
+    const opp::Div<ComputeT, T> op;
     const divSrcC functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op);
 
     forEachPixel(aMask, aDst, functor);
@@ -1862,17 +1861,17 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, const Image
         case opp::RoundingMode::NearestTiesToEven:
         {
             using divSrcCScale =
-                SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::NearestTiesToEven>;
-            const opp::Div<ComputeT> op;
+                SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::NearestTiesToEven>;
+            const opp::Div<ComputeT, T> op;
             const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(aMask, aDst, functor);
         }
         break;
         case opp::RoundingMode::NearestTiesAwayFromZero:
         {
-            using divSrcCScale =
-                SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
-            const opp::Div<ComputeT> op;
+            using divSrcCScale = SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>,
+                                                         RoundingMode::NearestTiesAwayFromZero>;
+            const opp::Div<ComputeT, T> op;
             const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(aMask, aDst, functor);
         }
@@ -1880,8 +1879,8 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, const Image
         case opp::RoundingMode::TowardZero:
         {
             using divSrcCScale =
-                SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardZero>;
-            const opp::Div<ComputeT> op;
+                SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::TowardZero>;
+            const opp::Div<ComputeT, T> op;
             const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(aMask, aDst, functor);
         }
@@ -1889,8 +1888,8 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, const Image
         case opp::RoundingMode::TowardNegativeInfinity:
         {
             using divSrcCScale =
-                SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardNegativeInfinity>;
-            const opp::Div<ComputeT> op;
+                SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::TowardNegativeInfinity>;
+            const opp::Div<ComputeT, T> op;
             const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(aMask, aDst, functor);
         }
@@ -1898,8 +1897,8 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, const Image
         case opp::RoundingMode::TowardPositiveInfinity:
         {
             using divSrcCScale =
-                SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardPositiveInfinity>;
-            const opp::Div<ComputeT> op;
+                SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::TowardPositiveInfinity>;
+            const opp::Div<ComputeT, T> op;
             const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(aMask, aDst, functor);
         }
@@ -1918,9 +1917,9 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, const ImageView<Pixel
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::None>;
+    using divInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::None>;
 
-    const opp::Div<ComputeT> op;
+    const opp::Div<ComputeT, T> op;
     const divInplaceSrc functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
     forEachPixel(aMask, *this, functor);
@@ -1943,8 +1942,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, const ImageView<Pixel
         case opp::RoundingMode::NearestTiesToEven:
         {
             using divInplaceSrcScale =
-                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::NearestTiesToEven>;
-            const opp::Div<ComputeT> op;
+                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::NearestTiesToEven>;
+            const opp::Div<ComputeT, T> op;
             const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
             forEachPixel(aMask, *this, functor);
         }
@@ -1952,8 +1951,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, const ImageView<Pixel
         case opp::RoundingMode::NearestTiesAwayFromZero:
         {
             using divInplaceSrcScale =
-                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
-            const opp::Div<ComputeT> op;
+                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::NearestTiesAwayFromZero>;
+            const opp::Div<ComputeT, T> op;
             const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
             forEachPixel(aMask, *this, functor);
         }
@@ -1961,8 +1960,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, const ImageView<Pixel
         case opp::RoundingMode::TowardZero:
         {
             using divInplaceSrcScale =
-                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardZero>;
-            const opp::Div<ComputeT> op;
+                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::TowardZero>;
+            const opp::Div<ComputeT, T> op;
             const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
             forEachPixel(aMask, *this, functor);
         }
@@ -1970,8 +1969,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, const ImageView<Pixel
         case opp::RoundingMode::TowardNegativeInfinity:
         {
             using divInplaceSrcScale =
-                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardNegativeInfinity>;
-            const opp::Div<ComputeT> op;
+                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::TowardNegativeInfinity>;
+            const opp::Div<ComputeT, T> op;
             const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
             forEachPixel(aMask, *this, functor);
         }
@@ -1979,8 +1978,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, const ImageView<Pixel
         case opp::RoundingMode::TowardPositiveInfinity:
         {
             using divInplaceSrcScale =
-                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardPositiveInfinity>;
-            const opp::Div<ComputeT> op;
+                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::TowardPositiveInfinity>;
+            const opp::Div<ComputeT, T> op;
             const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
             forEachPixel(aMask, *this, functor);
         }
@@ -1997,9 +1996,9 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, const ImageView<Pixel8uC1> &aMa
 {
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divInplaceC = InplaceConstantFunctor<1, ComputeT, T, opp::Div<ComputeT>, RoundingMode::None>;
+    using divInplaceC = InplaceConstantFunctor<1, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::None>;
 
-    const opp::Div<ComputeT> op;
+    const opp::Div<ComputeT, T> op;
     const divInplaceC functor(static_cast<ComputeT>(aConst), op);
 
     forEachPixel(aMask, *this, functor);
@@ -2020,17 +2019,17 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, const ImageView<Pixel8uC1> &aMa
         case opp::RoundingMode::NearestTiesToEven:
         {
             using divInplaceCScale =
-                InplaceConstantScaleFunctor<1, ComputeT, T, opp::Div<ComputeT>, RoundingMode::NearestTiesToEven>;
-            const opp::Div<ComputeT> op;
+                InplaceConstantScaleFunctor<1, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::NearestTiesToEven>;
+            const opp::Div<ComputeT, T> op;
             const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(aMask, *this, functor);
         }
         break;
         case opp::RoundingMode::NearestTiesAwayFromZero:
         {
-            using divInplaceCScale =
-                InplaceConstantScaleFunctor<1, ComputeT, T, opp::Div<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
-            const opp::Div<ComputeT> op;
+            using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, opp::Div<ComputeT, T>,
+                                                                 RoundingMode::NearestTiesAwayFromZero>;
+            const opp::Div<ComputeT, T> op;
             const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(aMask, *this, functor);
         }
@@ -2038,26 +2037,26 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, const ImageView<Pixel8uC1> &aMa
         case opp::RoundingMode::TowardZero:
         {
             using divInplaceCScale =
-                InplaceConstantScaleFunctor<1, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardZero>;
-            const opp::Div<ComputeT> op;
+                InplaceConstantScaleFunctor<1, ComputeT, T, opp::Div<ComputeT, T>, RoundingMode::TowardZero>;
+            const opp::Div<ComputeT, T> op;
             const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(aMask, *this, functor);
         }
         break;
         case opp::RoundingMode::TowardNegativeInfinity:
         {
-            using divInplaceCScale =
-                InplaceConstantScaleFunctor<1, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardNegativeInfinity>;
-            const opp::Div<ComputeT> op;
+            using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, opp::Div<ComputeT, T>,
+                                                                 RoundingMode::TowardNegativeInfinity>;
+            const opp::Div<ComputeT, T> op;
             const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(aMask, *this, functor);
         }
         break;
         case opp::RoundingMode::TowardPositiveInfinity:
         {
-            using divInplaceCScale =
-                InplaceConstantScaleFunctor<1, ComputeT, T, opp::Div<ComputeT>, RoundingMode::TowardPositiveInfinity>;
-            const opp::Div<ComputeT> op;
+            using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, opp::Div<ComputeT, T>,
+                                                                 RoundingMode::TowardPositiveInfinity>;
+            const opp::Div<ComputeT, T> op;
             const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(aMask, *this, functor);
         }
@@ -2076,9 +2075,9 @@ ImageView<T> &ImageView<T>::DivInv(const ImageView<T> &aSrc2, const ImageView<Pi
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT>, RoundingMode::None>;
+    using divInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT, T>, RoundingMode::None>;
 
-    const opp::DivInv<ComputeT> op;
+    const opp::DivInv<ComputeT, T> op;
     const divInplaceSrc functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
     forEachPixel(aMask, *this, functor);
@@ -2101,17 +2100,17 @@ ImageView<T> &ImageView<T>::DivInv(const ImageView<T> &aSrc2, const ImageView<Pi
         case opp::RoundingMode::NearestTiesToEven:
         {
             using divInplaceSrcScale =
-                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT>, RoundingMode::NearestTiesToEven>;
-            const opp::DivInv<ComputeT> op;
+                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT, T>, RoundingMode::NearestTiesToEven>;
+            const opp::DivInv<ComputeT, T> op;
             const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
             forEachPixel(aMask, *this, functor);
         }
         break;
         case opp::RoundingMode::NearestTiesAwayFromZero:
         {
-            using divInplaceSrcScale =
-                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
-            const opp::DivInv<ComputeT> op;
+            using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT, T>,
+                                                              RoundingMode::NearestTiesAwayFromZero>;
+            const opp::DivInv<ComputeT, T> op;
             const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
             forEachPixel(aMask, *this, functor);
         }
@@ -2119,26 +2118,26 @@ ImageView<T> &ImageView<T>::DivInv(const ImageView<T> &aSrc2, const ImageView<Pi
         case opp::RoundingMode::TowardZero:
         {
             using divInplaceSrcScale =
-                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT>, RoundingMode::TowardZero>;
-            const opp::DivInv<ComputeT> op;
+                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT, T>, RoundingMode::TowardZero>;
+            const opp::DivInv<ComputeT, T> op;
             const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
             forEachPixel(aMask, *this, functor);
         }
         break;
         case opp::RoundingMode::TowardNegativeInfinity:
         {
-            using divInplaceSrcScale =
-                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT>, RoundingMode::TowardNegativeInfinity>;
-            const opp::DivInv<ComputeT> op;
+            using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT, T>,
+                                                              RoundingMode::TowardNegativeInfinity>;
+            const opp::DivInv<ComputeT, T> op;
             const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
             forEachPixel(aMask, *this, functor);
         }
         break;
         case opp::RoundingMode::TowardPositiveInfinity:
         {
-            using divInplaceSrcScale =
-                InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT>, RoundingMode::TowardPositiveInfinity>;
-            const opp::DivInv<ComputeT> op;
+            using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, opp::DivInv<ComputeT, T>,
+                                                              RoundingMode::TowardPositiveInfinity>;
+            const opp::DivInv<ComputeT, T> op;
             const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaleFactorFloat);
             forEachPixel(aMask, *this, functor);
         }
@@ -2156,9 +2155,9 @@ ImageView<T> &ImageView<T>::DivInv(const T &aConst, const ImageView<Pixel8uC1> &
     using ComputeT = default_compute_type_for_t<T>;
 
     // set to roundingmode NONE, because Div cannot produce non-integers in computations with ints:
-    using divInplaceC = InplaceConstantFunctor<1, ComputeT, T, opp::DivInv<ComputeT>, RoundingMode::None>;
+    using divInplaceC = InplaceConstantFunctor<1, ComputeT, T, opp::DivInv<ComputeT, T>, RoundingMode::None>;
 
-    const opp::DivInv<ComputeT> op;
+    const opp::DivInv<ComputeT, T> op;
     const divInplaceC functor(static_cast<ComputeT>(aConst), op);
 
     forEachPixel(aMask, *this, functor);
@@ -2179,17 +2178,17 @@ ImageView<T> &ImageView<T>::DivInv(const T &aConst, const ImageView<Pixel8uC1> &
         case opp::RoundingMode::NearestTiesToEven:
         {
             using divInplaceCScale =
-                InplaceConstantScaleFunctor<1, ComputeT, T, opp::DivInv<ComputeT>, RoundingMode::NearestTiesToEven>;
-            const opp::DivInv<ComputeT> op;
+                InplaceConstantScaleFunctor<1, ComputeT, T, opp::DivInv<ComputeT, T>, RoundingMode::NearestTiesToEven>;
+            const opp::DivInv<ComputeT, T> op;
             const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(aMask, *this, functor);
         }
         break;
         case opp::RoundingMode::NearestTiesAwayFromZero:
         {
-            using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, opp::DivInv<ComputeT>,
+            using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, opp::DivInv<ComputeT, T>,
                                                                  RoundingMode::NearestTiesAwayFromZero>;
-            const opp::DivInv<ComputeT> op;
+            const opp::DivInv<ComputeT, T> op;
             const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(aMask, *this, functor);
         }
@@ -2197,26 +2196,26 @@ ImageView<T> &ImageView<T>::DivInv(const T &aConst, const ImageView<Pixel8uC1> &
         case opp::RoundingMode::TowardZero:
         {
             using divInplaceCScale =
-                InplaceConstantScaleFunctor<1, ComputeT, T, opp::DivInv<ComputeT>, RoundingMode::TowardZero>;
-            const opp::DivInv<ComputeT> op;
+                InplaceConstantScaleFunctor<1, ComputeT, T, opp::DivInv<ComputeT, T>, RoundingMode::TowardZero>;
+            const opp::DivInv<ComputeT, T> op;
             const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(aMask, *this, functor);
         }
         break;
         case opp::RoundingMode::TowardNegativeInfinity:
         {
-            using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, opp::DivInv<ComputeT>,
+            using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, opp::DivInv<ComputeT, T>,
                                                                  RoundingMode::TowardNegativeInfinity>;
-            const opp::DivInv<ComputeT> op;
+            const opp::DivInv<ComputeT, T> op;
             const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(aMask, *this, functor);
         }
         break;
         case opp::RoundingMode::TowardPositiveInfinity:
         {
-            using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, opp::DivInv<ComputeT>,
+            using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, opp::DivInv<ComputeT, T>,
                                                                  RoundingMode::TowardPositiveInfinity>;
-            const opp::DivInv<ComputeT> op;
+            const opp::DivInv<ComputeT, T> op;
             const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaleFactorFloat);
             forEachPixel(aMask, *this, functor);
         }
@@ -2225,6 +2224,167 @@ ImageView<T> &ImageView<T>::DivInv(const T &aConst, const ImageView<Pixel8uC1> &
             throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
     }
     return *this;
+}
+#pragma endregion
+
+#pragma region AddSquare
+template <PixelType T>
+ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddSquare(ImageView<add_spw_output_for_t<T>> &aSrcDst)
+{
+    checkSameSize(ROI(), aSrcDst.ROI());
+
+    using addSqrInplaceSrc = InplaceSrcFunctor<1, T, add_spw_output_for_t<T>, add_spw_output_for_t<T>,
+                                               opp::AddSqr<add_spw_output_for_t<T>>, RoundingMode::None>;
+
+    const opp::AddSqr<add_spw_output_for_t<T>> op;
+
+    const addSqrInplaceSrc functor(PointerRoi(), Pitch(), op);
+
+    forEachPixel(aSrcDst, functor);
+
+    return aSrcDst;
+}
+
+template <PixelType T>
+ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddSquare(ImageView<add_spw_output_for_t<T>> &aSrcDst,
+                                                            const ImageView<Pixel8uC1> &aMask)
+{
+    checkSameSize(ROI(), aSrcDst.ROI());
+    checkSameSize(ROI(), aMask.ROI());
+
+    using addSqrInplaceSrc = InplaceSrcFunctor<1, T, add_spw_output_for_t<T>, add_spw_output_for_t<T>,
+                                               opp::AddSqr<add_spw_output_for_t<T>>, RoundingMode::None>;
+
+    const opp::AddSqr<add_spw_output_for_t<T>> op;
+
+    const addSqrInplaceSrc functor(PointerRoi(), Pitch(), op);
+
+    forEachPixel(aMask, aSrcDst, functor);
+
+    return aSrcDst;
+}
+#pragma endregion
+
+#pragma region AddProduct
+template <PixelType T>
+ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddProduct(const ImageView<T> &aSrc2,
+                                                             ImageView<add_spw_output_for_t<T>> &aSrcDst)
+{
+    checkSameSize(ROI(), aSrc2.ROI());
+    checkSameSize(ROI(), aSrcDst.ROI());
+
+    using addProductInplaceSrcSrc = InplaceSrcSrcFunctor<1, T, add_spw_output_for_t<T>, add_spw_output_for_t<T>,
+                                                         opp::AddProduct<add_spw_output_for_t<T>>, RoundingMode::None>;
+
+    const opp::AddProduct<add_spw_output_for_t<T>> op;
+
+    const addProductInplaceSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
+
+    forEachPixel(aSrcDst, functor);
+
+    return aSrcDst;
+}
+
+template <PixelType T>
+ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddProduct(const ImageView<T> &aSrc2,
+                                                             ImageView<add_spw_output_for_t<T>> &aSrcDst,
+                                                             const ImageView<Pixel8uC1> &aMask)
+{
+    checkSameSize(ROI(), aSrc2.ROI());
+    checkSameSize(ROI(), aSrcDst.ROI());
+    checkSameSize(ROI(), aMask.ROI());
+
+    using addProductInplaceSrcSrc = InplaceSrcSrcFunctor<1, T, add_spw_output_for_t<T>, add_spw_output_for_t<T>,
+                                                         opp::AddProduct<add_spw_output_for_t<T>>, RoundingMode::None>;
+
+    const opp::AddProduct<add_spw_output_for_t<T>> op;
+
+    const addProductInplaceSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
+
+    forEachPixel(aMask, aSrcDst, functor);
+
+    return aSrcDst;
+}
+#pragma endregion
+
+#pragma region AddWeighted
+template <PixelType T>
+ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddWeighted(const ImageView<T> &aSrc2,
+                                                              ImageView<add_spw_output_for_t<T>> &aDst,
+                                                              remove_vector_t<add_spw_output_for_t<T>> aAlpha)
+{
+    checkSameSize(ROI(), aSrc2.ROI());
+    checkSameSize(ROI(), aDst.ROI());
+
+    using addWeightedSrcSrc = SrcSrcFunctor<1, T, add_spw_output_for_t<T>, add_spw_output_for_t<T>,
+                                            opp::AddWeighted<add_spw_output_for_t<T>>, RoundingMode::None>;
+
+    const opp::AddWeighted<add_spw_output_for_t<T>> op(aAlpha);
+
+    const addWeightedSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
+
+    forEachPixel(aDst, functor);
+
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddWeighted(const ImageView<T> &aSrc2,
+                                                              ImageView<add_spw_output_for_t<T>> &aDst,
+                                                              remove_vector_t<add_spw_output_for_t<T>> aAlpha,
+                                                              const ImageView<Pixel8uC1> &aMask)
+{
+    checkSameSize(ROI(), aSrc2.ROI());
+    checkSameSize(ROI(), aDst.ROI());
+    checkSameSize(ROI(), aMask.ROI());
+
+    using addWeightedSrcSrc = SrcSrcFunctor<1, T, add_spw_output_for_t<T>, add_spw_output_for_t<T>,
+                                            opp::AddWeighted<add_spw_output_for_t<T>>, RoundingMode::None>;
+
+    const opp::AddWeighted<add_spw_output_for_t<T>> op(aAlpha);
+
+    const addWeightedSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
+
+    forEachPixel(aMask, aDst, functor);
+
+    return aDst;
+}
+template <PixelType T>
+ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddWeighted(ImageView<add_spw_output_for_t<T>> &aSrcDst,
+                                                              remove_vector_t<add_spw_output_for_t<T>> aAlpha)
+{
+    checkSameSize(ROI(), aSrcDst.ROI());
+
+    using addWeightedInplaceSrc = InplaceSrcFunctor<1, T, add_spw_output_for_t<T>, add_spw_output_for_t<T>,
+                                                    opp::AddWeighted<add_spw_output_for_t<T>>, RoundingMode::None>;
+
+    const opp::AddWeighted<add_spw_output_for_t<T>> op(aAlpha);
+
+    const addWeightedInplaceSrc functor(PointerRoi(), Pitch(), op);
+
+    forEachPixel(aSrcDst, functor);
+
+    return aSrcDst;
+}
+
+template <PixelType T>
+ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddWeighted(ImageView<add_spw_output_for_t<T>> &aSrcDst,
+                                                              remove_vector_t<add_spw_output_for_t<T>> aAlpha,
+                                                              const ImageView<Pixel8uC1> &aMask)
+{
+    checkSameSize(ROI(), aSrcDst.ROI());
+    checkSameSize(ROI(), aMask.ROI());
+
+    using addWeightedInplaceSrc = InplaceSrcFunctor<1, T, add_spw_output_for_t<T>, add_spw_output_for_t<T>,
+                                                    opp::AddWeighted<add_spw_output_for_t<T>>, RoundingMode::None>;
+
+    const opp::AddWeighted<add_spw_output_for_t<T>> op(aAlpha);
+
+    const addWeightedInplaceSrc functor(PointerRoi(), Pitch(), op);
+
+    forEachPixel(aMask, aSrcDst, functor);
+
+    return aSrcDst;
 }
 #pragma endregion
 
@@ -2436,7 +2596,7 @@ ImageView<T> &ImageView<T>::Exp(ImageView<T> &aDst)
     checkSameSize(ROI(), aDst.ROI());
     using ComputeT = default_compute_type_for_t<T>;
 
-    using expSrc = SrcFunctor<1, T, ComputeT, T, opp::Exp<ComputeT>, RoundingMode::None>;
+    using expSrc = SrcFunctor<1, T, ComputeT, T, opp::Exp<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Exp<ComputeT> op;
     const expSrc functor(PointerRoi(), Pitch(), op);
@@ -2451,7 +2611,7 @@ ImageView<T> &ImageView<T>::Exp()
 {
     using ComputeT = default_compute_type_for_t<T>;
 
-    using expInplace = InplaceFunctor<1, ComputeT, T, opp::Exp<ComputeT>, RoundingMode::None>;
+    using expInplace = InplaceFunctor<1, ComputeT, T, opp::Exp<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Exp<ComputeT> op;
     const expInplace functor(op);
@@ -2468,7 +2628,7 @@ ImageView<T> &ImageView<T>::Ln(ImageView<T> &aDst)
     checkSameSize(ROI(), aDst.ROI());
     using ComputeT = default_compute_type_for_t<T>;
 
-    using lnSrc = SrcFunctor<1, T, ComputeT, T, opp::Ln<ComputeT>, RoundingMode::None>;
+    using lnSrc = SrcFunctor<1, T, ComputeT, T, opp::Ln<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Ln<ComputeT> op;
     const lnSrc functor(PointerRoi(), Pitch(), op);
@@ -2483,7 +2643,7 @@ ImageView<T> &ImageView<T>::Ln()
 {
     using ComputeT = default_compute_type_for_t<T>;
 
-    using lnInplace = InplaceFunctor<1, ComputeT, T, opp::Ln<ComputeT>, RoundingMode::None>;
+    using lnInplace = InplaceFunctor<1, ComputeT, T, opp::Ln<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Ln<ComputeT> op;
     const lnInplace functor(op);
@@ -2633,7 +2793,7 @@ ImageView<T> &ImageView<T>::Sqrt(ImageView<T> &aDst)
     checkSameSize(ROI(), aDst.ROI());
     using ComputeT = default_compute_type_for_t<T>;
 
-    using sqrtSrc = SrcFunctor<1, T, ComputeT, T, opp::Sqrt<ComputeT>, RoundingMode::None>;
+    using sqrtSrc = SrcFunctor<1, T, ComputeT, T, opp::Sqrt<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Sqrt<ComputeT> op;
     const sqrtSrc functor(PointerRoi(), Pitch(), op);
@@ -2648,7 +2808,7 @@ ImageView<T> &ImageView<T>::Sqrt()
 {
     using ComputeT = default_compute_type_for_t<T>;
 
-    using sqrtInplace = InplaceFunctor<1, ComputeT, T, opp::Sqrt<ComputeT>, RoundingMode::None>;
+    using sqrtInplace = InplaceFunctor<1, ComputeT, T, opp::Sqrt<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Sqrt<ComputeT> op;
     const sqrtInplace functor(op);
@@ -2762,22 +2922,15 @@ ImageView<T> &ImageView<T>::Xor(const T &aConst)
 #pragma region AlphaPremul
 template <PixelType T>
 ImageView<T> &ImageView<T>::AlphaPremul(ImageView<T> &aDst)
-    requires FourChannelNoAlpha<T>
+    requires FourChannelNoAlpha<T> && RealVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
 
     using ComputeT = default_compute_type_for_t<T>;
     using alphaPremulSrc =
-        SrcFunctor<1, T, ComputeT, T, opp::AlphaPremul<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        SrcFunctor<1, T, ComputeT, T, opp::AlphaPremul<ComputeT, T>, RoundingMode::NearestTiesToEven>;
 
-    // NOLINTNEXTLINE(misc-const-correctness)
-    remove_vector_t<ComputeT> alphaScaleVal = static_cast<remove_vector_t<ComputeT>>(1);
-    if constexpr (RealIntVector<T>)
-    {
-        alphaScaleVal = static_cast<remove_vector_t<ComputeT>>(numeric_limits<remove_vector_t<T>>::max());
-    }
-
-    const opp::AlphaPremul<ComputeT> op(alphaScaleVal);
+    const opp::AlphaPremul<ComputeT, T> op;
 
     const alphaPremulSrc functor(PointerRoi(), Pitch(), op);
     forEachPixel(aDst, functor);
@@ -2787,20 +2940,13 @@ ImageView<T> &ImageView<T>::AlphaPremul(ImageView<T> &aDst)
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::AlphaPremul()
-    requires FourChannelNoAlpha<T>
+    requires FourChannelNoAlpha<T> && RealVector<T>
 {
     using ComputeT = default_compute_type_for_t<T>;
     using alphaPremulInplace =
-        InplaceFunctor<1, ComputeT, T, opp::AlphaPremul<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceFunctor<1, ComputeT, T, opp::AlphaPremul<ComputeT, T>, RoundingMode::NearestTiesToEven>;
 
-    // NOLINTNEXTLINE(misc-const-correctness)
-    remove_vector_t<ComputeT> alphaScaleVal = static_cast<remove_vector_t<ComputeT>>(1);
-    if constexpr (RealIntVector<T>)
-    {
-        alphaScaleVal = static_cast<remove_vector_t<ComputeT>>(numeric_limits<remove_vector_t<T>>::max());
-    }
-
-    const opp::AlphaPremul<ComputeT> op(alphaScaleVal);
+    const opp::AlphaPremul<ComputeT, T> op;
 
     const alphaPremulInplace functor(op);
     forEachPixel(*this, functor);
@@ -2810,7 +2956,7 @@ ImageView<T> &ImageView<T>::AlphaPremul()
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst)
-    requires RealFloatingVector<T>
+    requires RealFloatingVector<T> && (!FourChannelAlpha<T>)
 {
     checkSameSize(ROI(), aDst.ROI());
 
@@ -2828,7 +2974,7 @@ ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> 
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst)
-    requires RealIntVector<T>
+    requires RealIntVector<T> && (!FourChannelAlpha<T>)
 {
     checkSameSize(ROI(), aDst.ROI());
 
@@ -2837,7 +2983,7 @@ ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> 
     const float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
 
     using mulSrcCScale =
-        SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        SrcConstantScaleFunctor<1, T, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Mul<ComputeT> op;
     const mulSrcCScale functor(PointerRoi(), Pitch(), alphaVec, op, scaleFactorFloat);
@@ -2848,7 +2994,7 @@ ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> 
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha)
-    requires RealFloatingVector<T>
+    requires RealFloatingVector<T> && (!FourChannelAlpha<T>)
 {
     using ComputeT = default_compute_type_for_t<T>;
     const T alphaVec(aAlpha);
@@ -2864,19 +3010,59 @@ ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha)
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha)
-    requires RealIntVector<T>
+    requires RealIntVector<T> && (!FourChannelAlpha<T>)
 {
     using ComputeT = default_compute_type_for_t<T>;
     const T alphaVec(aAlpha);
     const float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
 
     using mulInplaceCScale =
-        InplaceConstantScaleFunctor<1, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        InplaceConstantScaleFunctor<1, ComputeT, T, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Mul<ComputeT> op;
     const mulInplaceCScale functor(alphaVec, op, scaleFactorFloat);
 
     forEachPixel(*this, functor);
+    return *this;
+}
+
+template <PixelType T>
+ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst)
+    requires FourChannelAlpha<T>
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    // use non-alpha Vector4 in order to correctly treat the setted alpha value:
+    using ComputeT = Vector4<remove_vector_t<default_compute_type_for_t<T>>>;
+    using SrcT     = Vector4<remove_vector_t<T>>;
+    using alphaPremulACSrc =
+        SrcFunctor<1, SrcT, ComputeT, SrcT, opp::AlphaPremulAC<ComputeT, SrcT>, RoundingMode::NearestTiesToEven>;
+
+    const opp::AlphaPremulAC<ComputeT, SrcT> op(aAlpha);
+
+    const alphaPremulACSrc functor(reinterpret_cast<SrcT *>(PointerRoi()), Pitch(), op);
+    ImageView<SrcT> aDstNoAlpha = aDst;
+    forEachPixel(aDstNoAlpha, functor);
+
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha)
+    requires FourChannelAlpha<T>
+{
+    // use non-alpha Vector4 in order to correctly treat the setted alpha value:
+    using ComputeT = Vector4<remove_vector_t<default_compute_type_for_t<T>>>;
+    using SrcT     = Vector4<remove_vector_t<T>>;
+    using alphaPremulACInplace =
+        InplaceFunctor<1, ComputeT, SrcT, opp::AlphaPremulAC<ComputeT, SrcT>, RoundingMode::NearestTiesToEven>;
+
+    const opp::AlphaPremulAC<ComputeT, SrcT> op(aAlpha);
+
+    const alphaPremulACInplace functor(op);
+    ImageView<SrcT> aDstNoAlpha = *this;
+    forEachPixel(aDstNoAlpha, functor);
+
     return *this;
 }
 #pragma endregion
@@ -2908,7 +3094,7 @@ ImageView<T> &ImageView<T>::AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &a
                 using AlphaCompOp = opp::AlphaCompositionScale<ComputeT, alphaScaleVal, alphaScaleValInv,
                                                                opp::AlphaCompositionOp::Over>;
                 using alphaCompSrcSrc =
-                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesAwayFromZero>;
+                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesToEven>;
                 const AlphaCompOp op;
                 const alphaCompSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
                 forEachPixel(aDst, functor);
@@ -2919,7 +3105,7 @@ ImageView<T> &ImageView<T>::AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &a
                 using AlphaCompOp =
                     opp::AlphaCompositionScale<ComputeT, alphaScaleVal, alphaScaleValInv, opp::AlphaCompositionOp::In>;
                 using alphaCompSrcSrc =
-                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesAwayFromZero>;
+                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesToEven>;
                 const AlphaCompOp op;
                 const alphaCompSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
                 forEachPixel(aDst, functor);
@@ -2930,7 +3116,7 @@ ImageView<T> &ImageView<T>::AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &a
                 using AlphaCompOp =
                     opp::AlphaCompositionScale<ComputeT, alphaScaleVal, alphaScaleValInv, opp::AlphaCompositionOp::Out>;
                 using alphaCompSrcSrc =
-                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesAwayFromZero>;
+                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesToEven>;
                 const AlphaCompOp op;
                 const alphaCompSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
                 forEachPixel(aDst, functor);
@@ -2941,7 +3127,7 @@ ImageView<T> &ImageView<T>::AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &a
                 using AlphaCompOp = opp::AlphaCompositionScale<ComputeT, alphaScaleVal, alphaScaleValInv,
                                                                opp::AlphaCompositionOp::ATop>;
                 using alphaCompSrcSrc =
-                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesAwayFromZero>;
+                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesToEven>;
                 const AlphaCompOp op;
                 const alphaCompSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
                 forEachPixel(aDst, functor);
@@ -2952,7 +3138,7 @@ ImageView<T> &ImageView<T>::AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &a
                 using AlphaCompOp =
                     opp::AlphaCompositionScale<ComputeT, alphaScaleVal, alphaScaleValInv, opp::AlphaCompositionOp::XOr>;
                 using alphaCompSrcSrc =
-                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesAwayFromZero>;
+                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesToEven>;
                 const AlphaCompOp op;
                 const alphaCompSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
                 forEachPixel(aDst, functor);
@@ -2963,7 +3149,7 @@ ImageView<T> &ImageView<T>::AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &a
                 using AlphaCompOp = opp::AlphaCompositionScale<ComputeT, alphaScaleVal, alphaScaleValInv,
                                                                opp::AlphaCompositionOp::Plus>;
                 using alphaCompSrcSrc =
-                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesAwayFromZero>;
+                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesToEven>;
                 const AlphaCompOp op;
                 const alphaCompSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
                 forEachPixel(aDst, functor);
@@ -2974,7 +3160,7 @@ ImageView<T> &ImageView<T>::AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &a
                 using AlphaCompOp = opp::AlphaCompositionScale<ComputeT, alphaScaleVal, alphaScaleValInv,
                                                                opp::AlphaCompositionOp::OverPremul>;
                 using alphaCompSrcSrc =
-                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesAwayFromZero>;
+                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesToEven>;
                 const AlphaCompOp op;
                 const alphaCompSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
                 forEachPixel(aDst, functor);
@@ -2985,7 +3171,7 @@ ImageView<T> &ImageView<T>::AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &a
                 using AlphaCompOp = opp::AlphaCompositionScale<ComputeT, alphaScaleVal, alphaScaleValInv,
                                                                opp::AlphaCompositionOp::InPremul>;
                 using alphaCompSrcSrc =
-                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesAwayFromZero>;
+                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesToEven>;
                 const AlphaCompOp op;
                 const alphaCompSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
                 forEachPixel(aDst, functor);
@@ -2996,7 +3182,7 @@ ImageView<T> &ImageView<T>::AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &a
                 using AlphaCompOp = opp::AlphaCompositionScale<ComputeT, alphaScaleVal, alphaScaleValInv,
                                                                opp::AlphaCompositionOp::OutPremul>;
                 using alphaCompSrcSrc =
-                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesAwayFromZero>;
+                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesToEven>;
                 const AlphaCompOp op;
                 const alphaCompSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
                 forEachPixel(aDst, functor);
@@ -3007,7 +3193,7 @@ ImageView<T> &ImageView<T>::AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &a
                 using AlphaCompOp = opp::AlphaCompositionScale<ComputeT, alphaScaleVal, alphaScaleValInv,
                                                                opp::AlphaCompositionOp::ATopPremul>;
                 using alphaCompSrcSrc =
-                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesAwayFromZero>;
+                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesToEven>;
                 const AlphaCompOp op;
                 const alphaCompSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
                 forEachPixel(aDst, functor);
@@ -3018,7 +3204,7 @@ ImageView<T> &ImageView<T>::AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &a
                 using AlphaCompOp = opp::AlphaCompositionScale<ComputeT, alphaScaleVal, alphaScaleValInv,
                                                                opp::AlphaCompositionOp::XOrPremul>;
                 using alphaCompSrcSrc =
-                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesAwayFromZero>;
+                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesToEven>;
                 const AlphaCompOp op;
                 const alphaCompSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
                 forEachPixel(aDst, functor);
@@ -3029,7 +3215,7 @@ ImageView<T> &ImageView<T>::AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &a
                 using AlphaCompOp = opp::AlphaCompositionScale<ComputeT, alphaScaleVal, alphaScaleValInv,
                                                                opp::AlphaCompositionOp::PlusPremul>;
                 using alphaCompSrcSrc =
-                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesAwayFromZero>;
+                    SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::NearestTiesToEven>;
                 const AlphaCompOp op;
                 const alphaCompSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
                 forEachPixel(aDst, functor);
@@ -3373,8 +3559,7 @@ ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_
     using ComputeT = default_compute_type_for_t<T>;
     using DstT     = same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>;
 
-    using magnitudeSrc =
-        SrcFunctor<1, SrcT, ComputeT, DstT, opp::Magnitude<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+    using magnitudeSrc = SrcFunctor<1, SrcT, ComputeT, DstT, opp::Magnitude<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Magnitude<ComputeT> op;
 
@@ -3395,7 +3580,7 @@ ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_
     using DstT     = same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>;
 
     using magnitudeSqrSrc =
-        SrcFunctor<1, SrcT, ComputeT, DstT, opp::MagnitudeSqr<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+        SrcFunctor<1, SrcT, ComputeT, DstT, opp::MagnitudeSqr<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::MagnitudeSqr<ComputeT> op;
 
@@ -3415,7 +3600,7 @@ ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_
     using ComputeT = default_compute_type_for_t<T>;
     using DstT     = same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>;
 
-    using angleSrc = SrcFunctor<1, SrcT, ComputeT, DstT, opp::Angle<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+    using angleSrc = SrcFunctor<1, SrcT, ComputeT, DstT, opp::Angle<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Angle<ComputeT> op;
 
@@ -3435,7 +3620,7 @@ ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_
     using ComputeT = T;
     using DstT     = same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>;
 
-    using realSrc = SrcFunctor<1, SrcT, ComputeT, DstT, opp::Real<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+    using realSrc = SrcFunctor<1, SrcT, ComputeT, DstT, opp::Real<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Real<ComputeT> op;
 
@@ -3455,7 +3640,7 @@ ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_
     using ComputeT = T;
     using DstT     = same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>;
 
-    using imagSrc = SrcFunctor<1, SrcT, ComputeT, DstT, opp::Imag<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+    using imagSrc = SrcFunctor<1, SrcT, ComputeT, DstT, opp::Imag<ComputeT>, RoundingMode::NearestTiesToEven>;
 
     const opp::Imag<ComputeT> op;
 
@@ -3475,8 +3660,7 @@ ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>
     using ComputeT = T;
     using DstT     = same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>;
 
-    using makeComplexSrc =
-        SrcFunctor<1, SrcT, ComputeT, DstT, opp::MakeComplex<DstT>, RoundingMode::NearestTiesAwayFromZero>;
+    using makeComplexSrc = SrcFunctor<1, SrcT, ComputeT, DstT, opp::MakeComplex<DstT>, RoundingMode::NearestTiesToEven>;
 
     const opp::MakeComplex<DstT> op;
 
@@ -3499,7 +3683,7 @@ ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>
     using DstT     = same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>;
 
     using makeComplexSrcSrc =
-        SrcSrcFunctor<1, SrcT, ComputeT, DstT, opp::MakeComplex<DstT>, RoundingMode::NearestTiesAwayFromZero>;
+        SrcSrcFunctor<1, SrcT, ComputeT, DstT, opp::MakeComplex<DstT>, RoundingMode::NearestTiesToEven>;
 
     const opp::MakeComplex<DstT> op;
 
@@ -3509,4 +3693,6 @@ ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>
     return aDst;
 }
 #pragma endregion
+
+// NOLINTEND(clang-diagnostic-double-promotion)
 } // namespace opp::image::cpuSimple

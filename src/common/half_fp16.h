@@ -43,7 +43,7 @@ class alignas(2) HalfFp16
     explicit HalfFp16(double aDouble);
     explicit HalfFp16(long64 aLong64);
     explicit HalfFp16(ulong64 aULong64);
-    explicit HalfFp16(int aInt);
+    explicit HalfFp16(int aInt) : value(static_cast<float>(aInt)) {};
     explicit HalfFp16(uint aUInt);
     explicit HalfFp16(short aShort);
     explicit HalfFp16(ushort aUShort);
@@ -162,9 +162,13 @@ class alignas(2) HalfFp16
     /// </summary>
     DEVICE_CODE HalfFp16 &operator/=(HalfFp16 aOther);
 
+    // defined here in header because of inline/no-inline host/device compiler complexity...
     /// <summary>
     /// </summary>
-    DEVICE_CODE [[nodiscard]] HalfFp16 operator/(HalfFp16 aOther) const;
+    DEVICE_CODE [[nodiscard]] HalfFp16 operator/(HalfFp16 aOther) const // NOLINT(performance-unnecessary-value-param)
+    {
+        return HalfFp16(value / aOther.value);
+    }
 
 #ifdef IS_HOST_COMPILER
     /// <summary>

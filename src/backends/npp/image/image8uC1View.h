@@ -47,12 +47,12 @@ class Image8uC1View : public ImageView<Pixel8uC1>
     /// <summary>
     /// Returns a new Image8uC1View with the new ROI
     /// </summary>
-    [[nodiscard]] Image8uC1View GetView(const Roi &aRoi) const;
+    [[nodiscard]] Image8uC1View GetView(const Roi &aRoi);
 
     /// <summary>
     /// Returns a new ImageView with the current ROI adapted by aBorder
     /// </summary>
-    [[nodiscard]] Image8uC1View GetView(const Border &aBorder = Border()) const;
+    [[nodiscard]] Image8uC1View GetView(const Border &aBorder = Border());
 
     //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 #if OPPi_ENABLE_UINT8_TYPE && OPPi_ENABLE_ONE_CHANNEL
@@ -754,7 +754,7 @@ class Image8uC1View : public ImageView<Pixel8uC1>
     [[nodiscard]] size_t SegmentWatershedGetBufferSize() const;
 
     // NppStatus nppiSegmentWatershed_8u_C1IR_Ctx(Npp8u * pSrcDst, Npp32s nSrcDstStep, Npp32u * pMarkerLabels, Npp32s nMarkerLabelsStep, NppiNorm eNorm, NppiWatershedSegmentBoundaryType eSegmentBoundaryType, NppiSize oSizeROI, Npp8u * pDeviceMemoryBuffer, NppStreamContext nppStreamCtx)
-    void SegmentWatershed(const Image32uC1View &pMarkerLabels, NppiNorm eNorm, NppiWatershedSegmentBoundaryType eSegmentBoundaryType, opp::cuda::DevVarView<byte> &pDeviceMemoryBuffer, const NppStreamContext &nppStreamCtx);
+    void SegmentWatershed(Image32uC1View &pMarkerLabels, NppiNorm eNorm, NppiWatershedSegmentBoundaryType eSegmentBoundaryType, opp::cuda::DevVarView<byte> &pDeviceMemoryBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSum_8u_C1R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSizeROI, Npp8u * pDeviceBuffer, Npp64f * pSum, NppStreamContext nppStreamCtx)
     void Sum(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<double> &pSum, const NppStreamContext &nppStreamCtx) const;
@@ -967,13 +967,13 @@ class Image8uC1View : public ImageView<Pixel8uC1>
     Image32fC1View &Integral(Image32fC1View &pDst, const Pixel32fC1 &nVal, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSqrIntegral_8u32s_C1R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp32s * pDst, int nDstStep, Npp32s * pSqr, int nSqrStep, NppiSize oSrcROI, Npp32s nVal, Npp32s nValSqr, NppStreamContext nppStreamCtx)
-    void SqrIntegral(Image32sC1View &pDst, const Image32sC1View &pSqr, const Pixel32sC1 &nVal, const Pixel32sC1 &nValSqr, const NppStreamContext &nppStreamCtx) const;
+    void SqrIntegral(Image32sC1View &pDst, Image32sC1View &pSqr, const Pixel32sC1 &nVal, const Pixel32sC1 &nValSqr, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSqrIntegral_8u32s64f_C1R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp32s * pDst, int nDstStep, Npp64f * pSqr, int nSqrStep, NppiSize oSrcROI, Npp32s nVal, Npp64f nValSqr, NppStreamContext nppStreamCtx)
-    void SqrIntegral(Image32sC1View &pDst, const Image64fC1View &pSqr, const Pixel32sC1 &nVal, const Pixel64fC1 &nValSqr, const NppStreamContext &nppStreamCtx) const;
+    void SqrIntegral(Image32sC1View &pDst, Image64fC1View &pSqr, const Pixel32sC1 &nVal, const Pixel64fC1 &nValSqr, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSqrIntegral_8u32f64f_C1R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp32f * pDst, int nDstStep, Npp64f * pSqr, int nSqrStep, NppiSize oSrcROI, Npp32f nVal, Npp64f nValSqr, NppStreamContext nppStreamCtx)
-    void SqrIntegral(Image32fC1View &pDst, const Image64fC1View &pSqr, const Pixel32fC1 &nVal, const Pixel64fC1 &nValSqr, const NppStreamContext &nppStreamCtx) const;
+    void SqrIntegral(Image32fC1View &pDst, Image64fC1View &pSqr, const Pixel32fC1 &nVal, const Pixel64fC1 &nValSqr, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiHistogramEven_8u_C1R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSizeROI, Npp32s * pHist, int nLevels, Npp32s nLowerLevel, Npp32s nUpperLevel, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
     void HistogramEven(opp::cuda::DevVarView<int> &pHist, int nLevels, const Pixel32sC1 &nLowerLevel, const Pixel32sC1 &nUpperLevel, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx) const;

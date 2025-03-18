@@ -43,12 +43,12 @@ class Image32sC4View : public ImageView<Pixel32sC4>
     /// <summary>
     /// Returns a new Image32sC4View with the new ROI
     /// </summary>
-    [[nodiscard]] Image32sC4View GetView(const Roi &aRoi) const;
+    [[nodiscard]] Image32sC4View GetView(const Roi &aRoi);
 
     /// <summary>
     /// Returns a new ImageView with the current ROI adapted by aBorder
     /// </summary>
-    [[nodiscard]] Image32sC4View GetView(const Border &aBorder = Border()) const;
+    [[nodiscard]] Image32sC4View GetView(const Border &aBorder = Border());
 
     //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 #if OPPi_ENABLE_INT32_TYPE && OPPi_ENABLE_FOUR_CHANNEL
@@ -148,12 +148,6 @@ class Image32sC4View : public ImageView<Pixel32sC4>
 
     // NppStatus nppiSwapChannels_32s_AC4R_Ctx(const Npp32s * pSrc, int nSrcStep, Npp32s * pDst, int nDstStep, NppiSize oSizeROI, const int[3] aDstOrder, NppStreamContext nppStreamCtx)
     Image32sC4View &SwapChannelsA(Image32sC4View &pDst, const int aDstOrder[3], const NppStreamContext &nppStreamCtx) const;
-
-    // NppStatus nppiSub_32s_C4RSfs_Ctx(const Npp32s * pSrc1, int nSrc1Step, const Npp32s * pSrc2, int nSrc2Step, Npp32s * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    Image32sC4View &Sub(const Image32sC4View &pSrc2, Image32sC4View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
-
-    // NppStatus nppiSub_32s_C4IRSfs_Ctx(const Npp32s * pSrc, int nSrcStep, Npp32s * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    Image32sC4View &Sub(const Image32sC4View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAndC_32s_AC4R_Ctx(const Npp32s * pSrc1, int nSrc1Step, const Npp32s[3] aConstants, Npp32s * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     Image32sC4View &AndA(const Pixel32sC3 &aConstants, Image32sC4View &pDst, const NppStreamContext &nppStreamCtx) const;

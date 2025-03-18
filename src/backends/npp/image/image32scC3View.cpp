@@ -37,12 +37,12 @@ Image32scC3View::Image32scC3View(Pixel32scC3 *aBasePointer, const SizePitched &a
 {
 }
 
-Image32scC3View Image32scC3View::GetView(const Roi &aRoi) const
+Image32scC3View Image32scC3View::GetView(const Roi &aRoi)
 {
     return {Pointer(), SizePitched(SizeAlloc(), Pitch()), aRoi};
 }
 
-Image32scC3View Image32scC3View::GetView(const Border &aBorder) const
+Image32scC3View Image32scC3View::GetView(const Border &aBorder)
 {
     const Roi newRoi = ROI() + aBorder;
     checkRoiIsInRoi(newRoi, Roi(0, 0, SizeAlloc()));

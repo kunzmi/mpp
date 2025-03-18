@@ -100,6 +100,109 @@ template ImageView<Pixel8uC4A> &ImageView<Pixel8uC4A>::SwapChannel<Pixel8uC4A>(
     ImageView<Pixel8uC4A> &aDst, const ChannelList<vector_active_size_v<Pixel8uC4A>> &aDstChannels,
     const opp::cuda::StreamCtx &aStreamCtx);
 
+template class ImageView<Pixel16uC1>;
+template class ImageView<Pixel16uC2>;
+template class ImageView<Pixel16uC3>;
+template class ImageView<Pixel16uC4>;
+template class ImageView<Pixel16uC4A>;
+
+using Image16uC1View  = ImageView<Pixel16uC1>;
+using Image16uC2View  = ImageView<Pixel16uC2>;
+using Image16uC3View  = ImageView<Pixel16uC3>;
+using Image16uC4View  = ImageView<Pixel16uC4>;
+using Image16uC4AView = ImageView<Pixel16uC4A>;
+
+template ImageView<Pixel32fC3> &ImageView<Pixel16uC3>::Convert<Pixel32fC3>(ImageView<Pixel32fC3> &aDst,
+                                                                           const opp::cuda::StreamCtx &aStreamCtx);
+template ImageView<Pixel16uC3> &ImageView<Pixel32fC3>::Convert<Pixel16uC3>(ImageView<Pixel16uC3> &aDst,
+                                                                           RoundingMode aRoundingMode,
+                                                                           const opp::cuda::StreamCtx &aStreamCtx);
+template ImageView<Pixel16uC3> &ImageView<Pixel32fC3>::Convert<Pixel16uC3>(ImageView<Pixel16uC3> &aDst,
+                                                                           RoundingMode aRoundingMode, int aScaleFactor,
+                                                                           const opp::cuda::StreamCtx &aStreamCtx);
+
+template ImageView<Pixel16uC2> &ImageView<Pixel16uC2>::Copy<Pixel16uC2>(Channel aSrcChannel,
+                                                                        ImageView<Pixel16uC2> &aDst,
+                                                                        Channel aDstChannel,
+                                                                        const opp::cuda::StreamCtx &aStreamCtx);
+template ImageView<Pixel16uC3> &ImageView<Pixel16uC2>::Copy<Pixel16uC3>(Channel aSrcChannel,
+                                                                        ImageView<Pixel16uC3> &aDst,
+                                                                        Channel aDstChannel,
+                                                                        const opp::cuda::StreamCtx &aStreamCtx);
+template ImageView<Pixel16uC4> &ImageView<Pixel16uC2>::Copy<Pixel16uC4>(Channel aSrcChannel,
+                                                                        ImageView<Pixel16uC4> &aDst,
+                                                                        Channel aDstChannel,
+                                                                        const opp::cuda::StreamCtx &aStreamCtx);
+
+template ImageView<Pixel16uC2> &ImageView<Pixel16uC3>::Copy<Pixel16uC2>(Channel aSrcChannel,
+                                                                        ImageView<Pixel16uC2> &aDst,
+                                                                        Channel aDstChannel,
+                                                                        const opp::cuda::StreamCtx &aStreamCtx);
+template ImageView<Pixel16uC3> &ImageView<Pixel16uC3>::Copy<Pixel16uC3>(Channel aSrcChannel,
+                                                                        ImageView<Pixel16uC3> &aDst,
+                                                                        Channel aDstChannel,
+                                                                        const opp::cuda::StreamCtx &aStreamCtx);
+template ImageView<Pixel16uC4> &ImageView<Pixel16uC3>::Copy<Pixel16uC4>(Channel aSrcChannel,
+                                                                        ImageView<Pixel16uC4> &aDst,
+                                                                        Channel aDstChannel,
+                                                                        const opp::cuda::StreamCtx &aStreamCtx);
+
+template ImageView<Pixel16uC2> &ImageView<Pixel16uC4>::Copy<Pixel16uC2>(Channel aSrcChannel,
+                                                                        ImageView<Pixel16uC2> &aDst,
+                                                                        Channel aDstChannel,
+                                                                        const opp::cuda::StreamCtx &aStreamCtx);
+template ImageView<Pixel16uC3> &ImageView<Pixel16uC4>::Copy<Pixel16uC3>(Channel aSrcChannel,
+                                                                        ImageView<Pixel16uC3> &aDst,
+                                                                        Channel aDstChannel,
+                                                                        const opp::cuda::StreamCtx &aStreamCtx);
+template ImageView<Pixel16uC4> &ImageView<Pixel16uC4>::Copy<Pixel16uC4>(Channel aSrcChannel,
+                                                                        ImageView<Pixel16uC4> &aDst,
+                                                                        Channel aDstChannel,
+                                                                        const opp::cuda::StreamCtx &aStreamCtx);
+
+template ImageView<Pixel16uC2> &ImageView<Pixel16uC1>::Copy<Pixel16uC2>(ImageView<Pixel16uC2> &aDst,
+                                                                        Channel aDstChannel,
+                                                                        const opp::cuda::StreamCtx &aStreamCtx);
+template ImageView<Pixel16uC3> &ImageView<Pixel16uC1>::Copy<Pixel16uC3>(ImageView<Pixel16uC3> &aDst,
+                                                                        Channel aDstChannel,
+                                                                        const opp::cuda::StreamCtx &aStreamCtx);
+template ImageView<Pixel16uC4> &ImageView<Pixel16uC1>::Copy<Pixel16uC4>(ImageView<Pixel16uC4> &aDst,
+                                                                        Channel aDstChannel,
+                                                                        const opp::cuda::StreamCtx &aStreamCtx);
+
+template ImageView<Pixel16uC1> &ImageView<Pixel16uC2>::Copy<Pixel16uC1>(Channel aSrcChannel,
+                                                                        ImageView<Pixel16uC1> &aDst,
+                                                                        const opp::cuda::StreamCtx &aStreamCtx);
+template ImageView<Pixel16uC1> &ImageView<Pixel16uC3>::Copy<Pixel16uC1>(Channel aSrcChannel,
+                                                                        ImageView<Pixel16uC1> &aDst,
+                                                                        const opp::cuda::StreamCtx &aStreamCtx);
+template ImageView<Pixel16uC1> &ImageView<Pixel16uC4>::Copy<Pixel16uC1>(Channel aSrcChannel,
+                                                                        ImageView<Pixel16uC1> &aDst,
+                                                                        const opp::cuda::StreamCtx &aStreamCtx);
+
+template ImageView<Pixel16uC3> &ImageView<Pixel16uC1>::Dup<Pixel16uC3>(ImageView<Pixel16uC3> &aDst,
+                                                                       const opp::cuda::StreamCtx &aStreamCtx);
+template ImageView<Pixel16uC4> &ImageView<Pixel16uC1>::Dup<Pixel16uC4>(ImageView<Pixel16uC4> &aDst,
+                                                                       const opp::cuda::StreamCtx &aStreamCtx);
+template ImageView<Pixel16uC4A> &ImageView<Pixel16uC1>::Dup<Pixel16uC4A>(ImageView<Pixel16uC4A> &aDst,
+                                                                         const opp::cuda::StreamCtx &aStreamCtx);
+
+template ImageView<Pixel16uC4> &ImageView<Pixel16uC3>::SwapChannel<Pixel16uC4>(
+    ImageView<Pixel16uC4> &aDst, const ChannelList<vector_active_size_v<Pixel16uC4>> &aDstChannels,
+    remove_vector_t<Pixel16uC3> aValue, const opp::cuda::StreamCtx &aStreamCtx);
+template ImageView<Pixel16uC3> &ImageView<Pixel16uC4>::SwapChannel<Pixel16uC3>(
+    ImageView<Pixel16uC3> &aDst, const ChannelList<vector_active_size_v<Pixel16uC3>> &aDstChannels,
+    const opp::cuda::StreamCtx &aStreamCtx);
+template ImageView<Pixel16uC3> &ImageView<Pixel16uC3>::SwapChannel<Pixel16uC3>(
+    ImageView<Pixel16uC3> &aDst, const ChannelList<vector_active_size_v<Pixel16uC3>> &aDstChannels,
+    const opp::cuda::StreamCtx &aStreamCtx);
+template ImageView<Pixel16uC4> &ImageView<Pixel16uC4>::SwapChannel<Pixel16uC4>(
+    ImageView<Pixel16uC4> &aDst, const ChannelList<vector_active_size_v<Pixel16uC4>> &aDstChannels,
+    const opp::cuda::StreamCtx &aStreamCtx);
+template ImageView<Pixel16uC4A> &ImageView<Pixel16uC4A>::SwapChannel<Pixel16uC4A>(
+    ImageView<Pixel16uC4A> &aDst, const ChannelList<vector_active_size_v<Pixel16uC4A>> &aDstChannels,
+    const opp::cuda::StreamCtx &aStreamCtx);
+
 template class ImageView<Pixel32fC1>;
 template class ImageView<Pixel32fC2>;
 template class ImageView<Pixel32fC3>;

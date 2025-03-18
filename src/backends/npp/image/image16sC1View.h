@@ -47,15 +47,15 @@ class Image16sC1View : public ImageView<Pixel16sC1>
     /// <summary>
     /// Returns a new Image16sC1View with the new ROI
     /// </summary>
-    [[nodiscard]] Image16sC1View GetView(const Roi &aRoi) const;
+    [[nodiscard]] Image16sC1View GetView(const Roi &aRoi);
 
     /// <summary>
     /// Returns a new ImageView with the current ROI adapted by aBorder
     /// </summary>
-    [[nodiscard]] Image16sC1View GetView(const Border &aBorder = Border()) const;
+    [[nodiscard]] Image16sC1View GetView(const Border &aBorder = Border());
 
     //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
-#if OPPi_ENABLE_SINT16_TYPE && OPPi_ENABLE_ONE_CHANNEL
+#if OPPi_ENABLE_INT16_TYPE && OPPi_ENABLE_ONE_CHANNEL
 
     // NppStatus nppiSet_16s_C1R_Ctx(const Npp16s nValue, Npp16s * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     Image16sC1View &Set(const Pixel16sC1 &nValue, const NppStreamContext &nppStreamCtx);
@@ -681,7 +681,7 @@ class Image16sC1View : public ImageView<Pixel16sC1>
     // NppStatus nppiMirror_16s_C1IR_Ctx(Npp16s * pSrcDst, int nSrcDstStep, NppiSize oROI, NppiAxis flip, NppStreamContext nppStreamCtx)
     Image16sC1View &Mirror(NppiAxis flip, const NppStreamContext &nppStreamCtx);
 
-#endif // OPPi_ENABLE_SINT16_TYPE && OPPi_ENABLE_ONE_CHANNEL
+#endif // OPPi_ENABLE_INT16_TYPE && OPPi_ENABLE_ONE_CHANNEL
     //NOLINTEND(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 };
 } // namespace opp::image::npp

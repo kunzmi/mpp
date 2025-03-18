@@ -43,12 +43,12 @@ class Image8sC3View : public ImageView<Pixel8sC3>
     /// <summary>
     /// Returns a new Image8sC3View with the new ROI
     /// </summary>
-    [[nodiscard]] Image8sC3View GetView(const Roi &aRoi) const;
+    [[nodiscard]] Image8sC3View GetView(const Roi &aRoi);
 
     /// <summary>
     /// Returns a new ImageView with the current ROI adapted by aBorder
     /// </summary>
-    [[nodiscard]] Image8sC3View GetView(const Border &aBorder = Border()) const;
+    [[nodiscard]] Image8sC3View GetView(const Border &aBorder = Border());
 
     //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 #if OPPi_ENABLE_INT8_TYPE && OPPi_ENABLE_THREE_CHANNEL
@@ -81,7 +81,7 @@ class Image8sC3View : public ImageView<Pixel8sC3>
     static void ColorTwist32f(const Image8sC1View &aSrcChannel0, const Image8sC1View &aSrcChannel1, const Image8sC1View &aSrcChannel2, Image8sC1View &aDstChannel0, Image8sC1View &aDstChannel1, Image8sC1View &aDstChannel2, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiColorTwist32f_8s_IP3R_Ctx(Npp8s *const[3] pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp32f[3][4] aTwist, NppStreamContext nppStreamCtx)
-    static void ColorTwist32f(const Image8sC1View &aSrcDstChannel0, const Image8sC1View &aSrcDstChannel1, const Image8sC1View &aSrcDstChannel2, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
+    static void ColorTwist32f(Image8sC1View &aSrcDstChannel0, Image8sC1View &aSrcDstChannel1, Image8sC1View &aSrcDstChannel2, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiFilter32f_8s_C3R_Ctx(const Npp8s * pSrc, int nSrcStep, Npp8s * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
     Image8sC3View &Filter32f(Image8sC3View &pDst, const opp::cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;

@@ -9,8 +9,8 @@
 #include <common/opp_defs.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
-#include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vectorTypes.h>
 #include <concepts>
 
 // disable warning for pragma unroll when compiling with host compiler:
@@ -63,7 +63,14 @@ struct SrcDevConstantScaleFunctor : public ImageFunctor<false>
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         ComputeT temp;
         Op(static_cast<ComputeT>(*pixelSrc1), static_cast<ComputeT>(*Constant), temp);
-        temp *= ScaleFactor;
+        if constexpr (ComplexVector<ComputeT>)
+        {
+            temp = temp * ScaleFactor;
+        }
+        else
+        {
+            temp *= ScaleFactor;
+        }
         round(temp);
         // DstT constructor will clamp temp to value range of DstT
         aDst = static_cast<DstT>(temp);
@@ -86,7 +93,14 @@ struct SrcDevConstantScaleFunctor : public ImageFunctor<false>
         {
             ComputeT temp;
             Op(static_cast<ComputeT>(tupelSrc1.value[i]), _constant, temp);
-            temp *= ScaleFactor;
+            if constexpr (ComplexVector<ComputeT>)
+            {
+                temp = temp * ScaleFactor;
+            }
+            else
+            {
+                temp *= ScaleFactor;
+            }
             round(temp);
             // DstT constructor will clamp temp to value range of DstT
             aDst.value[i] = static_cast<DstT>(temp);

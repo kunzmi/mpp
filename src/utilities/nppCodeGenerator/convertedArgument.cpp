@@ -270,7 +270,7 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
     {
         if (aArgument->type == "Npp32u *")
         {
-            mType = "const Image32uC1View &";
+            mType = "Image32uC1View &";
         }
         else
         {
@@ -281,11 +281,11 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
     {
         if (aArgument->type == "Npp32s *" || aArgument->type == "const Npp32s *")
         {
-            mType = "const Image32sC1View &";
+            mType = "Image32sC1View &";
         }
         else if (aArgument->type == "Npp64f *" || aArgument->type == "const Npp64f *")
         {
-            mType = "const Image64fC1View &";
+            mType = "Image64fC1View &";
         }
         else
         {

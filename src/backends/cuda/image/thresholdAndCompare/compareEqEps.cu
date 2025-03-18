@@ -39,7 +39,7 @@ void InvokeCompareEqEpsSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *
         using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::EqEps<ComputeT>, RoundingMode::None,
                                             voidType, voidType, true>;
         const opp::EqEps<ComputeT> op(aEpsilon);
-        compareSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+        const compareSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
         InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
 }
@@ -90,7 +90,7 @@ void InvokeCompareEqEpsSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aCon
         using compareSrcC          = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::EqEps<ComputeT>,
                                                         RoundingMode::None, voidType, voidType, true>;
         const opp::EqEps<ComputeT> op(aEpsilon);
-        compareSrcC functor(aSrc, aPitchSrc, aConst, op);
+        const compareSrcC functor(aSrc, aPitchSrc, aConst, op);
         InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
 }
@@ -140,7 +140,7 @@ void InvokeCompareEqEpsSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *a
         using compareSrcC =
             SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::EqEps<ComputeT>, RoundingMode::None, true>;
         const opp::EqEps<ComputeT> op(aEpsilon);
-        compareSrcC functor(aSrc, aPitchSrc, aConst, op);
+        const compareSrcC functor(aSrc, aPitchSrc, aConst, op);
         InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
 }

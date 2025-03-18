@@ -38,9 +38,9 @@ void InvokeAddWeightedSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *a
         using addWeightedSrcSrc =
             SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AddWeighted<ComputeT>, RoundingMode::None>;
 
-        AddWeighted<ComputeT> op(aAlpha);
+        const opp::AddWeighted<ComputeT> op(aAlpha);
 
-        addWeightedSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+        const addWeightedSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, addWeightedSrcSrc>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                             functor);
@@ -105,9 +105,9 @@ void InvokeAddWeightedInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT 
         using addWeightedInplaceSrc =
             InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AddWeighted<ComputeT>, RoundingMode::None>;
 
-        AddWeighted<ComputeT> op(aAlpha);
+        const opp::AddWeighted<ComputeT> op(aAlpha);
 
-        addWeightedInplaceSrc functor(aSrc2, aPitchSrc2, op);
+        const addWeightedInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, addWeightedInplaceSrc>(aSrcDst, aPitchSrcDst, aSize,
                                                                                 aStreamCtx, functor);

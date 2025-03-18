@@ -13,6 +13,12 @@ template <AnyVector T> struct FillRandom
 {
     std::default_random_engine engine;
 
+    FillRandom() = default;
+
+    FillRandom(uint aSeed) : engine(aSeed)
+    {
+    }
+
     void operator()(T &aDst)
         requires NativeFloatingPoint<remove_vector_t<T>>
     {

@@ -53,10 +53,10 @@ void InvokeSubSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, si
             using subSrcSrcSIMD = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>, RoundingMode::None,
                                                 ComputeT_SIMD, simdOP_t>;
 
-            Sub<ComputeT> op;
-            simdOP_t opSIMD;
+            const opp::Sub<ComputeT> op;
+            const simdOP_t opSIMD;
 
-            subSrcSrcSIMD functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, opSIMD);
+            const subSrcSrcSIMD functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, opSIMD);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, subSrcSrcSIMD>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                             functor);
@@ -66,9 +66,9 @@ void InvokeSubSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, si
             // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
             using subSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>, RoundingMode::None>;
 
-            Sub<ComputeT> op;
+            const opp::Sub<ComputeT> op;
 
-            subSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+            const subSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, subSrcSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
         }
@@ -137,12 +137,12 @@ void InvokeSubSrcSrcScale(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using subSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>,
-                                                  RoundingMode::NearestTiesAwayFromZero>;
+        using subSrcSrcScale =
+            SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>, RoundingMode::NearestTiesToEven>;
 
-        Sub<ComputeT> op;
+        const opp::Sub<ComputeT> op;
 
-        subSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
+        const subSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, subSrcSrcScale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -206,12 +206,12 @@ void InvokeSubSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT 
             using subSrcCSIMD = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>,
                                                    RoundingMode::None, Tupel<ComputeT_SIMD, TupelSize>, simdOP_t>;
 
-            Sub<ComputeT> op;
-            simdOP_t opSIMD;
-            Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
+            const opp::Sub<ComputeT> op;
+            const simdOP_t opSIMD;
+            const Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
                 Tupel<ComputeT_SIMD, TupelSize>::GetConstant(static_cast<ComputeT_SIMD>(aConst));
 
-            subSrcCSIMD functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
+            const subSrcCSIMD functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, subSrcCSIMD>(aDst, aPitchDst, aSize, aStreamCtx, functor);
         }
@@ -220,9 +220,9 @@ void InvokeSubSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT 
             // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
             using subSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>, RoundingMode::None>;
 
-            Sub<ComputeT> op;
+            const opp::Sub<ComputeT> op;
 
-            subSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
+            const subSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, subSrcC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
         }
@@ -291,11 +291,11 @@ void InvokeSubSrcCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using subSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>,
-                                                     RoundingMode::NearestTiesAwayFromZero>;
+                                                     RoundingMode::NearestTiesToEven>;
 
-        Sub<ComputeT> op;
+        const opp::Sub<ComputeT> op;
 
-        subSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
+        const subSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, subSrcCScale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -354,9 +354,9 @@ void InvokeSubSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst, Ds
         using subSrcDevC =
             SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>, RoundingMode::None>;
 
-        Sub<ComputeT> op;
+        const opp::Sub<ComputeT> op;
 
-        subSrcDevC functor(aSrc, aPitchSrc, aConst, op);
+        const subSrcDevC functor(aSrc, aPitchSrc, aConst, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, subSrcDevC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -424,11 +424,11 @@ void InvokeSubSrcDevCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aCons
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using subSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>,
-                                                           RoundingMode::NearestTiesAwayFromZero>;
+                                                           RoundingMode::NearestTiesToEven>;
 
-        Sub<ComputeT> op;
+        const opp::Sub<ComputeT> op;
 
-        subSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
+        const subSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, subSrcDevCScale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -491,10 +491,10 @@ void InvokeSubInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, 
             using subInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>,
                                                         RoundingMode::None, ComputeT_SIMD, simdOP_t>;
 
-            Sub<ComputeT> op;
-            simdOP_t opSIMD;
+            const opp::Sub<ComputeT> op;
+            const simdOP_t opSIMD;
 
-            subInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
+            const subInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, subInplaceSrcSIMD>(aSrcDst, aPitchSrcDst, aSize,
                                                                                 aStreamCtx, functor);
@@ -505,9 +505,9 @@ void InvokeSubInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, 
             using subInplaceSrc =
                 InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>, RoundingMode::None>;
 
-            Sub<ComputeT> op;
+            const opp::Sub<ComputeT> op;
 
-            subInplaceSrc functor(aSrc2, aPitchSrc2, op);
+            const subInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, subInplaceSrc>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                             functor);
@@ -577,11 +577,11 @@ void InvokeSubInplaceSrcScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aS
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using subInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>,
-                                                          RoundingMode::NearestTiesAwayFromZero>;
+                                                          RoundingMode::NearestTiesToEven>;
 
-        Sub<ComputeT> op;
+        const opp::Sub<ComputeT> op;
 
-        subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
+        const subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, subInplaceSrcScale>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                              functor);
@@ -646,12 +646,12 @@ void InvokeSubInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, c
                 InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Sub<ComputeT>, RoundingMode::None,
                                        Tupel<ComputeT_SIMD, TupelSize>, simdOP_t>;
 
-            Sub<ComputeT> op;
-            simdOP_t opSIMD;
-            Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
+            const opp::Sub<ComputeT> op;
+            const simdOP_t opSIMD;
+            const Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
                 Tupel<ComputeT_SIMD, TupelSize>::GetConstant(static_cast<ComputeT_SIMD>(aConst));
 
-            subInplaceCSIMD functor(static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
+            const subInplaceCSIMD functor(static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, subInplaceCSIMD>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                               functor);
@@ -662,9 +662,9 @@ void InvokeSubInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, c
             using subInplaceC =
                 InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Sub<ComputeT>, RoundingMode::None>;
 
-            Sub<ComputeT> op;
+            const opp::Sub<ComputeT> op;
 
-            subInplaceC functor(static_cast<ComputeT>(aConst), op);
+            const subInplaceC functor(static_cast<ComputeT>(aConst), op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, subInplaceC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                           functor);
@@ -733,12 +733,12 @@ void InvokeSubInplaceCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aCon
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using subInplaceCScale = InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Sub<ComputeT>,
-                                                             RoundingMode::NearestTiesAwayFromZero>;
+        using subInplaceCScale =
+            InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Sub<ComputeT>, RoundingMode::NearestTiesToEven>;
 
-        Sub<ComputeT> op;
+        const opp::Sub<ComputeT> op;
 
-        subInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
+        const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, subInplaceCScale>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                            functor);
@@ -798,9 +798,9 @@ void InvokeSubInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aConst
         using subInplaceDevC =
             InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, opp::Sub<ComputeT>, RoundingMode::None>;
 
-        Sub<ComputeT> op;
+        const opp::Sub<ComputeT> op;
 
-        subInplaceDevC functor(aConst, op);
+        const subInplaceDevC functor(aConst, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, subInplaceDevC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                          functor);
@@ -869,11 +869,11 @@ void InvokeSubInplaceDevCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *a
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using subInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Sub<ComputeT>,
-                                                                   RoundingMode::NearestTiesAwayFromZero>;
+                                                                   RoundingMode::NearestTiesToEven>;
 
-        Sub<ComputeT> op;
+        const opp::Sub<ComputeT> op;
 
-        subInplaceDevCScale functor(aConst, op, aScaleFactor);
+        const subInplaceDevCScale functor(aConst, op, aScaleFactor);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, subInplaceDevCScale>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                               functor);
@@ -937,10 +937,10 @@ void InvokeSubInvInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc
             using subInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::SubInv<ComputeT>,
                                                         RoundingMode::None, ComputeT_SIMD, simdOP_t>;
 
-            SubInv<ComputeT> op;
-            simdOP_t opSIMD;
+            const opp::SubInv<ComputeT> op;
+            const simdOP_t opSIMD;
 
-            subInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
+            const subInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, subInplaceSrcSIMD>(aSrcDst, aPitchSrcDst, aSize,
                                                                                 aStreamCtx, functor);
@@ -951,9 +951,9 @@ void InvokeSubInvInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc
             using subInplaceSrc =
                 InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::SubInv<ComputeT>, RoundingMode::None>;
 
-            SubInv<ComputeT> op;
+            const opp::SubInv<ComputeT> op;
 
-            subInplaceSrc functor(aSrc2, aPitchSrc2, op);
+            const subInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, subInplaceSrc>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                             functor);
@@ -1023,11 +1023,11 @@ void InvokeSubInvInplaceSrcScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using subInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::SubInv<ComputeT>,
-                                                          RoundingMode::NearestTiesAwayFromZero>;
+                                                          RoundingMode::NearestTiesToEven>;
 
-        SubInv<ComputeT> op;
+        const opp::SubInv<ComputeT> op;
 
-        subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
+        const subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, subInplaceSrcScale>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                              functor);
@@ -1092,12 +1092,12 @@ void InvokeSubInvInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst
                 InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::SubInv<ComputeT>, RoundingMode::None,
                                        Tupel<ComputeT_SIMD, TupelSize>, simdOP_t>;
 
-            SubInv<ComputeT> op;
-            simdOP_t opSIMD;
-            Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
+            const opp::SubInv<ComputeT> op;
+            const simdOP_t opSIMD;
+            const Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
                 Tupel<ComputeT_SIMD, TupelSize>::GetConstant(static_cast<ComputeT_SIMD>(aConst));
 
-            subInplaceCSIMD functor(static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
+            const subInplaceCSIMD functor(static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, subInplaceCSIMD>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                               functor);
@@ -1108,9 +1108,9 @@ void InvokeSubInvInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst
             using subInplaceC =
                 InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::SubInv<ComputeT>, RoundingMode::None>;
 
-            SubInv<ComputeT> op;
+            const opp::SubInv<ComputeT> op;
 
-            subInplaceC functor(static_cast<ComputeT>(aConst), op);
+            const subInplaceC functor(static_cast<ComputeT>(aConst), op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, subInplaceC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                           functor);
@@ -1180,11 +1180,11 @@ void InvokeSubInvInplaceCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &a
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using subInplaceCScale = InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::SubInv<ComputeT>,
-                                                             RoundingMode::NearestTiesAwayFromZero>;
+                                                             RoundingMode::NearestTiesToEven>;
 
-        SubInv<ComputeT> op;
+        const opp::SubInv<ComputeT> op;
 
-        subInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
+        const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, subInplaceCScale>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                            functor);
@@ -1244,9 +1244,9 @@ void InvokeSubInvInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aCo
         using subInplaceDevC =
             InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, opp::SubInv<ComputeT>, RoundingMode::None>;
 
-        SubInv<ComputeT> op;
+        const opp::SubInv<ComputeT> op;
 
-        subInplaceDevC functor(aConst, op);
+        const subInplaceDevC functor(aConst, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, subInplaceDevC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                          functor);
@@ -1316,11 +1316,11 @@ void InvokeSubInvInplaceDevCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using subInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::SubInv<ComputeT>,
-                                                                   RoundingMode::NearestTiesAwayFromZero>;
+                                                                   RoundingMode::NearestTiesToEven>;
 
-        SubInv<ComputeT> op;
+        const opp::SubInv<ComputeT> op;
 
-        subInplaceDevCScale functor(aConst, op, aScaleFactor);
+        const subInplaceDevCScale functor(aConst, op, aScaleFactor);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, subInplaceDevCScale>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                               functor);

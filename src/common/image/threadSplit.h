@@ -38,8 +38,9 @@ template <int WarpAlignmentInBytes, int TupelSize> class ThreadSplit
     /// <typeparam name="T"></typeparam>
     /// <param name="aPointer"></param>
     /// <param name="aDataWidthInElements"></param>
+    /// <param name="aWarpSize"></param>
     template <typename T>
-    ThreadSplit(T *aPointer, int aDataWidthInElements)
+    ThreadSplit(T *aPointer, int aDataWidthInElements, int aWarpSize)
         requires(TupelSize > 1)
     {
         if (WarpAlignmentInBytes % (to_int(sizeof(T) * TupelSize)) != 0)
@@ -57,20 +58,38 @@ template <int WarpAlignmentInBytes, int TupelSize> class ThreadSplit
                                                             << sizeof(T) << "). Impossible to fill warp with tupels.");
         }
 
-        int muted              = GetElementsLeft(aPointer, WarpAlignmentInBytes);
-        int left               = GetElementsRight(aPointer, WarpAlignmentInBytes);
+        int muted = GetElementsLeft(aPointer, WarpAlignmentInBytes);
+
+        // if number of muted elements is greater than warp size, then we would launch entire warps doing nothing, so
+        // reduce the number of muted threads:
+        while (muted - aWarpSize >= 0)
+        {
+            muted -= aWarpSize;
+        }
+
+        int left               = std::min(GetElementsRight(aPointer, WarpAlignmentInBytes), aDataWidthInElements);
         int dataElementsCenter = aDataWidthInElements - left;
         int right              = dataElementsCenter % TupelSize;
         int center             = dataElementsCenter / TupelSize;
 
+        int centerFullWarp = center - center % aWarpSize;
+        right += (center % aWarpSize) * TupelSize;
+
+        if (centerFullWarp == 0) // if we can't fill a full warp with tuples, put everything in the "right" part
+        {
+            right += left;
+            left  = 0;
+            muted = 0;
+        }
+
         mMuted                 = muted;
         mLeftAndMuted          = muted + left;
-        mCenterAndLeftAndMuted = muted + left + center;
-        mTotal                 = muted + left + center + right;
+        mCenterAndLeftAndMuted = muted + left + centerFullWarp;
+        mTotal                 = muted + left + centerFullWarp + right;
     }
 
     template <typename T>
-    ThreadSplit(T *aPointer, int aDataWidthInElements)
+    ThreadSplit(T *aPointer, int aDataWidthInElements, int /*aWarpSize*/)
         requires(TupelSize == 1)
         : mMuted(0), mLeftAndMuted(0), mCenterAndLeftAndMuted(aDataWidthInElements), mTotal(aDataWidthInElements)
     {

@@ -49,12 +49,12 @@ class Image16uC1View : public ImageView<Pixel16uC1>
     /// <summary>
     /// Returns a new Image16uC1View with the new ROI
     /// </summary>
-    [[nodiscard]] Image16uC1View GetView(const Roi &aRoi) const;
+    [[nodiscard]] Image16uC1View GetView(const Roi &aRoi);
 
     /// <summary>
     /// Returns a new ImageView with the current ROI adapted by aBorder
     /// </summary>
-    [[nodiscard]] Image16uC1View GetView(const Border &aBorder = Border()) const;
+    [[nodiscard]] Image16uC1View GetView(const Border &aBorder = Border());
 
     //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 #if OPPi_ENABLE_UINT16_TYPE && OPPi_ENABLE_ONE_CHANNEL
@@ -624,7 +624,7 @@ class Image16uC1View : public ImageView<Pixel16uC1>
     [[nodiscard]] size_t SegmentWatershedGetBufferSize() const;
 
     // NppStatus nppiSegmentWatershed_16u_C1IR_Ctx(Npp16u * pSrcDst, Npp32s nSrcDstStep, Npp32u * pMarkerLabels, Npp32s nMarkerLabelsStep, NppiNorm eNorm, NppiWatershedSegmentBoundaryType eSegmentBoundaryType, NppiSize oSizeROI, Npp8u * pDeviceMemoryBuffer, NppStreamContext nppStreamCtx)
-    void SegmentWatershed(const Image32uC1View &pMarkerLabels, NppiNorm eNorm, NppiWatershedSegmentBoundaryType eSegmentBoundaryType, opp::cuda::DevVarView<byte> &pDeviceMemoryBuffer, const NppStreamContext &nppStreamCtx);
+    void SegmentWatershed(Image32uC1View &pMarkerLabels, NppiNorm eNorm, NppiWatershedSegmentBoundaryType eSegmentBoundaryType, opp::cuda::DevVarView<byte> &pDeviceMemoryBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSum_16u_C1R_Ctx(const Npp16u * pSrc, int nSrcStep, NppiSize oSizeROI, Npp8u * pDeviceBuffer, Npp64f * pSum, NppStreamContext nppStreamCtx)
     void Sum(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<double> &pSum, const NppStreamContext &nppStreamCtx) const;

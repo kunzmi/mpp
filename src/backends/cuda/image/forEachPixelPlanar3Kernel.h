@@ -122,24 +122,24 @@ __global__ void forEachPixelPlanar3Kernel(Vector1<remove_vector_t<DstT>> *__rest
 }
 
 template <typename DstT, size_t TupelSize, int WarpAlignmentInBytes, typename funcType>
-void InvokeForEachPixelPlanar3Kernel(const dim3 &aBlockSize, uint aSharedMemory, cudaStream_t aStream,
+void InvokeForEachPixelPlanar3Kernel(const dim3 &aBlockSize, uint aSharedMemory, int aWarpSize, cudaStream_t aStream,
                                      Vector1<remove_vector_t<DstT>> *__restrict__ aDst1, size_t aPitchDst1,
                                      Vector1<remove_vector_t<DstT>> *__restrict__ aDst2, size_t aPitchDst2,
                                      Vector1<remove_vector_t<DstT>> *__restrict__ aDst3, size_t aPitchDst3,
                                      const Size2D &aSize, const funcType &aFunctor)
 {
-    ThreadSplit<WarpAlignmentInBytes, TupelSize> ts(aDst1, aSize.x);
+    ThreadSplit<WarpAlignmentInBytes, TupelSize> ts(aDst1, aSize.x, aWarpSize);
 
     if (TupelSize != 1)
     {
-        ThreadSplit<WarpAlignmentInBytes, TupelSize> tsCheck(aDst2, aSize.x);
+        ThreadSplit<WarpAlignmentInBytes, TupelSize> tsCheck(aDst2, aSize.x, aWarpSize);
         if (ts != tsCheck)
         {
             throw INVALIDARGUMENT(
                 aDst1 and aDst2,
                 "All destination images must fulfill the same byte-alignments in order to use tupeled memory access.");
         }
-        ThreadSplit<WarpAlignmentInBytes, TupelSize> tsCheck2(aDst3, aSize.x);
+        ThreadSplit<WarpAlignmentInBytes, TupelSize> tsCheck2(aDst3, aSize.x, aWarpSize);
         if (ts != tsCheck2)
         {
             throw INVALIDARGUMENT(
@@ -173,8 +173,8 @@ void InvokeForEachPixelPlanar3KernelDefault(Vector1<remove_vector_t<DstT>> *__re
         constexpr uint SharedMemory        = 0;
 
         InvokeForEachPixelPlanar3Kernel<DstT, TupelSize, WarpAlignmentInBytes, funcType>(
-            BlockSize, SharedMemory, aStreamCtx.Stream, aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSize,
-            aFunc);
+            BlockSize, SharedMemory, aStreamCtx.WarpSize, aStreamCtx.Stream, aDst1, aPitchDst1, aDst2, aPitchDst2,
+            aDst3, aPitchDst3, aSize, aFunc);
     }
     else
     {

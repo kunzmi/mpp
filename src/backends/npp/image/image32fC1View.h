@@ -49,12 +49,12 @@ class Image32fC1View : public ImageView<Pixel32fC1>
     /// <summary>
     /// Returns a new Image32fC1View with the new ROI
     /// </summary>
-    [[nodiscard]] Image32fC1View GetView(const Roi &aRoi) const;
+    [[nodiscard]] Image32fC1View GetView(const Roi &aRoi);
 
     /// <summary>
     /// Returns a new ImageView with the current ROI adapted by aBorder
     /// </summary>
-    [[nodiscard]] Image32fC1View GetView(const Border &aBorder = Border()) const;
+    [[nodiscard]] Image32fC1View GetView(const Border &aBorder = Border());
 
     //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 #if OPPi_ENABLE_FLOAT_TYPE && OPPi_ENABLE_ONE_CHANNEL
@@ -636,16 +636,16 @@ class Image32fC1View : public ImageView<Pixel32fC1>
     void DistanceTransformAbsPBA(const Pixel32fC1 &nMinSiteValue, const Pixel32fC1 &nMaxSiteValue, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16uC1View &pDstVoronoiAbsoluteManhattanDistances, Image64fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAntialiasingDeviceBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSignedDistanceTransformPBA_32f_C1R_Ctx(Npp32f * pSrc, int nSrcStep, Npp32f nCutoffValue, Npp32f nSubPixelXShift, Npp32f nSubPixelYShift, Npp16s * pDstVoronoi, int nDstVoronoiStep, Npp16s * pDstVoronoiIndices, int nDstVoronoiIndicesStep, Npp16s * pDstVoronoiRelativeManhattanDistances, int nDstVoronoiRelativeManhattanDistancesStep, Npp32f * pDstTransform, int nDstTransformStep, NppiSize oSizeROI, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void SignedDistanceTransformPBA(const Pixel32fC1 &nCutoffValue, const Pixel32fC1 &nSubPixelXShift, const Pixel32fC1 &nSubPixelYShift, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16sC1View &pDstVoronoiRelativeManhattanDistances, Image32fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void SignedDistanceTransformPBA(const Pixel32fC1 &nCutoffValue, const Pixel32fC1 &nSubPixelXShift, const Pixel32fC1 &nSubPixelYShift, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16sC1View &pDstVoronoiRelativeManhattanDistances, Image32fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSignedDistanceTransformAbsPBA_32f_C1R_Ctx(Npp32f * pSrc, int nSrcStep, Npp32f nCutoffValue, Npp32f nSubPixelXShift, Npp32f nSubPixelYShift, Npp16s * pDstVoronoi, int nDstVoronoiStep, Npp16s * pDstVoronoiIndices, int nDstVoronoiIndicesStep, Npp16u * pDstVoronoiAbsoluteManhattanDistances, int nDstVoronoiAbsoluteManhattanDistancesStep, Npp32f * pDstTransform, int nDstTransformStep, NppiSize oSizeROI, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void SignedDistanceTransformAbsPBA(const Pixel32fC1 &nCutoffValue, const Pixel32fC1 &nSubPixelXShift, const Pixel32fC1 &nSubPixelYShift, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16uC1View &pDstVoronoiAbsoluteManhattanDistances, Image32fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void SignedDistanceTransformAbsPBA(const Pixel32fC1 &nCutoffValue, const Pixel32fC1 &nSubPixelXShift, const Pixel32fC1 &nSubPixelYShift, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16uC1View &pDstVoronoiAbsoluteManhattanDistances, Image32fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSignedDistanceTransformPBA_32f64f_C1R_Ctx(Npp32f * pSrc, int nSrcStep, Npp32f nCutoffValue, Npp64f nSubPixelXShift, Npp64f nSubPixelYShift, Npp16s * pDstVoronoi, int nDstVoronoiStep, Npp16s * pDstVoronoiIndices, int nDstVoronoiIndicesStep, Npp16s * pDstVoronoiRelativeManhattanDistances, int nDstVoronoiRelativeManhattanDistancesStep, Npp64f * pDstTransform, int nDstTransformStep, NppiSize oSizeROI, Npp8u * pDeviceBuffer, Npp8u * pAntialiasingDeviceBuffer, NppStreamContext nppStreamCtx)
-    void SignedDistanceTransformPBA(const Pixel32fC1 &nCutoffValue, const Pixel64fC1 &nSubPixelXShift, const Pixel64fC1 &nSubPixelYShift, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16sC1View &pDstVoronoiRelativeManhattanDistances, Image64fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAntialiasingDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void SignedDistanceTransformPBA(const Pixel32fC1 &nCutoffValue, const Pixel64fC1 &nSubPixelXShift, const Pixel64fC1 &nSubPixelYShift, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16sC1View &pDstVoronoiRelativeManhattanDistances, Image64fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAntialiasingDeviceBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSignedDistanceTransformAbsPBA_32f64f_C1R_Ctx(Npp32f * pSrc, int nSrcStep, Npp32f nCutoffValue, Npp64f nSubPixelXShift, Npp64f nSubPixelYShift, Npp16s * pDstVoronoi, int nDstVoronoiStep, Npp16s * pDstVoronoiIndices, int nDstVoronoiIndicesStep, Npp16u * pDstVoronoiAbsoluteManhattanDistances, int nDstVoronoiAbsoluteManhattanDistancesStep, Npp64f * pDstTransform, int nDstTransformStep, NppiSize oSizeROI, Npp8u * pDeviceBuffer, Npp8u * pAntialiasingDeviceBuffer, NppStreamContext nppStreamCtx)
-    void SignedDistanceTransformAbsPBA(const Pixel32fC1 &nCutoffValue, const Pixel64fC1 &nSubPixelXShift, const Pixel64fC1 &nSubPixelYShift, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16uC1View &pDstVoronoiAbsoluteManhattanDistances, Image64fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAntialiasingDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void SignedDistanceTransformAbsPBA(const Pixel32fC1 &nCutoffValue, const Pixel64fC1 &nSubPixelXShift, const Pixel64fC1 &nSubPixelYShift, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16uC1View &pDstVoronoiAbsoluteManhattanDistances, Image64fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAntialiasingDeviceBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiHistogramOfGradientsBorder_32f_C1R_Ctx(const Npp32f * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, const NppiPoint * hpLocations, int nLocations, Npp32f * pDstWindowDescriptorBuffer, NppiSize oSizeROI, const NppiHOGConfig oHOGConfig, Npp8u * pScratchBuffer, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
     void HistogramOfGradientsBorder(const NppiPoint *hpLocations, int nLocations, Npp32f *pDstWindowDescriptorBuffer, const NppiHOGConfig oHOGConfig, opp::cuda::DevVarView<byte> &pScratchBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
@@ -849,7 +849,7 @@ class Image32fC1View : public ImageView<Pixel32fC1>
     Image32fC1View &MinEvery(const Image32fC1View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiRectStdDev_32f_C1R_Ctx(const Npp32f * pSrc, int nSrcStep, const Npp64f * pSqr, int nSqrStep, Npp32f * pDst, int nDstStep, NppiSize oSizeROI, NppiRect oRect, NppStreamContext nppStreamCtx)
-    void RectStdDev(const Image64fC1View &pSqr, Image32fC1View &pDst, NppiRect oRect, const NppStreamContext &nppStreamCtx) const;
+    void RectStdDev(Image64fC1View &pSqr, Image32fC1View &pDst, NppiRect oRect, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiHistogramRange_32f_C1R_Ctx(const Npp32f * pSrc, int nSrcStep, NppiSize oSizeROI, Npp32s * pHist, const Npp32f * pLevels, int nLevels, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
     void HistogramRange(opp::cuda::DevVarView<int> &pHist, const opp::cuda::DevVarView<float> &pLevels, int nLevels, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx) const;

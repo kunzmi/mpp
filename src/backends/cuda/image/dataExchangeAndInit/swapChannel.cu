@@ -40,9 +40,9 @@ void InvokeSwapChannelSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size
         using swapChannelSrc =
             SrcFunctor<TupelSize, SrcT, SrcT, DstT, opp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
 
-        SwapChannel<SrcT, DstT> op(aDstChannels);
+        const opp::SwapChannel<SrcT, DstT> op(aDstChannels);
 
-        swapChannelSrc functor(aSrc1, aPitchSrc1, op);
+        const swapChannelSrc functor(aSrc1, aPitchSrc1, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, swapChannelSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -112,9 +112,9 @@ void InvokeSwapChannelSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size
             using swapChannelSrc =
                 SrcFunctor<TupelSize, SrcT, SrcT, DstT, opp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
 
-            SwapChannel<SrcT, DstT> op(aDstChannels, aValue);
+            const opp::SwapChannel<SrcT, DstT> op(aDstChannels, aValue);
 
-            swapChannelSrc functor(aSrc1, aPitchSrc1, op);
+            const swapChannelSrc functor(aSrc1, aPitchSrc1, op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, swapChannelSrc>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                              functor);
@@ -123,9 +123,9 @@ void InvokeSwapChannelSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size
         {
             using swapChannelSrcDstAsSrc = SrcDstAsSrcFunctor<TupelSize, SrcT, DstT, opp::SwapChannel<SrcT, DstT>>;
 
-            SwapChannel<SrcT, DstT> op(aDstChannels, aValue);
+            const opp::SwapChannel<SrcT, DstT> op(aDstChannels, aValue);
 
-            swapChannelSrcDstAsSrc functor(aSrc1, aPitchSrc1, aDst, aPitchDst, op);
+            const swapChannelSrcDstAsSrc functor(aSrc1, aPitchSrc1, aDst, aPitchDst, op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, swapChannelSrcDstAsSrc>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                      functor);

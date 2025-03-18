@@ -47,12 +47,12 @@ class Image####View : public ImageView<Pixel####>
     /// <summary>
     /// Returns a new Image####View with the new ROI
     /// </summary>
-    [[nodiscard]] Image####View GetView(const Roi &aRoi) const;
+    [[nodiscard]] Image####View GetView(const Roi &aRoi);
 
     /// <summary>
     /// Returns a new ImageView with the current ROI adapted by aBorder
     /// </summary>
-    [[nodiscard]] Image####View GetView(const Border &aBorder = Border()) const;
+    [[nodiscard]] Image####View GetView(const Border &aBorder = Border());
 
     //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 )";
@@ -99,12 +99,12 @@ Image####View::Image####View(Pixel#### *aBasePointer, const SizePitched &aSizeAl
 {
 }
 
-Image####View Image####View::GetView(const Roi &aRoi) const
+Image####View Image####View::GetView(const Roi &aRoi)
 {
     return {Pointer(), SizePitched(SizeAlloc(), Pitch()), aRoi};
 }
 
-Image####View Image####View::GetView(const Border &aBorder) const
+Image####View Image####View::GetView(const Border &aBorder)
 {
     const Roi newRoi = ROI() + aBorder;
     checkRoiIsInRoi(newRoi, Roi(0, 0, SizeAlloc()));

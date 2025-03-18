@@ -38,23 +38,24 @@ void InvokeSqrtSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPit
         using simdOP_t = simd::Sqrt<Tupel<DstT, TupelSize>>;
         if constexpr (simdOP_t::has_simd)
         {
-            using sqrtSrcSIMD = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sqrt<ComputeT>, RoundingMode::None,
-                                           ComputeT, simdOP_t>;
+            using sqrtSrcSIMD = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sqrt<ComputeT>,
+                                           RoundingMode::NearestTiesToEven, ComputeT, simdOP_t>;
 
-            Sqrt<ComputeT> op;
-            simdOP_t opSIMD;
+            const opp::Sqrt<ComputeT> op;
+            const simdOP_t opSIMD;
 
-            sqrtSrcSIMD functor(aSrc1, aPitchSrc1, op, opSIMD);
+            const sqrtSrcSIMD functor(aSrc1, aPitchSrc1, op, opSIMD);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, sqrtSrcSIMD>(aDst, aPitchDst, aSize, aStreamCtx, functor);
         }
         else
         {
-            using sqrtSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sqrt<ComputeT>, RoundingMode::None>;
+            using sqrtSrc =
+                SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sqrt<ComputeT>, RoundingMode::NearestTiesToEven>;
 
-            Sqrt<ComputeT> op;
+            const opp::Sqrt<ComputeT> op;
 
-            sqrtSrc functor(aSrc1, aPitchSrc1, op);
+            const sqrtSrc functor(aSrc1, aPitchSrc1, op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, sqrtSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
         }
@@ -116,24 +117,25 @@ void InvokeSqrtInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, 
         using simdOP_t = simd::Sqrt<Tupel<DstT, TupelSize>>;
         if constexpr (simdOP_t::has_simd)
         {
-            using sqrtInplaceSIMD =
-                InplaceFunctor<TupelSize, ComputeT, DstT, opp::Sqrt<ComputeT>, RoundingMode::None, ComputeT, simdOP_t>;
+            using sqrtInplaceSIMD = InplaceFunctor<TupelSize, ComputeT, DstT, opp::Sqrt<ComputeT>,
+                                                   RoundingMode::NearestTiesToEven, ComputeT, simdOP_t>;
 
-            Sqrt<ComputeT> op;
-            simdOP_t opSIMD;
+            const opp::Sqrt<ComputeT> op;
+            const simdOP_t opSIMD;
 
-            sqrtInplaceSIMD functor(op, opSIMD);
+            const sqrtInplaceSIMD functor(op, opSIMD);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, sqrtInplaceSIMD>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                               functor);
         }
         else
         {
-            using sqrtInplace = InplaceFunctor<TupelSize, ComputeT, DstT, opp::Sqrt<ComputeT>, RoundingMode::None>;
+            using sqrtInplace =
+                InplaceFunctor<TupelSize, ComputeT, DstT, opp::Sqrt<ComputeT>, RoundingMode::NearestTiesToEven>;
 
-            Sqrt<ComputeT> op;
+            const opp::Sqrt<ComputeT> op;
 
-            sqrtInplace functor(op);
+            const sqrtInplace functor(op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, sqrtInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                           functor);

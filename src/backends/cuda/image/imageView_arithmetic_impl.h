@@ -2416,7 +2416,7 @@ ImageView<T> &ImageView<T>::AlphaPremul(const opp::cuda::StreamCtx &aStreamCtx)
 template <PixelType T>
 ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst,
                                         const opp::cuda::StreamCtx &aStreamCtx)
-    requires RealFloatingVector<T>
+    requires RealFloatingVector<T> && (!FourChannelAlpha<T>)
 {
     checkSameSize(ROI(), aDst.ROI());
 
@@ -2430,7 +2430,7 @@ ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> 
 template <PixelType T>
 ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst,
                                         const opp::cuda::StreamCtx &aStreamCtx)
-    requires RealIntVector<T>
+    requires RealIntVector<T> && (!FourChannelAlpha<T>)
 {
     checkSameSize(ROI(), aDst.ROI());
 
@@ -2446,7 +2446,7 @@ ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> 
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, const opp::cuda::StreamCtx &aStreamCtx)
-    requires RealFloatingVector<T>
+    requires RealFloatingVector<T> && (!FourChannelAlpha<T>)
 {
     const T alphaVec(aAlpha);
 
@@ -2457,13 +2457,37 @@ ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, const opp::cu
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, const opp::cuda::StreamCtx &aStreamCtx)
-    requires RealIntVector<T>
+    requires RealIntVector<T> && (!FourChannelAlpha<T>)
 {
     const float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
 
     const T alphaVec(aAlpha);
 
     InvokeMulInplaceCScale(PointerRoi(), Pitch(), alphaVec, scaleFactorFloat, SizeRoi(), aStreamCtx);
+
+    return *this;
+}
+
+template <PixelType T>
+ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst,
+                                        const opp::cuda::StreamCtx &aStreamCtx)
+    requires FourChannelAlpha<T>
+{
+    checkSameSize(ROI(), aDst.ROI());
+    using SrcTA = Vector4<remove_vector_t<T>>;
+
+    InvokeAlphaPremulACSrc(reinterpret_cast<SrcTA *>(PointerRoi()), Pitch(),
+                           reinterpret_cast<SrcTA *>(aDst.PointerRoi()), aDst.Pitch(), aAlpha, SizeRoi(), aStreamCtx);
+
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, const opp::cuda::StreamCtx &aStreamCtx)
+    requires FourChannelAlpha<T>
+{
+    using SrcTA = Vector4<remove_vector_t<T>>;
+    InvokeAlphaPremulACInplace(reinterpret_cast<SrcTA *>(PointerRoi()), Pitch(), aAlpha, SizeRoi(), aStreamCtx);
 
     return *this;
 }

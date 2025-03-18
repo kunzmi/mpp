@@ -176,7 +176,7 @@ ConvertedFunction::ConvertedFunction(const Function &aFunction)
             const int channelCount = InputPlanarCount();
             for (int i = 0; i < channelCount; i++)
             {
-                const std::string type = "const Image" + GetTypeString() + "C1View &";
+                const std::string type = "Image" + GetTypeString() + "C1View &";
                 mArguments.emplace_back(*this, type, "aSrcDstChannel" + std::to_string(i));
             }
         }
@@ -305,7 +305,7 @@ ConvertedFunction::ConvertedFunction(const Function &aFunction)
             ss << "    const " << type << " srcList[] = { ";
             for (int i = 0; i < channelCount; i++)
             {
-                ss << "reinterpret_cast<" << type << ">(aSrcChannel" << i;
+                ss << "reinterpret_cast<const " << type << ">(aSrcChannel" << i;
                 if (IsGeometryFunction())
                 {
                     ss << ".Pointer())";

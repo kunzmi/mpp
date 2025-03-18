@@ -36,9 +36,9 @@ void InvokeRealSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPit
         using realSrc =
             SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Real<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
 
-        Real<ComputeT> op;
+        const opp::Real<ComputeT> op;
 
-        realSrc functor(aSrc1, aPitchSrc1, op);
+        const realSrc functor(aSrc1, aPitchSrc1, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, realSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }

@@ -183,8 +183,8 @@ class Event
 };
 
 /// <summary>
-/// Shortcut for elapsed time
+/// Shortcut for elapsed time, mathematically correct we put aEventEnd on the left side of the -sign
 /// </summary>
-float operator-(const Event &aEventStart, const Event &aEventEnd);
+float operator-(const Event &aEventEnd, const Event &aEventStart);
 } // namespace opp::cuda
 #endif // OPP_ENABLE_CUDA_CORE

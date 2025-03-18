@@ -41,12 +41,12 @@ Image8uC2View::Image8uC2View(Pixel8uC2 *aBasePointer, const SizePitched &aSizeAl
 {
 }
 
-Image8uC2View Image8uC2View::GetView(const Roi &aRoi) const
+Image8uC2View Image8uC2View::GetView(const Roi &aRoi)
 {
     return {Pointer(), SizePitched(SizeAlloc(), Pitch()), aRoi};
 }
 
-Image8uC2View Image8uC2View::GetView(const Border &aBorder) const
+Image8uC2View Image8uC2View::GetView(const Border &aBorder)
 {
     const Roi newRoi = ROI() + aBorder;
     checkRoiIsInRoi(newRoi, Roi(0, 0, SizeAlloc()));
@@ -73,7 +73,7 @@ Image8uC3View &Image8uC2View::YUV422ToRGB(Image8uC3View &pDst, const NppStreamCo
 
 Image8uC3View &Image8uC2View::NV12ToRGB(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, Image8uC3View &pDst, const NppStreamContext &nppStreamCtx)
 {
-    const Npp8u * srcList[] = { reinterpret_cast<Npp8u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<Npp8u *>(aSrcChannel1.PointerRoi()) };
+    const Npp8u * srcList[] = { reinterpret_cast<const Npp8u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<const Npp8u *>(aSrcChannel1.PointerRoi()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
     {
         throw INVALIDARGUMENT(aSrcChannel1, "Not all source image planes have the same image pitch. First image pitch is " << aSrcChannel0.Pitch() << " but the pitch for plane no 1 is " << aSrcChannel1.Pitch());
@@ -84,7 +84,7 @@ Image8uC3View &Image8uC2View::NV12ToRGB(const Image8uC1View &aSrcChannel0, const
 
 Image8uC3View &Image8uC2View::NV12ToRGB_709HDTV(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, Image8uC3View &pDst, const NppStreamContext &nppStreamCtx)
 {
-    const Npp8u * srcList[] = { reinterpret_cast<Npp8u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<Npp8u *>(aSrcChannel1.PointerRoi()) };
+    const Npp8u * srcList[] = { reinterpret_cast<const Npp8u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<const Npp8u *>(aSrcChannel1.PointerRoi()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
     {
         throw INVALIDARGUMENT(aSrcChannel1, "Not all source image planes have the same image pitch. First image pitch is " << aSrcChannel0.Pitch() << " but the pitch for plane no 1 is " << aSrcChannel1.Pitch());
@@ -95,7 +95,7 @@ Image8uC3View &Image8uC2View::NV12ToRGB_709HDTV(const Image8uC1View &aSrcChannel
 
 Image8uC3View &Image8uC2View::NV12ToRGB_709CS(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, Image8uC3View &pDst, const NppStreamContext &nppStreamCtx)
 {
-    const Npp8u * srcList[] = { reinterpret_cast<Npp8u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<Npp8u *>(aSrcChannel1.PointerRoi()) };
+    const Npp8u * srcList[] = { reinterpret_cast<const Npp8u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<const Npp8u *>(aSrcChannel1.PointerRoi()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
     {
         throw INVALIDARGUMENT(aSrcChannel1, "Not all source image planes have the same image pitch. First image pitch is " << aSrcChannel0.Pitch() << " but the pitch for plane no 1 is " << aSrcChannel1.Pitch());
@@ -106,7 +106,7 @@ Image8uC3View &Image8uC2View::NV12ToRGB_709CS(const Image8uC1View &aSrcChannel0,
 
 Image8uC4View &Image8uC2View::NV21ToRGB(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx)
 {
-    const Npp8u * srcList[] = { reinterpret_cast<Npp8u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<Npp8u *>(aSrcChannel1.PointerRoi()) };
+    const Npp8u * srcList[] = { reinterpret_cast<const Npp8u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<const Npp8u *>(aSrcChannel1.PointerRoi()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
     {
         throw INVALIDARGUMENT(aSrcChannel1, "Not all source image planes have the same image pitch. First image pitch is " << aSrcChannel0.Pitch() << " but the pitch for plane no 1 is " << aSrcChannel1.Pitch());
@@ -117,7 +117,7 @@ Image8uC4View &Image8uC2View::NV21ToRGB(const Image8uC1View &aSrcChannel0, const
 
 Image8uC3View &Image8uC2View::NV12ToBGR(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, Image8uC3View &pDst, const NppStreamContext &nppStreamCtx)
 {
-    const Npp8u * srcList[] = { reinterpret_cast<Npp8u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<Npp8u *>(aSrcChannel1.PointerRoi()) };
+    const Npp8u * srcList[] = { reinterpret_cast<const Npp8u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<const Npp8u *>(aSrcChannel1.PointerRoi()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
     {
         throw INVALIDARGUMENT(aSrcChannel1, "Not all source image planes have the same image pitch. First image pitch is " << aSrcChannel0.Pitch() << " but the pitch for plane no 1 is " << aSrcChannel1.Pitch());
@@ -128,7 +128,7 @@ Image8uC3View &Image8uC2View::NV12ToBGR(const Image8uC1View &aSrcChannel0, const
 
 Image8uC3View &Image8uC2View::NV12ToBGR_709HDTV(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, Image8uC3View &pDst, const NppStreamContext &nppStreamCtx)
 {
-    const Npp8u * srcList[] = { reinterpret_cast<Npp8u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<Npp8u *>(aSrcChannel1.PointerRoi()) };
+    const Npp8u * srcList[] = { reinterpret_cast<const Npp8u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<const Npp8u *>(aSrcChannel1.PointerRoi()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
     {
         throw INVALIDARGUMENT(aSrcChannel1, "Not all source image planes have the same image pitch. First image pitch is " << aSrcChannel0.Pitch() << " but the pitch for plane no 1 is " << aSrcChannel1.Pitch());
@@ -139,7 +139,7 @@ Image8uC3View &Image8uC2View::NV12ToBGR_709HDTV(const Image8uC1View &aSrcChannel
 
 Image8uC3View &Image8uC2View::NV12ToBGR_709CS(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, Image8uC3View &pDst, const NppStreamContext &nppStreamCtx)
 {
-    const Npp8u * srcList[] = { reinterpret_cast<Npp8u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<Npp8u *>(aSrcChannel1.PointerRoi()) };
+    const Npp8u * srcList[] = { reinterpret_cast<const Npp8u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<const Npp8u *>(aSrcChannel1.PointerRoi()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
     {
         throw INVALIDARGUMENT(aSrcChannel1, "Not all source image planes have the same image pitch. First image pitch is " << aSrcChannel0.Pitch() << " but the pitch for plane no 1 is " << aSrcChannel1.Pitch());
@@ -150,7 +150,7 @@ Image8uC3View &Image8uC2View::NV12ToBGR_709CS(const Image8uC1View &aSrcChannel0,
 
 Image8uC4View &Image8uC2View::NV21ToBGR(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, Image8uC4View &pDst, const NppStreamContext &nppStreamCtx)
 {
-    const Npp8u * srcList[] = { reinterpret_cast<Npp8u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<Npp8u *>(aSrcChannel1.PointerRoi()) };
+    const Npp8u * srcList[] = { reinterpret_cast<const Npp8u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<const Npp8u *>(aSrcChannel1.PointerRoi()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
     {
         throw INVALIDARGUMENT(aSrcChannel1, "Not all source image planes have the same image pitch. First image pitch is " << aSrcChannel0.Pitch() << " but the pitch for plane no 1 is " << aSrcChannel1.Pitch());
@@ -443,7 +443,7 @@ void Image8uC2View::YCbCr411ToYCrCb420(Image8uC1View &aDstChannel0, Image8uC1Vie
 
 void Image8uC2View::NV12ToYUV420(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const NppStreamContext &nppStreamCtx)
 {
-    const Npp8u * srcList[] = { reinterpret_cast<Npp8u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<Npp8u *>(aSrcChannel1.PointerRoi()) };
+    const Npp8u * srcList[] = { reinterpret_cast<const Npp8u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<const Npp8u *>(aSrcChannel1.PointerRoi()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
     {
         throw INVALIDARGUMENT(aSrcChannel1, "Not all source image planes have the same image pitch. First image pitch is " << aSrcChannel0.Pitch() << " but the pitch for plane no 1 is " << aSrcChannel1.Pitch());
@@ -478,7 +478,7 @@ Image8uC3View &Image8uC2View::YUV422ToRGB(Image8uC3View &pDst, const Npp32f aTwi
 
 Image8uC3View &Image8uC2View::NV12ToRGB(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, Image8uC3View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx)
 {
-    const Npp8u * srcList[] = { reinterpret_cast<Npp8u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<Npp8u *>(aSrcChannel1.PointerRoi()) };
+    const Npp8u * srcList[] = { reinterpret_cast<const Npp8u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<const Npp8u *>(aSrcChannel1.PointerRoi()) };
     int pitchSrcList[] = { to_int(aSrcChannel0.Pitch()), to_int(aSrcChannel1.Pitch()) };
     nppSafeCall(nppiNV12ToRGB_8u_ColorTwist32f_P2C3R_Ctx(srcList, pitchSrcList, reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), aSrcChannel0.NppiSizeRoi(), aTwist, nppStreamCtx));
     return pDst;

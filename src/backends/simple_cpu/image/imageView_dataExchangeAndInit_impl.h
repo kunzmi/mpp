@@ -51,9 +51,9 @@
 #include <common/opp_defs.h>
 #include <common/safeCast.h>
 #include <common/utilities.h>
-#include <common/vector_typetraits.h>
 #include <common/vector1.h>
 #include <common/vectorTypes.h>
+#include <common/vector_typetraits.h>
 #include <concepts>
 #include <cstddef>
 #include <type_traits>
@@ -635,6 +635,17 @@ template <PixelType T> ImageView<T> &ImageView<T>::FillRandom()
     using randomInplace = InplaceFunctor<1, T, T, opp::FillRandom<T>, RoundingMode::None>;
 
     const opp::FillRandom<T> op;
+    const randomInplace functor(op);
+
+    forEachPixel(*this, functor);
+    return *this;
+}
+
+template <PixelType T> ImageView<T> &ImageView<T>::FillRandom(uint aSeed)
+{
+    using randomInplace = InplaceFunctor<1, T, T, opp::FillRandom<T>, RoundingMode::None>;
+
+    const opp::FillRandom<T> op(aSeed);
     const randomInplace functor(op);
 
     forEachPixel(*this, functor);

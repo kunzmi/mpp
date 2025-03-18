@@ -54,10 +54,10 @@ void InvokeAddSrcSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *
             using addSrcSrcSIMD = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoundingMode::None,
                                                 ComputeT_SIMD, simdOP_t>;
 
-            Add<ComputeT> op;
-            simdOP_t opSIMD;
+            const opp::Add<ComputeT> op;
+            const simdOP_t opSIMD;
 
-            addSrcSrcSIMD functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, opSIMD);
+            const addSrcSrcSIMD functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, opSIMD);
 
             InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addSrcSrcSIMD>(aMask, aPitchMask, aDst, aPitchDst,
                                                                                   aSize, aStreamCtx, functor);
@@ -67,9 +67,9 @@ void InvokeAddSrcSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *
             // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
             using addSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoundingMode::None>;
 
-            Add<ComputeT> op;
+            const opp::Add<ComputeT> op;
 
-            addSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+            const addSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
             InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addSrcSrc>(aMask, aPitchMask, aDst, aPitchDst, aSize,
                                                                               aStreamCtx, functor);
@@ -141,12 +141,12 @@ void InvokeAddSrcSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const S
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using addSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>,
-                                                  RoundingMode::NearestTiesAwayFromZero>;
+        using addSrcSrcScale =
+            SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoundingMode::NearestTiesToEven>;
 
-        Add<ComputeT> op;
+        const opp::Add<ComputeT> op;
 
-        addSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
+        const addSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addSrcSrcScale>(aMask, aPitchMask, aDst, aPitchDst,
                                                                                aSize, aStreamCtx, functor);
@@ -212,12 +212,12 @@ void InvokeAddSrcCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aS
             using addSrcCSIMD = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>,
                                                    RoundingMode::None, Tupel<ComputeT_SIMD, TupelSize>, simdOP_t>;
 
-            Add<ComputeT> op;
-            simdOP_t opSIMD;
-            Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
+            const opp::Add<ComputeT> op;
+            const simdOP_t opSIMD;
+            const Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
                 Tupel<ComputeT_SIMD, TupelSize>::GetConstant(static_cast<ComputeT_SIMD>(aConst));
 
-            addSrcCSIMD functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
+            const addSrcCSIMD functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
 
             InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addSrcCSIMD>(aMask, aPitchMask, aDst, aPitchDst,
                                                                                 aSize, aStreamCtx, functor);
@@ -227,9 +227,9 @@ void InvokeAddSrcCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aS
             // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
             using addSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoundingMode::None>;
 
-            Add<ComputeT> op;
+            const opp::Add<ComputeT> op;
 
-            addSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
+            const addSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
 
             InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addSrcC>(aMask, aPitchMask, aDst, aPitchDst, aSize,
                                                                             aStreamCtx, functor);
@@ -301,11 +301,11 @@ void InvokeAddSrcCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const Src
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using addSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>,
-                                                     RoundingMode::NearestTiesAwayFromZero>;
+                                                     RoundingMode::NearestTiesToEven>;
 
-        Add<ComputeT> op;
+        const opp::Add<ComputeT> op;
 
-        addSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
+        const addSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addSrcCScale>(aMask, aPitchMask, aDst, aPitchDst, aSize,
                                                                              aStreamCtx, functor);
@@ -367,9 +367,9 @@ void InvokeAddSrcDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT 
         using addSrcDevC =
             SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoundingMode::None>;
 
-        Add<ComputeT> op;
+        const opp::Add<ComputeT> op;
 
-        addSrcDevC functor(aSrc, aPitchSrc, aConst, op);
+        const addSrcDevC functor(aSrc, aPitchSrc, aConst, op);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addSrcDevC>(aMask, aPitchMask, aDst, aPitchDst, aSize,
                                                                            aStreamCtx, functor);
@@ -440,11 +440,11 @@ void InvokeAddSrcDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using addSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>,
-                                                           RoundingMode::NearestTiesAwayFromZero>;
+                                                           RoundingMode::NearestTiesToEven>;
 
-        Add<ComputeT> op;
+        const opp::Add<ComputeT> op;
 
-        addSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
+        const addSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addSrcDevCScale>(aMask, aPitchMask, aDst, aPitchDst,
                                                                                 aSize, aStreamCtx, functor);
@@ -509,10 +509,10 @@ void InvokeAddInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aS
             using addInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>,
                                                         RoundingMode::None, ComputeT_SIMD, simdOP_t>;
 
-            Add<ComputeT> op;
-            simdOP_t opSIMD;
+            const opp::Add<ComputeT> op;
+            const simdOP_t opSIMD;
 
-            addInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
+            const addInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
 
             InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addInplaceSrcSIMD>(
                 aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
@@ -523,9 +523,9 @@ void InvokeAddInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aS
             using addInplaceSrc =
                 InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoundingMode::None>;
 
-            Add<ComputeT> op;
+            const opp::Add<ComputeT> op;
 
-            addInplaceSrc functor(aSrc2, aPitchSrc2, op);
+            const addInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
             InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addInplaceSrc>(
                 aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
@@ -596,11 +596,11 @@ void InvokeAddInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Dst
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using addInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>,
-                                                          RoundingMode::NearestTiesAwayFromZero>;
+                                                          RoundingMode::NearestTiesToEven>;
 
-        Add<ComputeT> op;
+        const opp::Add<ComputeT> op;
 
-        addInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
+        const addInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addInplaceSrcScale>(
             aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
@@ -666,12 +666,12 @@ void InvokeAddInplaceCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrc
                 InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Add<ComputeT>, RoundingMode::None,
                                        Tupel<ComputeT_SIMD, TupelSize>, simdOP_t>;
 
-            Add<ComputeT> op;
-            simdOP_t opSIMD;
-            Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
+            const opp::Add<ComputeT> op;
+            const simdOP_t opSIMD;
+            const Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
                 Tupel<ComputeT_SIMD, TupelSize>::GetConstant(static_cast<ComputeT_SIMD>(aConst));
 
-            addInplaceCSIMD functor(static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
+            const addInplaceCSIMD functor(static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
 
             InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addInplaceCSIMD>(
                 aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
@@ -682,9 +682,9 @@ void InvokeAddInplaceCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrc
             using addInplaceC =
                 InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Add<ComputeT>, RoundingMode::None>;
 
-            Add<ComputeT> op;
+            const opp::Add<ComputeT> op;
 
-            addInplaceC functor(static_cast<ComputeT>(aConst), op);
+            const addInplaceC functor(static_cast<ComputeT>(aConst), op);
 
             InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addInplaceC>(
                 aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
@@ -754,12 +754,12 @@ void InvokeAddInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT 
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using addInplaceCScale = InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Add<ComputeT>,
-                                                             RoundingMode::NearestTiesAwayFromZero>;
+        using addInplaceCScale =
+            InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Add<ComputeT>, RoundingMode::NearestTiesToEven>;
 
-        Add<ComputeT> op;
+        const opp::Add<ComputeT> op;
 
-        addInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
+        const addInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addInplaceCScale>(
             aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
@@ -819,9 +819,9 @@ void InvokeAddInplaceDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *a
         using addInplaceDevC =
             InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, opp::Add<ComputeT>, RoundingMode::None>;
 
-        Add<ComputeT> op;
+        const opp::Add<ComputeT> op;
 
-        addInplaceDevC functor(aConst, op);
+        const addInplaceDevC functor(aConst, op);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addInplaceDevC>(aMask, aPitchMask, aSrcDst, aPitchSrcDst,
                                                                                aSize, aStreamCtx, functor);
@@ -891,11 +891,11 @@ void InvokeAddInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using addInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Add<ComputeT>,
-                                                                   RoundingMode::NearestTiesAwayFromZero>;
+                                                                   RoundingMode::NearestTiesToEven>;
 
-        Add<ComputeT> op;
+        const opp::Add<ComputeT> op;
 
-        addInplaceDevCScale functor(aConst, op, aScaleFactor);
+        const addInplaceDevCScale functor(aConst, op, aScaleFactor);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addInplaceDevCScale>(
             aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);

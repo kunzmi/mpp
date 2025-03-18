@@ -36,9 +36,9 @@ void InvokeConjSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPit
 
         using conjSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Conj<ComputeT>, RoundingMode::None>;
 
-        Conj<ComputeT> op;
+        const opp::Conj<ComputeT> op;
 
-        conjSrc functor(aSrc1, aPitchSrc1, op);
+        const conjSrc functor(aSrc1, aPitchSrc1, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, conjSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -76,9 +76,9 @@ void InvokeConjInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, 
 
         using conjInplace = InplaceFunctor<TupelSize, ComputeT, DstT, opp::Conj<ComputeT>, RoundingMode::None>;
 
-        Conj<ComputeT> op;
+        const opp::Conj<ComputeT> op;
 
-        conjInplace functor(op);
+        const conjInplace functor(op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, conjInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                       functor);

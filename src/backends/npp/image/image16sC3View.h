@@ -45,15 +45,15 @@ class Image16sC3View : public ImageView<Pixel16sC3>
     /// <summary>
     /// Returns a new Image16sC3View with the new ROI
     /// </summary>
-    [[nodiscard]] Image16sC3View GetView(const Roi &aRoi) const;
+    [[nodiscard]] Image16sC3View GetView(const Roi &aRoi);
 
     /// <summary>
     /// Returns a new ImageView with the current ROI adapted by aBorder
     /// </summary>
-    [[nodiscard]] Image16sC3View GetView(const Border &aBorder = Border()) const;
+    [[nodiscard]] Image16sC3View GetView(const Border &aBorder = Border());
 
     //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
-#if OPPi_ENABLE_SINT16_TYPE && OPPi_ENABLE_THREE_CHANNEL
+#if OPPi_ENABLE_INT16_TYPE && OPPi_ENABLE_THREE_CHANNEL
 
     // NppStatus nppiSet_16s_C3R_Ctx(const Npp16s[3] aValue, Npp16s * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     Image16sC3View &Set(const Pixel16sC3 &aValue, const NppStreamContext &nppStreamCtx);
@@ -251,7 +251,7 @@ class Image16sC3View : public ImageView<Pixel16sC3>
     static void ColorTwist32f(const Image16sC1View &aSrcChannel0, const Image16sC1View &aSrcChannel1, const Image16sC1View &aSrcChannel2, Image16sC1View &aDstChannel0, Image16sC1View &aDstChannel1, Image16sC1View &aDstChannel2, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiColorTwist32f_16s_IP3R_Ctx(Npp16s *const[3] pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp32f[3][4] aTwist, NppStreamContext nppStreamCtx)
-    static void ColorTwist32f(const Image16sC1View &aSrcDstChannel0, const Image16sC1View &aSrcDstChannel1, const Image16sC1View &aSrcDstChannel2, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
+    static void ColorTwist32f(Image16sC1View &aSrcDstChannel0, Image16sC1View &aSrcDstChannel1, Image16sC1View &aSrcDstChannel2, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiLUT_16s_C3R_Ctx(const Npp16s * pSrc, int nSrcStep, Npp16s * pDst, int nDstStep, NppiSize oSizeROI, const Npp32s *[3] pValues, const Npp32s *[3] pLevels, int[3] nLevels, NppStreamContext nppStreamCtx)
     Image16sC3View &LUT(Image16sC3View &pDst, opp::cuda::DevVarView<int> pValues[3], opp::cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx) const;
@@ -661,7 +661,7 @@ class Image16sC3View : public ImageView<Pixel16sC3>
     // NppStatus nppiMirror_16s_C3IR_Ctx(Npp16s * pSrcDst, int nSrcDstStep, NppiSize oROI, NppiAxis flip, NppStreamContext nppStreamCtx)
     Image16sC3View &Mirror(NppiAxis flip, const NppStreamContext &nppStreamCtx);
 
-#endif // OPPi_ENABLE_SINT16_TYPE && OPPi_ENABLE_THREE_CHANNEL
+#endif // OPPi_ENABLE_INT16_TYPE && OPPi_ENABLE_THREE_CHANNEL
     //NOLINTEND(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 };
 } // namespace opp::image::npp

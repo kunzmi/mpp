@@ -35,9 +35,9 @@ void InvokeImagSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPit
 
         using imagSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Imag<ComputeT>, RoundingMode::None>;
 
-        Imag<ComputeT> op;
+        const opp::Imag<ComputeT> op;
 
-        imagSrc functor(aSrc1, aPitchSrc1, op);
+        const imagSrc functor(aSrc1, aPitchSrc1, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, imagSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }

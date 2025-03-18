@@ -46,10 +46,10 @@ void InvokeAbsDiffSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2
             using absDiffSrcSrcSIMD = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AbsDiff<ComputeT>,
                                                     RoundingMode::None, ComputeT_SIMD, simdOP_t>;
 
-            AbsDiff<ComputeT> op;
-            simdOP_t opSIMD;
+            const opp::AbsDiff<ComputeT> op;
+            const simdOP_t opSIMD;
 
-            absDiffSrcSrcSIMD functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, opSIMD);
+            const absDiffSrcSrcSIMD functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, opSIMD);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, absDiffSrcSrcSIMD>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                 functor);
@@ -59,9 +59,9 @@ void InvokeAbsDiffSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2
             using absDiffSrcSrc =
                 SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AbsDiff<ComputeT>, RoundingMode::None>;
 
-            AbsDiff<ComputeT> op;
+            const opp::AbsDiff<ComputeT> op;
 
-            absDiffSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+            const absDiffSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, absDiffSrcSrc>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                             functor);
@@ -123,12 +123,12 @@ void InvokeAbsDiffSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, D
             using absDiffSrcCSIMD = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AbsDiff<ComputeT>,
                                                        RoundingMode::None, Tupel<ComputeT_SIMD, TupelSize>, simdOP_t>;
 
-            AbsDiff<ComputeT> op;
-            simdOP_t opSIMD;
-            Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
+            const opp::AbsDiff<ComputeT> op;
+            const simdOP_t opSIMD;
+            const Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
                 Tupel<ComputeT_SIMD, TupelSize>::GetConstant(static_cast<ComputeT_SIMD>(aConst));
 
-            absDiffSrcCSIMD functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
+            const absDiffSrcCSIMD functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, absDiffSrcCSIMD>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                               functor);
@@ -138,9 +138,9 @@ void InvokeAbsDiffSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, D
             using absDiffSrcC =
                 SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AbsDiff<ComputeT>, RoundingMode::None>;
 
-            AbsDiff<ComputeT> op;
+            const opp::AbsDiff<ComputeT> op;
 
-            absDiffSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
+            const absDiffSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, absDiffSrcC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
         }
@@ -198,9 +198,9 @@ void InvokeAbsDiffSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst
         using absDiffSrcDevC =
             SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AbsDiff<ComputeT>, RoundingMode::None>;
 
-        AbsDiff<ComputeT> op;
+        const opp::AbsDiff<ComputeT> op;
 
-        absDiffSrcDevC functor(aSrc, aPitchSrc, aConst, op);
+        const absDiffSrcDevC functor(aSrc, aPitchSrc, aConst, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, absDiffSrcDevC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -260,10 +260,10 @@ void InvokeAbsDiffInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSr
             using absDiffInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AbsDiff<ComputeT>,
                                                             RoundingMode::None, ComputeT_SIMD, simdOP_t>;
 
-            AbsDiff<ComputeT> op;
-            simdOP_t opSIMD;
+            const opp::AbsDiff<ComputeT> op;
+            const simdOP_t opSIMD;
 
-            absDiffInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
+            const absDiffInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, absDiffInplaceSrcSIMD>(aSrcDst, aPitchSrcDst, aSize,
                                                                                     aStreamCtx, functor);
@@ -273,9 +273,9 @@ void InvokeAbsDiffInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSr
             using absDiffInplaceSrc =
                 InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AbsDiff<ComputeT>, RoundingMode::None>;
 
-            AbsDiff<ComputeT> op;
+            const opp::AbsDiff<ComputeT> op;
 
-            absDiffInplaceSrc functor(aSrc2, aPitchSrc2, op);
+            const absDiffInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, absDiffInplaceSrc>(aSrcDst, aPitchSrcDst, aSize,
                                                                                 aStreamCtx, functor);
@@ -338,12 +338,12 @@ void InvokeAbsDiffInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aCons
                 InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::AbsDiff<ComputeT>, RoundingMode::None,
                                        Tupel<ComputeT_SIMD, TupelSize>, simdOP_t>;
 
-            AbsDiff<ComputeT> op;
-            simdOP_t opSIMD;
-            Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
+            const opp::AbsDiff<ComputeT> op;
+            const simdOP_t opSIMD;
+            const Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
                 Tupel<ComputeT_SIMD, TupelSize>::GetConstant(static_cast<ComputeT_SIMD>(aConst));
 
-            absDiffInplaceCSIMD functor(static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
+            const absDiffInplaceCSIMD functor(static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, absDiffInplaceCSIMD>(aSrcDst, aPitchSrcDst, aSize,
                                                                                   aStreamCtx, functor);
@@ -353,9 +353,9 @@ void InvokeAbsDiffInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aCons
             using absDiffInplaceC =
                 InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::AbsDiff<ComputeT>, RoundingMode::None>;
 
-            AbsDiff<ComputeT> op;
+            const opp::AbsDiff<ComputeT> op;
 
-            absDiffInplaceC functor(static_cast<ComputeT>(aConst), op);
+            const absDiffInplaceC functor(static_cast<ComputeT>(aConst), op);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, absDiffInplaceC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                               functor);
@@ -413,9 +413,9 @@ void InvokeAbsDiffInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aC
         using absDiffInplaceDevC =
             InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, opp::AbsDiff<ComputeT>, RoundingMode::None>;
 
-        AbsDiff<ComputeT> op;
+        const opp::AbsDiff<ComputeT> op;
 
-        absDiffInplaceDevC functor(aConst, op);
+        const absDiffInplaceDevC functor(aConst, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, absDiffInplaceDevC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                              functor);

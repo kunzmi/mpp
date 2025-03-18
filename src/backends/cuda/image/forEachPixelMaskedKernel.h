@@ -166,11 +166,11 @@ __global__ void forEachPixelMaskedKernel(const byte *__restrict__ aMask, size_t 
 }
 
 template <typename DstT, size_t TupelSize, int WarpAlignmentInBytes, class funcType>
-void InvokeForEachPixelMaskedKernel(const dim3 &aBlockSize, uint aSharedMemory, cudaStream_t aStream, const byte *aMask,
-                                    size_t aPitchMask, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
-                                    const funcType &aFunctor)
+void InvokeForEachPixelMaskedKernel(const dim3 &aBlockSize, uint aSharedMemory, int aWarpSize, cudaStream_t aStream,
+                                    const byte *aMask, size_t aPitchMask, DstT *aDst, size_t aPitchDst,
+                                    const Size2D &aSize, const funcType &aFunctor)
 {
-    ThreadSplit<WarpAlignmentInBytes, TupelSize> ts(aDst, aSize.x);
+    ThreadSplit<WarpAlignmentInBytes, TupelSize> ts(aDst, aSize.x, aWarpSize);
 
     dim3 blocksPerGrid(DIV_UP(ts.Total(), aBlockSize.x), DIV_UP(aSize.y, aBlockSize.y), 1);
 
@@ -195,8 +195,8 @@ void InvokeForEachPixelMaskedKernelDefault(const Pixel8uC1 *aMask, size_t aPitch
         constexpr uint SharedMemory        = 0;
 
         InvokeForEachPixelMaskedKernel<DstT, TupelSize, WarpAlignmentInBytes, funcType>(
-            BlockSize, SharedMemory, aStreamCtx.Stream, reinterpret_cast<const byte *>(aMask), aPitchMask, aDst,
-            aPitchDst, aSize, aFunc);
+            BlockSize, SharedMemory, aStreamCtx.WarpSize, aStreamCtx.Stream, reinterpret_cast<const byte *>(aMask),
+            aPitchMask, aDst, aPitchDst, aSize, aFunc);
     }
     else
     {

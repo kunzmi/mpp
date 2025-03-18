@@ -46,12 +46,12 @@ class Image32fC3View : public ImageView<Pixel32fC3>
     /// <summary>
     /// Returns a new Image32fC3View with the new ROI
     /// </summary>
-    [[nodiscard]] Image32fC3View GetView(const Roi &aRoi) const;
+    [[nodiscard]] Image32fC3View GetView(const Roi &aRoi);
 
     /// <summary>
     /// Returns a new ImageView with the current ROI adapted by aBorder
     /// </summary>
-    [[nodiscard]] Image32fC3View GetView(const Border &aBorder = Border()) const;
+    [[nodiscard]] Image32fC3View GetView(const Border &aBorder = Border());
 
     //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 #if OPPi_ENABLE_FLOAT_TYPE && OPPi_ENABLE_THREE_CHANNEL
@@ -246,7 +246,7 @@ class Image32fC3View : public ImageView<Pixel32fC3>
     static void ColorTwist(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiColorTwist_32f_IP3R_Ctx(Npp32f *const[3] pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp32f[3][4] aTwist, NppStreamContext nppStreamCtx)
-    static void ColorTwist(const Image32fC1View &aSrcDstChannel0, const Image32fC1View &aSrcDstChannel1, const Image32fC1View &aSrcDstChannel2, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
+    static void ColorTwist(Image32fC1View &aSrcDstChannel0, Image32fC1View &aSrcDstChannel1, Image32fC1View &aSrcDstChannel2, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiLUT_32f_C3R_Ctx(const Npp32f * pSrc, int nSrcStep, Npp32f * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f *[3] pValues, const Npp32f *[3] pLevels, int[3] nLevels, NppStreamContext nppStreamCtx)
     Image32fC3View &LUT(Image32fC3View &pDst, opp::cuda::DevVarView<float> pValues[3], opp::cuda::DevVarView<float> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx) const;

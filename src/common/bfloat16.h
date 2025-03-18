@@ -248,9 +248,19 @@ class alignas(2) BFloat16
     /// </summary>
     DEVICE_CODE BFloat16 &operator/=(BFloat16 aOther);
 
+    // defined here in header because of inline/no-inline host/device compiler complexity...
     /// <summary>
     /// </summary>
-    DEVICE_CODE [[nodiscard]] BFloat16 operator/(BFloat16 aOther) const;
+    DEVICE_CODE [[nodiscard]] BFloat16 operator/(BFloat16 aOther) const
+    {
+#ifdef IS_HOST_COMPILER
+        return BFloat16(static_cast<float>(*this) / static_cast<float>(aOther));
+#endif
+
+#ifdef IS_CUDA_COMPILER
+        return BFloat16(value / aOther.value);
+#endif
+    }
 
 #ifdef IS_HOST_COMPILER
     /// <summary>

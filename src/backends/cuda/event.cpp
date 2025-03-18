@@ -133,7 +133,7 @@ float Event::ElapsedTime(const Event &aEventStart, const Event &aEventEnd)
     return time;
 }
 
-float operator-(const Event &aEventStart, const Event &aEventEnd)
+float operator-(const Event &aEventEnd, const Event &aEventStart)
 {
     return Event::ElapsedTime(aEventStart, aEventEnd);
 }

@@ -38,12 +38,12 @@ class Image16scC2View : public ImageView<Pixel16scC2>
     /// <summary>
     /// Returns a new Image16scC2View with the new ROI
     /// </summary>
-    [[nodiscard]] Image16scC2View GetView(const Roi &aRoi) const;
+    [[nodiscard]] Image16scC2View GetView(const Roi &aRoi);
 
     /// <summary>
     /// Returns a new ImageView with the current ROI adapted by aBorder
     /// </summary>
-    [[nodiscard]] Image16scC2View GetView(const Border &aBorder = Border()) const;
+    [[nodiscard]] Image16scC2View GetView(const Border &aBorder = Border());
 
     //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 #if OPPi_ENABLE_COMPLEX_INT16_TYPE && OPPi_ENABLE_TWO_CHANNEL

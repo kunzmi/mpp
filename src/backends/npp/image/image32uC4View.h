@@ -38,12 +38,12 @@ class Image32uC4View : public ImageView<Pixel32uC4>
     /// <summary>
     /// Returns a new Image32uC4View with the new ROI
     /// </summary>
-    [[nodiscard]] Image32uC4View GetView(const Roi &aRoi) const;
+    [[nodiscard]] Image32uC4View GetView(const Roi &aRoi);
 
     /// <summary>
     /// Returns a new ImageView with the current ROI adapted by aBorder
     /// </summary>
-    [[nodiscard]] Image32uC4View GetView(const Border &aBorder = Border()) const;
+    [[nodiscard]] Image32uC4View GetView(const Border &aBorder = Border());
 
     //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 #if OPPi_ENABLE_UINT32_TYPE && OPPi_ENABLE_FOUR_CHANNEL

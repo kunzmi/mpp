@@ -40,12 +40,12 @@ Image64fC1View::Image64fC1View(Pixel64fC1 *aBasePointer, const SizePitched &aSiz
 {
 }
 
-Image64fC1View Image64fC1View::GetView(const Roi &aRoi) const
+Image64fC1View Image64fC1View::GetView(const Roi &aRoi)
 {
     return {Pointer(), SizePitched(SizeAlloc(), Pitch()), aRoi};
 }
 
-Image64fC1View Image64fC1View::GetView(const Border &aBorder) const
+Image64fC1View Image64fC1View::GetView(const Border &aBorder)
 {
     const Roi newRoi = ROI() + aBorder;
     checkRoiIsInRoi(newRoi, Roi(0, 0, SizeAlloc()));
@@ -138,7 +138,7 @@ void Image64fC1View::DistanceTransformAbsPBA(const Pixel64fC1 &nMinSiteValue, co
                    "ROI Src: " << ROI() << "ROI pDstVoronoi: " << pDstVoronoi.ROI() << "ROI pDstVoronoiIndices: " << pDstVoronoiIndices.ROI() << "ROI pDstVoronoiAbsoluteManhattanDistances: " << pDstVoronoiAbsoluteManhattanDistances.ROI() << "ROI pDstTransform: " << pDstTransform.ROI());
 }
 
-void Image64fC1View::SignedDistanceTransformPBA(const Pixel64fC1 &nCutoffValue, const Pixel64fC1 &nSubPixelXShift, const Pixel64fC1 &nSubPixelYShift, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16sC1View &pDstVoronoiRelativeManhattanDistances, Image64fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAntialiasingDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image64fC1View::SignedDistanceTransformPBA(const Pixel64fC1 &nCutoffValue, const Pixel64fC1 &nSubPixelXShift, const Pixel64fC1 &nSubPixelYShift, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16sC1View &pDstVoronoiRelativeManhattanDistances, Image64fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAntialiasingDeviceBuffer, const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pDstVoronoi.ROI());
     checkSameSize(ROI(), pDstVoronoiIndices.ROI());
@@ -148,7 +148,7 @@ void Image64fC1View::SignedDistanceTransformPBA(const Pixel64fC1 &nCutoffValue, 
                    "ROI Src: " << ROI() << "ROI pDstVoronoi: " << pDstVoronoi.ROI() << "ROI pDstVoronoiIndices: " << pDstVoronoiIndices.ROI() << "ROI pDstVoronoiRelativeManhattanDistances: " << pDstVoronoiRelativeManhattanDistances.ROI() << "ROI pDstTransform: " << pDstTransform.ROI());
 }
 
-void Image64fC1View::SignedDistanceTransformAbsPBA(const Pixel64fC1 &nCutoffValue, const Pixel64fC1 &nSubPixelXShift, const Pixel64fC1 &nSubPixelYShift, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16uC1View &pDstVoronoiAbsoluteManhattanDistances, Image64fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAntialiasingDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image64fC1View::SignedDistanceTransformAbsPBA(const Pixel64fC1 &nCutoffValue, const Pixel64fC1 &nSubPixelXShift, const Pixel64fC1 &nSubPixelYShift, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16uC1View &pDstVoronoiAbsoluteManhattanDistances, Image64fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAntialiasingDeviceBuffer, const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pDstVoronoi.ROI());
     checkSameSize(ROI(), pDstVoronoiIndices.ROI());

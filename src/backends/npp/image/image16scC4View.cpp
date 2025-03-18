@@ -37,12 +37,12 @@ Image16scC4View::Image16scC4View(Pixel16scC4 *aBasePointer, const SizePitched &a
 {
 }
 
-Image16scC4View Image16scC4View::GetView(const Roi &aRoi) const
+Image16scC4View Image16scC4View::GetView(const Roi &aRoi)
 {
     return {Pointer(), SizePitched(SizeAlloc(), Pitch()), aRoi};
 }
 
-Image16scC4View Image16scC4View::GetView(const Border &aBorder) const
+Image16scC4View Image16scC4View::GetView(const Border &aBorder)
 {
     const Roi newRoi = ROI() + aBorder;
     checkRoiIsInRoi(newRoi, Roi(0, 0, SizeAlloc()));

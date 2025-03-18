@@ -41,9 +41,9 @@ void InvokeAndSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, si
 
         using andSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::And<ComputeT>, RoundingMode::None>;
 
-        And<ComputeT> op;
+        const opp::And<ComputeT> op;
 
-        andSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+        const andSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, andSrcSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -95,9 +95,9 @@ void InvokeAndSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT 
 
         using andSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::And<ComputeT>, RoundingMode::None>;
 
-        And<ComputeT> op;
+        const opp::And<ComputeT> op;
 
-        andSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
+        const andSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, andSrcC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -149,9 +149,9 @@ void InvokeAndSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst, Ds
         using andSrcDevC =
             SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::And<ComputeT>, RoundingMode::None>;
 
-        And<ComputeT> op;
+        const opp::And<ComputeT> op;
 
-        andSrcDevC functor(aSrc, aPitchSrc, aConst, op);
+        const andSrcDevC functor(aSrc, aPitchSrc, aConst, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, andSrcDevC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -204,9 +204,9 @@ void InvokeAndInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, 
         using andInplaceSrc =
             InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::And<ComputeT>, RoundingMode::None>;
 
-        And<ComputeT> op;
+        const opp::And<ComputeT> op;
 
-        andInplaceSrc functor(aSrc2, aPitchSrc2, op);
+        const andInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, andInplaceSrc>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                         functor);
@@ -258,9 +258,9 @@ void InvokeAndInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, c
 
         using andInplaceC = InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::And<ComputeT>, RoundingMode::None>;
 
-        And<ComputeT> op;
+        const opp::And<ComputeT> op;
 
-        andInplaceC functor(static_cast<ComputeT>(aConst), op);
+        const andInplaceC functor(static_cast<ComputeT>(aConst), op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, andInplaceC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                       functor);
@@ -313,9 +313,9 @@ void InvokeAndInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aConst
         using andInplaceDevC =
             InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, opp::And<ComputeT>, RoundingMode::None>;
 
-        And<ComputeT> op;
+        const opp::And<ComputeT> op;
 
-        andInplaceDevC functor(aConst, op);
+        const andInplaceDevC functor(aConst, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, andInplaceDevC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                          functor);

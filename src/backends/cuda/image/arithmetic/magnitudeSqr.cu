@@ -33,12 +33,12 @@ void InvokeMagnitudeSqrSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, siz
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using magnitudeSqrSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::MagnitudeSqr<ComputeT>,
-                                           RoundingMode::NearestTiesAwayFromZero>;
+        using magnitudeSqrSrc =
+            SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::MagnitudeSqr<ComputeT>, RoundingMode::NearestTiesToEven>;
 
-        MagnitudeSqr<ComputeT> op;
+        const opp::MagnitudeSqr<ComputeT> op;
 
-        magnitudeSqrSrc functor(aSrc1, aPitchSrc1, op);
+        const magnitudeSqrSrc functor(aSrc1, aPitchSrc1, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, magnitudeSqrSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }

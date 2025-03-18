@@ -37,9 +37,9 @@ void InvokeNotSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitc
 
         using notSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Not<ComputeT>, RoundingMode::None>;
 
-        Not<ComputeT> op;
+        const opp::Not<ComputeT> op;
 
-        notSrc functor(aSrc1, aPitchSrc1, op);
+        const notSrc functor(aSrc1, aPitchSrc1, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, notSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -83,9 +83,9 @@ void InvokeNotInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, c
 
         using notInplace = InplaceFunctor<TupelSize, DstT, DstT, opp::Not<DstT>, RoundingMode::None>;
 
-        Not<DstT> op;
+        const opp::Not<DstT> op;
 
-        notInplace functor(op);
+        const notInplace functor(op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, notInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
     }

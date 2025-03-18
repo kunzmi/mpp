@@ -8,6 +8,7 @@
 // #include <cuda_runtime_api.h>
 // #include <driver_types.h>
 #include <backends/cuda/image/arithmetic/addSquareProductWeightedOutputType.h>
+#include <backends/cuda/image/statistics/sum.h>
 #include <common/arithmetic/binary_operators.h>
 #include <common/arithmetic/unary_operators.h>
 #include <common/image/channel.h>
@@ -16,6 +17,7 @@
 #include <common/image/functors/srcPlanar3Functor.h>
 #include <common/image/functors/srcPlanar4Functor.h>
 #include <common/image/functors/srcSingleChannelFunctor.h>
+#include <common/image/threadSplit.h>
 #include <common/opp_defs.h>
 #include <iostream>
 #include <vector>
@@ -76,18 +78,8 @@ namespace cpu = opp::image::cpuSimple;
 
 int main()
 {
-    opp::Vector1<c_double> var(1);
+    StreamCtx oppCtx = StreamCtxSingleton::Get();
 
-    opp::Vector1<c_double> var2 = var + 1;
-
-    // opp::Vector1<c_double>::Ln(var);
-
-    var.Ln();
-
-    c_double cf(1, 2);
-    c_int ci(1, 2);
-
-    cf.Ln();
     // c_double::Ln(cf);
     // constexpr bool iscf = NonNativeFloatingPoint<BFloat16>;
     /*
@@ -139,16 +131,6 @@ int main()
     try
     {
 
-        EqEps<Vector4<float>> op(0.01f);
-
-        Pixel32fC4 aaIn(0, 240, 100, 190);
-        Pixel32fC4 aaaIn(0, 240.001f, 100, 190);
-        Pixel8uC1 testres;
-        op(aaIn, aaaIn, testres);
-
-        std::cout << aaIn << std::endl;
-        std::cout << testres << std::endl;
-
         /*std::cout << "Scalefactor 4 = " << GetScaleFactor(4) << std::endl;
         std::cout << "Scalefactor 2 = " << GetScaleFactor(2) << std::endl;
         std::cout << "Scalefactor 1 = " << GetScaleFactor(1) << std::endl;
@@ -180,7 +162,23 @@ int main()
         cpu::Image<Pixel8uC3> resGPU(cpu_flower.SizeRoi());
 
         Image<Pixel8uC4> u8test(128, 128);
-        Image<Pixel8uC1> u8test2(128, 128);
+        u8test.Set({1, 2, 3, 4});
+        DevVar<Pixel32fC4> sums(128);
+        u8test.SetRoi(Border(-1, 0));
+
+        InvokeSumSrc(u8test.PointerRoi(), u8test.Pitch(), sums.Pointer(), u8test.SizeRoi(), oppCtx);
+
+        auto error = cudaDeviceSynchronize();
+        if (error != cudaSuccess)
+        {
+        }
+        std::vector<Pixel32fC4> sumsh(128);
+
+        sums >> sumsh;
+
+        std::cout << "";
+
+        /*Image<Pixel8uC1> u8test2(128, 128);
         Image<Pixel8uC4> u8test3(128, 128);
         cpu::Image<Pixel8uC4> cpu_test(128, 128);
         cpu::Image<Pixel8uC1> cpu_test2(128, 128);
@@ -189,16 +187,15 @@ int main()
         byte val[4] = {1, 2, 3, 4};
         cpu_test.Add(Pixel8uC4(val));
         cpu_test.FillRandom();
-        cpu_test4.FillRandom();
+        cpu_test4.FillRandom();*/
 
-        u8test.Set(Pixel8uC4(2, 4, 6, 8));
-        // u8test2.Set(Pixel8uC4(1, 3, 5, 7));
+        // u8test.Set(Pixel8uC4(2, 4, 6, 8));
+        //// u8test2.Set(Pixel8uC4(1, 3, 5, 7));
 
-        u8test.Copy(RGBA::G, u8test2);
+        // u8test.Copy(RGBA::G, u8test2);
 
-        // u8test2.ResetRoi();
-        cpu_test2 << u8test2;
-        cudaDeviceSynchronize();
+        //// u8test2.ResetRoi();
+        // cpu_test2 << u8test2;
 
         // cpu_flower.Convert(conv);
         // conv.Mul(2.0f);

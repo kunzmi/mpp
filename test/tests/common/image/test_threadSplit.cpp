@@ -28,22 +28,22 @@ TEST_CASE("ThreadSplit - 4 bytes base type", "[Common.Image]")
     Pixel32fC1 *vec32fC1 = reinterpret_cast<Pixel32fC1 *>(address);
 
     // Vector3 has 12 bytes and can't be a multiple of bytesPerWarp, impossible to align
-    CHECK_THROWS_AS((ThreadSplit<bytesPerWarp, 2>(vec32fC3, dataSize)), InvalidArgumentException);
+    CHECK_THROWS_AS((ThreadSplit<bytesPerWarp, 2>(vec32fC3, dataSize, 32)), InvalidArgumentException);
 
-    CHECK_NOTHROW(ThreadSplit<bytesPerWarp, 2>(vec32fC4, dataSize));
-    CHECK_NOTHROW(ThreadSplit<bytesPerWarp, 2>(vec32fC1, dataSize));
+    CHECK_NOTHROW(ThreadSplit<bytesPerWarp, 2>(vec32fC4, dataSize, 32));
+    CHECK_NOTHROW(ThreadSplit<bytesPerWarp, 2>(vec32fC1, dataSize, 32));
 
-    ThreadSplit<bytesPerWarp, 1> ts32fC4_Aligned(vec32fC4, dataSize);
-    ThreadSplit<bytesPerWarp, 1> ts32fC4_Unaligned(vec32fC4 + 1, dataSize);
+    ThreadSplit<bytesPerWarp, 1> ts32fC4_Aligned(vec32fC4, dataSize, 32);
+    ThreadSplit<bytesPerWarp, 1> ts32fC4_Unaligned(vec32fC4 + 1, dataSize, 32);
 
-    ThreadSplit<bytesPerWarp, 1> ts32fC3_Aligned(vec32fC3, dataSize);
-    ThreadSplit<bytesPerWarp, 1> ts32fC3_Unaligned(vec32fC3 + 1, dataSize);
+    ThreadSplit<bytesPerWarp, 1> ts32fC3_Aligned(vec32fC3, dataSize, 32);
+    ThreadSplit<bytesPerWarp, 1> ts32fC3_Unaligned(vec32fC3 + 1, dataSize, 32);
 
-    ThreadSplit<bytesPerWarp, 1> ts32fC2_Aligned(vec32fC2, dataSize);
-    ThreadSplit<bytesPerWarp, 1> ts32fC2_Unaligned(vec32fC2 + 1, dataSize);
+    ThreadSplit<bytesPerWarp, 1> ts32fC2_Aligned(vec32fC2, dataSize, 32);
+    ThreadSplit<bytesPerWarp, 1> ts32fC2_Unaligned(vec32fC2 + 1, dataSize, 32);
 
-    ThreadSplit<bytesPerWarp, 2> ts32fC1_Aligned(vec32fC1, dataSize);
-    ThreadSplit<bytesPerWarp, 2> ts32fC1_Unaligned(vec32fC1 + 1, dataSize);
+    ThreadSplit<bytesPerWarp, 2> ts32fC1_Aligned(vec32fC1, dataSize, 32);
+    ThreadSplit<bytesPerWarp, 2> ts32fC1_Unaligned(vec32fC1 + 1, dataSize, 32);
 
     CHECK(ts32fC4_Aligned.Muted() == 0);
     CHECK(ts32fC4_Aligned.Left() == 0);
@@ -299,22 +299,22 @@ TEST_CASE("ThreadSplit - 2 bytes base type", "[Common.Image]")
     Pixel16sC1 *vec16sC1 = reinterpret_cast<Pixel16sC1 *>(address);
 
     // Vector3 has 6 bytes and can't be a multiple of bytesPerWarp, impossible to align
-    CHECK_THROWS_AS((ThreadSplit<bytesPerWarp, 2>(vec16sC3, dataSize)), InvalidArgumentException);
+    CHECK_THROWS_AS((ThreadSplit<bytesPerWarp, 2>(vec16sC3, dataSize, 32)), InvalidArgumentException);
 
-    CHECK_NOTHROW(ThreadSplit<bytesPerWarp, 2>(vec16sC4, dataSize));
-    CHECK_NOTHROW(ThreadSplit<bytesPerWarp, 2>(vec16sC1, dataSize));
+    CHECK_NOTHROW(ThreadSplit<bytesPerWarp, 2>(vec16sC4, dataSize, 32));
+    CHECK_NOTHROW(ThreadSplit<bytesPerWarp, 2>(vec16sC1, dataSize, 32));
 
-    ThreadSplit<bytesPerWarp, 1> ts16sC4_Aligned(vec16sC4, dataSize);
-    ThreadSplit<bytesPerWarp, 1> ts16sC4_Unaligned(vec16sC4 + 1, dataSize);
+    ThreadSplit<bytesPerWarp, 1> ts16sC4_Aligned(vec16sC4, dataSize, 32);
+    ThreadSplit<bytesPerWarp, 1> ts16sC4_Unaligned(vec16sC4 + 1, dataSize, 32);
 
-    ThreadSplit<bytesPerWarp, 1> ts16sC3_Aligned(vec16sC3, dataSize);
-    ThreadSplit<bytesPerWarp, 1> ts16sC3_Unaligned(vec16sC3 + 1, dataSize);
+    ThreadSplit<bytesPerWarp, 1> ts16sC3_Aligned(vec16sC3, dataSize, 32);
+    ThreadSplit<bytesPerWarp, 1> ts16sC3_Unaligned(vec16sC3 + 1, dataSize, 32);
 
-    ThreadSplit<bytesPerWarp, 2> ts16sC2_Aligned(vec16sC2, dataSize);
-    ThreadSplit<bytesPerWarp, 2> ts16sC2_Unaligned(vec16sC2 + 1, dataSize);
+    ThreadSplit<bytesPerWarp, 2> ts16sC2_Aligned(vec16sC2, dataSize, 32);
+    ThreadSplit<bytesPerWarp, 2> ts16sC2_Unaligned(vec16sC2 + 1, dataSize, 32);
 
-    ThreadSplit<bytesPerWarp, 4> ts16sC1_Aligned(vec16sC1, dataSize);
-    ThreadSplit<bytesPerWarp, 4> ts16sC1_Unaligned(vec16sC1 + 1, dataSize);
+    ThreadSplit<bytesPerWarp, 4> ts16sC1_Aligned(vec16sC1, dataSize, 32);
+    ThreadSplit<bytesPerWarp, 4> ts16sC1_Unaligned(vec16sC1 + 1, dataSize, 32);
 
     CHECK(ts16sC4_Aligned.Muted() == 0);
     CHECK(ts16sC4_Aligned.Left() == 0);
@@ -572,22 +572,22 @@ TEST_CASE("ThreadSplit - 1 byte base type", "[Common.Image]")
     Pixel8uC1 *vec8uC1 = reinterpret_cast<Pixel8uC1 *>(address);
 
     // Vector3 has 3 bytes and can't be a multiple of bytesPerWarp, impossible to align
-    CHECK_THROWS_AS((ThreadSplit<bytesPerWarp, 2>(vec8uC3, dataSize)), InvalidArgumentException);
+    CHECK_THROWS_AS((ThreadSplit<bytesPerWarp, 2>(vec8uC3, dataSize, 32)), InvalidArgumentException);
 
-    CHECK_NOTHROW(ThreadSplit<bytesPerWarp, 2>(vec8uC4, dataSize));
-    CHECK_NOTHROW(ThreadSplit<bytesPerWarp, 4>(vec8uC1, dataSize));
+    CHECK_NOTHROW(ThreadSplit<bytesPerWarp, 2>(vec8uC4, dataSize, 32));
+    CHECK_NOTHROW(ThreadSplit<bytesPerWarp, 4>(vec8uC1, dataSize, 32));
 
-    ThreadSplit<bytesPerWarp, 2> ts8uC4_Aligned(vec8uC4, dataSize);
-    ThreadSplit<bytesPerWarp, 2> ts8uC4_Unaligned(vec8uC4 + 1, dataSize);
+    ThreadSplit<bytesPerWarp, 2> ts8uC4_Aligned(vec8uC4, dataSize, 32);
+    ThreadSplit<bytesPerWarp, 2> ts8uC4_Unaligned(vec8uC4 + 1, dataSize, 32);
 
-    ThreadSplit<bytesPerWarp, 1> ts8uC3_Aligned(vec8uC3, dataSize);
-    ThreadSplit<bytesPerWarp, 1> ts8uC3_Unaligned(vec8uC3 + 1, dataSize);
+    ThreadSplit<bytesPerWarp, 1> ts8uC3_Aligned(vec8uC3, dataSize, 32);
+    ThreadSplit<bytesPerWarp, 1> ts8uC3_Unaligned(vec8uC3 + 1, dataSize, 32);
 
-    ThreadSplit<bytesPerWarp, 4> ts8uC2_Aligned(vec8uC2, dataSize);
-    ThreadSplit<bytesPerWarp, 4> ts8uC2_Unaligned(vec8uC2 + 1, dataSize);
+    ThreadSplit<bytesPerWarp, 4> ts8uC2_Aligned(vec8uC2, dataSize, 32);
+    ThreadSplit<bytesPerWarp, 4> ts8uC2_Unaligned(vec8uC2 + 1, dataSize, 32);
 
-    ThreadSplit<bytesPerWarp, 8> ts8uC1_Aligned(vec8uC1, dataSize);
-    ThreadSplit<bytesPerWarp, 8> ts8uC1_Unaligned(vec8uC1 + 1, dataSize);
+    ThreadSplit<bytesPerWarp, 8> ts8uC1_Aligned(vec8uC1, dataSize, 32);
+    ThreadSplit<bytesPerWarp, 8> ts8uC1_Unaligned(vec8uC1 + 1, dataSize, 32);
 
     CHECK(ts8uC4_Aligned.Muted() == 0);
     CHECK(ts8uC4_Aligned.Left() == 0);

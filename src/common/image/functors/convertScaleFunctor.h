@@ -9,8 +9,8 @@
 #include <common/opp_defs.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
-#include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vectorTypes.h>
 #include <concepts>
 
 // disable warning for pragma unroll when compiling with host compiler:
@@ -81,7 +81,14 @@ struct ConvertScaleFunctor : public ImageFunctor<false>
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         ComputeT temp         = static_cast<ComputeT>(*pixelSrc1);
-        temp *= ScaleFactor;
+        if constexpr (ComplexVector<ComputeT>)
+        {
+            temp = temp * ScaleFactor;
+        }
+        else
+        {
+            temp *= ScaleFactor;
+        }
         if constexpr (RealOrComplexFloatingPoint<pixel_basetype_t<ComputeT>> &&
                       RealOrComplexIntegral<pixel_basetype_t<DstT>>)
         {
@@ -103,7 +110,14 @@ struct ConvertScaleFunctor : public ImageFunctor<false>
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         ComputeT temp         = *pixelSrc1;
-        temp *= ScaleFactor;
+        if constexpr (ComplexVector<ComputeT>)
+        {
+            temp = temp * ScaleFactor;
+        }
+        else
+        {
+            temp *= ScaleFactor;
+        }
         aDst = DstT(temp, roundingMode);
     }
 #pragma endregion
@@ -119,7 +133,14 @@ struct ConvertScaleFunctor : public ImageFunctor<false>
         for (size_t i = 0; i < tupelSize; i++)
         {
             ComputeT temp = static_cast<ComputeT>(tupelSrc1.value[i]);
-            temp *= ScaleFactor;
+            if constexpr (ComplexVector<ComputeT>)
+            {
+                temp = temp * ScaleFactor;
+            }
+            else
+            {
+                temp *= ScaleFactor;
+            }
             if constexpr (RealOrComplexFloatingPoint<pixel_basetype_t<SrcT>> &&
                           RealOrComplexIntegral<pixel_basetype_t<DstT>>)
             {

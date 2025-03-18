@@ -48,12 +48,12 @@ Image32sC1View::Image32sC1View(Pixel32sC1 *aBasePointer, const SizePitched &aSiz
 {
 }
 
-Image32sC1View Image32sC1View::GetView(const Roi &aRoi) const
+Image32sC1View Image32sC1View::GetView(const Roi &aRoi)
 {
     return {Pointer(), SizePitched(SizeAlloc(), Pitch()), aRoi};
 }
 
-Image32sC1View Image32sC1View::GetView(const Border &aBorder) const
+Image32sC1View Image32sC1View::GetView(const Border &aBorder)
 {
     const Roi newRoi = ROI() + aBorder;
     checkRoiIsInRoi(newRoi, Roi(0, 0, SizeAlloc()));
@@ -655,7 +655,7 @@ size_t Image32sC1View::DotProdGetBufferHostSize(const NppStreamContext &nppStrea
     return retValue;
 }
 
-void Image32sC1View::RectStdDev(const Image32sC1View &pSqr, Image32sC1View &pDst, NppiRect oRect, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+void Image32sC1View::RectStdDev(Image32sC1View &pSqr, Image32sC1View &pDst, NppiRect oRect, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSqr.ROI());
     checkSameSize(ROI(), pDst.ROI());
@@ -663,7 +663,7 @@ void Image32sC1View::RectStdDev(const Image32sC1View &pSqr, Image32sC1View &pDst
                    "ROI Src: " << ROI() << "ROI pSqr: " << pSqr.ROI() << "ROI pDst: " << pDst.ROI());
 }
 
-void Image32sC1View::RectStdDev(const Image64fC1View &pSqr, Image32fC1View &pDst, NppiRect oRect, const NppStreamContext &nppStreamCtx) const
+void Image32sC1View::RectStdDev(Image64fC1View &pSqr, Image32fC1View &pDst, NppiRect oRect, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSqr.ROI());
     checkSameSize(ROI(), pDst.ROI());

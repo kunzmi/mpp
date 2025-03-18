@@ -4,6 +4,7 @@
 #include <common/image/pixelTypeEnabler.h>
 
 #include <backends/cuda/cudaException.h>
+#include <backends/cuda/stream.h>
 #include <backends/npp/nppException.h>
 #include <common/defines.h>
 #include <common/image/gotoPtr.h>
@@ -15,6 +16,7 @@
 #include <common/safeCast.h>
 #include <common/vector_typetraits.h>
 #include <cstddef>
+#include <nppcore.h>
 #include <nppdefs.h>
 #include <nppi_filtering_functions.h>
 #include <nppi_statistics_functions.h>
@@ -117,14 +119,28 @@ template <PixelType T> class ImageView
     /// <summary>
     /// Base pointer to image data.
     /// </summary>
-    [[nodiscard]] T *Pointer() const
+    [[nodiscard]] T *Pointer()
+    {
+        return mPtr;
+    }
+    /// <summary>
+    /// Base pointer to image data.
+    /// </summary>
+    [[nodiscard]] const T *Pointer() const
     {
         return mPtr;
     }
     /// <summary>
     /// Base pointer moved to actual ROI.
     /// </summary>
-    [[nodiscard]] T *PointerRoi() const
+    [[nodiscard]] T *PointerRoi()
+    {
+        return mPtrRoi;
+    }
+    /// <summary>
+    /// Base pointer moved to actual ROI.
+    /// </summary>
+    [[nodiscard]] const T *PointerRoi() const
     {
         return mPtrRoi;
     }
@@ -451,6 +467,23 @@ template <PixelType T> class ImageView
 
         cudaSafeCall(cudaMemcpy2D(dest, aDestPitch, mPtrRoi, mPitch, WidthRoiInBytes(), to_size_t(HeightRoi()),
                                   cudaMemcpyDeviceToHost));
+    }
+
+    [[nodiscard]] static NppStreamContext GetStreamContext()
+    {
+        NppStreamContext nppCtx{};
+        nppSafeCall(nppGetStreamContext(&nppCtx));
+        return nppCtx;
+    }
+
+    static void SetStream(const opp::cuda::Stream &aStream)
+    {
+        nppSafeCall(nppSetStream(aStream.Original()));
+    }
+
+    [[nodiscard]] static opp::cuda::Stream GetStream()
+    {
+        return opp::cuda::Stream(nppGetStream());
     }
 
     [[nodiscard]] size_t FilterBoxBorderAdvancedGetDeviceBufferSize() const

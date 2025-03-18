@@ -37,9 +37,9 @@ void InvokeAddProductInplaceSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const S
         using addProductInplaceSrcSrc =
             InplaceSrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AddProduct<ComputeT>, RoundingMode::None>;
 
-        AddProduct<ComputeT> op;
+        const opp::AddProduct<ComputeT> op;
 
-        addProductInplaceSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+        const addProductInplaceSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, addProductInplaceSrcSrc>(aSrcDst, aPitchSrcDst, aSize,
                                                                                   aStreamCtx, functor);

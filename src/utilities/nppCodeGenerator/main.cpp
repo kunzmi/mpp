@@ -38,6 +38,12 @@ size_t processForPixelType(const std::vector<Function> &aFunctions, std::vector<
     std::vector<Function> functionsForType;
     for (const auto &elem : aFunctions)
     {
+        if (elem.name == "nppiSub_32s_C4RSfs_Ctx" || elem.name == "nppiSub_32s_C4IRSfs_Ctx")
+        {
+            // these functions are defined in the headers but are missing in the library --> link error if included in
+            // the wrapper
+            continue;
+        }
         if (elem.category != "support") // we don't need malloc and free here, they are implemented in the image-class
         {
             if (NPPParser::GetPixelType(elem) == aType)
@@ -338,7 +344,7 @@ int main()
         {
             // 16sC1
             {
-                const std::string condition          = "OPPi_ENABLE_SINT16_TYPE && OPPi_ENABLE_ONE_CHANNEL";
+                const std::string condition          = "OPPi_ENABLE_INT16_TYPE && OPPi_ENABLE_ONE_CHANNEL";
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16sC1;
                 const std::string typeString         = "16sC1";
 
@@ -348,7 +354,7 @@ int main()
 
             // 16sC2
             {
-                const std::string condition          = "OPPi_ENABLE_SINT16_TYPE && OPPi_ENABLE_TWO_CHANNEL";
+                const std::string condition          = "OPPi_ENABLE_INT16_TYPE && OPPi_ENABLE_TWO_CHANNEL";
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16sC2;
                 const std::string typeString         = "16sC2";
 
@@ -358,7 +364,7 @@ int main()
 
             // 16sC3
             {
-                const std::string condition          = "OPPi_ENABLE_SINT16_TYPE && OPPi_ENABLE_THREE_CHANNEL";
+                const std::string condition          = "OPPi_ENABLE_INT16_TYPE && OPPi_ENABLE_THREE_CHANNEL";
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16sC3;
                 const std::string typeString         = "16sC3";
 
@@ -368,7 +374,7 @@ int main()
 
             // 16sC4
             {
-                const std::string condition          = "OPPi_ENABLE_SINT16_TYPE && OPPi_ENABLE_FOUR_CHANNEL";
+                const std::string condition          = "OPPi_ENABLE_INT16_TYPE && OPPi_ENABLE_FOUR_CHANNEL";
                 const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16sC4;
                 const std::string typeString         = "16sC4";
 

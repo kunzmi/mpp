@@ -38,9 +38,9 @@ void InvokeRShiftSrcC(const SrcDstT *aSrc, size_t aPitchSrc, uint aConst, SrcDst
 
         using rshiftSrcC = SrcFunctor<TupelSize, SrcDstT, SrcDstT, SrcDstT, opp::RShift<SrcDstT>, RoundingMode::None>;
 
-        RShift<SrcDstT> op(aConst);
+        const opp::RShift<SrcDstT> op(aConst);
 
-        rshiftSrcC functor(aSrc, aPitchSrc, op);
+        const rshiftSrcC functor(aSrc, aPitchSrc, op);
 
         InvokeForEachPixelKernelDefault<SrcDstT, TupelSize, rshiftSrcC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -92,9 +92,9 @@ void InvokeRShiftInplaceC(SrcDstT *aSrcDst, size_t aPitchSrcDst, uint aConst, co
 
         using rshiftInplaceC = InplaceFunctor<TupelSize, SrcDstT, SrcDstT, opp::RShift<SrcDstT>, RoundingMode::None>;
 
-        RShift<SrcDstT> op(aConst);
+        const opp::RShift<SrcDstT> op(aConst);
 
-        rshiftInplaceC functor(op);
+        const rshiftInplaceC functor(op);
 
         InvokeForEachPixelKernelDefault<SrcDstT, TupelSize, rshiftInplaceC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                             functor);

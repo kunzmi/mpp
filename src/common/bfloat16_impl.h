@@ -368,18 +368,17 @@ DEVICE_CODE INLINE BFloat16 &BFloat16::operator/=(BFloat16 aOther)
 #endif
 }
 
-/// <summary>
-/// </summary>
-DEVICE_CODE INLINE BFloat16 BFloat16::operator/(BFloat16 aOther) const
-{
-#ifdef IS_HOST_COMPILER
-    return BFloat16(static_cast<float>(*this) / static_cast<float>(aOther));
-#endif
-
-#ifdef IS_CUDA_COMPILER
-    return BFloat16(value / aOther.value);
-#endif
-}
+// defined in header...
+// DEVICE_CODE INLINE BFloat16 BFloat16::operator/(BFloat16 aOther) const
+//{
+// #ifdef IS_HOST_COMPILER
+//    return BFloat16(static_cast<float>(*this) / static_cast<float>(aOther));
+// #endif
+//
+// #ifdef IS_CUDA_COMPILER
+//    return BFloat16(value / aOther.value);
+// #endif
+//}
 
 #ifdef IS_HOST_COMPILER
 /// <summary>

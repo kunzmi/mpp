@@ -282,11 +282,13 @@ template <ComplexVector T> struct MakeComplex
     }
 };
 
-template <RealVector T> struct AlphaPremul
+template <RealVector T, RealVector SrcT> struct AlphaPremul
 {
     const remove_vector_t<T> InvAlphaMax; // Inverse of the maximum value of the source or destination type
 
-    AlphaPremul(remove_vector_t<T> aInvAlphaMax) : InvAlphaMax(aInvAlphaMax)
+    AlphaPremul()
+        : InvAlphaMax(static_cast<remove_vector_t<T>>(1) /
+                      static_cast<remove_vector_t<T>>(numeric_limits<remove_vector_t<SrcT>>::max()))
     {
     }
 
@@ -297,16 +299,18 @@ template <RealVector T> struct AlphaPremul
         aDst.x = aSrc1.x * alpha;
         aDst.y = aSrc1.y * alpha;
         aDst.z = aSrc1.z * alpha;
+        aDst.w = aSrc1.w; // copy alpha value
     }
 
     DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
-        requires RealFloatingVector<T>
+        requires RealFloatingVector<SrcT>
     {
         const remove_vector_t<T> alpha = aSrc1.w;
 
         aDst.x = aSrc1.x * alpha;
         aDst.y = aSrc1.y * alpha;
         aDst.z = aSrc1.z * alpha;
+        aDst.w = aSrc1.w; // copy alpha value
     }
     DEVICE_CODE void operator()(T &aSrcDst)
     {
@@ -317,13 +321,60 @@ template <RealVector T> struct AlphaPremul
         aSrcDst.z *= alpha;
     }
     DEVICE_CODE void operator()(T &aSrcDst)
-        requires RealFloatingVector<T>
+        requires RealFloatingVector<SrcT>
     {
         const remove_vector_t<T> alpha = aSrcDst.w;
 
         aSrcDst.x *= alpha;
         aSrcDst.y *= alpha;
         aSrcDst.z *= alpha;
+    }
+};
+
+// special case of AlphaPremul with a constant alpha value that also sets the alpha channel to the used alpha value
+template <RealVector T, RealVector SrcT> struct AlphaPremulAC
+{
+    // Alpha value scaled with inverse of the maximum value of the source or destination type for integer types:
+    const remove_vector_t<T> AlphaValueDivMax;
+    const remove_vector_t<T> AlphaValue;
+
+    AlphaPremulAC(remove_vector_t<SrcT> aAlphaValue)
+        : AlphaValueDivMax(static_cast<remove_vector_t<T>>(aAlphaValue) /
+                           static_cast<remove_vector_t<T>>(numeric_limits<remove_vector_t<SrcT>>::max())),
+          AlphaValue(static_cast<remove_vector_t<T>>(aAlphaValue))
+    {
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
+    {
+        aDst.x = aSrc1.x * AlphaValueDivMax;
+        aDst.y = aSrc1.y * AlphaValueDivMax;
+        aDst.z = aSrc1.z * AlphaValueDivMax;
+        aDst.w = AlphaValue; // set alpha value
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
+        requires RealFloatingVector<SrcT>
+    {
+        aDst.x = aSrc1.x * AlphaValue;
+        aDst.y = aSrc1.y * AlphaValue;
+        aDst.z = aSrc1.z * AlphaValue;
+        aDst.w = AlphaValue; // set alpha value
+    }
+    DEVICE_CODE void operator()(T &aSrcDst)
+    {
+        aSrcDst.x *= AlphaValueDivMax;
+        aSrcDst.y *= AlphaValueDivMax;
+        aSrcDst.z *= AlphaValueDivMax;
+        aSrcDst.w = AlphaValue; // set alpha value
+    }
+    DEVICE_CODE void operator()(T &aSrcDst)
+        requires RealFloatingVector<SrcT>
+    {
+        aSrcDst.x *= AlphaValue;
+        aSrcDst.y *= AlphaValue;
+        aSrcDst.z *= AlphaValue;
+        aSrcDst.w = AlphaValue; // set alpha value
     }
 };
 

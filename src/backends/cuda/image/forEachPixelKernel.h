@@ -130,10 +130,10 @@ __global__ void forEachPixelKernel(DstT *__restrict__ aDst, size_t aPitchDst, Si
 }
 
 template <typename DstT, size_t TupelSize, int WarpAlignmentInBytes, typename funcType>
-void InvokeForEachPixelKernel(const dim3 &aBlockSize, uint aSharedMemory, cudaStream_t aStream, DstT *aDst,
+void InvokeForEachPixelKernel(const dim3 &aBlockSize, uint aSharedMemory, int aWarpSize, cudaStream_t aStream, DstT *aDst,
                               size_t aPitchDst, const Size2D &aSize, const funcType &aFunctor)
 {
-    ThreadSplit<WarpAlignmentInBytes, TupelSize> ts(aDst, aSize.x);
+    ThreadSplit<WarpAlignmentInBytes, TupelSize> ts(aDst, aSize.x, aWarpSize);
 
     dim3 blocksPerGrid(DIV_UP(ts.Total(), aBlockSize.x), DIV_UP(aSize.y, aBlockSize.y), 1);
 
@@ -156,7 +156,7 @@ void InvokeForEachPixelKernelDefault(DstT *aDst, size_t aPitchDst, const Size2D 
         constexpr uint SharedMemory        = 0;
 
         InvokeForEachPixelKernel<DstT, TupelSize, WarpAlignmentInBytes, funcType>(
-            BlockSize, SharedMemory, aStreamCtx.Stream, aDst, aPitchDst, aSize, aFunc);
+            BlockSize, SharedMemory, aStreamCtx.WarpSize, aStreamCtx.Stream, aDst, aPitchDst, aSize, aFunc);
     }
     else
     {

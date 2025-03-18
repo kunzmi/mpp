@@ -54,10 +54,10 @@ void InvokeSubSrcSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *
             using subSrcSrcSIMD = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>, RoundingMode::None,
                                                 ComputeT_SIMD, simdOP_t>;
 
-            Sub<ComputeT> op;
-            simdOP_t opSIMD;
+            const opp::Sub<ComputeT> op;
+            const simdOP_t opSIMD;
 
-            subSrcSrcSIMD functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, opSIMD);
+            const subSrcSrcSIMD functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, opSIMD);
 
             InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcSrcSIMD>(aMask, aPitchMask, aDst, aPitchDst,
                                                                                   aSize, aStreamCtx, functor);
@@ -67,9 +67,9 @@ void InvokeSubSrcSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *
             // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
             using subSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>, RoundingMode::None>;
 
-            Sub<ComputeT> op;
+            const opp::Sub<ComputeT> op;
 
-            subSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+            const subSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
             InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcSrc>(aMask, aPitchMask, aDst, aPitchDst, aSize,
                                                                               aStreamCtx, functor);
@@ -141,12 +141,12 @@ void InvokeSubSrcSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const S
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using subSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>,
-                                                  RoundingMode::NearestTiesAwayFromZero>;
+        using subSrcSrcScale =
+            SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>, RoundingMode::NearestTiesToEven>;
 
-        Sub<ComputeT> op;
+        const opp::Sub<ComputeT> op;
 
-        subSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
+        const subSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcSrcScale>(aMask, aPitchMask, aDst, aPitchDst,
                                                                                aSize, aStreamCtx, functor);
@@ -212,12 +212,12 @@ void InvokeSubSrcCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aS
             using subSrcCSIMD = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>,
                                                    RoundingMode::None, Tupel<ComputeT_SIMD, TupelSize>, simdOP_t>;
 
-            Sub<ComputeT> op;
-            simdOP_t opSIMD;
-            Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
+            const opp::Sub<ComputeT> op;
+            const simdOP_t opSIMD;
+            const Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
                 Tupel<ComputeT_SIMD, TupelSize>::GetConstant(static_cast<ComputeT_SIMD>(aConst));
 
-            subSrcCSIMD functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
+            const subSrcCSIMD functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
 
             InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcCSIMD>(aMask, aPitchMask, aDst, aPitchDst,
                                                                                 aSize, aStreamCtx, functor);
@@ -227,9 +227,9 @@ void InvokeSubSrcCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aS
             // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
             using subSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>, RoundingMode::None>;
 
-            Sub<ComputeT> op;
+            const opp::Sub<ComputeT> op;
 
-            subSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
+            const subSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
 
             InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcC>(aMask, aPitchMask, aDst, aPitchDst, aSize,
                                                                             aStreamCtx, functor);
@@ -301,11 +301,11 @@ void InvokeSubSrcCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const Src
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using subSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>,
-                                                     RoundingMode::NearestTiesAwayFromZero>;
+                                                     RoundingMode::NearestTiesToEven>;
 
-        Sub<ComputeT> op;
+        const opp::Sub<ComputeT> op;
 
-        subSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
+        const subSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcCScale>(aMask, aPitchMask, aDst, aPitchDst, aSize,
                                                                              aStreamCtx, functor);
@@ -367,9 +367,9 @@ void InvokeSubSrcDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT 
         using subSrcDevC =
             SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>, RoundingMode::None>;
 
-        Sub<ComputeT> op;
+        const opp::Sub<ComputeT> op;
 
-        subSrcDevC functor(aSrc, aPitchSrc, aConst, op);
+        const subSrcDevC functor(aSrc, aPitchSrc, aConst, op);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcDevC>(aMask, aPitchMask, aDst, aPitchDst, aSize,
                                                                            aStreamCtx, functor);
@@ -440,11 +440,11 @@ void InvokeSubSrcDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using subSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>,
-                                                           RoundingMode::NearestTiesAwayFromZero>;
+                                                           RoundingMode::NearestTiesToEven>;
 
-        Sub<ComputeT> op;
+        const opp::Sub<ComputeT> op;
 
-        subSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
+        const subSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcDevCScale>(aMask, aPitchMask, aDst, aPitchDst,
                                                                                 aSize, aStreamCtx, functor);
@@ -509,10 +509,10 @@ void InvokeSubInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aS
             using subInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>,
                                                         RoundingMode::None, ComputeT_SIMD, simdOP_t>;
 
-            Sub<ComputeT> op;
-            simdOP_t opSIMD;
+            const opp::Sub<ComputeT> op;
+            const simdOP_t opSIMD;
 
-            subInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
+            const subInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
 
             InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcSIMD>(
                 aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
@@ -523,9 +523,9 @@ void InvokeSubInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aS
             using subInplaceSrc =
                 InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>, RoundingMode::None>;
 
-            Sub<ComputeT> op;
+            const opp::Sub<ComputeT> op;
 
-            subInplaceSrc functor(aSrc2, aPitchSrc2, op);
+            const subInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
             InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrc>(
                 aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
@@ -596,11 +596,11 @@ void InvokeSubInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Dst
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using subInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sub<ComputeT>,
-                                                          RoundingMode::NearestTiesAwayFromZero>;
+                                                          RoundingMode::NearestTiesToEven>;
 
-        Sub<ComputeT> op;
+        const opp::Sub<ComputeT> op;
 
-        subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
+        const subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcScale>(
             aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
@@ -666,12 +666,12 @@ void InvokeSubInplaceCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrc
                 InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Sub<ComputeT>, RoundingMode::None,
                                        Tupel<ComputeT_SIMD, TupelSize>, simdOP_t>;
 
-            Sub<ComputeT> op;
-            simdOP_t opSIMD;
-            Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
+            const opp::Sub<ComputeT> op;
+            const simdOP_t opSIMD;
+            const Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
                 Tupel<ComputeT_SIMD, TupelSize>::GetConstant(static_cast<ComputeT_SIMD>(aConst));
 
-            subInplaceCSIMD functor(static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
+            const subInplaceCSIMD functor(static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
 
             InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCSIMD>(
                 aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
@@ -682,9 +682,9 @@ void InvokeSubInplaceCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrc
             using subInplaceC =
                 InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Sub<ComputeT>, RoundingMode::None>;
 
-            Sub<ComputeT> op;
+            const opp::Sub<ComputeT> op;
 
-            subInplaceC functor(static_cast<ComputeT>(aConst), op);
+            const subInplaceC functor(static_cast<ComputeT>(aConst), op);
 
             InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceC>(
                 aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
@@ -754,12 +754,12 @@ void InvokeSubInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT 
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using subInplaceCScale = InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Sub<ComputeT>,
-                                                             RoundingMode::NearestTiesAwayFromZero>;
+        using subInplaceCScale =
+            InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Sub<ComputeT>, RoundingMode::NearestTiesToEven>;
 
-        Sub<ComputeT> op;
+        const opp::Sub<ComputeT> op;
 
-        subInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
+        const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCScale>(
             aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
@@ -819,9 +819,9 @@ void InvokeSubInplaceDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *a
         using subInplaceDevC =
             InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, opp::Sub<ComputeT>, RoundingMode::None>;
 
-        Sub<ComputeT> op;
+        const opp::Sub<ComputeT> op;
 
-        subInplaceDevC functor(aConst, op);
+        const subInplaceDevC functor(aConst, op);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevC>(aMask, aPitchMask, aSrcDst, aPitchSrcDst,
                                                                                aSize, aStreamCtx, functor);
@@ -891,11 +891,11 @@ void InvokeSubInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using subInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Sub<ComputeT>,
-                                                                   RoundingMode::NearestTiesAwayFromZero>;
+                                                                   RoundingMode::NearestTiesToEven>;
 
-        Sub<ComputeT> op;
+        const opp::Sub<ComputeT> op;
 
-        subInplaceDevCScale functor(aConst, op, aScaleFactor);
+        const subInplaceDevCScale functor(aConst, op, aScaleFactor);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevCScale>(
             aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
@@ -959,10 +959,10 @@ void InvokeSubInvInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT 
             using subInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::SubInv<ComputeT>,
                                                         RoundingMode::None, ComputeT_SIMD, simdOP_t>;
 
-            SubInv<ComputeT> op;
-            simdOP_t opSIMD;
+            const opp::SubInv<ComputeT> op;
+            const simdOP_t opSIMD;
 
-            subInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
+            const subInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
 
             InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcSIMD>(
                 aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
@@ -973,9 +973,9 @@ void InvokeSubInvInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT 
             using subInplaceSrc =
                 InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::SubInv<ComputeT>, RoundingMode::None>;
 
-            SubInv<ComputeT> op;
+            const opp::SubInv<ComputeT> op;
 
-            subInplaceSrc functor(aSrc2, aPitchSrc2, op);
+            const subInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
             InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrc>(
                 aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
@@ -1046,11 +1046,11 @@ void InvokeSubInvInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using subInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::SubInv<ComputeT>,
-                                                          RoundingMode::NearestTiesAwayFromZero>;
+                                                          RoundingMode::NearestTiesToEven>;
 
-        SubInv<ComputeT> op;
+        const opp::SubInv<ComputeT> op;
 
-        subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
+        const subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcScale>(
             aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
@@ -1116,12 +1116,12 @@ void InvokeSubInvInplaceCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *a
                 InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::SubInv<ComputeT>, RoundingMode::None,
                                        Tupel<ComputeT_SIMD, TupelSize>, simdOP_t>;
 
-            SubInv<ComputeT> op;
-            simdOP_t opSIMD;
-            Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
+            const opp::SubInv<ComputeT> op;
+            const simdOP_t opSIMD;
+            const Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
                 Tupel<ComputeT_SIMD, TupelSize>::GetConstant(static_cast<ComputeT_SIMD>(aConst));
 
-            subInplaceCSIMD functor(static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
+            const subInplaceCSIMD functor(static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
 
             InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCSIMD>(
                 aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
@@ -1132,9 +1132,9 @@ void InvokeSubInvInplaceCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *a
             using subInplaceC =
                 InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::SubInv<ComputeT>, RoundingMode::None>;
 
-            SubInv<ComputeT> op;
+            const opp::SubInv<ComputeT> op;
 
-            subInplaceC functor(static_cast<ComputeT>(aConst), op);
+            const subInplaceC functor(static_cast<ComputeT>(aConst), op);
 
             InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceC>(
                 aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
@@ -1205,11 +1205,11 @@ void InvokeSubInvInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using subInplaceCScale = InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::SubInv<ComputeT>,
-                                                             RoundingMode::NearestTiesAwayFromZero>;
+                                                             RoundingMode::NearestTiesToEven>;
 
-        SubInv<ComputeT> op;
+        const opp::SubInv<ComputeT> op;
 
-        subInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
+        const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCScale>(
             aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
@@ -1269,9 +1269,9 @@ void InvokeSubInvInplaceDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT
         using subInplaceDevC =
             InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, opp::SubInv<ComputeT>, RoundingMode::None>;
 
-        SubInv<ComputeT> op;
+        const opp::SubInv<ComputeT> op;
 
-        subInplaceDevC functor(aConst, op);
+        const subInplaceDevC functor(aConst, op);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevC>(aMask, aPitchMask, aSrcDst, aPitchSrcDst,
                                                                                aSize, aStreamCtx, functor);
@@ -1341,11 +1341,11 @@ void InvokeSubInvInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask,
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using subInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::SubInv<ComputeT>,
-                                                                   RoundingMode::NearestTiesAwayFromZero>;
+                                                                   RoundingMode::NearestTiesToEven>;
 
-        SubInv<ComputeT> op;
+        const opp::SubInv<ComputeT> op;
 
-        subInplaceDevCScale functor(aConst, op, aScaleFactor);
+        const subInplaceDevCScale functor(aConst, op, aScaleFactor);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevCScale>(
             aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);

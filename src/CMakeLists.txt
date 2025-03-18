@@ -49,6 +49,7 @@ target_link_libraries(perfTest PUBLIC
 						common.image
 						backends.cuda	
 						backends.cuda.image
+						backends.cuda.image.statistics 
 						backends.npp
 						backends.npp.image
 						backends.simple_cpu

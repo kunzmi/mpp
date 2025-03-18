@@ -41,9 +41,9 @@ void InvokeXorSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, si
 
         using xorSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Xor<ComputeT>, RoundingMode::None>;
 
-        Xor<ComputeT> op;
+        const opp::Xor<ComputeT> op;
 
-        xorSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+        const xorSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, xorSrcSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -95,9 +95,9 @@ void InvokeXorSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT 
 
         using xorSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Xor<ComputeT>, RoundingMode::None>;
 
-        Xor<ComputeT> op;
+        const opp::Xor<ComputeT> op;
 
-        xorSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
+        const xorSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, xorSrcC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -149,9 +149,9 @@ void InvokeXorSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst, Ds
         using xorSrcDevC =
             SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Xor<ComputeT>, RoundingMode::None>;
 
-        Xor<ComputeT> op;
+        const opp::Xor<ComputeT> op;
 
-        xorSrcDevC functor(aSrc, aPitchSrc, aConst, op);
+        const xorSrcDevC functor(aSrc, aPitchSrc, aConst, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, xorSrcDevC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -204,9 +204,9 @@ void InvokeXorInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, 
         using xorInplaceSrc =
             InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Xor<ComputeT>, RoundingMode::None>;
 
-        Xor<ComputeT> op;
+        const opp::Xor<ComputeT> op;
 
-        xorInplaceSrc functor(aSrc2, aPitchSrc2, op);
+        const xorInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, xorInplaceSrc>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                         functor);
@@ -258,9 +258,9 @@ void InvokeXorInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, c
 
         using xorInplaceC = InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Xor<ComputeT>, RoundingMode::None>;
 
-        Xor<ComputeT> op;
+        const opp::Xor<ComputeT> op;
 
-        xorInplaceC functor(static_cast<ComputeT>(aConst), op);
+        const xorInplaceC functor(static_cast<ComputeT>(aConst), op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, xorInplaceC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                       functor);
@@ -313,9 +313,9 @@ void InvokeXorInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aConst
         using xorInplaceDevC =
             InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, opp::Xor<ComputeT>, RoundingMode::None>;
 
-        Xor<ComputeT> op;
+        const opp::Xor<ComputeT> op;
 
-        xorInplaceDevC functor(aConst, op);
+        const xorInplaceDevC functor(aConst, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, xorInplaceDevC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                          functor);

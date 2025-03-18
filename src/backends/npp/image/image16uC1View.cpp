@@ -3,40 +3,40 @@
 #if OPP_ENABLE_NPP_BACKEND
 #include <common/image/pixelTypeEnabler.h> //NOLINT(misc-include-cleaner)
 
-#include "image16sC1View.h" //NOLINT
-#include "image16uC1View.h" //NOLINT
-#include "image16uC3View.h" //NOLINT
-#include "image16uC4View.h" //NOLINT
-#include "image32fC1View.h" //NOLINT
-#include "image32sC1View.h" //NOLINT
-#include "image32uC1View.h" //NOLINT
-#include "image64fC1View.h" //NOLINT
-#include "image8sC1View.h" //NOLINT
-#include "image8uC1View.h" //NOLINT
-#include "image8uC3View.h" //NOLINT
-#include "image8uC4View.h" //NOLINT
-#include "imageView.h"  //NOLINT
-#include <backends/cuda/devVarView.h> //NOLINT
-#include <backends/npp/nppException.h>  //NOLINT
-#include <common/defines.h> //NOLINT
-#include <common/exception.h> //NOLINT
-#include <common/image/border.h> //NOLINT
-#include <common/image/pixelTypes.h> //NOLINT
-#include <common/image/roi.h> //NOLINT
-#include <common/image/roiException.h>  //NOLINT
-#include <common/image/size2D.h>  //NOLINT
-#include <common/image/sizePitched.h>  //NOLINT
-#include <common/safeCast.h>  //NOLINT
-#include <cstddef> //NOLINT
-#include <nppdefs.h>  //NOLINT
+#include "image16sC1View.h"                         //NOLINT
+#include "image16uC1View.h"                         //NOLINT
+#include "image16uC3View.h"                         //NOLINT
+#include "image16uC4View.h"                         //NOLINT
+#include "image32fC1View.h"                         //NOLINT
+#include "image32sC1View.h"                         //NOLINT
+#include "image32uC1View.h"                         //NOLINT
+#include "image64fC1View.h"                         //NOLINT
+#include "image8sC1View.h"                          //NOLINT
+#include "image8uC1View.h"                          //NOLINT
+#include "image8uC3View.h"                          //NOLINT
+#include "image8uC4View.h"                          //NOLINT
+#include "imageView.h"                              //NOLINT
+#include <backends/cuda/devVarView.h>               //NOLINT
+#include <backends/npp/nppException.h>              //NOLINT
+#include <common/defines.h>                         //NOLINT
+#include <common/exception.h>                       //NOLINT
+#include <common/image/border.h>                    //NOLINT
+#include <common/image/pixelTypes.h>                //NOLINT
+#include <common/image/roi.h>                       //NOLINT
+#include <common/image/roiException.h>              //NOLINT
+#include <common/image/size2D.h>                    //NOLINT
+#include <common/image/sizePitched.h>               //NOLINT
+#include <common/safeCast.h>                        //NOLINT
+#include <cstddef>                                  //NOLINT
+#include <nppdefs.h>                                //NOLINT
 #include <nppi_arithmetic_and_logical_operations.h> //NOLINT
-#include <nppi_color_conversion.h> //NOLINT
-#include <nppi_data_exchange_and_initialization.h> //NOLINT
-#include <nppi_filtering_functions.h> //NOLINT
-#include <nppi_geometry_transforms.h> //NOLINT
-#include <nppi_morphological_operations.h> //NOLINT
-#include <nppi_statistics_functions.h> //NOLINT
-#include <nppi_threshold_and_compare_operations.h> //NOLINT
+#include <nppi_color_conversion.h>                  //NOLINT
+#include <nppi_data_exchange_and_initialization.h>  //NOLINT
+#include <nppi_filtering_functions.h>               //NOLINT
+#include <nppi_geometry_transforms.h>               //NOLINT
+#include <nppi_morphological_operations.h>          //NOLINT
+#include <nppi_statistics_functions.h>              //NOLINT
+#include <nppi_threshold_and_compare_operations.h>  //NOLINT
 
 namespace opp::image::npp
 {
@@ -53,31 +53,36 @@ Image16uC1View::Image16uC1View(Pixel16uC1 *aBasePointer, const SizePitched &aSiz
 {
 }
 
-Image16uC1View Image16uC1View::GetView(const Roi &aRoi) const
+Image16uC1View Image16uC1View::GetView(const Roi &aRoi)
 {
     return {Pointer(), SizePitched(SizeAlloc(), Pitch()), aRoi};
 }
 
-Image16uC1View Image16uC1View::GetView(const Border &aBorder) const
+Image16uC1View Image16uC1View::GetView(const Border &aBorder)
 {
     const Roi newRoi = ROI() + aBorder;
     checkRoiIsInRoi(newRoi, Roi(0, 0, SizeAlloc()));
     return {Pointer(), SizePitched(SizeAlloc(), Pitch()), newRoi};
 }
 
-//NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
+// NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls,
+// bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 #if OPPi_ENABLE_UINT16_TYPE && OPPi_ENABLE_ONE_CHANNEL
 
 Image16uC1View &Image16uC1View::Set(const Pixel16uC1 &nValue, const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiSet_16u_C1R_Ctx(nValue.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiSet_16u_C1R_Ctx(nValue.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                       NppiSizeRoi(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Set(const Pixel16uC1 &nValue, const Image8uC1View &pMask, const NppStreamContext &nppStreamCtx)
+Image16uC1View &Image16uC1View::Set(const Pixel16uC1 &nValue, const Image8uC1View &pMask,
+                                    const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiSet_16u_C1MR_Ctx(nValue.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()), nppStreamCtx),
+    nppSafeCallExt(nppiSet_16u_C1MR_Ctx(nValue.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                        NppiSizeRoi(), reinterpret_cast<const Npp8u *>(pMask.PointerRoi()),
+                                        to_int(pMask.Pitch()), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
@@ -85,71 +90,98 @@ Image16uC1View &Image16uC1View::Set(const Pixel16uC1 &nValue, const Image8uC1Vie
 Image16uC1View &Image16uC1View::Copy(Image16uC1View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCopy_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiCopy_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                        reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                        NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Copy(Image16uC1View &pDst, const Image8uC1View &pMask, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Copy(Image16uC1View &pDst, const Image8uC1View &pMask,
+                                     const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCopy_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()), nppStreamCtx),
+    nppSafeCallExt(nppiCopy_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                         reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                         NppiSizeRoi(), reinterpret_cast<const Npp8u *>(pMask.PointerRoi()),
+                                         to_int(pMask.Pitch()), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC3View &Image16uC1View::Copy(size_t aDstChannel, Image16uC3View &pDst, const NppStreamContext &nppStreamCtx) const
+Image16uC3View &Image16uC1View::Copy(size_t aDstChannel, Image16uC3View &pDst,
+                                     const NppStreamContext &nppStreamCtx) const
 {
     if (aDstChannel >= 3)
     {
         throw INVALIDARGUMENT(aDstChannel, "Value must be in range [0..2] but provided value is: " << aDstChannel);
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCopy_16u_C1C3R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()) + aDstChannel, to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiCopy_16u_C1C3R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                          reinterpret_cast<Npp16u *>(pDst.PointerRoi()) + aDstChannel,
+                                          to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC4View &Image16uC1View::Copy(size_t aDstChannel, Image16uC4View &pDst, const NppStreamContext &nppStreamCtx) const
+Image16uC4View &Image16uC1View::Copy(size_t aDstChannel, Image16uC4View &pDst,
+                                     const NppStreamContext &nppStreamCtx) const
 {
     if (aDstChannel >= 4)
     {
         throw INVALIDARGUMENT(aDstChannel, "Value must be in range [0..3] but provided value is: " << aDstChannel);
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCopy_16u_C1C4R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()) + aDstChannel, to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiCopy_16u_C1C4R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                          reinterpret_cast<Npp16u *>(pDst.PointerRoi()) + aDstChannel,
+                                          to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::CopyConstBorder(Image16uC1View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const Pixel16uC1 &nValue, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::CopyConstBorder(Image16uC1View &pDst, int nTopBorderHeight, int nLeftBorderWidth,
+                                                const Pixel16uC1 &nValue, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCopyConstBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDst.NppiSizeRoi(), nTopBorderHeight, nLeftBorderWidth, nValue.x, nppStreamCtx),
+    nppSafeCallExt(nppiCopyConstBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                   NppiSizeRoi(), reinterpret_cast<Npp16u *>(pDst.PointerRoi()),
+                                                   to_int(pDst.Pitch()), pDst.NppiSizeRoi(), nTopBorderHeight,
+                                                   nLeftBorderWidth, nValue.x, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::CopyReplicateBorder(Image16uC1View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::CopyReplicateBorder(Image16uC1View &pDst, int nTopBorderHeight, int nLeftBorderWidth,
+                                                    const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCopyReplicateBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDst.NppiSizeRoi(), nTopBorderHeight, nLeftBorderWidth, nppStreamCtx),
+    nppSafeCallExt(nppiCopyReplicateBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                       NppiSizeRoi(), reinterpret_cast<Npp16u *>(pDst.PointerRoi()),
+                                                       to_int(pDst.Pitch()), pDst.NppiSizeRoi(), nTopBorderHeight,
+                                                       nLeftBorderWidth, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::CopyWrapBorder(Image16uC1View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::CopyWrapBorder(Image16uC1View &pDst, int nTopBorderHeight, int nLeftBorderWidth,
+                                               const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCopyWrapBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDst.NppiSizeRoi(), nTopBorderHeight, nLeftBorderWidth, nppStreamCtx),
+    nppSafeCallExt(nppiCopyWrapBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                  NppiSizeRoi(), reinterpret_cast<Npp16u *>(pDst.PointerRoi()),
+                                                  to_int(pDst.Pitch()), pDst.NppiSizeRoi(), nTopBorderHeight,
+                                                  nLeftBorderWidth, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::CopySubpix(Image16uC1View &pDst, const Pixel32fC1 &nDx, const Pixel32fC1 &nDy, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::CopySubpix(Image16uC1View &pDst, const Pixel32fC1 &nDx, const Pixel32fC1 &nDy,
+                                           const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCopySubpix_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDst.NppiSizeRoi(), nDx.x, nDy.x, nppStreamCtx),
+    nppSafeCallExt(nppiCopySubpix_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                              reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                              pDst.NppiSizeRoi(), nDx.x, nDy.x, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -157,7 +189,9 @@ Image16uC1View &Image16uC1View::CopySubpix(Image16uC1View &pDst, const Pixel32fC
 Image32sC1View &Image16uC1View::Convert(Image32sC1View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiConvert_16u32s_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp32s *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiConvert_16u32s_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                              reinterpret_cast<Npp32s *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                              NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -165,7 +199,9 @@ Image32sC1View &Image16uC1View::Convert(Image32sC1View &pDst, const NppStreamCon
 Image32fC1View &Image16uC1View::Convert(Image32fC1View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiConvert_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiConvert_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                              reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                              NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -173,7 +209,9 @@ Image32fC1View &Image16uC1View::Convert(Image32fC1View &pDst, const NppStreamCon
 Image32uC1View &Image16uC1View::Convert(Image32uC1View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiConvert_16u32u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp32u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiConvert_16u32u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                              reinterpret_cast<Npp32u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                              NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -181,31 +219,42 @@ Image32uC1View &Image16uC1View::Convert(Image32uC1View &pDst, const NppStreamCon
 Image8uC1View &Image16uC1View::Convert(Image8uC1View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiConvert_16u8u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiConvert_16u8u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                             reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                             NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image8sC1View &Image16uC1View::Convert(Image8sC1View &pDst, NppRoundMode eRoundMode, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image8sC1View &Image16uC1View::Convert(Image8sC1View &pDst, NppRoundMode eRoundMode, int nScaleFactor,
+                                       const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiConvert_16u8s_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp8s *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), eRoundMode, nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiConvert_16u8s_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                reinterpret_cast<Npp8s *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                NppiSizeRoi(), eRoundMode, nScaleFactor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16sC1View &Image16uC1View::Convert(Image16sC1View &pDst, NppRoundMode eRoundMode, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image16sC1View &Image16uC1View::Convert(Image16sC1View &pDst, NppRoundMode eRoundMode, int nScaleFactor,
+                                        const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiConvert_16u16s_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16s *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), eRoundMode, nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiConvert_16u16s_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                 reinterpret_cast<Npp16s *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                 NppiSizeRoi(), eRoundMode, nScaleFactor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image8uC1View &Image16uC1View::Scale(Image8uC1View &pDst, NppHintAlgorithm hint, const NppStreamContext &nppStreamCtx) const
+Image8uC1View &Image16uC1View::Scale(Image8uC1View &pDst, NppHintAlgorithm hint,
+                                     const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiScale_16u8u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), hint, nppStreamCtx),
+    nppSafeCallExt(nppiScale_16u8u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                           reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                           NppiSizeRoi(), hint, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -213,7 +262,9 @@ Image8uC1View &Image16uC1View::Scale(Image8uC1View &pDst, NppHintAlgorithm hint,
 Image16uC3View &Image16uC1View::Dup(Image16uC3View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiDup_16u_C1C3R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDst.NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiDup_16u_C1C3R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                         reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                         pDst.NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -221,7 +272,9 @@ Image16uC3View &Image16uC1View::Dup(Image16uC3View &pDst, const NppStreamContext
 Image16uC4View &Image16uC1View::Dup(Image16uC4View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiDup_16u_C1C4R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDst.NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiDup_16u_C1C4R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                         reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                         pDst.NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -229,7 +282,9 @@ Image16uC4View &Image16uC1View::Dup(Image16uC4View &pDst, const NppStreamContext
 Image16uC4View &Image16uC1View::DupA(Image16uC4View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiDup_16u_C1AC4R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDst.NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiDup_16u_C1AC4R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                          reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                          pDst.NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -237,182 +292,250 @@ Image16uC4View &Image16uC1View::DupA(Image16uC4View &pDst, const NppStreamContex
 Image16uC1View &Image16uC1View::Transpose(Image16uC1View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI().Size(), Size2D(pDst.SizeRoi().y, pDst.SizeRoi().x));
-    nppSafeCallExt(nppiTranspose_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiTranspose_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                             reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                             NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Add(const Pixel16uC1 &nConstant, Image16uC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Add(const Pixel16uC1 &nConstant, Image16uC1View &pDst, int nScaleFactor,
+                                    const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiAddC_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nConstant.x, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiAddC_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nConstant.x,
+                                           reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                           NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Add(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, Image16uC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Add(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, Image16uC1View &pDst,
+                                    int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiAddDeviceC_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pConstant.Pointer()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiAddDeviceC_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                 reinterpret_cast<const Npp16u *>(pConstant.Pointer()),
+                                                 reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                 NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 Image16uC1View &Image16uC1View::Add(const Pixel16uC1 &nConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiAddC_16u_C1IRSfs_Ctx(nConstant.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiAddC_16u_C1IRSfs_Ctx(nConstant.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                            NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Add(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx)
+Image16uC1View &Image16uC1View::Add(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor,
+                                    const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiAddDeviceC_16u_C1IRSfs_Ctx(reinterpret_cast<const Npp16u *>(pConstant.Pointer()), reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiAddDeviceC_16u_C1IRSfs_Ctx(reinterpret_cast<const Npp16u *>(pConstant.Pointer()),
+                                                  reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                  NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Mul(const Pixel16uC1 &nConstant, Image16uC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Mul(const Pixel16uC1 &nConstant, Image16uC1View &pDst, int nScaleFactor,
+                                    const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiMulC_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nConstant.x, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiMulC_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nConstant.x,
+                                           reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                           NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Mul(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, Image16uC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Mul(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, Image16uC1View &pDst,
+                                    int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiMulDeviceC_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pConstant.Pointer()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiMulDeviceC_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                 reinterpret_cast<const Npp16u *>(pConstant.Pointer()),
+                                                 reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                 NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 Image16uC1View &Image16uC1View::Mul(const Pixel16uC1 &nConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiMulC_16u_C1IRSfs_Ctx(nConstant.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiMulC_16u_C1IRSfs_Ctx(nConstant.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                            NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Mul(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx)
+Image16uC1View &Image16uC1View::Mul(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor,
+                                    const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiMulDeviceC_16u_C1IRSfs_Ctx(reinterpret_cast<const Npp16u *>(pConstant.Pointer()), reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiMulDeviceC_16u_C1IRSfs_Ctx(reinterpret_cast<const Npp16u *>(pConstant.Pointer()),
+                                                  reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                  NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::MulScale(const Pixel16uC1 &nConstant, Image16uC1View &pDst, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::MulScale(const Pixel16uC1 &nConstant, Image16uC1View &pDst,
+                                         const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiMulCScale_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nConstant.x, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiMulCScale_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                             nConstant.x, reinterpret_cast<Npp16u *>(pDst.PointerRoi()),
+                                             to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::MulScale(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, Image16uC1View &pDst, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::MulScale(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, Image16uC1View &pDst,
+                                         const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiMulDeviceCScale_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pConstant.Pointer()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiMulDeviceCScale_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                   reinterpret_cast<const Npp16u *>(pConstant.Pointer()),
+                                                   reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                   NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 Image16uC1View &Image16uC1View::MulScale(const Pixel16uC1 &nConstant, const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiMulCScale_16u_C1IR_Ctx(nConstant.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiMulCScale_16u_C1IR_Ctx(nConstant.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                              NppiSizeRoi(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::MulScale(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, const NppStreamContext &nppStreamCtx)
+Image16uC1View &Image16uC1View::MulScale(const opp::cuda::DevVarView<Pixel8uC1> &pConstant,
+                                         const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiMulDeviceCScale_16u_C1IR_Ctx(reinterpret_cast<const Npp16u *>(pConstant.Pointer()), reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiMulDeviceCScale_16u_C1IR_Ctx(reinterpret_cast<const Npp16u *>(pConstant.Pointer()),
+                                                    reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                    NppiSizeRoi(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Sub(const Pixel16uC1 &nConstant, Image16uC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Sub(const Pixel16uC1 &nConstant, Image16uC1View &pDst, int nScaleFactor,
+                                    const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiSubC_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nConstant.x, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiSubC_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nConstant.x,
+                                           reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                           NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Sub(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, Image16uC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Sub(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, Image16uC1View &pDst,
+                                    int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiSubDeviceC_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pConstant.Pointer()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiSubDeviceC_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                 reinterpret_cast<const Npp16u *>(pConstant.Pointer()),
+                                                 reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                 NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 Image16uC1View &Image16uC1View::Sub(const Pixel16uC1 &nConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiSubC_16u_C1IRSfs_Ctx(nConstant.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiSubC_16u_C1IRSfs_Ctx(nConstant.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                            NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Sub(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx)
+Image16uC1View &Image16uC1View::Sub(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor,
+                                    const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiSubDeviceC_16u_C1IRSfs_Ctx(reinterpret_cast<const Npp16u *>(pConstant.Pointer()), reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiSubDeviceC_16u_C1IRSfs_Ctx(reinterpret_cast<const Npp16u *>(pConstant.Pointer()),
+                                                  reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                  NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Div(const Pixel16uC1 &nConstant, Image16uC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Div(const Pixel16uC1 &nConstant, Image16uC1View &pDst, int nScaleFactor,
+                                    const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiDivC_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nConstant.x, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiDivC_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nConstant.x,
+                                           reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                           NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Div(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, Image16uC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Div(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, Image16uC1View &pDst,
+                                    int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiDivDeviceC_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pConstant.Pointer()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiDivDeviceC_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                 reinterpret_cast<const Npp16u *>(pConstant.Pointer()),
+                                                 reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                 NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 Image16uC1View &Image16uC1View::Div(const Pixel16uC1 &nConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiDivC_16u_C1IRSfs_Ctx(nConstant.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiDivC_16u_C1IRSfs_Ctx(nConstant.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                            NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Div(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor, const NppStreamContext &nppStreamCtx)
+Image16uC1View &Image16uC1View::Div(const opp::cuda::DevVarView<Pixel8uC1> &pConstant, int nScaleFactor,
+                                    const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiDivDeviceC_16u_C1IRSfs_Ctx(reinterpret_cast<const Npp16u *>(pConstant.Pointer()), reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiDivDeviceC_16u_C1IRSfs_Ctx(reinterpret_cast<const Npp16u *>(pConstant.Pointer()),
+                                                  reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                  NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::AbsDiff(Image16uC1View &pDst, const Pixel16uC1 &nConstant, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::AbsDiff(Image16uC1View &pDst, const Pixel16uC1 &nConstant,
+                                        const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiAbsDiffC_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nConstant.x, nppStreamCtx),
+    nppSafeCallExt(nppiAbsDiffC_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                            reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                            NppiSizeRoi(), nConstant.x, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::AbsDiff(Image16uC1View &pDst, opp::cuda::DevVarView<Pixel8uC1> &pConstant, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::AbsDiff(Image16uC1View &pDst, opp::cuda::DevVarView<Pixel8uC1> &pConstant,
+                                        const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiAbsDiffDeviceC_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), reinterpret_cast<Npp16u *>(pConstant.Pointer()), nppStreamCtx),
+    nppSafeCallExt(nppiAbsDiffDeviceC_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                  reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                  NppiSizeRoi(), reinterpret_cast<Npp16u *>(pConstant.Pointer()),
+                                                  nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Add(const Image16uC1View &pSrc2, Image16uC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Add(const Image16uC1View &pSrc2, Image16uC1View &pDst, int nScaleFactor,
+                                    const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiAdd_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiAdd_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                          reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()),
+                                          reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                          NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -420,16 +543,22 @@ Image16uC1View &Image16uC1View::Add(const Image16uC1View &pSrc2, Image16uC1View 
 Image16uC1View &Image16uC1View::Add(const Image16uC1View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pSrc.ROI());
-    nppSafeCallExt(nppiAdd_16u_C1IRSfs_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()), reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiAdd_16u_C1IRSfs_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()),
+                                           reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                           nScaleFactor, nppStreamCtx),
                    "ROI Src2: " << pSrc.ROI() << "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Mul(const Image16uC1View &pSrc2, Image16uC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Mul(const Image16uC1View &pSrc2, Image16uC1View &pDst, int nScaleFactor,
+                                    const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiMul_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiMul_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                          reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()),
+                                          reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                          NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -437,16 +566,22 @@ Image16uC1View &Image16uC1View::Mul(const Image16uC1View &pSrc2, Image16uC1View 
 Image16uC1View &Image16uC1View::Mul(const Image16uC1View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pSrc.ROI());
-    nppSafeCallExt(nppiMul_16u_C1IRSfs_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()), reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiMul_16u_C1IRSfs_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()),
+                                           reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                           nScaleFactor, nppStreamCtx),
                    "ROI Src2: " << pSrc.ROI() << "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::MulScale(const Image16uC1View &pSrc2, Image16uC1View &pDst, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::MulScale(const Image16uC1View &pSrc2, Image16uC1View &pDst,
+                                         const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiMulScale_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiMulScale_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                            reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()),
+                                            reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                            NppiSizeRoi(), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -454,16 +589,22 @@ Image16uC1View &Image16uC1View::MulScale(const Image16uC1View &pSrc2, Image16uC1
 Image16uC1View &Image16uC1View::MulScale(const Image16uC1View &pSrc, const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pSrc.ROI());
-    nppSafeCallExt(nppiMulScale_16u_C1IR_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()), reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiMulScale_16u_C1IR_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()),
+                                             reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                             nppStreamCtx),
                    "ROI Src2: " << pSrc.ROI() << "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Sub(const Image16uC1View &pSrc2, Image16uC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Sub(const Image16uC1View &pSrc2, Image16uC1View &pDst, int nScaleFactor,
+                                    const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiSub_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiSub_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                          reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()),
+                                          reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                          NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -471,16 +612,22 @@ Image16uC1View &Image16uC1View::Sub(const Image16uC1View &pSrc2, Image16uC1View 
 Image16uC1View &Image16uC1View::Sub(const Image16uC1View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pSrc.ROI());
-    nppSafeCallExt(nppiSub_16u_C1IRSfs_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()), reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiSub_16u_C1IRSfs_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()),
+                                           reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                           nScaleFactor, nppStreamCtx),
                    "ROI Src2: " << pSrc.ROI() << "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Div(const Image16uC1View &pSrc2, Image16uC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Div(const Image16uC1View &pSrc2, Image16uC1View &pDst, int nScaleFactor,
+                                    const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiDiv_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiDiv_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                          reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()),
+                                          reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                          NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -488,33 +635,47 @@ Image16uC1View &Image16uC1View::Div(const Image16uC1View &pSrc2, Image16uC1View 
 Image16uC1View &Image16uC1View::Div(const Image16uC1View &pSrc, int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pSrc.ROI());
-    nppSafeCallExt(nppiDiv_16u_C1IRSfs_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()), reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiDiv_16u_C1IRSfs_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()),
+                                           reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                           nScaleFactor, nppStreamCtx),
                    "ROI Src2: " << pSrc.ROI() << "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Div_Round(const Image16uC1View &pSrc2, Image16uC1View &pDst, NppRoundMode rndMode, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Div_Round(const Image16uC1View &pSrc2, Image16uC1View &pDst, NppRoundMode rndMode,
+                                          int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiDiv_Round_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), rndMode, nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiDiv_Round_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()),
+                                                to_int(pSrc2.Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()),
+                                                to_int(pDst.Pitch()), NppiSizeRoi(), rndMode, nScaleFactor,
+                                                nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Div_Round(const Image16uC1View &pSrc, NppRoundMode rndMode, int nScaleFactor, const NppStreamContext &nppStreamCtx)
+Image16uC1View &Image16uC1View::Div_Round(const Image16uC1View &pSrc, NppRoundMode rndMode, int nScaleFactor,
+                                          const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pSrc.ROI());
-    nppSafeCallExt(nppiDiv_Round_16u_C1IRSfs_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()), reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), rndMode, nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiDiv_Round_16u_C1IRSfs_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()),
+                                                 to_int(pSrc.Pitch()), reinterpret_cast<Npp16u *>(PointerRoi()),
+                                                 to_int(Pitch()), NppiSizeRoi(), rndMode, nScaleFactor, nppStreamCtx),
                    "ROI Src2: " << pSrc.ROI() << "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::AbsDiff(const Image16uC1View &pSrc2, Image16uC1View &pDst, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::AbsDiff(const Image16uC1View &pSrc2, Image16uC1View &pDst,
+                                        const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiAbsDiff_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiAbsDiff_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                           reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()),
+                                           reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                           NppiSizeRoi(), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -522,14 +683,17 @@ Image16uC1View &Image16uC1View::AbsDiff(const Image16uC1View &pSrc2, Image16uC1V
 Image16uC1View &Image16uC1View::Sqr(Image16uC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiSqr_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiSqr_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                          reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                          NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 Image16uC1View &Image16uC1View::Sqr(int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiSqr_16u_C1IRSfs_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiSqr_16u_C1IRSfs_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                           nScaleFactor, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
@@ -537,14 +701,17 @@ Image16uC1View &Image16uC1View::Sqr(int nScaleFactor, const NppStreamContext &np
 Image16uC1View &Image16uC1View::Sqrt(Image16uC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiSqrt_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiSqrt_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                           reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                           NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 Image16uC1View &Image16uC1View::Sqrt(int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiSqrt_16u_C1IRSfs_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiSqrt_16u_C1IRSfs_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                            nScaleFactor, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
@@ -552,14 +719,17 @@ Image16uC1View &Image16uC1View::Sqrt(int nScaleFactor, const NppStreamContext &n
 Image16uC1View &Image16uC1View::Ln(Image16uC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiLn_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiLn_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                         reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                         NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 Image16uC1View &Image16uC1View::Ln(int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiLn_16u_C1IRSfs_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiLn_16u_C1IRSfs_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                          nScaleFactor, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
@@ -567,98 +737,125 @@ Image16uC1View &Image16uC1View::Ln(int nScaleFactor, const NppStreamContext &npp
 Image16uC1View &Image16uC1View::Exp(Image16uC1View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiExp_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiExp_16u_C1RSfs_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                          reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                          NppiSizeRoi(), nScaleFactor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 Image16uC1View &Image16uC1View::Exp(int nScaleFactor, const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiExp_16u_C1IRSfs_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nScaleFactor, nppStreamCtx),
+    nppSafeCallExt(nppiExp_16u_C1IRSfs_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                           nScaleFactor, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::And(const Pixel16uC1 &nConstant, Image16uC1View &pDst, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::And(const Pixel16uC1 &nConstant, Image16uC1View &pDst,
+                                    const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiAndC_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nConstant.x, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiAndC_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nConstant.x,
+                                        reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                        NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 Image16uC1View &Image16uC1View::And(const Pixel16uC1 &nConstant, const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiAndC_16u_C1IR_Ctx(nConstant.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiAndC_16u_C1IR_Ctx(nConstant.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                         NppiSizeRoi(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Or(const Pixel16uC1 &nConstant, Image16uC1View &pDst, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Or(const Pixel16uC1 &nConstant, Image16uC1View &pDst,
+                                   const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiOrC_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nConstant.x, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiOrC_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nConstant.x,
+                                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                       NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 Image16uC1View &Image16uC1View::Or(const Pixel16uC1 &nConstant, const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiOrC_16u_C1IR_Ctx(nConstant.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiOrC_16u_C1IR_Ctx(nConstant.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                        NppiSizeRoi(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Xor(const Pixel16uC1 &nConstant, Image16uC1View &pDst, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Xor(const Pixel16uC1 &nConstant, Image16uC1View &pDst,
+                                    const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiXorC_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nConstant.x, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiXorC_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nConstant.x,
+                                        reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                        NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 Image16uC1View &Image16uC1View::Xor(const Pixel16uC1 &nConstant, const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiXorC_16u_C1IR_Ctx(nConstant.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiXorC_16u_C1IR_Ctx(nConstant.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                         NppiSizeRoi(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::RShift(Npp32u nConstant, Image16uC1View &pDst, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::RShift(Npp32u nConstant, Image16uC1View &pDst,
+                                       const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiRShiftC_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nConstant, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiRShiftC_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nConstant,
+                                           reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                           NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 Image16uC1View &Image16uC1View::RShift(Npp32u nConstant, const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiRShiftC_16u_C1IR_Ctx(nConstant, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiRShiftC_16u_C1IR_Ctx(nConstant, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                            NppiSizeRoi(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::LShift(Npp32u nConstant, Image16uC1View &pDst, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::LShift(Npp32u nConstant, Image16uC1View &pDst,
+                                       const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiLShiftC_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nConstant, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiLShiftC_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nConstant,
+                                           reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                           NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 Image16uC1View &Image16uC1View::LShift(Npp32u nConstant, const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiLShiftC_16u_C1IR_Ctx(nConstant, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiLShiftC_16u_C1IR_Ctx(nConstant, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                            NppiSizeRoi(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::And(const Image16uC1View &pSrc2, Image16uC1View &pDst, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::And(const Image16uC1View &pSrc2, Image16uC1View &pDst,
+                                    const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiAnd_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiAnd_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                       reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()),
+                                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                       NppiSizeRoi(), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -666,16 +863,22 @@ Image16uC1View &Image16uC1View::And(const Image16uC1View &pSrc2, Image16uC1View 
 Image16uC1View &Image16uC1View::And(const Image16uC1View &pSrc, const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pSrc.ROI());
-    nppSafeCallExt(nppiAnd_16u_C1IR_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()), reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiAnd_16u_C1IR_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()),
+                                        reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                        nppStreamCtx),
                    "ROI Src2: " << pSrc.ROI() << "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Or(const Image16uC1View &pSrc2, Image16uC1View &pDst, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Or(const Image16uC1View &pSrc2, Image16uC1View &pDst,
+                                   const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiOr_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiOr_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                      reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()),
+                                      reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                      NppiSizeRoi(), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -683,16 +886,22 @@ Image16uC1View &Image16uC1View::Or(const Image16uC1View &pSrc2, Image16uC1View &
 Image16uC1View &Image16uC1View::Or(const Image16uC1View &pSrc, const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pSrc.ROI());
-    nppSafeCallExt(nppiOr_16u_C1IR_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()), reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiOr_16u_C1IR_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()),
+                                       reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                       nppStreamCtx),
                    "ROI Src2: " << pSrc.ROI() << "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Xor(const Image16uC1View &pSrc2, Image16uC1View &pDst, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Xor(const Image16uC1View &pSrc2, Image16uC1View &pDst,
+                                    const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiXor_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiXor_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                       reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()),
+                                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                       NppiSizeRoi(), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -700,283 +909,406 @@ Image16uC1View &Image16uC1View::Xor(const Image16uC1View &pSrc2, Image16uC1View 
 Image16uC1View &Image16uC1View::Xor(const Image16uC1View &pSrc, const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pSrc.ROI());
-    nppSafeCallExt(nppiXor_16u_C1IR_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()), reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiXor_16u_C1IR_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()),
+                                        reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                        nppStreamCtx),
                    "ROI Src2: " << pSrc.ROI() << "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::AlphaComp(const Pixel16uC1 &nAlpha1, const Image16uC1View &pSrc2, const Pixel16uC1 &nAlpha2, Image16uC1View &pDst, NppiAlphaOp eAlphaOp, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::AlphaComp(const Pixel16uC1 &nAlpha1, const Image16uC1View &pSrc2,
+                                          const Pixel16uC1 &nAlpha2, Image16uC1View &pDst, NppiAlphaOp eAlphaOp,
+                                          const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiAlphaCompC_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nAlpha1.x, reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), nAlpha2.x, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), eAlphaOp, nppStreamCtx),
+    nppSafeCallExt(nppiAlphaCompC_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                              nAlpha1.x, reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()),
+                                              to_int(pSrc2.Pitch()), nAlpha2.x,
+                                              reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                              NppiSizeRoi(), eAlphaOp, nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::AlphaPremul(const Pixel16uC1 &nAlpha1, Image16uC1View &pDst, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::AlphaPremul(const Pixel16uC1 &nAlpha1, Image16uC1View &pDst,
+                                            const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiAlphaPremulC_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nAlpha1.x, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiAlphaPremulC_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                nAlpha1.x, reinterpret_cast<Npp16u *>(pDst.PointerRoi()),
+                                                to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 Image16uC1View &Image16uC1View::AlphaPremul(const Pixel16uC1 &nAlpha1, const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiAlphaPremulC_16u_C1IR_Ctx(nAlpha1.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiAlphaPremulC_16u_C1IR_Ctx(nAlpha1.x, reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                 NppiSizeRoi(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::AlphaComp(const Image16uC1View &pSrc2, Image16uC1View &pDst, NppiAlphaOp eAlphaOp, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::AlphaComp(const Image16uC1View &pSrc2, Image16uC1View &pDst, NppiAlphaOp eAlphaOp,
+                                          const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiAlphaComp_16u_AC1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), eAlphaOp, nppStreamCtx),
+    nppSafeCallExt(nppiAlphaComp_16u_AC1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                              reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()),
+                                              to_int(pSrc2.Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()),
+                                              to_int(pDst.Pitch()), NppiSizeRoi(), eAlphaOp, nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC3View &Image16uC1View::CFAToRGB(Image16uC3View &pDst, NppiBayerGridPosition eGrid, NppiInterpolationMode eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image16uC3View &Image16uC1View::CFAToRGB(Image16uC3View &pDst, NppiBayerGridPosition eGrid,
+                                         NppiInterpolationMode eInterpolation,
+                                         const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCFAToRGB_16u_C1C3R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), to_int(Pitch()), NppiSizeFull(), NppiRectRoi(), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), eGrid, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiCFAToRGB_16u_C1C3R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), to_int(Pitch()),
+                                              NppiSizeFull(), NppiRectRoi(),
+                                              reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                              eGrid, eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC4View &Image16uC1View::CFAToRGBA(Image16uC4View &pDst, NppiBayerGridPosition eGrid, NppiInterpolationMode eInterpolation, const Pixel16uC1 &nAlpha, const NppStreamContext &nppStreamCtx) const
+Image16uC4View &Image16uC1View::CFAToRGBA(Image16uC4View &pDst, NppiBayerGridPosition eGrid,
+                                          NppiInterpolationMode eInterpolation, const Pixel16uC1 &nAlpha,
+                                          const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCFAToRGBA_16u_C1AC4R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), to_int(Pitch()), NppiSizeFull(), NppiRectRoi(), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), eGrid, eInterpolation, nAlpha.x, nppStreamCtx),
+    nppSafeCallExt(nppiCFAToRGBA_16u_C1AC4R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), to_int(Pitch()),
+                                                NppiSizeFull(), NppiRectRoi(),
+                                                reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                eGrid, eInterpolation, nAlpha.x, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::ColorTwist32f(Image16uC1View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::ColorTwist32f(Image16uC1View &pDst, const Npp32f aTwist[3][4],
+                                              const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiColorTwist32f_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), aTwist, nppStreamCtx),
+    nppSafeCallExt(nppiColorTwist32f_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                 reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                 NppiSizeRoi(), aTwist, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 Image16uC1View &Image16uC1View::ColorTwist32f(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiColorTwist32f_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), aTwist, nppStreamCtx),
+    nppSafeCallExt(nppiColorTwist32f_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                  NppiSizeRoi(), aTwist, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::LUT(Image16uC1View &pDst, const opp::cuda::DevVarView<int> &pValues, const opp::cuda::DevVarView<int> &pLevels, int nLevels, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::LUT(Image16uC1View &pDst, const opp::cuda::DevVarView<int> &pValues,
+                                    const opp::cuda::DevVarView<int> &pLevels, int nLevels,
+                                    const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiLUT_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pValues.Pointer(), pLevels.Pointer(), nLevels, nppStreamCtx),
+    nppSafeCallExt(nppiLUT_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                       NppiSizeRoi(), pValues.Pointer(), pLevels.Pointer(), nLevels, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::LUT(const opp::cuda::DevVarView<int> &pValues, const opp::cuda::DevVarView<int> &pLevels, int nLevels, const NppStreamContext &nppStreamCtx)
+Image16uC1View &Image16uC1View::LUT(const opp::cuda::DevVarView<int> &pValues,
+                                    const opp::cuda::DevVarView<int> &pLevels, int nLevels,
+                                    const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiLUT_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), pValues.Pointer(), pLevels.Pointer(), nLevels, nppStreamCtx),
+    nppSafeCallExt(nppiLUT_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                        pValues.Pointer(), pLevels.Pointer(), nLevels, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::LUT_Linear(Image16uC1View &pDst, const opp::cuda::DevVarView<int> &pValues, const opp::cuda::DevVarView<int> &pLevels, int nLevels, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::LUT_Linear(Image16uC1View &pDst, const opp::cuda::DevVarView<int> &pValues,
+                                           const opp::cuda::DevVarView<int> &pLevels, int nLevels,
+                                           const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiLUT_Linear_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pValues.Pointer(), pLevels.Pointer(), nLevels, nppStreamCtx),
+    nppSafeCallExt(nppiLUT_Linear_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                              reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                              NppiSizeRoi(), pValues.Pointer(), pLevels.Pointer(), nLevels,
+                                              nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::LUT_Linear(const opp::cuda::DevVarView<int> &pValues, const opp::cuda::DevVarView<int> &pLevels, int nLevels, const NppStreamContext &nppStreamCtx)
+Image16uC1View &Image16uC1View::LUT_Linear(const opp::cuda::DevVarView<int> &pValues,
+                                           const opp::cuda::DevVarView<int> &pLevels, int nLevels,
+                                           const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiLUT_Linear_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), pValues.Pointer(), pLevels.Pointer(), nLevels, nppStreamCtx),
+    nppSafeCallExt(nppiLUT_Linear_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                               pValues.Pointer(), pLevels.Pointer(), nLevels, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::LUT_Cubic(Image16uC1View &pDst, const opp::cuda::DevVarView<int> &pValues, const opp::cuda::DevVarView<int> &pLevels, int nLevels, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::LUT_Cubic(Image16uC1View &pDst, const opp::cuda::DevVarView<int> &pValues,
+                                          const opp::cuda::DevVarView<int> &pLevels, int nLevels,
+                                          const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiLUT_Cubic_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pValues.Pointer(), pLevels.Pointer(), nLevels, nppStreamCtx),
+    nppSafeCallExt(nppiLUT_Cubic_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                             reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                             NppiSizeRoi(), pValues.Pointer(), pLevels.Pointer(), nLevels,
+                                             nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::LUT_Cubic(const opp::cuda::DevVarView<int> &pValues, const opp::cuda::DevVarView<int> &pLevels, int nLevels, const NppStreamContext &nppStreamCtx)
+Image16uC1View &Image16uC1View::LUT_Cubic(const opp::cuda::DevVarView<int> &pValues,
+                                          const opp::cuda::DevVarView<int> &pLevels, int nLevels,
+                                          const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiLUT_Cubic_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), pValues.Pointer(), pLevels.Pointer(), nLevels, nppStreamCtx),
+    nppSafeCallExt(nppiLUT_Cubic_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                              pValues.Pointer(), pLevels.Pointer(), nLevels, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::LUTPalette(Image16uC1View &pDst, const opp::cuda::DevVarView<Pixel16uC1> &pTable, int nBitSize, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::LUTPalette(Image16uC1View &pDst, const opp::cuda::DevVarView<Pixel16uC1> &pTable,
+                                           int nBitSize, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiLUTPalette_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), reinterpret_cast<const Npp16u *>(pTable.Pointer()), nBitSize, nppStreamCtx),
+    nppSafeCallExt(nppiLUTPalette_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                              reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                              NppiSizeRoi(), reinterpret_cast<const Npp16u *>(pTable.Pointer()),
+                                              nBitSize, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image8uC1View &Image16uC1View::LUTPalette(Image8uC1View &pDst, const opp::cuda::DevVarView<Pixel8uC1> &pTable, int nBitSize, const NppStreamContext &nppStreamCtx) const
+Image8uC1View &Image16uC1View::LUTPalette(Image8uC1View &pDst, const opp::cuda::DevVarView<Pixel8uC1> &pTable,
+                                          int nBitSize, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiLUTPalette_16u8u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), reinterpret_cast<const Npp8u *>(pTable.Pointer()), nBitSize, nppStreamCtx),
+    nppSafeCallExt(nppiLUTPalette_16u8u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                NppiSizeRoi(), reinterpret_cast<const Npp8u *>(pTable.Pointer()),
+                                                nBitSize, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image8uC3View &Image16uC1View::LUTPalette(Image8uC3View &pDst, const opp::cuda::DevVarView<Pixel8uC3> &pTable, int nBitSize, const NppStreamContext &nppStreamCtx) const
+Image8uC3View &Image16uC1View::LUTPalette(Image8uC3View &pDst, const opp::cuda::DevVarView<Pixel8uC3> &pTable,
+                                          int nBitSize, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiLUTPalette_16u24u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), reinterpret_cast<const Npp8u *>(pTable.Pointer()), nBitSize, nppStreamCtx),
+    nppSafeCallExt(nppiLUTPalette_16u24u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                 reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                 NppiSizeRoi(), reinterpret_cast<const Npp8u *>(pTable.Pointer()),
+                                                 nBitSize, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image8uC4View &Image16uC1View::LUTPalette(Image8uC4View &pDst, const opp::cuda::DevVarView<Pixel8uC4> &pTable, int nBitSize, const NppStreamContext &nppStreamCtx) const
+Image8uC4View &Image16uC1View::LUTPalette(Image8uC4View &pDst, const opp::cuda::DevVarView<Pixel8uC4> &pTable,
+                                          int nBitSize, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiLUTPalette_16u32u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp32u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), reinterpret_cast<const Npp32u *>(pTable.Pointer()), nBitSize, nppStreamCtx),
+    nppSafeCallExt(nppiLUTPalette_16u32u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                 reinterpret_cast<Npp32u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                 NppiSizeRoi(), reinterpret_cast<const Npp32u *>(pTable.Pointer()),
+                                                 nBitSize, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Threshold(Image16uC1View &pDst, const Pixel16uC1 &nThreshold, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Threshold(Image16uC1View &pDst, const Pixel16uC1 &nThreshold,
+                                          NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiThreshold_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nThreshold.x, eComparisonOperation, nppStreamCtx),
+    nppSafeCallExt(nppiThreshold_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                             reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                             NppiSizeRoi(), nThreshold.x, eComparisonOperation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Threshold(const Pixel16uC1 &nThreshold, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx)
+Image16uC1View &Image16uC1View::Threshold(const Pixel16uC1 &nThreshold, NppCmpOp eComparisonOperation,
+                                          const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiThreshold_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nThreshold.x, eComparisonOperation, nppStreamCtx),
+    nppSafeCallExt(nppiThreshold_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                              nThreshold.x, eComparisonOperation, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Threshold_GT(Image16uC1View &pDst, const Pixel16uC1 &nThreshold, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Threshold_GT(Image16uC1View &pDst, const Pixel16uC1 &nThreshold,
+                                             const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiThreshold_GT_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nThreshold.x, nppStreamCtx),
+    nppSafeCallExt(nppiThreshold_GT_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                NppiSizeRoi(), nThreshold.x, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 Image16uC1View &Image16uC1View::Threshold_GT(const Pixel16uC1 &nThreshold, const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiThreshold_GT_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nThreshold.x, nppStreamCtx),
+    nppSafeCallExt(nppiThreshold_GT_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                 NppiSizeRoi(), nThreshold.x, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Threshold_LT(Image16uC1View &pDst, const Pixel16uC1 &nThreshold, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Threshold_LT(Image16uC1View &pDst, const Pixel16uC1 &nThreshold,
+                                             const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiThreshold_LT_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nThreshold.x, nppStreamCtx),
+    nppSafeCallExt(nppiThreshold_LT_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                NppiSizeRoi(), nThreshold.x, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 Image16uC1View &Image16uC1View::Threshold_LT(const Pixel16uC1 &nThreshold, const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiThreshold_LT_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nThreshold.x, nppStreamCtx),
+    nppSafeCallExt(nppiThreshold_LT_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                 NppiSizeRoi(), nThreshold.x, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Threshold_Val(Image16uC1View &pDst, const Pixel16uC1 &nThreshold, const Pixel16uC1 &nValue, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Threshold_Val(Image16uC1View &pDst, const Pixel16uC1 &nThreshold,
+                                              const Pixel16uC1 &nValue, NppCmpOp eComparisonOperation,
+                                              const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiThreshold_Val_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nThreshold.x, nValue.x, eComparisonOperation, nppStreamCtx),
+    nppSafeCallExt(nppiThreshold_Val_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                 reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                 NppiSizeRoi(), nThreshold.x, nValue.x, eComparisonOperation,
+                                                 nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Threshold_Val(const Pixel16uC1 &nThreshold, const Pixel16uC1 &nValue, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx)
+Image16uC1View &Image16uC1View::Threshold_Val(const Pixel16uC1 &nThreshold, const Pixel16uC1 &nValue,
+                                              NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiThreshold_Val_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nThreshold.x, nValue.x, eComparisonOperation, nppStreamCtx),
+    nppSafeCallExt(nppiThreshold_Val_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                  NppiSizeRoi(), nThreshold.x, nValue.x, eComparisonOperation,
+                                                  nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Threshold_GTVal(Image16uC1View &pDst, const Pixel16uC1 &nThreshold, const Pixel16uC1 &nValue, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Threshold_GTVal(Image16uC1View &pDst, const Pixel16uC1 &nThreshold,
+                                                const Pixel16uC1 &nValue, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiThreshold_GTVal_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nThreshold.x, nValue.x, nppStreamCtx),
+    nppSafeCallExt(nppiThreshold_GTVal_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                   reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                   NppiSizeRoi(), nThreshold.x, nValue.x, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Threshold_GTVal(const Pixel16uC1 &nThreshold, const Pixel16uC1 &nValue, const NppStreamContext &nppStreamCtx)
+Image16uC1View &Image16uC1View::Threshold_GTVal(const Pixel16uC1 &nThreshold, const Pixel16uC1 &nValue,
+                                                const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiThreshold_GTVal_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nThreshold.x, nValue.x, nppStreamCtx),
+    nppSafeCallExt(nppiThreshold_GTVal_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                    NppiSizeRoi(), nThreshold.x, nValue.x, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Threshold_LTVal(Image16uC1View &pDst, const Pixel16uC1 &nThreshold, const Pixel16uC1 &nValue, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Threshold_LTVal(Image16uC1View &pDst, const Pixel16uC1 &nThreshold,
+                                                const Pixel16uC1 &nValue, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiThreshold_LTVal_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nThreshold.x, nValue.x, nppStreamCtx),
+    nppSafeCallExt(nppiThreshold_LTVal_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                   reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                   NppiSizeRoi(), nThreshold.x, nValue.x, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Threshold_LTVal(const Pixel16uC1 &nThreshold, const Pixel16uC1 &nValue, const NppStreamContext &nppStreamCtx)
+Image16uC1View &Image16uC1View::Threshold_LTVal(const Pixel16uC1 &nThreshold, const Pixel16uC1 &nValue,
+                                                const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiThreshold_LTVal_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nThreshold.x, nValue.x, nppStreamCtx),
+    nppSafeCallExt(nppiThreshold_LTVal_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                    NppiSizeRoi(), nThreshold.x, nValue.x, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::Threshold_LTValGTVal(Image16uC1View &pDst, const Pixel16uC1 &nThresholdLT, const Pixel16uC1 &nValueLT, const Pixel16uC1 &nThresholdGT, const Pixel16uC1 &nValueGT, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Threshold_LTValGTVal(Image16uC1View &pDst, const Pixel16uC1 &nThresholdLT,
+                                                     const Pixel16uC1 &nValueLT, const Pixel16uC1 &nThresholdGT,
+                                                     const Pixel16uC1 &nValueGT,
+                                                     const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiThreshold_LTValGTVal_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nThresholdLT.x, nValueLT.x, nThresholdGT.x, nValueGT.x, nppStreamCtx),
+    nppSafeCallExt(nppiThreshold_LTValGTVal_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                        reinterpret_cast<Npp16u *>(pDst.PointerRoi()),
+                                                        to_int(pDst.Pitch()), NppiSizeRoi(), nThresholdLT.x, nValueLT.x,
+                                                        nThresholdGT.x, nValueGT.x, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Threshold_LTValGTVal(const Pixel16uC1 &nThresholdLT, const Pixel16uC1 &nValueLT, const Pixel16uC1 &nThresholdGT, const Pixel16uC1 &nValueGT, const NppStreamContext &nppStreamCtx)
+Image16uC1View &Image16uC1View::Threshold_LTValGTVal(const Pixel16uC1 &nThresholdLT, const Pixel16uC1 &nValueLT,
+                                                     const Pixel16uC1 &nThresholdGT, const Pixel16uC1 &nValueGT,
+                                                     const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiThreshold_LTValGTVal_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nThresholdLT.x, nValueLT.x, nThresholdGT.x, nValueGT.x, nppStreamCtx),
+    nppSafeCallExt(nppiThreshold_LTValGTVal_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                         NppiSizeRoi(), nThresholdLT.x, nValueLT.x, nThresholdGT.x,
+                                                         nValueGT.x, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image8uC1View &Image16uC1View::Compare(const Image16uC1View &pSrc2, Image8uC1View &pDst, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx) const
+Image8uC1View &Image16uC1View::Compare(const Image16uC1View &pSrc2, Image8uC1View &pDst, NppCmpOp eComparisonOperation,
+                                       const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCompare_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), eComparisonOperation, nppStreamCtx),
+    nppSafeCallExt(nppiCompare_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                           reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()),
+                                           reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                           NppiSizeRoi(), eComparisonOperation, nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image8uC1View &Image16uC1View::Compare(const Pixel16uC1 &nConstant, Image8uC1View &pDst, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx) const
+Image8uC1View &Image16uC1View::Compare(const Pixel16uC1 &nConstant, Image8uC1View &pDst, NppCmpOp eComparisonOperation,
+                                       const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCompareC_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), nConstant.x, reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), eComparisonOperation, nppStreamCtx),
+    nppSafeCallExt(nppiCompareC_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                            nConstant.x, reinterpret_cast<Npp8u *>(pDst.PointerRoi()),
+                                            to_int(pDst.Pitch()), NppiSizeRoi(), eComparisonOperation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Dilate(Image16uC1View &pDst, const opp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Dilate(Image16uC1View &pDst, const opp::cuda::DevVarView<byte> &pMask,
+                                       NppiSize oMaskSize, NppiPoint oAnchor,
+                                       const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiDilate_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pMask.Pointer(), oMaskSize, oAnchor, nppStreamCtx),
+    nppSafeCallExt(nppiDilate_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                          reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                          NppiSizeRoi(), pMask.Pointer(), oMaskSize, oAnchor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::DilateBorder(Image16uC1View &pDst, const opp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image16uC1View &Image16uC1View::DilateBorder(Image16uC1View &pDst, const opp::cuda::DevVarView<byte> &pMask,
+                                             NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType,
+                                             const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -986,7 +1318,10 @@ Image16uC1View &Image16uC1View::DilateBorder(Image16uC1View &pDst, const opp::cu
         filterSize.height = ROI().height;
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiDilateBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pMask.Pointer(), oMaskSize, oAnchor, eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiDilateBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()),
+                                                to_int(pDst.Pitch()), NppiSizeRoi(), pMask.Pointer(), oMaskSize,
+                                                oAnchor, eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -994,12 +1329,15 @@ Image16uC1View &Image16uC1View::DilateBorder(Image16uC1View &pDst, const opp::cu
 Image16uC1View &Image16uC1View::Dilate3x3(Image16uC1View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiDilate3x3_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiDilate3x3_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                             reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                             NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Dilate3x3Border(Image16uC1View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image16uC1View &Image16uC1View::Dilate3x3Border(Image16uC1View &pDst, NppiBorderType eBorderType,
+                                                const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1009,20 +1347,28 @@ Image16uC1View &Image16uC1View::Dilate3x3Border(Image16uC1View &pDst, NppiBorder
         filterSize.height = ROI().height;
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiDilate3x3Border_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiDilate3x3Border_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                   filterSize, filterOffset,
+                                                   reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                   NppiSizeRoi(), eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Erode(Image16uC1View &pDst, const opp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Erode(Image16uC1View &pDst, const opp::cuda::DevVarView<byte> &pMask,
+                                      NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiErode_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pMask.Pointer(), oMaskSize, oAnchor, nppStreamCtx),
+    nppSafeCallExt(nppiErode_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                         reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                         NppiSizeRoi(), pMask.Pointer(), oMaskSize, oAnchor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::ErodeBorder(Image16uC1View &pDst, const opp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image16uC1View &Image16uC1View::ErodeBorder(Image16uC1View &pDst, const opp::cuda::DevVarView<byte> &pMask,
+                                            NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType,
+                                            const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1032,7 +1378,10 @@ Image16uC1View &Image16uC1View::ErodeBorder(Image16uC1View &pDst, const opp::cud
         filterSize.height = ROI().height;
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiErodeBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pMask.Pointer(), oMaskSize, oAnchor, eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiErodeBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                               filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()),
+                                               to_int(pDst.Pitch()), NppiSizeRoi(), pMask.Pointer(), oMaskSize, oAnchor,
+                                               eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -1040,12 +1389,15 @@ Image16uC1View &Image16uC1View::ErodeBorder(Image16uC1View &pDst, const opp::cud
 Image16uC1View &Image16uC1View::Erode3x3(Image16uC1View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiErode3x3_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiErode3x3_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                            reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                            NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Erode3x3Border(Image16uC1View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image16uC1View &Image16uC1View::Erode3x3Border(Image16uC1View &pDst, NppiBorderType eBorderType,
+                                               const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1055,7 +1407,10 @@ Image16uC1View &Image16uC1View::Erode3x3Border(Image16uC1View &pDst, NppiBorderT
         filterSize.height = ROI().height;
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiErode3x3Border_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiErode3x3Border_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                  filterSize, filterOffset,
+                                                  reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                  NppiSizeRoi(), eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -1067,7 +1422,10 @@ size_t Image16uC1View::MorphGetBufferSize() const
     return to_size_t(retValue);
 }
 
-Image16uC1View &Image16uC1View::MorphCloseBorder(Image16uC1View &pDst, const opp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, opp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image16uC1View &Image16uC1View::MorphCloseBorder(Image16uC1View &pDst, const opp::cuda::DevVarView<byte> &pMask,
+                                                 NppiSize oMaskSize, NppiPoint oAnchor,
+                                                 opp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType,
+                                                 const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1077,12 +1435,18 @@ Image16uC1View &Image16uC1View::MorphCloseBorder(Image16uC1View &pDst, const opp
         filterSize.height = ROI().height;
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiMorphCloseBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pMask.Pointer(), oMaskSize, oAnchor, pBuffer.Pointer(), eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiMorphCloseBorder_16u_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(),
+                       pMask.Pointer(), oMaskSize, oAnchor, pBuffer.Pointer(), eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::MorphOpenBorder(Image16uC1View &pDst, const opp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, opp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image16uC1View &Image16uC1View::MorphOpenBorder(Image16uC1View &pDst, const opp::cuda::DevVarView<byte> &pMask,
+                                                NppiSize oMaskSize, NppiPoint oAnchor,
+                                                opp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType,
+                                                const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1092,12 +1456,18 @@ Image16uC1View &Image16uC1View::MorphOpenBorder(Image16uC1View &pDst, const opp:
         filterSize.height = ROI().height;
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiMorphOpenBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pMask.Pointer(), oMaskSize, oAnchor, pBuffer.Pointer(), eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiMorphOpenBorder_16u_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(),
+                       pMask.Pointer(), oMaskSize, oAnchor, pBuffer.Pointer(), eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::MorphTopHatBorder(Image16uC1View &pDst, const opp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, opp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image16uC1View &Image16uC1View::MorphTopHatBorder(Image16uC1View &pDst, const opp::cuda::DevVarView<byte> &pMask,
+                                                  NppiSize oMaskSize, NppiPoint oAnchor,
+                                                  opp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType,
+                                                  const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1107,12 +1477,18 @@ Image16uC1View &Image16uC1View::MorphTopHatBorder(Image16uC1View &pDst, const op
         filterSize.height = ROI().height;
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiMorphTopHatBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pMask.Pointer(), oMaskSize, oAnchor, pBuffer.Pointer(), eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiMorphTopHatBorder_16u_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(),
+                       pMask.Pointer(), oMaskSize, oAnchor, pBuffer.Pointer(), eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::MorphBlackHatBorder(Image16uC1View &pDst, const opp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, opp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image16uC1View &Image16uC1View::MorphBlackHatBorder(Image16uC1View &pDst, const opp::cuda::DevVarView<byte> &pMask,
+                                                    NppiSize oMaskSize, NppiPoint oAnchor,
+                                                    opp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType,
+                                                    const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1122,12 +1498,18 @@ Image16uC1View &Image16uC1View::MorphBlackHatBorder(Image16uC1View &pDst, const 
         filterSize.height = ROI().height;
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiMorphBlackHatBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pMask.Pointer(), oMaskSize, oAnchor, pBuffer.Pointer(), eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiMorphBlackHatBorder_16u_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(),
+                       pMask.Pointer(), oMaskSize, oAnchor, pBuffer.Pointer(), eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::MorphGradientBorder(Image16uC1View &pDst, const opp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, opp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image16uC1View &Image16uC1View::MorphGradientBorder(Image16uC1View &pDst, const opp::cuda::DevVarView<byte> &pMask,
+                                                    NppiSize oMaskSize, NppiPoint oAnchor,
+                                                    opp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType,
+                                                    const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1137,43 +1519,31 @@ Image16uC1View &Image16uC1View::MorphGradientBorder(Image16uC1View &pDst, const 
         filterSize.height = ROI().height;
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiMorphGradientBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pMask.Pointer(), oMaskSize, oAnchor, pBuffer.Pointer(), eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiMorphGradientBorder_16u_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(),
+                       pMask.Pointer(), oMaskSize, oAnchor, pBuffer.Pointer(), eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::FilterColumn(Image16uC1View &pDst, const opp::cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::FilterColumn(Image16uC1View &pDst, const opp::cuda::DevVarView<int> &pKernel,
+                                             Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor,
+                                             const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterColumn_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pKernel.Pointer(), nMaskSize, nAnchor, nDivisor.x, nppStreamCtx),
+    nppSafeCallExt(nppiFilterColumn_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                NppiSizeRoi(), pKernel.Pointer(), nMaskSize, nAnchor, nDivisor.x,
+                                                nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::FilterColumnBorder(Image16uC1View &pDst, const opp::cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
-{
-    NppiSize filterSize{aFilterArea.width, aFilterArea.height};
-    const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
-    if (aFilterArea.Size() == Size2D())
-    {
-        filterSize.width  = ROI().width;
-        filterSize.height = ROI().height;
-    }
-    checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterColumnBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pKernel.Pointer(), nMaskSize, nAnchor, nDivisor.x, eBorderType, nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
-    return pDst;
-}
-
-Image16uC1View &Image16uC1View::FilterColumn32f(Image16uC1View &pDst, const opp::cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const NppStreamContext &nppStreamCtx) const
-{
-    checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterColumn32f_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pKernel.Pointer(), nMaskSize, nAnchor, nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
-    return pDst;
-}
-
-Image16uC1View &Image16uC1View::FilterColumnBorder32f(Image16uC1View &pDst, const opp::cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image16uC1View &Image16uC1View::FilterColumnBorder(Image16uC1View &pDst, const opp::cuda::DevVarView<int> &pKernel,
+                                                   Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor,
+                                                   NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx,
+                                                   const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1183,43 +1553,30 @@ Image16uC1View &Image16uC1View::FilterColumnBorder32f(Image16uC1View &pDst, cons
         filterSize.height = ROI().height;
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterColumnBorder32f_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pKernel.Pointer(), nMaskSize, nAnchor, eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiFilterColumnBorder_16u_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(),
+                       pKernel.Pointer(), nMaskSize, nAnchor, nDivisor.x, eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::FilterRow(Image16uC1View &pDst, const opp::cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::FilterColumn32f(Image16uC1View &pDst, const opp::cuda::DevVarView<float> &pKernel,
+                                                Npp32s nMaskSize, Npp32s nAnchor,
+                                                const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterRow_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pKernel.Pointer(), nMaskSize, nAnchor, nDivisor.x, nppStreamCtx),
+    nppSafeCallExt(nppiFilterColumn32f_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                   reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                   NppiSizeRoi(), pKernel.Pointer(), nMaskSize, nAnchor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::FilterRowBorder(Image16uC1View &pDst, const opp::cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
-{
-    NppiSize filterSize{aFilterArea.width, aFilterArea.height};
-    const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
-    if (aFilterArea.Size() == Size2D())
-    {
-        filterSize.width  = ROI().width;
-        filterSize.height = ROI().height;
-    }
-    checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterRowBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pKernel.Pointer(), nMaskSize, nAnchor, nDivisor.x, eBorderType, nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
-    return pDst;
-}
-
-Image16uC1View &Image16uC1View::FilterRow32f(Image16uC1View &pDst, const opp::cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const NppStreamContext &nppStreamCtx) const
-{
-    checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterRow32f_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pKernel.Pointer(), nMaskSize, nAnchor, nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
-    return pDst;
-}
-
-Image16uC1View &Image16uC1View::FilterRowBorder32f(Image16uC1View &pDst, const opp::cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image16uC1View &Image16uC1View::FilterColumnBorder32f(Image16uC1View &pDst, const opp::cuda::DevVarView<float> &pKernel,
+                                                      Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType,
+                                                      const NppStreamContext &nppStreamCtx,
+                                                      const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1229,43 +1586,31 @@ Image16uC1View &Image16uC1View::FilterRowBorder32f(Image16uC1View &pDst, const o
         filterSize.height = ROI().height;
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterRowBorder32f_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pKernel.Pointer(), nMaskSize, nAnchor, eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiFilterColumnBorder32f_16u_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(),
+                       pKernel.Pointer(), nMaskSize, nAnchor, eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image32fC1View &Image16uC1View::SumWindowColumn(Image32fC1View &pDst, Npp32s nMaskSize, Npp32s nAnchor, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::FilterRow(Image16uC1View &pDst, const opp::cuda::DevVarView<int> &pKernel,
+                                          Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor,
+                                          const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiSumWindowColumn_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nMaskSize, nAnchor, nppStreamCtx),
+    nppSafeCallExt(nppiFilterRow_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                             reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                             NppiSizeRoi(), pKernel.Pointer(), nMaskSize, nAnchor, nDivisor.x,
+                                             nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image32fC1View &Image16uC1View::SumWindowRow(Image32fC1View &pDst, Npp32s nMaskSize, Npp32s nAnchor, const NppStreamContext &nppStreamCtx) const
-{
-    checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiSumWindowRow_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nMaskSize, nAnchor, nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
-    return pDst;
-}
-
-Image32fC1View &Image16uC1View::SumWindowColumnBorder(Image32fC1View &pDst, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
-{
-    NppiSize filterSize{aFilterArea.width, aFilterArea.height};
-    const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
-    if (aFilterArea.Size() == Size2D())
-    {
-        filterSize.width  = ROI().width;
-        filterSize.height = ROI().height;
-    }
-    checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiSumWindowColumnBorder_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nMaskSize, nAnchor, eBorderType, nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
-    return pDst;
-}
-
-Image32fC1View &Image16uC1View::SumWindowRowBorder(Image32fC1View &pDst, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image16uC1View &Image16uC1View::FilterRowBorder(Image16uC1View &pDst, const opp::cuda::DevVarView<int> &pKernel,
+                                                Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor,
+                                                NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx,
+                                                const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1275,43 +1620,29 @@ Image32fC1View &Image16uC1View::SumWindowRowBorder(Image32fC1View &pDst, Npp32s 
         filterSize.height = ROI().height;
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiSumWindowRowBorder_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nMaskSize, nAnchor, eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiFilterRowBorder_16u_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(),
+                       pKernel.Pointer(), nMaskSize, nAnchor, nDivisor.x, eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Filter(Image16uC1View &pDst, const opp::cuda::DevVarView<int> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const Pixel32sC1 &nDivisor, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::FilterRow32f(Image16uC1View &pDst, const opp::cuda::DevVarView<float> &pKernel,
+                                             Npp32s nMaskSize, Npp32s nAnchor,
+                                             const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilter_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pKernel.Pointer(), oKernelSize, oAnchor, nDivisor.x, nppStreamCtx),
+    nppSafeCallExt(nppiFilterRow32f_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                NppiSizeRoi(), pKernel.Pointer(), nMaskSize, nAnchor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Filter32f(Image16uC1View &pDst, const opp::cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const
-{
-    checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilter32f_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pKernel.Pointer(), oKernelSize, oAnchor, nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
-    return pDst;
-}
-
-Image16uC1View &Image16uC1View::FilterBorder(Image16uC1View &pDst, const opp::cuda::DevVarView<int> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const Pixel32sC1 &nDivisor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
-{
-    NppiSize filterSize{aFilterArea.width, aFilterArea.height};
-    const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
-    if (aFilterArea.Size() == Size2D())
-    {
-        filterSize.width  = ROI().width;
-        filterSize.height = ROI().height;
-    }
-    checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pKernel.Pointer(), oKernelSize, oAnchor, nDivisor.x, eBorderType, nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
-    return pDst;
-}
-
-Image16uC1View &Image16uC1View::FilterBorder32f(Image16uC1View &pDst, const opp::cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image16uC1View &Image16uC1View::FilterRowBorder32f(Image16uC1View &pDst, const opp::cuda::DevVarView<float> &pKernel,
+                                                   Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType,
+                                                   const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1321,58 +1652,40 @@ Image16uC1View &Image16uC1View::FilterBorder32f(Image16uC1View &pDst, const opp:
         filterSize.height = ROI().height;
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterBorder32f_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), pKernel.Pointer(), oKernelSize, oAnchor, eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiFilterRowBorder32f_16u_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(),
+                       pKernel.Pointer(), nMaskSize, nAnchor, eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::FilterBox(Image16uC1View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image16uC1View::SumWindowColumn(Image32fC1View &pDst, Npp32s nMaskSize, Npp32s nAnchor,
+                                                const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterBox_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), oMaskSize, oAnchor, nppStreamCtx),
+    nppSafeCallExt(nppiSumWindowColumn_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                      reinterpret_cast<Npp32f *>(pDst.PointerRoi()),
+                                                      to_int(pDst.Pitch()), NppiSizeRoi(), nMaskSize, nAnchor,
+                                                      nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::FilterBoxBorder(Image16uC1View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
-{
-    NppiSize filterSize{aFilterArea.width, aFilterArea.height};
-    const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
-    if (aFilterArea.Size() == Size2D())
-    {
-        filterSize.width  = ROI().width;
-        filterSize.height = ROI().height;
-    }
-    checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterBoxBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), oMaskSize, oAnchor, eBorderType, nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
-    return pDst;
-}
-
-Image16uC1View &Image16uC1View::FilterBoxBorderAdvanced(Image16uC1View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
-{
-    NppiSize filterSize{aFilterArea.width, aFilterArea.height};
-    const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
-    if (aFilterArea.Size() == Size2D())
-    {
-        filterSize.width  = ROI().width;
-        filterSize.height = ROI().height;
-    }
-    checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterBoxBorderAdvanced_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), oMaskSize, oAnchor, eBorderType, pBuffer.Pointer(), nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
-    return pDst;
-}
-
-Image16uC1View &Image16uC1View::FilterMax(Image16uC1View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image16uC1View::SumWindowRow(Image32fC1View &pDst, Npp32s nMaskSize, Npp32s nAnchor,
+                                             const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterMax_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), oMaskSize, oAnchor, nppStreamCtx),
+    nppSafeCallExt(nppiSumWindowRow_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                   reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                   NppiSizeRoi(), nMaskSize, nAnchor, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::FilterMaxBorder(Image16uC1View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image32fC1View &Image16uC1View::SumWindowColumnBorder(Image32fC1View &pDst, Npp32s nMaskSize, Npp32s nAnchor,
+                                                      NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx,
+                                                      const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1382,20 +1695,17 @@ Image16uC1View &Image16uC1View::FilterMaxBorder(Image16uC1View &pDst, NppiSize o
         filterSize.height = ROI().height;
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterMaxBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), oMaskSize, oAnchor, eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiSumWindowColumnBorder_16u32f_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nMaskSize,
+                       nAnchor, eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::FilterMin(Image16uC1View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const
-{
-    checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterMin_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), oMaskSize, oAnchor, nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
-    return pDst;
-}
-
-Image16uC1View &Image16uC1View::FilterMinBorder(Image16uC1View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image32fC1View &Image16uC1View::SumWindowRowBorder(Image32fC1View &pDst, Npp32s nMaskSize, Npp32s nAnchor,
+                                                   NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx,
+                                                   const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1405,15 +1715,203 @@ Image16uC1View &Image16uC1View::FilterMinBorder(Image16uC1View &pDst, NppiSize o
         filterSize.height = ROI().height;
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterMinBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), oMaskSize, oAnchor, eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiSumWindowRowBorder_16u32f_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nMaskSize,
+                       nAnchor, eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::FilterMedian(Image16uC1View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Filter(Image16uC1View &pDst, const opp::cuda::DevVarView<int> &pKernel,
+                                       NppiSize oKernelSize, NppiPoint oAnchor, const Pixel32sC1 &nDivisor,
+                                       const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterMedian_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), oMaskSize, oAnchor, pBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiFilter_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                          reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                          NppiSizeRoi(), pKernel.Pointer(), oKernelSize, oAnchor, nDivisor.x,
+                                          nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
+}
+
+Image16uC1View &Image16uC1View::Filter32f(Image16uC1View &pDst, const opp::cuda::DevVarView<float> &pKernel,
+                                          NppiSize oKernelSize, NppiPoint oAnchor,
+                                          const NppStreamContext &nppStreamCtx) const
+{
+    checkSameSize(ROI(), pDst.ROI());
+    nppSafeCallExt(nppiFilter32f_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                             reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                             NppiSizeRoi(), pKernel.Pointer(), oKernelSize, oAnchor, nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
+}
+
+Image16uC1View &Image16uC1View::FilterBorder(Image16uC1View &pDst, const opp::cuda::DevVarView<int> &pKernel,
+                                             NppiSize oKernelSize, NppiPoint oAnchor, const Pixel32sC1 &nDivisor,
+                                             NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx,
+                                             const Roi &aFilterArea) const
+{
+    NppiSize filterSize{aFilterArea.width, aFilterArea.height};
+    const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
+    if (aFilterArea.Size() == Size2D())
+    {
+        filterSize.width  = ROI().width;
+        filterSize.height = ROI().height;
+    }
+    checkSameSize(ROI(), pDst.ROI());
+    nppSafeCallExt(nppiFilterBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()),
+                                                to_int(pDst.Pitch()), NppiSizeRoi(), pKernel.Pointer(), oKernelSize,
+                                                oAnchor, nDivisor.x, eBorderType, nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
+}
+
+Image16uC1View &Image16uC1View::FilterBorder32f(Image16uC1View &pDst, const opp::cuda::DevVarView<float> &pKernel,
+                                                NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType,
+                                                const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+{
+    NppiSize filterSize{aFilterArea.width, aFilterArea.height};
+    const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
+    if (aFilterArea.Size() == Size2D())
+    {
+        filterSize.width  = ROI().width;
+        filterSize.height = ROI().height;
+    }
+    checkSameSize(ROI(), pDst.ROI());
+    nppSafeCallExt(nppiFilterBorder32f_16u_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(),
+                       pKernel.Pointer(), oKernelSize, oAnchor, eBorderType, nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
+}
+
+Image16uC1View &Image16uC1View::FilterBox(Image16uC1View &pDst, NppiSize oMaskSize, NppiPoint oAnchor,
+                                          const NppStreamContext &nppStreamCtx) const
+{
+    checkSameSize(ROI(), pDst.ROI());
+    nppSafeCallExt(nppiFilterBox_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                             reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                             NppiSizeRoi(), oMaskSize, oAnchor, nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
+}
+
+Image16uC1View &Image16uC1View::FilterBoxBorder(Image16uC1View &pDst, NppiSize oMaskSize, NppiPoint oAnchor,
+                                                NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx,
+                                                const Roi &aFilterArea) const
+{
+    NppiSize filterSize{aFilterArea.width, aFilterArea.height};
+    const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
+    if (aFilterArea.Size() == Size2D())
+    {
+        filterSize.width  = ROI().width;
+        filterSize.height = ROI().height;
+    }
+    checkSameSize(ROI(), pDst.ROI());
+    nppSafeCallExt(nppiFilterBoxBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                   filterSize, filterOffset,
+                                                   reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                   NppiSizeRoi(), oMaskSize, oAnchor, eBorderType, nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
+}
+
+Image16uC1View &Image16uC1View::FilterBoxBorderAdvanced(Image16uC1View &pDst, NppiSize oMaskSize, NppiPoint oAnchor,
+                                                        NppiBorderType eBorderType,
+                                                        opp::cuda::DevVarView<byte> &pBuffer,
+                                                        const NppStreamContext &nppStreamCtx,
+                                                        const Roi &aFilterArea) const
+{
+    NppiSize filterSize{aFilterArea.width, aFilterArea.height};
+    const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
+    if (aFilterArea.Size() == Size2D())
+    {
+        filterSize.width  = ROI().width;
+        filterSize.height = ROI().height;
+    }
+    checkSameSize(ROI(), pDst.ROI());
+    nppSafeCallExt(nppiFilterBoxBorderAdvanced_16u_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), oMaskSize,
+                       oAnchor, eBorderType, pBuffer.Pointer(), nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
+}
+
+Image16uC1View &Image16uC1View::FilterMax(Image16uC1View &pDst, NppiSize oMaskSize, NppiPoint oAnchor,
+                                          const NppStreamContext &nppStreamCtx) const
+{
+    checkSameSize(ROI(), pDst.ROI());
+    nppSafeCallExt(nppiFilterMax_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                             reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                             NppiSizeRoi(), oMaskSize, oAnchor, nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
+}
+
+Image16uC1View &Image16uC1View::FilterMaxBorder(Image16uC1View &pDst, NppiSize oMaskSize, NppiPoint oAnchor,
+                                                NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx,
+                                                const Roi &aFilterArea) const
+{
+    NppiSize filterSize{aFilterArea.width, aFilterArea.height};
+    const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
+    if (aFilterArea.Size() == Size2D())
+    {
+        filterSize.width  = ROI().width;
+        filterSize.height = ROI().height;
+    }
+    checkSameSize(ROI(), pDst.ROI());
+    nppSafeCallExt(nppiFilterMaxBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                   filterSize, filterOffset,
+                                                   reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                   NppiSizeRoi(), oMaskSize, oAnchor, eBorderType, nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
+}
+
+Image16uC1View &Image16uC1View::FilterMin(Image16uC1View &pDst, NppiSize oMaskSize, NppiPoint oAnchor,
+                                          const NppStreamContext &nppStreamCtx) const
+{
+    checkSameSize(ROI(), pDst.ROI());
+    nppSafeCallExt(nppiFilterMin_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                             reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                             NppiSizeRoi(), oMaskSize, oAnchor, nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
+}
+
+Image16uC1View &Image16uC1View::FilterMinBorder(Image16uC1View &pDst, NppiSize oMaskSize, NppiPoint oAnchor,
+                                                NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx,
+                                                const Roi &aFilterArea) const
+{
+    NppiSize filterSize{aFilterArea.width, aFilterArea.height};
+    const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
+    if (aFilterArea.Size() == Size2D())
+    {
+        filterSize.width  = ROI().width;
+        filterSize.height = ROI().height;
+    }
+    checkSameSize(ROI(), pDst.ROI());
+    nppSafeCallExt(nppiFilterMinBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                   filterSize, filterOffset,
+                                                   reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                   NppiSizeRoi(), oMaskSize, oAnchor, eBorderType, nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
+}
+
+Image16uC1View &Image16uC1View::FilterMedian(Image16uC1View &pDst, NppiSize oMaskSize, NppiPoint oAnchor,
+                                             opp::cuda::DevVarView<byte> &pBuffer,
+                                             const NppStreamContext &nppStreamCtx) const
+{
+    checkSameSize(ROI(), pDst.ROI());
+    nppSafeCallExt(nppiFilterMedian_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                NppiSizeRoi(), oMaskSize, oAnchor, pBuffer.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -1425,7 +1923,9 @@ size_t Image16uC1View::FilterMedianGetBufferSize(NppiSize oMaskSize, const NppSt
     return to_size_t(retValue);
 }
 
-Image16uC1View &Image16uC1View::FilterMedianBorder(Image16uC1View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, opp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image16uC1View &Image16uC1View::FilterMedianBorder(Image16uC1View &pDst, NppiSize oMaskSize, NppiPoint oAnchor,
+                                                   opp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType,
+                                                   const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1435,35 +1935,50 @@ Image16uC1View &Image16uC1View::FilterMedianBorder(Image16uC1View &pDst, NppiSiz
         filterSize.height = ROI().height;
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterMedianBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), oMaskSize, oAnchor, pBuffer.Pointer(), eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiFilterMedianBorder_16u_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), oMaskSize,
+                       oAnchor, pBuffer.Pointer(), eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-size_t Image16uC1View::FilterMedianBorderGetBufferSize(NppiSize oMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx) const
+size_t Image16uC1View::FilterMedianBorderGetBufferSize(NppiSize oMaskSize, NppiBorderType eBorderType,
+                                                       const NppStreamContext &nppStreamCtx) const
 {
     uint retValue = 0;
-    nppSafeCall(nppiFilterMedianBorderGetBufferSize_16u_C1R_Ctx(NppiSizeRoi(), oMaskSize, &retValue, eBorderType, nppStreamCtx));
+    nppSafeCall(nppiFilterMedianBorderGetBufferSize_16u_C1R_Ctx(NppiSizeRoi(), oMaskSize, &retValue, eBorderType,
+                                                                nppStreamCtx));
     return to_size_t(retValue);
 }
 
-Image16uC1View &Image16uC1View::FilterGauss(Image16uC1View &pDst, NppiMaskSize eMaskSize, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::FilterGauss(Image16uC1View &pDst, NppiMaskSize eMaskSize,
+                                            const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterGauss_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), eMaskSize, nppStreamCtx),
+    nppSafeCallExt(nppiFilterGauss_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                               reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                               NppiSizeRoi(), eMaskSize, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::FilterGaussAdvanced(Image16uC1View &pDst, const int nFilterTaps, const opp::cuda::DevVarView<float> &pKernel, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::FilterGaussAdvanced(Image16uC1View &pDst, const int nFilterTaps,
+                                                    const opp::cuda::DevVarView<float> &pKernel,
+                                                    const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterGaussAdvanced_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nFilterTaps, pKernel.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiFilterGaussAdvanced_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()),
+                                                       to_int(pDst.Pitch()), NppiSizeRoi(), nFilterTaps,
+                                                       pKernel.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::FilterGaussBorder(Image16uC1View &pDst, NppiMaskSize eMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image16uC1View &Image16uC1View::FilterGaussBorder(Image16uC1View &pDst, NppiMaskSize eMaskSize,
+                                                  NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx,
+                                                  const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1473,12 +1988,19 @@ Image16uC1View &Image16uC1View::FilterGaussBorder(Image16uC1View &pDst, NppiMask
         filterSize.height = ROI().height;
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterGaussBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), eMaskSize, eBorderType, nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    nppSafeCallExt(
+        nppiFilterGaussBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize,
+                                          filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()),
+                                          to_int(pDst.Pitch()), NppiSizeRoi(), eMaskSize, eBorderType, nppStreamCtx),
+        "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::FilterGaussAdvancedBorder(Image16uC1View &pDst, const int nFilterTaps, const opp::cuda::DevVarView<float> &pKernel, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image16uC1View &Image16uC1View::FilterGaussAdvancedBorder(Image16uC1View &pDst, const int nFilterTaps,
+                                                          const opp::cuda::DevVarView<float> &pKernel,
+                                                          NppiBorderType eBorderType,
+                                                          const NppStreamContext &nppStreamCtx,
+                                                          const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1488,12 +2010,17 @@ Image16uC1View &Image16uC1View::FilterGaussAdvancedBorder(Image16uC1View &pDst, 
         filterSize.height = ROI().height;
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterGaussAdvancedBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nFilterTaps, pKernel.Pointer(), eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiFilterGaussAdvancedBorder_16u_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nFilterTaps,
+                       pKernel.Pointer(), eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::FilterGaussPyramidLayerDownBorder(Image16uC1View &pDst, const Pixel32fC1 &nRate, const int nFilterTaps, const opp::cuda::DevVarView<float> &pKernel, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image16uC1View &Image16uC1View::FilterGaussPyramidLayerDownBorder(
+    Image16uC1View &pDst, const Pixel32fC1 &nRate, const int nFilterTaps, const opp::cuda::DevVarView<float> &pKernel,
+    NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1502,12 +2029,17 @@ Image16uC1View &Image16uC1View::FilterGaussPyramidLayerDownBorder(Image16uC1View
         filterSize.width  = ROI().width;
         filterSize.height = ROI().height;
     }
-    nppSafeCallExt(nppiFilterGaussPyramidLayerDownBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nRate.x, nFilterTaps, pKernel.Pointer(), eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiFilterGaussPyramidLayerDownBorder_16u_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nRate.x,
+                       nFilterTaps, pKernel.Pointer(), eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::FilterGaussPyramidLayerUpBorder(Image16uC1View &pDst, const Pixel32fC1 &nRate, const int nFilterTaps, const opp::cuda::DevVarView<float> &pKernel, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image16uC1View &Image16uC1View::FilterGaussPyramidLayerUpBorder(
+    Image16uC1View &pDst, const Pixel32fC1 &nRate, const int nFilterTaps, const opp::cuda::DevVarView<float> &pKernel,
+    NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1516,58 +2048,18 @@ Image16uC1View &Image16uC1View::FilterGaussPyramidLayerUpBorder(Image16uC1View &
         filterSize.width  = ROI().width;
         filterSize.height = ROI().height;
     }
-    nppSafeCallExt(nppiFilterGaussPyramidLayerUpBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nRate.x, nFilterTaps, pKernel.Pointer(), eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiFilterGaussPyramidLayerUpBorder_16u_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nRate.x,
+                       nFilterTaps, pKernel.Pointer(), eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::FilterBilateralGaussBorder(Image16uC1View &pDst, const int nRadius, const int nStepBetweenSrcPixels, const Pixel32fC1 &nValSquareSigma, const Pixel32fC1 &nPosSquareSigma, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
-{
-    NppiSize filterSize{aFilterArea.width, aFilterArea.height};
-    const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
-    if (aFilterArea.Size() == Size2D())
-    {
-        filterSize.width  = ROI().width;
-        filterSize.height = ROI().height;
-    }
-    checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterBilateralGaussBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nRadius, nStepBetweenSrcPixels, nValSquareSigma.x, nPosSquareSigma.x, eBorderType, nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
-    return pDst;
-}
-
-Image16uC1View &Image16uC1View::FilterHighPass(Image16uC1View &pDst, NppiMaskSize eMaskSize, const NppStreamContext &nppStreamCtx) const
-{
-    checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterHighPass_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), eMaskSize, nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
-    return pDst;
-}
-
-Image16uC1View &Image16uC1View::FilterHighPassBorder(Image16uC1View &pDst, NppiMaskSize eMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
-{
-    NppiSize filterSize{aFilterArea.width, aFilterArea.height};
-    const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
-    if (aFilterArea.Size() == Size2D())
-    {
-        filterSize.width  = ROI().width;
-        filterSize.height = ROI().height;
-    }
-    checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterHighPassBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), eMaskSize, eBorderType, nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
-    return pDst;
-}
-
-Image16uC1View &Image16uC1View::FilterLowPass(Image16uC1View &pDst, NppiMaskSize eMaskSize, const NppStreamContext &nppStreamCtx) const
-{
-    checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterLowPass_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), eMaskSize, nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
-    return pDst;
-}
-
-Image16uC1View &Image16uC1View::FilterLowPassBorder(Image16uC1View &pDst, NppiMaskSize eMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image16uC1View &Image16uC1View::FilterBilateralGaussBorder(
+    Image16uC1View &pDst, const int nRadius, const int nStepBetweenSrcPixels, const Pixel32fC1 &nValSquareSigma,
+    const Pixel32fC1 &nPosSquareSigma, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx,
+    const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1577,20 +2069,88 @@ Image16uC1View &Image16uC1View::FilterLowPassBorder(Image16uC1View &pDst, NppiMa
         filterSize.height = ROI().height;
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterLowPassBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), eMaskSize, eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiFilterBilateralGaussBorder_16u_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nRadius,
+                       nStepBetweenSrcPixels, nValSquareSigma.x, nPosSquareSigma.x, eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
+}
+
+Image16uC1View &Image16uC1View::FilterHighPass(Image16uC1View &pDst, NppiMaskSize eMaskSize,
+                                               const NppStreamContext &nppStreamCtx) const
+{
+    checkSameSize(ROI(), pDst.ROI());
+    nppSafeCallExt(nppiFilterHighPass_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                  reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                  NppiSizeRoi(), eMaskSize, nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
+}
+
+Image16uC1View &Image16uC1View::FilterHighPassBorder(Image16uC1View &pDst, NppiMaskSize eMaskSize,
+                                                     NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx,
+                                                     const Roi &aFilterArea) const
+{
+    NppiSize filterSize{aFilterArea.width, aFilterArea.height};
+    const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
+    if (aFilterArea.Size() == Size2D())
+    {
+        filterSize.width  = ROI().width;
+        filterSize.height = ROI().height;
+    }
+    checkSameSize(ROI(), pDst.ROI());
+    nppSafeCallExt(
+        nppiFilterHighPassBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                             filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()),
+                                             to_int(pDst.Pitch()), NppiSizeRoi(), eMaskSize, eBorderType, nppStreamCtx),
+        "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
+}
+
+Image16uC1View &Image16uC1View::FilterLowPass(Image16uC1View &pDst, NppiMaskSize eMaskSize,
+                                              const NppStreamContext &nppStreamCtx) const
+{
+    checkSameSize(ROI(), pDst.ROI());
+    nppSafeCallExt(nppiFilterLowPass_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                 reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                 NppiSizeRoi(), eMaskSize, nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
+}
+
+Image16uC1View &Image16uC1View::FilterLowPassBorder(Image16uC1View &pDst, NppiMaskSize eMaskSize,
+                                                    NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx,
+                                                    const Roi &aFilterArea) const
+{
+    NppiSize filterSize{aFilterArea.width, aFilterArea.height};
+    const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
+    if (aFilterArea.Size() == Size2D())
+    {
+        filterSize.width  = ROI().width;
+        filterSize.height = ROI().height;
+    }
+    checkSameSize(ROI(), pDst.ROI());
+    nppSafeCallExt(
+        nppiFilterLowPassBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize,
+                                            filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()),
+                                            to_int(pDst.Pitch()), NppiSizeRoi(), eMaskSize, eBorderType, nppStreamCtx),
+        "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 Image16uC1View &Image16uC1View::FilterSharpen(Image16uC1View &pDst, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterSharpen_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiFilterSharpen_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                 reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                                 NppiSizeRoi(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::FilterSharpenBorder(Image16uC1View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+Image16uC1View &Image16uC1View::FilterSharpenBorder(Image16uC1View &pDst, NppiBorderType eBorderType,
+                                                    const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1600,15 +2160,25 @@ Image16uC1View &Image16uC1View::FilterSharpenBorder(Image16uC1View &pDst, NppiBo
         filterSize.height = ROI().height;
     }
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterSharpenBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiFilterSharpenBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                       filterSize, filterOffset,
+                                                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()),
+                                                       to_int(pDst.Pitch()), NppiSizeRoi(), eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::FilterUnsharpBorder(Image16uC1View &pDst, const Pixel32fC1 &nRadius, const Pixel32fC1 &nSigma, const Pixel32fC1 &nWeight, const Pixel32fC1 &nThreshold, NppiBorderType eBorderType, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::FilterUnsharpBorder(Image16uC1View &pDst, const Pixel32fC1 &nRadius,
+                                                    const Pixel32fC1 &nSigma, const Pixel32fC1 &nWeight,
+                                                    const Pixel32fC1 &nThreshold, NppiBorderType eBorderType,
+                                                    opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                                    const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiFilterUnsharpBorder_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiPointRoi(), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nRadius.x, nSigma.x, nWeight.x, nThreshold.x, eBorderType, pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiFilterUnsharpBorder_16u_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiPointRoi(),
+                       reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nRadius.x,
+                       nSigma.x, nWeight.x, nThreshold.x, eBorderType, pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -1620,7 +2190,10 @@ size_t Image16uC1View::FilterUnsharpGetBufferSize(const Pixel32fC1 &nRadius, con
     return to_size_t(retValue);
 }
 
-void Image16uC1View::GradientVectorPrewittBorder(Image32fC1View &pDstX, Image32fC1View &pDstY, Image32fC1View &pDstMag, Image32fC1View &pDstAngle, NppiMaskSize eMaskSize, NppiNorm eNorm, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+void Image16uC1View::GradientVectorPrewittBorder(Image32fC1View &pDstX, Image32fC1View &pDstY, Image32fC1View &pDstMag,
+                                                 Image32fC1View &pDstAngle, NppiMaskSize eMaskSize, NppiNorm eNorm,
+                                                 NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx,
+                                                 const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1633,11 +2206,21 @@ void Image16uC1View::GradientVectorPrewittBorder(Image32fC1View &pDstX, Image32f
     checkSameSize(ROI(), pDstY.ROI());
     checkSameSize(ROI(), pDstMag.ROI());
     checkSameSize(ROI(), pDstAngle.ROI());
-    nppSafeCallExt(nppiGradientVectorPrewittBorder_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp32f *>(pDstX.PointerRoi()), to_int(pDstX.Pitch()), reinterpret_cast<Npp32f *>(pDstY.PointerRoi()), to_int(pDstY.Pitch()), reinterpret_cast<Npp32f *>(pDstMag.PointerRoi()), to_int(pDstMag.Pitch()), reinterpret_cast<Npp32f *>(pDstAngle.PointerRoi()), to_int(pDstAngle.Pitch()), NppiSizeRoi(), eMaskSize, eNorm, eBorderType, nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI pDstX: " << pDstX.ROI() << "ROI pDstY: " << pDstY.ROI() << "ROI pDstMag: " << pDstMag.ROI() << "ROI pDstAngle: " << pDstAngle.ROI());
+    nppSafeCallExt(nppiGradientVectorPrewittBorder_16u32f_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       reinterpret_cast<Npp32f *>(pDstX.PointerRoi()), to_int(pDstX.Pitch()),
+                       reinterpret_cast<Npp32f *>(pDstY.PointerRoi()), to_int(pDstY.Pitch()),
+                       reinterpret_cast<Npp32f *>(pDstMag.PointerRoi()), to_int(pDstMag.Pitch()),
+                       reinterpret_cast<Npp32f *>(pDstAngle.PointerRoi()), to_int(pDstAngle.Pitch()), NppiSizeRoi(),
+                       eMaskSize, eNorm, eBorderType, nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI pDstX: " << pDstX.ROI() << "ROI pDstY: " << pDstY.ROI()
+                               << "ROI pDstMag: " << pDstMag.ROI() << "ROI pDstAngle: " << pDstAngle.ROI());
 }
 
-void Image16uC1View::GradientVectorScharrBorder(Image32fC1View &pDstX, Image32fC1View &pDstY, Image32fC1View &pDstMag, Image32fC1View &pDstAngle, NppiMaskSize eMaskSize, NppiNorm eNorm, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+void Image16uC1View::GradientVectorScharrBorder(Image32fC1View &pDstX, Image32fC1View &pDstY, Image32fC1View &pDstMag,
+                                                Image32fC1View &pDstAngle, NppiMaskSize eMaskSize, NppiNorm eNorm,
+                                                NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx,
+                                                const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1650,11 +2233,21 @@ void Image16uC1View::GradientVectorScharrBorder(Image32fC1View &pDstX, Image32fC
     checkSameSize(ROI(), pDstY.ROI());
     checkSameSize(ROI(), pDstMag.ROI());
     checkSameSize(ROI(), pDstAngle.ROI());
-    nppSafeCallExt(nppiGradientVectorScharrBorder_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp32f *>(pDstX.PointerRoi()), to_int(pDstX.Pitch()), reinterpret_cast<Npp32f *>(pDstY.PointerRoi()), to_int(pDstY.Pitch()), reinterpret_cast<Npp32f *>(pDstMag.PointerRoi()), to_int(pDstMag.Pitch()), reinterpret_cast<Npp32f *>(pDstAngle.PointerRoi()), to_int(pDstAngle.Pitch()), NppiSizeRoi(), eMaskSize, eNorm, eBorderType, nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI pDstX: " << pDstX.ROI() << "ROI pDstY: " << pDstY.ROI() << "ROI pDstMag: " << pDstMag.ROI() << "ROI pDstAngle: " << pDstAngle.ROI());
+    nppSafeCallExt(nppiGradientVectorScharrBorder_16u32f_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       reinterpret_cast<Npp32f *>(pDstX.PointerRoi()), to_int(pDstX.Pitch()),
+                       reinterpret_cast<Npp32f *>(pDstY.PointerRoi()), to_int(pDstY.Pitch()),
+                       reinterpret_cast<Npp32f *>(pDstMag.PointerRoi()), to_int(pDstMag.Pitch()),
+                       reinterpret_cast<Npp32f *>(pDstAngle.PointerRoi()), to_int(pDstAngle.Pitch()), NppiSizeRoi(),
+                       eMaskSize, eNorm, eBorderType, nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI pDstX: " << pDstX.ROI() << "ROI pDstY: " << pDstY.ROI()
+                               << "ROI pDstMag: " << pDstMag.ROI() << "ROI pDstAngle: " << pDstAngle.ROI());
 }
 
-void Image16uC1View::GradientVectorSobelBorder(Image32fC1View &pDstX, Image32fC1View &pDstY, Image32fC1View &pDstMag, Image32fC1View &pDstAngle, NppiMaskSize eMaskSize, NppiNorm eNorm, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+void Image16uC1View::GradientVectorSobelBorder(Image32fC1View &pDstX, Image32fC1View &pDstY, Image32fC1View &pDstMag,
+                                               Image32fC1View &pDstAngle, NppiMaskSize eMaskSize, NppiNorm eNorm,
+                                               NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx,
+                                               const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1667,71 +2260,167 @@ void Image16uC1View::GradientVectorSobelBorder(Image32fC1View &pDstX, Image32fC1
     checkSameSize(ROI(), pDstY.ROI());
     checkSameSize(ROI(), pDstMag.ROI());
     checkSameSize(ROI(), pDstAngle.ROI());
-    nppSafeCallExt(nppiGradientVectorSobelBorder_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp32f *>(pDstX.PointerRoi()), to_int(pDstX.Pitch()), reinterpret_cast<Npp32f *>(pDstY.PointerRoi()), to_int(pDstY.Pitch()), reinterpret_cast<Npp32f *>(pDstMag.PointerRoi()), to_int(pDstMag.Pitch()), reinterpret_cast<Npp32f *>(pDstAngle.PointerRoi()), to_int(pDstAngle.Pitch()), NppiSizeRoi(), eMaskSize, eNorm, eBorderType, nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI pDstX: " << pDstX.ROI() << "ROI pDstY: " << pDstY.ROI() << "ROI pDstMag: " << pDstMag.ROI() << "ROI pDstAngle: " << pDstAngle.ROI());
+    nppSafeCallExt(nppiGradientVectorSobelBorder_16u32f_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       reinterpret_cast<Npp32f *>(pDstX.PointerRoi()), to_int(pDstX.Pitch()),
+                       reinterpret_cast<Npp32f *>(pDstY.PointerRoi()), to_int(pDstY.Pitch()),
+                       reinterpret_cast<Npp32f *>(pDstMag.PointerRoi()), to_int(pDstMag.Pitch()),
+                       reinterpret_cast<Npp32f *>(pDstAngle.PointerRoi()), to_int(pDstAngle.Pitch()), NppiSizeRoi(),
+                       eMaskSize, eNorm, eBorderType, nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI pDstX: " << pDstX.ROI() << "ROI pDstY: " << pDstY.ROI()
+                               << "ROI pDstMag: " << pDstMag.ROI() << "ROI pDstAngle: " << pDstAngle.ROI());
 }
 
-void Image16uC1View::DistanceTransformPBA(const Pixel16uC1 &nMinSiteValue, const Pixel16uC1 &nMaxSiteValue, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16sC1View &pDstVoronoiRelativeManhattanDistances, Image16uC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx)
+void Image16uC1View::DistanceTransformPBA(const Pixel16uC1 &nMinSiteValue, const Pixel16uC1 &nMaxSiteValue,
+                                          Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices,
+                                          Image16sC1View &pDstVoronoiRelativeManhattanDistances,
+                                          Image16uC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                          const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pDstVoronoi.ROI());
     checkSameSize(ROI(), pDstVoronoiIndices.ROI());
     checkSameSize(ROI(), pDstVoronoiRelativeManhattanDistances.ROI());
     checkSameSize(ROI(), pDstTransform.ROI());
-    nppSafeCallExt(nppiDistanceTransformPBA_16u16u_C1R_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), nMinSiteValue.x, nMaxSiteValue.x, reinterpret_cast<Npp16s *>(pDstVoronoi.PointerRoi()), to_int(pDstVoronoi.Pitch()), reinterpret_cast<Npp16s *>(pDstVoronoiIndices.PointerRoi()), to_int(pDstVoronoiIndices.Pitch()), reinterpret_cast<Npp16s *>(pDstVoronoiRelativeManhattanDistances.PointerRoi()), to_int(pDstVoronoiRelativeManhattanDistances.Pitch()), reinterpret_cast<Npp16u *>(pDstTransform.PointerRoi()), to_int(pDstTransform.Pitch()), NppiSizeRoi(), pDeviceBuffer.Pointer(), nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI pDstVoronoi: " << pDstVoronoi.ROI() << "ROI pDstVoronoiIndices: " << pDstVoronoiIndices.ROI() << "ROI pDstVoronoiRelativeManhattanDistances: " << pDstVoronoiRelativeManhattanDistances.ROI() << "ROI pDstTransform: " << pDstTransform.ROI());
+    nppSafeCallExt(nppiDistanceTransformPBA_16u16u_C1R_Ctx(
+                       reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), nMinSiteValue.x, nMaxSiteValue.x,
+                       reinterpret_cast<Npp16s *>(pDstVoronoi.PointerRoi()), to_int(pDstVoronoi.Pitch()),
+                       reinterpret_cast<Npp16s *>(pDstVoronoiIndices.PointerRoi()), to_int(pDstVoronoiIndices.Pitch()),
+                       reinterpret_cast<Npp16s *>(pDstVoronoiRelativeManhattanDistances.PointerRoi()),
+                       to_int(pDstVoronoiRelativeManhattanDistances.Pitch()),
+                       reinterpret_cast<Npp16u *>(pDstTransform.PointerRoi()), to_int(pDstTransform.Pitch()),
+                       NppiSizeRoi(), pDeviceBuffer.Pointer(), nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI pDstVoronoi: " << pDstVoronoi.ROI() << "ROI pDstVoronoiIndices: "
+                               << pDstVoronoiIndices.ROI() << "ROI pDstVoronoiRelativeManhattanDistances: "
+                               << pDstVoronoiRelativeManhattanDistances.ROI()
+                               << "ROI pDstTransform: " << pDstTransform.ROI());
 }
 
-void Image16uC1View::DistanceTransformAbsPBA(const Pixel16uC1 &nMinSiteValue, const Pixel16uC1 &nMaxSiteValue, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16uC1View &pDstVoronoiAbsoluteManhattanDistances, Image16uC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx)
+void Image16uC1View::DistanceTransformAbsPBA(const Pixel16uC1 &nMinSiteValue, const Pixel16uC1 &nMaxSiteValue,
+                                             Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices,
+                                             Image16uC1View &pDstVoronoiAbsoluteManhattanDistances,
+                                             Image16uC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                             const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pDstVoronoi.ROI());
     checkSameSize(ROI(), pDstVoronoiIndices.ROI());
     checkSameSize(ROI(), pDstVoronoiAbsoluteManhattanDistances.ROI());
     checkSameSize(ROI(), pDstTransform.ROI());
-    nppSafeCallExt(nppiDistanceTransformAbsPBA_16u16u_C1R_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), nMinSiteValue.x, nMaxSiteValue.x, reinterpret_cast<Npp16s *>(pDstVoronoi.PointerRoi()), to_int(pDstVoronoi.Pitch()), reinterpret_cast<Npp16s *>(pDstVoronoiIndices.PointerRoi()), to_int(pDstVoronoiIndices.Pitch()), reinterpret_cast<Npp16u *>(pDstVoronoiAbsoluteManhattanDistances.PointerRoi()), to_int(pDstVoronoiAbsoluteManhattanDistances.Pitch()), reinterpret_cast<Npp16u *>(pDstTransform.PointerRoi()), to_int(pDstTransform.Pitch()), NppiSizeRoi(), pDeviceBuffer.Pointer(), nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI pDstVoronoi: " << pDstVoronoi.ROI() << "ROI pDstVoronoiIndices: " << pDstVoronoiIndices.ROI() << "ROI pDstVoronoiAbsoluteManhattanDistances: " << pDstVoronoiAbsoluteManhattanDistances.ROI() << "ROI pDstTransform: " << pDstTransform.ROI());
+    nppSafeCallExt(nppiDistanceTransformAbsPBA_16u16u_C1R_Ctx(
+                       reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), nMinSiteValue.x, nMaxSiteValue.x,
+                       reinterpret_cast<Npp16s *>(pDstVoronoi.PointerRoi()), to_int(pDstVoronoi.Pitch()),
+                       reinterpret_cast<Npp16s *>(pDstVoronoiIndices.PointerRoi()), to_int(pDstVoronoiIndices.Pitch()),
+                       reinterpret_cast<Npp16u *>(pDstVoronoiAbsoluteManhattanDistances.PointerRoi()),
+                       to_int(pDstVoronoiAbsoluteManhattanDistances.Pitch()),
+                       reinterpret_cast<Npp16u *>(pDstTransform.PointerRoi()), to_int(pDstTransform.Pitch()),
+                       NppiSizeRoi(), pDeviceBuffer.Pointer(), nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI pDstVoronoi: " << pDstVoronoi.ROI() << "ROI pDstVoronoiIndices: "
+                               << pDstVoronoiIndices.ROI() << "ROI pDstVoronoiAbsoluteManhattanDistances: "
+                               << pDstVoronoiAbsoluteManhattanDistances.ROI()
+                               << "ROI pDstTransform: " << pDstTransform.ROI());
 }
 
-void Image16uC1View::DistanceTransformPBA(const Pixel16uC1 &nMinSiteValue, const Pixel16uC1 &nMaxSiteValue, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16sC1View &pDstVoronoiRelativeManhattanDistances, Image32fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx)
+void Image16uC1View::DistanceTransformPBA(const Pixel16uC1 &nMinSiteValue, const Pixel16uC1 &nMaxSiteValue,
+                                          Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices,
+                                          Image16sC1View &pDstVoronoiRelativeManhattanDistances,
+                                          Image32fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                          const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pDstVoronoi.ROI());
     checkSameSize(ROI(), pDstVoronoiIndices.ROI());
     checkSameSize(ROI(), pDstVoronoiRelativeManhattanDistances.ROI());
     checkSameSize(ROI(), pDstTransform.ROI());
-    nppSafeCallExt(nppiDistanceTransformPBA_16u32f_C1R_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), nMinSiteValue.x, nMaxSiteValue.x, reinterpret_cast<Npp16s *>(pDstVoronoi.PointerRoi()), to_int(pDstVoronoi.Pitch()), reinterpret_cast<Npp16s *>(pDstVoronoiIndices.PointerRoi()), to_int(pDstVoronoiIndices.Pitch()), reinterpret_cast<Npp16s *>(pDstVoronoiRelativeManhattanDistances.PointerRoi()), to_int(pDstVoronoiRelativeManhattanDistances.Pitch()), reinterpret_cast<Npp32f *>(pDstTransform.PointerRoi()), to_int(pDstTransform.Pitch()), NppiSizeRoi(), pDeviceBuffer.Pointer(), nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI pDstVoronoi: " << pDstVoronoi.ROI() << "ROI pDstVoronoiIndices: " << pDstVoronoiIndices.ROI() << "ROI pDstVoronoiRelativeManhattanDistances: " << pDstVoronoiRelativeManhattanDistances.ROI() << "ROI pDstTransform: " << pDstTransform.ROI());
+    nppSafeCallExt(nppiDistanceTransformPBA_16u32f_C1R_Ctx(
+                       reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), nMinSiteValue.x, nMaxSiteValue.x,
+                       reinterpret_cast<Npp16s *>(pDstVoronoi.PointerRoi()), to_int(pDstVoronoi.Pitch()),
+                       reinterpret_cast<Npp16s *>(pDstVoronoiIndices.PointerRoi()), to_int(pDstVoronoiIndices.Pitch()),
+                       reinterpret_cast<Npp16s *>(pDstVoronoiRelativeManhattanDistances.PointerRoi()),
+                       to_int(pDstVoronoiRelativeManhattanDistances.Pitch()),
+                       reinterpret_cast<Npp32f *>(pDstTransform.PointerRoi()), to_int(pDstTransform.Pitch()),
+                       NppiSizeRoi(), pDeviceBuffer.Pointer(), nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI pDstVoronoi: " << pDstVoronoi.ROI() << "ROI pDstVoronoiIndices: "
+                               << pDstVoronoiIndices.ROI() << "ROI pDstVoronoiRelativeManhattanDistances: "
+                               << pDstVoronoiRelativeManhattanDistances.ROI()
+                               << "ROI pDstTransform: " << pDstTransform.ROI());
 }
 
-void Image16uC1View::DistanceTransformAbsPBA(const Pixel16uC1 &nMinSiteValue, const Pixel16uC1 &nMaxSiteValue, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16uC1View &pDstVoronoiAbsoluteManhattanDistances, Image32fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx)
+void Image16uC1View::DistanceTransformAbsPBA(const Pixel16uC1 &nMinSiteValue, const Pixel16uC1 &nMaxSiteValue,
+                                             Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices,
+                                             Image16uC1View &pDstVoronoiAbsoluteManhattanDistances,
+                                             Image32fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                             const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pDstVoronoi.ROI());
     checkSameSize(ROI(), pDstVoronoiIndices.ROI());
     checkSameSize(ROI(), pDstVoronoiAbsoluteManhattanDistances.ROI());
     checkSameSize(ROI(), pDstTransform.ROI());
-    nppSafeCallExt(nppiDistanceTransformAbsPBA_16u32f_C1R_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), nMinSiteValue.x, nMaxSiteValue.x, reinterpret_cast<Npp16s *>(pDstVoronoi.PointerRoi()), to_int(pDstVoronoi.Pitch()), reinterpret_cast<Npp16s *>(pDstVoronoiIndices.PointerRoi()), to_int(pDstVoronoiIndices.Pitch()), reinterpret_cast<Npp16u *>(pDstVoronoiAbsoluteManhattanDistances.PointerRoi()), to_int(pDstVoronoiAbsoluteManhattanDistances.Pitch()), reinterpret_cast<Npp32f *>(pDstTransform.PointerRoi()), to_int(pDstTransform.Pitch()), NppiSizeRoi(), pDeviceBuffer.Pointer(), nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI pDstVoronoi: " << pDstVoronoi.ROI() << "ROI pDstVoronoiIndices: " << pDstVoronoiIndices.ROI() << "ROI pDstVoronoiAbsoluteManhattanDistances: " << pDstVoronoiAbsoluteManhattanDistances.ROI() << "ROI pDstTransform: " << pDstTransform.ROI());
+    nppSafeCallExt(nppiDistanceTransformAbsPBA_16u32f_C1R_Ctx(
+                       reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), nMinSiteValue.x, nMaxSiteValue.x,
+                       reinterpret_cast<Npp16s *>(pDstVoronoi.PointerRoi()), to_int(pDstVoronoi.Pitch()),
+                       reinterpret_cast<Npp16s *>(pDstVoronoiIndices.PointerRoi()), to_int(pDstVoronoiIndices.Pitch()),
+                       reinterpret_cast<Npp16u *>(pDstVoronoiAbsoluteManhattanDistances.PointerRoi()),
+                       to_int(pDstVoronoiAbsoluteManhattanDistances.Pitch()),
+                       reinterpret_cast<Npp32f *>(pDstTransform.PointerRoi()), to_int(pDstTransform.Pitch()),
+                       NppiSizeRoi(), pDeviceBuffer.Pointer(), nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI pDstVoronoi: " << pDstVoronoi.ROI() << "ROI pDstVoronoiIndices: "
+                               << pDstVoronoiIndices.ROI() << "ROI pDstVoronoiAbsoluteManhattanDistances: "
+                               << pDstVoronoiAbsoluteManhattanDistances.ROI()
+                               << "ROI pDstTransform: " << pDstTransform.ROI());
 }
 
-void Image16uC1View::DistanceTransformPBA(const Pixel16uC1 &nMinSiteValue, const Pixel16uC1 &nMaxSiteValue, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16sC1View &pDstVoronoiRelativeManhattanDistances, Image64fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAntialiasingDeviceBuffer, const NppStreamContext &nppStreamCtx)
+void Image16uC1View::DistanceTransformPBA(const Pixel16uC1 &nMinSiteValue, const Pixel16uC1 &nMaxSiteValue,
+                                          Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices,
+                                          Image16sC1View &pDstVoronoiRelativeManhattanDistances,
+                                          Image64fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                          opp::cuda::DevVarView<byte> &pAntialiasingDeviceBuffer,
+                                          const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pDstVoronoi.ROI());
     checkSameSize(ROI(), pDstVoronoiIndices.ROI());
     checkSameSize(ROI(), pDstVoronoiRelativeManhattanDistances.ROI());
     checkSameSize(ROI(), pDstTransform.ROI());
-    nppSafeCallExt(nppiDistanceTransformPBA_16u64f_C1R_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), nMinSiteValue.x, nMaxSiteValue.x, reinterpret_cast<Npp16s *>(pDstVoronoi.PointerRoi()), to_int(pDstVoronoi.Pitch()), reinterpret_cast<Npp16s *>(pDstVoronoiIndices.PointerRoi()), to_int(pDstVoronoiIndices.Pitch()), reinterpret_cast<Npp16s *>(pDstVoronoiRelativeManhattanDistances.PointerRoi()), to_int(pDstVoronoiRelativeManhattanDistances.Pitch()), reinterpret_cast<Npp64f *>(pDstTransform.PointerRoi()), to_int(pDstTransform.Pitch()), NppiSizeRoi(), pDeviceBuffer.Pointer(), pAntialiasingDeviceBuffer.Pointer(), nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI pDstVoronoi: " << pDstVoronoi.ROI() << "ROI pDstVoronoiIndices: " << pDstVoronoiIndices.ROI() << "ROI pDstVoronoiRelativeManhattanDistances: " << pDstVoronoiRelativeManhattanDistances.ROI() << "ROI pDstTransform: " << pDstTransform.ROI());
+    nppSafeCallExt(nppiDistanceTransformPBA_16u64f_C1R_Ctx(
+                       reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), nMinSiteValue.x, nMaxSiteValue.x,
+                       reinterpret_cast<Npp16s *>(pDstVoronoi.PointerRoi()), to_int(pDstVoronoi.Pitch()),
+                       reinterpret_cast<Npp16s *>(pDstVoronoiIndices.PointerRoi()), to_int(pDstVoronoiIndices.Pitch()),
+                       reinterpret_cast<Npp16s *>(pDstVoronoiRelativeManhattanDistances.PointerRoi()),
+                       to_int(pDstVoronoiRelativeManhattanDistances.Pitch()),
+                       reinterpret_cast<Npp64f *>(pDstTransform.PointerRoi()), to_int(pDstTransform.Pitch()),
+                       NppiSizeRoi(), pDeviceBuffer.Pointer(), pAntialiasingDeviceBuffer.Pointer(), nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI pDstVoronoi: " << pDstVoronoi.ROI() << "ROI pDstVoronoiIndices: "
+                               << pDstVoronoiIndices.ROI() << "ROI pDstVoronoiRelativeManhattanDistances: "
+                               << pDstVoronoiRelativeManhattanDistances.ROI()
+                               << "ROI pDstTransform: " << pDstTransform.ROI());
 }
 
-void Image16uC1View::DistanceTransformAbsPBA(const Pixel16uC1 &nMinSiteValue, const Pixel16uC1 &nMaxSiteValue, Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices, Image16uC1View &pDstVoronoiAbsoluteManhattanDistances, Image64fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAntialiasingDeviceBuffer, const NppStreamContext &nppStreamCtx)
+void Image16uC1View::DistanceTransformAbsPBA(const Pixel16uC1 &nMinSiteValue, const Pixel16uC1 &nMaxSiteValue,
+                                             Image16sC1View &pDstVoronoi, Image16sC1View &pDstVoronoiIndices,
+                                             Image16uC1View &pDstVoronoiAbsoluteManhattanDistances,
+                                             Image64fC1View &pDstTransform, opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                             opp::cuda::DevVarView<byte> &pAntialiasingDeviceBuffer,
+                                             const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pDstVoronoi.ROI());
     checkSameSize(ROI(), pDstVoronoiIndices.ROI());
     checkSameSize(ROI(), pDstVoronoiAbsoluteManhattanDistances.ROI());
     checkSameSize(ROI(), pDstTransform.ROI());
-    nppSafeCallExt(nppiDistanceTransformAbsPBA_16u64f_C1R_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), nMinSiteValue.x, nMaxSiteValue.x, reinterpret_cast<Npp16s *>(pDstVoronoi.PointerRoi()), to_int(pDstVoronoi.Pitch()), reinterpret_cast<Npp16s *>(pDstVoronoiIndices.PointerRoi()), to_int(pDstVoronoiIndices.Pitch()), reinterpret_cast<Npp16u *>(pDstVoronoiAbsoluteManhattanDistances.PointerRoi()), to_int(pDstVoronoiAbsoluteManhattanDistances.Pitch()), reinterpret_cast<Npp64f *>(pDstTransform.PointerRoi()), to_int(pDstTransform.Pitch()), NppiSizeRoi(), pDeviceBuffer.Pointer(), pAntialiasingDeviceBuffer.Pointer(), nppStreamCtx),
-                   "ROI Src: " << ROI() << "ROI pDstVoronoi: " << pDstVoronoi.ROI() << "ROI pDstVoronoiIndices: " << pDstVoronoiIndices.ROI() << "ROI pDstVoronoiAbsoluteManhattanDistances: " << pDstVoronoiAbsoluteManhattanDistances.ROI() << "ROI pDstTransform: " << pDstTransform.ROI());
+    nppSafeCallExt(nppiDistanceTransformAbsPBA_16u64f_C1R_Ctx(
+                       reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), nMinSiteValue.x, nMaxSiteValue.x,
+                       reinterpret_cast<Npp16s *>(pDstVoronoi.PointerRoi()), to_int(pDstVoronoi.Pitch()),
+                       reinterpret_cast<Npp16s *>(pDstVoronoiIndices.PointerRoi()), to_int(pDstVoronoiIndices.Pitch()),
+                       reinterpret_cast<Npp16u *>(pDstVoronoiAbsoluteManhattanDistances.PointerRoi()),
+                       to_int(pDstVoronoiAbsoluteManhattanDistances.Pitch()),
+                       reinterpret_cast<Npp64f *>(pDstTransform.PointerRoi()), to_int(pDstTransform.Pitch()),
+                       NppiSizeRoi(), pDeviceBuffer.Pointer(), pAntialiasingDeviceBuffer.Pointer(), nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI pDstVoronoi: " << pDstVoronoi.ROI() << "ROI pDstVoronoiIndices: "
+                               << pDstVoronoiIndices.ROI() << "ROI pDstVoronoiAbsoluteManhattanDistances: "
+                               << pDstVoronoiAbsoluteManhattanDistances.ROI()
+                               << "ROI pDstTransform: " << pDstTransform.ROI());
 }
 
-void Image16uC1View::HistogramOfGradientsBorder(const NppiPoint *hpLocations, int nLocations, Npp32f *pDstWindowDescriptorBuffer, const NppiHOGConfig oHOGConfig, opp::cuda::DevVarView<byte> &pScratchBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+void Image16uC1View::HistogramOfGradientsBorder(const NppiPoint *hpLocations, int nLocations,
+                                                Npp32f *pDstWindowDescriptorBuffer, const NppiHOGConfig oHOGConfig,
+                                                opp::cuda::DevVarView<byte> &pScratchBuffer, NppiBorderType eBorderType,
+                                                const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};
     const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
@@ -1740,77 +2429,128 @@ void Image16uC1View::HistogramOfGradientsBorder(const NppiPoint *hpLocations, in
         filterSize.width  = ROI().width;
         filterSize.height = ROI().height;
     }
-    nppSafeCallExt(nppiHistogramOfGradientsBorder_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, hpLocations, nLocations, pDstWindowDescriptorBuffer, NppiSizeRoi(), oHOGConfig, pScratchBuffer.Pointer(), eBorderType, nppStreamCtx),
+    nppSafeCallExt(nppiHistogramOfGradientsBorder_16u32f_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset,
+                       hpLocations, nLocations, pDstWindowDescriptorBuffer, NppiSizeRoi(), oHOGConfig,
+                       pScratchBuffer.Pointer(), eBorderType, nppStreamCtx),
                    "ROI Src: " << ROI());
 }
 
-Image16uC1View &Image16uC1View::FloodFill(NppiPoint oSeed, const Pixel16uC1 &nNewValue, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
+Image16uC1View &Image16uC1View::FloodFill(NppiPoint oSeed, const Pixel16uC1 &nNewValue, NppiNorm eNorm,
+                                          NppiConnectedRegion *pConnectedRegion, opp::cuda::DevVarView<byte> &pBuffer,
+                                          const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiFloodFill_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), oSeed, nNewValue.x, eNorm, NppiSizeRoi(), pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiFloodFill_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), oSeed,
+                                              nNewValue.x, eNorm, NppiSizeRoi(), pConnectedRegion, pBuffer.Pointer(),
+                                              nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::FloodFillBoundary(NppiPoint oSeed, const Pixel16uC1 &nNewValue, const Pixel16uC1 &nBoundaryValue, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
+Image16uC1View &Image16uC1View::FloodFillBoundary(NppiPoint oSeed, const Pixel16uC1 &nNewValue,
+                                                  const Pixel16uC1 &nBoundaryValue, NppiNorm eNorm,
+                                                  NppiConnectedRegion *pConnectedRegion,
+                                                  opp::cuda::DevVarView<byte> &pBuffer,
+                                                  const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiFloodFillBoundary_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), oSeed, nNewValue.x, nBoundaryValue.x, eNorm, NppiSizeRoi(), pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiFloodFillBoundary_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), oSeed,
+                                                      nNewValue.x, nBoundaryValue.x, eNorm, NppiSizeRoi(),
+                                                      pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::FloodFillRange(NppiPoint oSeed, const Pixel16uC1 &nMin, const Pixel16uC1 &nMax, const Pixel16uC1 &nNewValue, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
+Image16uC1View &Image16uC1View::FloodFillRange(NppiPoint oSeed, const Pixel16uC1 &nMin, const Pixel16uC1 &nMax,
+                                               const Pixel16uC1 &nNewValue, NppiNorm eNorm,
+                                               NppiConnectedRegion *pConnectedRegion,
+                                               opp::cuda::DevVarView<byte> &pBuffer,
+                                               const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiFloodFillRange_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), oSeed, nMin.x, nMax.x, nNewValue.x, eNorm, NppiSizeRoi(), pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiFloodFillRange_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), oSeed,
+                                                   nMin.x, nMax.x, nNewValue.x, eNorm, NppiSizeRoi(), pConnectedRegion,
+                                                   pBuffer.Pointer(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::FloodFillRangeBoundary(NppiPoint oSeed, const Pixel16uC1 &nMin, const Pixel16uC1 &nMax, const Pixel16uC1 &nNewValue, const Pixel16uC1 &nBoundaryValue, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
+Image16uC1View &Image16uC1View::FloodFillRangeBoundary(NppiPoint oSeed, const Pixel16uC1 &nMin, const Pixel16uC1 &nMax,
+                                                       const Pixel16uC1 &nNewValue, const Pixel16uC1 &nBoundaryValue,
+                                                       NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion,
+                                                       opp::cuda::DevVarView<byte> &pBuffer,
+                                                       const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiFloodFillRangeBoundary_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), oSeed, nMin.x, nMax.x, nNewValue.x, nBoundaryValue.x, eNorm, NppiSizeRoi(), pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiFloodFillRangeBoundary_16u_C1IR_Ctx(
+                       reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), oSeed, nMin.x, nMax.x, nNewValue.x,
+                       nBoundaryValue.x, eNorm, NppiSizeRoi(), pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::FloodFillGradient(NppiPoint oSeed, const Pixel16uC1 &nMin, const Pixel16uC1 &nMax, const Pixel16uC1 &nNewValue, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
+Image16uC1View &Image16uC1View::FloodFillGradient(NppiPoint oSeed, const Pixel16uC1 &nMin, const Pixel16uC1 &nMax,
+                                                  const Pixel16uC1 &nNewValue, NppiNorm eNorm,
+                                                  NppiConnectedRegion *pConnectedRegion,
+                                                  opp::cuda::DevVarView<byte> &pBuffer,
+                                                  const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiFloodFillGradient_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), oSeed, nMin.x, nMax.x, nNewValue.x, eNorm, NppiSizeRoi(), pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiFloodFillGradient_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), oSeed,
+                                                      nMin.x, nMax.x, nNewValue.x, eNorm, NppiSizeRoi(),
+                                                      pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::FloodFillGradientBoundary(NppiPoint oSeed, const Pixel16uC1 &nMin, const Pixel16uC1 &nMax, const Pixel16uC1 &nNewValue, const Pixel16uC1 &nBoundaryValue, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
+Image16uC1View &Image16uC1View::FloodFillGradientBoundary(NppiPoint oSeed, const Pixel16uC1 &nMin,
+                                                          const Pixel16uC1 &nMax, const Pixel16uC1 &nNewValue,
+                                                          const Pixel16uC1 &nBoundaryValue, NppiNorm eNorm,
+                                                          NppiConnectedRegion *pConnectedRegion,
+                                                          opp::cuda::DevVarView<byte> &pBuffer,
+                                                          const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiFloodFillGradientBoundary_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), oSeed, nMin.x, nMax.x, nNewValue.x, nBoundaryValue.x, eNorm, NppiSizeRoi(), pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiFloodFillGradientBoundary_16u_C1IR_Ctx(
+                       reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), oSeed, nMin.x, nMax.x, nNewValue.x,
+                       nBoundaryValue.x, eNorm, NppiSizeRoi(), pConnectedRegion, pBuffer.Pointer(), nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image32uC1View &Image16uC1View::LabelMarkersUF(Image32uC1View &pDst, NppiNorm eNorm, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx)
+Image32uC1View &Image16uC1View::LabelMarkersUF(Image32uC1View &pDst, NppiNorm eNorm,
+                                               opp::cuda::DevVarView<byte> &pBuffer,
+                                               const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiLabelMarkersUF_16u32u_C1R_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp32u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), eNorm, pBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiLabelMarkersUF_16u32u_C1R_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                     reinterpret_cast<Npp32u *>(pDst.PointerRoi()),
+                                                     to_int(pDst.Pitch()), NppiSizeRoi(), eNorm, pBuffer.Pointer(),
+                                                     nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 size_t Image16uC1View::SegmentWatershedGetBufferSize() const
 {
-    int retValue = 0;
+    size_t retValue = 0;
     nppSafeCall(nppiSegmentWatershedGetBufferSize_16u_C1R(NppiSizeRoi(), &retValue));
-    return to_size_t(retValue);
+    return retValue;
 }
 
-void Image16uC1View::SegmentWatershed(const Image32uC1View &pMarkerLabels, NppiNorm eNorm, NppiWatershedSegmentBoundaryType eSegmentBoundaryType, opp::cuda::DevVarView<byte> &pDeviceMemoryBuffer, const NppStreamContext &nppStreamCtx)
+void Image16uC1View::SegmentWatershed(Image32uC1View &pMarkerLabels, NppiNorm eNorm,
+                                      NppiWatershedSegmentBoundaryType eSegmentBoundaryType,
+                                      opp::cuda::DevVarView<byte> &pDeviceMemoryBuffer,
+                                      const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pMarkerLabels.ROI());
-    nppSafeCallExt(nppiSegmentWatershed_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp32u *>(pMarkerLabels.PointerRoi()), to_int(pMarkerLabels.Pitch()), eNorm, eSegmentBoundaryType, NppiSizeRoi(), pDeviceMemoryBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiSegmentWatershed_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                     reinterpret_cast<Npp32u *>(pMarkerLabels.PointerRoi()),
+                                                     to_int(pMarkerLabels.Pitch()), eNorm, eSegmentBoundaryType,
+                                                     NppiSizeRoi(), pDeviceMemoryBuffer.Pointer(), nppStreamCtx),
                    "ROI SrcDst: " << ROI() << " ROI MarkerLabels: " << pMarkerLabels.ROI());
 }
 
-void Image16uC1View::Sum(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<double> &pSum, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::Sum(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<double> &pSum,
+                         const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiSum_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), pDeviceBuffer.Pointer(), pSum.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiSum_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                       pDeviceBuffer.Pointer(), pSum.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI());
 }
 
@@ -1821,9 +2561,11 @@ size_t Image16uC1View::SumGetBufferHostSize(const NppStreamContext &nppStreamCtx
     return retValue;
 }
 
-void Image16uC1View::Min(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<ushort> &pMin, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::Min(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<ushort> &pMin,
+                         const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiMin_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), pDeviceBuffer.Pointer(), pMin.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiMin_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                       pDeviceBuffer.Pointer(), pMin.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI());
 }
 
@@ -1834,9 +2576,13 @@ size_t Image16uC1View::MinGetBufferHostSize(const NppStreamContext &nppStreamCtx
     return retValue;
 }
 
-void Image16uC1View::MinIndx(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<ushort> &pMin, opp::cuda::DevVarView<int> &pIndexX, opp::cuda::DevVarView<int> &pIndexY, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::MinIndx(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<ushort> &pMin,
+                             opp::cuda::DevVarView<int> &pIndexX, opp::cuda::DevVarView<int> &pIndexY,
+                             const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiMinIndx_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), pDeviceBuffer.Pointer(), pMin.Pointer(), pIndexX.Pointer(), pIndexY.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiMinIndx_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                           NppiSizeRoi(), pDeviceBuffer.Pointer(), pMin.Pointer(), pIndexX.Pointer(),
+                                           pIndexY.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI());
 }
 
@@ -1847,9 +2593,11 @@ size_t Image16uC1View::MinIndxGetBufferHostSize(const NppStreamContext &nppStrea
     return retValue;
 }
 
-void Image16uC1View::Max(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<ushort> &pMax, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::Max(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<ushort> &pMax,
+                         const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiMax_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), pDeviceBuffer.Pointer(), pMax.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiMax_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                       pDeviceBuffer.Pointer(), pMax.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI());
 }
 
@@ -1860,9 +2608,13 @@ size_t Image16uC1View::MaxGetBufferHostSize(const NppStreamContext &nppStreamCtx
     return retValue;
 }
 
-void Image16uC1View::MaxIndx(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<ushort> &pMax, opp::cuda::DevVarView<int> &pIndexX, opp::cuda::DevVarView<int> &pIndexY, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::MaxIndx(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<ushort> &pMax,
+                             opp::cuda::DevVarView<int> &pIndexX, opp::cuda::DevVarView<int> &pIndexY,
+                             const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiMaxIndx_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), pDeviceBuffer.Pointer(), pMax.Pointer(), pIndexX.Pointer(), pIndexY.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiMaxIndx_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                           NppiSizeRoi(), pDeviceBuffer.Pointer(), pMax.Pointer(), pIndexX.Pointer(),
+                                           pIndexY.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI());
 }
 
@@ -1873,9 +2625,12 @@ size_t Image16uC1View::MaxIndxGetBufferHostSize(const NppStreamContext &nppStrea
     return retValue;
 }
 
-void Image16uC1View::MinMax(opp::cuda::DevVarView<ushort> &pMin, opp::cuda::DevVarView<ushort> &pMax, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::MinMax(opp::cuda::DevVarView<ushort> &pMin, opp::cuda::DevVarView<ushort> &pMax,
+                            opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiMinMax_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), pMin.Pointer(), pMax.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiMinMax_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                          NppiSizeRoi(), pMin.Pointer(), pMax.Pointer(), pDeviceBuffer.Pointer(),
+                                          nppStreamCtx),
                    "ROI Src: " << ROI());
 }
 
@@ -1886,15 +2641,28 @@ size_t Image16uC1View::MinMaxGetBufferHostSize(const NppStreamContext &nppStream
     return retValue;
 }
 
-void Image16uC1View::MinMaxIndx(opp::cuda::DevVarView<ushort> &pMinValue, opp::cuda::DevVarView<ushort> &pMaxValue, opp::cuda::DevVarView<NppiPoint> &pMinIndex, opp::cuda::DevVarView<NppiPoint> &pMaxIndex, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::MinMaxIndx(opp::cuda::DevVarView<ushort> &pMinValue, opp::cuda::DevVarView<ushort> &pMaxValue,
+                                opp::cuda::DevVarView<NppiPoint> &pMinIndex,
+                                opp::cuda::DevVarView<NppiPoint> &pMaxIndex, opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiMinMaxIndx_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), pMinValue.Pointer(), pMaxValue.Pointer(), pMinIndex.Pointer(), pMaxIndex.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiMinMaxIndx_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                              NppiSizeRoi(), pMinValue.Pointer(), pMaxValue.Pointer(),
+                                              pMinIndex.Pointer(), pMaxIndex.Pointer(), pDeviceBuffer.Pointer(),
+                                              nppStreamCtx),
                    "ROI Src: " << ROI());
 }
 
-void Image16uC1View::MinMaxIndx(const Image8uC1View &pMask, opp::cuda::DevVarView<ushort> &pMinValue, opp::cuda::DevVarView<ushort> &pMaxValue, opp::cuda::DevVarView<NppiPoint> &pMinIndex, opp::cuda::DevVarView<NppiPoint> &pMaxIndex, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::MinMaxIndx(const Image8uC1View &pMask, opp::cuda::DevVarView<ushort> &pMinValue,
+                                opp::cuda::DevVarView<ushort> &pMaxValue, opp::cuda::DevVarView<NppiPoint> &pMinIndex,
+                                opp::cuda::DevVarView<NppiPoint> &pMaxIndex, opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiMinMaxIndx_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()), NppiSizeRoi(), pMinValue.Pointer(), pMaxValue.Pointer(), pMinIndex.Pointer(), pMaxIndex.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiMinMaxIndx_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                               reinterpret_cast<const Npp8u *>(pMask.PointerRoi()),
+                                               to_int(pMask.Pitch()), NppiSizeRoi(), pMinValue.Pointer(),
+                                               pMaxValue.Pointer(), pMinIndex.Pointer(), pMaxIndex.Pointer(),
+                                               pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI());
 }
 
@@ -1912,15 +2680,20 @@ size_t Image16uC1View::MinMaxIndxGetBufferHostSizeMasked(const NppStreamContext 
     return retValue;
 }
 
-void Image16uC1View::Mean(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<double> &pMean, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::Mean(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<double> &pMean,
+                          const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiMean_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), pDeviceBuffer.Pointer(), pMean.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiMean_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                        pDeviceBuffer.Pointer(), pMean.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI());
 }
 
-void Image16uC1View::Mean(const Image8uC1View &pMask, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<double> &pMean, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::Mean(const Image8uC1View &pMask, opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                          opp::cuda::DevVarView<double> &pMean, const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiMean_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()), NppiSizeRoi(), pDeviceBuffer.Pointer(), pMean.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiMean_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                         reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()),
+                                         NppiSizeRoi(), pDeviceBuffer.Pointer(), pMean.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI());
 }
 
@@ -1938,15 +2711,23 @@ size_t Image16uC1View::MeanGetBufferHostSizeMasked(const NppStreamContext &nppSt
     return retValue;
 }
 
-void Image16uC1View::Mean_StdDev(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<double> &pMean, opp::cuda::DevVarView<double> &pStdDev, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::Mean_StdDev(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<double> &pMean,
+                                 opp::cuda::DevVarView<double> &pStdDev, const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiMean_StdDev_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), pDeviceBuffer.Pointer(), pMean.Pointer(), pStdDev.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiMean_StdDev_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                               NppiSizeRoi(), pDeviceBuffer.Pointer(), pMean.Pointer(),
+                                               pStdDev.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI());
 }
 
-void Image16uC1View::Mean_StdDev(const Image8uC1View &pMask, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<double> &pMean, opp::cuda::DevVarView<double> &pStdDev, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::Mean_StdDev(const Image8uC1View &pMask, opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                 opp::cuda::DevVarView<double> &pMean, opp::cuda::DevVarView<double> &pStdDev,
+                                 const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiMean_StdDev_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()), NppiSizeRoi(), pDeviceBuffer.Pointer(), pMean.Pointer(), pStdDev.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiMean_StdDev_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                reinterpret_cast<const Npp8u *>(pMask.PointerRoi()),
+                                                to_int(pMask.Pitch()), NppiSizeRoi(), pDeviceBuffer.Pointer(),
+                                                pMean.Pointer(), pStdDev.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI());
 }
 
@@ -1964,15 +2745,20 @@ size_t Image16uC1View::MeanStdDevGetBufferHostSizeMasked(const NppStreamContext 
     return retValue;
 }
 
-void Image16uC1View::Norm_Inf(opp::cuda::DevVarView<double> &pNorm, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::Norm_Inf(opp::cuda::DevVarView<double> &pNorm, opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                              const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiNorm_Inf_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), pNorm.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiNorm_Inf_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                            NppiSizeRoi(), pNorm.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI());
 }
 
-void Image16uC1View::Norm_Inf(const Image8uC1View &pMask, opp::cuda::DevVarView<double> &pNorm, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::Norm_Inf(const Image8uC1View &pMask, opp::cuda::DevVarView<double> &pNorm,
+                              opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiNorm_Inf_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()), NppiSizeRoi(), pNorm.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiNorm_Inf_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                             reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()),
+                                             NppiSizeRoi(), pNorm.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI());
 }
 
@@ -1990,15 +2776,20 @@ size_t Image16uC1View::NormInfGetBufferHostSizeMasked(const NppStreamContext &np
     return retValue;
 }
 
-void Image16uC1View::Norm_L1(opp::cuda::DevVarView<double> &pNorm, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::Norm_L1(opp::cuda::DevVarView<double> &pNorm, opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                             const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiNorm_L1_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), pNorm.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiNorm_L1_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                           NppiSizeRoi(), pNorm.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI());
 }
 
-void Image16uC1View::Norm_L1(const Image8uC1View &pMask, opp::cuda::DevVarView<double> &pNorm, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::Norm_L1(const Image8uC1View &pMask, opp::cuda::DevVarView<double> &pNorm,
+                             opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiNorm_L1_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()), NppiSizeRoi(), pNorm.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiNorm_L1_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                            reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()),
+                                            NppiSizeRoi(), pNorm.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI());
 }
 
@@ -2016,15 +2807,20 @@ size_t Image16uC1View::NormL1GetBufferHostSizeMasked(const NppStreamContext &npp
     return retValue;
 }
 
-void Image16uC1View::Norm_L2(opp::cuda::DevVarView<double> &pNorm, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::Norm_L2(opp::cuda::DevVarView<double> &pNorm, opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                             const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiNorm_L2_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), pNorm.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiNorm_L2_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                           NppiSizeRoi(), pNorm.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI());
 }
 
-void Image16uC1View::Norm_L2(const Image8uC1View &pMask, opp::cuda::DevVarView<double> &pNorm, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::Norm_L2(const Image8uC1View &pMask, opp::cuda::DevVarView<double> &pNorm,
+                             opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiNorm_L2_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()), NppiSizeRoi(), pNorm.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiNorm_L2_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                            reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()),
+                                            NppiSizeRoi(), pNorm.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI());
 }
 
@@ -2042,18 +2838,29 @@ size_t Image16uC1View::NormL2GetBufferHostSizeMasked(const NppStreamContext &npp
     return retValue;
 }
 
-void Image16uC1View::NormDiff_Inf(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pNormDiff, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::NormDiff_Inf(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pNormDiff,
+                                  opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                  const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
-    nppSafeCallExt(nppiNormDiff_Inf_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pNormDiff.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiNormDiff_Inf_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()),
+                                                to_int(pSrc2.Pitch()), NppiSizeRoi(), pNormDiff.Pointer(),
+                                                pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
 }
 
-void Image16uC1View::NormDiff_Inf(const Image16uC1View &pSrc2, const Image8uC1View &pMask, opp::cuda::DevVarView<double> &pNormDiff, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::NormDiff_Inf(const Image16uC1View &pSrc2, const Image8uC1View &pMask,
+                                  opp::cuda::DevVarView<double> &pNormDiff, opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                  const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
-    nppSafeCallExt(nppiNormDiff_Inf_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()), NppiSizeRoi(), pNormDiff.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
-                   "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
+    nppSafeCallExt(
+        nppiNormDiff_Inf_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                      reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()),
+                                      reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()),
+                                      NppiSizeRoi(), pNormDiff.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+        "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
 }
 
 size_t Image16uC1View::NormDiffInfGetBufferHostSize(const NppStreamContext &nppStreamCtx) const
@@ -2070,18 +2877,28 @@ size_t Image16uC1View::NormDiffInfGetBufferHostSizeMasked(const NppStreamContext
     return retValue;
 }
 
-void Image16uC1View::NormDiff_L1(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pNormDiff, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::NormDiff_L1(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pNormDiff,
+                                 opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
-    nppSafeCallExt(nppiNormDiff_L1_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pNormDiff.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiNormDiff_L1_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                               reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()),
+                                               to_int(pSrc2.Pitch()), NppiSizeRoi(), pNormDiff.Pointer(),
+                                               pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
 }
 
-void Image16uC1View::NormDiff_L1(const Image16uC1View &pSrc2, const Image8uC1View &pMask, opp::cuda::DevVarView<double> &pNormDiff, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::NormDiff_L1(const Image16uC1View &pSrc2, const Image8uC1View &pMask,
+                                 opp::cuda::DevVarView<double> &pNormDiff, opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                 const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
-    nppSafeCallExt(nppiNormDiff_L1_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()), NppiSizeRoi(), pNormDiff.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
-                   "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
+    nppSafeCallExt(
+        nppiNormDiff_L1_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                     reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()),
+                                     reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()),
+                                     NppiSizeRoi(), pNormDiff.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+        "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
 }
 
 size_t Image16uC1View::NormDiffL1GetBufferHostSize(const NppStreamContext &nppStreamCtx) const
@@ -2098,18 +2915,28 @@ size_t Image16uC1View::NormDiffL1GetBufferHostSizeMasked(const NppStreamContext 
     return retValue;
 }
 
-void Image16uC1View::NormDiff_L2(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pNormDiff, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::NormDiff_L2(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pNormDiff,
+                                 opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
-    nppSafeCallExt(nppiNormDiff_L2_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pNormDiff.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiNormDiff_L2_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                               reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()),
+                                               to_int(pSrc2.Pitch()), NppiSizeRoi(), pNormDiff.Pointer(),
+                                               pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
 }
 
-void Image16uC1View::NormDiff_L2(const Image16uC1View &pSrc2, const Image8uC1View &pMask, opp::cuda::DevVarView<double> &pNormDiff, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::NormDiff_L2(const Image16uC1View &pSrc2, const Image8uC1View &pMask,
+                                 opp::cuda::DevVarView<double> &pNormDiff, opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                 const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
-    nppSafeCallExt(nppiNormDiff_L2_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()), NppiSizeRoi(), pNormDiff.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
-                   "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
+    nppSafeCallExt(
+        nppiNormDiff_L2_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                     reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()),
+                                     reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()),
+                                     NppiSizeRoi(), pNormDiff.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+        "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
 }
 
 size_t Image16uC1View::NormDiffL2GetBufferHostSize(const NppStreamContext &nppStreamCtx) const
@@ -2126,18 +2953,28 @@ size_t Image16uC1View::NormDiffL2GetBufferHostSizeMasked(const NppStreamContext 
     return retValue;
 }
 
-void Image16uC1View::NormRel_Inf(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pNormRel, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::NormRel_Inf(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pNormRel,
+                                 opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
-    nppSafeCallExt(nppiNormRel_Inf_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pNormRel.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiNormRel_Inf_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                               reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()),
+                                               to_int(pSrc2.Pitch()), NppiSizeRoi(), pNormRel.Pointer(),
+                                               pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
 }
 
-void Image16uC1View::NormRel_Inf(const Image16uC1View &pSrc2, const Image8uC1View &pMask, opp::cuda::DevVarView<double> &pNormRel, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::NormRel_Inf(const Image16uC1View &pSrc2, const Image8uC1View &pMask,
+                                 opp::cuda::DevVarView<double> &pNormRel, opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                 const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
-    nppSafeCallExt(nppiNormRel_Inf_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()), NppiSizeRoi(), pNormRel.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
-                   "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
+    nppSafeCallExt(
+        nppiNormRel_Inf_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                     reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()),
+                                     reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()),
+                                     NppiSizeRoi(), pNormRel.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+        "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
 }
 
 size_t Image16uC1View::NormRelInfGetBufferHostSize(const NppStreamContext &nppStreamCtx) const
@@ -2154,18 +2991,28 @@ size_t Image16uC1View::NormRelInfGetBufferHostSizeMasked(const NppStreamContext 
     return retValue;
 }
 
-void Image16uC1View::NormRel_L1(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pNormRel, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::NormRel_L1(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pNormRel,
+                                opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
-    nppSafeCallExt(nppiNormRel_L1_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pNormRel.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiNormRel_L1_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                              reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()),
+                                              to_int(pSrc2.Pitch()), NppiSizeRoi(), pNormRel.Pointer(),
+                                              pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
 }
 
-void Image16uC1View::NormRel_L1(const Image16uC1View &pSrc2, const Image8uC1View &pMask, opp::cuda::DevVarView<double> &pNormRel, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::NormRel_L1(const Image16uC1View &pSrc2, const Image8uC1View &pMask,
+                                opp::cuda::DevVarView<double> &pNormRel, opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
-    nppSafeCallExt(nppiNormRel_L1_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()), NppiSizeRoi(), pNormRel.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
-                   "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
+    nppSafeCallExt(
+        nppiNormRel_L1_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                    reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()),
+                                    reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()),
+                                    NppiSizeRoi(), pNormRel.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+        "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
 }
 
 size_t Image16uC1View::NormRelL1GetBufferHostSize(const NppStreamContext &nppStreamCtx) const
@@ -2182,18 +3029,28 @@ size_t Image16uC1View::NormRelL1GetBufferHostSizeMasked(const NppStreamContext &
     return retValue;
 }
 
-void Image16uC1View::NormRel_L2(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pNormRel, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::NormRel_L2(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pNormRel,
+                                opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
-    nppSafeCallExt(nppiNormRel_L2_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pNormRel.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiNormRel_L2_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                              reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()),
+                                              to_int(pSrc2.Pitch()), NppiSizeRoi(), pNormRel.Pointer(),
+                                              pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
 }
 
-void Image16uC1View::NormRel_L2(const Image16uC1View &pSrc2, const Image8uC1View &pMask, opp::cuda::DevVarView<double> &pNormRel, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::NormRel_L2(const Image16uC1View &pSrc2, const Image8uC1View &pMask,
+                                opp::cuda::DevVarView<double> &pNormRel, opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
-    nppSafeCallExt(nppiNormRel_L2_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()), NppiSizeRoi(), pNormRel.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
-                   "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
+    nppSafeCallExt(
+        nppiNormRel_L2_16u_C1MR_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                    reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()),
+                                    reinterpret_cast<const Npp8u *>(pMask.PointerRoi()), to_int(pMask.Pitch()),
+                                    NppiSizeRoi(), pNormRel.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+        "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
 }
 
 size_t Image16uC1View::NormRelL2GetBufferHostSize(const NppStreamContext &nppStreamCtx) const
@@ -2210,10 +3067,14 @@ size_t Image16uC1View::NormRelL2GetBufferHostSizeMasked(const NppStreamContext &
     return retValue;
 }
 
-void Image16uC1View::DotProd(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pDp, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::DotProd(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pDp,
+                             opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
-    nppSafeCallExt(nppiDotProd_16u64f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pDp.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiDotProd_16u64f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                              reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()),
+                                              to_int(pSrc2.Pitch()), NppiSizeRoi(), pDp.Pointer(),
+                                              pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
 }
 
@@ -2227,7 +3088,9 @@ size_t Image16uC1View::DotProdGetBufferHostSize(const NppStreamContext &nppStrea
 Image16uC1View &Image16uC1View::MaxEvery(const Image16uC1View &pSrc, const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pSrc.ROI());
-    nppSafeCallExt(nppiMaxEvery_16u_C1IR_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()), reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiMaxEvery_16u_C1IR_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()),
+                                             reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                             nppStreamCtx),
                    "ROI Src2: " << pSrc.ROI() << "ROI SrcDst: " << ROI());
     return *this;
 }
@@ -2235,14 +3098,20 @@ Image16uC1View &Image16uC1View::MaxEvery(const Image16uC1View &pSrc, const NppSt
 Image16uC1View &Image16uC1View::MinEvery(const Image16uC1View &pSrc, const NppStreamContext &nppStreamCtx)
 {
     checkSameSize(ROI(), pSrc.ROI());
-    nppSafeCallExt(nppiMinEvery_16u_C1IR_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()), reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), nppStreamCtx),
+    nppSafeCallExt(nppiMinEvery_16u_C1IR_Ctx(reinterpret_cast<const Npp16u *>(pSrc.PointerRoi()), to_int(pSrc.Pitch()),
+                                             reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                             nppStreamCtx),
                    "ROI Src2: " << pSrc.ROI() << "ROI SrcDst: " << ROI());
     return *this;
 }
 
-void Image16uC1View::HistogramEven(opp::cuda::DevVarView<int> &pHist, int nLevels, const Pixel32sC1 &nLowerLevel, const Pixel32sC1 &nUpperLevel, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::HistogramEven(opp::cuda::DevVarView<int> &pHist, int nLevels, const Pixel32sC1 &nLowerLevel,
+                                   const Pixel32sC1 &nUpperLevel, opp::cuda::DevVarView<byte> &pBuffer,
+                                   const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiHistogramEven_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), pHist.Pointer(), nLevels, nLowerLevel.x, nUpperLevel.x, pBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiHistogramEven_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                 NppiSizeRoi(), pHist.Pointer(), nLevels, nLowerLevel.x, nUpperLevel.x,
+                                                 pBuffer.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI());
 }
 
@@ -2253,9 +3122,13 @@ size_t Image16uC1View::HistogramEvenGetBufferSize(int nLevels, const NppStreamCo
     return retValue;
 }
 
-void Image16uC1View::HistogramRange(opp::cuda::DevVarView<int> &pHist, const opp::cuda::DevVarView<int> &pLevels, int nLevels, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::HistogramRange(opp::cuda::DevVarView<int> &pHist, const opp::cuda::DevVarView<int> &pLevels,
+                                    int nLevels, opp::cuda::DevVarView<byte> &pBuffer,
+                                    const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiHistogramRange_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), pHist.Pointer(), pLevels.Pointer(), nLevels, pBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiHistogramRange_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                  NppiSizeRoi(), pHist.Pointer(), pLevels.Pointer(), nLevels,
+                                                  pBuffer.Pointer(), nppStreamCtx),
                    "ROI Src: " << ROI());
 }
 
@@ -2266,66 +3139,100 @@ size_t Image16uC1View::HistogramRangeGetBufferSize(int nLevels, const NppStreamC
     return retValue;
 }
 
-Image32fC1View &Image16uC1View::SqrDistanceFull_Norm(const Image16uC1View &pTpl, Image32fC1View &pDst, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image16uC1View::SqrDistanceFull_Norm(const Image16uC1View &pTpl, Image32fC1View &pDst,
+                                                     const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiSqrDistanceFull_Norm_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(), reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), nppStreamCtx),
+    nppSafeCallExt(nppiSqrDistanceFull_Norm_16u32f_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                       reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(),
+                       reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pTpl.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image32fC1View &Image16uC1View::SqrDistanceSame_Norm(const Image16uC1View &pTpl, Image32fC1View &pDst, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image16uC1View::SqrDistanceSame_Norm(const Image16uC1View &pTpl, Image32fC1View &pDst,
+                                                     const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiSqrDistanceSame_Norm_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(), reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), nppStreamCtx),
+    nppSafeCallExt(nppiSqrDistanceSame_Norm_16u32f_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                       reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(),
+                       reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pTpl.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image32fC1View &Image16uC1View::SqrDistanceValid_Norm(const Image16uC1View &pTpl, Image32fC1View &pDst, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image16uC1View::SqrDistanceValid_Norm(const Image16uC1View &pTpl, Image32fC1View &pDst,
+                                                      const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiSqrDistanceValid_Norm_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(), reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), nppStreamCtx),
+    nppSafeCallExt(nppiSqrDistanceValid_Norm_16u32f_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                       reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(),
+                       reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pTpl.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image32fC1View &Image16uC1View::CrossCorrFull_Norm(const Image16uC1View &pTpl, Image32fC1View &pDst, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image16uC1View::CrossCorrFull_Norm(const Image16uC1View &pTpl, Image32fC1View &pDst,
+                                                   const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCrossCorrFull_Norm_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(), reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), nppStreamCtx),
+    nppSafeCallExt(nppiCrossCorrFull_Norm_16u32f_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                       reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(),
+                       reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pTpl.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image32fC1View &Image16uC1View::CrossCorrSame_Norm(const Image16uC1View &pTpl, Image32fC1View &pDst, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image16uC1View::CrossCorrSame_Norm(const Image16uC1View &pTpl, Image32fC1View &pDst,
+                                                   const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCrossCorrSame_Norm_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(), reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), nppStreamCtx),
+    nppSafeCallExt(nppiCrossCorrSame_Norm_16u32f_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                       reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(),
+                       reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pTpl.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image32fC1View &Image16uC1View::CrossCorrValid_Norm(const Image16uC1View &pTpl, Image32fC1View &pDst, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image16uC1View::CrossCorrValid_Norm(const Image16uC1View &pTpl, Image32fC1View &pDst,
+                                                    const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCrossCorrValid_Norm_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(), reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), nppStreamCtx),
+    nppSafeCallExt(nppiCrossCorrValid_Norm_16u32f_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                       reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(),
+                       reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pTpl.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image32fC1View &Image16uC1View::CrossCorrValid(const Image16uC1View &pTpl, Image32fC1View &pDst, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image16uC1View::CrossCorrValid(const Image16uC1View &pTpl, Image32fC1View &pDst,
+                                               const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCrossCorrValid_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(), reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), nppStreamCtx),
+    nppSafeCallExt(nppiCrossCorrValid_16u32f_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                       reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(),
+                       reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pTpl.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image32fC1View &Image16uC1View::CrossCorrFull_NormLevel(const Image16uC1View &pTpl, Image32fC1View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image16uC1View::CrossCorrFull_NormLevel(const Image16uC1View &pTpl, Image32fC1View &pDst,
+                                                        opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                                        const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCrossCorrFull_NormLevel_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(), reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiCrossCorrFull_NormLevel_16u32f_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                       reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(),
+                       reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDeviceBuffer.Pointer(),
+                       nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pTpl.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -2337,10 +3244,16 @@ size_t Image16uC1View::FullNormLevelGetBufferHostSize(const NppStreamContext &np
     return retValue;
 }
 
-Image32fC1View &Image16uC1View::CrossCorrSame_NormLevel(const Image16uC1View &pTpl, Image32fC1View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image16uC1View::CrossCorrSame_NormLevel(const Image16uC1View &pTpl, Image32fC1View &pDst,
+                                                        opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                                        const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCrossCorrSame_NormLevel_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(), reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiCrossCorrSame_NormLevel_16u32f_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                       reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(),
+                       reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDeviceBuffer.Pointer(),
+                       nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pTpl.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -2352,10 +3265,16 @@ size_t Image16uC1View::SameNormLevelGetBufferHostSize(const NppStreamContext &np
     return retValue;
 }
 
-Image32fC1View &Image16uC1View::CrossCorrValid_NormLevel(const Image16uC1View &pTpl, Image32fC1View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image16uC1View::CrossCorrValid_NormLevel(const Image16uC1View &pTpl, Image32fC1View &pDst,
+                                                         opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                                         const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCrossCorrValid_NormLevel_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(), reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiCrossCorrValid_NormLevel_16u32f_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                       reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(),
+                       reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDeviceBuffer.Pointer(),
+                       nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pTpl.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -2367,34 +3286,60 @@ size_t Image16uC1View::ValidNormLevelGetBufferHostSize(const NppStreamContext &n
     return retValue;
 }
 
-Image32fC1View &Image16uC1View::CrossCorrFull_NormLevelAdvanced(const Image16uC1View &pTpl, Image32fC1View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image16uC1View::CrossCorrFull_NormLevelAdvanced(const Image16uC1View &pTpl, Image32fC1View &pDst,
+                                                                opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                                                opp::cuda::DevVarView<byte> &pAdvancedScratchBuffer,
+                                                                const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCrossCorrFull_NormLevelAdvanced_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(), reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDeviceBuffer.Pointer(), pAdvancedScratchBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiCrossCorrFull_NormLevelAdvanced_16u32f_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                       reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(),
+                       reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDeviceBuffer.Pointer(),
+                       pAdvancedScratchBuffer.Pointer(), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pTpl.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image32fC1View &Image16uC1View::CrossCorrSame_NormLevelAdvanced(const Image16uC1View &pTpl, Image32fC1View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image16uC1View::CrossCorrSame_NormLevelAdvanced(const Image16uC1View &pTpl, Image32fC1View &pDst,
+                                                                opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                                                opp::cuda::DevVarView<byte> &pAdvancedScratchBuffer,
+                                                                const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCrossCorrSame_NormLevelAdvanced_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(), reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDeviceBuffer.Pointer(), pAdvancedScratchBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiCrossCorrSame_NormLevelAdvanced_16u32f_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                       reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(),
+                       reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDeviceBuffer.Pointer(),
+                       pAdvancedScratchBuffer.Pointer(), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pTpl.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image32fC1View &Image16uC1View::CrossCorrValid_NormLevelAdvanced(const Image16uC1View &pTpl, Image32fC1View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image16uC1View::CrossCorrValid_NormLevelAdvanced(const Image16uC1View &pTpl, Image32fC1View &pDst,
+                                                                 opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                                                 opp::cuda::DevVarView<byte> &pAdvancedScratchBuffer,
+                                                                 const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiCrossCorrValid_NormLevelAdvanced_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(), reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDeviceBuffer.Pointer(), pAdvancedScratchBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiCrossCorrValid_NormLevelAdvanced_16u32f_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                       reinterpret_cast<const Npp16u *>(pTpl.PointerRoi()), to_int(pTpl.Pitch()), pTpl.NppiSizeRoi(),
+                       reinterpret_cast<Npp32f *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDeviceBuffer.Pointer(),
+                       pAdvancedScratchBuffer.Pointer(), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pTpl.ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-void Image16uC1View::QualityIndex(const Image16uC1View &pSrc2, NppiSize oRoiSize, opp::cuda::DevVarView<float> &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::QualityIndex(const Image16uC1View &pSrc2, NppiSize oRoiSize, opp::cuda::DevVarView<float> &pDst,
+                                  opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                  const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
-    nppSafeCallExt(nppiQualityIndex_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), oRoiSize, pDst.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiQualityIndex_16u32f_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                   reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()),
+                                                   to_int(pSrc2.Pitch()), oRoiSize, pDst.Pointer(),
+                                                   pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
 }
 
@@ -2405,10 +3350,15 @@ size_t Image16uC1View::QualityIndexGetBufferHostSize(const NppStreamContext &npp
     return retValue;
 }
 
-void Image16uC1View::MaximumError(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::MaximumError(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pError,
+                                  opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                  const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
-    nppSafeCallExt(nppiMaximumError_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiMaximumError_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()),
+                                                to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(),
+                                                pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
 }
 
@@ -2419,10 +3369,15 @@ size_t Image16uC1View::MaximumErrorGetBufferHostSize(const NppStreamContext &npp
     return retValue;
 }
 
-void Image16uC1View::AverageError(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::AverageError(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pError,
+                                  opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                  const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
-    nppSafeCallExt(nppiAverageError_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiAverageError_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()),
+                                                to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(),
+                                                pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
 }
 
@@ -2433,10 +3388,15 @@ size_t Image16uC1View::AverageErrorGetBufferHostSize(const NppStreamContext &npp
     return retValue;
 }
 
-void Image16uC1View::MaximumRelativeError(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::MaximumRelativeError(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pError,
+                                          opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                          const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
-    nppSafeCallExt(nppiMaximumRelativeError_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiMaximumRelativeError_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                        reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()),
+                                                        to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(),
+                                                        pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
 }
 
@@ -2447,10 +3407,15 @@ size_t Image16uC1View::MaximumRelativeErrorGetBufferHostSize(const NppStreamCont
     return retValue;
 }
 
-void Image16uC1View::AverageRelativeError(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const
+void Image16uC1View::AverageRelativeError(const Image16uC1View &pSrc2, opp::cuda::DevVarView<double> &pError,
+                                          opp::cuda::DevVarView<byte> &pDeviceBuffer,
+                                          const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
-    nppSafeCallExt(nppiAverageRelativeError_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()), to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(), pDeviceBuffer.Pointer(), nppStreamCtx),
+    nppSafeCallExt(nppiAverageRelativeError_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                                        reinterpret_cast<const Npp16u *>(pSrc2.PointerRoi()),
+                                                        to_int(pSrc2.Pitch()), NppiSizeRoi(), pError.Pointer(),
+                                                        pDeviceBuffer.Pointer(), nppStreamCtx),
                    "ROI Src1: " << ROI() << " ROI Src2: " << pSrc2.ROI());
 }
 
@@ -2461,32 +3426,51 @@ size_t Image16uC1View::AverageRelativeErrorGetBufferHostSize(const NppStreamCont
     return retValue;
 }
 
-Image16uC1View &Image16uC1View::ResizeSqrPixel(Image16uC1View &pDst, double nXFactor, double nYFactor, double nXShift, double nYShift, int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::ResizeSqrPixel(Image16uC1View &pDst, double nXFactor, double nYFactor, double nXShift,
+                                               double nYShift, int eInterpolation,
+                                               const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiResizeSqrPixel_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp16u *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), nXFactor, nYFactor, nXShift, nYShift, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiResizeSqrPixel_16u_C1R_Ctx(
+                       reinterpret_cast<const Npp16u *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(),
+                       reinterpret_cast<Npp16u *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), nXFactor,
+                       nYFactor, nXShift, nYShift, eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Resize(Image16uC1View &pDst, int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Resize(Image16uC1View &pDst, int eInterpolation,
+                                       const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiResize_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), to_int(Pitch()), NppiSizeFull(), NppiRectRoi(), reinterpret_cast<Npp16u *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiSizeFull(), pDst.NppiRectRoi(), eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiResize_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), to_int(Pitch()), NppiSizeFull(),
+                                          NppiRectRoi(), reinterpret_cast<Npp16u *>(pDst.Pointer()),
+                                          to_int(pDst.Pitch()), pDst.NppiSizeFull(), pDst.NppiRectRoi(), eInterpolation,
+                                          nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Remap(const Image32fC1View &pXMap, const Image32fC1View &pYMap, Image16uC1View &pDst, int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Remap(const Image32fC1View &pXMap, const Image32fC1View &pYMap, Image16uC1View &pDst,
+                                      int eInterpolation, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(pXMap.ROI(), pDst.ROI());
     checkSameSize(pYMap.ROI(), pDst.ROI());
-    nppSafeCallExt(nppiRemap_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<const Npp32f *>(pXMap.PointerRoi()), to_int(pXMap.Pitch()), reinterpret_cast<const Npp32f *>(pYMap.PointerRoi()), to_int(pYMap.Pitch()), reinterpret_cast<Npp16u *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiSizeRoi(), eInterpolation, nppStreamCtx),
-                   "ROI Src: " << ROI() << " ROI pXMap: " << pXMap.ROI() << " ROI pYMap: " << pYMap.ROI() << "ROI Dst: " << pDst.ROI());
+    nppSafeCallExt(nppiRemap_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), NppiSizeFull(), to_int(Pitch()),
+                                         NppiRectRoi(), reinterpret_cast<const Npp32f *>(pXMap.PointerRoi()),
+                                         to_int(pXMap.Pitch()), reinterpret_cast<const Npp32f *>(pYMap.PointerRoi()),
+                                         to_int(pYMap.Pitch()), reinterpret_cast<Npp16u *>(pDst.Pointer()),
+                                         to_int(pDst.Pitch()), pDst.NppiSizeRoi(), eInterpolation, nppStreamCtx),
+                   "ROI Src: " << ROI() << " ROI pXMap: " << pXMap.ROI() << " ROI pYMap: " << pYMap.ROI()
+                               << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::Rotate(Image16uC1View &pDst, double nAngle, double nShiftX, double nShiftY, int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::Rotate(Image16uC1View &pDst, double nAngle, double nShiftX, double nShiftY,
+                                       int eInterpolation, const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiRotate_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp16u *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), nAngle, nShiftX, nShiftY, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiRotate_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), NppiSizeFull(), to_int(Pitch()),
+                                          NppiRectRoi(), reinterpret_cast<Npp16u *>(pDst.Pointer()),
+                                          to_int(pDst.Pitch()), pDst.NppiRectRoi(), nAngle, nShiftX, nShiftY,
+                                          eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
@@ -2494,61 +3478,91 @@ Image16uC1View &Image16uC1View::Rotate(Image16uC1View &pDst, double nAngle, doub
 Image16uC1View &Image16uC1View::Mirror(Image16uC1View &pDst, NppiAxis flip, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
-    nppSafeCallExt(nppiMirror_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()), reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), flip, nppStreamCtx),
+    nppSafeCallExt(nppiMirror_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(PointerRoi()), to_int(Pitch()),
+                                          reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()),
+                                          NppiSizeRoi(), flip, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 Image16uC1View &Image16uC1View::Mirror(NppiAxis flip, const NppStreamContext &nppStreamCtx)
 {
-    nppSafeCallExt(nppiMirror_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), flip, nppStreamCtx),
+    nppSafeCallExt(nppiMirror_16u_C1IR_Ctx(reinterpret_cast<Npp16u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(),
+                                           flip, nppStreamCtx),
                    "ROI SrcDst: " << ROI());
     return *this;
 }
 
-Image16uC1View &Image16uC1View::WarpAffine(Image16uC1View &pDst, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::WarpAffine(Image16uC1View &pDst, const double aCoeffs[2][3], int eInterpolation,
+                                           const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiWarpAffine_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp16u *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiWarpAffine_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), NppiSizeFull(),
+                                              to_int(Pitch()), NppiRectRoi(),
+                                              reinterpret_cast<Npp16u *>(pDst.Pointer()), to_int(pDst.Pitch()),
+                                              pDst.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::WarpAffineBack(Image16uC1View &pDst, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::WarpAffineBack(Image16uC1View &pDst, const double aCoeffs[2][3], int eInterpolation,
+                                               const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiWarpAffineBack_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp16u *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiWarpAffineBack_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), NppiSizeFull(),
+                                                  to_int(Pitch()), NppiRectRoi(),
+                                                  reinterpret_cast<Npp16u *>(pDst.Pointer()), to_int(pDst.Pitch()),
+                                                  pDst.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::WarpAffineQuad(const double aSrcQuad[4][2], Image16uC1View &pDst, const double aDstQuad[4][2], int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::WarpAffineQuad(const double aSrcQuad[4][2], Image16uC1View &pDst,
+                                               const double aDstQuad[4][2], int eInterpolation,
+                                               const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiWarpAffineQuad_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), aSrcQuad, reinterpret_cast<Npp16u *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), aDstQuad, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiWarpAffineQuad_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), NppiSizeFull(),
+                                                  to_int(Pitch()), NppiRectRoi(), aSrcQuad,
+                                                  reinterpret_cast<Npp16u *>(pDst.Pointer()), to_int(pDst.Pitch()),
+                                                  pDst.NppiRectRoi(), aDstQuad, eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::WarpPerspective(Image16uC1View &pDst, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::WarpPerspective(Image16uC1View &pDst, const double aCoeffs[3][3], int eInterpolation,
+                                                const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiWarpPerspective_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp16u *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiWarpPerspective_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), NppiSizeFull(),
+                                                   to_int(Pitch()), NppiRectRoi(),
+                                                   reinterpret_cast<Npp16u *>(pDst.Pointer()), to_int(pDst.Pitch()),
+                                                   pDst.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::WarpPerspectiveBack(Image16uC1View &pDst, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::WarpPerspectiveBack(Image16uC1View &pDst, const double aCoeffs[3][3],
+                                                    int eInterpolation, const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiWarpPerspectiveBack_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp16u *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiWarpPerspectiveBack_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), NppiSizeFull(),
+                                                       to_int(Pitch()), NppiRectRoi(),
+                                                       reinterpret_cast<Npp16u *>(pDst.Pointer()), to_int(pDst.Pitch()),
+                                                       pDst.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image16uC1View &Image16uC1View::WarpPerspectiveQuad(const double aSrcQuad[4][2], Image16uC1View &pDst, const double aDstQuad[4][2], int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image16uC1View &Image16uC1View::WarpPerspectiveQuad(const double aSrcQuad[4][2], Image16uC1View &pDst,
+                                                    const double aDstQuad[4][2], int eInterpolation,
+                                                    const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiWarpPerspectiveQuad_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), aSrcQuad, reinterpret_cast<Npp16u *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), aDstQuad, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiWarpPerspectiveQuad_16u_C1R_Ctx(reinterpret_cast<const Npp16u *>(Pointer()), NppiSizeFull(),
+                                                       to_int(Pitch()), NppiRectRoi(), aSrcQuad,
+                                                       reinterpret_cast<Npp16u *>(pDst.Pointer()), to_int(pDst.Pitch()),
+                                                       pDst.NppiRectRoi(), aDstQuad, eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
 #endif // OPPi_ENABLE_UINT16_TYPE && OPPi_ENABLE_ONE_CHANNEL
-//NOLINTEND(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
+// NOLINTEND(readability-identifier-naming,readability-avoid-const-params-in-decls,
+// bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 } // namespace opp::image::npp
 #endif // OPP_ENABLE_NPP_BACKEND

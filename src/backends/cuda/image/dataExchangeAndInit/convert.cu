@@ -41,9 +41,9 @@ void InvokeConvert(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPit
             // rounding is only used in float to half/bfloat
             using convertSIMD = ConvertFunctor<TupelSize, SrcT, DstT, RoundingMode::NearestTiesToEven, simdOP_t>;
 
-            simdOP_t opSIMD;
+            const simdOP_t opSIMD;
 
-            convertSIMD functor(aSrc1, aPitchSrc1, opSIMD);
+            const convertSIMD functor(aSrc1, aPitchSrc1, opSIMD);
 
             InvokeForEachPixelKernelDefault<DstT, TupelSize, convertSIMD>(aDst, aPitchDst, aSize, aStreamCtx, functor);
         }

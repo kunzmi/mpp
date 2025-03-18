@@ -38,12 +38,12 @@ class Image8sC2View : public ImageView<Pixel8sC2>
     /// <summary>
     /// Returns a new Image8sC2View with the new ROI
     /// </summary>
-    [[nodiscard]] Image8sC2View GetView(const Roi &aRoi) const;
+    [[nodiscard]] Image8sC2View GetView(const Roi &aRoi);
 
     /// <summary>
     /// Returns a new ImageView with the current ROI adapted by aBorder
     /// </summary>
-    [[nodiscard]] Image8sC2View GetView(const Border &aBorder = Border()) const;
+    [[nodiscard]] Image8sC2View GetView(const Border &aBorder = Border());
 
     //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 #if OPPi_ENABLE_INT8_TYPE && OPPi_ENABLE_TWO_CHANNEL

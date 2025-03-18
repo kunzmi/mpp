@@ -38,15 +38,15 @@ class Image16sC2View : public ImageView<Pixel16sC2>
     /// <summary>
     /// Returns a new Image16sC2View with the new ROI
     /// </summary>
-    [[nodiscard]] Image16sC2View GetView(const Roi &aRoi) const;
+    [[nodiscard]] Image16sC2View GetView(const Roi &aRoi);
 
     /// <summary>
     /// Returns a new ImageView with the current ROI adapted by aBorder
     /// </summary>
-    [[nodiscard]] Image16sC2View GetView(const Border &aBorder = Border()) const;
+    [[nodiscard]] Image16sC2View GetView(const Border &aBorder = Border());
 
     //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
-#if OPPi_ENABLE_SINT16_TYPE && OPPi_ENABLE_TWO_CHANNEL
+#if OPPi_ENABLE_INT16_TYPE && OPPi_ENABLE_TWO_CHANNEL
 
     // NppStatus nppiSet_16s_C2R_Ctx(const Npp16s[2] aValue, Npp16s * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     Image16sC2View &Set(const Pixel16sC2 &aValue, const NppStreamContext &nppStreamCtx);
@@ -81,7 +81,7 @@ class Image16sC2View : public ImageView<Pixel16sC2>
     // NppStatus nppiAverageRelativeErrorGetBufferHostSize_16s_C2R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t AverageRelativeErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
-#endif // OPPi_ENABLE_SINT16_TYPE && OPPi_ENABLE_TWO_CHANNEL
+#endif // OPPi_ENABLE_INT16_TYPE && OPPi_ENABLE_TWO_CHANNEL
     //NOLINTEND(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 };
 } // namespace opp::image::npp

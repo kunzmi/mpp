@@ -1,6 +1,7 @@
 #pragma once
 #include <common/defines.h>
 #include <common/image/pixelTypes.h>
+#include <common/numeric_limits.h>
 #include <common/opp_defs.h>
 #include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
@@ -82,7 +83,10 @@ template <ComplexVector T> struct ConjMul
     }
 };
 
-template <AnyVector T> struct Div
+// When result type is byte (unsigned char), then NPP handles seperatly the case that src1 == 0 and src2 == 0. Any
+// number devided by 0 in floating point results in INF, but 0 / 0 gets NAN. Usually this would flush to 0 while
+// casting to integer, but NPP returns 255...
+template <AnyVector T, AnyVector DstT> struct Div
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
     {
@@ -92,16 +96,114 @@ template <AnyVector T> struct Div
     {
         aSrcDst /= aSrc1;
     }
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+        requires std::same_as<DstT, Vector1<byte>> || std::same_as<DstT, Vector3<byte>> ||
+                 std::same_as<DstT, Vector4<byte>> // not Vector4A though
+    {
+        aDst = aSrc1;
+        if (aDst.x == 0 && aSrc2.x == 0)
+        {
+            // by setting the first operand to 1 and keeping the second operand 0, the calculation will denormalize to
+            // INF, any later scaling, if any, will keep the result as INF and the final result will always be 255, as
+            // in NPP
+            aDst.x = static_cast<remove_vector_t<T>>(1);
+        }
+        if constexpr (vector_active_size_v<T> > 1)
+        {
+            if (aDst.y == 0 && aSrc2.y == 0)
+            {
+                aDst.y = static_cast<remove_vector_t<T>>(1);
+            }
+        }
+        if constexpr (vector_active_size_v<T> > 2)
+        {
+            if (aDst.z == 0 && aSrc2.z == 0)
+            {
+                aDst.z = static_cast<remove_vector_t<T>>(1);
+            }
+        }
+        if constexpr (vector_active_size_v<T> > 3)
+        {
+            if (aDst.w == 0 && aSrc2.w == 0)
+            {
+                aDst.w = static_cast<remove_vector_t<T>>(1);
+            }
+        }
+        aDst /= aSrc2;
+    }
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
+        requires std::same_as<DstT, Vector1<byte>> || std::same_as<DstT, Vector3<byte>> ||
+                 std::same_as<DstT, Vector4<byte>> // not Vector4A though
+    {
+        if (aSrc1.x == 0 && aSrcDst.x == 0)
+        {
+            aSrcDst.x = static_cast<remove_vector_t<T>>(1);
+        }
+        if constexpr (vector_active_size_v<T> > 1)
+        {
+            if (aSrc1.y == 0 && aSrcDst.y == 0)
+            {
+                aSrcDst.y = static_cast<remove_vector_t<T>>(1);
+            }
+        }
+        if constexpr (vector_active_size_v<T> > 2)
+        {
+            if (aSrc1.z == 0 && aSrcDst.z == 0)
+            {
+                aSrcDst.z = static_cast<remove_vector_t<T>>(1);
+            }
+        }
+        if constexpr (vector_active_size_v<T> > 3)
+        {
+            if (aSrc1.w == 0 && aSrcDst.w == 0)
+            {
+                aSrcDst.w = static_cast<remove_vector_t<T>>(1);
+            }
+        }
+        aSrcDst /= aSrc1;
+    }
 };
 
 /// <summary>
 /// Inverted argument order for inplace div: aSrcDst = aSrc1 / aSrcDst
 /// </summary>
-template <AnyVector T> struct DivInv
+template <AnyVector T, AnyVector DstT> struct DivInv
 {
     DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
     {
         aSrcDst.DivInv(aSrc1);
+    }
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
+        requires std::same_as<DstT, Vector1<byte>> || std::same_as<DstT, Vector3<byte>> ||
+                 std::same_as<DstT, Vector4<byte>> // not Vector4A though
+    {
+        T src1 = aSrc1;
+        if (src1.x == 0 && aSrcDst.x == 0)
+        {
+            src1.x = static_cast<remove_vector_t<T>>(1);
+        }
+        if constexpr (vector_active_size_v<T> > 1)
+        {
+            if (src1.y == 0 && aSrcDst.y == 0)
+            {
+                src1.y = static_cast<remove_vector_t<T>>(1);
+            }
+        }
+        if constexpr (vector_active_size_v<T> > 2)
+        {
+            if (src1.z == 0 && aSrcDst.z == 0)
+            {
+                src1.z = static_cast<remove_vector_t<T>>(1);
+            }
+        }
+        if constexpr (vector_active_size_v<T> > 3)
+        {
+            if (src1.w == 0 && aSrcDst.w == 0)
+            {
+                src1.w = static_cast<remove_vector_t<T>>(1);
+            }
+        }
+        aSrcDst.DivInv(src1);
     }
 };
 
@@ -539,7 +641,20 @@ template <RealVector T, AlphaCompositionOp alphaOp> struct AlphaComposition
                        (static_cast<remove_vector_t<T>>(1) - aAlpha1) * aAlpha2;
             case opp::AlphaCompositionOp::Plus:
             case opp::AlphaCompositionOp::PlusPremul:
-                return aAlpha1 + aAlpha2;
+            {
+                if constexpr (Is16BitFloat<remove_vector_t<T>>)
+                {
+                    return remove_vector_t<T>::Min(aAlpha1 + aAlpha2, static_cast<remove_vector_t<T>>(1));
+                }
+                else
+                {
+#ifdef IS_HOST_COMPILER
+                    return std::min(aAlpha1 + aAlpha2, static_cast<remove_vector_t<T>>(1));
+#else
+                    return min(aAlpha1 + aAlpha2, static_cast<remove_vector_t<T>>(1));
+#endif
+                }
+            }
         }
         return remove_vector_t<T>();
     }

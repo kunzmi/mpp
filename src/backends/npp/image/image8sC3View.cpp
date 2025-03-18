@@ -44,12 +44,12 @@ Image8sC3View::Image8sC3View(Pixel8sC3 *aBasePointer, const SizePitched &aSizeAl
 {
 }
 
-Image8sC3View Image8sC3View::GetView(const Roi &aRoi) const
+Image8sC3View Image8sC3View::GetView(const Roi &aRoi)
 {
     return {Pointer(), SizePitched(SizeAlloc(), Pitch()), aRoi};
 }
 
-Image8sC3View Image8sC3View::GetView(const Border &aBorder) const
+Image8sC3View Image8sC3View::GetView(const Border &aBorder)
 {
     const Roi newRoi = ROI() + aBorder;
     checkRoiIsInRoi(newRoi, Roi(0, 0, SizeAlloc()));
@@ -122,7 +122,7 @@ Image8sC3View &Image8sC3View::ColorTwist32f(const Npp32f aTwist[3][4], const Npp
 
 void Image8sC3View::ColorTwist32f(const Image8sC1View &aSrcChannel0, const Image8sC1View &aSrcChannel1, const Image8sC1View &aSrcChannel2, Image8sC1View &aDstChannel0, Image8sC1View &aDstChannel1, Image8sC1View &aDstChannel2, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx)
 {
-    const Npp8s * srcList[] = { reinterpret_cast<Npp8s *>(aSrcChannel0.PointerRoi()), reinterpret_cast<Npp8s *>(aSrcChannel1.PointerRoi()), reinterpret_cast<Npp8s *>(aSrcChannel2.PointerRoi()) };
+    const Npp8s * srcList[] = { reinterpret_cast<const Npp8s *>(aSrcChannel0.PointerRoi()), reinterpret_cast<const Npp8s *>(aSrcChannel1.PointerRoi()), reinterpret_cast<const Npp8s *>(aSrcChannel2.PointerRoi()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
     {
         throw INVALIDARGUMENT(aSrcChannel1, "Not all source image planes have the same image pitch. First image pitch is " << aSrcChannel0.Pitch() << " but the pitch for plane no 1 is " << aSrcChannel1.Pitch());
@@ -143,7 +143,7 @@ void Image8sC3View::ColorTwist32f(const Image8sC1View &aSrcChannel0, const Image
     nppSafeCall(nppiColorTwist32f_8s_P3R_Ctx(srcList, to_int(aSrcChannel0.Pitch()), dstList, to_int(aDstChannel0.Pitch()), aSrcChannel0.NppiSizeRoi(), aTwist, nppStreamCtx));
 }
 
-void Image8sC3View::ColorTwist32f(const Image8sC1View &aSrcDstChannel0, const Image8sC1View &aSrcDstChannel1, const Image8sC1View &aSrcDstChannel2, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx)
+void Image8sC3View::ColorTwist32f(Image8sC1View &aSrcDstChannel0, Image8sC1View &aSrcDstChannel1, Image8sC1View &aSrcDstChannel2, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx)
 {
     Npp8s * srcList[] = { reinterpret_cast<Npp8s *>(aSrcDstChannel0.PointerRoi()), reinterpret_cast<Npp8s *>(aSrcDstChannel1.PointerRoi()), reinterpret_cast<Npp8s *>(aSrcDstChannel2.PointerRoi()) };
     if (aSrcDstChannel0.Pitch() != aSrcDstChannel1.Pitch())

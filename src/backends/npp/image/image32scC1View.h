@@ -38,12 +38,12 @@ class Image32scC1View : public ImageView<Pixel32scC1>
     /// <summary>
     /// Returns a new Image32scC1View with the new ROI
     /// </summary>
-    [[nodiscard]] Image32scC1View GetView(const Roi &aRoi) const;
+    [[nodiscard]] Image32scC1View GetView(const Roi &aRoi);
 
     /// <summary>
     /// Returns a new ImageView with the current ROI adapted by aBorder
     /// </summary>
-    [[nodiscard]] Image32scC1View GetView(const Border &aBorder = Border()) const;
+    [[nodiscard]] Image32scC1View GetView(const Border &aBorder = Border());
 
     //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 #if OPPi_ENABLE_COMPLEX_INT32_TYPE && OPPi_ENABLE_ONE_CHANNEL

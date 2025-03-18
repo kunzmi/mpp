@@ -63,9 +63,9 @@ INLINE HalfFp16::HalfFp16(long64 aLong64) : value(static_cast<float>(aLong64))
 INLINE HalfFp16::HalfFp16(ulong64 aULong64) : value(static_cast<float>(aULong64))
 {
 }
-INLINE HalfFp16::HalfFp16(int aInt) : value(static_cast<float>(aInt))
-{
-}
+// INLINE HalfFp16::HalfFp16(int aInt) : value(static_cast<float>(aInt))
+//{
+// }
 INLINE HalfFp16::HalfFp16(uint aUInt) : value(static_cast<float>(aUInt))
 {
 }
@@ -273,12 +273,11 @@ DEVICE_CODE INLINE HalfFp16 &HalfFp16::operator/=(HalfFp16 aOther)
     return *this;
 }
 
-/// <summary>
-/// </summary>
-DEVICE_CODE INLINE HalfFp16 HalfFp16::operator/(HalfFp16 aOther) const
-{
-    return HalfFp16(value / aOther.value);
-}
+// defined in header...
+// DEVICE_CODE INLINE HalfFp16 HalfFp16::operator/(HalfFp16 aOther) const
+//{
+//     return HalfFp16(value / aOther.value);
+// }
 
 #ifdef IS_HOST_COMPILER
 /// <summary>

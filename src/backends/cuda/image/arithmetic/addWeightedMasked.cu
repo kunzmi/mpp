@@ -39,9 +39,9 @@ void InvokeAddWeightedSrcSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, cons
         using addWeightedSrcSrc =
             SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AddWeighted<ComputeT>, RoundingMode::None>;
 
-        AddWeighted<ComputeT> op(aAlpha);
+        const opp::AddWeighted<ComputeT> op(aAlpha);
 
-        addWeightedSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+        const addWeightedSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addWeightedSrcSrc>(aMask, aPitchMask, aDst, aPitchDst,
                                                                                   aSize, aStreamCtx, functor);
@@ -106,9 +106,9 @@ void InvokeAddWeightedInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, 
         using addWeightedInplaceSrc =
             InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AddWeighted<ComputeT>, RoundingMode::None>;
 
-        AddWeighted<ComputeT> op(aAlpha);
+        const opp::AddWeighted<ComputeT> op(aAlpha);
 
-        addWeightedInplaceSrc functor(aSrc2, aPitchSrc2, op);
+        const addWeightedInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addWeightedInplaceSrc>(
             aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);

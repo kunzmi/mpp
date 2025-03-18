@@ -1,5 +1,6 @@
 add_library(backends.cuda.image.statistics 
 	minMaxEvery.cu
+	sum.cu
 	)
 	
 target_include_directories(backends.cuda.image.statistics  PUBLIC 

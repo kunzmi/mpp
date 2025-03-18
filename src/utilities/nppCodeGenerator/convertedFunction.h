@@ -1,4 +1,5 @@
 #pragma once
+#include "convertedArgument.h"
 #include <json.h>
 #include <map>
 #include <string>
@@ -8,14 +9,13 @@
 
 namespace opp::utilities::nppParser
 {
-class ConvertedArgument;
-
 class ConvertedFunction
 {
   private:
     // These functions have a missing const specifier for the source image
     inline static const std::unordered_set<std::string> sMissingConst = { // NOLINT
-        "LabelMarkersUF", "DistanceTransformPBA", "DistanceTransformAbsPBA"};
+        "LabelMarkersUF", "DistanceTransformPBA", "DistanceTransformAbsPBA", "SignedDistanceTransformPBA",
+        "SignedDistanceTransformAbsPBA"};
 
     // These functions take the allocated pointer as input
     inline static const std::unordered_set<std::string> sGeometryWithAllocPointer = { // NOLINT

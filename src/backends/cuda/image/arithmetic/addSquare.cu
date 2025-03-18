@@ -38,9 +38,9 @@ void InvokeAddSquareInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *a
         using addSqrInplaceSrc =
             InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AddSqr<ComputeT>, RoundingMode::None>;
 
-        AddSqr<ComputeT> op;
+        const opp::AddSqr<ComputeT> op;
 
-        addSqrInplaceSrc functor(aSrc2, aPitchSrc2, op);
+        const addSqrInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, addSqrInplaceSrc>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                            functor);

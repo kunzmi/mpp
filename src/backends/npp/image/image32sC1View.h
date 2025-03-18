@@ -47,12 +47,12 @@ class Image32sC1View : public ImageView<Pixel32sC1>
     /// <summary>
     /// Returns a new Image32sC1View with the new ROI
     /// </summary>
-    [[nodiscard]] Image32sC1View GetView(const Roi &aRoi) const;
+    [[nodiscard]] Image32sC1View GetView(const Roi &aRoi);
 
     /// <summary>
     /// Returns a new ImageView with the current ROI adapted by aBorder
     /// </summary>
-    [[nodiscard]] Image32sC1View GetView(const Border &aBorder = Border()) const;
+    [[nodiscard]] Image32sC1View GetView(const Border &aBorder = Border());
 
     //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 #if OPPi_ENABLE_INT32_TYPE && OPPi_ENABLE_ONE_CHANNEL
@@ -277,10 +277,10 @@ class Image32sC1View : public ImageView<Pixel32sC1>
     [[nodiscard]] size_t DotProdGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiRectStdDev_32s_C1RSfs_Ctx(const Npp32s * pSrc, int nSrcStep, const Npp32s * pSqr, int nSqrStep, Npp32s * pDst, int nDstStep, NppiSize oSizeROI, NppiRect oRect, int nScaleFactor, NppStreamContext nppStreamCtx)
-    void RectStdDev(const Image32sC1View &pSqr, Image32sC1View &pDst, NppiRect oRect, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    void RectStdDev(Image32sC1View &pSqr, Image32sC1View &pDst, NppiRect oRect, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiRectStdDev_32s32f_C1R_Ctx(const Npp32s * pSrc, int nSrcStep, const Npp64f * pSqr, int nSqrStep, Npp32f * pDst, int nDstStep, NppiSize oSizeROI, NppiRect oRect, NppStreamContext nppStreamCtx)
-    void RectStdDev(const Image64fC1View &pSqr, Image32fC1View &pDst, NppiRect oRect, const NppStreamContext &nppStreamCtx) const;
+    void RectStdDev(Image64fC1View &pSqr, Image32fC1View &pDst, NppiRect oRect, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumError_32s_C1R_Ctx(const Npp32s * pSrc1, int nSrc1Step, const Npp32s * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
     void MaximumError(const Image32sC1View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;

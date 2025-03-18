@@ -39,12 +39,12 @@ Image16uC2View::Image16uC2View(Pixel16uC2 *aBasePointer, const SizePitched &aSiz
 {
 }
 
-Image16uC2View Image16uC2View::GetView(const Roi &aRoi) const
+Image16uC2View Image16uC2View::GetView(const Roi &aRoi)
 {
     return {Pointer(), SizePitched(SizeAlloc(), Pitch()), aRoi};
 }
 
-Image16uC2View Image16uC2View::GetView(const Border &aBorder) const
+Image16uC2View Image16uC2View::GetView(const Border &aBorder)
 {
     const Roi newRoi = ROI() + aBorder;
     checkRoiIsInRoi(newRoi, Roi(0, 0, SizeAlloc()));
@@ -86,7 +86,7 @@ Image16uC3View &Image16uC2View::YUV422ToRGB(Image16uC3View &pDst, const Npp32f a
 
 Image16uC3View &Image16uC2View::NV12ToRGB(const Image16uC1View &aSrcChannel0, const Image16uC1View &aSrcChannel1, Image16uC3View &pDst, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx)
 {
-    const Npp16u * srcList[] = { reinterpret_cast<Npp16u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<Npp16u *>(aSrcChannel1.PointerRoi()) };
+    const Npp16u * srcList[] = { reinterpret_cast<const Npp16u *>(aSrcChannel0.PointerRoi()), reinterpret_cast<const Npp16u *>(aSrcChannel1.PointerRoi()) };
     int pitchSrcList[] = { to_int(aSrcChannel0.Pitch()), to_int(aSrcChannel1.Pitch()) };
     nppSafeCall(nppiNV12ToRGB_16u_ColorTwist32f_P2C3R_Ctx(srcList, pitchSrcList, reinterpret_cast<Npp16u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), aSrcChannel0.NppiSizeRoi(), aTwist, nppStreamCtx));
     return pDst;

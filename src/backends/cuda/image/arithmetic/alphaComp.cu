@@ -48,8 +48,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                                                                        opp::AlphaCompositionOp::Over>;
                     using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp,
                                                           RoundingMode::NearestTiesAwayFromZero>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -60,8 +60,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                                                                        opp::AlphaCompositionOp::In>;
                     using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp,
                                                           RoundingMode::NearestTiesAwayFromZero>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -72,8 +72,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                                                                        opp::AlphaCompositionOp::Out>;
                     using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp,
                                                           RoundingMode::NearestTiesAwayFromZero>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -84,8 +84,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                                                                        opp::AlphaCompositionOp::ATop>;
                     using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp,
                                                           RoundingMode::NearestTiesAwayFromZero>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -96,8 +96,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                                                                        opp::AlphaCompositionOp::XOr>;
                     using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp,
                                                           RoundingMode::NearestTiesAwayFromZero>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -108,8 +108,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                                                                        opp::AlphaCompositionOp::Plus>;
                     using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp,
                                                           RoundingMode::NearestTiesAwayFromZero>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -120,8 +120,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                                                                        opp::AlphaCompositionOp::OverPremul>;
                     using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp,
                                                           RoundingMode::NearestTiesAwayFromZero>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -132,8 +132,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                                                                        opp::AlphaCompositionOp::InPremul>;
                     using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp,
                                                           RoundingMode::NearestTiesAwayFromZero>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -144,8 +144,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                                                                        opp::AlphaCompositionOp::OutPremul>;
                     using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp,
                                                           RoundingMode::NearestTiesAwayFromZero>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -156,8 +156,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                                                                        opp::AlphaCompositionOp::ATopPremul>;
                     using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp,
                                                           RoundingMode::NearestTiesAwayFromZero>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -168,8 +168,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                                                                        opp::AlphaCompositionOp::XOrPremul>;
                     using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp,
                                                           RoundingMode::NearestTiesAwayFromZero>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -180,8 +180,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                                                                        opp::AlphaCompositionOp::PlusPremul>;
                     using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp,
                                                           RoundingMode::NearestTiesAwayFromZero>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -197,8 +197,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                     using AlphaCompOp = opp::AlphaComposition<ComputeT, opp::AlphaCompositionOp::Over>;
                     using alphaCompSrcSrc =
                         SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::None>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -208,8 +208,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                     using AlphaCompOp = opp::AlphaComposition<ComputeT, opp::AlphaCompositionOp::In>;
                     using alphaCompSrcSrc =
                         SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::None>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -219,8 +219,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                     using AlphaCompOp = opp::AlphaComposition<ComputeT, opp::AlphaCompositionOp::Out>;
                     using alphaCompSrcSrc =
                         SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::None>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -230,8 +230,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                     using AlphaCompOp = opp::AlphaComposition<ComputeT, opp::AlphaCompositionOp::ATop>;
                     using alphaCompSrcSrc =
                         SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::None>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -241,8 +241,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                     using AlphaCompOp = opp::AlphaComposition<ComputeT, opp::AlphaCompositionOp::XOr>;
                     using alphaCompSrcSrc =
                         SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::None>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -252,8 +252,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                     using AlphaCompOp = opp::AlphaComposition<ComputeT, opp::AlphaCompositionOp::Plus>;
                     using alphaCompSrcSrc =
                         SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::None>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -263,8 +263,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                     using AlphaCompOp = opp::AlphaComposition<ComputeT, opp::AlphaCompositionOp::OverPremul>;
                     using alphaCompSrcSrc =
                         SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::None>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -274,8 +274,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                     using AlphaCompOp = opp::AlphaComposition<ComputeT, opp::AlphaCompositionOp::InPremul>;
                     using alphaCompSrcSrc =
                         SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::None>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -285,8 +285,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                     using AlphaCompOp = opp::AlphaComposition<ComputeT, opp::AlphaCompositionOp::OutPremul>;
                     using alphaCompSrcSrc =
                         SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::None>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -296,8 +296,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                     using AlphaCompOp = opp::AlphaComposition<ComputeT, opp::AlphaCompositionOp::ATopPremul>;
                     using alphaCompSrcSrc =
                         SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::None>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -307,8 +307,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                     using AlphaCompOp = opp::AlphaComposition<ComputeT, opp::AlphaCompositionOp::XOrPremul>;
                     using alphaCompSrcSrc =
                         SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::None>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }
@@ -318,8 +318,8 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                     using AlphaCompOp = opp::AlphaComposition<ComputeT, opp::AlphaCompositionOp::PlusPremul>;
                     using alphaCompSrcSrc =
                         SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, RoundingMode::None>;
-                    AlphaCompOp op;
-                    alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                    const AlphaCompOp op;
+                    const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaCompSrcSrc>(aDst, aPitchDst, aSize,
                                                                                       aStreamCtx, functor);
                 }

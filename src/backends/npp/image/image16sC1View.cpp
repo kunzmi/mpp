@@ -51,12 +51,12 @@ Image16sC1View::Image16sC1View(Pixel16sC1 *aBasePointer, const SizePitched &aSiz
 {
 }
 
-Image16sC1View Image16sC1View::GetView(const Roi &aRoi) const
+Image16sC1View Image16sC1View::GetView(const Roi &aRoi)
 {
     return {Pointer(), SizePitched(SizeAlloc(), Pitch()), aRoi};
 }
 
-Image16sC1View Image16sC1View::GetView(const Border &aBorder) const
+Image16sC1View Image16sC1View::GetView(const Border &aBorder)
 {
     const Roi newRoi = ROI() + aBorder;
     checkRoiIsInRoi(newRoi, Roi(0, 0, SizeAlloc()));
@@ -64,7 +64,7 @@ Image16sC1View Image16sC1View::GetView(const Border &aBorder) const
 }
 
 //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
-#if OPPi_ENABLE_SINT16_TYPE && OPPi_ENABLE_ONE_CHANNEL
+#if OPPi_ENABLE_INT16_TYPE && OPPi_ENABLE_ONE_CHANNEL
 
 Image16sC1View &Image16sC1View::Set(const Pixel16sC1 &nValue, const NppStreamContext &nppStreamCtx)
 {
@@ -1916,7 +1916,7 @@ Image16sC1View &Image16sC1View::Mirror(NppiAxis flip, const NppStreamContext &np
     return *this;
 }
 
-#endif // OPPi_ENABLE_SINT16_TYPE && OPPi_ENABLE_ONE_CHANNEL
+#endif // OPPi_ENABLE_INT16_TYPE && OPPi_ENABLE_ONE_CHANNEL
 //NOLINTEND(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 } // namespace opp::image::npp
 #endif // OPP_ENABLE_NPP_BACKEND

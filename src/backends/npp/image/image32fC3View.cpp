@@ -50,12 +50,12 @@ Image32fC3View::Image32fC3View(Pixel32fC3 *aBasePointer, const SizePitched &aSiz
 {
 }
 
-Image32fC3View Image32fC3View::GetView(const Roi &aRoi) const
+Image32fC3View Image32fC3View::GetView(const Roi &aRoi)
 {
     return {Pointer(), SizePitched(SizeAlloc(), Pitch()), aRoi};
 }
 
-Image32fC3View Image32fC3View::GetView(const Border &aBorder) const
+Image32fC3View Image32fC3View::GetView(const Border &aBorder)
 {
     const Roi newRoi = ROI() + aBorder;
     checkRoiIsInRoi(newRoi, Roi(0, 0, SizeAlloc()));
@@ -146,7 +146,7 @@ void Image32fC3View::Copy(Image32fC1View &aDstChannel0, Image32fC1View &aDstChan
 
 Image32fC3View &Image32fC3View::Copy(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC3View &pDst, const NppStreamContext &nppStreamCtx)
 {
-    const Npp32f * srcList[] = { reinterpret_cast<Npp32f *>(aSrcChannel0.PointerRoi()), reinterpret_cast<Npp32f *>(aSrcChannel1.PointerRoi()), reinterpret_cast<Npp32f *>(aSrcChannel2.PointerRoi()) };
+    const Npp32f * srcList[] = { reinterpret_cast<const Npp32f *>(aSrcChannel0.PointerRoi()), reinterpret_cast<const Npp32f *>(aSrcChannel1.PointerRoi()), reinterpret_cast<const Npp32f *>(aSrcChannel2.PointerRoi()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
     {
         throw INVALIDARGUMENT(aSrcChannel1, "Not all source image planes have the same image pitch. First image pitch is " << aSrcChannel0.Pitch() << " but the pitch for plane no 1 is " << aSrcChannel1.Pitch());
@@ -574,7 +574,7 @@ Image32fC3View &Image32fC3View::ColorTwist(const Npp32f aTwist[3][4], const NppS
 
 void Image32fC3View::ColorTwist(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx)
 {
-    const Npp32f * srcList[] = { reinterpret_cast<Npp32f *>(aSrcChannel0.PointerRoi()), reinterpret_cast<Npp32f *>(aSrcChannel1.PointerRoi()), reinterpret_cast<Npp32f *>(aSrcChannel2.PointerRoi()) };
+    const Npp32f * srcList[] = { reinterpret_cast<const Npp32f *>(aSrcChannel0.PointerRoi()), reinterpret_cast<const Npp32f *>(aSrcChannel1.PointerRoi()), reinterpret_cast<const Npp32f *>(aSrcChannel2.PointerRoi()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
     {
         throw INVALIDARGUMENT(aSrcChannel1, "Not all source image planes have the same image pitch. First image pitch is " << aSrcChannel0.Pitch() << " but the pitch for plane no 1 is " << aSrcChannel1.Pitch());
@@ -595,7 +595,7 @@ void Image32fC3View::ColorTwist(const Image32fC1View &aSrcChannel0, const Image3
     nppSafeCall(nppiColorTwist_32f_P3R_Ctx(srcList, to_int(aSrcChannel0.Pitch()), dstList, to_int(aDstChannel0.Pitch()), aSrcChannel0.NppiSizeRoi(), aTwist, nppStreamCtx));
 }
 
-void Image32fC3View::ColorTwist(const Image32fC1View &aSrcDstChannel0, const Image32fC1View &aSrcDstChannel1, const Image32fC1View &aSrcDstChannel2, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx)
+void Image32fC3View::ColorTwist(Image32fC1View &aSrcDstChannel0, Image32fC1View &aSrcDstChannel1, Image32fC1View &aSrcDstChannel2, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx)
 {
     Npp32f * srcList[] = { reinterpret_cast<Npp32f *>(aSrcDstChannel0.PointerRoi()), reinterpret_cast<Npp32f *>(aSrcDstChannel1.PointerRoi()), reinterpret_cast<Npp32f *>(aSrcDstChannel2.PointerRoi()) };
     if (aSrcDstChannel0.Pitch() != aSrcDstChannel1.Pitch())
@@ -2238,7 +2238,7 @@ Image32fC3View &Image32fC3View::ResizeSqrPixel(Image32fC3View &pDst, double nXFa
 
 void Image32fC3View::ResizeSqrPixel(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, double nXFactor, double nYFactor, double nXShift, double nYShift, int eInterpolation, const NppStreamContext &nppStreamCtx)
 {
-    const Npp32f * srcList[] = { reinterpret_cast<Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<Npp32f *>(aSrcChannel2.Pointer()) };
+    const Npp32f * srcList[] = { reinterpret_cast<const Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel2.Pointer()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
     {
         throw INVALIDARGUMENT(aSrcChannel1, "Not all source image planes have the same image pitch. First image pitch is " << aSrcChannel0.Pitch() << " but the pitch for plane no 1 is " << aSrcChannel1.Pitch());
@@ -2268,7 +2268,7 @@ Image32fC3View &Image32fC3View::Resize(Image32fC3View &pDst, int eInterpolation,
 
 void Image32fC3View::Resize(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, int eInterpolation, const NppStreamContext &nppStreamCtx)
 {
-    const Npp32f * srcList[] = { reinterpret_cast<Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<Npp32f *>(aSrcChannel2.Pointer()) };
+    const Npp32f * srcList[] = { reinterpret_cast<const Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel2.Pointer()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
     {
         throw INVALIDARGUMENT(aSrcChannel1, "Not all source image planes have the same image pitch. First image pitch is " << aSrcChannel0.Pitch() << " but the pitch for plane no 1 is " << aSrcChannel1.Pitch());
@@ -2300,7 +2300,7 @@ Image32fC3View &Image32fC3View::Remap(const Image32fC1View &pXMap, const Image32
 
 void Image32fC3View::Remap(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, const Image32fC1View &pXMap, const Image32fC1View &pYMap, int eInterpolation, const NppStreamContext &nppStreamCtx)
 {
-    const Npp32f * srcList[] = { reinterpret_cast<Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<Npp32f *>(aSrcChannel2.Pointer()) };
+    const Npp32f * srcList[] = { reinterpret_cast<const Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel2.Pointer()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
     {
         throw INVALIDARGUMENT(aSrcChannel1, "Not all source image planes have the same image pitch. First image pitch is " << aSrcChannel0.Pitch() << " but the pitch for plane no 1 is " << aSrcChannel1.Pitch());
@@ -2354,7 +2354,7 @@ Image32fC3View &Image32fC3View::WarpAffine(Image32fC3View &pDst, const double aC
 
 void Image32fC3View::WarpAffine(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx)
 {
-    const Npp32f * srcList[] = { reinterpret_cast<Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<Npp32f *>(aSrcChannel2.Pointer()) };
+    const Npp32f * srcList[] = { reinterpret_cast<const Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel2.Pointer()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
     {
         throw INVALIDARGUMENT(aSrcChannel1, "Not all source image planes have the same image pitch. First image pitch is " << aSrcChannel0.Pitch() << " but the pitch for plane no 1 is " << aSrcChannel1.Pitch());
@@ -2384,7 +2384,7 @@ Image32fC3View &Image32fC3View::WarpAffineBack(Image32fC3View &pDst, const doubl
 
 void Image32fC3View::WarpAffineBack(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx)
 {
-    const Npp32f * srcList[] = { reinterpret_cast<Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<Npp32f *>(aSrcChannel2.Pointer()) };
+    const Npp32f * srcList[] = { reinterpret_cast<const Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel2.Pointer()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
     {
         throw INVALIDARGUMENT(aSrcChannel1, "Not all source image planes have the same image pitch. First image pitch is " << aSrcChannel0.Pitch() << " but the pitch for plane no 1 is " << aSrcChannel1.Pitch());
@@ -2414,7 +2414,7 @@ Image32fC3View &Image32fC3View::WarpAffineQuad(const double aSrcQuad[4][2], Imag
 
 void Image32fC3View::WarpAffineQuad(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, const double aSrcQuad[4][2], const double aDstQuad[4][2], int eInterpolation, const NppStreamContext &nppStreamCtx)
 {
-    const Npp32f * srcList[] = { reinterpret_cast<Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<Npp32f *>(aSrcChannel2.Pointer()) };
+    const Npp32f * srcList[] = { reinterpret_cast<const Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel2.Pointer()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
     {
         throw INVALIDARGUMENT(aSrcChannel1, "Not all source image planes have the same image pitch. First image pitch is " << aSrcChannel0.Pitch() << " but the pitch for plane no 1 is " << aSrcChannel1.Pitch());
@@ -2444,7 +2444,7 @@ Image32fC3View &Image32fC3View::WarpPerspective(Image32fC3View &pDst, const doub
 
 void Image32fC3View::WarpPerspective(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx)
 {
-    const Npp32f * srcList[] = { reinterpret_cast<Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<Npp32f *>(aSrcChannel2.Pointer()) };
+    const Npp32f * srcList[] = { reinterpret_cast<const Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel2.Pointer()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
     {
         throw INVALIDARGUMENT(aSrcChannel1, "Not all source image planes have the same image pitch. First image pitch is " << aSrcChannel0.Pitch() << " but the pitch for plane no 1 is " << aSrcChannel1.Pitch());
@@ -2474,7 +2474,7 @@ Image32fC3View &Image32fC3View::WarpPerspectiveBack(Image32fC3View &pDst, const 
 
 void Image32fC3View::WarpPerspectiveBack(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx)
 {
-    const Npp32f * srcList[] = { reinterpret_cast<Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<Npp32f *>(aSrcChannel2.Pointer()) };
+    const Npp32f * srcList[] = { reinterpret_cast<const Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel2.Pointer()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
     {
         throw INVALIDARGUMENT(aSrcChannel1, "Not all source image planes have the same image pitch. First image pitch is " << aSrcChannel0.Pitch() << " but the pitch for plane no 1 is " << aSrcChannel1.Pitch());
@@ -2504,7 +2504,7 @@ Image32fC3View &Image32fC3View::WarpPerspectiveQuad(const double aSrcQuad[4][2],
 
 void Image32fC3View::WarpPerspectiveQuad(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, const double aSrcQuad[4][2], const double aDstQuad[4][2], int eInterpolation, const NppStreamContext &nppStreamCtx)
 {
-    const Npp32f * srcList[] = { reinterpret_cast<Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<Npp32f *>(aSrcChannel2.Pointer()) };
+    const Npp32f * srcList[] = { reinterpret_cast<const Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel2.Pointer()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
     {
         throw INVALIDARGUMENT(aSrcChannel1, "Not all source image planes have the same image pitch. First image pitch is " << aSrcChannel0.Pitch() << " but the pitch for plane no 1 is " << aSrcChannel1.Pitch());

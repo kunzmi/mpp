@@ -41,9 +41,9 @@ void InvokeOrSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, siz
 
         using orSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Or<ComputeT>, RoundingMode::None>;
 
-        Or<ComputeT> op;
+        const opp::Or<ComputeT> op;
 
-        orSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+        const orSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, orSrcSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -95,9 +95,9 @@ void InvokeOrSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT *
 
         using orSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Or<ComputeT>, RoundingMode::None>;
 
-        Or<ComputeT> op;
+        const opp::Or<ComputeT> op;
 
-        orSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
+        const orSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, orSrcC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -148,9 +148,9 @@ void InvokeOrSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst, Dst
 
         using orSrcDevC = SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Or<ComputeT>, RoundingMode::None>;
 
-        Or<ComputeT> op;
+        const opp::Or<ComputeT> op;
 
-        orSrcDevC functor(aSrc, aPitchSrc, aConst, op);
+        const orSrcDevC functor(aSrc, aPitchSrc, aConst, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, orSrcDevC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -202,9 +202,9 @@ void InvokeOrInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, s
 
         using orInplaceSrc = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Or<ComputeT>, RoundingMode::None>;
 
-        Or<ComputeT> op;
+        const opp::Or<ComputeT> op;
 
-        orInplaceSrc functor(aSrc2, aPitchSrc2, op);
+        const orInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, orInplaceSrc>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                        functor);
@@ -256,9 +256,9 @@ void InvokeOrInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, co
 
         using orInplaceC = InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Or<ComputeT>, RoundingMode::None>;
 
-        Or<ComputeT> op;
+        const opp::Or<ComputeT> op;
 
-        orInplaceC functor(static_cast<ComputeT>(aConst), op);
+        const orInplaceC functor(static_cast<ComputeT>(aConst), op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, orInplaceC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
     }
@@ -310,9 +310,9 @@ void InvokeOrInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aConst,
         using orInplaceDevC =
             InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, opp::Or<ComputeT>, RoundingMode::None>;
 
-        Or<ComputeT> op;
+        const opp::Or<ComputeT> op;
 
-        orInplaceDevC functor(aConst, op);
+        const orInplaceDevC functor(aConst, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, orInplaceDevC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                         functor);

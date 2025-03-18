@@ -1,3 +1,2 @@
-addCatchTest(test_Image.cpp "" "Image")
-
+add_subdirectory(backends/npp)
 add_subdirectory(common)

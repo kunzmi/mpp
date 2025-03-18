@@ -34,7 +34,7 @@ void InvokeSetC(const DstT &aConst, DstT *aDst, size_t aPitchDst, const Size2D &
 
         using setC = ConstantFunctor<TupelSize, DstT>;
 
-        setC functor(aConst);
+        const setC functor(aConst);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, setC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -93,7 +93,7 @@ void InvokeSetDevC(const DstT *aConst, DstT *aDst, size_t aPitchDst, const Size2
 
         using setDevC = DevConstantFunctor<TupelSize, DstT>;
 
-        setDevC functor(aConst);
+        const setDevC functor(aConst);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, setDevC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }

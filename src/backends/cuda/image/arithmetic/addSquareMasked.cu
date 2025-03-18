@@ -39,9 +39,9 @@ void InvokeAddSquareInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
         using addSqrInplaceSrc =
             InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AddSqr<ComputeT>, RoundingMode::None>;
 
-        AddSqr<ComputeT> op;
+        const opp::AddSqr<ComputeT> op;
 
-        addSqrInplaceSrc functor(aSrc2, aPitchSrc2, op);
+        const addSqrInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addSqrInplaceSrc>(
             aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);

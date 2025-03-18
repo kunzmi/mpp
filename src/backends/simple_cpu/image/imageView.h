@@ -1,5 +1,7 @@
 #pragma once
 #include <backends/cuda/image/imageView.h>
+#include <backends/npp/image/imageView.h>
+#include <backends/simple_cpu/image/addSquareProductWeightedOutputType.h>
 #include <common/arithmetic/binary_operators.h>
 #include <common/bfloat16.h>
 #include <common/complex.h>
@@ -31,9 +33,9 @@
 #include <common/opp_defs.h>
 #include <common/safeCast.h>
 #include <common/utilities.h>
-#include <common/vector_typetraits.h>
 #include <common/vector1.h>
 #include <common/vectorTypes.h>
+#include <common/vector_typetraits.h>
 #include <concepts>
 #include <cstddef>
 #include <iterator>
@@ -464,6 +466,20 @@ template <PixelType T> class ImageView
 
     ImageView &operator=(const ImageView &)     = default;
     ImageView &operator=(ImageView &&) noexcept = default;
+
+    operator ImageView<Vector4<remove_vector_t<T>>>() // NOLINT(hicpp-explicit-conversions)
+        requires FourChannelAlpha<T>
+    {
+        return ImageView<Vector4<remove_vector_t<T>>>(reinterpret_cast<Vector4<remove_vector_t<T>> *>(mPtr),
+                                                      SizePitched(mSizeAlloc, mPitch), mRoi);
+    }
+
+    operator ImageView<Vector4A<remove_vector_t<T>>>() // NOLINT(hicpp-explicit-conversions)
+        requires FourChannelNoAlpha<T>
+    {
+        return ImageView<Vector4A<remove_vector_t<T>>>(reinterpret_cast<Vector4A<remove_vector_t<T>> *>(mPtr),
+                                                       SizePitched(mSizeAlloc, mPitch), mRoi);
+    }
 #pragma endregion
 
 #pragma region Basics and Copy to device/host
@@ -480,14 +496,31 @@ template <PixelType T> class ImageView
     /// <summary>
     /// Base pointer to image data.
     /// </summary>
-    [[nodiscard]] T *Pointer() const
+    [[nodiscard]] T *Pointer()
     {
         return mPtr;
     }
+
+    /// <summary>
+    /// Base pointer to image data.
+    /// </summary>
+    [[nodiscard]] const T *Pointer() const
+    {
+        return mPtr;
+    }
+
     /// <summary>
     /// Base pointer moved to actual ROI.
     /// </summary>
-    [[nodiscard]] T *PointerRoi() const
+    [[nodiscard]] T *PointerRoi()
+    {
+        return mPtrRoi;
+    }
+
+    /// <summary>
+    /// Base pointer moved to actual ROI.
+    /// </summary>
+    [[nodiscard]] const T *PointerRoi() const
     {
         return mPtrRoi;
     }
@@ -653,6 +686,7 @@ template <PixelType T> class ImageView
         return const_iterator({mRoi.FirstX(), mRoi.LastY() + 1}, *this);
     }
 
+#if OPP_ENABLE_CUDA_BACKEND
     /// <summary>
     /// Copy from host to device memory
     /// </summary>
@@ -718,6 +752,75 @@ template <PixelType T> class ImageView
         // the callee will move the ptr to the first roi pixel
         aDeviceSrc.CopyToHostRoi(mPtr, mPitch, mRoi);
     }
+#endif // OPP_ENABLE_CUDA_BACKEND
+
+#if OPP_ENABLE_NPP_BACKEND
+    /// <summary>
+    /// Copy from host to device memory
+    /// </summary>
+    /// <param name="aDeviceDst">Destination</param>
+    void CopyToDevice(npp::ImageView<T> &aDeviceDst) const
+    {
+        if (mSizeAlloc != aDeviceDst.SizeAlloc())
+        {
+            throw ROIEXCEPTION("The source image does not have the same size as the destination image. Source size "
+                               << mSizeAlloc << ", Destination size: " << aDeviceDst.SizeAlloc());
+        }
+
+        aDeviceDst.CopyToDevice(mPtr, mPitch);
+    }
+
+    /// <summary>
+    /// Copy from device to host memory
+    /// </summary>
+    /// <param name="aDeviceSrc">Source</param>
+    void CopyToHost(const npp::ImageView<T> &aDeviceSrc)
+    {
+        if (mSizeAlloc != aDeviceSrc.SizeAlloc())
+        {
+            throw ROIEXCEPTION("The source image does not have the same size as the destination image. Source size "
+                               << aDeviceSrc.SizeAlloc() << ", Destination size: " << mSizeAlloc);
+        }
+
+        aDeviceSrc.CopyToHost(mPtr, mPitch);
+    }
+
+    /// <summary>
+    /// Copy from host to device memory
+    /// </summary>
+    void operator>>(npp::ImageView<T> &aDest) const
+    {
+        CopyToDevice(aDest);
+    }
+
+    /// <summary>
+    /// Copy from device to host memory
+    /// </summary>
+    void operator<<(const npp::ImageView<T> &aDeviceSrc)
+    {
+        CopyToHost(aDeviceSrc);
+    }
+
+    /// <summary>
+    /// Copy data from host to device memory only in ROI
+    /// </summary>
+    /// <param name="aDeviceDst">Device destination view</param>
+    void CopyToDeviceRoi(npp::ImageView<T> &aDeviceDst) const
+    {
+        // the callee will move the ptr to the first roi pixel
+        aDeviceDst.CopyToDeviceRoi(mPtr, mPitch, mRoi);
+    }
+
+    /// <summary>
+    /// Copy data from device to device memory
+    /// </summary>
+    /// <param name="aDeviceSrc">Device source view</param>
+    void CopyToHostRoi(const npp::ImageView<T> &aDeviceSrc)
+    {
+        // the callee will move the ptr to the first roi pixel
+        aDeviceSrc.CopyToHostRoi(mPtr, mPitch, mRoi);
+    }
+#endif // OPP_ENABLE_NPP_BACKEND
 
     /// <summary>
     /// Returns true, if size and pixel content is identical (inside the ROI). Returns false if ROI size differs.
@@ -746,7 +849,7 @@ template <PixelType T> class ImageView
     /// false if ROI size differs.
     /// </summary>
     [[nodiscard]] bool IsSimilar(const ImageView<T> &aOther, remove_vector_t<T> aMaxDiff) const
-        requires RealFloatingVector<T>
+        requires RealSignedVector<T>
     {
         if (aOther.SizeRoi() != SizeRoi())
         {
@@ -759,9 +862,162 @@ template <PixelType T> class ImageView
         for (const auto &elemSrc2 : aOther)
         {
             T diff = T::Abs(elemSrc2.Value() - iterSrc1.Value());
+            if (!(diff <= limit))
+            {
+                return false;
+            }
+            ++iterSrc1;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Returns true, if size is equal and pixel content is identical up to provided limit (inside the ROI). Returns
+    /// false if ROI size differs.
+    /// </summary>
+    [[nodiscard]] bool IsSimilar(const ImageView<T> &aOther, remove_vector_t<T> aMaxDiff) const
+        requires RealUnsignedVector<T> && RealIntVector<T>
+    {
+        if (aOther.SizeRoi() != SizeRoi())
+        {
+            return false;
+        }
+
+        T limit(aMaxDiff);
+
+        auto iterSrc1 = cbegin();
+        for (const auto &elemSrc2 : aOther)
+        {
+            T diff{0};
+
+            if (elemSrc2.Value().x > iterSrc1.Value().x)
+            {
+                diff.x = elemSrc2.Value().x - iterSrc1.Value().x;
+            }
+            if (elemSrc2.Value().x < iterSrc1.Value().x)
+            {
+                diff.x = iterSrc1.Value().x - elemSrc2.Value().x;
+            }
+
+            if constexpr (vector_active_size_v<T> > 1)
+            {
+                if (elemSrc2.Value().y > iterSrc1.Value().y)
+                {
+                    diff.y = elemSrc2.Value().y - iterSrc1.Value().y;
+                }
+                if (elemSrc2.Value().y < iterSrc1.Value().y)
+                {
+                    diff.y = iterSrc1.Value().y - elemSrc2.Value().y;
+                }
+            }
+            if constexpr (vector_active_size_v<T> > 2)
+            {
+                if (elemSrc2.Value().z > iterSrc1.Value().z)
+                {
+                    diff.z = elemSrc2.Value().z - iterSrc1.Value().z;
+                }
+                if (elemSrc2.Value().z < iterSrc1.Value().z)
+                {
+                    diff.z = iterSrc1.Value().z - elemSrc2.Value().z;
+                }
+            }
+            if constexpr (vector_active_size_v<T> > 3)
+            {
+                if (elemSrc2.Value().w > iterSrc1.Value().w)
+                {
+                    diff.w = elemSrc2.Value().w - iterSrc1.Value().w;
+                }
+                if (elemSrc2.Value().w < iterSrc1.Value().w)
+                {
+                    diff.w = iterSrc1.Value().w - elemSrc2.Value().w;
+                }
+            }
+
+            if (!(diff <= limit))
+            {
+                return false;
+            }
+            ++iterSrc1;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Returns true, if size is equal and pixel content is identical up to provided limit (inside the ROI). Returns
+    /// false if ROI size differs.
+    /// </summary>
+    [[nodiscard]] bool IsSimilarIgnoringNAN(const ImageView<T> &aOther, remove_vector_t<T> aMaxDiff) const
+        requires RealFloatingVector<T>
+    {
+        if (aOther.SizeRoi() != SizeRoi())
+        {
+            return false;
+        }
+
+        T limit(aMaxDiff);
+
+        auto iterSrc1 = cbegin();
+        for (const auto &elemSrc2 : aOther)
+        {
+            T src1 = iterSrc1.Value();
+            T src2 = elemSrc2.Value();
+
+            MakeNANandINFValid(src1.x, src2.x);
+            if constexpr (vector_active_size_v<T> > 1)
+            {
+                MakeNANandINFValid(src1.y, src2.y);
+            }
+            if constexpr (vector_active_size_v<T> > 2)
+            {
+                MakeNANandINFValid(src1.z, src2.z);
+            }
+            if constexpr (vector_active_size_v<T> > 3)
+            {
+                MakeNANandINFValid(src1.w, src2.w);
+            }
+
+            T diff = T::Abs(src2 - src1);
             if (!(diff < limit))
             {
                 return false;
+            }
+            ++iterSrc1;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Returns true, if size is equal and pixel content is identical up to provided limit (inside the ROI). Returns
+    /// false if ROI size differs.
+    /// </summary>
+    [[nodiscard]] bool IsSimilar(const ImageView<T> &aOther, complex_basetype_t<remove_vector_t<T>> aMaxDiff) const
+        requires ComplexVector<T>
+    {
+        if (aOther.SizeRoi() != SizeRoi())
+        {
+            return false;
+        }
+
+        using pixelT           = complex_basetype_t<remove_vector_t<T>>;
+        constexpr int channels = vector_active_size_v<T>;
+
+        auto iterSrc1 = cbegin();
+        for (const auto &elemSrc2 : aOther)
+        {
+            for (int channel = 0; channel < channels; channel++)
+            {
+                const pixelT real1 = elemSrc2.Value()[Channel(channel)].real;
+                const pixelT imag1 = elemSrc2.Value()[Channel(channel)].imag;
+                const pixelT real2 = iterSrc1.Value()[Channel(channel)].real;
+                const pixelT imag2 = iterSrc1.Value()[Channel(channel)].imag;
+
+                const pixelT diffreal = std::abs(real1 - real2);
+                const pixelT diffimag = std::abs(imag1 - imag2);
+
+                if (diffreal > aMaxDiff || diffimag > aMaxDiff)
+                {
+                    return false;
+                }
             }
             ++iterSrc1;
         }
@@ -968,6 +1224,8 @@ template <PixelType T> class ImageView
 
 #pragma region FillRandom
     ImageView<T> &FillRandom();
+
+    ImageView<T> &FillRandom(uint aSeed);
 #pragma endregion
 #pragma endregion
 
@@ -1176,85 +1434,137 @@ template <PixelType T> class ImageView
         requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+                      RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
         requires RealOrComplexIntVector<T>;
 
     ImageView<T> &Div(const T &aConst, ImageView<T> &aDst)
         requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &Div(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+                      RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
         requires RealOrComplexIntVector<T>;
 
     ImageView<T> &Div(const ImageView<T> &aSrc2)
         requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &Div(const ImageView<T> &aSrc2, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+                      RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
         requires RealOrComplexIntVector<T>;
 
     ImageView<T> &Div(const T &aConst)
         requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &Div(const T &aConst, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+                      RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
         requires RealOrComplexIntVector<T>;
 
     ImageView<T> &DivInv(const ImageView<T> &aSrc2)
         requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &DivInv(const ImageView<T> &aSrc2, int aScaleFactor = 0,
-                         RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+                         RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
         requires RealOrComplexIntVector<T>;
 
     ImageView<T> &DivInv(const T &aConst)
         requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &DivInv(const T &aConst, int aScaleFactor = 0,
-                         RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+                         RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
         requires RealOrComplexIntVector<T>;
 
     ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
         requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+                      int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
         requires RealOrComplexIntVector<T>;
 
     ImageView<T> &Div(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
         requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &Div(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+                      RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
         requires RealOrComplexIntVector<T>;
 
     ImageView<T> &Div(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
         requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &Div(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+                      RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
         requires RealOrComplexIntVector<T>;
 
     ImageView<T> &Div(const T &aConst, const ImageView<Pixel8uC1> &aMask)
         requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &Div(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+                      RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
         requires RealOrComplexIntVector<T>;
 
     ImageView<T> &DivInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
         requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &DivInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                         RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+                         RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
         requires RealOrComplexIntVector<T>;
 
     ImageView<T> &DivInv(const T &aConst, const ImageView<Pixel8uC1> &aMask)
         requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &DivInv(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                         RoundingMode aRoundingMode = RoundingMode::NearestTiesAwayFromZero)
+                         RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
         requires RealOrComplexIntVector<T>;
+#pragma endregion
+#pragma region AddSquare
+    /// <summary>
+    /// SrcDst += this^2
+    /// </summary>
+    ImageView<add_spw_output_for_t<T>> &AddSquare(ImageView<add_spw_output_for_t<T>> &aSrcDst);
+
+    /// <summary>
+    /// SrcDst += this^2
+    /// </summary>
+    ImageView<add_spw_output_for_t<T>> &AddSquare(ImageView<add_spw_output_for_t<T>> &aSrcDst,
+                                                  const ImageView<Pixel8uC1> &aMask);
+#pragma endregion
+#pragma region AddProduct
+    /// <summary>
+    /// SrcDst += this * Src2
+    /// </summary>
+    ImageView<add_spw_output_for_t<T>> &AddProduct(const ImageView<T> &aSrc2,
+                                                   ImageView<add_spw_output_for_t<T>> &aSrcDst);
+
+    /// <summary>
+    /// SrcDst += this * Src2
+    /// </summary>
+    ImageView<add_spw_output_for_t<T>> &AddProduct(const ImageView<T> &aSrc2,
+                                                   ImageView<add_spw_output_for_t<T>> &aSrcDst,
+                                                   const ImageView<Pixel8uC1> &aMask);
+#pragma endregion
+#pragma region AddWeighted
+    /// <summary>
+    /// Dst = this * alpha + Src2 * (1 - alpha)
+    /// </summary>
+    ImageView<add_spw_output_for_t<T>> &AddWeighted(const ImageView<T> &aSrc2, ImageView<add_spw_output_for_t<T>> &aDst,
+                                                    remove_vector_t<add_spw_output_for_t<T>> aAlpha);
+
+    /// <summary>
+    /// Dst = this * alpha + Src2 * (1 - alpha)
+    /// </summary>
+    ImageView<add_spw_output_for_t<T>> &AddWeighted(const ImageView<T> &aSrc2, ImageView<add_spw_output_for_t<T>> &aDst,
+                                                    remove_vector_t<add_spw_output_for_t<T>> aAlpha,
+                                                    const ImageView<Pixel8uC1> &aMask);
+    /// <summary>
+    /// SrcDst = this * alpha + SrcDst * (1 - alpha)
+    /// </summary>
+    ImageView<add_spw_output_for_t<T>> &AddWeighted(ImageView<add_spw_output_for_t<T>> &aSrcDst,
+                                                    remove_vector_t<add_spw_output_for_t<T>> aAlpha);
+
+    /// <summary>
+    /// SrcDst = this * alpha + SrcDst * (1 - alpha)
+    /// </summary>
+    ImageView<add_spw_output_for_t<T>> &AddWeighted(ImageView<add_spw_output_for_t<T>> &aSrcDst,
+                                                    remove_vector_t<add_spw_output_for_t<T>> aAlpha,
+                                                    const ImageView<Pixel8uC1> &aMask);
 #pragma endregion
 
 #pragma region Abs
@@ -1372,22 +1682,28 @@ template <PixelType T> class ImageView
     /// same for all values. Values may differ by 1.
     /// </summary>
     ImageView<T> &AlphaPremul(ImageView<T> &aDst)
-        requires FourChannelNoAlpha<T>;
+        requires FourChannelNoAlpha<T> && RealVector<T>;
 
     ImageView<T> &AlphaPremul()
-        requires FourChannelNoAlpha<T>;
+        requires FourChannelNoAlpha<T> && RealVector<T>;
 
     ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst)
-        requires RealFloatingVector<T>;
+        requires RealFloatingVector<T> && (!FourChannelAlpha<T>);
 
     ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst)
-        requires RealIntVector<T>;
+        requires RealIntVector<T> && (!FourChannelAlpha<T>);
 
     ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha)
-        requires RealFloatingVector<T>;
+        requires RealFloatingVector<T> && (!FourChannelAlpha<T>);
 
     ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha)
-        requires RealIntVector<T>;
+        requires RealIntVector<T> && (!FourChannelAlpha<T>);
+
+    ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst)
+        requires FourChannelAlpha<T>;
+
+    ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha)
+        requires FourChannelAlpha<T>;
 #pragma endregion
 
 #pragma region AlphaComp

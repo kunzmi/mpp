@@ -36,9 +36,9 @@ void InvokeMakeComplexSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size
 
         using makeComplexSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::MakeComplex<DstT>, RoundingMode::None>;
 
-        MakeComplex<DstT> op;
+        const opp::MakeComplex<DstT> op;
 
-        makeComplexSrc functor(aSrc1, aPitchSrc1, op);
+        const makeComplexSrc functor(aSrc1, aPitchSrc1, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, makeComplexSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
@@ -78,9 +78,9 @@ void InvokeMakeComplexSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *a
         using makeComplexSrcSrc =
             SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::MakeComplex<DstT>, RoundingMode::None>;
 
-        MakeComplex<DstT> op;
+        const opp::MakeComplex<DstT> op;
 
-        makeComplexSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+        const makeComplexSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
         InvokeForEachPixelKernelDefault<DstT, TupelSize, makeComplexSrcSrc>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                             functor);

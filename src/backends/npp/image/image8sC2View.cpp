@@ -38,12 +38,12 @@ Image8sC2View::Image8sC2View(Pixel8sC2 *aBasePointer, const SizePitched &aSizeAl
 {
 }
 
-Image8sC2View Image8sC2View::GetView(const Roi &aRoi) const
+Image8sC2View Image8sC2View::GetView(const Roi &aRoi)
 {
     return {Pointer(), SizePitched(SizeAlloc(), Pitch()), aRoi};
 }
 
-Image8sC2View Image8sC2View::GetView(const Border &aBorder) const
+Image8sC2View Image8sC2View::GetView(const Border &aBorder)
 {
     const Roi newRoi = ROI() + aBorder;
     checkRoiIsInRoi(newRoi, Roi(0, 0, SizeAlloc()));

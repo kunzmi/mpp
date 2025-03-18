@@ -47,12 +47,12 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     /// <summary>
     /// Returns a new Image8uC3View with the new ROI
     /// </summary>
-    [[nodiscard]] Image8uC3View GetView(const Roi &aRoi) const;
+    [[nodiscard]] Image8uC3View GetView(const Roi &aRoi);
 
     /// <summary>
     /// Returns a new ImageView with the current ROI adapted by aBorder
     /// </summary>
-    [[nodiscard]] Image8uC3View GetView(const Border &aBorder = Border()) const;
+    [[nodiscard]] Image8uC3View GetView(const Border &aBorder = Border());
 
     //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 #if OPPi_ENABLE_UINT8_TYPE && OPPi_ENABLE_THREE_CHANNEL
@@ -751,7 +751,7 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     static void GammaFwd(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiGammaFwd_8u_IP3R_Ctx(Npp8u *const[3] pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    static void GammaFwd(const Image8uC1View &aSrcDstChannel0, const Image8uC1View &aSrcDstChannel1, const Image8uC1View &aSrcDstChannel2, const NppStreamContext &nppStreamCtx);
+    static void GammaFwd(Image8uC1View &aSrcDstChannel0, Image8uC1View &aSrcDstChannel1, Image8uC1View &aSrcDstChannel2, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiGammaInv_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     Image8uC3View &GammaInv(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const;
@@ -763,7 +763,7 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     static void GammaInv(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiGammaInv_8u_IP3R_Ctx(Npp8u *const[3] pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    static void GammaInv(const Image8uC1View &aSrcDstChannel0, const Image8uC1View &aSrcDstChannel1, const Image8uC1View &aSrcDstChannel2, const NppStreamContext &nppStreamCtx);
+    static void GammaInv(Image8uC1View &aSrcDstChannel0, Image8uC1View &aSrcDstChannel1, Image8uC1View &aSrcDstChannel2, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiCompColorKey_8u_C3R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, Npp8u[3] nColorKeyConst, NppStreamContext nppStreamCtx)
     Image8uC3View &CompColorKey(const Image8uC3View &pSrc2, Image8uC3View &pDst, Pixel8uC3 &nColorKeyConst, const NppStreamContext &nppStreamCtx) const;
@@ -778,7 +778,7 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     static void ColorTwist32f(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiColorTwist32f_8u_IP3R_Ctx(Npp8u *const[3] pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp32f[3][4] aTwist, NppStreamContext nppStreamCtx)
-    static void ColorTwist32f(const Image8uC1View &aSrcDstChannel0, const Image8uC1View &aSrcDstChannel1, const Image8uC1View &aSrcDstChannel2, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
+    static void ColorTwist32f(Image8uC1View &aSrcDstChannel0, Image8uC1View &aSrcDstChannel1, Image8uC1View &aSrcDstChannel2, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiLUT_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32s *[3] pValues, const Npp32s *[3] pLevels, int[3] nLevels, NppStreamContext nppStreamCtx)
     Image8uC3View &LUT(Image8uC3View &pDst, opp::cuda::DevVarView<int> pValues[3], opp::cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx) const;

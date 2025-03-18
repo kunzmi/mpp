@@ -37,9 +37,9 @@ void InvokeAddProductInplaceSrcSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask
         using addProductInplaceSrcSrc =
             InplaceSrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AddProduct<ComputeT>, RoundingMode::None>;
 
-        AddProduct<ComputeT> op;
+        const opp::AddProduct<ComputeT> op;
 
-        addProductInplaceSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+        const addProductInplaceSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
         InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addProductInplaceSrcSrc>(
             aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
