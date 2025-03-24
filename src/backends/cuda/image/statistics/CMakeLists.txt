@@ -1,5 +1,17 @@
 add_library(backends.cuda.image.statistics 
+	countInRange.cu
+	mean.cu
+	meanStd.cu
+	max.cu
+	min.cu
+	maxIdx.cu
+	minIdx.cu
+	minMax.cu
 	minMaxEvery.cu
+	minMaxIdx.cu
+	normInf.cu
+	normL1.cu
+	normL2.cu
 	sum.cu
 	)
 	

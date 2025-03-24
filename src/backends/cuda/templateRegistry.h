@@ -28,6 +28,10 @@ namespace opp::cuda
                                                       opp::image::pixel_type_name<DstT>::value);                       \
     const void *_ = &opp::cuda::TemplateRegistry<kernelName>::sInstance;
 
+#define OPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE                                                                        \
+    constexpr opp::cuda::KernelNameWrapper kernelName(__func__, opp::image::pixel_type_name<SrcT>::value, "", "");     \
+    const void *_ = &opp::cuda::TemplateRegistry<kernelName>::sInstance;
+
 #define OPP_CUDA_REGISTER_TEMPALTE_SRC_DST                                                                             \
     constexpr opp::cuda::KernelNameWrapper kernelName(__func__, opp::image::pixel_type_name<SrcT>::value, "",          \
                                                       opp::image::pixel_type_name<DstT>::value);                       \

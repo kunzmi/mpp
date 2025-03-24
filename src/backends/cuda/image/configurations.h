@@ -46,6 +46,18 @@ template <> struct ConfigBlockSize<"Default">
 {
     static constexpr ConstExprDim3 value{32, 8, 1};
 };
+template <> struct ConfigBlockSize<"DefaultReductionX">
+{
+    static constexpr ConstExprDim3 value{32, 8, 1};
+};
+template <> struct ConfigBlockSize<"DefaultReductionY">
+{
+    static constexpr ConstExprDim3 value{32, 32, 1};
+};
+template <> struct ConfigBlockSize<"DefaultReductionYLargeType">
+{
+    static constexpr ConstExprDim3 value{32, 16, 1};
+};
 
 // Warp alignment, the size in bytes a warp should be aligned to
 template <ConfigNameWrapper ConfigName, int hardwareMajor = 0, int hardwareMinor = 0> struct ConfigWarpAlignment

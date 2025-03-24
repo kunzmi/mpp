@@ -5,6 +5,7 @@
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/streamCtx.h>
+#include <common/image/functors/reductionInitValues.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
@@ -17,160 +18,209 @@
 
 namespace opp::image::cuda
 {
+
 /// <summary>
-/// runs aFunctor reduction on every image line, single output value.
+/// runs aFunctor reduction on one image column, single output value.
 /// The kernel is supposed to launch warpSize threads on x-block dimension.
 /// </summary>
-template <typename SrcT, typename DstT>
-__global__ void reductionAlongYKernel(const SrcT *__restrict__ aSrc, DstT *__restrict__ aDst, int aSize)
+template <typename SrcT, typename DstT, typename reductionOp, ReductionInitValue NeutralValue, typename postOp,
+          typename postOpScalar>
+__global__ void reductionAlongYKernel(const SrcT *__restrict__ aSrc, DstT *__restrict__ aDst,
+                                      remove_vector_t<DstT> *__restrict__ aDstScalar, int aSize, postOp aPostOp,
+                                      postOpScalar aPostOpScalar)
 {
-    int warpLaneID = threadIdx.x;
+    int warpLaneId = threadIdx.x;
     int batchId    = threadIdx.y;
 
-    DstT result(0);
+    reductionOp redOp;
+    DstT result(reduction_init_value_v<NeutralValue, DstT>);
 
-    __shared__ DstT buffer[32][32];
+    /*__shared__ DstT
+        buffer[ConfigBlockSize<"DefaultReductionY">::value.y][ConfigBlockSize<"DefaultReductionY">::value.x];*/
+    extern __shared__ int sharedBuffer[];
 
-    buffer[batchId][warpLaneID] = DstT(0);
+    // Block dimension in X are the same for large and small configuration!
+    DstT(*buffer)[ConfigBlockSize<"DefaultReductionY">::value.x] =
+        (DstT(*)[ConfigBlockSize<"DefaultReductionY">::value.x])(sharedBuffer);
 
+    // process 1D input array in threadBlock-junks
     for (int pixelYWarp0 = 0; pixelYWarp0 < aSize; pixelYWarp0 += warpSize * blockDim.y)
     {
-        const int pixelY = pixelYWarp0 + warpLaneID + batchId * warpSize;
+        const int pixelY = pixelYWarp0 + warpLaneId + batchId * warpSize;
         if (pixelY < aSize)
         {
-            buffer[batchId][warpLaneID] += aSrc[pixelY];
+            redOp(aSrc[pixelY], result);
         }
     }
 
+    // write intermediate threadBlock sums to shared memory:
+    buffer[batchId][warpLaneId] = result;
+
     __syncthreads();
+
     if (batchId == 0)
     {
+        // reduce over Y the entire thread block:
 #pragma unroll
-        for (int i = 1; i < 32; i++)
+        for (int i = 1; i < ConfigBlockSize<"DefaultReductionY">::value.y; i++) // i = 0 is already stored in result
         {
-            buffer[0][warpLaneID] += buffer[i][warpLaneID];
+            redOp(buffer[i][warpLaneId], result);
         }
 
-        SrcT threadValue = buffer[0][warpLaneID];
         // reduce over warp:
-        threadValue.x += __shfl_down_sync(0xFFFFFFFF, threadValue.x, 16);
-        threadValue.x += __shfl_down_sync(0xFFFFFFFF, threadValue.x, 8);
-        threadValue.x += __shfl_down_sync(0xFFFFFFFF, threadValue.x, 4);
-        threadValue.x += __shfl_down_sync(0xFFFFFFFF, threadValue.x, 2);
-        threadValue.x += __shfl_down_sync(0xFFFFFFFF, threadValue.x, 1);
+        if constexpr (ComplexVector<DstT>)
+        {
+            redOp(__shfl_down_sync(0xFFFFFFFF, result.x.real, 16), result.x.real);
+            redOp(__shfl_down_sync(0xFFFFFFFF, result.x.real, 8), result.x.real);
+            redOp(__shfl_down_sync(0xFFFFFFFF, result.x.real, 4), result.x.real);
+            redOp(__shfl_down_sync(0xFFFFFFFF, result.x.real, 2), result.x.real);
+            redOp(__shfl_down_sync(0xFFFFFFFF, result.x.real, 1), result.x.real);
+
+            redOp(__shfl_down_sync(0xFFFFFFFF, result.x.imag, 16), result.x.imag);
+            redOp(__shfl_down_sync(0xFFFFFFFF, result.x.imag, 8), result.x.imag);
+            redOp(__shfl_down_sync(0xFFFFFFFF, result.x.imag, 4), result.x.imag);
+            redOp(__shfl_down_sync(0xFFFFFFFF, result.x.imag, 2), result.x.imag);
+            redOp(__shfl_down_sync(0xFFFFFFFF, result.x.imag, 1), result.x.imag);
+        }
+        else
+        {
+            redOp(__shfl_down_sync(0xFFFFFFFF, result.x, 16), result.x);
+            redOp(__shfl_down_sync(0xFFFFFFFF, result.x, 8), result.x);
+            redOp(__shfl_down_sync(0xFFFFFFFF, result.x, 4), result.x);
+            redOp(__shfl_down_sync(0xFFFFFFFF, result.x, 2), result.x);
+            redOp(__shfl_down_sync(0xFFFFFFFF, result.x, 1), result.x);
+        }
 
         if constexpr (vector_active_size_v<DstT> > 1)
         {
-            threadValue.y += __shfl_down_sync(0xFFFFFFFF, threadValue.y, 16);
-            threadValue.y += __shfl_down_sync(0xFFFFFFFF, threadValue.y, 8);
-            threadValue.y += __shfl_down_sync(0xFFFFFFFF, threadValue.y, 4);
-            threadValue.y += __shfl_down_sync(0xFFFFFFFF, threadValue.y, 2);
-            threadValue.y += __shfl_down_sync(0xFFFFFFFF, threadValue.y, 1);
+            if constexpr (ComplexVector<DstT>)
+            {
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.y.real, 16), result.y.real);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.y.real, 8), result.y.real);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.y.real, 4), result.y.real);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.y.real, 2), result.y.real);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.y.real, 1), result.y.real);
+
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.y.imag, 16), result.y.imag);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.y.imag, 8), result.y.imag);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.y.imag, 4), result.y.imag);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.y.imag, 2), result.y.imag);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.y.imag, 1), result.y.imag);
+            }
+            else
+            {
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.y, 16), result.y);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.y, 8), result.y);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.y, 4), result.y);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.y, 2), result.y);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.y, 1), result.y);
+            }
         }
         if constexpr (vector_active_size_v<DstT> > 2)
         {
-            threadValue.z += __shfl_down_sync(0xFFFFFFFF, threadValue.z, 16);
-            threadValue.z += __shfl_down_sync(0xFFFFFFFF, threadValue.z, 8);
-            threadValue.z += __shfl_down_sync(0xFFFFFFFF, threadValue.z, 4);
-            threadValue.z += __shfl_down_sync(0xFFFFFFFF, threadValue.z, 2);
-            threadValue.z += __shfl_down_sync(0xFFFFFFFF, threadValue.z, 1);
+            if constexpr (ComplexVector<DstT>)
+            {
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.z.real, 16), result.z.real);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.z.real, 8), result.z.real);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.z.real, 4), result.z.real);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.z.real, 2), result.z.real);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.z.real, 1), result.z.real);
+
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.z.imag, 16), result.z.imag);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.z.imag, 8), result.z.imag);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.z.imag, 4), result.z.imag);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.z.imag, 2), result.z.imag);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.z.imag, 1), result.z.imag);
+            }
+            else
+            {
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.z, 16), result.z);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.z, 8), result.z);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.z, 4), result.z);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.z, 2), result.z);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.z, 1), result.z);
+            }
         }
         if constexpr (vector_active_size_v<DstT> > 3)
         {
-            threadValue.w += __shfl_down_sync(0xFFFFFFFF, threadValue.w, 16);
-            threadValue.w += __shfl_down_sync(0xFFFFFFFF, threadValue.w, 8);
-            threadValue.w += __shfl_down_sync(0xFFFFFFFF, threadValue.w, 4);
-            threadValue.w += __shfl_down_sync(0xFFFFFFFF, threadValue.w, 2);
-            threadValue.w += __shfl_down_sync(0xFFFFFFFF, threadValue.w, 1);
-        }
+            if constexpr (ComplexVector<DstT>)
+            {
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.w.real, 16), result.w.real);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.w.real, 8), result.w.real);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.w.real, 4), result.w.real);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.w.real, 2), result.w.real);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.w.real, 1), result.w.real);
 
-        result = threadValue;
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.w.imag, 16), result.w.imag);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.w.imag, 8), result.w.imag);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.w.imag, 4), result.w.imag);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.w.imag, 2), result.w.imag);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.w.imag, 1), result.w.imag);
+            }
+            else
+            {
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.w, 16), result.w);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.w, 8), result.w);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.w, 4), result.w);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.w, 2), result.w);
+                redOp(__shfl_down_sync(0xFFFFFFFF, result.w, 1), result.w);
+            }
+        }
     }
 
-    // for (int pixelYWarp0 = 0; pixelYWarp0 < aSize; pixelYWarp0 += warpSize * blockDim.y)
-    //{
-    //     SrcT threadValue(0);
-    //     const int pixelY = pixelYWarp0 + warpLaneID + batchId * warpSize;
-    //     if (pixelY < aSize)
-    //     {
-    //         threadValue += aSrc[pixelY];
-    //     }
-    //
-    //    // reduce over warp:
-    //    threadValue.x += __shfl_down_sync(0xFFFFFFFF, threadValue.x, 16);
-    //    threadValue.x += __shfl_down_sync(0xFFFFFFFF, threadValue.x, 8);
-    //    threadValue.x += __shfl_down_sync(0xFFFFFFFF, threadValue.x, 4);
-    //    threadValue.x += __shfl_down_sync(0xFFFFFFFF, threadValue.x, 2);
-    //    threadValue.x += __shfl_down_sync(0xFFFFFFFF, threadValue.x, 1);
-    //
-    //    if constexpr (vector_active_size_v<DstT> > 1)
-    //    {
-    //        threadValue.y += __shfl_down_sync(0xFFFFFFFF, threadValue.y, 16);
-    //        threadValue.y += __shfl_down_sync(0xFFFFFFFF, threadValue.y, 8);
-    //        threadValue.y += __shfl_down_sync(0xFFFFFFFF, threadValue.y, 4);
-    //        threadValue.y += __shfl_down_sync(0xFFFFFFFF, threadValue.y, 2);
-    //        threadValue.y += __shfl_down_sync(0xFFFFFFFF, threadValue.y, 1);
-    //    }
-    //    if constexpr (vector_active_size_v<DstT> > 2)
-    //    {
-    //        threadValue.z += __shfl_down_sync(0xFFFFFFFF, threadValue.z, 16);
-    //        threadValue.z += __shfl_down_sync(0xFFFFFFFF, threadValue.z, 8);
-    //        threadValue.z += __shfl_down_sync(0xFFFFFFFF, threadValue.z, 4);
-    //        threadValue.z += __shfl_down_sync(0xFFFFFFFF, threadValue.z, 2);
-    //        threadValue.z += __shfl_down_sync(0xFFFFFFFF, threadValue.z, 1);
-    //    }
-    //    if constexpr (vector_active_size_v<DstT> > 3)
-    //    {
-    //        threadValue.w += __shfl_down_sync(0xFFFFFFFF, threadValue.w, 16);
-    //        threadValue.w += __shfl_down_sync(0xFFFFFFFF, threadValue.w, 8);
-    //        threadValue.w += __shfl_down_sync(0xFFFFFFFF, threadValue.w, 4);
-    //        threadValue.w += __shfl_down_sync(0xFFFFFFFF, threadValue.w, 2);
-    //        threadValue.w += __shfl_down_sync(0xFFFFFFFF, threadValue.w, 1);
-    //    }
-    //
-    //    result += threadValue;
-    //}
-    // buffer[batchId] = result;
-
-    //__syncthreads();
-
-    if (warpLaneID == 0 && batchId == 0)
+    if (warpLaneId == 0 && batchId == 0)
     {
-        /*result += buffer[1];
-        result += buffer[2];
-        result += buffer[3];
-        result += buffer[4];
-        result += buffer[5];
-        result += buffer[6];
-        result += buffer[7];*/
-        *aDst = result;
+        if (aDstScalar != nullptr)
+        {
+            *aDstScalar = aPostOpScalar(result);
+        }
+        if (aDst != nullptr)
+        {
+            aPostOp(result);
+            *aDst = result;
+        }
     }
 }
 
-template <typename SrcT, typename DstT>
+template <typename SrcT, typename DstT, typename reductionOp, ReductionInitValue NeutralValue, typename postOp,
+          typename postOpScalar>
 void InvokeReductionAlongYKernel(const dim3 &aBlockSize, uint aSharedMemory, int aWarpSize, cudaStream_t aStream,
-                                 const SrcT *aSrc, DstT *aDst, int aSize)
+                                 const SrcT *aSrc, DstT *aDst, remove_vector_t<DstT> *aDstScalar, int aSize,
+                                 postOp aPostOp, postOpScalar aPostOpScalar)
 {
     dim3 blocksPerGrid(1, 1, 1);
 
-    reductionAlongYKernel<SrcT, DstT><<<blocksPerGrid, aBlockSize, aSharedMemory, aStream>>>(aSrc, aDst, aSize);
+    int size = aSize / ConfigBlockSize<"DefaultReductionX">::value.y;
+    size     = std::max(size, 1);
+
+    reductionAlongYKernel<SrcT, DstT, reductionOp, NeutralValue, postOp, postOpScalar>
+        <<<blocksPerGrid, aBlockSize, aSharedMemory, aStream>>>(aSrc, aDst, aDstScalar, size, aPostOp, aPostOpScalar);
 
     peekAndCheckLastCudaError("Block size: " << aBlockSize << " Grid size: " << blocksPerGrid
                                              << " SharedMemory: " << aSharedMemory << " Stream: " << aStream);
 }
 
-template <typename SrcT, typename DstT>
-void InvokeReductionAlongYKernelDefault(const SrcT *aSrc, DstT *aDst, int aSize, const opp::cuda::StreamCtx &aStreamCtx)
+template <typename SrcT, typename DstT, typename reductionOp, ReductionInitValue NeutralValue, typename postOp,
+          typename postOpScalar>
+void InvokeReductionAlongYKernelDefault(const SrcT *aSrc, DstT *aDst, remove_vector_t<DstT> *aDstScalar, int aSize,
+                                        postOp aPostOp, postOpScalar aPostOpScalar,
+                                        const opp::cuda::StreamCtx &aStreamCtx)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {
-        // const dim3 BlockSize               = ConfigBlockSize<"Default">::value;
-        const dim3 BlockSize{32, 32, 1};
-        constexpr int WarpAlignmentInBytes = ConfigWarpAlignment<"Default">::value;
-        constexpr uint SharedMemory        = 0;
+        dim3 BlockSize    = ConfigBlockSize<"DefaultReductionY">::value;
+        uint SharedMemory = sizeof(DstT) * BlockSize.x * BlockSize.y * BlockSize.z;
 
-        InvokeReductionAlongYKernel<SrcT, DstT>(BlockSize, SharedMemory, aStreamCtx.WarpSize, aStreamCtx.Stream, aSrc,
-                                                aDst, aSize);
+        if (SharedMemory > aStreamCtx.SharedMemPerBlock)
+        {
+            // use a block config of half the size:
+            BlockSize    = ConfigBlockSize<"DefaultReductionYLarge">::value;
+            SharedMemory = sizeof(DstT) * BlockSize.x * BlockSize.y * BlockSize.z;
+        }
+
+        InvokeReductionAlongYKernel<SrcT, DstT, reductionOp, NeutralValue, postOp, postOpScalar>(
+            BlockSize, SharedMemory, aStreamCtx.WarpSize, aStreamCtx.Stream, aSrc, aDst, aDstScalar, aSize, aPostOp,
+            aPostOpScalar);
     }
     else
     {

@@ -7,6 +7,7 @@
 #include <backends/cuda/streamCtx.h>
 #include <backends/cuda/templateRegistry.h>
 #include <common/defines.h>
+#include <common/image/functors/reductionInitValues.h>
 #include <common/image/functors/srcReductionFunctor.h>
 #include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
@@ -15,6 +16,7 @@
 #include <common/opp_defs.h>
 #include <common/safeCast.h>
 #include <common/statistics/operators.h>
+#include <common/statistics/postOperators.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
@@ -24,66 +26,79 @@ using namespace opp::cuda;
 namespace opp::image::cuda
 {
 template <typename SrcT, typename ComputeT, typename DstT>
-void InvokeSumSrc(const SrcT *aSrc, size_t aPitchSrc, ComputeT *aTempBuffer, DstT *aDst, const Size2D &aSize,
-                  const opp::cuda::StreamCtx &aStreamCtx)
+void InvokeSumSrc(const SrcT *aSrc, size_t aPitchSrc, ComputeT *aTempBuffer, DstT *aDst,
+                  remove_vector_t<DstT> *aDstScalar, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
 {
     if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
     {
-        // OPP_CUDA_REGISTER_TEMPALTE;
+        OPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
-        // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
         using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::Sum<SrcT, ComputeT>>;
 
         const opp::Sum<SrcT, ComputeT> op;
 
         const sumSrc functor(aSrc, aPitchSrc, op);
 
-        InvokeReductionAlongXKernelDefault<SrcT, ComputeT, TupelSize, sumSrc>(aSrc, aTempBuffer, aSize, aStreamCtx,
-                                                                              functor);
+        InvokeReductionAlongXKernelDefault<SrcT, ComputeT, TupelSize, sumSrc, opp::Sum<ComputeT, ComputeT>,
+                                           ReductionInitValue::Zero>(aSrc, aTempBuffer, aSize, aStreamCtx, functor);
 
-        InvokeReductionAlongYKernelDefault<ComputeT, DstT>(aTempBuffer, aDst, aSize.y, aStreamCtx);
+        const opp::Nothing<DstT> postOp;
+        const opp::SumScalar<DstT> postOpScalar;
+
+        InvokeReductionAlongYKernelDefault<ComputeT, DstT, opp::Sum<DstT, DstT>, ReductionInitValue::Zero,
+                                           opp::Nothing<DstT>, opp::SumScalar<DstT>>(
+            aTempBuffer, aDst, aDstScalar, aSize.y, postOp, postOpScalar, aStreamCtx);
     }
 }
 
 #pragma region Instantiate
 
-#define Instantiate_For(typeSrc, typeTemp, typeDst)                                                                    \
-    template void InvokeSumSrc<typeSrc, typeTemp, typeDst>(const typeSrc *aSrc, size_t aPitchSrc1, typeTemp *aTemp,    \
-                                                           typeDst *aDst, const Size2D &aSize,                         \
-                                                           const StreamCtx &aStreamCtx);
+#define Instantiate_For(typeSrc, variant)                                                                              \
+    template void InvokeSumSrc<typeSrc, sum_types_for_ct<typeSrc, variant>, sum_types_for_rt<typeSrc, variant>>(       \
+        const typeSrc *aSrc, size_t aPitchSrc1, sum_types_for_ct<typeSrc, variant> *aTemp,                             \
+        sum_types_for_rt<typeSrc, variant> *aDst, remove_vector_t<sum_types_for_rt<typeSrc, variant>> *aDstScalar,     \
+        const Size2D &aSize, const StreamCtx &aStreamCtx);
 
-#define ForAllChannelsNoAlpha(type)                                                                                    \
-    Instantiate_For(Pixel##type##C1);                                                                                  \
-    Instantiate_For(Pixel##type##C2);                                                                                  \
-    Instantiate_For(Pixel##type##C3);                                                                                  \
-    Instantiate_For(Pixel##type##C4);
+#define ForAllChannelsNoAlpha(typeIn, variant)                                                                         \
+    Instantiate_For(Pixel##typeIn##C1, variant);                                                                       \
+    Instantiate_For(Pixel##typeIn##C2, variant);                                                                       \
+    Instantiate_For(Pixel##typeIn##C3, variant);                                                                       \
+    Instantiate_For(Pixel##typeIn##C4, variant);
 
-#define ForAllChannelsWithAlpha(type)                                                                                  \
-    Instantiate_For(Pixel##type##C1, Pixel32fC1, Pixel64fC1);                                                          \
-    Instantiate_For(Pixel##type##C2, Pixel32fC2, Pixel64fC2);                                                          \
-    Instantiate_For(Pixel##type##C3, Pixel32fC3, Pixel64fC3);                                                          \
-    Instantiate_For(Pixel##type##C4, Pixel32fC4, Pixel64fC4);                                                          \
-    Instantiate_For(Pixel##type##C4A, Pixel32fC4A, Pixel64fC4A);
+#define ForAllChannelsWithAlpha(typeIn, variant)                                                                       \
+    Instantiate_For(Pixel##typeIn##C1, variant);                                                                       \
+    Instantiate_For(Pixel##typeIn##C2, variant);                                                                       \
+    Instantiate_For(Pixel##typeIn##C3, variant);                                                                       \
+    Instantiate_For(Pixel##typeIn##C4, variant);                                                                       \
+    Instantiate_For(Pixel##typeIn##C4A, variant);
 
-ForAllChannelsWithAlpha(8u);
-// ForAllChannelsWithAlpha(8s);
-//
-// ForAllChannelsWithAlpha(16u);
-// ForAllChannelsWithAlpha(16s);
-//
-// ForAllChannelsWithAlpha(32u);
-// ForAllChannelsWithAlpha(32s);
-//
-// ForAllChannelsWithAlpha(16f);
-// ForAllChannelsWithAlpha(16bf);
-// ForAllChannelsWithAlpha(32f);
-// ForAllChannelsWithAlpha(64f);
-//
-// ForAllChannelsNoAlpha(16sc);
-// ForAllChannelsNoAlpha(32sc);
-// ForAllChannelsNoAlpha(32fc);
+ForAllChannelsWithAlpha(8u, 1);
+ForAllChannelsWithAlpha(8s, 1);
+ForAllChannelsWithAlpha(8u, 2);
+ForAllChannelsWithAlpha(8s, 2);
+
+ForAllChannelsWithAlpha(16u, 1);
+ForAllChannelsWithAlpha(16s, 1);
+ForAllChannelsWithAlpha(16u, 2);
+ForAllChannelsWithAlpha(16s, 2);
+
+ForAllChannelsWithAlpha(32u, 1);
+ForAllChannelsWithAlpha(32s, 1);
+ForAllChannelsWithAlpha(32u, 2);
+ForAllChannelsWithAlpha(32s, 2);
+
+ForAllChannelsWithAlpha(16f, 1);
+ForAllChannelsWithAlpha(16bf, 1);
+ForAllChannelsWithAlpha(32f, 1);
+ForAllChannelsWithAlpha(64f, 1);
+
+ForAllChannelsNoAlpha(16sc, 1);
+ForAllChannelsNoAlpha(32sc, 1);
+ForAllChannelsNoAlpha(16sc, 2);
+ForAllChannelsNoAlpha(32sc, 2);
+ForAllChannelsNoAlpha(32fc, 1);
 
 #undef Instantiate_For
 #undef ForAllChannelsWithAlpha
