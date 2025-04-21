@@ -788,7 +788,7 @@ Image8uC1View &Image32fC3View::Compare(const Pixel32fC3 &pConstants, Image8uC1Vi
     return pDst;
 }
 
-Image8uC3View &Image32fC3View::CompareEqualEps(const Image32fC3View &pSrc2, Image8uC3View &pDst, const Pixel32fC1 &nEpsilon, const NppStreamContext &nppStreamCtx) const
+Image8uC1View &Image32fC3View::CompareEqualEps(const Image32fC3View &pSrc2, Image8uC1View &pDst, const Pixel32fC1 &nEpsilon, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pSrc2.ROI());
     checkSameSize(ROI(), pDst.ROI());
@@ -797,7 +797,7 @@ Image8uC3View &Image32fC3View::CompareEqualEps(const Image32fC3View &pSrc2, Imag
     return pDst;
 }
 
-Image8uC3View &Image32fC3View::CompareEqualEps(const Pixel32fC3 &pConstants, Image8uC3View &pDst, const Pixel32fC1 &nEpsilon, const NppStreamContext &nppStreamCtx) const
+Image8uC1View &Image32fC3View::CompareEqualEps(const Pixel32fC3 &pConstants, Image8uC1View &pDst, const Pixel32fC1 &nEpsilon, const NppStreamContext &nppStreamCtx) const
 {
     checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiCompareEqualEpsC_32f_C3R_Ctx(reinterpret_cast<const Npp32f *>(PointerRoi()), to_int(Pitch()), pConstants.data(), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), nEpsilon.x, nppStreamCtx),

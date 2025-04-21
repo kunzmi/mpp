@@ -133,6 +133,10 @@ DEVICE_CODE INLINE BFloat16::operator float() const
 }
 
 #ifdef IS_CUDA_COMPILER
+DEVICE_CODE INLINE BFloat16::operator __nv_bfloat16() const
+{
+    return value;
+}
 DEVICE_CODE INLINE BFloat16::operator int() const
 {
     return __bfloat162int_rz(value);
@@ -156,6 +160,10 @@ DEVICE_CODE INLINE BFloat16::operator byte() const
 DEVICE_CODE INLINE BFloat16::operator sbyte() const
 {
     return __bfloat162char_rz(value);
+}
+DEVICE_CODE INLINE BFloat16::operator double() const
+{
+    return __bfloat162float(value);
 }
 #endif
 

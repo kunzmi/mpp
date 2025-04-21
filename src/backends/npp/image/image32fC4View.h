@@ -471,16 +471,16 @@ class Image32fC4View : public ImageView<Pixel32fC4>
     Image8uC1View &CompareA(const Pixel32fC3 &pConstants, Image8uC1View &pDst, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCompareEqualEps_32f_C4R_Ctx(const Npp32f * pSrc1, int nSrc1Step, const Npp32f * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, Npp32f nEpsilon, NppStreamContext nppStreamCtx)
-    Image8uC4View &CompareEqualEps(const Image32fC4View &pSrc2, Image8uC4View &pDst, const Pixel32fC1 &nEpsilon, const NppStreamContext &nppStreamCtx) const;
+    Image8uC1View &CompareEqualEps(const Image32fC4View &pSrc2, Image8uC1View &pDst, const Pixel32fC1 &nEpsilon, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCompareEqualEps_32f_AC4R_Ctx(const Npp32f * pSrc1, int nSrc1Step, const Npp32f * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, Npp32f nEpsilon, NppStreamContext nppStreamCtx)
-    Image8uC4View &CompareEqualEpsA(const Image32fC4View &pSrc2, Image8uC4View &pDst, const Pixel32fC1 &nEpsilon, const NppStreamContext &nppStreamCtx) const;
+    Image8uC1View &CompareEqualEpsA(const Image32fC4View &pSrc2, Image8uC1View &pDst, const Pixel32fC1 &nEpsilon, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCompareEqualEpsC_32f_C4R_Ctx(const Npp32f * pSrc, int nSrcStep, const Npp32f * pConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, Npp32f nEpsilon, NppStreamContext nppStreamCtx)
-    Image8uC4View &CompareEqualEps(const Pixel32fC4 &pConstants, Image8uC4View &pDst, const Pixel32fC1 &nEpsilon, const NppStreamContext &nppStreamCtx) const;
+    Image8uC1View &CompareEqualEps(const Pixel32fC4 &pConstants, Image8uC1View &pDst, const Pixel32fC1 &nEpsilon, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCompareEqualEpsC_32f_AC4R_Ctx(const Npp32f * pSrc, int nSrcStep, const Npp32f * pConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, Npp32f nEpsilon, NppStreamContext nppStreamCtx)
-    Image8uC4View &CompareEqualEpsA(const Pixel32fC3 &pConstants, Image8uC4View &pDst, const Pixel32fC1 &nEpsilon, const NppStreamContext &nppStreamCtx) const;
+    Image8uC1View &CompareEqualEpsA(const Pixel32fC3 &pConstants, Image8uC1View &pDst, const Pixel32fC1 &nEpsilon, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDilate_32f_C4R_Ctx(const Npp32f * pSrc, int nSrcStep, Npp32f * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
     Image32fC4View &Dilate(Image32fC4View &pDst, const opp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;

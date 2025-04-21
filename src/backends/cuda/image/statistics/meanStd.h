@@ -10,7 +10,7 @@
 
 namespace opp::image::cuda
 {
-// compute and result types for sum reduction:
+// compute and result types for meanStd reduction:
 template <typename SrcT> struct meanStd_types_scalar_for
 {
     using computeType = SrcT;
@@ -70,7 +70,7 @@ template <> struct meanStd_types_scalar_for<BFloat16>
 template <> struct meanStd_types_scalar_for<float>
 {
     // using 64f as intermediate format, slows down by factor 2 (roughly) and
-    // with 32f precision is still better as NPP compared to matlab...
+    // with 32f precision is still better than NPP compared to matlab...
     using computeType = float;
     using resultType1 = double;
     using resultType2 = double;

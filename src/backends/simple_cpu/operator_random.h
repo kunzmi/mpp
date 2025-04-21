@@ -2,8 +2,8 @@
 #include <common/defines.h>
 #include <common/image/pixelTypes.h>
 #include <common/opp_defs.h>
-#include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
+#include <common/vector_typetraits.h>
 #include <concepts>
 #include <random>
 
@@ -147,6 +147,146 @@ template <AnyVector T> struct FillRandom
         if constexpr (vector_size_v<T> > 3)
         {
             aDst.w = remove_vector_t<T>(uniform_dist(engine), uniform_dist(engine));
+        }
+    }
+};
+
+template <AnyVector T> struct FillRandomNormal
+{
+    std::default_random_engine engine;
+    std::normal_distribution<double> normal_dist;
+
+    FillRandomNormal() = default;
+
+    FillRandomNormal(uint aSeed, double aMean, double aStd) : engine(aSeed), normal_dist(aMean, aStd)
+    {
+    }
+
+    void operator()(T &aDst)
+        requires NativeFloatingPoint<remove_vector_t<T>>
+    {
+        aDst.x = static_cast<remove_vector_t<T>>(normal_dist(engine));
+        if constexpr (vector_size_v<T> > 1)
+        {
+            aDst.y = static_cast<remove_vector_t<T>>(normal_dist(engine));
+        }
+        if constexpr (vector_size_v<T> > 2)
+        {
+            aDst.z = static_cast<remove_vector_t<T>>(normal_dist(engine));
+        }
+        if constexpr (vector_size_v<T> > 3)
+        {
+            aDst.w = static_cast<remove_vector_t<T>>(normal_dist(engine));
+        }
+    }
+    void operator()(T &aDst)
+        requires IsHalfFp16<remove_vector_t<T>>
+    {
+        aDst.x = static_cast<HalfFp16>(normal_dist(engine));
+        if constexpr (vector_size_v<T> > 1)
+        {
+            aDst.y = static_cast<HalfFp16>(normal_dist(engine));
+        }
+        if constexpr (vector_size_v<T> > 2)
+        {
+            aDst.z = static_cast<HalfFp16>(normal_dist(engine));
+        }
+        if constexpr (vector_size_v<T> > 3)
+        {
+            aDst.w = static_cast<HalfFp16>(normal_dist(engine));
+        }
+    }
+    void operator()(T &aDst)
+        requires IsBFloat16<remove_vector_t<T>>
+    {
+        aDst.x = static_cast<BFloat16>(normal_dist(engine));
+        if constexpr (vector_size_v<T> > 1)
+        {
+            aDst.y = static_cast<BFloat16>(normal_dist(engine));
+        }
+        if constexpr (vector_size_v<T> > 2)
+        {
+            aDst.z = static_cast<BFloat16>(normal_dist(engine));
+        }
+        if constexpr (vector_size_v<T> > 3)
+        {
+            aDst.w = static_cast<BFloat16>(normal_dist(engine));
+        }
+    }
+    void operator()(T &aDst)
+        requires NativeIntegral<remove_vector_t<T>> && (!ByteSizeType<remove_vector_t<T>>)
+    {
+        aDst.x = static_cast<remove_vector_t<T>>(normal_dist(engine));
+        if constexpr (vector_size_v<T> > 1)
+        {
+            aDst.y = static_cast<remove_vector_t<T>>(normal_dist(engine));
+        }
+        if constexpr (vector_size_v<T> > 2)
+        {
+            aDst.z = static_cast<remove_vector_t<T>>(normal_dist(engine));
+        }
+        if constexpr (vector_size_v<T> > 3)
+        {
+            aDst.w = static_cast<remove_vector_t<T>>(normal_dist(engine));
+        }
+    }
+    void operator()(T &aDst)
+        requires NativeIntegral<remove_vector_t<T>> && (ByteSizeType<remove_vector_t<T>>)
+    {
+        aDst.x = static_cast<remove_vector_t<T>>(normal_dist(engine));
+        if constexpr (vector_size_v<T> > 1)
+        {
+            aDst.y = static_cast<remove_vector_t<T>>(normal_dist(engine));
+        }
+        if constexpr (vector_size_v<T> > 2)
+        {
+            aDst.z = static_cast<remove_vector_t<T>>(normal_dist(engine));
+        }
+        if constexpr (vector_size_v<T> > 3)
+        {
+            aDst.w = static_cast<remove_vector_t<T>>(normal_dist(engine));
+        }
+    }
+    void operator()(T &aDst)
+        requires ComplexFloatingPoint<remove_vector_t<T>>
+    {
+        aDst.x = remove_vector_t<T>(static_cast<complex_basetype_t<remove_vector_t<T>>>(normal_dist(engine)),
+                                    static_cast<complex_basetype_t<remove_vector_t<T>>>(normal_dist(engine)));
+        if constexpr (vector_size_v<T> > 1)
+        {
+            aDst.y = remove_vector_t<T>(static_cast<complex_basetype_t<remove_vector_t<T>>>(normal_dist(engine)),
+                                        static_cast<complex_basetype_t<remove_vector_t<T>>>(normal_dist(engine)));
+        }
+        if constexpr (vector_size_v<T> > 2)
+        {
+            aDst.z = remove_vector_t<T>(static_cast<complex_basetype_t<remove_vector_t<T>>>(normal_dist(engine)),
+                                        static_cast<complex_basetype_t<remove_vector_t<T>>>(normal_dist(engine)));
+        }
+        if constexpr (vector_size_v<T> > 3)
+        {
+            aDst.w = remove_vector_t<T>(static_cast<complex_basetype_t<remove_vector_t<T>>>(normal_dist(engine)),
+                                        static_cast<complex_basetype_t<remove_vector_t<T>>>(normal_dist(engine)));
+        }
+    }
+    void operator()(T &aDst)
+        requires ComplexIntegral<remove_vector_t<T>>
+    {
+        aDst.x = remove_vector_t<T>(static_cast<complex_basetype_t<remove_vector_t<T>>>(normal_dist(engine)),
+                                    static_cast<complex_basetype_t<remove_vector_t<T>>>(normal_dist(engine)));
+        if constexpr (vector_size_v<T> > 1)
+        {
+            aDst.y = remove_vector_t<T>(static_cast<complex_basetype_t<remove_vector_t<T>>>(normal_dist(engine)),
+                                        static_cast<complex_basetype_t<remove_vector_t<T>>>(normal_dist(engine)));
+        }
+        if constexpr (vector_size_v<T> > 2)
+        {
+            aDst.z = remove_vector_t<T>(static_cast<complex_basetype_t<remove_vector_t<T>>>(normal_dist(engine)),
+                                        static_cast<complex_basetype_t<remove_vector_t<T>>>(normal_dist(engine)));
+        }
+        if constexpr (vector_size_v<T> > 3)
+        {
+            aDst.w = remove_vector_t<T>(static_cast<complex_basetype_t<remove_vector_t<T>>>(normal_dist(engine)),
+                                        static_cast<complex_basetype_t<remove_vector_t<T>>>(normal_dist(engine)));
         }
     }
 };

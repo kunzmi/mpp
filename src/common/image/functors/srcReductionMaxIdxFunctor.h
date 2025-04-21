@@ -3,6 +3,7 @@
 #include <common/defines.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
+#include <common/maskTupel.h>
 #include <common/numberTypes.h>
 #include <common/opp_defs.h>
 #include <common/roundFunctor.h>
@@ -64,6 +65,24 @@ template <size_t tupelSize, typename SrcT> struct SrcReductionMaxIdxFunctor
         for (size_t i = 0; i < tupelSize; i++)
         {
             OpMax(tupelSrc1.value[i], aPixelX + static_cast<int>(i), aDstMax, aIdxXMax);
+        }
+    }
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, SrcT &aDstMax,
+                                same_vector_size_different_type_t<SrcT, int> &aIdxXMax,
+                                const MaskTupel<tupelSize> &aMaskTupel)
+    {
+        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+
+        // we know for src1 that it is aligned to tupels, no need to check:
+        Tupel<SrcT, tupelSize> tupelSrc1 = Tupel<SrcT, tupelSize>::LoadAligned(pixelSrc1);
+
+#pragma unroll
+        for (size_t i = 0; i < tupelSize; i++)
+        {
+            if (aMaskTupel.value[i])
+            {
+                OpMax(tupelSrc1.value[i], aPixelX + static_cast<int>(i), aDstMax, aIdxXMax);
+            }
         }
     }
 #pragma endregion

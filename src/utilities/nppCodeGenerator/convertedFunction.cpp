@@ -527,7 +527,7 @@ ConvertedFunction::ConvertedFunction(const Function &aFunction)
         std::stringstream ss;
 
         if (!IsGeometryFunction() && !IsInputPlanar() && !IsOutputPlanar() &&
-            mName.find("Pyramid") == std::string::npos)
+            mName.find("Pyramid") == std::string::npos && mName.find("Integral") == std::string::npos)
         {
             // If it is a geometry function, the ROIs may differ
             // in the planar case we can have different ROIs due to different samplings
@@ -560,6 +560,15 @@ ConvertedFunction::ConvertedFunction(const Function &aFunction)
         {
             ss << "    checkSameSize(pXMap.ROI(), aDstChannel0.ROI());" << std::endl;
             ss << "    checkSameSize(pYMap.ROI(), aDstChannel0.ROI());" << std::endl;
+        }
+        else if (mName == "Integral")
+        {
+            ss << "    checkSameSize(ROI().Size(), pDst.ROI().Size() - 1);" << std::endl;
+        }
+        else if (mName == "SqrIntegral")
+        {
+            ss << "    checkSameSize(ROI().Size(), pDst.ROI().Size() - 1);" << std::endl;
+            ss << "    checkSameSize(ROI().Size(), pSqr.ROI().Size() - 1);" << std::endl;
         }
         mCallHeader += ss.str();
     }
@@ -1452,7 +1461,7 @@ int ConvertedFunction::GetInChannels() const
 
 int ConvertedFunction::GetOutChannels() const
 {
-    if (mName == "Compare" || mName == "CompareA")
+    if (mName == "Compare" || mName == "CompareA" || mName == "CompareEqualEps" || mName == "CompareEqualEpsA")
     {
         return 1;
     }

@@ -45,6 +45,8 @@ TEST_CASE("ThreadSplit - 4 bytes base type", "[Common.Image]")
     ThreadSplit<bytesPerWarp, 2> ts32fC1_Aligned(vec32fC1, dataSize, 32);
     ThreadSplit<bytesPerWarp, 2> ts32fC1_Unaligned(vec32fC1 + 1, dataSize, 32);
 
+    ThreadSplit<64, 2> ts32fC1_Unaligned2(vec32fC1 + 1, 2046, 32);
+
     CHECK(ts32fC4_Aligned.Muted() == 0);
     CHECK(ts32fC4_Aligned.Left() == 0);
     CHECK(ts32fC4_Aligned.Center() == dataSize);

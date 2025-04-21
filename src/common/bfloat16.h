@@ -77,7 +77,7 @@ class alignas(2) BFloat16
     }
 #endif
 #ifdef IS_CUDA_COMPILER
-    DEVICE_CODE explicit BFloat16(__nv_bfloat16 aBFloat);
+    DEVICE_CODE BFloat16(__nv_bfloat16 aBFloat);
     DEVICE_CODE explicit BFloat16(float aFloat);
     DEVICE_CODE explicit BFloat16(float aFloat, RoundingMode aRoundingMode);
     DEVICE_CODE explicit BFloat16(sbyte aVal);
@@ -154,18 +154,21 @@ class alignas(2) BFloat16
     /// Truncate instead of rounding, preserving SNaN
     /// </summary>
     [[nodiscard]] static BFloat16 FromFloatTruncate(float aFloat);
-#endif
 
     // zero extend lower 16 bits of bfloat16 to convert to IEEE float
     DEVICE_CODE operator float() const; // NOLINT(hicpp-explicit-conversions)
+#endif
 
 #ifdef IS_CUDA_COMPILER
-    DEVICE_CODE operator int() const;
-    DEVICE_CODE operator uint() const;
-    DEVICE_CODE operator short() const;
-    DEVICE_CODE operator ushort() const;
-    DEVICE_CODE operator byte() const;
-    DEVICE_CODE operator sbyte() const;
+    DEVICE_CODE explicit operator float() const;
+    DEVICE_CODE operator __nv_bfloat16() const;
+    DEVICE_CODE explicit operator int() const;
+    DEVICE_CODE explicit operator uint() const;
+    DEVICE_CODE explicit operator short() const;
+    DEVICE_CODE explicit operator ushort() const;
+    DEVICE_CODE explicit operator byte() const;
+    DEVICE_CODE explicit operator sbyte() const;
+    DEVICE_CODE explicit operator double() const;
 #endif
 
     /// <summary>

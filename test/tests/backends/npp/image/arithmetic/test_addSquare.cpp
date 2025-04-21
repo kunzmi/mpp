@@ -85,7 +85,7 @@ TEST_CASE("8uC1", "[NPP.Arithmetic.AddSquareMasked]")
     cpu_src1 >> npp_src1;
     cpu_dst >> npp_dst;
 
-    cpu_src1.AddSquare(cpu_dst, cpu_mask);
+    cpu_src1.AddSquareMasked(cpu_dst, cpu_mask);
     npp_dst.AddSquare(npp_src1, npp_mask, nppCtx);
 
     npp_res << npp_dst;
@@ -147,7 +147,7 @@ TEST_CASE("16uC1", "[NPP.Arithmetic.AddSquareMasked]")
     cpu_src1 >> npp_src1;
     cpu_dst >> npp_dst;
 
-    cpu_src1.AddSquare(cpu_dst, cpu_mask);
+    cpu_src1.AddSquareMasked(cpu_dst, cpu_mask);
     npp_dst.AddSquare(npp_src1, npp_mask, nppCtx);
 
     npp_res << npp_dst;
@@ -201,7 +201,7 @@ TEST_CASE("32fC1", "[NPP.Arithmetic.AddSquareMasked]")
     cpu_src1 >> npp_src1;
     cpu_dst >> npp_dst;
 
-    cpu_src1.AddSquare(cpu_dst, cpu_mask);
+    cpu_src1.AddSquareMasked(cpu_dst, cpu_mask);
     npp_dst.AddSquare(npp_src1, npp_mask, nppCtx);
 
     npp_res << npp_dst;

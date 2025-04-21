@@ -16,6 +16,7 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
 #include <common/image/roiException.h>
+#include <common/image/size2D.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
 #include <common/opp_defs.h>
@@ -28,7 +29,7 @@ namespace opp::image::cuda
 #pragma region Convert
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
     requires(!std::same_as<T, TTo>) &&
             (RealOrComplexIntVector<T> || (std::same_as<complex_basetype_t<remove_vector_t<T>>, float> &&
                                            (std::same_as<complex_basetype_t<remove_vector_t<TTo>>, BFloat16> ||
@@ -44,7 +45,7 @@ ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, const opp::cuda::Str
 template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode,
-                                      const opp::cuda::StreamCtx &aStreamCtx)
+                                      const opp::cuda::StreamCtx &aStreamCtx) const
     requires(!std::same_as<T, TTo>) && RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -57,7 +58,7 @@ ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundi
 template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode, int aScaleFactor,
-                                      const opp::cuda::StreamCtx &aStreamCtx)
+                                      const opp::cuda::StreamCtx &aStreamCtx) const
     requires(!std::same_as<T, TTo>) && (!std::same_as<TTo, float>) && (!std::same_as<TTo, double>) &&
             (!std::same_as<TTo, Complex<float>>) && (!std::same_as<TTo, Complex<double>>)
 {
@@ -88,7 +89,8 @@ ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundi
 /// <summary>
 /// Copy image.
 /// </summary>
-template <PixelType T> ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx)
+template <PixelType T>
+ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
 {
     checkSameSize(ROI(), aDst.ROI());
 
@@ -101,8 +103,8 @@ template <PixelType T> ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst, cons
 /// Copy image with mask. Pixels with mask == 0 remain untouched in destination image.
 /// </summary>
 template <PixelType T>
-ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                 const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::CopyMasked(ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                                       const opp::cuda::StreamCtx &aStreamCtx) const
 {
     checkSameSize(ROI(), aDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
@@ -119,7 +121,7 @@ ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst, const ImageView<Pixel8uC1> 
 template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Copy(Channel aSrcChannel, ImageView<TTo> &aDst, Channel aDstChannel,
-                                   const opp::cuda::StreamCtx &aStreamCtx)
+                                   const opp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_size_v<T> > 1) &&   //
             (vector_size_v<TTo> > 1) && //
             std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
@@ -137,7 +139,8 @@ ImageView<TTo> &ImageView<T>::Copy(Channel aSrcChannel, ImageView<TTo> &aDst, Ch
 /// </summary>
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Copy(ImageView<TTo> &aDst, Channel aDstChannel, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<TTo> &ImageView<T>::Copy(ImageView<TTo> &aDst, Channel aDstChannel,
+                                   const opp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_size_v<T> == 1) &&  //
             (vector_size_v<TTo> > 1) && //
             std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
@@ -154,7 +157,8 @@ ImageView<TTo> &ImageView<T>::Copy(ImageView<TTo> &aDst, Channel aDstChannel, co
 /// </summary>
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Copy(Channel aSrcChannel, ImageView<TTo> &aDst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<TTo> &ImageView<T>::Copy(Channel aSrcChannel, ImageView<TTo> &aDst,
+                                   const opp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_size_v<T> > 1) &&    //
             (vector_size_v<TTo> == 1) && //
             std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
@@ -171,7 +175,8 @@ ImageView<TTo> &ImageView<T>::Copy(Channel aSrcChannel, ImageView<TTo> &aDst, co
 /// </summary>
 template <PixelType T>
 void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
-                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2, const opp::cuda::StreamCtx &aStreamCtx)
+                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2,
+                        const opp::cuda::StreamCtx &aStreamCtx) const
     requires(TwoChannel<T>)
 {
     checkSameSize(ROI(), aDstChannel1.ROI());
@@ -187,7 +192,8 @@ void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
 template <PixelType T>
 void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
                         ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2,
-                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel3, const opp::cuda::StreamCtx &aStreamCtx)
+                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel3,
+                        const opp::cuda::StreamCtx &aStreamCtx) const
     requires(ThreeChannel<T>)
 {
     checkSameSize(ROI(), aDstChannel1.ROI());
@@ -205,7 +211,8 @@ template <PixelType T>
 void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
                         ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2,
                         ImageView<Vector1<remove_vector_t<T>>> &aDstChannel3,
-                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel4, const opp::cuda::StreamCtx &aStreamCtx)
+                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel4,
+                        const opp::cuda::StreamCtx &aStreamCtx) const
     requires(FourChannelNoAlpha<T>)
 {
     checkSameSize(ROI(), aDstChannel1.ROI());
@@ -284,7 +291,7 @@ ImageView<T> &ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aSrcCha
 #pragma region Dup
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Dup(ImageView<TTo> &aDst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<TTo> &ImageView<T>::Dup(ImageView<TTo> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_size_v<T> == 1) &&
             (vector_size_v<TTo> > 1) && std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
 {
@@ -300,7 +307,7 @@ ImageView<TTo> &ImageView<T>::Dup(ImageView<TTo> &aDst, const opp::cuda::StreamC
 // NOLINTBEGIN(bugprone-easily-swappable-parameters)
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
     requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<T> && RealOrComplexIntVector<TTo>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -320,7 +327,7 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, const opp::cuda::Strea
 template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax,
-                                    const opp::cuda::StreamCtx &aStreamCtx)
+                                    const opp::cuda::StreamCtx &aStreamCtx) const
     requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -340,7 +347,7 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDs
 template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
-                                    const opp::cuda::StreamCtx &aStreamCtx)
+                                    const opp::cuda::StreamCtx &aStreamCtx) const
     requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<TTo>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -361,7 +368,7 @@ template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
                                     scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax,
-                                    const opp::cuda::StreamCtx &aStreamCtx)
+                                    const opp::cuda::StreamCtx &aStreamCtx) const
     requires(!std::same_as<T, TTo>)
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -397,8 +404,8 @@ ImageView<T> &ImageView<T>::Set(const opp::cuda::DevVarView<T> &aConst, const op
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Set(const T &aConst, const ImageView<Pixel8uC1> &aMask,
-                                const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::SetMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask,
+                                      const opp::cuda::StreamCtx &aStreamCtx)
 {
     checkSameSize(ROI(), aMask.ROI());
     InvokeSetCMask(aMask.PointerRoi(), aMask.Pitch(), aConst, PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
@@ -407,8 +414,8 @@ ImageView<T> &ImageView<T>::Set(const T &aConst, const ImageView<Pixel8uC1> &aMa
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Set(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                                const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::SetMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                                      const opp::cuda::StreamCtx &aStreamCtx)
 {
     checkSameSize(ROI(), aMask.ROI());
     InvokeSetDevCMask(aMask.PointerRoi(), aMask.Pitch(), aConst.Pointer(), PointerRoi(), Pitch(), SizeRoi(),
@@ -426,20 +433,22 @@ template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::SwapChannel(ImageView<TTo> &aDst,
                                           const ChannelList<vector_active_size_v<TTo>> &aDstChannels,
-                                          const opp::cuda::StreamCtx &aStreamCtx)
+                                          const opp::cuda::StreamCtx &aStreamCtx) const
     requires((vector_active_size_v<TTo> <= vector_active_size_v<T>)) && //
             (vector_size_v<T> >= 3) &&                                  //
             (vector_size_v<TTo> >= 3) &&                                //
+            (!has_alpha_channel_v<TTo>) &&                              //
+            (!has_alpha_channel_v<T>) &&                                //
             std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
 {
     checkSameSize(ROI(), aDst.ROI());
     for (size_t i = 0; i < vector_active_size_v<TTo>; i++)
     {
-        if (!aDstChannels.data()[i].template IsInRange<TTo>())
+        if (!aDstChannels.data()[i].template IsInRange<T>())
         {
-            throw INVALIDARGUMENT(
-                aDstChannels, "Channel " << i << " in aDstChannels is out of range. Expected value in range 0.."
-                                         << vector_active_size_v<TTo> - 1 << " but got: " << aDstChannels.data()[i]);
+            throw INVALIDARGUMENT(aDstChannels,
+                                  "Channel " << i << " in aDstChannels is out of range. Expected value in range 0.."
+                                             << vector_active_size_v<T> - 1 << " but got: " << aDstChannels.data()[i]);
         }
     }
 
@@ -448,20 +457,58 @@ ImageView<TTo> &ImageView<T>::SwapChannel(ImageView<TTo> &aDst,
     return aDst;
 }
 
+/// <summary>
+/// Swap channels (inplace)
+/// </summary>
+template <PixelType T>
+ImageView<T> &ImageView<T>::SwapChannel(const ChannelList<vector_active_size_v<T>> &aDstChannels,
+                                        const opp::cuda::StreamCtx &aStreamCtx)
+    requires(vector_size_v<T> >= 3) && (!has_alpha_channel_v<T>)
+{
+    for (size_t i = 0; i < vector_active_size_v<T>; i++)
+    {
+        if (!aDstChannels.data()[i].template IsInRange<T>())
+        {
+            throw INVALIDARGUMENT(aDstChannels,
+                                  "Channel " << i << " in aDstChannels is out of range. Expected value in range 0.."
+                                             << vector_active_size_v<T> - 1 << " but got: " << aDstChannels.data()[i]);
+        }
+    }
+
+    InvokeSwapChannelInplace(PointerRoi(), Pitch(), aDstChannels, SizeRoi(), aStreamCtx);
+
+    return *this;
+}
+
 template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::SwapChannel(ImageView<TTo> &aDst,
                                           const ChannelList<vector_active_size_v<TTo>> &aDstChannels,
                                           remove_vector_t<T> aValue,
-                                          const opp::cuda::StreamCtx &aStreamCtx)
+                                          const opp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_size_v<T> == 3) &&          //
             (vector_active_size_v<TTo> == 4) && //
+            (!has_alpha_channel_v<TTo>) &&      //
+            (!has_alpha_channel_v<T>) &&        //
             std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
 {
     checkSameSize(ROI(), aDst.ROI());
 
     InvokeSwapChannelSrc(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aDstChannels, aValue, SizeRoi(),
                          aStreamCtx);
+
+    return aDst;
+}
+#pragma endregion
+
+#pragma region Transpose
+template <PixelType T>
+ImageView<T> &ImageView<T>::Transpose(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
+    requires NoAlpha<T>
+{
+    checkSameSize(ROI().Size(), Size2D(aDst.SizeRoi().y, aDst.SizeRoi().x));
+
+    InvokeTransposeSrc(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aDst.SizeRoi(), aStreamCtx);
 
     return aDst;
 }

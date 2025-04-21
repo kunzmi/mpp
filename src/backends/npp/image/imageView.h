@@ -597,11 +597,10 @@ template <PixelType T> class ImageView
         return to_size_t(retValue);
     }
 
-    [[nodiscard]] static std::vector<int> EvenLevels(int aLevels, int aLowerLevel, int aUpperLevel,
-                                                     const NppStreamContext &aNppStreamCtx)
+    [[nodiscard]] static std::vector<int> EvenLevels(int aLevels, int aLowerLevel, int aUpperLevel)
     {
         std::vector<int> retValue(to_size_t(aLevels));
-        nppSafeCall(nppiEvenLevelsHost_32s_Ctx(retValue.data(), aLevels, aLowerLevel, aUpperLevel, aNppStreamCtx));
+        nppSafeCall(nppiEvenLevelsHost_32s(retValue.data(), aLevels, aLowerLevel, aUpperLevel));
         return retValue;
     }
 

@@ -215,6 +215,19 @@ size_t Size2D::TotalSize() const
     return to_size_t(x) * to_size_t(y);
 }
 
+Size2D::iterator Size2D::begin() const
+{
+    return {Index(), x};
+}
+
+Size2D::iterator Size2D::end() const
+{
+    Index idx;
+    idx.Flat  = to_size_t(x) * to_size_t(y);
+    idx.Pixel = Vector2<int>(0, y);
+    return {idx, x};
+}
+
 std::ostream &operator<<(std::ostream &aOs, const Size2D &aSize)
 {
     aOs << '(' << aSize.x << " x " << aSize.y << ')';
@@ -237,5 +250,142 @@ std::wistream &operator>>(std::wistream &aIs, Size2D &aSize)
 {
     aIs >> aSize.x >> aSize.y;
     return aIs;
+}
+
+Size2D::iterator::iterator(const Size2D::Index &aValue, int aWidth) : mValue(aValue), mWidth(aWidth)
+{
+}
+
+Size2D::iterator &Size2D::iterator::operator++()
+{
+    mValue.Flat++;
+    mValue.Pixel.x++;
+    if (mValue.Pixel.x >= mWidth)
+    {
+        mValue.Pixel.x = 0;
+        mValue.Pixel.y++;
+    }
+    return *this;
+}
+Size2D::iterator &Size2D::iterator::operator--()
+{
+    mValue.Flat--;
+    mValue.Pixel.x--;
+    if (mValue.Pixel.x < 0)
+    {
+        mValue.Pixel.x = mWidth - 1;
+        mValue.Pixel.y--;
+    }
+    return *this;
+}
+
+Size2D::iterator Size2D::iterator::operator++(int) & // NOLINT(cert-dcl21-cpp)
+{
+    iterator ret = *this;
+    operator++();
+    return ret;
+}
+Size2D::iterator Size2D::iterator::operator--(int) & // NOLINT(cert-dcl21-cpp)
+{
+    iterator ret = *this;
+    operator--();
+    return ret;
+}
+
+bool Size2D::iterator::operator==(Size2D::iterator const &aOther) const
+{
+    return mValue.Flat == aOther.mValue.Flat && mValue.Pixel == aOther.mValue.Pixel && mWidth == aOther.mWidth;
+}
+
+bool Size2D::iterator::operator!=(Size2D::iterator const &aOther) const
+{
+    return !(*this == aOther);
+}
+
+Size2D::iterator::reference Size2D::iterator::operator*()
+{
+    return mValue;
+}
+
+Size2D::iterator::pointer Size2D::iterator::operator->()
+{
+    return &mValue;
+}
+
+Size2D::iterator::difference_type Size2D::iterator::operator[](Size2D::iterator::difference_type aRhs) const
+{
+    difference_type diff = to_long64(mValue.Flat);
+    diff += aRhs;
+    return diff;
+}
+
+Size2D::iterator::difference_type Size2D::iterator::operator-(const Size2D::iterator &aRhs) const
+{
+    difference_type diff = to_long64(mValue.Flat);
+    diff -= to_long64(aRhs.mValue.Flat);
+    return diff;
+}
+Size2D::iterator Size2D::iterator::operator+(Size2D::iterator::difference_type aRhs) const
+{
+    Size2D::Index idx;
+    idx.Flat    = to_size_t(to_long64(mValue.Flat) + aRhs);
+    idx.Pixel.y = to_int(idx.Flat / to_size_t(mWidth));
+    idx.Pixel.x = to_int(idx.Flat - to_size_t(idx.Pixel.y) * to_size_t(mWidth));
+    return {idx, mWidth};
+}
+Size2D::iterator Size2D::iterator::operator-(Size2D::iterator::difference_type aRhs) const
+{
+    Size2D::Index idx;
+    idx.Flat    = to_size_t(to_long64(mValue.Flat) - aRhs);
+    idx.Pixel.y = to_int(idx.Flat / to_size_t(mWidth));
+    idx.Pixel.x = to_int(idx.Flat - to_size_t(idx.Pixel.y) * to_size_t(mWidth));
+    return {idx, mWidth};
+}
+Size2D::iterator &Size2D::iterator::operator+=(Size2D::iterator::difference_type aRhs)
+{
+    mValue.Flat    = to_size_t(to_long64(mValue.Flat) + aRhs);
+    mValue.Pixel.y = to_int(mValue.Flat / to_size_t(mWidth));
+    mValue.Pixel.x = to_int(mValue.Flat - to_size_t(mValue.Pixel.y) * to_size_t(mWidth));
+    return *this;
+}
+Size2D::iterator &Size2D::iterator::operator-=(Size2D::iterator::difference_type aRhs)
+{
+    mValue.Flat    = to_size_t(to_long64(mValue.Flat) - aRhs);
+    mValue.Pixel.y = to_int(mValue.Flat / to_size_t(mWidth));
+    mValue.Pixel.x = to_int(mValue.Flat - to_size_t(mValue.Pixel.y) * to_size_t(mWidth));
+    return *this;
+}
+Size2D::iterator operator+(Size2D::iterator::difference_type aLhs, const Size2D::iterator &aRhs)
+{
+    Size2D::Index idx;
+    idx.Flat    = to_size_t(aLhs + to_long64(aRhs.mValue.Flat));
+    idx.Pixel.y = to_int(idx.Flat / to_size_t(aRhs.mWidth));
+    idx.Pixel.x = to_int(idx.Flat - to_size_t(idx.Pixel.y) * to_size_t(aRhs.mWidth));
+    return {idx, aRhs.mWidth};
+}
+Size2D::iterator operator-(Size2D::iterator::difference_type aLhs, const Size2D::iterator &aRhs)
+{
+    Size2D::Index idx;
+    idx.Flat    = to_size_t(aLhs - to_long64(aRhs.mValue.Flat));
+    idx.Pixel.y = to_int(idx.Flat / to_size_t(aRhs.mWidth));
+    idx.Pixel.x = to_int(idx.Flat - to_size_t(idx.Pixel.y) * to_size_t(aRhs.mWidth));
+    return {idx, aRhs.mWidth};
+}
+
+bool Size2D::iterator::operator>(const Size2D::iterator &aRhs) const
+{
+    return mValue.Flat > aRhs.mValue.Flat;
+}
+bool Size2D::iterator::operator<(const Size2D::iterator &aRhs) const
+{
+    return mValue.Flat < aRhs.mValue.Flat;
+}
+bool Size2D::iterator::operator>=(const Size2D::iterator &aRhs) const
+{
+    return mValue.Flat >= aRhs.mValue.Flat;
+}
+bool Size2D::iterator::operator<=(const Size2D::iterator &aRhs) const
+{
+    return mValue.Flat <= aRhs.mValue.Flat;
 }
 } // namespace opp::image

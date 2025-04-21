@@ -51,7 +51,7 @@ class alignas(2) HalfFp16
     explicit HalfFp16(byte aByte);
 #endif
 #ifdef IS_CUDA_COMPILER
-    DEVICE_CODE explicit HalfFp16(__half aHalf);
+    DEVICE_CODE HalfFp16(__half aHalf);
     DEVICE_CODE explicit HalfFp16(float aFloat);
     DEVICE_CODE explicit HalfFp16(float aFloat, RoundingMode aRoundingMode);
     DEVICE_CODE explicit HalfFp16(double aDouble);
@@ -85,18 +85,22 @@ class alignas(2) HalfFp16
     friend bool DEVICE_CODE isnan(HalfFp16 aVal);
     friend bool DEVICE_CODE isinf(HalfFp16 aVal);
 
-    DEVICE_CODE operator float() const; // NOLINT(hicpp-explicit-conversions)
-
 #ifdef IS_CUDA_COMPILER
-    DEVICE_CODE operator int() const;
-    DEVICE_CODE operator uint() const;
-    DEVICE_CODE operator short() const;
-    DEVICE_CODE operator ushort() const;
-    DEVICE_CODE operator byte() const;
-    DEVICE_CODE operator sbyte() const;
+    DEVICE_CODE operator __half() const;
+    DEVICE_CODE explicit operator int() const;
+    DEVICE_CODE explicit operator uint() const;
+    DEVICE_CODE explicit operator short() const;
+    DEVICE_CODE explicit operator ushort() const;
+    DEVICE_CODE explicit operator byte() const;
+    DEVICE_CODE explicit operator sbyte() const;
+    DEVICE_CODE explicit operator double() const; // we need that one for the conversion kernel
+
+    DEVICE_CODE explicit operator float() const; // NOLINT(hicpp-explicit-conversions)
 #endif
 
 #ifdef IS_HOST_COMPILER
+    DEVICE_CODE operator float() const; // NOLINT(hicpp-explicit-conversions)
+
     [[nodiscard]] constexpr static HalfFp16 FromUShort(ushort aUShort)
     {
         HalfFp16 ret;

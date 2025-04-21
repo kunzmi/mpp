@@ -10,6 +10,7 @@
 #include <common/defines.h>
 #include <common/image/channel.h>
 #include <common/image/channelList.h>
+#include <common/image/functors/inplaceFunctor.h>
 #include <common/image/functors/srcDstAsSrcFunctor.h>
 #include <common/image/functors/srcFunctor.h>
 #include <common/image/pixelTypeEnabler.h>
@@ -35,16 +36,35 @@ void InvokeSwapChannelSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size
     {
         OPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+        // in case that either input or ourput type is three-channel, we can't use tupels:
+        if constexpr (vector_size_v<SrcT> == 3 || vector_size_v<DstT> == 3)
+        {
+            constexpr size_t TupelSize = 1;
 
-        using swapChannelSrc =
-            SrcFunctor<TupelSize, SrcT, SrcT, DstT, opp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
+            using swapChannelSrc =
+                SrcFunctor<TupelSize, SrcT, SrcT, DstT, opp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
 
-        const opp::SwapChannel<SrcT, DstT> op(aDstChannels);
+            const opp::SwapChannel<SrcT, DstT> op(aDstChannels);
 
-        const swapChannelSrc functor(aSrc1, aPitchSrc1, op);
+            const swapChannelSrc functor(aSrc1, aPitchSrc1, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, swapChannelSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, swapChannelSrc>(aDst, aPitchDst, aSize, aStreamCtx,
+                                                                             functor);
+        }
+        else
+        {
+            constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+            using swapChannelSrc =
+                SrcFunctor<TupelSize, SrcT, SrcT, DstT, opp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
+
+            const opp::SwapChannel<SrcT, DstT> op(aDstChannels);
+
+            const swapChannelSrc functor(aSrc1, aPitchSrc1, op);
+
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, swapChannelSrc>(aDst, aPitchDst, aSize, aStreamCtx,
+                                                                             functor);
+        }
     }
 }
 
@@ -56,30 +76,25 @@ void InvokeSwapChannelSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size
         const ChannelList<vector_active_size_v<typeDst>> &aDstChannels, const Size2D &aSize,                           \
         const StreamCtx &aStreamCtx);
 
-#define ForAllChannelsWithAlpha(type)                                                                                  \
-    Instantiate_For(Pixel##type##C3, Pixel##type##C3);                                                                 \
-    Instantiate_For(Pixel##type##C4, Pixel##type##C4);                                                                 \
-    Instantiate_For(Pixel##type##C4, Pixel##type##C3);                                                                 \
-    Instantiate_For(Pixel##type##C4A, Pixel##type##C4A);
-
 #define ForAllChannelsNoAlpha(type)                                                                                    \
     Instantiate_For(Pixel##type##C3, Pixel##type##C3);                                                                 \
-    Instantiate_For(Pixel##type##C4, Pixel##type##C4);                                                                 \
-    Instantiate_For(Pixel##type##C4, Pixel##type##C3);
+    Instantiate_For(Pixel##type##C3, Pixel##type##C4);                                                                 \
+    Instantiate_For(Pixel##type##C4, Pixel##type##C3);                                                                 \
+    Instantiate_For(Pixel##type##C4, Pixel##type##C4);
 
-ForAllChannelsWithAlpha(8s);
-ForAllChannelsWithAlpha(8u);
+ForAllChannelsNoAlpha(8s);
+ForAllChannelsNoAlpha(8u);
 
-ForAllChannelsWithAlpha(16s);
-ForAllChannelsWithAlpha(16u);
+ForAllChannelsNoAlpha(16s);
+ForAllChannelsNoAlpha(16u);
 
-ForAllChannelsWithAlpha(32s);
-ForAllChannelsWithAlpha(32u);
+ForAllChannelsNoAlpha(32s);
+ForAllChannelsNoAlpha(32u);
 
-ForAllChannelsWithAlpha(16f);
-ForAllChannelsWithAlpha(16bf);
-ForAllChannelsWithAlpha(32f);
-ForAllChannelsWithAlpha(64f);
+ForAllChannelsNoAlpha(16f);
+ForAllChannelsNoAlpha(16bf);
+ForAllChannelsNoAlpha(32f);
+ForAllChannelsNoAlpha(64f);
 
 ForAllChannelsNoAlpha(16sc);
 ForAllChannelsNoAlpha(32sc);
@@ -87,7 +102,6 @@ ForAllChannelsNoAlpha(32fc);
 
 #undef Instantiate_For
 #undef ForAllChannelsNoAlpha
-#undef ForAllChannelsWithAlpha
 #pragma endregion
 
 template <ThreeChannel SrcT, FourChannelNoAlpha DstT>
@@ -141,23 +155,21 @@ void InvokeSwapChannelSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size
         const ChannelList<vector_active_size_v<typeDst>> &aDstChannels, remove_vector_t<typeDst> aValue,               \
         const Size2D &aSize, const StreamCtx &aStreamCtx);
 
-#define ForAllChannelsWithAlpha(type) Instantiate_For(Pixel##type##C3, Pixel##type##C4);
-
 #define ForAllChannelsNoAlpha(type) Instantiate_For(Pixel##type##C3, Pixel##type##C4);
 
-ForAllChannelsWithAlpha(8s);
-ForAllChannelsWithAlpha(8u);
+ForAllChannelsNoAlpha(8s);
+ForAllChannelsNoAlpha(8u);
 
-ForAllChannelsWithAlpha(16s);
-ForAllChannelsWithAlpha(16u);
+ForAllChannelsNoAlpha(16s);
+ForAllChannelsNoAlpha(16u);
 
-ForAllChannelsWithAlpha(32s);
-ForAllChannelsWithAlpha(32u);
+ForAllChannelsNoAlpha(32s);
+ForAllChannelsNoAlpha(32u);
 
-ForAllChannelsWithAlpha(16f);
-ForAllChannelsWithAlpha(16bf);
-ForAllChannelsWithAlpha(32f);
-ForAllChannelsWithAlpha(64f);
+ForAllChannelsNoAlpha(16f);
+ForAllChannelsNoAlpha(16bf);
+ForAllChannelsNoAlpha(32f);
+ForAllChannelsNoAlpha(64f);
 
 ForAllChannelsNoAlpha(16sc);
 ForAllChannelsNoAlpha(32sc);
@@ -165,7 +177,63 @@ ForAllChannelsNoAlpha(32fc);
 
 #undef Instantiate_For
 #undef ForAllChannelsNoAlpha
-#undef ForAllChannelsWithAlpha
+#pragma endregion
+
+template <typename SrcT>
+void InvokeSwapChannelInplace(SrcT *aSrcDst, size_t aPitchSrcDst,
+                              const ChannelList<vector_active_size_v<SrcT>> &aDstChannels, const Size2D &aSize,
+                              const opp::cuda::StreamCtx &aStreamCtx)
+{
+    if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
+    {
+        using DstT = SrcT;
+        OPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+
+        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+        using swapChannelInplace =
+            InplaceFunctor<TupelSize, SrcT, DstT, opp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
+
+        const opp::SwapChannel<SrcT, DstT> op(aDstChannels);
+
+        const swapChannelInplace functor(op);
+
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, swapChannelInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
+                                                                             functor);
+    }
+}
+
+#pragma region Instantiate
+
+#define Instantiate_For(typeSrc)                                                                                       \
+    template void InvokeSwapChannelInplace<typeSrc>(typeSrc * aSrcDst, size_t aPitchSrcDst,                            \
+                                                    const ChannelList<vector_active_size_v<typeSrc>> &aDstChannels,    \
+                                                    const Size2D &aSize, const StreamCtx &aStreamCtx);
+
+#define ForAllChannelsNoAlpha(type)                                                                                    \
+    Instantiate_For(Pixel##type##C3);                                                                                  \
+    Instantiate_For(Pixel##type##C4);
+
+ForAllChannelsNoAlpha(8s);
+ForAllChannelsNoAlpha(8u);
+
+ForAllChannelsNoAlpha(16s);
+ForAllChannelsNoAlpha(16u);
+
+ForAllChannelsNoAlpha(32s);
+ForAllChannelsNoAlpha(32u);
+
+ForAllChannelsNoAlpha(16f);
+ForAllChannelsNoAlpha(16bf);
+ForAllChannelsNoAlpha(32f);
+ForAllChannelsNoAlpha(64f);
+
+ForAllChannelsNoAlpha(16sc);
+ForAllChannelsNoAlpha(32sc);
+ForAllChannelsNoAlpha(32fc);
+
+#undef Instantiate_For
+#undef ForAllChannelsNoAlpha
 #pragma endregion
 
 } // namespace opp::image::cuda

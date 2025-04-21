@@ -450,6 +450,11 @@ struct SwapChannel<SrcT, DstT>
     {
     }
 
+    SwapChannel(const opp::image::ChannelList<4> &aChannel)
+        : DstOrder{aChannel.data()[0], aChannel.data()[1], aChannel.data()[2], aChannel.data()[3]}, mValue(0)
+    {
+    }
+
     // In case that one DstOrder-value is > 3, i.e. undefined we leave the destination pixel value untouched. This then
     // means that we have to load the value before hand from memory. Here the initial Dst-Value is unknown as aDst has
     // not been loaded from memory. Thus this operator() can only be called when all DstOrder-values are <= 3.
@@ -619,11 +624,11 @@ struct Copy<SrcT, DstT>
 };
 
 // due to the high number of constants, we put them all here in the operator and not in the functor...
-template <RealVector T> struct MinVal
+template <RealVector T> struct MaxVal
 {
     T Val;
     T Threshold;
-    MinVal(T aVal, T aThreshold) : Val(aVal), Threshold(aThreshold)
+    MaxVal(T aVal, T aThreshold) : Val(aVal), Threshold(aThreshold)
     {
     }
 
@@ -661,11 +666,11 @@ template <RealVector T> struct MinVal
     }
 };
 
-template <RealVector T> struct MaxVal
+template <RealVector T> struct MinVal
 {
     T Val;
     T Threshold;
-    MaxVal(T aVal, T aThreshold) : Val(aVal), Threshold(aThreshold)
+    MinVal(T aVal, T aThreshold) : Val(aVal), Threshold(aThreshold)
     {
     }
 
@@ -716,34 +721,34 @@ template <RealVector T> struct MinValMaxVal
 
     DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
     {
-        aDst.x = aSrc1.x < MinThreshold.x ? MinVal.x : (aSrc1.x > MaxThreshold.x ? MaxVal.x : aSrc1.x);
+        aDst.x = aSrc1.x > MinThreshold.x ? MinVal.x : (aSrc1.x < MaxThreshold.x ? MaxVal.x : aSrc1.x);
         if constexpr (vector_active_size_v<T> > 1)
         {
-            aDst.y = aSrc1.y < MinThreshold.y ? MinVal.y : (aSrc1.y > MaxThreshold.y ? MaxVal.y : aSrc1.y);
+            aDst.y = aSrc1.y > MinThreshold.y ? MinVal.y : (aSrc1.y < MaxThreshold.y ? MaxVal.y : aSrc1.y);
         }
         if constexpr (vector_active_size_v<T> > 2)
         {
-            aDst.z = aSrc1.z < MinThreshold.z ? MinVal.z : (aSrc1.z > MaxThreshold.z ? MaxVal.z : aSrc1.z);
+            aDst.z = aSrc1.z > MinThreshold.z ? MinVal.z : (aSrc1.z < MaxThreshold.z ? MaxVal.z : aSrc1.z);
         }
         if constexpr (vector_active_size_v<T> > 3)
         {
-            aDst.w = aSrc1.w < MinThreshold.w ? MinVal.w : (aSrc1.w > MaxThreshold.w ? MaxVal.w : aSrc1.w);
+            aDst.w = aSrc1.w > MinThreshold.w ? MinVal.w : (aSrc1.w < MaxThreshold.w ? MaxVal.w : aSrc1.w);
         }
     }
     DEVICE_CODE void operator()(T &aSrcDst)
     {
-        aSrcDst.x = aSrcDst.x < MinThreshold.x ? MinVal.x : (aSrcDst.x > MaxThreshold.x ? MaxVal.x : aSrcDst.x);
+        aSrcDst.x = aSrcDst.x > MinThreshold.x ? MinVal.x : (aSrcDst.x < MaxThreshold.x ? MaxVal.x : aSrcDst.x);
         if constexpr (vector_active_size_v<T> > 1)
         {
-            aSrcDst.y = aSrcDst.y < MinThreshold.y ? MinVal.y : (aSrcDst.y > MaxThreshold.y ? MaxVal.y : aSrcDst.y);
+            aSrcDst.y = aSrcDst.y > MinThreshold.y ? MinVal.y : (aSrcDst.y < MaxThreshold.y ? MaxVal.y : aSrcDst.y);
         }
         if constexpr (vector_active_size_v<T> > 2)
         {
-            aSrcDst.z = aSrcDst.z < MinThreshold.z ? MinVal.z : (aSrcDst.z > MaxThreshold.z ? MaxVal.z : aSrcDst.z);
+            aSrcDst.z = aSrcDst.z > MinThreshold.z ? MinVal.z : (aSrcDst.z < MaxThreshold.z ? MaxVal.z : aSrcDst.z);
         }
         if constexpr (vector_active_size_v<T> > 3)
         {
-            aSrcDst.w = aSrcDst.w < MinThreshold.w ? MinVal.w : (aSrcDst.w > MaxThreshold.w ? MaxVal.w : aSrcDst.w);
+            aSrcDst.w = aSrcDst.w > MinThreshold.w ? MinVal.w : (aSrcDst.w < MaxThreshold.w ? MaxVal.w : aSrcDst.w);
         }
     }
 };

@@ -27,9 +27,8 @@ namespace opp::image::cuda
 {
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeCountInRangeSrc(const SrcT *aSrc, size_t aPitchSrc, ComputeT *aTempBuffer, DstT *aDst,
-                           remove_vector_t<DstT> *aDstScalar, remove_vector_t<SrcT> aLowerLimit,
-                           remove_vector_t<SrcT> aUpperLimit, const Size2D &aSize,
-                           const opp::cuda::StreamCtx &aStreamCtx)
+                           remove_vector_t<DstT> *aDstScalar, const SrcT &aLowerLimit, const SrcT &aUpperLimit,
+                           const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
 {
     if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
     {
@@ -60,8 +59,7 @@ void InvokeCountInRangeSrc(const SrcT *aSrc, size_t aPitchSrc, ComputeT *aTempBu
 #define Instantiate_For(typeSrc, typeTemp, typeDst)                                                                    \
     template void InvokeCountInRangeSrc<typeSrc, typeTemp, typeDst>(                                                   \
         const typeSrc *aSrc, size_t aPitchSrc1, typeTemp *aTemp, typeDst *aDst, remove_vector_t<typeDst> *aDstScalar,  \
-        remove_vector_t<typeSrc> aLowerLimit, remove_vector_t<typeSrc> aUpperLimit, const Size2D &aSize,               \
-        const StreamCtx &aStreamCtx);
+        const typeSrc &aLowerLimit, const typeSrc &aUpperLimit, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsWithAlpha(typeIn, typeCompute, typeDst)                                                          \
     Instantiate_For(Pixel##typeIn##C1, Pixel##typeCompute##C1, Pixel##typeDst##C1);                                    \

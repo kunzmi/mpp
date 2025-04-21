@@ -1252,11 +1252,11 @@ void TIFFFile::DecodeDifferencingPredictor(size_t aIdx)
             nextPixelOffset = 1;
             planeOffset     = width * height;
             colorPlanes     = to_size_t(mSamplesPerPixel);
-            lineOffset      = width * to_size_t(mBitsPerSample / 8);
+            lineOffset      = width /** to_size_t(mBitsPerSample / 8)*/;
         }
         else
         {
-            lineOffset = width * to_size_t(mSamplesPerPixel) * to_size_t(mBitsPerSample / 8);
+            lineOffset = width * to_size_t(mSamplesPerPixel) /** to_size_t(mBitsPerSample / 8)*/;
         }
 
         switch (mBitsPerSample)
@@ -1365,7 +1365,7 @@ void TIFFFile::EncodeDifferencingPredictor(void *aData, opp::image::PixelTypeEnu
     const size_t nextPixelOffset = samplesPerPixel;
     const size_t colorPlanes     = 1;
     const size_t planeOffset     = 0;
-    lineOffset                   = width * samplesPerPixel * bitsPerSample / 8;
+    lineOffset                   = width * samplesPerPixel /* * bitsPerSample / 8*/;
 
     /*if (mIsPlanar) //can't be planar at this stage
     {
@@ -1695,6 +1695,10 @@ opp::image::PixelTypeEnum TIFFFile::GetDataTypeUnsigned() const
         {
             return opp::image::PixelTypeEnum::PTE32uC1;
         }
+        if (mBitsPerSample == 64)
+        {
+            return opp::image::PixelTypeEnum::PTE64uC1;
+        }
     }
     if (mSamplesPerPixel == 2)
     {
@@ -1709,6 +1713,10 @@ opp::image::PixelTypeEnum TIFFFile::GetDataTypeUnsigned() const
         if (mBitsPerSample == 32)
         {
             return opp::image::PixelTypeEnum::PTE32uC2;
+        }
+        if (mBitsPerSample == 64)
+        {
+            return opp::image::PixelTypeEnum::PTE64uC2;
         }
     }
     if (mSamplesPerPixel == 3)
@@ -1725,6 +1733,10 @@ opp::image::PixelTypeEnum TIFFFile::GetDataTypeUnsigned() const
         {
             return opp::image::PixelTypeEnum::PTE32uC3;
         }
+        if (mBitsPerSample == 64)
+        {
+            return opp::image::PixelTypeEnum::PTE64uC3;
+        }
     }
     if (mSamplesPerPixel == 4)
     {
@@ -1739,6 +1751,10 @@ opp::image::PixelTypeEnum TIFFFile::GetDataTypeUnsigned() const
         if (mBitsPerSample == 32)
         {
             return opp::image::PixelTypeEnum::PTE32uC4;
+        }
+        if (mBitsPerSample == 64)
+        {
+            return opp::image::PixelTypeEnum::PTE64uC4;
         }
     }
     return opp::image::PixelTypeEnum::Unknown;
@@ -1762,6 +1778,10 @@ opp::image::PixelTypeEnum TIFFFile::GetDataTypeSigned() const
         {
             return opp::image::PixelTypeEnum::PTE32sC1;
         }
+        if (mBitsPerSample == 64)
+        {
+            return opp::image::PixelTypeEnum::PTE64sC1;
+        }
     }
     if (mSamplesPerPixel == 2)
     {
@@ -1776,6 +1796,10 @@ opp::image::PixelTypeEnum TIFFFile::GetDataTypeSigned() const
         if (mBitsPerSample == 32)
         {
             return opp::image::PixelTypeEnum::PTE32sC2;
+        }
+        if (mBitsPerSample == 64)
+        {
+            return opp::image::PixelTypeEnum::PTE64sC2;
         }
     }
     if (mSamplesPerPixel == 3)
@@ -1792,6 +1816,10 @@ opp::image::PixelTypeEnum TIFFFile::GetDataTypeSigned() const
         {
             return opp::image::PixelTypeEnum::PTE32sC3;
         }
+        if (mBitsPerSample == 64)
+        {
+            return opp::image::PixelTypeEnum::PTE64sC3;
+        }
     }
     if (mSamplesPerPixel == 4)
     {
@@ -1806,6 +1834,10 @@ opp::image::PixelTypeEnum TIFFFile::GetDataTypeSigned() const
         if (mBitsPerSample == 32)
         {
             return opp::image::PixelTypeEnum::PTE32sC4;
+        }
+        if (mBitsPerSample == 64)
+        {
+            return opp::image::PixelTypeEnum::PTE64sC4;
         }
     }
     return opp::image::PixelTypeEnum::Unknown;
@@ -1876,6 +1908,10 @@ opp::image::PixelTypeEnum TIFFFile::GetDataTypeComplex() const
         {
             return opp::image::PixelTypeEnum::PTE32scC1;
         }
+        if (mBitsPerSample == 128)
+        {
+            return opp::image::PixelTypeEnum::PTE64scC1;
+        }
     }
     if (mSamplesPerPixel == 2)
     {
@@ -1886,6 +1922,10 @@ opp::image::PixelTypeEnum TIFFFile::GetDataTypeComplex() const
         if (mBitsPerSample == 64)
         {
             return opp::image::PixelTypeEnum::PTE32scC2;
+        }
+        if (mBitsPerSample == 128)
+        {
+            return opp::image::PixelTypeEnum::PTE64scC2;
         }
     }
     if (mSamplesPerPixel == 3)
@@ -1898,6 +1938,10 @@ opp::image::PixelTypeEnum TIFFFile::GetDataTypeComplex() const
         {
             return opp::image::PixelTypeEnum::PTE32scC3;
         }
+        if (mBitsPerSample == 128)
+        {
+            return opp::image::PixelTypeEnum::PTE64scC3;
+        }
     }
     if (mSamplesPerPixel == 4)
     {
@@ -1908,6 +1952,10 @@ opp::image::PixelTypeEnum TIFFFile::GetDataTypeComplex() const
         if (mBitsPerSample == 64)
         {
             return opp::image::PixelTypeEnum::PTE32scC4;
+        }
+        if (mBitsPerSample == 128)
+        {
+            return opp::image::PixelTypeEnum::PTE64scC4;
         }
     }
     return opp::image::PixelTypeEnum::Unknown;
@@ -1923,12 +1971,20 @@ opp::image::PixelTypeEnum TIFFFile::GetDataTypeComplexFloat() const
         {
             return opp::image::PixelTypeEnum::PTE32fcC1;
         }
+        if (mBitsPerSample == 128)
+        {
+            return opp::image::PixelTypeEnum::PTE64fcC1;
+        }
     }
     if (mSamplesPerPixel == 2)
     {
         if (mBitsPerSample == 64)
         {
             return opp::image::PixelTypeEnum::PTE32fcC2;
+        }
+        if (mBitsPerSample == 128)
+        {
+            return opp::image::PixelTypeEnum::PTE64fcC2;
         }
     }
     if (mSamplesPerPixel == 3)
@@ -1937,12 +1993,20 @@ opp::image::PixelTypeEnum TIFFFile::GetDataTypeComplexFloat() const
         {
             return opp::image::PixelTypeEnum::PTE32fcC3;
         }
+        if (mBitsPerSample == 128)
+        {
+            return opp::image::PixelTypeEnum::PTE64fcC3;
+        }
     }
     if (mSamplesPerPixel == 4)
     {
         if (mBitsPerSample == 64)
         {
             return opp::image::PixelTypeEnum::PTE32fcC4;
+        }
+        if (mBitsPerSample == 128)
+        {
+            return opp::image::PixelTypeEnum::PTE64fcC4;
         }
     }
     return opp::image::PixelTypeEnum::Unknown;
@@ -2005,6 +2069,30 @@ void TIFFFile::SetDataType(opp::image::PixelTypeEnum aDataType)
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 64;
             return;
+        case opp::image::PixelTypeEnum::PTE64fcC1:
+            mSampleFormat              = TIFFSampleFormat::COMPLEXIEEEFP;
+            mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
+            mSamplesPerPixel           = 1;
+            mBitsPerSample             = 128;
+            return;
+        case opp::image::PixelTypeEnum::PTE64fcC2:
+            mSampleFormat              = TIFFSampleFormat::COMPLEXIEEEFP;
+            mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
+            mSamplesPerPixel           = 2;
+            mBitsPerSample             = 128;
+            return;
+        case opp::image::PixelTypeEnum::PTE64fcC3:
+            mSampleFormat              = TIFFSampleFormat::COMPLEXIEEEFP;
+            mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
+            mSamplesPerPixel           = 3;
+            mBitsPerSample             = 128;
+            return;
+        case opp::image::PixelTypeEnum::PTE64fcC4:
+            mSampleFormat              = TIFFSampleFormat::COMPLEXIEEEFP;
+            mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
+            mSamplesPerPixel           = 4;
+            mBitsPerSample             = 128;
+            return;
         case opp::image::PixelTypeEnum::PTE32fC1:
             mSampleFormat              = TIFFSampleFormat::IEEEFP;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
@@ -2055,6 +2143,90 @@ void TIFFFile::SetDataType(opp::image::PixelTypeEnum aDataType)
             return;
         case opp::image::PixelTypeEnum::PTE32fcC4:
             mSampleFormat              = TIFFSampleFormat::COMPLEXIEEEFP;
+            mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
+            mSamplesPerPixel           = 4;
+            mBitsPerSample             = 64;
+            return;
+        case opp::image::PixelTypeEnum::PTE64sC1:
+            mSampleFormat              = TIFFSampleFormat::INT;
+            mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
+            mSamplesPerPixel           = 1;
+            mBitsPerSample             = 64;
+            return;
+        case opp::image::PixelTypeEnum::PTE64sC2:
+            mSampleFormat              = TIFFSampleFormat::INT;
+            mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
+            mSamplesPerPixel           = 2;
+            mBitsPerSample             = 64;
+            return;
+        case opp::image::PixelTypeEnum::PTE64sC3:
+            mSampleFormat              = TIFFSampleFormat::INT;
+            mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
+            mSamplesPerPixel           = 3;
+            mBitsPerSample             = 64;
+            return;
+        case opp::image::PixelTypeEnum::PTE64sC4:
+            mSampleFormat              = TIFFSampleFormat::INT;
+            mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
+            mSamplesPerPixel           = 4;
+            mBitsPerSample             = 64;
+            return;
+        case opp::image::PixelTypeEnum::PTE64sC4A:
+            mSampleFormat              = TIFFSampleFormat::INT;
+            mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
+            mSamplesPerPixel           = 4;
+            mBitsPerSample             = 64;
+            return;
+        case opp::image::PixelTypeEnum::PTE64scC1:
+            mSampleFormat              = TIFFSampleFormat::COMPLEXINT;
+            mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
+            mSamplesPerPixel           = 1;
+            mBitsPerSample             = 128;
+            return;
+        case opp::image::PixelTypeEnum::PTE64scC2:
+            mSampleFormat              = TIFFSampleFormat::COMPLEXINT;
+            mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
+            mSamplesPerPixel           = 2;
+            mBitsPerSample             = 128;
+            return;
+        case opp::image::PixelTypeEnum::PTE64scC3:
+            mSampleFormat              = TIFFSampleFormat::COMPLEXINT;
+            mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
+            mSamplesPerPixel           = 3;
+            mBitsPerSample             = 128;
+            return;
+        case opp::image::PixelTypeEnum::PTE64scC4:
+            mSampleFormat              = TIFFSampleFormat::COMPLEXINT;
+            mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
+            mSamplesPerPixel           = 4;
+            mBitsPerSample             = 128;
+            return;
+        case opp::image::PixelTypeEnum::PTE64uC1:
+            mSampleFormat              = TIFFSampleFormat::UINT;
+            mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
+            mSamplesPerPixel           = 1;
+            mBitsPerSample             = 64;
+            return;
+        case opp::image::PixelTypeEnum::PTE64uC2:
+            mSampleFormat              = TIFFSampleFormat::UINT;
+            mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
+            mSamplesPerPixel           = 2;
+            mBitsPerSample             = 64;
+            return;
+        case opp::image::PixelTypeEnum::PTE64uC3:
+            mSampleFormat              = TIFFSampleFormat::UINT;
+            mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
+            mSamplesPerPixel           = 3;
+            mBitsPerSample             = 64;
+            return;
+        case opp::image::PixelTypeEnum::PTE64uC4:
+            mSampleFormat              = TIFFSampleFormat::UINT;
+            mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
+            mSamplesPerPixel           = 4;
+            mBitsPerSample             = 64;
+            return;
+        case opp::image::PixelTypeEnum::PTE64uC4A:
+            mSampleFormat              = TIFFSampleFormat::UINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 64;

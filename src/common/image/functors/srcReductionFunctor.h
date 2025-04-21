@@ -3,13 +3,14 @@
 #include <common/defines.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
+#include <common/maskTupel.h>
 #include <common/numberTypes.h>
 #include <common/opp_defs.h>
 #include <common/roundFunctor.h>
 #include <common/statistics/operators.h>
 #include <common/tupel.h>
-#include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vectorTypes.h>
 #include <concepts>
 
 // disable warning for pragma unroll when compiling with host compiler:
@@ -63,6 +64,40 @@ template <size_t tupelSize, typename SrcT, typename DstT, typename operation> st
         for (size_t i = 0; i < tupelSize; i++)
         {
             Op(tupelSrc1.value[i], aDst);
+        }
+    }
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst, const MaskTupel<tupelSize> &aMaskTupel,
+                                int &maskCount)
+    {
+        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+
+        // we know for src1 that it is aligned to tupels, no need to check:
+        Tupel<SrcT, tupelSize> tupelSrc1 = Tupel<SrcT, tupelSize>::LoadAligned(pixelSrc1);
+
+#pragma unroll
+        for (size_t i = 0; i < tupelSize; i++)
+        {
+            if (aMaskTupel.value[i])
+            {
+                Op(tupelSrc1.value[i], aDst);
+                maskCount++;
+            }
+        }
+    }
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst, const MaskTupel<tupelSize> &aMaskTupel)
+    {
+        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+
+        // we know for src1 that it is aligned to tupels, no need to check:
+        Tupel<SrcT, tupelSize> tupelSrc1 = Tupel<SrcT, tupelSize>::LoadAligned(pixelSrc1);
+
+#pragma unroll
+        for (size_t i = 0; i < tupelSize; i++)
+        {
+            if (aMaskTupel.value[i])
+            {
+                Op(tupelSrc1.value[i], aDst);
+            }
         }
     }
 #pragma endregion

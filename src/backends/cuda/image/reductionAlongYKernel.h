@@ -177,7 +177,17 @@ __global__ void reductionAlongYKernel(const SrcT *__restrict__ aSrc, DstT *__res
         if (aDst != nullptr)
         {
             aPostOp(result);
-            *aDst = result;
+
+            // don't overwrite alpha channel if it exists:
+            if constexpr (has_alpha_channel_v<DstT>)
+            {
+                Vector3<remove_vector_t<DstT>> *dstVec3 = reinterpret_cast<Vector3<remove_vector_t<DstT>> *>(aDst);
+                *dstVec3                                = result.XYZ();
+            }
+            else
+            {
+                *aDst = result;
+            }
         }
     }
 }
@@ -190,8 +200,7 @@ void InvokeReductionAlongYKernel(const dim3 &aBlockSize, uint aSharedMemory, int
 {
     dim3 blocksPerGrid(1, 1, 1);
 
-    int size = aSize / ConfigBlockSize<"DefaultReductionX">::value.y;
-    size     = std::max(size, 1);
+    const int size = DIV_UP(aSize, ConfigBlockSize<"DefaultReductionX">::value.y);
 
     reductionAlongYKernel<SrcT, DstT, reductionOp, NeutralValue, postOp, postOpScalar>
         <<<blocksPerGrid, aBlockSize, aSharedMemory, aStream>>>(aSrc, aDst, aDstScalar, size, aPostOp, aPostOpScalar);

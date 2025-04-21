@@ -29,8 +29,8 @@ template <typename SrcT>
 void InvokeMinMaxIdxSrc(const SrcT *aSrc, size_t aPitchSrc, SrcT *aTempBufferMin, SrcT *aTempBufferMax,
                         same_vector_size_different_type_t<SrcT, int> *aTempMinIdxX,
                         same_vector_size_different_type_t<SrcT, int> *aTempMaxIdxX, SrcT *aDstMin, SrcT *aDstMax,
-                        MinMaxIndex *aDstIdx, remove_vector_t<SrcT> *aDstScalarMin,
-                        remove_vector_t<SrcT> *aDstScalarMax, MinMaxIndexChannel *aDstScalarIdx, const Size2D &aSize,
+                        IndexMinMax *aDstIdx, remove_vector_t<SrcT> *aDstScalarMin,
+                        remove_vector_t<SrcT> *aDstScalarMax, IndexMinMaxChannel *aDstScalarIdx, const Size2D &aSize,
                         const opp::cuda::StreamCtx &aStreamCtx)
 {
     if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
@@ -55,8 +55,8 @@ void InvokeMinMaxIdxSrc(const SrcT *aSrc, size_t aPitchSrc, SrcT *aTempBufferMin
         const type *aSrc, size_t aPitchSrc, type *aTempBufferMin, type *aTempBufferMax,                                \
         same_vector_size_different_type_t<type, int> *aTempMinIdxX,                                                    \
         same_vector_size_different_type_t<type, int> *aTempMaxIdxX, type *aDstMin, type *aDstMax,                      \
-        MinMaxIndex *aDstIdx, remove_vector_t<type> *aDstScalarMin, remove_vector_t<type> *aDstScalarMax,              \
-        MinMaxIndexChannel *aDstScalarIdx, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx);
+        IndexMinMax *aDstIdx, remove_vector_t<type> *aDstScalarMin, remove_vector_t<type> *aDstScalarMax,              \
+        IndexMinMaxChannel *aDstScalarIdx, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx);
 
 #define ForAllChannelsWithAlpha(type)                                                                                  \
     Instantiate_For(Pixel##type##C1);                                                                                  \

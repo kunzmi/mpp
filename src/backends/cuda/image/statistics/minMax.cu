@@ -36,15 +36,15 @@ void InvokeMinMaxSrc(const SrcT *aSrc, size_t aPitchSrc, SrcT *aTempBuffer1, Src
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
-        using minMaxSrc = SrcReduction2Functor<TupelSize, SrcT, SrcT, SrcT, opp::Min<SrcT>, opp::Max<SrcT>>;
+        using minMaxSrc = SrcReduction2Functor<TupelSize, SrcT, SrcT, SrcT, opp::MinRed<SrcT>, opp::MaxRed<SrcT>>;
 
-        const opp::Min<SrcT> op1;
-        const opp::Max<SrcT> op2;
+        const opp::MinRed<SrcT> op1;
+        const opp::MaxRed<SrcT> op2;
 
         const minMaxSrc functor(aSrc, aPitchSrc, op1, op2);
 
-        InvokeReduction2AlongXKernelDefault<SrcT, SrcT, SrcT, TupelSize, minMaxSrc, opp::Min<SrcT>, opp::Max<SrcT>,
-                                            ReductionInitValue::Max, ReductionInitValue::Min>(
+        InvokeReduction2AlongXKernelDefault<SrcT, SrcT, SrcT, TupelSize, minMaxSrc, opp::MinRed<SrcT>,
+                                            opp::MaxRed<SrcT>, ReductionInitValue::Max, ReductionInitValue::Min>(
             aSrc, aTempBuffer1, aTempBuffer2, aSize, aStreamCtx, functor);
 
         const opp::Nothing<SrcT> postOp1;
@@ -52,7 +52,7 @@ void InvokeMinMaxSrc(const SrcT *aSrc, size_t aPitchSrc, SrcT *aTempBuffer1, Src
         const opp::MinScalar<SrcT> postOpScalar1;
         const opp::MaxScalar<SrcT> postOpScalar2;
 
-        InvokeReduction2AlongYKernelDefault<SrcT, SrcT, SrcT, SrcT, opp::Min<SrcT>, opp::Max<SrcT>,
+        InvokeReduction2AlongYKernelDefault<SrcT, SrcT, SrcT, SrcT, opp::MinRed<SrcT>, opp::MaxRed<SrcT>,
                                             ReductionInitValue::Max, ReductionInitValue::Min, opp::Nothing<SrcT>,
                                             opp::Nothing<SrcT>, opp::MinScalar<SrcT>, opp::MaxScalar<SrcT>>(
             aTempBuffer1, aTempBuffer2, aDstMin, aDstMax, aDstMinScalar, aDstMaxScalar, aSize.y, postOp1, postOp2,

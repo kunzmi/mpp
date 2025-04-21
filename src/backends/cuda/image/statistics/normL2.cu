@@ -44,11 +44,11 @@ void InvokeNormL2Src(const SrcT *aSrc, size_t aPitchSrc, ComputeT *aTempBuffer, 
         InvokeReductionAlongXKernelDefault<SrcT, ComputeT, TupelSize, normL2Src, opp::Sum<ComputeT, ComputeT>,
                                            ReductionInitValue::Zero>(aSrc, aTempBuffer, aSize, aStreamCtx, functor);
 
-        const opp::Sqrt<DstT> postOp;
+        const opp::SqrtPostOp<DstT> postOp;
         const opp::SumThenSqrtScalar<DstT> postOpScalar;
 
         InvokeReductionAlongYKernelDefault<ComputeT, DstT, opp::Sum<DstT, DstT>, ReductionInitValue::Zero,
-                                           opp::Sqrt<DstT>, opp::SumThenSqrtScalar<DstT>>(
+                                           opp::SqrtPostOp<DstT>, opp::SumThenSqrtScalar<DstT>>(
             aTempBuffer, aDst, aDstScalar, aSize.y, postOp, postOpScalar, aStreamCtx);
     }
 }

@@ -102,14 +102,14 @@ template <typename T> __global__ void test_typecast_kernel(char *aDataOut, T *aD
     hf22->w = HalfFp16(static_cast<float>(f2in.w));
 
     // bypass the SIMD Half2float or Bfloat2float, depending on T, converters in Vector4:
-    f12->x = f1in.x;
-    f12->y = f1in.y;
-    f12->z = f1in.z;
-    f12->w = f1in.w;
-    f22->x = f2in.x;
-    f22->y = f2in.y;
-    f22->z = f2in.z;
-    f22->w = f2in.w;
+    f12->x = static_cast<float>(f1in.x);
+    f12->y = static_cast<float>(f1in.y);
+    f12->z = static_cast<float>(f1in.z);
+    f12->w = static_cast<float>(f1in.w);
+    f22->x = static_cast<float>(f2in.x);
+    f22->y = static_cast<float>(f2in.y);
+    f22->z = static_cast<float>(f2in.z);
+    f22->w = static_cast<float>(f2in.w);
 }
 
 template <typename T> void runtest_typecast_kernel(char *aDataOut, T *aDataIn)

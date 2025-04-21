@@ -22,6 +22,11 @@ template <typename... BufferTypes> class ScratchBuffer
         return ((aValue + (BUFFER_ALIGNMNENT - 1)) / BUFFER_ALIGNMNENT) * BUFFER_ALIGNMNENT;
     }
 
+    void *padToAlignment(void *aValue)
+    {
+        return reinterpret_cast<void *>(padToAlignment(reinterpret_cast<size_t>(aValue)));
+    }
+
     size_t getOffsetTo(size_t aBufferIndex)
     {
         size_t totalSize = 0;
@@ -49,7 +54,7 @@ template <typename... BufferTypes> class ScratchBuffer
     }
 
   public:
-    ScratchBuffer(void *aPtr, SizeTRange auto aBufferSizesInElements) : mStartPtr(aPtr)
+    ScratchBuffer(void *aPtr, SizeTRange auto aBufferSizesInElements) : mStartPtr(padToAlignment(aPtr))
     {
         std::tuple<BufferTypes *...> tupelPointerTypes{};
         size_t index = 0;
@@ -108,7 +113,8 @@ template <typename... BufferTypes> class ScratchBuffer
     /// </summary>
     size_t GetTotalBufferSize()
     {
-        return mBufferSizesInBytes[sizeof...(BufferTypes) - 1];
+        // Add BUFFER_ALIGNMNENT to cope with unaligned initial allocations:
+        return mBufferSizesInBytes[sizeof...(BufferTypes) - 1] + BUFFER_ALIGNMNENT;
     }
 };
 } // namespace opp

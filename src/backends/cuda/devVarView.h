@@ -23,11 +23,6 @@ template <typename T> class DevVarView
     static constexpr size_t mTypeSize{sizeof(T)};
 
   protected:
-    /// <summary>
-    /// Creates an empty DevVarView (nullptr)
-    /// </summary>
-    DevVarView() = default;
-
     T *&PointerRef()
     {
         return mDevPtr;
@@ -43,6 +38,11 @@ template <typename T> class DevVarView
     }
 
   public:
+    /// <summary>
+    /// Creates an empty DevVarView (nullptr)
+    /// </summary>
+    DevVarView() = default;
+
     /// <summary>
     /// Creates a new DevVarView from an existing T*.
     /// </summary>

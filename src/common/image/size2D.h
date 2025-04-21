@@ -13,6 +13,67 @@ namespace opp::image
 class Size2D : public Vector2<int>
 {
   public:
+    struct Index
+    {
+        size_t Flat{0};
+        Vector2<int> Pixel{0, 0};
+    };
+
+    struct iterator
+    {
+      private:
+        Index mValue;
+        int mWidth{0};
+
+      public:
+        iterator(const Index &aValue, int aWidth);
+
+        iterator() = default;
+
+        ~iterator() = default;
+
+        iterator(const iterator &)     = default;
+        iterator(iterator &&) noexcept = default;
+
+        iterator &operator=(const iterator &)     = default;
+        iterator &operator=(iterator &&) noexcept = default;
+
+        using iterator_category = std::random_access_iterator_tag;
+        using value_type        = Index;
+        using difference_type   = std::ptrdiff_t;
+        using pointer           = Index *;
+        using reference         = Index &;
+
+        iterator &operator++();
+        iterator &operator--();
+
+        iterator operator++(int) &; // NOLINT(cert-dcl21-cpp)
+        iterator operator--(int) &; // NOLINT(cert-dcl21-cpp)
+
+        [[nodiscard]] bool operator==(iterator const &aOther) const;
+
+        [[nodiscard]] bool operator!=(iterator const &aOther) const;
+
+        reference operator*();
+
+        pointer operator->();
+
+        [[nodiscard]] difference_type operator[](difference_type aRhs) const;
+
+        [[nodiscard]] difference_type operator-(const iterator &aRhs) const;
+        [[nodiscard]] iterator operator+(difference_type aRhs) const;
+        [[nodiscard]] iterator operator-(difference_type aRhs) const;
+        [[nodiscard]] iterator &operator+=(difference_type aRhs);
+        [[nodiscard]] iterator &operator-=(difference_type aRhs);
+        friend iterator operator+(difference_type aLhs, const iterator &aRhs);
+        friend iterator operator-(difference_type aLhs, const iterator &aRhs);
+
+        [[nodiscard]] bool operator>(const iterator &aRhs) const;
+        [[nodiscard]] bool operator<(const iterator &aRhs) const;
+        [[nodiscard]] bool operator>=(const iterator &aRhs) const;
+        [[nodiscard]] bool operator<=(const iterator &aRhs) const;
+    };
+
     /// <summary>
     /// Initializes a new size to all components = 0
     /// </summary>
@@ -126,6 +187,16 @@ class Size2D : public Vector2<int>
     /// Converts a 2D pixel index (x, y) to a flattened array index
     /// </summary>
     [[nodiscard]] size_t GetFlatIndex(size_t aX, size_t aY) const;
+
+    /// <summary>
+    /// Returns an index iterator to the first pixel in an image of this size
+    /// </summary>
+    [[nodiscard]] iterator begin() const;
+
+    /// <summary>
+    /// Returns an index iterator to the pixel next to the last pixel in an image of this size
+    /// </summary>
+    [[nodiscard]] iterator end() const;
 };
 
 Size2D operator+(const Size2D &aLeft, const Vector2<int> &aRight);

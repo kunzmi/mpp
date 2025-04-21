@@ -39,6 +39,10 @@ add_library(backends.npp.image
 	image32fC2View.cpp
 	image32fC3View.cpp
 	image32fC4View.cpp
+	image32fcC1View.cpp
+	image32fcC2View.cpp
+	image32fcC3View.cpp
+	image32fcC4View.cpp
 	image32sC1View.cpp
 	image32sC2View.cpp
 	image32sC3View.cpp

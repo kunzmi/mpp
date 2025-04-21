@@ -35,19 +35,19 @@ void InvokeMaxSrc(const SrcT *aSrc, size_t aPitchSrc, SrcT *aTempBuffer, SrcT *a
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
-        using maxSrc = SrcReductionFunctor<TupelSize, SrcT, SrcT, opp::Max<SrcT>>;
+        using maxSrc = SrcReductionFunctor<TupelSize, SrcT, SrcT, opp::MaxRed<SrcT>>;
 
-        const opp::Max<SrcT> op;
+        const opp::MaxRed<SrcT> op;
 
         const maxSrc functor(aSrc, aPitchSrc, op);
 
-        InvokeReductionAlongXKernelDefault<SrcT, SrcT, TupelSize, maxSrc, opp::Max<SrcT>, ReductionInitValue::Min>(
+        InvokeReductionAlongXKernelDefault<SrcT, SrcT, TupelSize, maxSrc, opp::MaxRed<SrcT>, ReductionInitValue::Min>(
             aSrc, aTempBuffer, aSize, aStreamCtx, functor);
 
         const opp::Nothing<SrcT> postOp;
         const opp::MaxScalar<SrcT> postOpScalar;
 
-        InvokeReductionAlongYKernelDefault<SrcT, SrcT, opp::Max<SrcT>, ReductionInitValue::Min, opp::Nothing<SrcT>,
+        InvokeReductionAlongYKernelDefault<SrcT, SrcT, opp::MaxRed<SrcT>, ReductionInitValue::Min, opp::Nothing<SrcT>,
                                            opp::MaxScalar<SrcT>>(aTempBuffer, aDst, aDstScalar, aSize.y, postOp,
                                                                  postOpScalar, aStreamCtx);
     }

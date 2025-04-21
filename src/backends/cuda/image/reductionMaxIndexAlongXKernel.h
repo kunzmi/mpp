@@ -37,7 +37,7 @@ __global__ void reductionMaxIdxAlongXKernel(const SrcT *aSrc, size_t aPitchSrc, 
     SrcReductionMaxIdxFunctor<TupelSize, SrcT> functor(aSrc, aPitchSrc);
 
     SrcT resultMax(reduction_init_value_v<ReductionInitValue::Min, SrcT>);
-    idxT resultMaxIdx(-1);
+    idxT resultMaxIdx(INT_MAX);
 
     if (pixelY >= aSize.y)
     {

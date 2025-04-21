@@ -3,13 +3,14 @@
 #include <common/defines.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
+#include <common/maskTupel.h>
 #include <common/numberTypes.h>
 #include <common/opp_defs.h>
 #include <common/roundFunctor.h>
 #include <common/statistics/operators.h>
 #include <common/tupel.h>
-#include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vectorTypes.h>
 #include <concepts>
 
 // disable warning for pragma unroll when compiling with host compiler:
@@ -26,7 +27,7 @@ namespace opp::image
 /// <typeparam name="tupelSize"></typeparam>
 /// <typeparam name="roundingMode"></typeparam>
 template <size_t tupelSize, typename SrcT, typename DstT1, typename DstT2, typename operation1, typename operation2>
-struct SrcReduction2Functor
+struct SrcSrcReduction2Functor
 {
     const SrcT *RESTRICT Src1;
     size_t SrcPitch1;
@@ -38,12 +39,12 @@ struct SrcReduction2Functor
     [[no_unique_address]] operation2 Op2;
 
 #pragma region Constructors
-    SrcReduction2Functor()
+    SrcSrcReduction2Functor()
     {
     }
 
-    SrcReduction2Functor(const SrcT *aSrc1, size_t aSrcPitch1, const SrcT *aSrc2, size_t aSrcPitch2, operation1 aOp1,
-                         operation2 aOp2)
+    SrcSrcReduction2Functor(const SrcT *aSrc1, size_t aSrcPitch1, const SrcT *aSrc2, size_t aSrcPitch2, operation1 aOp1,
+                            operation2 aOp2)
         : Src1(aSrc1), SrcPitch1(aSrcPitch1), Src2(aSrc2), SrcPitch2(aSrcPitch2), Op1(aOp1), Op2(aOp2)
     {
     }
@@ -76,6 +77,53 @@ struct SrcReduction2Functor
         {
             Op1(tupelSrc1.value[i], tupelSrc2.value[i], aDst1);
             Op2(tupelSrc1.value[i], tupelSrc2.value[i], aDst2);
+        }
+    }
+
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT1 &aDst1, DstT2 &aDst2,
+                                const MaskTupel<tupelSize> &aMaskTupel, int &maskCount)
+    {
+        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+        const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
+
+        // we know for src1 that it is aligned to tupels, no need to check:
+        Tupel<SrcT, tupelSize> tupelSrc1 = Tupel<SrcT, tupelSize>::LoadAligned(pixelSrc1);
+
+        // but we don't know if src2 is also aligned to tupels, so do the check:
+        Tupel<SrcT, tupelSize> tupelSrc2 = Tupel<SrcT, tupelSize>::Load(pixelSrc2);
+
+#pragma unroll
+        for (size_t i = 0; i < tupelSize; i++)
+        {
+            if (aMaskTupel.value[i])
+            {
+                Op1(tupelSrc1.value[i], tupelSrc2.value[i], aDst1);
+                Op2(tupelSrc1.value[i], tupelSrc2.value[i], aDst2);
+                maskCount++;
+            }
+        }
+    }
+
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT1 &aDst1, DstT2 &aDst2,
+                                const MaskTupel<tupelSize> &aMaskTupel)
+    {
+        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+        const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
+
+        // we know for src1 that it is aligned to tupels, no need to check:
+        Tupel<SrcT, tupelSize> tupelSrc1 = Tupel<SrcT, tupelSize>::LoadAligned(pixelSrc1);
+
+        // but we don't know if src2 is also aligned to tupels, so do the check:
+        Tupel<SrcT, tupelSize> tupelSrc2 = Tupel<SrcT, tupelSize>::Load(pixelSrc2);
+
+#pragma unroll
+        for (size_t i = 0; i < tupelSize; i++)
+        {
+            if (aMaskTupel.value[i])
+            {
+                Op1(tupelSrc1.value[i], tupelSrc2.value[i], aDst1);
+                Op2(tupelSrc1.value[i], tupelSrc2.value[i], aDst2);
+            }
         }
     }
 #pragma endregion

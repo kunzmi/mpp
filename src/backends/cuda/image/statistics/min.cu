@@ -35,19 +35,19 @@ void InvokeMinSrc(const SrcT *aSrc, size_t aPitchSrc, SrcT *aTempBuffer, SrcT *a
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
-        using minSrc = SrcReductionFunctor<TupelSize, SrcT, SrcT, opp::Min<SrcT>>;
+        using minSrc = SrcReductionFunctor<TupelSize, SrcT, SrcT, opp::MinRed<SrcT>>;
 
-        const opp::Min<SrcT> op;
+        const opp::MinRed<SrcT> op;
 
         const minSrc functor(aSrc, aPitchSrc, op);
 
-        InvokeReductionAlongXKernelDefault<SrcT, SrcT, TupelSize, minSrc, opp::Min<SrcT>, ReductionInitValue::Max>(
+        InvokeReductionAlongXKernelDefault<SrcT, SrcT, TupelSize, minSrc, opp::MinRed<SrcT>, ReductionInitValue::Max>(
             aSrc, aTempBuffer, aSize, aStreamCtx, functor);
 
         const opp::Nothing<SrcT> postOp;
         const opp::MinScalar<SrcT> postOpScalar;
 
-        InvokeReductionAlongYKernelDefault<SrcT, SrcT, opp::Min<SrcT>, ReductionInitValue::Max, opp::Nothing<SrcT>,
+        InvokeReductionAlongYKernelDefault<SrcT, SrcT, opp::MinRed<SrcT>, ReductionInitValue::Max, opp::Nothing<SrcT>,
                                            opp::MinScalar<SrcT>>(aTempBuffer, aDst, aDstScalar, aSize.y, postOp,
                                                                  postOpScalar, aStreamCtx);
     }

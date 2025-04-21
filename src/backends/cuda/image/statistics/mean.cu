@@ -44,11 +44,12 @@ void InvokeMeanSrc(const SrcT *aSrc, size_t aPitchSrc, ComputeT *aTempBuffer, Ds
         InvokeReductionAlongXKernelDefault<SrcT, ComputeT, TupelSize, sumSrc, opp::Sum<ComputeT, ComputeT>,
                                            ReductionInitValue::Zero>(aSrc, aTempBuffer, aSize, aStreamCtx, functor);
 
-        const opp::Div<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(aSize.TotalSize()));
-        const opp::MeanScalar<DstT> postOpScalar;
+        const opp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(aSize.TotalSize()));
+        const opp::DivScalar<DstT> postOpScalar(
+            static_cast<complex_basetype_t<remove_vector_t<DstT>>>(aSize.TotalSize()));
 
         InvokeReductionAlongYKernelDefault<ComputeT, DstT, opp::Sum<DstT, DstT>, ReductionInitValue::Zero,
-                                           opp::Div<DstT>, opp::MeanScalar<DstT>>(
+                                           opp::DivPostOp<DstT>, opp::DivScalar<DstT>>(
             aTempBuffer, aDst, aDstScalar, aSize.y, postOp, postOpScalar, aStreamCtx);
     }
 }

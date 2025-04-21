@@ -23,5 +23,10 @@ void InvokeSwapChannelSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size
                           const ChannelList<vector_active_size_v<DstT>> &aDstChannels, remove_vector_t<DstT> aValue,
                           const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx);
 
+template <typename SrcT>
+void InvokeSwapChannelInplace(SrcT *aSrcDst, size_t aPitchSrcDst,
+                              const ChannelList<vector_active_size_v<SrcT>> &aDstChannels, const Size2D &aSize,
+                              const opp::cuda::StreamCtx &aStreamCtx);
+
 } // namespace opp::image::cuda
 #endif // OPP_ENABLE_CUDA_BACKEND

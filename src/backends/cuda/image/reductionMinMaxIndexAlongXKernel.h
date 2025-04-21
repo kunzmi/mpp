@@ -41,8 +41,8 @@ __global__ void reductionMinMaxIdxAlongXKernel(const SrcT *aSrc, size_t aPitchSr
 
     SrcT resultMin(reduction_init_value_v<ReductionInitValue::Max, SrcT>);
     SrcT resultMax(reduction_init_value_v<ReductionInitValue::Min, SrcT>);
-    idxT resultMinIdx(-1);
-    idxT resultMaxIdx(-1);
+    idxT resultMinIdx(INT_MAX);
+    idxT resultMaxIdx(INT_MAX);
 
     if (pixelY >= aSize.y)
     {

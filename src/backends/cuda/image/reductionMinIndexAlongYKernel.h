@@ -172,11 +172,11 @@ __global__ void reductionMinIdxAlongYKernel(
             }
             if constexpr (vector_active_size_v<SrcT> > 2)
             {
-                redOpMin(resultMin.y, 2, minScalar, minIdxVec);
+                redOpMin(resultMin.z, 2, minScalar, minIdxVec);
             }
             if constexpr (vector_active_size_v<SrcT> > 3)
             {
-                redOpMin(resultMin.y, 3, minScalar, minIdxVec);
+                redOpMin(resultMin.w, 3, minScalar, minIdxVec);
             }
 
             Vector3<int> minIdx(minIdxX[Channel(minIdxVec)], resultMinIdx[Channel(minIdxVec)], minIdxVec);
@@ -188,9 +188,22 @@ __global__ void reductionMinIdxAlongYKernel(
 
         if (aDstMin != nullptr && aDstMinIdxX != nullptr && aDstMinIdxY != nullptr)
         {
-            *aDstMin     = resultMin;
-            *aDstMinIdxX = minIdxX;
-            *aDstMinIdxY = resultMinIdx;
+            // don't overwrite alpha channel if it exists:
+            if constexpr (has_alpha_channel_v<SrcT>)
+            {
+                Vector3<remove_vector_t<SrcT>> *dstVec3 = reinterpret_cast<Vector3<remove_vector_t<SrcT>> *>(aDstMin);
+                *dstVec3                                = resultMin.XYZ();
+                Vector3<int> *dstMinIdxXVec3            = reinterpret_cast<Vector3<int> *>(aDstMinIdxX);
+                *dstMinIdxXVec3                         = minIdxX.XYZ();
+                Vector3<int> *dstMinIdxYVec3            = reinterpret_cast<Vector3<int> *>(aDstMinIdxY);
+                *dstMinIdxYVec3                         = resultMinIdx.XYZ();
+            }
+            else
+            {
+                *aDstMin     = resultMin;
+                *aDstMinIdxX = minIdxX;
+                *aDstMinIdxY = resultMinIdx;
+            }
         }
     }
 }
@@ -205,8 +218,7 @@ void InvokeReductionMinIdxAlongYKernel(const dim3 &aBlockSize, uint aSharedMemor
 {
     dim3 blocksPerGrid(1, 1, 1);
 
-    int size = aSize / ConfigBlockSize<"DefaultReductionX">::value.y;
-    size     = std::max(size, 1);
+    const int size = DIV_UP(aSize, ConfigBlockSize<"DefaultReductionX">::value.y);
 
     reductionMinIdxAlongYKernel<SrcT><<<blocksPerGrid, aBlockSize, aSharedMemory, aStream>>>(
         aSrcMin, aSrcMinIdxX, aDstMin, aDstMinIdxX, aDstMinIdxY, aDstScalarMin, aDstScalarIdxMin, aSize);

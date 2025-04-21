@@ -24,7 +24,7 @@ namespace opp::image::cuda
 /// </summary>
 template <int WarpAlignmentInBytes, int TupelSize, class DstT1, class DstT2, typename funcType, typename reductionOp1,
           typename reductionOp2, ReductionInitValue NeutralValue1, ReductionInitValue NeutralValue2>
-__global__ void reduction2AlongXKernel(DstT1 *__restrict__ aDst1, DstT1 *__restrict__ aDst2, Size2D aSize,
+__global__ void reduction2AlongXKernel(DstT1 *__restrict__ aDst1, DstT2 *__restrict__ aDst2, Size2D aSize,
                                        ThreadSplit<WarpAlignmentInBytes, TupelSize> aSplit, funcType aFunctor)
 {
     int warpLaneID = threadIdx.x;

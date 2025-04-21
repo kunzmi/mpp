@@ -1,8 +1,8 @@
 #pragma once
 #include <common/complex.h>
 #include <common/defines.h>
-#include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vectorTypes.h>
 #include <concepts>
 #include <ostream>
 
@@ -37,6 +37,23 @@ using Pixel32fcC1 = Vector1<c_float>;
 using Pixel32fcC2 = Vector2<c_float>;
 using Pixel32fcC3 = Vector3<c_float>;
 using Pixel32fcC4 = Vector4<c_float>;
+
+using Pixel64sC1  = Vector1<long64>;
+using Pixel64sC2  = Vector2<long64>;
+using Pixel64sC3  = Vector3<long64>;
+using Pixel64sC4  = Vector4<long64>;
+using Pixel64sC4A = Vector4A<long64>;
+
+using Pixel64scC1 = Vector1<c_long>;
+using Pixel64scC2 = Vector2<c_long>;
+using Pixel64scC3 = Vector3<c_long>;
+using Pixel64scC4 = Vector4<c_long>;
+
+using Pixel64uC1  = Vector1<ulong64>;
+using Pixel64uC2  = Vector2<ulong64>;
+using Pixel64uC3  = Vector3<ulong64>;
+using Pixel64uC4  = Vector4<ulong64>;
+using Pixel64uC4A = Vector4A<ulong64>;
 
 using Pixel32sC1  = Vector1<int>;
 using Pixel32sC2  = Vector2<int>;
@@ -159,6 +176,23 @@ enum class PixelTypeEnum : byte
     PTE16bfcC2,
     PTE16bfcC3,
     PTE16bfcC4,
+    // long
+    PTE64sC1,
+    PTE64sC2,
+    PTE64sC3,
+    PTE64sC4,
+    PTE64sC4A,
+    // long complex
+    PTE64scC1,
+    PTE64scC2,
+    PTE64scC3,
+    PTE64scC4,
+    // unsigned long
+    PTE64uC1,
+    PTE64uC2,
+    PTE64uC3,
+    PTE64uC4,
+    PTE64uC4A,
     // int
     PTE32sC1,
     PTE32sC2,
@@ -217,6 +251,9 @@ constexpr size_t GetChannelCount(PixelTypeEnum aPixelType)
         case opp::image::PixelTypeEnum::Unknown: // treat as single channel
         case opp::image::PixelTypeEnum::PTE64fC1:
         case opp::image::PixelTypeEnum::PTE64fcC1:
+        case opp::image::PixelTypeEnum::PTE64sC1:
+        case opp::image::PixelTypeEnum::PTE64scC1:
+        case opp::image::PixelTypeEnum::PTE64uC1:
         case opp::image::PixelTypeEnum::PTE32fC1:
         case opp::image::PixelTypeEnum::PTE32fcC1:
         case opp::image::PixelTypeEnum::PTE16fC1:
@@ -234,6 +271,9 @@ constexpr size_t GetChannelCount(PixelTypeEnum aPixelType)
             return 1;
         case opp::image::PixelTypeEnum::PTE64fC2:
         case opp::image::PixelTypeEnum::PTE64fcC2:
+        case opp::image::PixelTypeEnum::PTE64sC2:
+        case opp::image::PixelTypeEnum::PTE64scC2:
+        case opp::image::PixelTypeEnum::PTE64uC2:
         case opp::image::PixelTypeEnum::PTE32fC2:
         case opp::image::PixelTypeEnum::PTE32fcC2:
         case opp::image::PixelTypeEnum::PTE16fC2:
@@ -251,6 +291,9 @@ constexpr size_t GetChannelCount(PixelTypeEnum aPixelType)
             return 2;
         case opp::image::PixelTypeEnum::PTE64fC3:
         case opp::image::PixelTypeEnum::PTE64fcC3:
+        case opp::image::PixelTypeEnum::PTE64sC3:
+        case opp::image::PixelTypeEnum::PTE64scC3:
+        case opp::image::PixelTypeEnum::PTE64uC3:
         case opp::image::PixelTypeEnum::PTE32fC3:
         case opp::image::PixelTypeEnum::PTE32fcC3:
         case opp::image::PixelTypeEnum::PTE16fC3:
@@ -269,6 +312,11 @@ constexpr size_t GetChannelCount(PixelTypeEnum aPixelType)
         case opp::image::PixelTypeEnum::PTE64fC4:
         case opp::image::PixelTypeEnum::PTE64fcC4:
         case opp::image::PixelTypeEnum::PTE64fC4A:
+        case opp::image::PixelTypeEnum::PTE64sC4:
+        case opp::image::PixelTypeEnum::PTE64scC4:
+        case opp::image::PixelTypeEnum::PTE64uC4:
+        case opp::image::PixelTypeEnum::PTE64sC4A:
+        case opp::image::PixelTypeEnum::PTE64uC4A:
         case opp::image::PixelTypeEnum::PTE32fC4:
         case opp::image::PixelTypeEnum::PTE32fC4A:
         case opp::image::PixelTypeEnum::PTE32fcC4:
@@ -305,21 +353,33 @@ constexpr size_t GetPixelSizeInBytes(PixelTypeEnum aPixelType)
         case opp::image::PixelTypeEnum::Unknown:
             return 1;
         case opp::image::PixelTypeEnum::PTE64fcC4: // 64
+        case opp::image::PixelTypeEnum::PTE64scC4: // 64
             return 2ULL * 4ULL * 8ULL;
         case opp::image::PixelTypeEnum::PTE64fcC3: // 48
+        case opp::image::PixelTypeEnum::PTE64scC3: // 48
             return 3ULL * 16ULL;
         case opp::image::PixelTypeEnum::PTE64fcC2: // 32
+        case opp::image::PixelTypeEnum::PTE64scC2: // 32
         case opp::image::PixelTypeEnum::PTE64fC4:  // 32
+        case opp::image::PixelTypeEnum::PTE64sC4:  // 32
+        case opp::image::PixelTypeEnum::PTE64uC4:  // 32
         case opp::image::PixelTypeEnum::PTE64fC4A: // 32
+        case opp::image::PixelTypeEnum::PTE64sC4A: // 32
+        case opp::image::PixelTypeEnum::PTE64uC4A: // 32
         case opp::image::PixelTypeEnum::PTE32fcC4: // 32
         case opp::image::PixelTypeEnum::PTE32scC4: // 32
             return 4ULL * 8ULL;
         case opp::image::PixelTypeEnum::PTE64fC3:  // 24
+        case opp::image::PixelTypeEnum::PTE64sC3:  // 24
+        case opp::image::PixelTypeEnum::PTE64uC3:  // 24
         case opp::image::PixelTypeEnum::PTE32fcC3: // 24
         case opp::image::PixelTypeEnum::PTE32scC3: // 24
             return 3ULL * 8ULL;
         case opp::image::PixelTypeEnum::PTE64fcC1:  // 16
+        case opp::image::PixelTypeEnum::PTE64scC1:  // 16
         case opp::image::PixelTypeEnum::PTE64fC2:   // 16
+        case opp::image::PixelTypeEnum::PTE64sC2:   // 16
+        case opp::image::PixelTypeEnum::PTE64uC2:   // 16
         case opp::image::PixelTypeEnum::PTE32fcC2:  // 16
         case opp::image::PixelTypeEnum::PTE32scC2:  // 16
         case opp::image::PixelTypeEnum::PTE32fC4:   // 16
@@ -340,6 +400,8 @@ constexpr size_t GetPixelSizeInBytes(PixelTypeEnum aPixelType)
         case opp::image::PixelTypeEnum::PTE16scC3:  // 12
             return 3ULL * 4ULL;
         case opp::image::PixelTypeEnum::PTE64fC1:   // 8
+        case opp::image::PixelTypeEnum::PTE64sC1:   // 8
+        case opp::image::PixelTypeEnum::PTE64uC1:   // 8
         case opp::image::PixelTypeEnum::PTE32fC2:   // 8
         case opp::image::PixelTypeEnum::PTE32fcC1:  // 8
         case opp::image::PixelTypeEnum::PTE32scC1:  // 8
@@ -558,6 +620,66 @@ template <> struct pixel_type_name<Pixel16bfcC4>
 {
     static constexpr char value[] = "Pixel16bfcC4";
 };
+// 64s
+template <> struct pixel_type_name<Pixel64sC1>
+{
+    static constexpr char value[] = "Pixel64sC1";
+};
+template <> struct pixel_type_name<Pixel64sC2>
+{
+    static constexpr char value[] = "Pixel64sC2";
+};
+template <> struct pixel_type_name<Pixel64sC3>
+{
+    static constexpr char value[] = "Pixel64sC3";
+};
+template <> struct pixel_type_name<Pixel64sC4>
+{
+    static constexpr char value[] = "Pixel64sC4";
+};
+template <> struct pixel_type_name<Pixel64sC4A>
+{
+    static constexpr char value[] = "Pixel64sC4A";
+};
+
+// 64s complex
+template <> struct pixel_type_name<Pixel64scC1>
+{
+    static constexpr char value[] = "Pixel64scC1";
+};
+template <> struct pixel_type_name<Pixel64scC2>
+{
+    static constexpr char value[] = "Pixel64scC2";
+};
+template <> struct pixel_type_name<Pixel64scC3>
+{
+    static constexpr char value[] = "Pixel64scC3";
+};
+template <> struct pixel_type_name<Pixel64scC4>
+{
+    static constexpr char value[] = "Pixel64scC4";
+};
+// 64u
+template <> struct pixel_type_name<Pixel64uC1>
+{
+    static constexpr char value[] = "Pixel64uC1";
+};
+template <> struct pixel_type_name<Pixel64uC2>
+{
+    static constexpr char value[] = "Pixel64uC2";
+};
+template <> struct pixel_type_name<Pixel64uC3>
+{
+    static constexpr char value[] = "Pixel64uC3";
+};
+template <> struct pixel_type_name<Pixel64uC4>
+{
+    static constexpr char value[] = "Pixel64uC4";
+};
+template <> struct pixel_type_name<Pixel64uC4A>
+{
+    static constexpr char value[] = "Pixel64uC4A";
+};
 
 // 32s
 template <> struct pixel_type_name<Pixel32sC1>
@@ -773,7 +895,10 @@ concept FourChannelNoAlpha = (channel_count_v<T> == 4) && (!has_alpha_channel_v<
 template <typename T>
 concept FourChannelAlpha = (channel_count_v<T> == 4) && (has_alpha_channel_v<T>);
 
-// indicates if it is better to load then entire vector4A for the alpha channel or just the single alpha channel
+template <typename T>
+concept NoAlpha = (!has_alpha_channel_v<T>);
+
+// indicates if it is better to load the entire vector4A for the alpha channel or just the single alpha channel
 template <typename T> struct load_full_vector_for_alpha : std::false_type
 {
 };
@@ -1378,6 +1503,68 @@ template <> struct pixel_type<PixelTypeEnum::PTE16bfcC4>
     using type = Pixel16bfcC4;
 };
 
+// 64s
+template <> struct pixel_type<PixelTypeEnum::PTE64sC1>
+{
+    using type = Pixel64sC1;
+};
+template <> struct pixel_type<PixelTypeEnum::PTE64sC2>
+{
+    using type = Pixel64sC2;
+};
+template <> struct pixel_type<PixelTypeEnum::PTE64sC3>
+{
+    using type = Pixel64sC3;
+};
+template <> struct pixel_type<PixelTypeEnum::PTE64sC4>
+{
+    using type = Pixel64sC4;
+};
+template <> struct pixel_type<PixelTypeEnum::PTE64sC4A>
+{
+    using type = Pixel64sC4A;
+};
+
+// 64sc
+template <> struct pixel_type<PixelTypeEnum::PTE64scC1>
+{
+    using type = Pixel64scC1;
+};
+template <> struct pixel_type<PixelTypeEnum::PTE64scC2>
+{
+    using type = Pixel64scC2;
+};
+template <> struct pixel_type<PixelTypeEnum::PTE64scC3>
+{
+    using type = Pixel64scC3;
+};
+template <> struct pixel_type<PixelTypeEnum::PTE64scC4>
+{
+    using type = Pixel64scC4;
+};
+
+// 64u
+template <> struct pixel_type<PixelTypeEnum::PTE64uC1>
+{
+    using type = Pixel64uC1;
+};
+template <> struct pixel_type<PixelTypeEnum::PTE64uC2>
+{
+    using type = Pixel64uC2;
+};
+template <> struct pixel_type<PixelTypeEnum::PTE64uC3>
+{
+    using type = Pixel64uC3;
+};
+template <> struct pixel_type<PixelTypeEnum::PTE64uC4>
+{
+    using type = Pixel64uC4;
+};
+template <> struct pixel_type<PixelTypeEnum::PTE64uC4A>
+{
+    using type = Pixel64uC4A;
+};
+
 // 32s
 template <> struct pixel_type<PixelTypeEnum::PTE32sC1>
 {
@@ -1710,6 +1897,68 @@ template <> struct pixel_type_enum<Pixel16bfcC3>
 template <> struct pixel_type_enum<Pixel16bfcC4>
 {
     static constexpr PixelTypeEnum pixelType = PixelTypeEnum::PTE16bfcC4;
+};
+
+// 64s
+template <> struct pixel_type_enum<Pixel64sC1>
+{
+    static constexpr PixelTypeEnum pixelType = PixelTypeEnum::PTE64sC1;
+};
+template <> struct pixel_type_enum<Pixel64sC2>
+{
+    static constexpr PixelTypeEnum pixelType = PixelTypeEnum::PTE64sC2;
+};
+template <> struct pixel_type_enum<Pixel64sC3>
+{
+    static constexpr PixelTypeEnum pixelType = PixelTypeEnum::PTE64sC3;
+};
+template <> struct pixel_type_enum<Pixel64sC4>
+{
+    static constexpr PixelTypeEnum pixelType = PixelTypeEnum::PTE64sC4;
+};
+template <> struct pixel_type_enum<Pixel64sC4A>
+{
+    static constexpr PixelTypeEnum pixelType = PixelTypeEnum::PTE64sC4A;
+};
+
+// 64sc
+template <> struct pixel_type_enum<Pixel64scC1>
+{
+    static constexpr PixelTypeEnum pixelType = PixelTypeEnum::PTE64scC1;
+};
+template <> struct pixel_type_enum<Pixel64scC2>
+{
+    static constexpr PixelTypeEnum pixelType = PixelTypeEnum::PTE64scC2;
+};
+template <> struct pixel_type_enum<Pixel64scC3>
+{
+    static constexpr PixelTypeEnum pixelType = PixelTypeEnum::PTE64scC3;
+};
+template <> struct pixel_type_enum<Pixel64scC4>
+{
+    static constexpr PixelTypeEnum pixelType = PixelTypeEnum::PTE64scC4;
+};
+
+// 64u
+template <> struct pixel_type_enum<Pixel64uC1>
+{
+    static constexpr PixelTypeEnum pixelType = PixelTypeEnum::PTE64uC1;
+};
+template <> struct pixel_type_enum<Pixel64uC2>
+{
+    static constexpr PixelTypeEnum pixelType = PixelTypeEnum::PTE64uC2;
+};
+template <> struct pixel_type_enum<Pixel64uC3>
+{
+    static constexpr PixelTypeEnum pixelType = PixelTypeEnum::PTE64uC3;
+};
+template <> struct pixel_type_enum<Pixel64uC4>
+{
+    static constexpr PixelTypeEnum pixelType = PixelTypeEnum::PTE64uC4;
+};
+template <> struct pixel_type_enum<Pixel64uC4A>
+{
+    static constexpr PixelTypeEnum pixelType = PixelTypeEnum::PTE64uC4A;
 };
 
 // 32s

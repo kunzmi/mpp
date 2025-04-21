@@ -78,7 +78,7 @@ namespace cpu = opp::image::cpuSimple;
 
 int main()
 {
-    StreamCtx oppCtx = StreamCtxSingleton::Get();
+    // StreamCtx oppCtx = StreamCtxSingleton::Get();
 
     // c_double::Ln(cf);
     // constexpr bool iscf = NonNativeFloatingPoint<BFloat16>;
@@ -166,7 +166,7 @@ int main()
         DevVar<Pixel32fC4> sums(128);
         u8test.SetRoi(Border(-1, 0));
 
-        InvokeSumSrc(u8test.PointerRoi(), u8test.Pitch(), sums.Pointer(), u8test.SizeRoi(), oppCtx);
+        // InvokeSumSrc(u8test.PointerRoi(), u8test.Pitch(), sums.Pointer(), u8test.SizeRoi(), oppCtx);
 
         auto error = cudaDeviceSynchronize();
         if (error != cudaSuccess)

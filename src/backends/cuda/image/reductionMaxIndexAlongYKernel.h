@@ -38,7 +38,7 @@ __global__ void reductionMaxIdxAlongYKernel(
     opp::MaxIdx<SrcT> redOpMax;
 
     SrcT resultMax(reduction_init_value_v<ReductionInitValue::Min, SrcT>);
-    idxT resultMaxIdx(-1);
+    idxT resultMaxIdx(INT_MAX);
 
     __shared__ SrcT bufferMaxVal[ConfigBlockSize<"DefaultReductionY">::value.y];
     __shared__ idxT bufferMaxIdx[ConfigBlockSize<"DefaultReductionY">::value.y];
@@ -174,11 +174,11 @@ __global__ void reductionMaxIdxAlongYKernel(
             }
             if constexpr (vector_active_size_v<SrcT> > 2)
             {
-                redOpMax(resultMax.y, 2, maxScalar, maxIdxVec);
+                redOpMax(resultMax.z, 2, maxScalar, maxIdxVec);
             }
             if constexpr (vector_active_size_v<SrcT> > 3)
             {
-                redOpMax(resultMax.y, 3, maxScalar, maxIdxVec);
+                redOpMax(resultMax.w, 3, maxScalar, maxIdxVec);
             }
 
             Vector3<int> maxIdx(maxIdxX[Channel(maxIdxVec)], resultMaxIdx[Channel(maxIdxVec)], maxIdxVec);
@@ -190,9 +190,22 @@ __global__ void reductionMaxIdxAlongYKernel(
 
         if (aDstMax != nullptr && aDstMaxIdxX != nullptr && aDstMaxIdxY != nullptr)
         {
-            *aDstMax     = resultMax;
-            *aDstMaxIdxX = maxIdxX;
-            *aDstMaxIdxY = resultMaxIdx;
+            // don't overwrite alpha channel if it exists:
+            if constexpr (has_alpha_channel_v<SrcT>)
+            {
+                Vector3<remove_vector_t<SrcT>> *dstVec3 = reinterpret_cast<Vector3<remove_vector_t<SrcT>> *>(aDstMax);
+                *dstVec3                                = resultMax.XYZ();
+                Vector3<int> *dstMaxIdxXVec3            = reinterpret_cast<Vector3<int> *>(aDstMaxIdxX);
+                *dstMaxIdxXVec3                         = maxIdxX.XYZ();
+                Vector3<int> *dstMaxIdxYVec3            = reinterpret_cast<Vector3<int> *>(aDstMaxIdxY);
+                *dstMaxIdxYVec3                         = resultMaxIdx.XYZ();
+            }
+            else
+            {
+                *aDstMax     = resultMax;
+                *aDstMaxIdxX = maxIdxX;
+                *aDstMaxIdxY = resultMaxIdx;
+            }
         }
     }
 }
@@ -207,8 +220,7 @@ void InvokeReductionMaxIdxAlongYKernel(const dim3 &aBlockSize, uint aSharedMemor
 {
     dim3 blocksPerGrid(1, 1, 1);
 
-    int size = aSize / ConfigBlockSize<"DefaultReductionX">::value.y;
-    size     = std::max(size, 1);
+    const int size = DIV_UP(aSize, ConfigBlockSize<"DefaultReductionX">::value.y);
 
     reductionMaxIdxAlongYKernel<SrcT><<<blocksPerGrid, aBlockSize, aSharedMemory, aStream>>>(
         aSrcMax, aSrcMaxIdxX, aDstMax, aDstMaxIdxX, aDstMaxIdxY, aDstScalarMax, aDstScalarIdxMax, aSize);

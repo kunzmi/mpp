@@ -123,6 +123,51 @@ std::ostream &operator<<(std::ostream &aOs, const PixelTypeEnum &aPixelType)
         case PixelTypeEnum::PTE16bfcC4:
             aOs << pixel_type_name<Pixel16bfcC4>::value;
             break;
+            // long
+        case PixelTypeEnum::PTE64sC1:
+            aOs << pixel_type_name<Pixel64sC1>::value;
+            break;
+        case PixelTypeEnum::PTE64sC2:
+            aOs << pixel_type_name<Pixel64sC2>::value;
+            break;
+        case PixelTypeEnum::PTE64sC3:
+            aOs << pixel_type_name<Pixel64sC3>::value;
+            break;
+        case PixelTypeEnum::PTE64sC4:
+            aOs << pixel_type_name<Pixel64sC4>::value;
+            break;
+        case PixelTypeEnum::PTE64sC4A:
+            aOs << pixel_type_name<Pixel64sC4A>::value;
+            break;
+            // complex long
+        case PixelTypeEnum::PTE64scC1:
+            aOs << pixel_type_name<Pixel64scC1>::value;
+            break;
+        case PixelTypeEnum::PTE64scC2:
+            aOs << pixel_type_name<Pixel64scC2>::value;
+            break;
+        case PixelTypeEnum::PTE64scC3:
+            aOs << pixel_type_name<Pixel64scC3>::value;
+            break;
+        case PixelTypeEnum::PTE64scC4:
+            aOs << pixel_type_name<Pixel64scC4>::value;
+            break;
+            // unsigned long
+        case PixelTypeEnum::PTE64uC1:
+            aOs << pixel_type_name<Pixel64uC1>::value;
+            break;
+        case PixelTypeEnum::PTE64uC2:
+            aOs << pixel_type_name<Pixel64uC2>::value;
+            break;
+        case PixelTypeEnum::PTE64uC3:
+            aOs << pixel_type_name<Pixel64uC3>::value;
+            break;
+        case PixelTypeEnum::PTE64uC4:
+            aOs << pixel_type_name<Pixel64uC4>::value;
+            break;
+        case PixelTypeEnum::PTE64uC4A:
+            aOs << pixel_type_name<Pixel64uC4A>::value;
+            break;
             // int
         case PixelTypeEnum::PTE32sC1:
             aOs << pixel_type_name<Pixel32sC1>::value;
@@ -371,6 +416,51 @@ std::wostream &operator<<(std::wostream &aOs, const PixelTypeEnum &aPixelType)
             break;
         case PixelTypeEnum::PTE16bfcC4:
             aOs << pixel_type_name<Pixel16bfcC4>::value;
+            break;
+            // long
+        case PixelTypeEnum::PTE64sC1:
+            aOs << pixel_type_name<Pixel64sC1>::value;
+            break;
+        case PixelTypeEnum::PTE64sC2:
+            aOs << pixel_type_name<Pixel64sC2>::value;
+            break;
+        case PixelTypeEnum::PTE64sC3:
+            aOs << pixel_type_name<Pixel64sC3>::value;
+            break;
+        case PixelTypeEnum::PTE64sC4:
+            aOs << pixel_type_name<Pixel64sC4>::value;
+            break;
+        case PixelTypeEnum::PTE64sC4A:
+            aOs << pixel_type_name<Pixel64sC4A>::value;
+            break;
+            // complex long
+        case PixelTypeEnum::PTE64scC1:
+            aOs << pixel_type_name<Pixel64scC1>::value;
+            break;
+        case PixelTypeEnum::PTE64scC2:
+            aOs << pixel_type_name<Pixel64scC2>::value;
+            break;
+        case PixelTypeEnum::PTE64scC3:
+            aOs << pixel_type_name<Pixel64scC3>::value;
+            break;
+        case PixelTypeEnum::PTE64scC4:
+            aOs << pixel_type_name<Pixel64scC4>::value;
+            break;
+            // unsigned long
+        case PixelTypeEnum::PTE64uC1:
+            aOs << pixel_type_name<Pixel64uC1>::value;
+            break;
+        case PixelTypeEnum::PTE64uC2:
+            aOs << pixel_type_name<Pixel64uC2>::value;
+            break;
+        case PixelTypeEnum::PTE64uC3:
+            aOs << pixel_type_name<Pixel64uC3>::value;
+            break;
+        case PixelTypeEnum::PTE64uC4:
+            aOs << pixel_type_name<Pixel64uC4>::value;
+            break;
+        case PixelTypeEnum::PTE64uC4A:
+            aOs << pixel_type_name<Pixel64uC4A>::value;
             break;
             // int
         case PixelTypeEnum::PTE32sC1:

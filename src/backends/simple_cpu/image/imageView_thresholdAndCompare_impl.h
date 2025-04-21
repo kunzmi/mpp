@@ -51,9 +51,9 @@
 #include <common/opp_defs.h>
 #include <common/safeCast.h>
 #include <common/utilities.h>
+#include <common/vector_typetraits.h>
 #include <common/vector1.h>
 #include <common/vectorTypes.h>
-#include <common/vector_typetraits.h>
 #include <concepts>
 #include <cstddef>
 #include <type_traits>
@@ -64,7 +64,8 @@ namespace opp::image::cpuSimple
 
 #pragma region Compare
 template <PixelType T>
-ImageView<Pixel8uC1> &ImageView<T>::Compare(const ImageView<T> &aSrc2, CompareOp aCompare, ImageView<Pixel8uC1> &aDst)
+ImageView<Pixel8uC1> &ImageView<T>::Compare(const ImageView<T> &aSrc2, CompareOp aCompare,
+                                            ImageView<Pixel8uC1> &aDst) const
 {
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aDst.ROI());
@@ -177,7 +178,7 @@ ImageView<Pixel8uC1> &ImageView<T>::Compare(const ImageView<T> &aSrc2, CompareOp
 }
 
 template <PixelType T>
-ImageView<Pixel8uC1> &ImageView<T>::Compare(const T &aConst, CompareOp aCompare, ImageView<Pixel8uC1> &aDst)
+ImageView<Pixel8uC1> &ImageView<T>::Compare(const T &aConst, CompareOp aCompare, ImageView<Pixel8uC1> &aDst) const
 {
     checkSameSize(ROI(), aDst.ROI());
 
@@ -292,7 +293,7 @@ ImageView<Pixel8uC1> &ImageView<T>::Compare(const T &aConst, CompareOp aCompare,
 template <PixelType T>
 ImageView<Pixel8uC1> &ImageView<T>::CompareEqEps(const ImageView<T> &aSrc2,
                                                  complex_basetype_t<remove_vector_t<T>> aEpsilon,
-                                                 ImageView<Pixel8uC1> &aDst)
+                                                 ImageView<Pixel8uC1> &aDst) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -314,7 +315,7 @@ ImageView<Pixel8uC1> &ImageView<T>::CompareEqEps(const ImageView<T> &aSrc2,
 
 template <PixelType T>
 ImageView<Pixel8uC1> &ImageView<T>::CompareEqEps(const T &aConst, complex_basetype_t<remove_vector_t<T>> aEpsilon,
-                                                 ImageView<Pixel8uC1> &aDst)
+                                                 ImageView<Pixel8uC1> &aDst) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -334,7 +335,7 @@ ImageView<Pixel8uC1> &ImageView<T>::CompareEqEps(const T &aConst, complex_basety
 #pragma endregion
 #pragma region Threshold
 template <PixelType T>
-ImageView<T> &ImageView<T>::Threshold(const T &aThreshold, CompareOp aCompare, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::Threshold(const T &aThreshold, CompareOp aCompare, ImageView<T> &aDst) const
     requires RealVector<T>
 {
     switch (aCompare)
@@ -353,7 +354,7 @@ ImageView<T> &ImageView<T>::Threshold(const T &aThreshold, CompareOp aCompare, I
     }
 }
 template <PixelType T>
-ImageView<T> &ImageView<T>::ThresholdLT(const T &aThreshold, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::ThresholdLT(const T &aThreshold, ImageView<T> &aDst) const
     requires RealVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -370,7 +371,7 @@ ImageView<T> &ImageView<T>::ThresholdLT(const T &aThreshold, ImageView<T> &aDst)
     return aDst;
 }
 template <PixelType T>
-ImageView<T> &ImageView<T>::ThresholdGT(const T &aThreshold, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::ThresholdGT(const T &aThreshold, ImageView<T> &aDst) const
     requires RealVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -435,7 +436,8 @@ ImageView<T> &ImageView<T>::ThresholdGT(const T &aThreshold)
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Threshold(const T &aThreshold, const T &aValue, CompareOp aCompare, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::Threshold(const T &aThreshold, const T &aValue, CompareOp aCompare,
+                                      ImageView<T> &aDst) const
     requires RealVector<T>
 {
     switch (aCompare)
@@ -454,7 +456,7 @@ ImageView<T> &ImageView<T>::Threshold(const T &aThreshold, const T &aValue, Comp
     }
 }
 template <PixelType T>
-ImageView<T> &ImageView<T>::ThresholdLT(const T &aThreshold, const T &aValue, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::ThresholdLT(const T &aThreshold, const T &aValue, ImageView<T> &aDst) const
     requires RealVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -471,7 +473,7 @@ ImageView<T> &ImageView<T>::ThresholdLT(const T &aThreshold, const T &aValue, Im
     return aDst;
 }
 template <PixelType T>
-ImageView<T> &ImageView<T>::ThresholdGT(const T &aThreshold, const T &aValue, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::ThresholdGT(const T &aThreshold, const T &aValue, ImageView<T> &aDst) const
     requires RealVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -536,7 +538,7 @@ ImageView<T> &ImageView<T>::ThresholdGT(const T &aThreshold, const T &aValue)
 }
 template <PixelType T>
 ImageView<T> &ImageView<T>::ThresholdLTGT(const T &aThresholdLT, const T &aValueLT, const T &aThresholdGT,
-                                          const T &aValueGT, ImageView<T> &aDst)
+                                          const T &aValueGT, ImageView<T> &aDst) const
     requires RealVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());

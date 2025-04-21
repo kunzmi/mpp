@@ -2,6 +2,7 @@
 #include <backends/cuda/image/imageView.h>
 #include <backends/npp/image/imageView.h>
 #include <backends/simple_cpu/image/addSquareProductWeightedOutputType.h>
+#include <backends/simple_cpu/image/histogramLevelsTypes.h>
 #include <common/arithmetic/binary_operators.h>
 #include <common/bfloat16.h>
 #include <common/complex.h>
@@ -32,6 +33,7 @@
 #include <common/numberTypes.h>
 #include <common/opp_defs.h>
 #include <common/safeCast.h>
+#include <common/statistics/indexMinMax.h>
 #include <common/utilities.h>
 #include <common/vector1.h>
 #include <common/vectorTypes.h>
@@ -1033,7 +1035,7 @@ template <PixelType T> class ImageView
     /// RoundingMode::NearestTiesToEven (real and complex).
     /// </summary>
     template <PixelType TTo>
-    ImageView<TTo> &Convert(ImageView<TTo> &aDst)
+    ImageView<TTo> &Convert(ImageView<TTo> &aDst) const
         requires(!std::same_as<T, TTo>) &&
                 (RealOrComplexIntVector<T> || (std::same_as<complex_basetype_t<remove_vector_t<T>>, float> &&
                                                (std::same_as<complex_basetype_t<remove_vector_t<TTo>>, BFloat16> ||
@@ -1046,14 +1048,14 @@ template <PixelType T> class ImageView
     /// host only RoundingMode::NearestTiesToEven and RoundingMode::TowardZero are supported.
     /// </summary>
     template <PixelType TTo>
-    ImageView<TTo> &Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode)
+    ImageView<TTo> &Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode) const
         requires(!std::same_as<T, TTo>) && RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// Convert with prior floating point scaling. Operation is SrcT -> float -> scale -> DstT
     /// </summary>
     template <PixelType TTo>
-    ImageView<TTo> &Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode, int aScaleFactor)
+    ImageView<TTo> &Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode, int aScaleFactor) const
         requires(!std::same_as<T, TTo>) && (!std::same_as<TTo, float>) && (!std::same_as<TTo, double>) &&
                 (!std::same_as<TTo, Complex<float>>) && (!std::same_as<TTo, Complex<double>>);
 #pragma endregion
@@ -1061,18 +1063,18 @@ template <PixelType T> class ImageView
     /// <summary>
     /// Copy image.
     /// </summary>
-    ImageView<T> &Copy(ImageView<T> &aDst);
+    ImageView<T> &Copy(ImageView<T> &aDst) const;
 
     /// <summary>
     /// Copy image with mask. Pixels with mask == 0 remain untouched in destination image.
     /// </summary>
-    ImageView<T> &Copy(ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask);
+    ImageView<T> &CopyMasked(ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask) const;
 
     /// <summary>
     /// Copy channel aSrcChannel to channel aDstChannel of aDst.
     /// </summary>
     template <PixelType TTo>
-    ImageView<TTo> &Copy(Channel aSrcChannel, ImageView<TTo> &aDst, Channel aDstChannel)
+    ImageView<TTo> &Copy(Channel aSrcChannel, ImageView<TTo> &aDst, Channel aDstChannel) const
         requires(vector_size_v<T> > 1) &&   //
                 (vector_size_v<TTo> > 1) && //
                 std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
@@ -1081,7 +1083,7 @@ template <PixelType T> class ImageView
     /// Copy this single channel image to channel aDstChannel of aDst.
     /// </summary>
     template <PixelType TTo>
-    ImageView<TTo> &Copy(ImageView<TTo> &aDst, Channel aDstChannel)
+    ImageView<TTo> &Copy(ImageView<TTo> &aDst, Channel aDstChannel) const
         requires(vector_size_v<T> == 1) &&  //
                 (vector_size_v<TTo> > 1) && //
                 std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
@@ -1090,7 +1092,7 @@ template <PixelType T> class ImageView
     /// Copy channel aSrcChannel to single channel image aDst.
     /// </summary>
     template <PixelType TTo>
-    ImageView<TTo> &Copy(Channel aSrcChannel, ImageView<TTo> &aDst)
+    ImageView<TTo> &Copy(Channel aSrcChannel, ImageView<TTo> &aDst) const
         requires(vector_size_v<T> > 1) &&    //
                 (vector_size_v<TTo> == 1) && //
                 std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
@@ -1099,7 +1101,7 @@ template <PixelType T> class ImageView
     /// Copy packed image pixels to planar images.
     /// </summary>
     void Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
-              ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2)
+              ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2) const
         requires(TwoChannel<T>);
 
     /// <summary>
@@ -1107,7 +1109,7 @@ template <PixelType T> class ImageView
     /// </summary>
     void Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
               ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2,
-              ImageView<Vector1<remove_vector_t<T>>> &aDstChannel3)
+              ImageView<Vector1<remove_vector_t<T>>> &aDstChannel3) const
         requires(ThreeChannel<T>);
 
     /// <summary>
@@ -1116,7 +1118,7 @@ template <PixelType T> class ImageView
     void Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
               ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2,
               ImageView<Vector1<remove_vector_t<T>>> &aDstChannel3,
-              ImageView<Vector1<remove_vector_t<T>>> &aDstChannel4)
+              ImageView<Vector1<remove_vector_t<T>>> &aDstChannel4) const
         requires(FourChannelNoAlpha<T>);
 
     /// <summary>
@@ -1148,7 +1150,7 @@ template <PixelType T> class ImageView
     /// Duplicates a one channel image to all channels in a multi-channel image
     /// </summary>
     template <PixelType TTo>
-    ImageView<TTo> &Dup(ImageView<TTo> &aDst)
+    ImageView<TTo> &Dup(ImageView<TTo> &aDst) const
         requires(vector_size_v<T> == 1) &&
                 (vector_size_v<TTo> > 1) && std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
 #pragma endregion
@@ -1159,7 +1161,7 @@ template <PixelType T> class ImageView
     /// whith scaleFactor = (dstMaxRangeValue - dstMinRangeValue) / (srcMaxRangeValue - srcMinRangeValue).
     /// </summary>
     template <PixelType TTo>
-    ImageView<TTo> &Scale(ImageView<TTo> &aDst)
+    ImageView<TTo> &Scale(ImageView<TTo> &aDst) const
         requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<T> && RealOrComplexIntVector<TTo>;
 
     /// <summary>
@@ -1169,7 +1171,7 @@ template <PixelType T> class ImageView
     /// smaller or larger the output range are clamped to min or max value if necessary for integer output types.
     /// </summary>
     template <PixelType TTo>
-    ImageView<TTo> &Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax)
+    ImageView<TTo> &Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax) const
         requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<T>;
 
     /// <summary>
@@ -1179,7 +1181,7 @@ template <PixelType T> class ImageView
     /// smaller or larger the output range are clamped to min or max value if necessary.
     /// </summary>
     template <PixelType TTo>
-    ImageView<TTo> &Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax)
+    ImageView<TTo> &Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax) const
         requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<TTo>;
 
     /// <summary>
@@ -1190,25 +1192,33 @@ template <PixelType T> class ImageView
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
-                          scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax)
+                          scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax) const
         requires(!std::same_as<T, TTo>);
 
 #pragma endregion
 #pragma region Set
     ImageView<T> &Set(const T &aConst);
 
-    ImageView<T> &Set(const T &aConst, const ImageView<Pixel8uC1> &aMask);
+    ImageView<T> &SetMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask);
 #pragma endregion
 #pragma region Swap Channel
     /// <summary>
     /// Swap channels
     /// </summary>
     template <PixelType TTo>
-    ImageView<TTo> &SwapChannel(ImageView<TTo> &aDst, const ChannelList<vector_active_size_v<TTo>> &aDstChannels)
+    ImageView<TTo> &SwapChannel(ImageView<TTo> &aDst, const ChannelList<vector_active_size_v<TTo>> &aDstChannels) const
         requires((vector_active_size_v<TTo> <= vector_active_size_v<T>)) && //
                 (vector_size_v<T> >= 3) &&                                  //
                 (vector_size_v<TTo> >= 3) &&                                //
+                (!has_alpha_channel_v<TTo>) &&                              //
+                (!has_alpha_channel_v<T>) &&                                //
                 std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
+
+    /// <summary>
+    /// Swap channels (inplace)
+    /// </summary>
+    ImageView<T> &SwapChannel(const ChannelList<vector_active_size_v<T>> &aDstChannels)
+        requires(vector_size_v<T> >= 3) && (!has_alpha_channel_v<T>);
 
     /// <summary>
     /// Swap channels (3-channel to 4-channel with additional value). If aDstChannels[i] == 3, channel i of aDst is set
@@ -1216,9 +1226,11 @@ template <PixelType T> class ImageView
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &SwapChannel(ImageView<TTo> &aDst, const ChannelList<vector_active_size_v<TTo>> &aDstChannels,
-                                remove_vector_t<T> aValue)
+                                remove_vector_t<T> aValue) const
         requires(vector_size_v<T> == 3) &&          //
                 (vector_active_size_v<TTo> == 4) && //
+                (!has_alpha_channel_v<TTo>) &&      //
+                (!has_alpha_channel_v<T>) &&        //
                 std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
 #pragma endregion
 
@@ -1226,21 +1238,31 @@ template <PixelType T> class ImageView
     ImageView<T> &FillRandom();
 
     ImageView<T> &FillRandom(uint aSeed);
+
+    ImageView<T> &FillRandomNormal(uint aSeed, double aMean, double aStd);
+#pragma endregion
+
+#pragma region Transpose
+    /// <summary>
+    /// Transpose image.
+    /// </summary>
+    ImageView<T> &Transpose(ImageView<T> &aDst) const
+        requires NoAlpha<T>;
 #pragma endregion
 #pragma endregion
 
 #pragma region Arithmetic functions
 #pragma region Add
-    ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+    ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0)
+    ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0) const
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &Add(const T &aConst, ImageView<T> &aDst)
+    ImageView<T> &Add(const T &aConst, ImageView<T> &aDst) const
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Add(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0)
+    ImageView<T> &Add(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0) const
         requires RealOrComplexIntVector<T>;
 
     ImageView<T> &Add(const ImageView<T> &aSrc2)
@@ -1255,42 +1277,43 @@ template <PixelType T> class ImageView
     ImageView<T> &Add(const T &aConst, int aScaleFactor = 0)
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &AddMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask) const
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      int aScaleFactor = 0)
+    ImageView<T> &AddMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            int aScaleFactor = 0) const
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &Add(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &AddMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask) const
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Add(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+    ImageView<T> &AddMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            int aScaleFactor = 0) const
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &Add(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &AddMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Add(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+    ImageView<T> &AddMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &Add(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &AddMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask)
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Add(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+    ImageView<T> &AddMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
         requires RealOrComplexIntVector<T>;
 #pragma endregion
 #pragma region Sub
-    ImageView<T> &Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+    ImageView<T> &Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0)
+    ImageView<T> &Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0) const
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &Sub(const T &aConst, ImageView<T> &aDst)
+    ImageView<T> &Sub(const T &aConst, ImageView<T> &aDst) const
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Sub(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0)
+    ImageView<T> &Sub(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0) const
         requires RealOrComplexIntVector<T>;
 
     ImageView<T> &Sub(const ImageView<T> &aSrc2)
@@ -1317,54 +1340,55 @@ template <PixelType T> class ImageView
     ImageView<T> &SubInv(const T &aConst, int aScaleFactor = 0)
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &SubMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask) const
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      int aScaleFactor = 0)
+    ImageView<T> &SubMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            int aScaleFactor = 0) const
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &Sub(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &SubMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask) const
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Sub(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+    ImageView<T> &SubMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            int aScaleFactor = 0) const
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &Sub(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &SubMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Sub(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+    ImageView<T> &SubMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &Sub(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &SubMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask)
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Sub(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+    ImageView<T> &SubMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &SubInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &SubInvMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &SubInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+    ImageView<T> &SubInvMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &SubInv(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &SubInvMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask)
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &SubInv(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+    ImageView<T> &SubInvMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
         requires RealOrComplexIntVector<T>;
 #pragma endregion
 #pragma region Mul
-    ImageView<T> &Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+    ImageView<T> &Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0)
+    ImageView<T> &Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0) const
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &Mul(const T &aConst, ImageView<T> &aDst)
+    ImageView<T> &Mul(const T &aConst, ImageView<T> &aDst) const
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Mul(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0)
+    ImageView<T> &Mul(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0) const
         requires RealOrComplexIntVector<T>;
 
     ImageView<T> &Mul(const ImageView<T> &aSrc2)
@@ -1379,36 +1403,37 @@ template <PixelType T> class ImageView
     ImageView<T> &Mul(const T &aConst, int aScaleFactor = 0)
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &MulMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask) const
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      int aScaleFactor = 0)
+    ImageView<T> &MulMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            int aScaleFactor = 0) const
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &Mul(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &MulMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask) const
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Mul(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+    ImageView<T> &MulMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            int aScaleFactor = 0) const
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &Mul(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &MulMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Mul(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+    ImageView<T> &MulMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &Mul(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &MulMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask)
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Mul(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
+    ImageView<T> &MulMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0)
         requires RealOrComplexIntVector<T>;
 #pragma endregion
 #pragma region MulScale
-    ImageView<T> &MulScale(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+    ImageView<T> &MulScale(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
-    ImageView<T> &MulScale(const T &aConst, ImageView<T> &aDst)
+    ImageView<T> &MulScale(const T &aConst, ImageView<T> &aDst) const
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
     ImageView<T> &MulScale(const ImageView<T> &aSrc2)
@@ -1417,31 +1442,31 @@ template <PixelType T> class ImageView
     ImageView<T> &MulScale(const T &aConst)
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
-    ImageView<T> &MulScale(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &MulScaleMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask) const
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
-    ImageView<T> &MulScale(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &MulScaleMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask) const
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
-    ImageView<T> &MulScale(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &MulScaleMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
-    ImageView<T> &MulScale(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &MulScaleMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask)
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 #pragma endregion
 #pragma region Div
-    ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+    ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
         requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
+                      RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven) const
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &Div(const T &aConst, ImageView<T> &aDst)
+    ImageView<T> &Div(const T &aConst, ImageView<T> &aDst) const
         requires RealOrComplexFloatingVector<T>;
 
     ImageView<T> &Div(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
+                      RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven) const
         requires RealOrComplexIntVector<T>;
 
     ImageView<T> &Div(const ImageView<T> &aSrc2)
@@ -1472,113 +1497,114 @@ template <PixelType T> class ImageView
                          RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &DivMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask) const
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
+    ImageView<T> &DivMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven) const
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &Div(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &DivMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask) const
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Div(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
+    ImageView<T> &DivMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven) const
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &Div(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &DivMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Div(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
+    ImageView<T> &DivMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                            RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &Div(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &DivMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask)
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &Div(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
+    ImageView<T> &DivMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                            RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &DivInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &DivInvMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &DivInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                         RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
+    ImageView<T> &DivInvMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                               RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
         requires RealOrComplexIntVector<T>;
 
-    ImageView<T> &DivInv(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+    ImageView<T> &DivInvMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask)
         requires RealOrComplexFloatingVector<T>;
 
-    ImageView<T> &DivInv(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                         RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
+    ImageView<T> &DivInvMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                               RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven)
         requires RealOrComplexIntVector<T>;
 #pragma endregion
 #pragma region AddSquare
     /// <summary>
     /// SrcDst += this^2
     /// </summary>
-    ImageView<add_spw_output_for_t<T>> &AddSquare(ImageView<add_spw_output_for_t<T>> &aSrcDst);
+    ImageView<add_spw_output_for_t<T>> &AddSquare(ImageView<add_spw_output_for_t<T>> &aSrcDst) const;
 
     /// <summary>
     /// SrcDst += this^2
     /// </summary>
-    ImageView<add_spw_output_for_t<T>> &AddSquare(ImageView<add_spw_output_for_t<T>> &aSrcDst,
-                                                  const ImageView<Pixel8uC1> &aMask);
+    ImageView<add_spw_output_for_t<T>> &AddSquareMasked(ImageView<add_spw_output_for_t<T>> &aSrcDst,
+                                                        const ImageView<Pixel8uC1> &aMask) const;
 #pragma endregion
 #pragma region AddProduct
     /// <summary>
     /// SrcDst += this * Src2
     /// </summary>
     ImageView<add_spw_output_for_t<T>> &AddProduct(const ImageView<T> &aSrc2,
-                                                   ImageView<add_spw_output_for_t<T>> &aSrcDst);
+                                                   ImageView<add_spw_output_for_t<T>> &aSrcDst) const;
 
     /// <summary>
     /// SrcDst += this * Src2
     /// </summary>
-    ImageView<add_spw_output_for_t<T>> &AddProduct(const ImageView<T> &aSrc2,
-                                                   ImageView<add_spw_output_for_t<T>> &aSrcDst,
-                                                   const ImageView<Pixel8uC1> &aMask);
+    ImageView<add_spw_output_for_t<T>> &AddProductMasked(const ImageView<T> &aSrc2,
+                                                         ImageView<add_spw_output_for_t<T>> &aSrcDst,
+                                                         const ImageView<Pixel8uC1> &aMask) const;
 #pragma endregion
 #pragma region AddWeighted
     /// <summary>
     /// Dst = this * alpha + Src2 * (1 - alpha)
     /// </summary>
     ImageView<add_spw_output_for_t<T>> &AddWeighted(const ImageView<T> &aSrc2, ImageView<add_spw_output_for_t<T>> &aDst,
-                                                    remove_vector_t<add_spw_output_for_t<T>> aAlpha);
+                                                    remove_vector_t<add_spw_output_for_t<T>> aAlpha) const;
 
     /// <summary>
     /// Dst = this * alpha + Src2 * (1 - alpha)
     /// </summary>
-    ImageView<add_spw_output_for_t<T>> &AddWeighted(const ImageView<T> &aSrc2, ImageView<add_spw_output_for_t<T>> &aDst,
-                                                    remove_vector_t<add_spw_output_for_t<T>> aAlpha,
-                                                    const ImageView<Pixel8uC1> &aMask);
+    ImageView<add_spw_output_for_t<T>> &AddWeightedMasked(const ImageView<T> &aSrc2,
+                                                          ImageView<add_spw_output_for_t<T>> &aDst,
+                                                          remove_vector_t<add_spw_output_for_t<T>> aAlpha,
+                                                          const ImageView<Pixel8uC1> &aMask) const;
     /// <summary>
     /// SrcDst = this * alpha + SrcDst * (1 - alpha)
     /// </summary>
     ImageView<add_spw_output_for_t<T>> &AddWeighted(ImageView<add_spw_output_for_t<T>> &aSrcDst,
-                                                    remove_vector_t<add_spw_output_for_t<T>> aAlpha);
+                                                    remove_vector_t<add_spw_output_for_t<T>> aAlpha) const;
 
     /// <summary>
     /// SrcDst = this * alpha + SrcDst * (1 - alpha)
     /// </summary>
-    ImageView<add_spw_output_for_t<T>> &AddWeighted(ImageView<add_spw_output_for_t<T>> &aSrcDst,
-                                                    remove_vector_t<add_spw_output_for_t<T>> aAlpha,
-                                                    const ImageView<Pixel8uC1> &aMask);
+    ImageView<add_spw_output_for_t<T>> &AddWeightedMasked(ImageView<add_spw_output_for_t<T>> &aSrcDst,
+                                                          remove_vector_t<add_spw_output_for_t<T>> aAlpha,
+                                                          const ImageView<Pixel8uC1> &aMask) const;
 #pragma endregion
 
 #pragma region Abs
-    ImageView<T> &Abs(ImageView<T> &aDst)
+    ImageView<T> &Abs(ImageView<T> &aDst) const
         requires RealSignedVector<T>;
 
     ImageView<T> &Abs()
         requires RealSignedVector<T>;
 #pragma endregion
 #pragma region AbsDiff
-    ImageView<T> &AbsDiff(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+    ImageView<T> &AbsDiff(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
         requires RealUnsignedVector<T>;
 
-    ImageView<T> &AbsDiff(const T &aConst, ImageView<T> &aDst)
+    ImageView<T> &AbsDiff(const T &aConst, ImageView<T> &aDst) const
         requires RealUnsignedVector<T>;
 
     ImageView<T> &AbsDiff(const ImageView<T> &aSrc2)
@@ -1588,10 +1614,10 @@ template <PixelType T> class ImageView
         requires RealUnsignedVector<T>;
 #pragma endregion
 #pragma region And
-    ImageView<T> &And(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+    ImageView<T> &And(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
         requires RealIntVector<T>;
 
-    ImageView<T> &And(const T &aConst, ImageView<T> &aDst)
+    ImageView<T> &And(const T &aConst, ImageView<T> &aDst) const
         requires RealIntVector<T>;
 
     ImageView<T> &And(const ImageView<T> &aSrc2)
@@ -1601,37 +1627,37 @@ template <PixelType T> class ImageView
         requires RealIntVector<T>;
 #pragma endregion
 #pragma region Not
-    ImageView<T> &Not(ImageView<T> &aDst)
+    ImageView<T> &Not(ImageView<T> &aDst) const
         requires RealIntVector<T>;
 
     ImageView<T> &Not()
         requires RealIntVector<T>;
 #pragma endregion
 #pragma region Exp
-    ImageView<T> &Exp(ImageView<T> &aDst)
+    ImageView<T> &Exp(ImageView<T> &aDst) const
         requires RealOrComplexVector<T>;
 
     ImageView<T> &Exp()
         requires RealOrComplexVector<T>;
 #pragma endregion
 #pragma region Ln
-    ImageView<T> &Ln(ImageView<T> &aDst)
+    ImageView<T> &Ln(ImageView<T> &aDst) const
         requires RealOrComplexVector<T>;
 
     ImageView<T> &Ln()
         requires RealOrComplexVector<T>;
 #pragma endregion
 #pragma region LShift
-    ImageView<T> &LShift(uint aConst, ImageView<T> &aDst)
+    ImageView<T> &LShift(uint aConst, ImageView<T> &aDst) const
         requires RealIntVector<T>;
     ImageView<T> &LShift(uint aConst)
         requires RealIntVector<T>;
 #pragma endregion
 #pragma region Or
-    ImageView<T> &Or(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+    ImageView<T> &Or(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
         requires RealIntVector<T>;
 
-    ImageView<T> &Or(const T &aConst, ImageView<T> &aDst)
+    ImageView<T> &Or(const T &aConst, ImageView<T> &aDst) const
         requires RealIntVector<T>;
 
     ImageView<T> &Or(const ImageView<T> &aSrc2)
@@ -1641,30 +1667,30 @@ template <PixelType T> class ImageView
         requires RealIntVector<T>;
 #pragma endregion
 #pragma region RShift
-    ImageView<T> &RShift(uint aConst, ImageView<T> &aDst)
+    ImageView<T> &RShift(uint aConst, ImageView<T> &aDst) const
         requires RealIntVector<T>;
     ImageView<T> &RShift(uint aConst)
         requires RealIntVector<T>;
 #pragma endregion
 #pragma region Sqr
-    ImageView<T> &Sqr(ImageView<T> &aDst)
+    ImageView<T> &Sqr(ImageView<T> &aDst) const
         requires RealOrComplexVector<T>;
 
     ImageView<T> &Sqr()
         requires RealOrComplexVector<T>;
 #pragma endregion
 #pragma region Sqrt
-    ImageView<T> &Sqrt(ImageView<T> &aDst)
+    ImageView<T> &Sqrt(ImageView<T> &aDst) const
         requires RealOrComplexVector<T>;
 
     ImageView<T> &Sqrt()
         requires RealOrComplexVector<T>;
 #pragma endregion
 #pragma region Xor
-    ImageView<T> &Xor(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+    ImageView<T> &Xor(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
         requires RealIntVector<T>;
 
-    ImageView<T> &Xor(const T &aConst, ImageView<T> &aDst)
+    ImageView<T> &Xor(const T &aConst, ImageView<T> &aDst) const
         requires RealIntVector<T>;
 
     ImageView<T> &Xor(const ImageView<T> &aSrc2)
@@ -1681,16 +1707,16 @@ template <PixelType T> class ImageView
     /// then round using RoundingMode::NearestTiesAwayFromZero (round()) which is nearly identical, but not exactly the
     /// same for all values. Values may differ by 1.
     /// </summary>
-    ImageView<T> &AlphaPremul(ImageView<T> &aDst)
+    ImageView<T> &AlphaPremul(ImageView<T> &aDst) const
         requires FourChannelNoAlpha<T> && RealVector<T>;
 
     ImageView<T> &AlphaPremul()
         requires FourChannelNoAlpha<T> && RealVector<T>;
 
-    ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst)
+    ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst) const
         requires RealFloatingVector<T> && (!FourChannelAlpha<T>);
 
-    ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst)
+    ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst) const
         requires RealIntVector<T> && (!FourChannelAlpha<T>);
 
     ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha)
@@ -1699,7 +1725,7 @@ template <PixelType T> class ImageView
     ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha)
         requires RealIntVector<T> && (!FourChannelAlpha<T>);
 
-    ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst)
+    ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst) const
         requires FourChannelAlpha<T>;
 
     ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha)
@@ -1707,95 +1733,639 @@ template <PixelType T> class ImageView
 #pragma endregion
 
 #pragma region AlphaComp
-    ImageView<T> &AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &aDst, AlphaCompositionOp aAlphaOp)
+    ImageView<T> &AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &aDst, AlphaCompositionOp aAlphaOp) const
         requires(!FourChannelAlpha<T>) && RealVector<T>;
 
     ImageView<T> &AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &aDst, remove_vector_t<T> aAlpha1,
-                            remove_vector_t<T> aAlpha2, AlphaCompositionOp aAlphaOp)
+                            remove_vector_t<T> aAlpha2, AlphaCompositionOp aAlphaOp) const
         requires RealVector<T>;
 #pragma endregion
 
 #pragma region Complex
-    ImageView<T> &ConjMul(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+    ImageView<T> &ConjMul(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
         requires ComplexVector<T>;
 
     ImageView<T> &ConjMul(const ImageView<T> &aSrc2)
         requires ComplexVector<T>;
 
-    ImageView<T> &Conj(ImageView<T> &aDst)
+    ImageView<T> &Conj(ImageView<T> &aDst) const
         requires ComplexVector<T>;
 
     ImageView<T> &Conj()
         requires ComplexVector<T>;
 
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &Magnitude(
-        ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst)
+        ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst) const
         requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>;
 
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &MagnitudeSqr(
-        ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst)
+        ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst) const
         requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>;
 
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &Angle(
-        ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst)
+        ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst) const
         requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>;
 
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &Real(
-        ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst)
+        ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst) const
         requires ComplexVector<T>;
 
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &Imag(
-        ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst)
+        ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst) const
         requires ComplexVector<T>;
 
     ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &MakeComplex(
-        ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst)
+        ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst) const
         requires RealSignedVector<T> && (!FourChannelAlpha<T>);
 
     ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &MakeComplex(
         const ImageView<T> &aSrcImag,
-        ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst)
+        ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst) const
         requires RealSignedVector<T> && (!FourChannelAlpha<T>);
 #pragma endregion
 #pragma endregion
 
 #pragma region Statistics
+#pragma region AverageError
+    void AverageError(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                      double &aDstScalar) const
+        requires(vector_active_size_v<T> > 1);
+
+    void AverageErrorMasked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                            double &aDstScalar, const ImageView<Pixel8uC1> &aMask) const
+        requires(vector_active_size_v<T> > 1);
+
+    void AverageError(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst) const
+        requires(vector_active_size_v<T> == 1);
+
+    void AverageErrorMasked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                            const ImageView<Pixel8uC1> &aMask) const
+        requires(vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region AverageRelativeError
+    void AverageRelativeError(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                              double &aDstScalar) const
+        requires(vector_active_size_v<T> > 1);
+
+    void AverageRelativeErrorMasked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                                    double &aDstScalar, const ImageView<Pixel8uC1> &aMask) const
+        requires(vector_active_size_v<T> > 1);
+
+    void AverageRelativeError(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst) const
+        requires(vector_active_size_v<T> == 1);
+
+    void AverageRelativeErrorMasked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                                    const ImageView<Pixel8uC1> &aMask) const
+        requires(vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region DotProduct
+    void DotProduct(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                    double &aDstScalar) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+    void DotProduct(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, c_double> &aDst,
+                    c_double &aDstScalar) const
+        requires ComplexVector<T> && (vector_active_size_v<T> > 1);
+
+    void DotProductMasked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                          double &aDstScalar, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+    void DotProductMasked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, c_double> &aDst,
+                          c_double &aDstScalar, const ImageView<Pixel8uC1> &aMask) const
+        requires ComplexVector<T> && (vector_active_size_v<T> > 1);
+
+    void DotProduct(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+    void DotProduct(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, c_double> &aDst) const
+        requires ComplexVector<T> && (vector_active_size_v<T> == 1);
+
+    void DotProductMasked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                          const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+    void DotProductMasked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, c_double> &aDst,
+                          const ImageView<Pixel8uC1> &aMask) const
+        requires ComplexVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region MSE
+    void MSE(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst, double &aDstScalar) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+    void MSE(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, c_double> &aDst,
+             c_double &aDstScalar) const
+        requires ComplexVector<T> && (vector_active_size_v<T> > 1);
+
+    void MSEMasked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst, double &aDstScalar,
+                   const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+    void MSEMasked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, c_double> &aDst,
+                   c_double &aDstScalar, const ImageView<Pixel8uC1> &aMask) const
+        requires ComplexVector<T> && (vector_active_size_v<T> > 1);
+
+    void MSE(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+    void MSE(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, c_double> &aDst) const
+        requires ComplexVector<T> && (vector_active_size_v<T> == 1);
+
+    void MSEMasked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                   const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+    void MSEMasked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, c_double> &aDst,
+                   const ImageView<Pixel8uC1> &aMask) const
+        requires ComplexVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region MaximumError
+    void MaximumError(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                      double &aDstScalar) const
+        requires(vector_active_size_v<T> > 1);
+
+    void MaximumErrorMasked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                            double &aDstScalar, const ImageView<Pixel8uC1> &aMask) const
+        requires(vector_active_size_v<T> > 1);
+
+    void MaximumError(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst) const
+        requires(vector_active_size_v<T> == 1);
+
+    void MaximumErrorMasked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                            const ImageView<Pixel8uC1> &aMask) const
+        requires(vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region MaximumRelativeError
+    void MaximumRelativeError(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                              double &aDstScalar) const
+        requires(vector_active_size_v<T> > 1);
+
+    void MaximumRelativeErrorMasked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                                    double &aDstScalar, const ImageView<Pixel8uC1> &aMask) const
+        requires(vector_active_size_v<T> > 1);
+
+    void MaximumRelativeError(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst) const
+        requires(vector_active_size_v<T> == 1);
+
+    void MaximumRelativeErrorMasked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                                    const ImageView<Pixel8uC1> &aMask) const
+        requires(vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region NormDiffInf
+    void NormDiffInf(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                     double &aDstScalar) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void NormDiffInfMasked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                           double &aDstScalar, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void NormDiffInf(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    void NormDiffInfMasked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                           const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region NormDiffL1
+    void NormDiffL1(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                    double &aDstScalar) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void NormDiffL1Masked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                          double &aDstScalar, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void NormDiffL1(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    void NormDiffL1Masked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                          const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region NormDiffL2
+    void NormDiffL2(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                    double &aDstScalar) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void NormDiffL2Masked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                          double &aDstScalar, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void NormDiffL2(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    void NormDiffL2Masked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                          const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region NormRelInf
+    void NormRelInf(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                    double &aDstScalar) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void NormRelInfMasked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                          double &aDstScalar, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void NormRelInf(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    void NormRelInfMasked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                          const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region NormRelL1
+    void NormRelL1(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                   double &aDstScalar) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void NormRelL1Masked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                         double &aDstScalar, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void NormRelL1(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    void NormRelL1Masked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                         const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region NormRelL2
+    void NormRelL2(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                   double &aDstScalar) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void NormRelL2Masked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                         double &aDstScalar, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void NormRelL2(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    void NormRelL2Masked(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                         const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region PSNR
+    void PSNR(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst, double &aDstScalar,
+              double aValueRange) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void PSNR(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst, double aValueRange) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region NormInf
+    void NormInf(same_vector_size_different_type_t<T, double> &aDst, double &aDstScalar) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void NormInfMasked(same_vector_size_different_type_t<T, double> &aDst, double &aDstScalar,
+                       const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void NormInf(same_vector_size_different_type_t<T, double> &aDst) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    void NormInfMasked(same_vector_size_different_type_t<T, double> &aDst, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region NormL1
+    void NormL1(same_vector_size_different_type_t<T, double> &aDst, double &aDstScalar) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void NormL1Masked(same_vector_size_different_type_t<T, double> &aDst, double &aDstScalar,
+                      const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void NormL1(same_vector_size_different_type_t<T, double> &aDst) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    void NormL1Masked(same_vector_size_different_type_t<T, double> &aDst, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region NormL2
+    void NormL2(same_vector_size_different_type_t<T, double> &aDst, double &aDstScalar) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void NormL2Masked(same_vector_size_different_type_t<T, double> &aDst, double &aDstScalar,
+                      const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void NormL2(same_vector_size_different_type_t<T, double> &aDst) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    void NormL2Masked(same_vector_size_different_type_t<T, double> &aDst, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region Sum
+    void Sum(same_vector_size_different_type_t<T, double> &aDst, double &aDstScalar) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+    void Sum(same_vector_size_different_type_t<T, c_double> &aDst, c_double &aDstScalar) const
+        requires ComplexVector<T> && (vector_active_size_v<T> > 1);
+
+    void SumMasked(same_vector_size_different_type_t<T, double> &aDst, double &aDstScalar,
+                   const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+    void SumMasked(same_vector_size_different_type_t<T, c_double> &aDst, c_double &aDstScalar,
+                   const ImageView<Pixel8uC1> &aMask) const
+        requires ComplexVector<T> && (vector_active_size_v<T> > 1);
+
+    void Sum(same_vector_size_different_type_t<T, double> &aDst) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+    void Sum(same_vector_size_different_type_t<T, c_double> &aDst) const
+        requires ComplexVector<T> && (vector_active_size_v<T> == 1);
+
+    void SumMasked(same_vector_size_different_type_t<T, double> &aDst, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+    void SumMasked(same_vector_size_different_type_t<T, c_double> &aDst, const ImageView<Pixel8uC1> &aMask) const
+        requires ComplexVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region Mean
+    void Mean(same_vector_size_different_type_t<T, double> &aDst, double &aDstScalar) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+    void Mean(same_vector_size_different_type_t<T, c_double> &aDst, c_double &aDstScalar) const
+        requires ComplexVector<T> && (vector_active_size_v<T> > 1);
+
+    void MeanMasked(same_vector_size_different_type_t<T, double> &aDst, double &aDstScalar,
+                    const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+    void MeanMasked(same_vector_size_different_type_t<T, c_double> &aDst, c_double &aDstScalar,
+                    const ImageView<Pixel8uC1> &aMask) const
+        requires ComplexVector<T> && (vector_active_size_v<T> > 1);
+
+    void Mean(same_vector_size_different_type_t<T, double> &aDst) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+    void Mean(same_vector_size_different_type_t<T, c_double> &aDst) const
+        requires ComplexVector<T> && (vector_active_size_v<T> == 1);
+
+    void MeanMasked(same_vector_size_different_type_t<T, double> &aDst, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+    void MeanMasked(same_vector_size_different_type_t<T, c_double> &aDst, const ImageView<Pixel8uC1> &aMask) const
+        requires ComplexVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region MeanStd
+    void MeanStd(same_vector_size_different_type_t<T, double> &aMean,
+                 same_vector_size_different_type_t<T, double> &aStd, double &aMeanScalar, double &aStdScalar) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+    void MeanStd(same_vector_size_different_type_t<T, c_double> &aMean,
+                 same_vector_size_different_type_t<T, double> &aStd, c_double &aMeanScalar, double &aStdScalar) const
+        requires ComplexVector<T> && (vector_active_size_v<T> > 1);
+
+    void MeanStdMasked(same_vector_size_different_type_t<T, double> &aMean,
+                       same_vector_size_different_type_t<T, double> &aStd, double &aMeanScalar, double &aStdScalar,
+                       const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+    void MeanStdMasked(same_vector_size_different_type_t<T, c_double> &aMean,
+                       same_vector_size_different_type_t<T, double> &aStd, c_double &aMeanScalar, double &aStdScalar,
+                       const ImageView<Pixel8uC1> &aMask) const
+        requires ComplexVector<T> && (vector_active_size_v<T> > 1);
+
+    void MeanStd(same_vector_size_different_type_t<T, double> &aMean,
+                 same_vector_size_different_type_t<T, double> &aStd) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+    void MeanStd(same_vector_size_different_type_t<T, c_double> &aMean,
+                 same_vector_size_different_type_t<T, double> &aStd) const
+        requires ComplexVector<T> && (vector_active_size_v<T> == 1);
+
+    void MeanStdMasked(same_vector_size_different_type_t<T, double> &aMean,
+                       same_vector_size_different_type_t<T, double> &aStd, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+    void MeanStdMasked(same_vector_size_different_type_t<T, c_double> &aMean,
+                       same_vector_size_different_type_t<T, double> &aStd, const ImageView<Pixel8uC1> &aMask) const
+        requires ComplexVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region CountInRange
+    void CountInRange(const T &aLowerLimit, const T &aUpperLimit, same_vector_size_different_type_t<T, size_t> &aDst,
+                      size_t &aDstScalar) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void CountInRangeMasked(const T &aLowerLimit, const T &aUpperLimit,
+                            same_vector_size_different_type_t<T, size_t> &aDst, size_t &aDstScalar,
+                            const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void CountInRange(const T &aLowerLimit, const T &aUpperLimit,
+                      same_vector_size_different_type_t<T, size_t> &aDst) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    void CountInRangeMasked(const T &aLowerLimit, const T &aUpperLimit,
+                            same_vector_size_different_type_t<T, size_t> &aDst, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region QualityIndex
+    void QualityIndex(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst) const
+        requires RealVector<T>;
+#pragma endregion
+
+#pragma region SSIM
+    void SSIM(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst, double aDynamicRange = 1.0,
+              double aK1 = 0.01,       // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+              double aK2 = 0.03) const // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+        requires RealVector<T>;
+#pragma endregion
+
+#pragma region Min
+    void Min(T &aDst, remove_vector_t<T> &aDstScalar) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void MinMasked(T &aDst, remove_vector_t<T> &aDstScalar, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void Min(T &aDst) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    void MinMasked(T &aDst, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region Max
+    void Max(T &aDst, remove_vector_t<T> &aDstScalar) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void MaxMasked(T &aDst, remove_vector_t<T> &aDstScalar, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void Max(T &aDst) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    void MaxMasked(T &aDst, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region MinMax
+    void MinMax(T &aDstMin, T &aDstMax, remove_vector_t<T> &aDstMinScalar, remove_vector_t<T> &aDstMaxScalar) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+    void MinMaxMasked(T &aDstMin, T &aDstMax, remove_vector_t<T> &aDstMinScalar, remove_vector_t<T> &aDstMaxScalar,
+                      const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void MinMax(T &aDstMin, T &aDstMax) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+    void MinMaxMasked(T &aDstMin, T &aDstMax, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region MinIndex
+    void MinIndex(T &aDstMin, same_vector_size_different_type_t<T, int> &aDstIndexX,
+                  same_vector_size_different_type_t<T, int> &aDstIndexY, remove_vector_t<T> &aDstMinScalar,
+                  Vector3<int> &aDstScalarIdx) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+    void MinIndexMasked(T &aDstMin, same_vector_size_different_type_t<T, int> &aDstIndexX,
+                        same_vector_size_different_type_t<T, int> &aDstIndexY, remove_vector_t<T> &aDstMinScalar,
+                        Vector3<int> &aDstScalarIdx, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void MinIndex(T &aDstMin, same_vector_size_different_type_t<T, int> &aDstIndexX,
+                  same_vector_size_different_type_t<T, int> &aDstIndexY) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+    void MinIndexMasked(T &aDstMin, same_vector_size_different_type_t<T, int> &aDstIndexX,
+                        same_vector_size_different_type_t<T, int> &aDstIndexY, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region MaxIndex
+    void MaxIndex(T &aDstMax, same_vector_size_different_type_t<T, int> &aDstIndexX,
+                  same_vector_size_different_type_t<T, int> &aDstIndexY, remove_vector_t<T> &aDstMaxScalar,
+                  Vector3<int> &aDstScalarIdx) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+    void MaxIndexMasked(T &aDstMax, same_vector_size_different_type_t<T, int> &aDstIndexX,
+                        same_vector_size_different_type_t<T, int> &aDstIndexY, remove_vector_t<T> &aDstMaxScalar,
+                        Vector3<int> &aDstScalarIdx, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    void MaxIndex(T &aDstMax, same_vector_size_different_type_t<T, int> &aDstIndexX,
+                  same_vector_size_different_type_t<T, int> &aDstIndexY) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+    void MaxIndexMasked(T &aDstMax, same_vector_size_different_type_t<T, int> &aDstIndexX,
+                        same_vector_size_different_type_t<T, int> &aDstIndexY, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region MinMaxIndex
+    void MinMaxIndex(T &aDstMin, T &aDstMax, IndexMinMax aDstIdx[vector_active_size_v<T>],
+                     remove_vector_t<T> &aDstMinScalar, remove_vector_t<T> &aDstMaxScalar,
+                     IndexMinMaxChannel &aDstScalarIdx) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+    void MinMaxIndexMasked(T &aDstMin, T &aDstMax, IndexMinMax aDstIdx[vector_active_size_v<T>],
+                           remove_vector_t<T> &aDstMinScalar, remove_vector_t<T> &aDstMaxScalar,
+                           IndexMinMaxChannel &aDstScalarIdx, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+    void MinMaxIndex(T &aDstMin, T &aDstMax, IndexMinMax &aDstIdx) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+    void MinMaxIndexMasked(T &aDstMin, T &aDstMax, IndexMinMax &aDstIdx, const ImageView<Pixel8uC1> &aMask) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+
 #pragma region MinEvery
-    ImageView<T> &MinEvery(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+    ImageView<T> &MinEvery(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
         requires RealVector<T>;
 
     ImageView<T> &MinEvery(const ImageView<T> &aSrc2)
         requires RealVector<T>;
 #pragma endregion
 #pragma region MaxEvery
-    ImageView<T> &MaxEvery(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+    ImageView<T> &MaxEvery(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
         requires RealVector<T>;
 
     ImageView<T> &MaxEvery(const ImageView<T> &aSrc2)
+        requires RealVector<T>;
+#pragma endregion
+
+#pragma region Integral
+    ImageView<same_vector_size_different_type_t<T, int>> &Integral(
+        ImageView<same_vector_size_different_type_t<T, int>> &aDst,
+        const same_vector_size_different_type_t<T, int> &aVal) const
+        requires RealIntVector<T>;
+
+    ImageView<same_vector_size_different_type_t<T, float>> &Integral(
+        ImageView<same_vector_size_different_type_t<T, float>> &aDst,
+        const same_vector_size_different_type_t<T, float> &aVal) const
+        requires RealVector<T> && (!std::same_as<double, remove_vector<T>>);
+
+    ImageView<same_vector_size_different_type_t<T, long64>> &Integral(
+        ImageView<same_vector_size_different_type_t<T, long64>> &aDst,
+        const same_vector_size_different_type_t<T, long64> &aVal) const
+        requires RealIntVector<T>;
+
+    ImageView<same_vector_size_different_type_t<T, double>> &Integral(
+        ImageView<same_vector_size_different_type_t<T, double>> &aDst,
+        const same_vector_size_different_type_t<T, double> &aVal) const
+        requires RealVector<T>;
+
+    void SqrIntegral(ImageView<same_vector_size_different_type_t<T, int>> &aDst,
+                     ImageView<same_vector_size_different_type_t<T, int>> &aSqr,
+                     const same_vector_size_different_type_t<T, int> &aVal,
+                     const same_vector_size_different_type_t<T, int> &aValSqr) const
+        requires RealIntVector<T>;
+
+    void SqrIntegral(ImageView<same_vector_size_different_type_t<T, int>> &aDst,
+                     ImageView<same_vector_size_different_type_t<T, long64>> &aSqr,
+                     const same_vector_size_different_type_t<T, int> &aVal,
+                     const same_vector_size_different_type_t<T, long64> &aValSqr) const
+        requires RealIntVector<T>;
+
+    void SqrIntegral(ImageView<same_vector_size_different_type_t<T, float>> &aDst,
+                     ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
+                     const same_vector_size_different_type_t<T, float> &aVal,
+                     const same_vector_size_different_type_t<T, double> &aValSqr) const
+        requires RealVector<T> && (!std::same_as<double, remove_vector<T>>);
+
+    void SqrIntegral(ImageView<same_vector_size_different_type_t<T, double>> &aDst,
+                     ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
+                     const same_vector_size_different_type_t<T, double> &aVal,
+                     const same_vector_size_different_type_t<T, double> &aValSqr) const
+        requires RealVector<T>;
+#pragma endregion
+
+#pragma region Histogram
+    /// <summary>
+    /// Compute levels with even distribution
+    /// </summary>
+    /// <param name="aHPtrLevels">A host pointer to array which receives the levels being computed.
+    /// The array needs to be of size aLevels.</ param>
+    /// <param name="aLevels">The number of levels being computed. aLevels must be at least 2</param>
+    /// <param name="aLowerLevel">Lower boundary value of the lowest level.</param>
+    /// <param name="aUpperLevel">Upper boundary value of the greatest level.</param>
+    void EvenLevels(hist_even_level_types_for_t<T> *aHPtrLevels, int aLevels,
+                    hist_even_level_types_for_t<T> aLowerLevel, hist_even_level_types_for_t<T> aUpperLevel);
+
+    /// <summary>
+    /// The aLowerLevel (inclusive) and aUpperLevel (exclusive) define the boundaries of the range,
+    /// which are evenly segmented into aHist.Size() bins.
+    /// </summary>
+    void HistogramEven(same_vector_size_different_type_t<T, int> *aHist, int aHistBinCount,
+                       const hist_even_level_types_for_t<T> &aLowerLevel,
+                       const hist_even_level_types_for_t<T> &aUpperLevel)
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Computes the histogram of an image within specified ranges.
+    /// </summary>
+    void HistogramRange(same_vector_size_different_type_t<T, int> *aHist, int aHistBinCount,
+                        hist_range_types_for_t<T> *aLevels)
         requires RealVector<T>;
 #pragma endregion
 #pragma endregion
 
 #pragma region Threshold and Compare
 #pragma region Compare
-    ImageView<Pixel8uC1> &Compare(const ImageView<T> &aSrc2, CompareOp aCompare, ImageView<Pixel8uC1> &aDst);
+    ImageView<Pixel8uC1> &Compare(const ImageView<T> &aSrc2, CompareOp aCompare, ImageView<Pixel8uC1> &aDst) const;
 
-    ImageView<Pixel8uC1> &Compare(const T &aConst, CompareOp aCompare, ImageView<Pixel8uC1> &aDst);
+    ImageView<Pixel8uC1> &Compare(const T &aConst, CompareOp aCompare, ImageView<Pixel8uC1> &aDst) const;
 
     ImageView<Pixel8uC1> &CompareEqEps(const ImageView<T> &aSrc2, complex_basetype_t<remove_vector_t<T>> aEpsilon,
-                                       ImageView<Pixel8uC1> &aDst)
+                                       ImageView<Pixel8uC1> &aDst) const
         requires RealOrComplexFloatingVector<T>;
 
     ImageView<Pixel8uC1> &CompareEqEps(const T &aConst, complex_basetype_t<remove_vector_t<T>> aEpsilon,
-                                       ImageView<Pixel8uC1> &aDst)
+                                       ImageView<Pixel8uC1> &aDst) const
         requires RealOrComplexFloatingVector<T>;
 #pragma endregion
 #pragma region Threshold
-    ImageView<T> &Threshold(const T &aThreshold, CompareOp aCompare, ImageView<T> &aDst)
+    ImageView<T> &Threshold(const T &aThreshold, CompareOp aCompare, ImageView<T> &aDst) const
         requires RealVector<T>;
-    ImageView<T> &ThresholdLT(const T &aThreshold, ImageView<T> &aDst)
+    ImageView<T> &ThresholdLT(const T &aThreshold, ImageView<T> &aDst) const
         requires RealVector<T>;
-    ImageView<T> &ThresholdGT(const T &aThreshold, ImageView<T> &aDst)
+    ImageView<T> &ThresholdGT(const T &aThreshold, ImageView<T> &aDst) const
         requires RealVector<T>;
     ImageView<T> &Threshold(const T &aThreshold, CompareOp aCompare)
         requires RealVector<T>;
@@ -1804,11 +2374,11 @@ template <PixelType T> class ImageView
     ImageView<T> &ThresholdGT(const T &aThreshold)
         requires RealVector<T>;
 
-    ImageView<T> &Threshold(const T &aThreshold, const T &aValue, CompareOp aCompare, ImageView<T> &aDst)
+    ImageView<T> &Threshold(const T &aThreshold, const T &aValue, CompareOp aCompare, ImageView<T> &aDst) const
         requires RealVector<T>;
-    ImageView<T> &ThresholdLT(const T &aThreshold, const T &aValue, ImageView<T> &aDst)
+    ImageView<T> &ThresholdLT(const T &aThreshold, const T &aValue, ImageView<T> &aDst) const
         requires RealVector<T>;
-    ImageView<T> &ThresholdGT(const T &aThreshold, const T &aValue, ImageView<T> &aDst)
+    ImageView<T> &ThresholdGT(const T &aThreshold, const T &aValue, ImageView<T> &aDst) const
         requires RealVector<T>;
     ImageView<T> &Threshold(const T &aThreshold, const T &aValue, CompareOp aCompare)
         requires RealVector<T>;
@@ -1817,7 +2387,7 @@ template <PixelType T> class ImageView
     ImageView<T> &ThresholdGT(const T &aThreshold, const T &aValue)
         requires RealVector<T>;
     ImageView<T> &ThresholdLTGT(const T &aThresholdLT, const T &aValueLT, const T &aThresholdGT, const T &aValueGT,
-                                ImageView<T> &aDst)
+                                ImageView<T> &aDst) const
         requires RealVector<T>;
     ImageView<T> &ThresholdLTGT(const T &aThresholdLT, const T &aValueLT, const T &aThresholdGT, const T &aValueGT)
         requires RealVector<T>;

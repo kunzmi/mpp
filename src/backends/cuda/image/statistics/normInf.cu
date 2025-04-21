@@ -41,15 +41,15 @@ void InvokeNormInfSrc(const SrcT *aSrc, size_t aPitchSrc, ComputeT *aTempBuffer,
 
         const normInfSrc functor(aSrc, aPitchSrc, op);
 
-        InvokeReductionAlongXKernelDefault<SrcT, ComputeT, TupelSize, normInfSrc, opp::Max<ComputeT>,
+        InvokeReductionAlongXKernelDefault<SrcT, ComputeT, TupelSize, normInfSrc, opp::MaxRed<ComputeT>,
                                            ReductionInitValue::Zero>(aSrc, aTempBuffer, aSize, aStreamCtx, functor);
 
         const opp::Nothing<DstT> postOp;
         const opp::MaxScalar<DstT> postOpScalar;
 
-        InvokeReductionAlongYKernelDefault<ComputeT, DstT, opp::Max<DstT>, ReductionInitValue::Zero, opp::Nothing<DstT>,
-                                           opp::MaxScalar<DstT>>(aTempBuffer, aDst, aDstScalar, aSize.y, postOp,
-                                                                 postOpScalar, aStreamCtx);
+        InvokeReductionAlongYKernelDefault<ComputeT, DstT, opp::MaxRed<DstT>, ReductionInitValue::Zero,
+                                           opp::Nothing<DstT>, opp::MaxScalar<DstT>>(
+            aTempBuffer, aDst, aDstScalar, aSize.y, postOp, postOpScalar, aStreamCtx);
     }
 }
 

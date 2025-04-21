@@ -11,7 +11,7 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/statistics/minMaxIndex.h>
+#include <common/statistics/indexMinMax.h>
 #include <common/tupel.h>
 #include <common/utilities.h>
 #include <common/vectorTypes_impl.h>
@@ -29,8 +29,8 @@ __global__ void reductionMinMaxIdxAlongYKernel(
     const SrcT *__restrict__ aSrcMin, const SrcT *__restrict__ aSrcMax,
     const same_vector_size_different_type_t<SrcT, int> *__restrict__ aSrcMinIdxX,
     const same_vector_size_different_type_t<SrcT, int> *__restrict__ aSrcMaxIdxX, SrcT *__restrict__ aDstMin,
-    SrcT *__restrict__ aDstMax, MinMaxIndex *__restrict__ aDstIdx, remove_vector_t<SrcT> *__restrict__ aDstScalarMin,
-    remove_vector_t<SrcT> *__restrict__ aDstScalarMax, MinMaxIndexChannel *__restrict__ aDstScalarIdx, int aSize)
+    SrcT *__restrict__ aDstMax, IndexMinMax *__restrict__ aDstIdx, remove_vector_t<SrcT> *__restrict__ aDstScalarMin,
+    remove_vector_t<SrcT> *__restrict__ aDstScalarMax, IndexMinMaxChannel *__restrict__ aDstScalarIdx, int aSize)
 {
     using idxT = same_vector_size_different_type_t<SrcT, int>;
 
@@ -42,8 +42,8 @@ __global__ void reductionMinMaxIdxAlongYKernel(
 
     SrcT resultMin(reduction_init_value_v<ReductionInitValue::Max, SrcT>);
     SrcT resultMax(reduction_init_value_v<ReductionInitValue::Min, SrcT>);
-    idxT resultMinIdx(-1);
-    idxT resultMaxIdx(-1);
+    idxT resultMinIdx(INT_MAX);
+    idxT resultMaxIdx(INT_MAX);
 
     __shared__ SrcT bufferMinVal[ConfigBlockSize<"DefaultReductionY">::value.y];
     __shared__ idxT bufferMinIdx[ConfigBlockSize<"DefaultReductionY">::value.y];
@@ -242,15 +242,15 @@ __global__ void reductionMinMaxIdxAlongYKernel(
             }
             if constexpr (vector_active_size_v<SrcT> > 2)
             {
-                redOpMin(resultMin.y, 2, minScalar, minIdxVec);
-                redOpMax(resultMax.y, 2, maxScalar, maxIdxVec);
+                redOpMin(resultMin.z, 2, minScalar, minIdxVec);
+                redOpMax(resultMax.z, 2, maxScalar, maxIdxVec);
             }
             if constexpr (vector_active_size_v<SrcT> > 3)
             {
-                redOpMin(resultMin.y, 3, minScalar, minIdxVec);
-                redOpMax(resultMax.y, 3, maxScalar, maxIdxVec);
+                redOpMin(resultMin.w, 3, minScalar, minIdxVec);
+                redOpMax(resultMax.w, 3, maxScalar, maxIdxVec);
             }
-            MinMaxIndexChannel idx;
+            IndexMinMaxChannel idx;
             idx.IndexMin.x = minIdxX[Channel(minIdxVec)];
             idx.IndexMin.y = resultMinIdx[Channel(minIdxVec)];
             idx.ChannelMin = minIdxVec;
@@ -258,8 +258,6 @@ __global__ void reductionMinMaxIdxAlongYKernel(
             idx.IndexMax.x = maxIdxX[Channel(maxIdxVec)];
             idx.IndexMax.y = resultMaxIdx[Channel(maxIdxVec)];
             idx.ChannelMax = maxIdxVec;
-            /*Vector3<int> minIdx(minIdxX[Channel(minIdxVec)], resultMinIdx[Channel(minIdxVec)], minIdxVec);
-            Vector3<int> maxIdx(maxIdxX[Channel(maxIdxVec)], resultMaxIdx[Channel(maxIdxVec)], maxIdxVec);*/
 
             *aDstScalarMin = minScalar;
             *aDstScalarMax = maxScalar;
@@ -271,7 +269,7 @@ __global__ void reductionMinMaxIdxAlongYKernel(
         {
             *aDstMin = resultMin;
             *aDstMax = resultMax;
-            MinMaxIndex idx;
+            IndexMinMax idx;
             idx.IndexMin.x = minIdxX.x;
             idx.IndexMin.y = resultMinIdx.x;
             idx.IndexMax.x = maxIdxX.x;
@@ -311,14 +309,13 @@ void InvokeReductionMinMaxIdxAlongYKernel(const dim3 &aBlockSize, uint aSharedMe
                                           cudaStream_t aStream, const SrcT *aSrcMin, const SrcT *aSrcMax,
                                           const same_vector_size_different_type_t<SrcT, int> *aSrcMinIdxX,
                                           const same_vector_size_different_type_t<SrcT, int> *aSrcMaxIdxX,
-                                          SrcT *aDstMin, SrcT *aDstMax, MinMaxIndex *aDstIdx,
+                                          SrcT *aDstMin, SrcT *aDstMax, IndexMinMax *aDstIdx,
                                           remove_vector_t<SrcT> *aDstScalarMin, remove_vector_t<SrcT> *aDstScalarMax,
-                                          MinMaxIndexChannel *aDstScalarIdx, int aSize)
+                                          IndexMinMaxChannel *aDstScalarIdx, int aSize)
 {
     dim3 blocksPerGrid(1, 1, 1);
 
-    int size = aSize / ConfigBlockSize<"DefaultReductionX">::value.y;
-    size     = std::max(size, 1);
+    const int size = DIV_UP(aSize, ConfigBlockSize<"DefaultReductionX">::value.y);
 
     reductionMinMaxIdxAlongYKernel<SrcT><<<blocksPerGrid, aBlockSize, aSharedMemory, aStream>>>(
         aSrcMin, aSrcMax, aSrcMinIdxX, aSrcMaxIdxX, aDstMin, aDstMax, aDstIdx, aDstScalarMin, aDstScalarMax,
@@ -331,8 +328,8 @@ void InvokeReductionMinMaxIdxAlongYKernel(const dim3 &aBlockSize, uint aSharedMe
 template <typename SrcT>
 void InvokeReductionMinMaxIdxAlongYKernelDefault(
     const SrcT *aSrcMin, const SrcT *aSrcMax, const same_vector_size_different_type_t<SrcT, int> *aSrcMinIdxX,
-    const same_vector_size_different_type_t<SrcT, int> *aSrcMaxIdxX, SrcT *aDstMin, SrcT *aDstMax, MinMaxIndex *aDstIdx,
-    remove_vector_t<SrcT> *aDstScalarMin, remove_vector_t<SrcT> *aDstScalarMax, MinMaxIndexChannel *aDstScalarIdx,
+    const same_vector_size_different_type_t<SrcT, int> *aSrcMaxIdxX, SrcT *aDstMin, SrcT *aDstMax, IndexMinMax *aDstIdx,
+    remove_vector_t<SrcT> *aDstScalarMin, remove_vector_t<SrcT> *aDstScalarMax, IndexMinMaxChannel *aDstScalarIdx,
     int aSize, const opp::cuda::StreamCtx &aStreamCtx)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)

@@ -32,7 +32,10 @@ void InvokeMeanStdSrc(const SrcT *aSrc, size_t aPitchSrc, ComputeT *aTempBuffer1
 {
     if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
     {
-        // OPP_CUDA_REGISTER_TEMPALTE;
+        {
+            using DstT = DstT1;
+            OPP_CUDA_REGISTER_TEMPALTE;
+        }
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
@@ -49,14 +52,15 @@ void InvokeMeanStdSrc(const SrcT *aSrc, size_t aPitchSrc, ComputeT *aTempBuffer1
                                             ReductionInitValue::Zero, ReductionInitValue::Zero>(
             aSrc, aTempBuffer1, aTempBuffer2, aSize, aStreamCtx, functor);
 
-        const opp::Div<DstT1> postOp1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(aSize.TotalSize()));
+        const opp::DivPostOp<DstT1> postOp1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(aSize.TotalSize()));
         const opp::StdDeviation<DstT2> postOp2(static_cast<remove_vector_t<DstT2>>(aSize.TotalSize()));
-        const opp::MeanScalar<DstT1> postOpScalar1;
+        const opp::DivScalar<DstT1> postOpScalar1(
+            static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(aSize.TotalSize()));
         const opp::StdDeviation<DstT2> postOpScalar2((static_cast<remove_vector_t<DstT2>>(aSize.TotalSize())));
 
         InvokeReduction2AlongYKernelDefault<ComputeT, ComputeT, DstT1, DstT2, opp::Sum<DstT1, DstT1>,
                                             opp::Sum<DstT1, DstT1>, ReductionInitValue::Zero, ReductionInitValue::Zero,
-                                            opp::Div<DstT1>, opp::StdDeviation<DstT2>, opp::MeanScalar<DstT1>,
+                                            opp::DivPostOp<DstT1>, opp::StdDeviation<DstT2>, opp::DivScalar<DstT1>,
                                             opp::StdDeviation<DstT2>>(
             aTempBuffer1, aTempBuffer2, aDst1, aDst2, aDstScalar1, aDstScalar2, aSize.y, postOp1, postOp2,
             postOpScalar1, postOpScalar2, aStreamCtx);

@@ -315,10 +315,10 @@ class Image32fC3View : public ImageView<Pixel32fC3>
     Image8uC1View &Compare(const Pixel32fC3 &pConstants, Image8uC1View &pDst, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCompareEqualEps_32f_C3R_Ctx(const Npp32f * pSrc1, int nSrc1Step, const Npp32f * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, Npp32f nEpsilon, NppStreamContext nppStreamCtx)
-    Image8uC3View &CompareEqualEps(const Image32fC3View &pSrc2, Image8uC3View &pDst, const Pixel32fC1 &nEpsilon, const NppStreamContext &nppStreamCtx) const;
+    Image8uC1View &CompareEqualEps(const Image32fC3View &pSrc2, Image8uC1View &pDst, const Pixel32fC1 &nEpsilon, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCompareEqualEpsC_32f_C3R_Ctx(const Npp32f * pSrc, int nSrcStep, const Npp32f * pConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, Npp32f nEpsilon, NppStreamContext nppStreamCtx)
-    Image8uC3View &CompareEqualEps(const Pixel32fC3 &pConstants, Image8uC3View &pDst, const Pixel32fC1 &nEpsilon, const NppStreamContext &nppStreamCtx) const;
+    Image8uC1View &CompareEqualEps(const Pixel32fC3 &pConstants, Image8uC1View &pDst, const Pixel32fC1 &nEpsilon, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDilate_32f_C3R_Ctx(const Npp32f * pSrc, Npp32s nSrcStep, Npp32f * pDst, Npp32s nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
     Image32fC3View &Dilate(Image32fC3View &pDst, const opp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;

@@ -58,16 +58,24 @@ template <int WarpAlignmentInBytes, int TupelSize> class ThreadSplit
                                                             << sizeof(T) << "). Impossible to fill warp with tupels.");
         }
 
-        int muted = GetElementsLeft(aPointer, WarpAlignmentInBytes);
+        // int muted = GetElementsLeft(aPointer, WarpAlignmentInBytes);
 
-        // if number of muted elements is greater than warp size, then we would launch entire warps doing nothing, so
-        // reduce the number of muted threads:
-        while (muted - aWarpSize >= 0)
+        //// if number of muted elements is greater than warp size, then we would launch entire warps doing nothing, so
+        //// reduce the number of muted threads:
+        // while (muted - aWarpSize >= 0)
+        //{
+        //     muted -= aWarpSize;
+        // }
+
+        int left = std::min(GetElementsRight(aPointer, WarpAlignmentInBytes), aDataWidthInElements);
+
+        // fill up muted to full warp:
+        int muted = 0;
+        if (left % aWarpSize != 0)
         {
-            muted -= aWarpSize;
+            muted = aWarpSize - (left % aWarpSize);
         }
 
-        int left               = std::min(GetElementsRight(aPointer, WarpAlignmentInBytes), aDataWidthInElements);
         int dataElementsCenter = aDataWidthInElements - left;
         int right              = dataElementsCenter % TupelSize;
         int center             = dataElementsCenter / TupelSize;
@@ -217,6 +225,33 @@ template <int WarpAlignmentInBytes, int TupelSize> class ThreadSplit
     }
 
     /// <summary>
+    /// Translates a threadID to a pixelID, for a threadID in the left part (no checks)
+    /// </summary>
+    DEVICE_CODE constexpr int GetPixelLeft(int aThreadID) const noexcept
+        requires(TupelSize > 1)
+    {
+        return aThreadID - mMuted;
+    }
+
+    /// <summary>
+    /// Translates a threadID to a pixelID, for a threadID in the center part (no checks)
+    /// </summary>
+    DEVICE_CODE constexpr int GetPixelCenter(int aThreadID) const noexcept
+        requires(TupelSize > 1)
+    {
+        return Left() + (aThreadID - mLeftAndMuted) * TupelSize;
+    }
+
+    /// <summary>
+    /// Translates a threadID to a pixelID, for a threadID in the right part (no checks)
+    /// </summary>
+    DEVICE_CODE constexpr int GetPixelRight(int aThreadID) const noexcept
+        requires(TupelSize > 1)
+    {
+        return Left() + Center() * TupelSize + aThreadID - mCenterAndLeftAndMuted;
+    }
+
+    /// <summary>
     /// The number of muted threads
     /// </summary>
     DEVICE_CODE constexpr int Muted() const noexcept
@@ -312,6 +347,33 @@ template <int WarpAlignmentInBytes, int TupelSize> class ThreadSplit
     /// Translates a threadID to a pixelID
     /// </summary>
     DEVICE_CODE constexpr int GetPixel(int aThreadID) const noexcept
+        requires(TupelSize == 1)
+    {
+        return aThreadID;
+    }
+
+    /// <summary>
+    /// Translates a threadID to a pixelID
+    /// </summary>
+    DEVICE_CODE constexpr int GetPixelLeft(int aThreadID) const noexcept
+        requires(TupelSize == 1)
+    {
+        return aThreadID;
+    }
+
+    /// <summary>
+    /// Translates a threadID to a pixelID
+    /// </summary>
+    DEVICE_CODE constexpr int GetPixelCenter(int aThreadID) const noexcept
+        requires(TupelSize == 1)
+    {
+        return aThreadID;
+    }
+
+    /// <summary>
+    /// Translates a threadID to a pixelID
+    /// </summary>
+    DEVICE_CODE constexpr int GetPixelRight(int aThreadID) const noexcept
         requires(TupelSize == 1)
     {
         return aThreadID;

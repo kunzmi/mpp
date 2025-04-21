@@ -3,6 +3,7 @@ add_library(common
 	complex.cpp
 	exception.cpp
 	half_fp16.cpp
+	scratchBufferException.cpp
 	vector1.cpp
 	vector2.cpp
 	vector3.cpp

@@ -51,9 +51,9 @@
 #include <common/opp_defs.h>
 #include <common/safeCast.h>
 #include <common/utilities.h>
+#include <common/vector_typetraits.h>
 #include <common/vector1.h>
 #include <common/vectorTypes.h>
-#include <common/vector_typetraits.h>
 #include <concepts>
 #include <cstddef>
 #include <type_traits>
@@ -64,7 +64,7 @@ namespace opp::image::cpuSimple
 #pragma region Convert
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst)
+ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst) const
     requires(!std::same_as<T, TTo>) &&
             (RealOrComplexIntVector<T> || (std::same_as<complex_basetype_t<remove_vector_t<T>>, float> &&
                                            (std::same_as<complex_basetype_t<remove_vector_t<TTo>>, BFloat16> ||
@@ -82,7 +82,7 @@ ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst)
 
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode)
+ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode) const
     requires(!std::same_as<T, TTo>) && RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -133,7 +133,7 @@ ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundi
 
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode, int aScaleFactor)
+ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode, int aScaleFactor) const
     requires(!std::same_as<T, TTo>) && (!std::same_as<TTo, float>) && (!std::same_as<TTo, double>) &&
             (!std::same_as<TTo, Complex<float>>) && (!std::same_as<TTo, Complex<double>>)
 {
@@ -190,7 +190,7 @@ ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundi
 /// <summary>
 /// Copy image.
 /// </summary>
-template <PixelType T> ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst)
+template <PixelType T> ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst) const
 {
     checkSameSize(ROI(), aDst.ROI());
 
@@ -207,7 +207,8 @@ template <PixelType T> ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst)
 /// <summary>
 /// Copy image with mask. Pixels with mask == 0 remain untouched in destination image.
 /// </summary>
-template <PixelType T> ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+template <PixelType T>
+ImageView<T> &ImageView<T>::CopyMasked(ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask) const
 {
     checkSameSize(ROI(), aDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
@@ -227,7 +228,7 @@ template <PixelType T> ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst, cons
 /// </summary>
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Copy(Channel aSrcChannel, ImageView<TTo> &aDst, Channel aDstChannel)
+ImageView<TTo> &ImageView<T>::Copy(Channel aSrcChannel, ImageView<TTo> &aDst, Channel aDstChannel) const
     requires(vector_size_v<T> > 1) &&   //
             (vector_size_v<TTo> > 1) && //
             std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
@@ -251,7 +252,7 @@ ImageView<TTo> &ImageView<T>::Copy(Channel aSrcChannel, ImageView<TTo> &aDst, Ch
 /// </summary>
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Copy(ImageView<TTo> &aDst, Channel aDstChannel)
+ImageView<TTo> &ImageView<T>::Copy(ImageView<TTo> &aDst, Channel aDstChannel) const
     requires(vector_size_v<T> == 1) &&  //
             (vector_size_v<TTo> > 1) && //
             std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
@@ -273,7 +274,7 @@ ImageView<TTo> &ImageView<T>::Copy(ImageView<TTo> &aDst, Channel aDstChannel)
 /// </summary>
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Copy(Channel aSrcChannel, ImageView<TTo> &aDst)
+ImageView<TTo> &ImageView<T>::Copy(Channel aSrcChannel, ImageView<TTo> &aDst) const
     requires(vector_size_v<T> > 1) &&    //
             (vector_size_v<TTo> == 1) && //
             std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
@@ -297,7 +298,7 @@ ImageView<TTo> &ImageView<T>::Copy(Channel aSrcChannel, ImageView<TTo> &aDst)
 /// </summary>
 template <PixelType T>
 void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
-                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2)
+                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2) const
     requires(TwoChannel<T>)
 {
     checkSameSize(ROI(), aDstChannel1.ROI());
@@ -318,7 +319,7 @@ void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
 template <PixelType T>
 void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
                         ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2,
-                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel3)
+                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel3) const
     requires(ThreeChannel<T>)
 {
     checkSameSize(ROI(), aDstChannel1.ROI());
@@ -341,7 +342,7 @@ template <PixelType T>
 void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
                         ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2,
                         ImageView<Vector1<remove_vector_t<T>>> &aDstChannel3,
-                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel4)
+                        ImageView<Vector1<remove_vector_t<T>>> &aDstChannel4) const
     requires(FourChannelNoAlpha<T>)
 {
     checkSameSize(ROI(), aDstChannel1.ROI());
@@ -438,7 +439,7 @@ ImageView<T> &ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aSrcCha
 #pragma region Dup
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Dup(ImageView<TTo> &aDst)
+ImageView<TTo> &ImageView<T>::Dup(ImageView<TTo> &aDst) const
     requires(vector_size_v<T> == 1) &&
             (vector_size_v<TTo> > 1) && std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
 {
@@ -457,7 +458,7 @@ ImageView<TTo> &ImageView<T>::Dup(ImageView<TTo> &aDst)
 // NOLINTBEGIN(bugprone-easily-swappable-parameters)
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst)
+ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst) const
     requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<T> && RealOrComplexIntVector<TTo>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -480,7 +481,7 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst)
 
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax)
+ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax) const
     requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -504,7 +505,7 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDs
 
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax)
+ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax) const
     requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<TTo>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -529,7 +530,7 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcM
 template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
-                                    scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax)
+                                    scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax) const
     requires(!std::same_as<T, TTo>)
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -563,7 +564,7 @@ template <PixelType T> ImageView<T> &ImageView<T>::Set(const T &aConst)
     return *this;
 }
 
-template <PixelType T> ImageView<T> &ImageView<T>::Set(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+template <PixelType T> ImageView<T> &ImageView<T>::SetMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask)
 {
     using setC = ConstantFunctor<1, T>;
     const setC functor(aConst);
@@ -580,20 +581,22 @@ template <PixelType T> ImageView<T> &ImageView<T>::Set(const T &aConst, const Im
 template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::SwapChannel(ImageView<TTo> &aDst,
-                                          const ChannelList<vector_active_size_v<TTo>> &aDstChannels)
+                                          const ChannelList<vector_active_size_v<TTo>> &aDstChannels) const
     requires((vector_active_size_v<TTo> <= vector_active_size_v<T>)) && //
             (vector_size_v<T> >= 3) &&                                  //
             (vector_size_v<TTo> >= 3) &&                                //
+            (!has_alpha_channel_v<TTo>) &&                              //
+            (!has_alpha_channel_v<T>) &&                                //
             std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
 {
     checkSameSize(ROI(), aDst.ROI());
     for (size_t i = 0; i < vector_active_size_v<TTo>; i++)
     {
-        if (!aDstChannels.data()[i].template IsInRange<TTo>())
+        if (!aDstChannels.data()[i].template IsInRange<T>())
         {
-            throw INVALIDARGUMENT(
-                aDstChannels, "Channel " << i << " in aDstChannels is out of range. Expected value in range 0.."
-                                         << vector_active_size_v<TTo> - 1 << " but got: " << aDstChannels.data()[i]);
+            throw INVALIDARGUMENT(aDstChannels,
+                                  "Channel " << i << " in aDstChannels is out of range. Expected value in range 0.."
+                                             << vector_active_size_v<T> - 1 << " but got: " << aDstChannels.data()[i]);
         }
     }
 
@@ -606,14 +609,42 @@ ImageView<TTo> &ImageView<T>::SwapChannel(ImageView<TTo> &aDst,
     forEachPixel(aDst, functor);
     return aDst;
 }
+/// <summary>
+/// Swap channels (inplace)
+/// </summary>
+template <PixelType T>
+ImageView<T> &ImageView<T>::SwapChannel(const ChannelList<vector_active_size_v<T>> &aDstChannels)
+    requires(vector_size_v<T> >= 3) && (!has_alpha_channel_v<T>)
+{
+    for (size_t i = 0; i < vector_active_size_v<T>; i++)
+    {
+        if (!aDstChannels.data()[i].template IsInRange<T>())
+        {
+            throw INVALIDARGUMENT(aDstChannels,
+                                  "Channel " << i << " in aDstChannels is out of range. Expected value in range 0.."
+                                             << vector_active_size_v<T> - 1 << " but got: " << aDstChannels.data()[i]);
+        }
+    }
+
+    using swapChannelInplace = InplaceFunctor<1, T, T, opp::SwapChannel<T, T>, RoundingMode::None>;
+
+    const opp::SwapChannel<T, T> op(aDstChannels);
+
+    const swapChannelInplace functor(op);
+
+    forEachPixel(*this, functor);
+    return *this;
+}
 
 template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::SwapChannel(ImageView<TTo> &aDst,
                                           const ChannelList<vector_active_size_v<TTo>> &aDstChannels,
-                                          remove_vector_t<T> aValue)
+                                          remove_vector_t<T> aValue) const
     requires(vector_size_v<T> == 3) &&          //
             (vector_active_size_v<TTo> == 4) && //
+            (!has_alpha_channel_v<TTo>) &&      //
+            (!has_alpha_channel_v<T>) &&        //
             std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -625,6 +656,47 @@ ImageView<TTo> &ImageView<T>::SwapChannel(ImageView<TTo> &aDst,
     const swapChannelSrcDstAsSrc functor(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), op);
 
     forEachPixel(aDst, functor);
+    return aDst;
+}
+#pragma endregion
+
+#pragma region Transpose
+/// <summary>
+/// Transpose image.
+/// </summary>
+template <PixelType T>
+ImageView<T> &ImageView<T>::Transpose(ImageView<T> &aDst) const
+    requires NoAlpha<T>
+{
+    checkSameSize(ROI().Size(), Size2D(aDst.SizeRoi().y, aDst.SizeRoi().x));
+
+    for (auto &pixelIterator : aDst)
+    {
+        const int pixelX = pixelIterator.Pixel().x - aDst.ROI().x;
+        const int pixelY = pixelIterator.Pixel().y - aDst.ROI().y;
+
+        // will be optimized away as unused in case of no alpha channel:
+        pixel_basetype_t<T> alphaChannel; // NOLINT
+
+        T &pixelOut = pixelIterator.Value();
+
+        // load the alpha channel, if needed:
+        if constexpr (has_alpha_channel_v<T>)
+        {
+            alphaChannel = pixelOut.w;
+        }
+
+        T res = (*this)(pixelY, pixelX); // NOLINT(readability-suspicious-call-argument) --> transpose...
+
+        // restore alpha channel value:
+        if constexpr (has_alpha_channel_v<T>)
+        {
+            res.w = alphaChannel;
+        }
+
+        pixelOut = res;
+    }
+
     return aDst;
 }
 #pragma endregion
@@ -646,6 +718,17 @@ template <PixelType T> ImageView<T> &ImageView<T>::FillRandom(uint aSeed)
     using randomInplace = InplaceFunctor<1, T, T, opp::FillRandom<T>, RoundingMode::None>;
 
     const opp::FillRandom<T> op(aSeed);
+    const randomInplace functor(op);
+
+    forEachPixel(*this, functor);
+    return *this;
+}
+
+template <PixelType T> ImageView<T> &ImageView<T>::FillRandomNormal(uint aSeed, double aMean, double aStd)
+{
+    using randomInplace = InplaceFunctor<1, T, T, opp::FillRandomNormal<T>, RoundingMode::None>;
+
+    const opp::FillRandomNormal<T> op(aSeed, aMean, aStd);
     const randomInplace functor(op);
 
     forEachPixel(*this, functor);

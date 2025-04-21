@@ -50,7 +50,7 @@ namespace opp::image::cpuSimple
 {
 #pragma region Add
 template <PixelType T>
-ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -69,7 +69,7 @@ ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, ImageView<T> &aDst)
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor)
+ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -89,7 +89,7 @@ ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Add(const T &aConst, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::Add(const T &aConst, ImageView<T> &aDst) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -107,7 +107,7 @@ ImageView<T> &ImageView<T>::Add(const T &aConst, ImageView<T> &aDst)
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Add(const T &aConst, ImageView<T> &aDst, int aScaleFactor)
+ImageView<T> &ImageView<T>::Add(const T &aConst, ImageView<T> &aDst, int aScaleFactor) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -199,7 +199,8 @@ ImageView<T> &ImageView<T>::Add(const T &aConst, int aScaleFactor)
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::AddMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst,
+                                      const ImageView<Pixel8uC1> &aMask) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -218,8 +219,8 @@ ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, c
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                int aScaleFactor)
+ImageView<T> &ImageView<T>::AddMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                                      int aScaleFactor) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -239,7 +240,7 @@ ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, c
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Add(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::AddMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -257,8 +258,8 @@ ImageView<T> &ImageView<T>::Add(const T &aConst, ImageView<T> &aDst, const Image
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Add(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                int aScaleFactor)
+ImageView<T> &ImageView<T>::AddMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                                      int aScaleFactor) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -278,7 +279,7 @@ ImageView<T> &ImageView<T>::Add(const T &aConst, ImageView<T> &aDst, const Image
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::AddMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -296,7 +297,7 @@ ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, const ImageView<Pixel
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor)
+ImageView<T> &ImageView<T>::AddMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -316,7 +317,7 @@ ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, const ImageView<Pixel
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Add(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::AddMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask)
     requires RealOrComplexFloatingVector<T>
 {
     using ComputeT = default_compute_type_for_t<T>;
@@ -332,7 +333,7 @@ ImageView<T> &ImageView<T>::Add(const T &aConst, const ImageView<Pixel8uC1> &aMa
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Add(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor)
+ImageView<T> &ImageView<T>::AddMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor)
     requires RealOrComplexIntVector<T>
 {
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
@@ -352,7 +353,7 @@ ImageView<T> &ImageView<T>::Add(const T &aConst, const ImageView<Pixel8uC1> &aMa
 
 #pragma region Sub
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -371,7 +372,7 @@ ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst)
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor)
+ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -391,7 +392,7 @@ ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sub(const T &aConst, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::Sub(const T &aConst, ImageView<T> &aDst) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -409,7 +410,7 @@ ImageView<T> &ImageView<T>::Sub(const T &aConst, ImageView<T> &aDst)
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sub(const T &aConst, ImageView<T> &aDst, int aScaleFactor)
+ImageView<T> &ImageView<T>::Sub(const T &aConst, ImageView<T> &aDst, int aScaleFactor) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -573,7 +574,8 @@ ImageView<T> &ImageView<T>::SubInv(const T &aConst, int aScaleFactor)
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::SubMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst,
+                                      const ImageView<Pixel8uC1> &aMask) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -592,8 +594,8 @@ ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, c
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                int aScaleFactor)
+ImageView<T> &ImageView<T>::SubMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                                      int aScaleFactor) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -613,7 +615,7 @@ ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, c
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sub(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::SubMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -631,8 +633,8 @@ ImageView<T> &ImageView<T>::Sub(const T &aConst, ImageView<T> &aDst, const Image
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sub(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                int aScaleFactor)
+ImageView<T> &ImageView<T>::SubMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                                      int aScaleFactor) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -652,7 +654,7 @@ ImageView<T> &ImageView<T>::Sub(const T &aConst, ImageView<T> &aDst, const Image
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::SubMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -670,7 +672,7 @@ ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, const ImageView<Pixel
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor)
+ImageView<T> &ImageView<T>::SubMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -690,7 +692,7 @@ ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, const ImageView<Pixel
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sub(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::SubMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask)
     requires RealOrComplexFloatingVector<T>
 {
     using ComputeT = default_compute_type_for_t<T>;
@@ -706,7 +708,7 @@ ImageView<T> &ImageView<T>::Sub(const T &aConst, const ImageView<Pixel8uC1> &aMa
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sub(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor)
+ImageView<T> &ImageView<T>::SubMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor)
     requires RealOrComplexIntVector<T>
 {
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
@@ -724,7 +726,7 @@ ImageView<T> &ImageView<T>::Sub(const T &aConst, const ImageView<Pixel8uC1> &aMa
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::SubInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::SubInvMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -742,7 +744,7 @@ ImageView<T> &ImageView<T>::SubInv(const ImageView<T> &aSrc2, const ImageView<Pi
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::SubInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor)
+ImageView<T> &ImageView<T>::SubInvMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -762,7 +764,7 @@ ImageView<T> &ImageView<T>::SubInv(const ImageView<T> &aSrc2, const ImageView<Pi
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::SubInv(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::SubInvMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask)
     requires RealOrComplexFloatingVector<T>
 {
     using ComputeT = default_compute_type_for_t<T>;
@@ -778,7 +780,7 @@ ImageView<T> &ImageView<T>::SubInv(const T &aConst, const ImageView<Pixel8uC1> &
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::SubInv(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor)
+ImageView<T> &ImageView<T>::SubInvMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor)
     requires RealOrComplexIntVector<T>
 {
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
@@ -798,7 +800,7 @@ ImageView<T> &ImageView<T>::SubInv(const T &aConst, const ImageView<Pixel8uC1> &
 
 #pragma region Mul
 template <PixelType T>
-ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -817,7 +819,7 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst)
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor)
+ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -837,7 +839,7 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Mul(const T &aConst, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::Mul(const T &aConst, ImageView<T> &aDst) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -855,7 +857,7 @@ ImageView<T> &ImageView<T>::Mul(const T &aConst, ImageView<T> &aDst)
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Mul(const T &aConst, ImageView<T> &aDst, int aScaleFactor)
+ImageView<T> &ImageView<T>::Mul(const T &aConst, ImageView<T> &aDst, int aScaleFactor) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -947,7 +949,8 @@ ImageView<T> &ImageView<T>::Mul(const T &aConst, int aScaleFactor)
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::MulMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst,
+                                      const ImageView<Pixel8uC1> &aMask) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -966,8 +969,8 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, c
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                int aScaleFactor)
+ImageView<T> &ImageView<T>::MulMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                                      int aScaleFactor) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -987,7 +990,7 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, c
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Mul(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::MulMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1005,8 +1008,8 @@ ImageView<T> &ImageView<T>::Mul(const T &aConst, ImageView<T> &aDst, const Image
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Mul(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                int aScaleFactor)
+ImageView<T> &ImageView<T>::MulMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                                      int aScaleFactor) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1026,7 +1029,7 @@ ImageView<T> &ImageView<T>::Mul(const T &aConst, ImageView<T> &aDst, const Image
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::MulMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1044,7 +1047,7 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, const ImageView<Pixel
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor)
+ImageView<T> &ImageView<T>::MulMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1064,7 +1067,7 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, const ImageView<Pixel
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Mul(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::MulMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask)
     requires RealOrComplexFloatingVector<T>
 {
     using ComputeT = default_ext_compute_type_for_t<T>;
@@ -1080,7 +1083,7 @@ ImageView<T> &ImageView<T>::Mul(const T &aConst, const ImageView<Pixel8uC1> &aMa
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Mul(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor)
+ImageView<T> &ImageView<T>::MulMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor)
     requires RealOrComplexIntVector<T>
 {
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
@@ -1100,7 +1103,7 @@ ImageView<T> &ImageView<T>::Mul(const T &aConst, const ImageView<Pixel8uC1> &aMa
 
 #pragma region MulScale
 template <PixelType T>
-ImageView<T> &ImageView<T>::MulScale(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::MulScale(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
     requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1120,7 +1123,7 @@ ImageView<T> &ImageView<T>::MulScale(const ImageView<T> &aSrc2, ImageView<T> &aD
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MulScale(const T &aConst, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::MulScale(const T &aConst, ImageView<T> &aDst) const
     requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1178,7 +1181,8 @@ ImageView<T> &ImageView<T>::MulScale(const T &aConst)
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MulScale(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::MulScaleMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst,
+                                           const ImageView<Pixel8uC1> &aMask) const
     requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1198,7 +1202,7 @@ ImageView<T> &ImageView<T>::MulScale(const ImageView<T> &aSrc2, ImageView<T> &aD
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MulScale(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::MulScaleMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask) const
     requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1218,7 +1222,7 @@ ImageView<T> &ImageView<T>::MulScale(const T &aConst, ImageView<T> &aDst, const 
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MulScale(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::MulScaleMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
     requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1238,7 +1242,7 @@ ImageView<T> &ImageView<T>::MulScale(const ImageView<T> &aSrc2, const ImageView<
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MulScale(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::MulScaleMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask)
     requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>
 {
     constexpr float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
@@ -1258,7 +1262,7 @@ ImageView<T> &ImageView<T>::MulScale(const T &aConst, const ImageView<Pixel8uC1>
 
 #pragma region Div
 template <PixelType T>
-ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1277,7 +1281,7 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst)
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor,
-                                RoundingMode aRoundingMode)
+                                RoundingMode aRoundingMode) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1347,7 +1351,7 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1364,7 +1368,7 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst)
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, int aScaleFactor, RoundingMode aRoundingMode)
+ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, int aScaleFactor, RoundingMode aRoundingMode) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1741,7 +1745,8 @@ ImageView<T> &ImageView<T>::DivInv(const T &aConst, int aScaleFactor, RoundingMo
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst,
+                                      const ImageView<Pixel8uC1> &aMask) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1759,8 +1764,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, c
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                int aScaleFactor, RoundingMode aRoundingMode)
+ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                                      int aScaleFactor, RoundingMode aRoundingMode) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1829,7 +1834,7 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, c
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::DivMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1846,8 +1851,8 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, const Image
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                int aScaleFactor, RoundingMode aRoundingMode)
+ImageView<T> &ImageView<T>::DivMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                                      int aScaleFactor, RoundingMode aRoundingMode) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1910,7 +1915,7 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, const Image
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1927,8 +1932,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, const ImageView<Pixel
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
-                                RoundingMode aRoundingMode)
+ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
+                                      RoundingMode aRoundingMode)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1991,7 +1996,7 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, const ImageView<Pixel
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Div(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::DivMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask)
     requires RealOrComplexFloatingVector<T>
 {
     using ComputeT = default_compute_type_for_t<T>;
@@ -2006,8 +2011,8 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, const ImageView<Pixel8uC1> &aMa
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Div(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
-                                RoundingMode aRoundingMode)
+ImageView<T> &ImageView<T>::DivMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
+                                      RoundingMode aRoundingMode)
     requires RealOrComplexIntVector<T>
 {
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
@@ -2068,7 +2073,7 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, const ImageView<Pixel8uC1> &aMa
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::DivInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::DivInvMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -2085,8 +2090,8 @@ ImageView<T> &ImageView<T>::DivInv(const ImageView<T> &aSrc2, const ImageView<Pi
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::DivInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
-                                   RoundingMode aRoundingMode)
+ImageView<T> &ImageView<T>::DivInvMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
+                                         RoundingMode aRoundingMode)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -2149,7 +2154,7 @@ ImageView<T> &ImageView<T>::DivInv(const ImageView<T> &aSrc2, const ImageView<Pi
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::DivInv(const T &aConst, const ImageView<Pixel8uC1> &aMask)
+ImageView<T> &ImageView<T>::DivInvMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask)
     requires RealOrComplexFloatingVector<T>
 {
     using ComputeT = default_compute_type_for_t<T>;
@@ -2165,8 +2170,8 @@ ImageView<T> &ImageView<T>::DivInv(const T &aConst, const ImageView<Pixel8uC1> &
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::DivInv(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
-                                   RoundingMode aRoundingMode)
+ImageView<T> &ImageView<T>::DivInvMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
+                                         RoundingMode aRoundingMode)
     requires RealOrComplexIntVector<T>
 {
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
@@ -2229,7 +2234,7 @@ ImageView<T> &ImageView<T>::DivInv(const T &aConst, const ImageView<Pixel8uC1> &
 
 #pragma region AddSquare
 template <PixelType T>
-ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddSquare(ImageView<add_spw_output_for_t<T>> &aSrcDst)
+ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddSquare(ImageView<add_spw_output_for_t<T>> &aSrcDst) const
 {
     checkSameSize(ROI(), aSrcDst.ROI());
 
@@ -2246,8 +2251,8 @@ ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddSquare(ImageView<add_spw_ou
 }
 
 template <PixelType T>
-ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddSquare(ImageView<add_spw_output_for_t<T>> &aSrcDst,
-                                                            const ImageView<Pixel8uC1> &aMask)
+ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddSquareMasked(ImageView<add_spw_output_for_t<T>> &aSrcDst,
+                                                                  const ImageView<Pixel8uC1> &aMask) const
 {
     checkSameSize(ROI(), aSrcDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
@@ -2268,7 +2273,7 @@ ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddSquare(ImageView<add_spw_ou
 #pragma region AddProduct
 template <PixelType T>
 ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddProduct(const ImageView<T> &aSrc2,
-                                                             ImageView<add_spw_output_for_t<T>> &aSrcDst)
+                                                             ImageView<add_spw_output_for_t<T>> &aSrcDst) const
 {
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aSrcDst.ROI());
@@ -2286,9 +2291,9 @@ ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddProduct(const ImageView<T> 
 }
 
 template <PixelType T>
-ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddProduct(const ImageView<T> &aSrc2,
-                                                             ImageView<add_spw_output_for_t<T>> &aSrcDst,
-                                                             const ImageView<Pixel8uC1> &aMask)
+ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddProductMasked(const ImageView<T> &aSrc2,
+                                                                   ImageView<add_spw_output_for_t<T>> &aSrcDst,
+                                                                   const ImageView<Pixel8uC1> &aMask) const
 {
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aSrcDst.ROI());
@@ -2311,7 +2316,7 @@ ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddProduct(const ImageView<T> 
 template <PixelType T>
 ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddWeighted(const ImageView<T> &aSrc2,
                                                               ImageView<add_spw_output_for_t<T>> &aDst,
-                                                              remove_vector_t<add_spw_output_for_t<T>> aAlpha)
+                                                              remove_vector_t<add_spw_output_for_t<T>> aAlpha) const
 {
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aDst.ROI());
@@ -2329,10 +2334,10 @@ ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddWeighted(const ImageView<T>
 }
 
 template <PixelType T>
-ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddWeighted(const ImageView<T> &aSrc2,
-                                                              ImageView<add_spw_output_for_t<T>> &aDst,
-                                                              remove_vector_t<add_spw_output_for_t<T>> aAlpha,
-                                                              const ImageView<Pixel8uC1> &aMask)
+ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddWeightedMasked(const ImageView<T> &aSrc2,
+                                                                    ImageView<add_spw_output_for_t<T>> &aDst,
+                                                                    remove_vector_t<add_spw_output_for_t<T>> aAlpha,
+                                                                    const ImageView<Pixel8uC1> &aMask) const
 {
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aDst.ROI());
@@ -2351,7 +2356,7 @@ ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddWeighted(const ImageView<T>
 }
 template <PixelType T>
 ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddWeighted(ImageView<add_spw_output_for_t<T>> &aSrcDst,
-                                                              remove_vector_t<add_spw_output_for_t<T>> aAlpha)
+                                                              remove_vector_t<add_spw_output_for_t<T>> aAlpha) const
 {
     checkSameSize(ROI(), aSrcDst.ROI());
 
@@ -2368,9 +2373,9 @@ ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddWeighted(ImageView<add_spw_
 }
 
 template <PixelType T>
-ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddWeighted(ImageView<add_spw_output_for_t<T>> &aSrcDst,
-                                                              remove_vector_t<add_spw_output_for_t<T>> aAlpha,
-                                                              const ImageView<Pixel8uC1> &aMask)
+ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddWeightedMasked(ImageView<add_spw_output_for_t<T>> &aSrcDst,
+                                                                    remove_vector_t<add_spw_output_for_t<T>> aAlpha,
+                                                                    const ImageView<Pixel8uC1> &aMask) const
 {
     checkSameSize(ROI(), aSrcDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
@@ -2390,7 +2395,7 @@ ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddWeighted(ImageView<add_spw_
 
 #pragma region Abs
 template <PixelType T>
-ImageView<T> &ImageView<T>::Abs(ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::Abs(ImageView<T> &aDst) const
     requires RealSignedVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2422,7 +2427,7 @@ ImageView<T> &ImageView<T>::Abs()
 #pragma endregion
 #pragma region AbsDiff
 template <PixelType T>
-ImageView<T> &ImageView<T>::AbsDiff(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::AbsDiff(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
     requires RealUnsignedVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -2440,7 +2445,7 @@ ImageView<T> &ImageView<T>::AbsDiff(const ImageView<T> &aSrc2, ImageView<T> &aDs
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::AbsDiff(const T &aConst, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::AbsDiff(const T &aConst, ImageView<T> &aDst) const
     requires RealUnsignedVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2490,7 +2495,7 @@ ImageView<T> &ImageView<T>::AbsDiff(const T &aConst)
 #pragma endregion
 #pragma region And
 template <PixelType T>
-ImageView<T> &ImageView<T>::And(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::And(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -2508,7 +2513,7 @@ ImageView<T> &ImageView<T>::And(const ImageView<T> &aSrc2, ImageView<T> &aDst)
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::And(const T &aConst, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::And(const T &aConst, ImageView<T> &aDst) const
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2558,7 +2563,7 @@ ImageView<T> &ImageView<T>::And(const T &aConst)
 #pragma endregion
 #pragma region Not
 template <PixelType T>
-ImageView<T> &ImageView<T>::Not(ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::Not(ImageView<T> &aDst) const
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2590,7 +2595,7 @@ ImageView<T> &ImageView<T>::Not()
 #pragma endregion
 #pragma region Exp
 template <PixelType T>
-ImageView<T> &ImageView<T>::Exp(ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::Exp(ImageView<T> &aDst) const
     requires RealOrComplexVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2622,7 +2627,7 @@ ImageView<T> &ImageView<T>::Exp()
 #pragma endregion
 #pragma region Ln
 template <PixelType T>
-ImageView<T> &ImageView<T>::Ln(ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::Ln(ImageView<T> &aDst) const
     requires RealOrComplexVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2654,7 +2659,7 @@ ImageView<T> &ImageView<T>::Ln()
 #pragma endregion
 #pragma region LShift
 template <PixelType T>
-ImageView<T> &ImageView<T>::LShift(uint aConst, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::LShift(uint aConst, ImageView<T> &aDst) const
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2687,7 +2692,7 @@ ImageView<T> &ImageView<T>::LShift(uint aConst)
 #pragma endregion
 #pragma region Or
 template <PixelType T>
-ImageView<T> &ImageView<T>::Or(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::Or(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -2705,7 +2710,7 @@ ImageView<T> &ImageView<T>::Or(const ImageView<T> &aSrc2, ImageView<T> &aDst)
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Or(const T &aConst, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::Or(const T &aConst, ImageView<T> &aDst) const
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2755,7 +2760,7 @@ ImageView<T> &ImageView<T>::Or(const T &aConst)
 #pragma endregion
 #pragma region Sqr
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sqr(ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::Sqr(ImageView<T> &aDst) const
     requires RealOrComplexVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2787,7 +2792,7 @@ ImageView<T> &ImageView<T>::Sqr()
 #pragma endregion
 #pragma region Sqrt
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sqrt(ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::Sqrt(ImageView<T> &aDst) const
     requires RealOrComplexVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2819,7 +2824,7 @@ ImageView<T> &ImageView<T>::Sqrt()
 #pragma endregion
 #pragma region RShift
 template <PixelType T>
-ImageView<T> &ImageView<T>::RShift(uint aConst, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::RShift(uint aConst, ImageView<T> &aDst) const
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2852,7 +2857,7 @@ ImageView<T> &ImageView<T>::RShift(uint aConst)
 #pragma endregion
 #pragma region Xor
 template <PixelType T>
-ImageView<T> &ImageView<T>::Xor(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::Xor(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -2870,7 +2875,7 @@ ImageView<T> &ImageView<T>::Xor(const ImageView<T> &aSrc2, ImageView<T> &aDst)
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Xor(const T &aConst, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::Xor(const T &aConst, ImageView<T> &aDst) const
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2921,7 +2926,7 @@ ImageView<T> &ImageView<T>::Xor(const T &aConst)
 
 #pragma region AlphaPremul
 template <PixelType T>
-ImageView<T> &ImageView<T>::AlphaPremul(ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::AlphaPremul(ImageView<T> &aDst) const
     requires FourChannelNoAlpha<T> && RealVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2955,7 +2960,7 @@ ImageView<T> &ImageView<T>::AlphaPremul()
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst) const
     requires RealFloatingVector<T> && (!FourChannelAlpha<T>)
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2973,7 +2978,7 @@ ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> 
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst) const
     requires RealIntVector<T> && (!FourChannelAlpha<T>)
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -3027,7 +3032,7 @@ ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha)
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst) const
     requires FourChannelAlpha<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -3040,7 +3045,7 @@ ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> 
 
     const opp::AlphaPremulAC<ComputeT, SrcT> op(aAlpha);
 
-    const alphaPremulACSrc functor(reinterpret_cast<SrcT *>(PointerRoi()), Pitch(), op);
+    const alphaPremulACSrc functor(reinterpret_cast<const SrcT *>(PointerRoi()), Pitch(), op);
     ImageView<SrcT> aDstNoAlpha = aDst;
     forEachPixel(aDstNoAlpha, functor);
 
@@ -3069,7 +3074,7 @@ ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha)
 
 #pragma region AlphaComp
 template <PixelType T>
-ImageView<T> &ImageView<T>::AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &aDst, AlphaCompositionOp aAlphaOp)
+ImageView<T> &ImageView<T>::AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &aDst, AlphaCompositionOp aAlphaOp) const
     requires(!FourChannelAlpha<T>) && RealVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -3343,7 +3348,7 @@ ImageView<T> &ImageView<T>::AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &a
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &aDst, remove_vector_t<T> aAlpha1,
-                                      remove_vector_t<T> aAlpha2, AlphaCompositionOp aAlphaOp)
+                                      remove_vector_t<T> aAlpha2, AlphaCompositionOp aAlphaOp) const
     requires RealVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -3485,7 +3490,7 @@ ImageView<T> &ImageView<T>::AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &a
 
 #pragma region Complex
 template <PixelType T>
-ImageView<T> &ImageView<T>::ConjMul(const ImageView<T> &aSrc2, ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::ConjMul(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
     requires ComplexVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -3522,7 +3527,7 @@ ImageView<T> &ImageView<T>::ConjMul(const ImageView<T> &aSrc2)
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Conj(ImageView<T> &aDst)
+ImageView<T> &ImageView<T>::Conj(ImageView<T> &aDst) const
     requires ComplexVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -3551,7 +3556,7 @@ ImageView<T> &ImageView<T>::Conj()
 
 template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &ImageView<T>::Magnitude(
-    ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst)
+    ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst) const
     requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -3571,7 +3576,7 @@ ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_
 
 template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &ImageView<T>::MagnitudeSqr(
-    ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst)
+    ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst) const
     requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -3592,7 +3597,7 @@ ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_
 
 template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &ImageView<T>::Angle(
-    ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst)
+    ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst) const
     requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -3612,7 +3617,7 @@ ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_
 
 template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &ImageView<T>::Real(
-    ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst)
+    ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst) const
     requires ComplexVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -3632,7 +3637,7 @@ ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_
 
 template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &ImageView<T>::Imag(
-    ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst)
+    ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst) const
     requires ComplexVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -3652,7 +3657,7 @@ ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_
 
 template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &ImageView<T>::MakeComplex(
-    ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst)
+    ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst) const
     requires RealSignedVector<T> && (!FourChannelAlpha<T>)
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -3673,7 +3678,7 @@ ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>
 template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &ImageView<T>::MakeComplex(
     const ImageView<T> &aSrcImag,
-    ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst)
+    ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst) const
     requires RealSignedVector<T> && (!FourChannelAlpha<T>)
 {
     checkSameSize(ROI(), aSrcImag.ROI());

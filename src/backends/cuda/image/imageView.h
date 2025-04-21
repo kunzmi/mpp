@@ -7,6 +7,7 @@
 #include <backends/cuda/image/arithmetic/addSquareProductWeightedOutputType.h>
 #include <backends/cuda/image/arithmetic/arithmeticKernel.h>
 #include <backends/cuda/image/dataExchangeAndInit/dataExchangeAndInitKernel.h>
+#include <backends/cuda/image/statistics/statisticsKernel.h>
 #include <backends/cuda/streamCtx.h>
 #include <common/bfloat16.h>
 #include <common/complex.h>
@@ -23,6 +24,7 @@
 #include <common/numberTypes.h>
 #include <common/opp_defs.h>
 #include <common/safeCast.h>
+#include <common/statistics/indexMinMax.h>
 #include <common/vector_typetraits.h>
 #include <concepts>
 #include <cstddef>
@@ -49,6 +51,10 @@ template <PixelType T> class ImageView
     /// Channel count
     /// </summary>
     static constexpr size_t ChannelCount = to_size_t(channel_count_v<T>);
+    /// <summary>
+    /// Default line-pitch alignment for manually allocated images [bytes]
+    /// </summary>
+    static constexpr size_t PitchAlignment = 256;
 
   private:
     /// <summary>
@@ -75,6 +81,15 @@ template <PixelType T> class ImageView
     /// ROI.
     /// </summary>
     Roi mRoi;
+
+    static size_t PadImageWidthToPitch(size_t aWidthInBytes, size_t aPitchAlignment = PitchAlignment)
+    {
+        if (aWidthInBytes % aPitchAlignment != 0)
+        {
+            aWidthInBytes += aPitchAlignment - (aWidthInBytes % aPitchAlignment);
+        }
+        return aWidthInBytes;
+    }
 
   protected:
     ImageView() = default;
@@ -478,7 +493,7 @@ template <PixelType T> class ImageView
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &Convert(ImageView<TTo> &aDst,
-                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(!std::same_as<T, TTo>) &&
                 (RealOrComplexIntVector<T> || (std::same_as<complex_basetype_t<remove_vector_t<T>>, float> &&
                                                (std::same_as<complex_basetype_t<remove_vector_t<TTo>>, BFloat16> ||
@@ -491,7 +506,7 @@ template <PixelType T> class ImageView
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode,
-                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(!std::same_as<T, TTo>) && RealOrComplexFloatingVector<T>;
 
     /// <summary>
@@ -499,7 +514,7 @@ template <PixelType T> class ImageView
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode, int aScaleFactor,
-                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(!std::same_as<T, TTo>) && (!std::same_as<TTo, float>) && (!std::same_as<TTo, double>) &&
                 (!std::same_as<TTo, Complex<float>>) && (!std::same_as<TTo, Complex<double>>);
 #pragma endregion
@@ -508,20 +523,20 @@ template <PixelType T> class ImageView
     /// Copy image.
     /// </summary>
     ImageView<T> &Copy(ImageView<T> &aDst,
-                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
     /// Copy image with mask. Pixels with mask == 0 remain untouched in destination image.
     /// </summary>
-    ImageView<T> &Copy(ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
+    ImageView<T> &CopyMasked(ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
     /// Copy channel aSrcChannel to channel aDstChannel of aDst.
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &Copy(Channel aSrcChannel, ImageView<TTo> &aDst, Channel aDstChannel,
-                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(vector_size_v<T> > 1) &&   //
                 (vector_size_v<TTo> > 1) && //
                 std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
@@ -531,7 +546,7 @@ template <PixelType T> class ImageView
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &Copy(ImageView<TTo> &aDst, Channel aDstChannel,
-                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(vector_size_v<T> == 1) &&  //
                 (vector_size_v<TTo> > 1) && //
                 std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
@@ -541,7 +556,7 @@ template <PixelType T> class ImageView
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &Copy(Channel aSrcChannel, ImageView<TTo> &aDst,
-                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(vector_size_v<T> > 1) &&    //
                 (vector_size_v<TTo> == 1) && //
                 std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
@@ -551,7 +566,7 @@ template <PixelType T> class ImageView
     /// </summary>
     void Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
               ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2,
-              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(TwoChannel<T>);
 
     /// <summary>
@@ -560,7 +575,7 @@ template <PixelType T> class ImageView
     void Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
               ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2,
               ImageView<Vector1<remove_vector_t<T>>> &aDstChannel3,
-              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(ThreeChannel<T>);
 
     /// <summary>
@@ -570,7 +585,7 @@ template <PixelType T> class ImageView
               ImageView<Vector1<remove_vector_t<T>>> &aDstChannel2,
               ImageView<Vector1<remove_vector_t<T>>> &aDstChannel3,
               ImageView<Vector1<remove_vector_t<T>>> &aDstChannel4,
-              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(FourChannelNoAlpha<T>);
 
     /// <summary>
@@ -606,7 +621,7 @@ template <PixelType T> class ImageView
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &Dup(ImageView<TTo> &aDst,
-                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(vector_size_v<T> == 1) &&
                 (vector_size_v<TTo> > 1) && std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
 #pragma endregion
@@ -618,7 +633,7 @@ template <PixelType T> class ImageView
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &Scale(ImageView<TTo> &aDst,
-                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<T> && RealOrComplexIntVector<TTo>;
 
     /// <summary>
@@ -629,7 +644,7 @@ template <PixelType T> class ImageView
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax,
-                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<T>;
 
     /// <summary>
@@ -640,7 +655,7 @@ template <PixelType T> class ImageView
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
-                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<TTo>;
 
     /// <summary>
@@ -652,7 +667,7 @@ template <PixelType T> class ImageView
     template <PixelType TTo>
     ImageView<TTo> &Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
                           scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax,
-                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(!std::same_as<T, TTo>);
 
 #pragma endregion
@@ -671,14 +686,14 @@ template <PixelType T> class ImageView
     /// <summary>
     /// Set all pixels with aMask != 0 to aConst
     /// </summary>
-    ImageView<T> &Set(const T &aConst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
+    ImageView<T> &SetMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
 
     /// <summary>
     /// Set all pixels with aMask != 0 to aConst
     /// </summary>
-    ImageView<T> &Set(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
+    ImageView<T> &SetMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
 #pragma endregion
 #pragma region Swap Channel
     /// <summary>
@@ -686,11 +701,20 @@ template <PixelType T> class ImageView
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &SwapChannel(ImageView<TTo> &aDst, const ChannelList<vector_active_size_v<TTo>> &aDstChannels,
-                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires((vector_active_size_v<TTo> <= vector_active_size_v<T>)) && //
                 (vector_size_v<T> >= 3) &&                                  //
                 (vector_size_v<TTo> >= 3) &&                                //
+                (!has_alpha_channel_v<TTo>) &&                              //
+                (!has_alpha_channel_v<T>) &&                                //
                 std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
+
+    /// <summary>
+    /// Swap channels (inplace)
+    /// </summary>
+    ImageView<T> &SwapChannel(const ChannelList<vector_active_size_v<T>> &aDstChannels,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires(vector_size_v<T> >= 3) && (!has_alpha_channel_v<T>);
 
     /// <summary>
     /// Swap channels (3-channel to 4-channel with additional value). If aDstChannels[i] == 3, channel i of aDst is set
@@ -699,10 +723,20 @@ template <PixelType T> class ImageView
     template <PixelType TTo>
     ImageView<TTo> &SwapChannel(ImageView<TTo> &aDst, const ChannelList<vector_active_size_v<TTo>> &aDstChannels,
                                 remove_vector_t<T> aValue,
-                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(vector_size_v<T> == 3) &&          //
                 (vector_active_size_v<TTo> == 4) && //
+                (!has_alpha_channel_v<TTo>) &&      //
+                (!has_alpha_channel_v<T>) &&        //
                 std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
+#pragma endregion
+#pragma region Transpose
+    /// <summary>
+    /// Transpose image.
+    /// </summary>
+    ImageView<T> &Transpose(ImageView<T> &aDst,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires NoAlpha<T>;
 #pragma endregion
 #pragma endregion
 
@@ -712,42 +746,42 @@ template <PixelType T> class ImageView
     /// aDst = this + aSrc2
     /// </summary>
     ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst = this + aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor
     /// </summary>
     ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// aDst = this + aConst
     /// </summary>
     ImageView<T> &Add(const T &aConst, ImageView<T> &aDst,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst = this + aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
     /// </summary>
     ImageView<T> &Add(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// aDst = this + aConst
     /// </summary>
     ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst = this + aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
     /// </summary>
     ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
@@ -794,93 +828,96 @@ template <PixelType T> class ImageView
     /// <summary>
     /// aDst = this + aSrc2 for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &AddMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst = this + aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
     /// where aMask != 0
     /// </summary>
-    ImageView<T> &Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      int aScaleFactor                       = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &AddMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            int aScaleFactor                       = 0,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// aDst = this + aConst for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Add(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &AddMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst = this + aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
     /// where aMask != 0
     /// </summary>
-    ImageView<T> &Add(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &AddMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            int aScaleFactor                       = 0,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// aDst = this + aConst for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &AddMasked(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                            const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst = this + aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
     /// where aMask != 0
     /// </summary>
-    ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      int aScaleFactor                       = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &AddMasked(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                            const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// this += aSrc2, for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Add(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &AddMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// this += aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
     /// aMask != 0
     /// </summary>
-    ImageView<T> &Add(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &AddMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// this += aConst, for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Add(const T &aConst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &AddMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// this += aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
     /// aMask != 0
     /// </summary>
-    ImageView<T> &Add(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &AddMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// this += aConst, for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &AddMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// this += aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
     /// aMask != 0
     /// </summary>
-    ImageView<T> &Add(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &AddMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                            int aScaleFactor                       = 0,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 #pragma endregion
 #pragma region Sub
@@ -888,42 +925,42 @@ template <PixelType T> class ImageView
     /// aDst = this - aSrc2
     /// </summary>
     ImageView<T> &Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst = this + aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor
     /// </summary>
     ImageView<T> &Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// aDst = this - aConst
     /// </summary>
     ImageView<T> &Sub(const T &aConst, ImageView<T> &aDst,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst = this - aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
     /// </summary>
     ImageView<T> &Sub(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// aDst = this - aConst
     /// </summary>
     ImageView<T> &Sub(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst = this - aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
     /// </summary>
     ImageView<T> &Sub(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
@@ -1011,139 +1048,142 @@ template <PixelType T> class ImageView
     /// <summary>
     /// aDst = this - aConst for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &SubMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst = this - aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
     /// where aMask != 0
     /// </summary>
-    ImageView<T> &Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      int aScaleFactor                       = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &SubMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            int aScaleFactor                       = 0,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// aDst = this - aConst for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Sub(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &SubMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst = this - aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
     /// where aMask != 0
     /// </summary>
-    ImageView<T> &Sub(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &SubMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            int aScaleFactor                       = 0,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// aDst = this - aConst for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Sub(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &SubMasked(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                            const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst = this - aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
     /// where aMask != 0
     /// </summary>
-    ImageView<T> &Sub(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      int aScaleFactor                       = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &SubMasked(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                            const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// this -= aSrc2, for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Sub(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &SubMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// this -= aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
     /// aMask != 0
     /// </summary>
-    ImageView<T> &Sub(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &SubMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// this -= aConst, for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Sub(const T &aConst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &SubMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// this -= aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
     /// aMask != 0
     /// </summary>
-    ImageView<T> &Sub(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &SubMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// this -= aConst, for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Sub(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &SubMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// this -= aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
     /// aMask != 0
     /// </summary>
-    ImageView<T> &Sub(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &SubMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                            int aScaleFactor                       = 0,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// this = aSrc2 - this, for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &SubInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
-                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &SubInvMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// this = aSrc2 - this, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
     /// where aMask != 0
     /// </summary>
-    ImageView<T> &SubInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &SubInvMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// this = aConst - this, for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &SubInv(const T &aConst, const ImageView<Pixel8uC1> &aMask,
-                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &SubInvMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// this = aConst - this, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
     /// where aMask != 0
     /// </summary>
-    ImageView<T> &SubInv(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &SubInvMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// this = aConst - this, for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &SubInv(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &SubInvMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// this = aConst - this, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
     /// where aMask != 0
     /// </summary>
-    ImageView<T> &SubInv(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                         int aScaleFactor                       = 0,
-                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &SubInvMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                               int aScaleFactor                       = 0,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 #pragma endregion
 #pragma region Mul
@@ -1151,42 +1191,42 @@ template <PixelType T> class ImageView
     /// aDst = this * aSrc2
     /// </summary>
     ImageView<T> &Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst = this * aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor
     /// </summary>
     ImageView<T> &Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// aDst = this * aConst
     /// </summary>
     ImageView<T> &Mul(const T &aConst, ImageView<T> &aDst,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst = this * aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
     /// </summary>
     ImageView<T> &Mul(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// aDst = this * aConst
     /// </summary>
     ImageView<T> &Mul(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst = this * aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor
     /// </summary>
     ImageView<T> &Mul(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
@@ -1233,93 +1273,96 @@ template <PixelType T> class ImageView
     /// <summary>
     /// aDst = this * aSrc2 for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &MulMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst = this * aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
     /// where aMask != 0
     /// </summary>
-    ImageView<T> &Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      int aScaleFactor                       = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &MulMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            int aScaleFactor                       = 0,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// aDst = this * aConst for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Mul(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &MulMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst = this * aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
     /// where aMask != 0
     /// </summary>
-    ImageView<T> &Mul(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &MulMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            int aScaleFactor                       = 0,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// aDst = this * aConst for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Mul(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &MulMasked(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                            const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst = this * aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
     /// where aMask != 0
     /// </summary>
-    ImageView<T> &Mul(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      int aScaleFactor                       = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &MulMasked(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                            const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// this *= aSrc2, for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Mul(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &MulMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// this *= aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
     /// aMask != 0
     /// </summary>
-    ImageView<T> &Mul(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &MulMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// this *= aConst, for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Mul(const T &aConst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &MulMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// this *= aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
     /// aMask != 0
     /// </summary>
-    ImageView<T> &Mul(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &MulMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// this *= aConst, for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Mul(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &MulMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// this *= aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
     /// aMask != 0
     /// </summary>
-    ImageView<T> &Mul(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &MulMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                            int aScaleFactor                       = 0,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 #pragma endregion
 #pragma region MulScale
@@ -1327,39 +1370,39 @@ template <PixelType T> class ImageView
     /// aDst = this * aSrc2, then scales the result by the maximum value for the data bit width
     /// </summary>
     ImageView<T> &MulScale(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
     /// <summary>
     /// aDst = this * aConst, then scales the result by the maximum value for the data bit width
     /// </summary>
     ImageView<T> &MulScale(const T &aConst, ImageView<T> &aDst,
-                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
     /// <summary>
     /// aDst = this * aConst, then scales the result by the maximum value for the data bit width
     /// </summary>
     ImageView<T> &MulScale(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
     /// <summary>
-    /// aDst = this * aSrc2, then scales the result by the maximum value for the data bit width
+    /// this = this * aSrc2, then scales the result by the maximum value for the data bit width
     /// </summary>
     ImageView<T> &MulScale(const ImageView<T> &aSrc2,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
     /// <summary>
-    /// aDst = this * aConst, then scales the result by the maximum value for the data bit width
+    /// this = this * aConst, then scales the result by the maximum value for the data bit width
     /// </summary>
     ImageView<T> &MulScale(const T &aConst,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
     /// <summary>
-    /// aDst = this * aConst, then scales the result by the maximum value for the data bit width
+    /// this = this * aConst, then scales the result by the maximum value for the data bit width
     /// </summary>
     ImageView<T> &MulScale(const opp::cuda::DevVarView<T> &aConst,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
@@ -1369,49 +1412,49 @@ template <PixelType T> class ImageView
     /// aDst = this * aSrc2, then scales the result by the maximum value for the data bit width, for all pixels where
     /// aMask != 0
     /// </summary>
-    ImageView<T> &MulScale(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &MulScaleMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                                 const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
     /// <summary>
     /// aDst = this * aConst, then scales the result by the maximum value for the data bit width, for all pixels where
     /// aMask != 0
     /// </summary>
-    ImageView<T> &MulScale(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &MulScaleMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                                 const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
     /// <summary>
     /// aDst = this * aConst, then scales the result by the maximum value for the data bit width, for all pixels where
     /// aMask != 0
     /// </summary>
-    ImageView<T> &MulScale(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                           const ImageView<Pixel8uC1> &aMask,
-                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &MulScaleMasked(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                                 const ImageView<Pixel8uC1> &aMask,
+                                 const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
     /// <summary>
-    /// aDst = this * aSrc2, then scales the result by the maximum value for the data bit width, for all pixels where
+    /// this = this * aSrc2, then scales the result by the maximum value for the data bit width, for all pixels where
     /// aMask != 0
     /// </summary>
-    ImageView<T> &MulScale(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
-                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &MulScaleMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
+                                 const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
     /// <summary>
-    /// aDst = this * aConst, then scales the result by the maximum value for the data bit width, for all pixels where
+    /// this = this * aConst, then scales the result by the maximum value for the data bit width, for all pixels where
     /// aMask != 0
     /// </summary>
-    ImageView<T> &MulScale(const T &aConst, const ImageView<Pixel8uC1> &aMask,
-                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &MulScaleMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask,
+                                 const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 
     /// <summary>
-    /// aDst = this * aConst, then scales the result by the maximum value for the data bit width, for all pixels where
+    /// this = this * aConst, then scales the result by the maximum value for the data bit width, for all pixels where
     /// aMask != 0
     /// </summary>
-    ImageView<T> &MulScale(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &MulScaleMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                                 const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>;
 #pragma endregion
 #pragma region Div
@@ -1419,7 +1462,7 @@ template <PixelType T> class ImageView
     /// aDst = this / aSrc2
     /// </summary>
     ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
@@ -1427,14 +1470,14 @@ template <PixelType T> class ImageView
     /// </summary>
     ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor = 0,
                       RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// aDst = this / aConst
     /// </summary>
     ImageView<T> &Div(const T &aConst, ImageView<T> &aDst,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
@@ -1442,14 +1485,14 @@ template <PixelType T> class ImageView
     /// </summary>
     ImageView<T> &Div(const T &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
                       RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// aDst = this / aConst
     /// </summary>
     ImageView<T> &Div(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
@@ -1457,7 +1500,7 @@ template <PixelType T> class ImageView
     /// </summary>
     ImageView<T> &Div(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, int aScaleFactor = 0,
                       RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
@@ -1551,145 +1594,147 @@ template <PixelType T> class ImageView
     /// <summary>
     /// aDst = this / aConst for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &DivMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst = this / aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
     /// where aMask != 0
     /// </summary>
-    ImageView<T> &Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &DivMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// aDst = this / aConst for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Div(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &DivMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst = this / aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
     /// where aMask != 0
     /// </summary>
-    ImageView<T> &Div(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &DivMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                            int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// aDst = this / aConst for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Div(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &DivMasked(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                            const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst = this / aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
     /// where aMask != 0
     /// </summary>
-    ImageView<T> &Div(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                      int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &DivMasked(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                            const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                            RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// this /= aSrc2, for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Div(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &DivMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// this /= aSrc2, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
     /// aMask != 0
     /// </summary>
-    ImageView<T> &Div(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &DivMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                            RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// this /= aConst, for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Div(const T &aConst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &DivMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// this /= aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
     /// aMask != 0
     /// </summary>
-    ImageView<T> &Div(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &DivMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                            RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// this /= aConst, for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &Div(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &DivMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// this /= aConst, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels where
     /// aMask != 0
     /// </summary>
-    ImageView<T> &Div(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                      RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &DivMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                            int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// this = aSrc2 / this, for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &DivInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
-                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &DivInvMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// this = aSrc2 / this, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
     /// where aMask != 0
     /// </summary>
-    ImageView<T> &DivInv(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                         RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
-                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &DivInvMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                               RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// this = aConst / this, for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &DivInv(const T &aConst, const ImageView<Pixel8uC1> &aMask,
-                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &DivInvMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// this = aConst / this, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
     /// where aMask != 0
     /// </summary>
-    ImageView<T> &DivInv(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
-                         RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
-                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &DivInvMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor = 0,
+                               RoundingMode aRoundingMode             = RoundingMode::NearestTiesToEven,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 
     /// <summary>
     /// this = aConst / this, for all pixels where aMask != 0
     /// </summary>
-    ImageView<T> &DivInv(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &DivInvMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// this = aConst / this, with floating point scaling factor with scale factor = 2^-aScaleFactor, for all pixels
     /// where aMask != 0
     /// </summary>
-    ImageView<T> &DivInv(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                         int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven,
-                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &DivInvMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                               int aScaleFactor = 0, RoundingMode aRoundingMode = RoundingMode::NearestTiesToEven,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealOrComplexIntVector<T>;
 #pragma endregion
 #pragma region AddSquare
@@ -1703,7 +1748,7 @@ template <PixelType T> class ImageView
     /// <summary>
     /// SrcDst += this^2
     /// </summary>
-    ImageView<add_spw_output_for_t<T>> &AddSquare(
+    ImageView<add_spw_output_for_t<T>> &AddSquareMasked(
         ImageView<add_spw_output_for_t<T>> &aSrcDst, const ImageView<Pixel8uC1> &aMask,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
 #pragma endregion
@@ -1718,7 +1763,7 @@ template <PixelType T> class ImageView
     /// <summary>
     /// SrcDst += this * Src2
     /// </summary>
-    ImageView<add_spw_output_for_t<T>> &AddProduct(
+    ImageView<add_spw_output_for_t<T>> &AddProductMasked(
         const ImageView<T> &aSrc2, ImageView<add_spw_output_for_t<T>> &aSrcDst, const ImageView<Pixel8uC1> &aMask,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
 #pragma endregion
@@ -1729,15 +1774,15 @@ template <PixelType T> class ImageView
     ImageView<add_spw_output_for_t<T>> &AddWeighted(
         const ImageView<T> &aSrc2, ImageView<add_spw_output_for_t<T>> &aDst,
         remove_vector_t<add_spw_output_for_t<T>> aAlpha,
-        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
     /// Dst = this * alpha + Src2 * (1 - alpha)
     /// </summary>
-    ImageView<add_spw_output_for_t<T>> &AddWeighted(
+    ImageView<add_spw_output_for_t<T>> &AddWeightedMasked(
         const ImageView<T> &aSrc2, ImageView<add_spw_output_for_t<T>> &aDst,
         remove_vector_t<add_spw_output_for_t<T>> aAlpha, const ImageView<Pixel8uC1> &aMask,
-        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
     /// <summary>
     /// SrcDst = this * alpha + SrcDst * (1 - alpha)
     /// </summary>
@@ -1748,7 +1793,7 @@ template <PixelType T> class ImageView
     /// <summary>
     /// SrcDst = this * alpha + SrcDst * (1 - alpha)
     /// </summary>
-    ImageView<add_spw_output_for_t<T>> &AddWeighted(
+    ImageView<add_spw_output_for_t<T>> &AddWeightedMasked(
         ImageView<add_spw_output_for_t<T>> &aSrcDst, remove_vector_t<add_spw_output_for_t<T>> aAlpha,
         const ImageView<Pixel8uC1> &aMask,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
@@ -1758,7 +1803,8 @@ template <PixelType T> class ImageView
     /// <summary>
     /// aDst = abs(this)
     /// </summary>
-    ImageView<T> &Abs(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &Abs(ImageView<T> &aDst,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealSignedVector<T>;
 
     /// <summary>
@@ -1772,21 +1818,21 @@ template <PixelType T> class ImageView
     /// aDst = abs(this - aSrc2)
     /// </summary>
     ImageView<T> &AbsDiff(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealUnsignedVector<T>;
 
     /// <summary>
     /// aDst = abs(this - aConst)
     /// </summary>
     ImageView<T> &AbsDiff(const T &aConst, ImageView<T> &aDst,
-                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealUnsignedVector<T>;
 
     /// <summary>
     /// aDst = abs(this - aConst)
     /// </summary>
     ImageView<T> &AbsDiff(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealUnsignedVector<T>;
 
     /// <summary>
@@ -1815,21 +1861,21 @@ template <PixelType T> class ImageView
     /// aDst = this & aSrc2 (bitwise AND)
     /// </summary>
     ImageView<T> &And(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealIntVector<T>;
 
     /// <summary>
     /// aDst = this & aConst (bitwise AND)
     /// </summary>
     ImageView<T> &And(const T &aConst, ImageView<T> &aDst,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealIntVector<T>;
 
     /// <summary>
     /// aDst = this & aConst (bitwise AND)
     /// </summary>
     ImageView<T> &And(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealIntVector<T>;
 
     /// <summary>
@@ -1856,7 +1902,8 @@ template <PixelType T> class ImageView
     /// <summary>
     /// aDst = ~this (bitwise NOT)
     /// </summary>
-    ImageView<T> &Not(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &Not(ImageView<T> &aDst,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealIntVector<T>;
 
     /// <summary>
@@ -1869,7 +1916,8 @@ template <PixelType T> class ImageView
     /// <summary>
     /// aDst = exp(this) (exponential function)
     /// </summary>
-    ImageView<T> &Exp(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &Exp(ImageView<T> &aDst,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexVector<T>;
 
     /// <summary>
@@ -1882,7 +1930,8 @@ template <PixelType T> class ImageView
     /// <summary>
     /// aDst = log(this) (natural logarithm)
     /// </summary>
-    ImageView<T> &Ln(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &Ln(ImageView<T> &aDst,
+                     const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexVector<T>;
 
     /// <summary>
@@ -1896,7 +1945,7 @@ template <PixelType T> class ImageView
     /// aDst = this << aConst (left bitshift)
     /// </summary>
     ImageView<T> &LShift(uint aConst, ImageView<T> &aDst,
-                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealIntVector<T>;
     /// <summary>
     /// this = this << aConst (left bitshift)
@@ -1909,21 +1958,21 @@ template <PixelType T> class ImageView
     /// aDst = this | aSrc2 (bitwise Or)
     /// </summary>
     ImageView<T> &Or(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                     const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                     const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealIntVector<T>;
 
     /// <summary>
     /// aDst = this | aConst (bitwise Or)
     /// </summary>
     ImageView<T> &Or(const T &aConst, ImageView<T> &aDst,
-                     const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                     const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealIntVector<T>;
 
     /// <summary>
     /// aDst = this | aConst (bitwise Or)
     /// </summary>
     ImageView<T> &Or(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                     const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                     const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealIntVector<T>;
 
     /// <summary>
@@ -1951,7 +2000,7 @@ template <PixelType T> class ImageView
     /// aDst = this >> aConst (right bitshift)
     /// </summary>
     ImageView<T> &RShift(uint aConst, ImageView<T> &aDst,
-                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealIntVector<T>;
     /// <summary>
     /// this = this >> aConst (right bitshift)
@@ -1963,7 +2012,8 @@ template <PixelType T> class ImageView
     /// <summary>
     /// aDst = this * this (this^2)
     /// </summary>
-    ImageView<T> &Sqr(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<T> &Sqr(ImageView<T> &aDst,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexVector<T>;
 
     /// <summary>
@@ -1977,7 +2027,7 @@ template <PixelType T> class ImageView
     /// aDst = Sqrt(this) (square root function)
     /// </summary>
     ImageView<T> &Sqrt(ImageView<T> &aDst,
-                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexVector<T>;
 
     /// <summary>
@@ -1991,21 +2041,21 @@ template <PixelType T> class ImageView
     /// aDst = this ^ aSrc2 (bitwise Xor)
     /// </summary>
     ImageView<T> &Xor(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealIntVector<T>;
 
     /// <summary>
     /// aDst = this ^ aConst (bitwise Xor)
     /// </summary>
     ImageView<T> &Xor(const T &aConst, ImageView<T> &aDst,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealIntVector<T>;
 
     /// <summary>
     /// aDst = this ^ aConst (bitwise Xor)
     /// </summary>
     ImageView<T> &Xor(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealIntVector<T>;
 
     /// <summary>
@@ -2038,7 +2088,7 @@ template <PixelType T> class ImageView
     /// same for all values. Values may differ by 1.
     /// </summary>
     ImageView<T> &AlphaPremul(ImageView<T> &aDst,
-                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires FourChannelNoAlpha<T> && RealVector<T>;
 
     /// <summary>
@@ -2055,7 +2105,7 @@ template <PixelType T> class ImageView
     /// Premultiplies pixels of an image with constant aAlpha value. aAlpha is expected in value range 0..1
     /// </summary>
     ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst,
-                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealFloatingVector<T> && (!FourChannelAlpha<T>);
 
     /// <summary>
@@ -2066,7 +2116,7 @@ template <PixelType T> class ImageView
     /// same for all values. Values may differ by 1.
     /// </summary>
     ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst,
-                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealIntVector<T> && (!FourChannelAlpha<T>);
 
     /// <summary>
@@ -2095,7 +2145,7 @@ template <PixelType T> class ImageView
     /// same for all values. Values may differ by 1.
     /// </summary>
     ImageView<T> &AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst,
-                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires FourChannelAlpha<T>;
 
     /// <summary>
@@ -2111,7 +2161,7 @@ template <PixelType T> class ImageView
     /// channel images are treated as alpha channel only.
     /// </summary>
     ImageView<T> &AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &aDst, AlphaCompositionOp aAlphaOp,
-                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(!FourChannelAlpha<T>) && RealVector<T>;
 
     /// <summary>
@@ -2119,7 +2169,7 @@ template <PixelType T> class ImageView
     /// </summary>
     ImageView<T> &AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &aDst, remove_vector_t<T> aAlpha1,
                             remove_vector_t<T> aAlpha2, AlphaCompositionOp aAlphaOp,
-                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
 #pragma endregion
 
@@ -2128,7 +2178,7 @@ template <PixelType T> class ImageView
     /// aDst = this * conj(aSrc2) (complex conjugate multiplication)
     /// </summary>
     ImageView<T> &ConjMul(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires ComplexVector<T>;
 
     /// <summary>
@@ -2142,7 +2192,7 @@ template <PixelType T> class ImageView
     /// aDst = conj(this) (complex conjugate)
     /// </summary>
     ImageView<T> &Conj(ImageView<T> &aDst,
-                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires ComplexVector<T>;
 
     /// <summary>
@@ -2156,7 +2206,7 @@ template <PixelType T> class ImageView
     /// </summary>
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &Magnitude(
         ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst,
-        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>;
 
     /// <summary>
@@ -2164,7 +2214,7 @@ template <PixelType T> class ImageView
     /// </summary>
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &MagnitudeSqr(
         ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst,
-        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>;
 
     /// <summary>
@@ -2172,7 +2222,7 @@ template <PixelType T> class ImageView
     /// </summary>
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &Angle(
         ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst,
-        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>;
 
     /// <summary>
@@ -2180,7 +2230,7 @@ template <PixelType T> class ImageView
     /// </summary>
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &Real(
         ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst,
-        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires ComplexVector<T>;
 
     /// <summary>
@@ -2188,7 +2238,7 @@ template <PixelType T> class ImageView
     /// </summary>
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &Imag(
         ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst,
-        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires ComplexVector<T>;
 
     /// <summary>
@@ -2196,7 +2246,7 @@ template <PixelType T> class ImageView
     /// </summary>
     ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &MakeComplex(
         ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst,
-        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealSignedVector<T> && (!FourChannelAlpha<T>);
 
     /// <summary>
@@ -2205,18 +2255,2388 @@ template <PixelType T> class ImageView
     ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &MakeComplex(
         const ImageView<T> &aSrcImag,
         ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst,
-        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealSignedVector<T> && (!FourChannelAlpha<T>);
 #pragma endregion
 #pragma endregion
 
 #pragma region Statistics
+#pragma region AverageError
+    /// <summary>
+    /// Returns the required temporary buffer size for AverageError.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t AverageErrorBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Returns the required temporary buffer size for AverageErrorMasked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t AverageErrorMaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// Computes the average error between two images.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the average error is defined as: AverageError = Sum(|Src1(i,j) - Src2(i,j)|)/(W * H) <para/>
+    /// For multi-channel images, the result is computed for each channel seperatly in aDst, or for all channels in
+    /// aDstScalar. <para/> If the image is in complex format, the absolute value is used for computation.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void AverageError(const ImageView<T> &aSrc2, opp::cuda::DevVarView<averageError_types_for_rt<T>> &aDst,
+                      opp::cuda::DevVarView<remove_vector_t<averageError_types_for_rt<T>>> &aDstScalar,
+                      opp::cuda::DevVarView<byte> &aBuffer,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the average error between two images where only pixels with mask != 0 are used.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the average error is defined as: AverageError = Sum(|Src1(i,j) - Src2(i,j)|)/(W * H) <para/>
+    /// For multi-channel images, the result is computed for each channel seperatly in aDst, or for all channels in
+    /// aDstScalar. <para/> If the image is in complex format, the absolute value is used for computation.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void AverageErrorMasked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<averageError_types_for_rt<T>> &aDst,
+                            opp::cuda::DevVarView<remove_vector_t<averageError_types_for_rt<T>>> &aDstScalar,
+                            const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the average error between two images.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the average error is defined as: AverageError = Sum(|Src1(i,j) - Src2(i,j)|)/(W * H) <para/>
+    /// <para/> If the image is in complex format, the absolute value is used for computation.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void AverageError(const ImageView<T> &aSrc2, opp::cuda::DevVarView<averageError_types_for_rt<T>> &aDst,
+                      opp::cuda::DevVarView<byte> &aBuffer,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Computes the average error between two images where only pixels with mask != 0 are used.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the average error is defined as: AverageError = Sum(|Src1(i,j) - Src2(i,j)|)/(W * H) <para/>
+    /// If the image is in complex format, the absolute value is used for computation.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void AverageErrorMasked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<averageError_types_for_rt<T>> &aDst,
+                            const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region AverageRelativeError
+    /// <summary>
+    /// Returns the required temporary buffer size for AverageRelativeError.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t AverageRelativeErrorBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Returns the required temporary buffer size for AverageRelativeErrorMasked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t AverageRelativeErrorMaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// Computes the average relative error between two images.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the average relative error is defined as: AverageRelativeError = Sum(|Src1(i,j) - Src2(i,j)| / max(|Src1(i,j)|,
+    /// |Src2(i,j)|))/(W * H) <para/> For multi-channel images, the result is computed for each channel seperatly in
+    /// aDst, or for all channels in aDstScalar. <para/> If the image is in complex format, the absolute value is used
+    /// for computation.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void AverageRelativeError(const ImageView<T> &aSrc2,
+                              opp::cuda::DevVarView<averageRelativeError_types_for_rt<T>> &aDst,
+                              opp::cuda::DevVarView<remove_vector_t<averageRelativeError_types_for_rt<T>>> &aDstScalar,
+                              opp::cuda::DevVarView<byte> &aBuffer,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the average relative error between two images where only pixels with mask != 0 are used.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the average relative error is defined as: AverageRelativeError = Sum(|Src1(i,j) - Src2(i,j)| / max(|Src1(i,j)|,
+    /// |Src2(i,j)|))/(W * H) <para/>
+    /// For multi-channel images, the result is computed for each channel seperatly in aDst, or for all channels in
+    /// aDstScalar. <para/> If the image is in complex format, the absolute value is used for computation.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void AverageRelativeErrorMasked(
+        const ImageView<T> &aSrc2, opp::cuda::DevVarView<averageRelativeError_types_for_rt<T>> &aDst,
+        opp::cuda::DevVarView<remove_vector_t<averageRelativeError_types_for_rt<T>>> &aDstScalar,
+        const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the average relative error between two images.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the average relative error is defined as: AverageRelativeError = Sum(|Src1(i,j) - Src2(i,j)| / max(|Src1(i,j)|,
+    /// |Src2(i,j)|))/(W * H) <para/>
+    /// <para/> If the image is in complex format, the absolute value is used for computation.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void AverageRelativeError(const ImageView<T> &aSrc2,
+                              opp::cuda::DevVarView<averageRelativeError_types_for_rt<T>> &aDst,
+                              opp::cuda::DevVarView<byte> &aBuffer,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Computes the average relative error between two images where only pixels with mask != 0 are used.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the average relative error is defined as: AverageRelativeError = Sum(|Src1(i,j) - Src2(i,j)| / max(|Src1(i,j)|,
+    /// |Src2(i,j)|))/(W * H) <para/>
+    /// If the image is in complex format, the absolute value is used for computation.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void AverageRelativeErrorMasked(const ImageView<T> &aSrc2,
+                                    opp::cuda::DevVarView<averageRelativeError_types_for_rt<T>> &aDst,
+                                    const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                                    const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region DotProduct
+    /// <summary>
+    /// Returns the required temporary buffer size for DotProduct.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t DotProductBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Returns the required temporary buffer size for DotProductMasked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t DotProductMaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// Computes the dot product of two images.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the dot product is defined as: DotProduct = Sum(Src1(i,j) * Src2(i,j)) <para/> For multi-channel images, the
+    /// result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aSrc2">Second source image</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void DotProduct(const ImageView<T> &aSrc2, opp::cuda::DevVarView<dotProduct_types_for_rt<T>> &aDst,
+                    opp::cuda::DevVarView<remove_vector_t<dotProduct_types_for_rt<T>>> &aDstScalar,
+                    opp::cuda::DevVarView<byte> &aBuffer,
+                    const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the dot product of two images where only pixels with mask != 0 are used.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the dot product is defined as: DotProduct = Sum(Src1(i,j) * Src2(i,j)) <para/>
+    /// For multi-channel images, the result is computed for each channel seperatly in aDst, or for all channels in
+    /// aDstScalar.
+    /// </summary>
+    /// <param name="aSrc2">Second source image</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void DotProductMasked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<dotProduct_types_for_rt<T>> &aDst,
+                          opp::cuda::DevVarView<remove_vector_t<dotProduct_types_for_rt<T>>> &aDstScalar,
+                          const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the dot product of two images.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the dot product is defined as: DotProduct = Sum(Src1(i,j) * Src2(i,j))
+    /// </summary>
+    /// <param name="aSrc2">Second source image</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void DotProduct(const ImageView<T> &aSrc2, opp::cuda::DevVarView<dotProduct_types_for_rt<T>> &aDst,
+                    opp::cuda::DevVarView<byte> &aBuffer,
+                    const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Computes dot product of two images where only pixels with mask != 0 are used.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the dot product is defined as: DotProduct = Sum(Src1(i,j) * Src2(i,j))
+    /// </summary>
+    /// <param name="aSrc2">Second source image</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void DotProductMasked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<dotProduct_types_for_rt<T>> &aDst,
+                          const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region MSE
+    /// <summary>
+    /// Returns the required temporary buffer size for MSE.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MSEBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Returns the required temporary buffer size for MSEMasked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MSEMaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// Computes the Mean Square Error of two images.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the MSE is defined as: MSE = Sum((Src1(i,j) - Src2(i,j))^2) / (W*H) <para/> For multi-channel images, the
+    /// result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aSrc2">Second source image</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MSE(const ImageView<T> &aSrc2, opp::cuda::DevVarView<mse_types_for_rt<T>> &aDst,
+             opp::cuda::DevVarView<remove_vector_t<mse_types_for_rt<T>>> &aDstScalar,
+             opp::cuda::DevVarView<byte> &aBuffer,
+             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the Mean Square Error of two images where only pixels with mask != 0 are used.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the MSE is defined as: MSE = Sum((Src1(i,j) - Src2(i,j))^2) / (W*H) <para/> For multi-channel images, the
+    /// result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aSrc2">Second source image</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MSEMasked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<mse_types_for_rt<T>> &aDst,
+                   opp::cuda::DevVarView<remove_vector_t<mse_types_for_rt<T>>> &aDstScalar,
+                   const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                   const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the Mean Square Error of two images.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the MSE is defined as: MSE = Sum((Src1(i,j) - Src2(i,j))^2) / (W*H)
+    /// </summary>
+    /// <param name="aSrc2">Second source image</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MSE(const ImageView<T> &aSrc2, opp::cuda::DevVarView<mse_types_for_rt<T>> &aDst,
+             opp::cuda::DevVarView<byte> &aBuffer,
+             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Computes the Mean Square Error of two images where only pixels with mask != 0 are used.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the MSE is defined as: MSE = Sum((Src1(i,j) - Src2(i,j))^2) / (W*H)
+    /// </summary>
+    /// <param name="aSrc2">Second source image</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MSEMasked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<mse_types_for_rt<T>> &aDst,
+                   const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                   const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region MaximumError
+    /// <summary>
+    /// Returns the required temporary buffer size for MaximumError.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MaximumErrorBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Returns the required temporary buffer size for MaximumErrorMasked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MaximumErrorMaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// Computes the maximum error between two images.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the maximum error is defined as: MaximumError = max(|Src1(i,j) - Src2(i,j)|) <para/>
+    /// For multi-channel images, the result is computed for each channel seperatly in aDst, or for all channels in
+    /// aDstScalar. <para/> If the image is in complex format, the absolute value is used for computation.<para/>
+    /// Note: Same as NormDiffInf
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MaximumError(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normDiffInf_types_for_rt<T>> &aDst,
+                      opp::cuda::DevVarView<remove_vector_t<normDiffInf_types_for_rt<T>>> &aDstScalar,
+                      opp::cuda::DevVarView<byte> &aBuffer,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the maximum error between two images where only pixels with mask != 0 are used.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the maximum error is defined as: MaximumError = max(|Src1(i,j) - Src2(i,j)|) <para/>
+    /// For multi-channel images, the result is computed for each channel seperatly in aDst, or for all channels in
+    /// aDstScalar. <para/> If the image is in complex format, the absolute value is used for computation.<para/>
+    /// Note: Same as NormDiffInf
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MaximumErrorMasked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normDiffInf_types_for_rt<T>> &aDst,
+                            opp::cuda::DevVarView<remove_vector_t<normDiffInf_types_for_rt<T>>> &aDstScalar,
+                            const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the maximum error between two images.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the maximum error is defined as: MaximumError = max(|Src1(i,j) - Src2(i,j)|) <para/>
+    /// <para/> If the image is in complex format, the absolute value is used for computation.<para/>
+    /// Note: Same as NormDiffInf
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MaximumError(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normDiffInf_types_for_rt<T>> &aDst,
+                      opp::cuda::DevVarView<byte> &aBuffer,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Computes the maximum error between two images where only pixels with mask != 0 are used.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the maximum error is defined as: MaximumError = max(|Src1(i,j) - Src2(i,j)|) <para/>
+    /// If the image is in complex format, the absolute value is used for computation.<para/>
+    /// Note: Same as NormDiffInf
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MaximumErrorMasked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normDiffInf_types_for_rt<T>> &aDst,
+                            const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region MaximumRelativeError
+    /// <summary>
+    /// Returns the required temporary buffer size for MaximumRelativeError.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MaximumRelativeErrorBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Returns the required temporary buffer size for MaximumRelativeErrorMasked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MaximumRelativeErrorMaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// Computes the maximum relative error between two images.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the maximum relative error is defined as: MaximumRelativeError = max((|Src1(i,j) - Src2(i,j)|) /
+    /// max(|Src1(i,j)|, |Src2(i,j)|)) <para/> For multi-channel images, the result is computed for each channel
+    /// seperatly in aDst, or for all channels in aDstScalar. <para/> If the image is in complex format, the absolute
+    /// value is used for computation.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MaximumRelativeError(const ImageView<T> &aSrc2, opp::cuda::DevVarView<maxRelativeError_types_for_rt<T>> &aDst,
+                              opp::cuda::DevVarView<remove_vector_t<maxRelativeError_types_for_rt<T>>> &aDstScalar,
+                              opp::cuda::DevVarView<byte> &aBuffer,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the maximum relative error between two images where only pixels with mask != 0 are used.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the maximum relative error is defined as: MaximumRelativeError = max((|Src1(i,j) - Src2(i,j)|) /
+    /// max(|Src1(i,j)|, |Src2(i,j)|)) <para/>
+    /// For multi-channel images, the result is computed for each channel seperatly in aDst, or for all channels in
+    /// aDstScalar. <para/> If the image is in complex format, the absolute value is used for computation.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MaximumRelativeErrorMasked(
+        const ImageView<T> &aSrc2, opp::cuda::DevVarView<maxRelativeError_types_for_rt<T>> &aDst,
+        opp::cuda::DevVarView<remove_vector_t<maxRelativeError_types_for_rt<T>>> &aDstScalar,
+        const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the maximum relative error between two images.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the maximum relative error is defined as: MaximumRelativeError = max((|Src1(i,j) - Src2(i,j)|) /
+    /// max(|Src1(i,j)|, |Src2(i,j)|)) <para/>
+    /// <para/> If the image is in complex format, the absolute value is used for computation.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MaximumRelativeError(const ImageView<T> &aSrc2, opp::cuda::DevVarView<maxRelativeError_types_for_rt<T>> &aDst,
+                              opp::cuda::DevVarView<byte> &aBuffer,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Computes the maximum relative error between two images where only pixels with mask != 0 are used.<para/>
+    /// Given two images Src1 and Src2 both with width W and height H,
+    /// the maximum relative error is defined as: MaximumRelativeError = max((|Src1(i,j) - Src2(i,j)|) /
+    /// max(|Src1(i,j)|, |Src2(i,j)|)) <para/>
+    /// If the image is in complex format, the absolute value is used for computation.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MaximumRelativeErrorMasked(const ImageView<T> &aSrc2,
+                                    opp::cuda::DevVarView<maxRelativeError_types_for_rt<T>> &aDst,
+                                    const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                                    const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region NormDiffInf
+    /// <summary>
+    /// Returns the required temporary buffer size for NormDiffInf.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t NormDiffInfBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for NormDiffInfMasked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t NormDiffInfMaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Computes the infinity norm of difference of pixels between two images.<para/>
+    /// The infinity norm of differences is defined as: NormDiffInf = max((|Src1(i,j) - Src2(i,j)|)
+    /// <para/> For multi-channel images, the
+    /// result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormDiffInf(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normDiffInf_types_for_rt<T>> &aDst,
+                     opp::cuda::DevVarView<remove_vector_t<normDiffInf_types_for_rt<T>>> &aDstScalar,
+                     opp::cuda::DevVarView<byte> &aBuffer,
+                     const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the infinity norm of difference of pixels between two images where only pixels with mask != 0 are
+    /// used.<para/>
+    /// The infinity norm of differences is defined as: NormDiffInf = max((|Src1(i,j) - Src2(i,j)|)<para/> For
+    /// multi-channel images, the result is computed for each channel seperatly in aDst, or for all channels in
+    /// aDstScalar.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormDiffInfMasked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normDiffInf_types_for_rt<T>> &aDst,
+                           opp::cuda::DevVarView<remove_vector_t<normDiffInf_types_for_rt<T>>> &aDstScalar,
+                           const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes infinity norm of difference of pixels between two images.<para/>
+    /// The infinity norm of differences is defined as: NormDiffInf = max((|Src1(i,j) - Src2(i,j)|)
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormDiffInf(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normDiffInf_types_for_rt<T>> &aDst,
+                     opp::cuda::DevVarView<byte> &aBuffer,
+                     const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Computes infinity norm of difference of pixels between two images where only pixels with mask != 0 are
+    /// used.<para/> The infinity norm of differences is defined as: NormDiffInf = max((|Src1(i,j) - Src2(i,j)|)
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormDiffInfMasked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normDiffInf_types_for_rt<T>> &aDst,
+                           const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region NormDiffL1
+    /// <summary>
+    /// Returns the required temporary buffer size for NormDiffL1.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t NormDiffL1BufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for NormDiffL1Masked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t NormDiffL1MaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Computes the L1 norm of difference of pixels between two images.<para/>
+    /// The L1 norm of differences is defined as: NormDiffL1 = sum((|Src1(i,j) - Src2(i,j)|)<para/> For multi-channel
+    /// images, the result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormDiffL1(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normDiffL1_types_for_rt<T>> &aDst,
+                    opp::cuda::DevVarView<remove_vector_t<normDiffL1_types_for_rt<T>>> &aDstScalar,
+                    opp::cuda::DevVarView<byte> &aBuffer,
+                    const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the L1 norm of difference of pixels between two images where only pixels with mask != 0 are
+    /// used.<para/>
+    /// The L1 norm of differences is defined as: NormDiffL1 = sum((|Src1(i,j) - Src2(i,j)|)<para/> For multi-channel
+    /// images, the result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormDiffL1Masked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normDiffL1_types_for_rt<T>> &aDst,
+                          opp::cuda::DevVarView<remove_vector_t<normDiffL1_types_for_rt<T>>> &aDstScalar,
+                          const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes L1 norm of difference of pixels between two images.<para/>
+    /// The L1 norm of differences is defined as: NormDiffL1 = sum((|Src1(i,j) - Src2(i,j)|)
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormDiffL1(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normDiffL1_types_for_rt<T>> &aDst,
+                    opp::cuda::DevVarView<byte> &aBuffer,
+                    const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Computes L1 norm of difference of pixels between two images where only pixels with mask != 0 are used.<para/>
+    /// The L1 norm of differences is defined as: NormDiffL1 = sum((|Src1(i,j) - Src2(i,j)|)
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormDiffL1Masked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normDiffL1_types_for_rt<T>> &aDst,
+                          const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region NormDiffL2
+    /// <summary>
+    /// Returns the required temporary buffer size for NormDiffL2.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t NormDiffL2BufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for NormDiffL2Masked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t NormDiffL2MaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Computes the L2 norm of difference of pixels between two images.<para/>
+    /// The L2 norm of differences is defined as: NormDiffL2 = sqrt(sum(((Src1(i,j) - Src2(i,j))^2))<para/> For
+    /// multi-channel images, the result is computed for each channel seperatly in aDst, or for all channels in
+    /// aDstScalar.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormDiffL2(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normDiffL2_types_for_rt<T>> &aDst,
+                    opp::cuda::DevVarView<remove_vector_t<normDiffL2_types_for_rt<T>>> &aDstScalar,
+                    opp::cuda::DevVarView<byte> &aBuffer,
+                    const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the L2 norm of difference of pixels between two images where only pixels with mask != 0 are
+    /// used.<para/>
+    /// The L2 norm of differences is defined as: NormDiffL2 = sqrt(sum(((Src1(i,j) - Src2(i,j))^2))<para/> For
+    /// multi-channel images, the result is computed for each channel seperatly in aDst, or for all channels in
+    /// aDstScalar.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormDiffL2Masked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normDiffL2_types_for_rt<T>> &aDst,
+                          opp::cuda::DevVarView<remove_vector_t<normDiffL2_types_for_rt<T>>> &aDstScalar,
+                          const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes L2 norm of difference of pixels between two images.<para/>
+    /// The L2 norm of differences is defined as: NormDiffL2 = sqrt(sum(((Src1(i,j) - Src2(i,j))^2))
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormDiffL2(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normDiffL2_types_for_rt<T>> &aDst,
+                    opp::cuda::DevVarView<byte> &aBuffer,
+                    const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Computes L2 norm of difference of pixels between two images where only pixels with mask != 0 are used.<para/>
+    /// The L2 norm of differences is defined as: NormDiffL2 = sqrt(sum(((Src1(i,j) - Src2(i,j))^2))
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormDiffL2Masked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normDiffL2_types_for_rt<T>> &aDst,
+                          const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region NormRelInf
+    /// <summary>
+    /// Returns the required temporary buffer size for NormRelInf.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t NormRelInfBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for NormRelInfMasked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t NormRelInfMaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Computes the relative infinity norm of difference of pixels between two images.<para/>
+    /// The relative infinity norm of differences is defined as: NormRelInf = NormDiffInf(Src1, Src2) / NormInf(Src2)
+    /// <para/> For multi-channel images, the
+    /// result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormRelInf(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normRelInf_types_for_rt<T>> &aDst,
+                    opp::cuda::DevVarView<remove_vector_t<normRelInf_types_for_rt<T>>> &aDstScalar,
+                    opp::cuda::DevVarView<byte> &aBuffer,
+                    const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the relative infinity norm of difference of pixels between two images where only pixels with mask != 0
+    /// are used.<para/> The relative infinity norm of differences is defined as: NormRelInf = NormDiffInf(Src1, Src2) /
+    /// NormInf(Src2)<para/> For multi-channel images, the result is computed for each channel seperatly in aDst, or for
+    /// all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormRelInfMasked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normRelInf_types_for_rt<T>> &aDst,
+                          opp::cuda::DevVarView<remove_vector_t<normRelInf_types_for_rt<T>>> &aDstScalar,
+                          const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes relative infinity norm of difference of pixels between two images.<para/>
+    /// The relative infinity norm of differences is defined as: NormRelInf = NormDiffInf(Src1, Src2) / NormInf(Src2)
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormRelInf(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normRelInf_types_for_rt<T>> &aDst,
+                    opp::cuda::DevVarView<byte> &aBuffer,
+                    const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Computes relative infinity norm of difference of pixels between two images where only pixels with mask != 0 are
+    /// used.<para/> The relative infinity norm of differences is defined as: NormRelInf = NormDiffInf(Src1, Src2) /
+    /// NormInf(Src2)
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormRelInfMasked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normRelInf_types_for_rt<T>> &aDst,
+                          const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region NormRelL1
+    /// <summary>
+    /// Returns the required temporary buffer size for NormRelL1.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t NormRelL1BufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for NormRelL1Masked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t NormRelL1MaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Computes the relative L1 norm of difference of pixels between two images.<para/>
+    /// The relative L1 norm of differences is defined as: NormRelL1 = NormDiffL1(Src1, Src2) / NormL1(Src2)<para/> For
+    /// multi-channel images, the result is computed for each channel seperatly in aDst, or for all channels in
+    /// aDstScalar.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormRelL1(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normRelL1_types_for_rt<T>> &aDst,
+                   opp::cuda::DevVarView<remove_vector_t<normRelL1_types_for_rt<T>>> &aDstScalar,
+                   opp::cuda::DevVarView<byte> &aBuffer,
+                   const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the relative L1 norm of difference of pixels between two images where only pixels with mask != 0 are
+    /// used.<para/>
+    /// The relative L1 norm of differences is defined as: NormRelL1 = NormDiffL1(Src1, Src2) / NormL1(Src2)<para/> For
+    /// multi-channel images, the result is computed for each channel seperatly in aDst, or for all channels in
+    /// aDstScalar.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormRelL1Masked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normRelL1_types_for_rt<T>> &aDst,
+                         opp::cuda::DevVarView<remove_vector_t<normRelL1_types_for_rt<T>>> &aDstScalar,
+                         const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes relative L1 norm of difference of pixels between two images.<para/>
+    /// The relative L1 norm of differences is defined as: NormRelL1 = NormDiffL1(Src1, Src2) / NormL1(Src2)
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormRelL1(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normRelL1_types_for_rt<T>> &aDst,
+                   opp::cuda::DevVarView<byte> &aBuffer,
+                   const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Computes L1 norm of difference of pixels between two images where only pixels with mask != 0 are used.<para/>
+    /// The relative L1 norm of differences is defined as: NormRelL1 = NormDiffL1(Src1, Src2) / NormL1(Src2)
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormRelL1Masked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normRelL1_types_for_rt<T>> &aDst,
+                         const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region NormRelL2
+    /// <summary>
+    /// Returns the required temporary buffer size for NormRelL2.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t NormRelL2BufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for NormRelL2Masked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t NormRelL2MaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Computes the relative L2 norm of difference of pixels between two images.<para/>
+    /// The relative L2 norm of differences is defined as: NormRelL2 = NormDiffL2(Src1, Src2) / NormL2(Src2)<para/> For
+    /// multi-channel images, the result is computed for each channel seperatly in aDst, or for all channels in
+    /// aDstScalar.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormRelL2(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normRelL2_types_for_rt<T>> &aDst,
+                   opp::cuda::DevVarView<remove_vector_t<normRelL2_types_for_rt<T>>> &aDstScalar,
+                   opp::cuda::DevVarView<byte> &aBuffer,
+                   const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the relative L2 norm of difference of pixels between two images where only pixels with mask != 0 are
+    /// used.<para/>
+    /// The relative L2 norm of differences is defined as: NormRelL2 = NormDiffL2(Src1, Src2) / NormL2(Src2)<para/> For
+    /// multi-channel images, the result is computed for each channel seperatly in aDst, or for all channels in
+    /// aDstScalar.
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormRelL2Masked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normRelL2_types_for_rt<T>> &aDst,
+                         opp::cuda::DevVarView<remove_vector_t<normRelL2_types_for_rt<T>>> &aDstScalar,
+                         const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes relative L2 norm of difference of pixels between two images.<para/>
+    /// The relative L2 norm of differences is defined as: NormRelL2 = NormDiffL2(Src1, Src2) / NormL2(Src2)
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormRelL2(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normRelL2_types_for_rt<T>> &aDst,
+                   opp::cuda::DevVarView<byte> &aBuffer,
+                   const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Computes L2 norm of difference of pixels between two images where only pixels with mask != 0 are used.<para/>
+    /// The relative L2 norm of differences is defined as: NormRelL2 = NormDiffL2(Src1, Src2) / NormL2(Src2)
+    /// </summary>
+    /// <param name="aSrc2">Second image to compare this image to</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormRelL2Masked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<normRelL2_types_for_rt<T>> &aDst,
+                         const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region PSNR
+    /// <summary>
+    /// Returns the required temporary buffer size for PSNR.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t PSNRBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Computes the PSNR of two images. <para/> For multi-channel images, the
+    /// result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aSrc2">Second source image</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aValueRange">The maximum possible pixel value, eg. 255 for 8 bit unsigned int images, 4095 for
+    /// 12-bit unsigned images, etc.</param> <param name="aBuffer">Temporary device memory buffer for
+    /// computation.</param> <param name="aStreamCtx"></param>
+    void PSNR(const ImageView<T> &aSrc2, opp::cuda::DevVarView<mse_types_for_rt<T>> &aDst,
+              opp::cuda::DevVarView<remove_vector_t<mse_types_for_rt<T>>> &aDstScalar,
+              remove_vector_t<mse_types_for_rt<T>> aValueRange, opp::cuda::DevVarView<byte> &aBuffer,
+              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the PSNR of two images.
+    /// </summary>
+    /// <param name="aSrc2">Second source image</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aValueRange">The maximum possible pixel value, eg. 255 for 8 bit unsigned int images, 4095 for
+    /// 12-bit unsigned images, etc.</param> <param name="aBuffer">Temporary device memory buffer for
+    /// computation.</param> <param name="aStreamCtx"></param>
+    void PSNR(const ImageView<T> &aSrc2, opp::cuda::DevVarView<mse_types_for_rt<T>> &aDst,
+              remove_vector_t<mse_types_for_rt<T>> aValueRange, opp::cuda::DevVarView<byte> &aBuffer,
+              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region NormInf
+    /// <summary>
+    /// Returns the required temporary buffer size for NormInf.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t NormInfBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for NormInfMasked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t NormInfMaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Computes the infinity norm.<para/>
+    /// The infinity norm is defined as: NormInf = max(|Src1(i,j)|)
+    /// <para/> For multi-channel images, the
+    /// result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormInf(opp::cuda::DevVarView<normInf_types_for_rt<T>> &aDst,
+                 opp::cuda::DevVarView<remove_vector_t<normInf_types_for_rt<T>>> &aDstScalar,
+                 opp::cuda::DevVarView<byte> &aBuffer,
+                 const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the infinity norm where only pixels with mask != 0 are
+    /// used.<para/>
+    /// The infinity norm is defined as: NormInf = max(|Src1(i,j)|)<para/> For
+    /// multi-channel images, the result is computed for each channel seperatly in aDst, or for all channels in
+    /// aDstScalar.
+    /// </summary>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormInfMasked(opp::cuda::DevVarView<normInf_types_for_rt<T>> &aDst,
+                       opp::cuda::DevVarView<remove_vector_t<normInf_types_for_rt<T>>> &aDstScalar,
+                       const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes infinity norm.<para/>
+    /// The infinity norm is defined as: NormInf = max(|Src1(i,j)|)
+    /// </summary>
+    /// <param name="aDst">Result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormInf(opp::cuda::DevVarView<normInf_types_for_rt<T>> &aDst, opp::cuda::DevVarView<byte> &aBuffer,
+                 const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Computes infinity norm where only pixels with mask != 0 are
+    /// used.<para/> The infinity norm is defined as: NormInf = max(|Src1(i,j)|)
+    /// </summary>
+    /// <param name="aDst">Result</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormInfMasked(opp::cuda::DevVarView<normInf_types_for_rt<T>> &aDst, const ImageView<Pixel8uC1> &aMask,
+                       opp::cuda::DevVarView<byte> &aBuffer,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region NormL1
+    /// <summary>
+    /// Returns the required temporary buffer size for NormL1.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t NormL1BufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for NormL1Masked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t NormL1MaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Computes the L1 norm.<para/>
+    /// The L1 norm is defined as: NormL1 = sum(|Src1(i,j)|)
+    /// <para/> For multi-channel images, the
+    /// result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormL1(opp::cuda::DevVarView<normL1_types_for_rt<T>> &aDst,
+                opp::cuda::DevVarView<remove_vector_t<normL1_types_for_rt<T>>> &aDstScalar,
+                opp::cuda::DevVarView<byte> &aBuffer,
+                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the L1 norm where only pixels with mask != 0 are
+    /// used.<para/>
+    /// The L1 norm is defined as: NormL1 = sum(|Src1(i,j)|)<para/> For
+    /// multi-channel images, the result is computed for each channel seperatly in aDst, or for all channels in
+    /// aDstScalar.
+    /// </summary>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormL1Masked(opp::cuda::DevVarView<normL1_types_for_rt<T>> &aDst,
+                      opp::cuda::DevVarView<remove_vector_t<normL1_types_for_rt<T>>> &aDstScalar,
+                      const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes L1 norm.<para/>
+    /// The L1 norm is defined as: NormL1 = sum(|Src1(i,j)|)
+    /// </summary>
+    /// <param name="aDst">Result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormL1(opp::cuda::DevVarView<normL1_types_for_rt<T>> &aDst, opp::cuda::DevVarView<byte> &aBuffer,
+                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Computes L1 norm where only pixels with mask != 0 are
+    /// used.<para/> The L1 norm is defined as: NormL1 = sum(|Src1(i,j)|)
+    /// </summary>
+    /// <param name="aDst">Result</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormL1Masked(opp::cuda::DevVarView<normL1_types_for_rt<T>> &aDst, const ImageView<Pixel8uC1> &aMask,
+                      opp::cuda::DevVarView<byte> &aBuffer,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region NormL2
+    /// <summary>
+    /// Returns the required temporary buffer size for NormL2.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t NormL2BufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for NormL2Masked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t NormL2MaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Computes the L2 norm.<para/>
+    /// The L2 norm is defined as: NormL2 = sqrt(sum(Src1(i,j)^2))
+    /// <para/> For multi-channel images, the
+    /// result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormL2(opp::cuda::DevVarView<normL2_types_for_rt<T>> &aDst,
+                opp::cuda::DevVarView<remove_vector_t<normL2_types_for_rt<T>>> &aDstScalar,
+                opp::cuda::DevVarView<byte> &aBuffer,
+                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the L2 norm where only pixels with mask != 0 are
+    /// used.<para/>
+    /// The L2 norm is defined as: NormL2 = sqrt(sum(Src1(i,j)^2))<para/> For
+    /// multi-channel images, the result is computed for each channel seperatly in aDst, or for all channels in
+    /// aDstScalar.
+    /// </summary>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormL2Masked(opp::cuda::DevVarView<normL2_types_for_rt<T>> &aDst,
+                      opp::cuda::DevVarView<remove_vector_t<normL2_types_for_rt<T>>> &aDstScalar,
+                      const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes L2 norm.<para/>
+    /// The L2 norm is defined as: NormL2 = sqrt(sum(Src1(i,j)^2))
+    /// </summary>
+    /// <param name="aDst">Result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormL2(opp::cuda::DevVarView<normL2_types_for_rt<T>> &aDst, opp::cuda::DevVarView<byte> &aBuffer,
+                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Computes L2 norm where only pixels with mask != 0 are
+    /// used.<para/> The L2 norm is defined as: NormL2 = sqrt(sum(Src1(i,j)^2))
+    /// </summary>
+    /// <param name="aDst">Result</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void NormL2Masked(opp::cuda::DevVarView<normL2_types_for_rt<T>> &aDst, const ImageView<Pixel8uC1> &aMask,
+                      opp::cuda::DevVarView<byte> &aBuffer,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region Sum
+    /// <summary>
+    /// Returns the required temporary buffer size for Sum.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    /// <param name="aDst">Used as output type indicator</param>
+    [[nodiscard]] size_t SumBufferSize(
+        const opp::cuda::DevVarView<sum_types_for_rt<T, 1>> &aDst,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Returns the required temporary buffer size for SumMasked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    /// <param name="aDst">Used as output type indicator</param>
+    [[nodiscard]] size_t SumMaskedBufferSize(
+        const opp::cuda::DevVarView<sum_types_for_rt<T, 1>> &aDst,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Returns the required temporary buffer size for Sum.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    /// <param name="aDst">Used as output type indicator</param>
+    [[nodiscard]] size_t SumBufferSize(
+        const opp::cuda::DevVarView<sum_types_for_rt<T, 2>> &aDst,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealOrComplexIntVector<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for SumMasked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    /// <param name="aDst">Used as output type indicator</param>
+    [[nodiscard]] size_t SumMaskedBufferSize(
+        const opp::cuda::DevVarView<sum_types_for_rt<T, 2>> &aDst,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealOrComplexIntVector<T>;
+
+    /// <summary>
+    /// Computes the sum of pixel values.<para/>For multi-channel images, the
+    /// result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void Sum(opp::cuda::DevVarView<sum_types_for_rt<T, 1>> &aDst,
+             opp::cuda::DevVarView<remove_vector_t<sum_types_for_rt<T, 1>>> &aDstScalar,
+             opp::cuda::DevVarView<byte> &aBuffer,
+             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the sum of pixel values.<para/>For multi-channel images, the
+    /// result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void Sum(opp::cuda::DevVarView<sum_types_for_rt<T, 2>> &aDst,
+             opp::cuda::DevVarView<remove_vector_t<sum_types_for_rt<T, 2>>> &aDstScalar,
+             opp::cuda::DevVarView<byte> &aBuffer,
+             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealOrComplexIntVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the sum of pixel values where only pixels with mask != 0 are used.<para/>For multi-channel images, the
+    /// result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void SumMasked(opp::cuda::DevVarView<sum_types_for_rt<T, 1>> &aDst,
+                   opp::cuda::DevVarView<remove_vector_t<sum_types_for_rt<T, 1>>> &aDstScalar,
+                   const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                   const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the sum of pixel values where only pixels with mask != 0 are used.<para/>For multi-channel images, the
+    /// result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void SumMasked(opp::cuda::DevVarView<sum_types_for_rt<T, 2>> &aDst,
+                   opp::cuda::DevVarView<remove_vector_t<sum_types_for_rt<T, 2>>> &aDstScalar,
+                   const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                   const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealOrComplexIntVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the sum of pixel values.
+    /// </summary>
+    /// <param name="aDst">Result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void Sum(opp::cuda::DevVarView<sum_types_for_rt<T, 1>> &aDst, opp::cuda::DevVarView<byte> &aBuffer,
+             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Computes the sum of pixel values.
+    /// </summary>
+    /// <param name="aDst">Result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void Sum(opp::cuda::DevVarView<sum_types_for_rt<T, 2>> &aDst, opp::cuda::DevVarView<byte> &aBuffer,
+             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealOrComplexIntVector<T> && (vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Computes the sum of pixel values where only pixels with mask != 0 are used.
+    /// </summary>
+    /// <param name="aDst">Result</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void SumMasked(opp::cuda::DevVarView<sum_types_for_rt<T, 1>> &aDst, const ImageView<Pixel8uC1> &aMask,
+                   opp::cuda::DevVarView<byte> &aBuffer,
+                   const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Computes the sum of pixel values where only pixels with mask != 0 are used.
+    /// </summary>
+    /// <param name="aDst">Result</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void SumMasked(opp::cuda::DevVarView<sum_types_for_rt<T, 2>> &aDst, const ImageView<Pixel8uC1> &aMask,
+                   opp::cuda::DevVarView<byte> &aBuffer,
+                   const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealOrComplexIntVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region Mean
+    /// <summary>
+    /// Returns the required temporary buffer size for Mean.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MeanBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Returns the required temporary buffer size for MeanMasked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MeanMaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// Computes the mean of pixel values.<para/>For multi-channel images, the
+    /// result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void Mean(opp::cuda::DevVarView<mean_types_for_rt<T>> &aDst,
+              opp::cuda::DevVarView<remove_vector_t<mean_types_for_rt<T>>> &aDstScalar,
+              opp::cuda::DevVarView<byte> &aBuffer,
+              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the mean of pixel values where only pixels with mask != 0 are used.<para/>For multi-channel images, the
+    /// result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MeanMasked(opp::cuda::DevVarView<mean_types_for_rt<T>> &aDst,
+                    opp::cuda::DevVarView<remove_vector_t<mean_types_for_rt<T>>> &aDstScalar,
+                    const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                    const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the mean of pixel values.
+    /// </summary>
+    /// <param name="aDst">Result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void Mean(opp::cuda::DevVarView<mean_types_for_rt<T>> &aDst, opp::cuda::DevVarView<byte> &aBuffer,
+              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Computes the mean of pixel values where only pixels with mask != 0 are used.
+    /// </summary>
+    /// <param name="aDst">Result</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MeanMasked(opp::cuda::DevVarView<mean_types_for_rt<T>> &aDst, const ImageView<Pixel8uC1> &aMask,
+                    opp::cuda::DevVarView<byte> &aBuffer,
+                    const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region MeanStd
+    /// <summary>
+    /// Returns the required temporary buffer size for MeanStd.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MeanStdBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Returns the required temporary buffer size for MeanStdMasked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MeanStdMaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// Computes the mean and standard deviation of pixel values.<para/>For multi-channel images, the
+    /// result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aMean">Per-channel mean value, can be nullptr if aStd is also nullptr</param>
+    /// <param name="aStd">Per-channel standard deviation value, can be nullptr if aMean is also nullptr</param>
+    /// <param name="aMeanScalar">Mean value for all channels, can be nullptr if aStdScalar also nullptr</param>
+    /// <param name="aStdScalar">Standard deviation for all channels, can be nullptr if aMeanScalar also nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MeanStd(opp::cuda::DevVarView<meanStd_types_for_rt1<T>> &aMean,
+                 opp::cuda::DevVarView<meanStd_types_for_rt2<T>> &aStd,
+                 opp::cuda::DevVarView<remove_vector_t<meanStd_types_for_rt1<T>>> &aMeanScalar,
+                 opp::cuda::DevVarView<remove_vector_t<meanStd_types_for_rt2<T>>> &aStdScalar,
+                 opp::cuda::DevVarView<byte> &aBuffer,
+                 const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the mean and standard deviation of pixel values where only pixels with mask != 0 are used.<para/>For
+    /// multi-channel images, the result is computed for each channel seperatly in aDst, or for all channels in
+    /// aDstScalar.
+    /// </summary>
+    /// <param name="aMean">Per-channel mean value, can be nullptr if aStd is also nullptr</param>
+    /// <param name="aStd">Per-channel standard deviation value, can be nullptr if aMean is also nullptr</param>
+    /// <param name="aMeanScalar">Mean value for all channels, can be nullptr if aStdScalar also nullptr</param>
+    /// <param name="aStdScalar">Standard deviation for all channels, can be nullptr if aMeanScalar also nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MeanStdMasked(opp::cuda::DevVarView<meanStd_types_for_rt1<T>> &aMean,
+                       opp::cuda::DevVarView<meanStd_types_for_rt2<T>> &aStd,
+                       opp::cuda::DevVarView<remove_vector_t<meanStd_types_for_rt1<T>>> &aMeanScalar,
+                       opp::cuda::DevVarView<remove_vector_t<meanStd_types_for_rt2<T>>> &aStdScalar,
+                       const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the mean and standard deviation of pixel values.
+    /// </summary>
+    /// <param name="aMean">Mean value</param>
+    /// <param name="aStd">Standard deviation</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MeanStd(opp::cuda::DevVarView<meanStd_types_for_rt1<T>> &aMean,
+                 opp::cuda::DevVarView<meanStd_types_for_rt2<T>> &aStd, opp::cuda::DevVarView<byte> &aBuffer,
+                 const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Computes the mean and standard deviation of pixel values where only pixels with mask != 0 are used.
+    /// </summary>
+    /// <param name="aMean">Mean value</param>
+    /// <param name="aStd">Standard deviation</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MeanStdMasked(opp::cuda::DevVarView<meanStd_types_for_rt1<T>> &aMean,
+                       opp::cuda::DevVarView<meanStd_types_for_rt2<T>> &aStd, const ImageView<Pixel8uC1> &aMask,
+                       opp::cuda::DevVarView<byte> &aBuffer,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region CountInRange
+    /// <summary>
+    /// Returns the required temporary buffer size for CountInRange.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t CountInRangeBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for CountInRangeMasked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t CountInRangeMaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Counts the pixels in a given value range.<para/>For multi-channel images, the
+    /// result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aLowerLimit">Lower bound of the specified range (inclusive).</param>
+    /// <param name="aUpperLimit">Upper bound of the specified range (inclusive).</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void CountInRange(const T &aLowerLimit, const T &aUpperLimit,
+                      opp::cuda::DevVarView<same_vector_size_different_type_t<T, size_t>> &aDst,
+                      opp::cuda::DevVarView<size_t> &aDstScalar, opp::cuda::DevVarView<byte> &aBuffer,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Counts the pixels in a given value range where only pixels with mask != 0 are used.<para/>For multi-channel
+    /// images, the result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aLowerLimit">Lower bound of the specified range (inclusive).</param>
+    /// <param name="aUpperLimit">Upper bound of the specified range (inclusive).</param>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void CountInRangeMasked(const T &aLowerLimit, const T &aUpperLimit,
+                            opp::cuda::DevVarView<same_vector_size_different_type_t<T, size_t>> &aDst,
+                            opp::cuda::DevVarView<size_t> &aDstScalar, const ImageView<Pixel8uC1> &aMask,
+                            opp::cuda::DevVarView<byte> &aBuffer,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Counts the pixels in a given value range.
+    /// </summary>
+    /// <param name="aLowerLimit">Lower bound of the specified range (inclusive).</param>
+    /// <param name="aUpperLimit">Upper bound of the specified range (inclusive).</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void CountInRange(const T &aLowerLimit, const T &aUpperLimit,
+                      opp::cuda::DevVarView<same_vector_size_different_type_t<T, size_t>> &aDst,
+                      opp::cuda::DevVarView<byte> &aBuffer,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Counts the pixels in a given value range where only pixels with mask != 0 are used.
+    /// </summary>
+    /// <param name="aLowerLimit">Lower bound of the specified range (inclusive).</param>
+    /// <param name="aUpperLimit">Upper bound of the specified range (inclusive).</param>
+    /// <param name="aDst">Result</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void CountInRangeMasked(const T &aLowerLimit, const T &aUpperLimit,
+                            opp::cuda::DevVarView<same_vector_size_different_type_t<T, size_t>> &aDst,
+                            const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region QualityIndex
+    /// <summary>
+    /// Returns the required temporary buffer size for QualityIndex.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t QualityIndexBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Computes the image quality index of two images.
+    /// </summary>
+    /// <param name="aSrc2">Second source image</param>
+    /// <param name="aDst">Per channel result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void QualityIndex(const ImageView<T> &aSrc2, opp::cuda::DevVarView<qualityIndex_types_for_rt<T>> &aDst,
+                      opp::cuda::DevVarView<byte> &aBuffer,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+#pragma endregion
+
+#pragma region SSIM
+    /// <summary>
+    /// Returns the required temporary buffer size for SSIM.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t SSIMBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Computes the SSIM of two images. TODO: Implement with image re-scaling
+    /// </summary>
+    /// <param name="aSrc2">Second source image</param>
+    /// <param name="aDst">Per channel result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aDynamicRange">The value range of the image. Typically this is 2^BitsPerPixel - 1.</param>
+    /// <param name="aK1">Stabilisation constant 1, Default=0.01</param>
+    /// <param name="aK2">Stabilisation constant 2, Default=0.03</param>
+    /// <param name="aStreamCtx"></param>
+    void SSIM(const ImageView<T> &aSrc2, opp::cuda::DevVarView<qualityIndex_types_for_rt<T>> &aDst,
+              opp::cuda::DevVarView<byte> &aBuffer,
+              // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+              remove_vector_t<qualityIndex_types_for_rt<T>> aDynamicRange =
+                  static_cast<remove_vector_t<qualityIndex_types_for_rt<T>>>(1.0),
+              remove_vector_t<qualityIndex_types_for_rt<T>> aK1 =
+                  static_cast<remove_vector_t<qualityIndex_types_for_rt<T>>>(0.01),
+              remove_vector_t<qualityIndex_types_for_rt<T>> aK2 =
+                  static_cast<remove_vector_t<qualityIndex_types_for_rt<T>>>(0.03),
+              // NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+#pragma endregion
+
+#pragma region Min
+    /// <summary>
+    /// Returns the required temporary buffer size for Min.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MinBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for MinMasked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MinMaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Minimum pixel value.
+    /// <para/> For multi-channel images, the
+    /// result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void Min(opp::cuda::DevVarView<T> &aDst, opp::cuda::DevVarView<remove_vector_t<T>> &aDstScalar,
+             opp::cuda::DevVarView<byte> &aBuffer,
+             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Minimum pixel value where only pixels with mask != 0 are used.<para/> For
+    /// multi-channel images, the result is computed for each channel seperatly in aDst, or for all channels in
+    /// aDstScalar.
+    /// </summary>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MinMasked(opp::cuda::DevVarView<T> &aDst, opp::cuda::DevVarView<remove_vector_t<T>> &aDstScalar,
+                   const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                   const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Minimum pixel value.
+    /// </summary>
+    /// <param name="aDst">Result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void Min(opp::cuda::DevVarView<T> &aDst, opp::cuda::DevVarView<byte> &aBuffer,
+             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Minimum pixel value where only pixels with mask != 0 are used.
+    /// </summary>
+    /// <param name="aDst">Result</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MinMasked(opp::cuda::DevVarView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                   opp::cuda::DevVarView<byte> &aBuffer,
+                   const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region Max
+    /// <summary>
+    /// Returns the required temporary buffer size for Max.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MaxBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for MaxMasked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MaxMaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Maximum pixel value.
+    /// <para/> For multi-channel images, the
+    /// result is computed for each channel seperatly in aDst, or for all channels in aDstScalar.
+    /// </summary>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void Max(opp::cuda::DevVarView<T> &aDst, opp::cuda::DevVarView<remove_vector_t<T>> &aDstScalar,
+             opp::cuda::DevVarView<byte> &aBuffer,
+             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Maximum pixel value where only pixels with mask != 0 are used.<para/> For
+    /// multi-channel images, the result is computed for each channel seperatly in aDst, or for all channels in
+    /// aDstScalar.
+    /// </summary>
+    /// <param name="aDst">Per-channel result, can be nullptr</param>
+    /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MaxMasked(opp::cuda::DevVarView<T> &aDst, opp::cuda::DevVarView<remove_vector_t<T>> &aDstScalar,
+                   const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                   const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Maximum pixel value.
+    /// </summary>
+    /// <param name="aDst">Result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void Max(opp::cuda::DevVarView<T> &aDst, opp::cuda::DevVarView<byte> &aBuffer,
+             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Maximum pixel value where only pixels with mask != 0 are used.
+    /// </summary>
+    /// <param name="aDst">Result</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MaxMasked(opp::cuda::DevVarView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
+                   opp::cuda::DevVarView<byte> &aBuffer,
+                   const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region MinMax
+    /// <summary>
+    /// Returns the required temporary buffer size for MinMax.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MinMaxBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for MinMaxMasked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MinMaxMaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Minimum and maximum pixel value.<para/>
+    /// For multi-channel images, the result is computed for each channel seperatly in aDstMin/aDstMax, or for all
+    /// channels in aDstMinScalar/aDstMaxScalar.
+    /// </summary>
+    /// <param name="aDstMin">Per-channel minimum value, can be nullptr if aDstMax is also nullptr</param>
+    /// <param name="aDstMax">Per-channel maximum value, can be nullptr if aDstMin is also nullptr</param>
+    /// <param name="aDstMinScalar">Minimum value for all channels, can be nullptr if aDstMaxScalar also nullptr</param>
+    /// <param name="aDstMaxScalar">Maximum value for all channels, can be nullptr if aDstMinScalar also nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MinMax(opp::cuda::DevVarView<T> &aDstMin, opp::cuda::DevVarView<T> &aDstMax,
+                opp::cuda::DevVarView<remove_vector_t<T>> &aDstMinScalar,
+                opp::cuda::DevVarView<remove_vector_t<T>> &aDstMaxScalar, opp::cuda::DevVarView<byte> &aBuffer,
+                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+    /// <summary>
+    /// Minimum and maximum pixel value where only pixels with mask != 0 are used.<para/>
+    /// For multi-channel images, the result is computed for each channel seperatly in aDstMin/aDstMax, or for all
+    /// channels in aDstMinScalar/aDstMaxScalar.
+    /// </summary>
+    /// <param name="aDstMin">Per-channel minimum value, can be nullptr if aDstMax is also nullptr</param>
+    /// <param name="aDstMax">Per-channel maximum value, can be nullptr if aDstMin is also nullptr</param>
+    /// <param name="aDstMinScalar">Minimum value for all channels, can be nullptr if aDstMaxScalar also nullptr</param>
+    /// <param name="aDstMaxScalar">Maximum value for all channels, can be nullptr if aDstMinScalar also nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MinMaxMasked(opp::cuda::DevVarView<T> &aDstMin, opp::cuda::DevVarView<T> &aDstMax,
+                      opp::cuda::DevVarView<remove_vector_t<T>> &aDstMinScalar,
+                      opp::cuda::DevVarView<remove_vector_t<T>> &aDstMaxScalar, const ImageView<Pixel8uC1> &aMask,
+                      opp::cuda::DevVarView<byte> &aBuffer,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Minimum and maximum pixel value.
+    /// </summary>
+    /// <param name="aDstMin">Minimum value</param>
+    /// <param name="aDstMax">Maximum value</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MinMax(opp::cuda::DevVarView<T> &aDstMin, opp::cuda::DevVarView<T> &aDstMax,
+                opp::cuda::DevVarView<byte> &aBuffer,
+                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Minimum and maximum pixel value where only pixels with mask != 0 are used.
+    /// </summary>
+    /// <param name="aDstMin">Minimum value</param>
+    /// <param name="aDstMax">Maximum value</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MinMaxMasked(opp::cuda::DevVarView<T> &aDstMin, opp::cuda::DevVarView<T> &aDstMax,
+                      const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region MinIndex
+    /// <summary>
+    /// Returns the required temporary buffer size for MinIndex.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MinIndexBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for MinIndexMasked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MinIndexMaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Minimum pixel value and its pixel index. For multiple occurences of the same value the index with the lowest
+    /// flattened index (y * width + x) is returned.<para/> For multi-channel images, the result is computed for each
+    /// channel seperatly in aDstMin/aDstIndexX/aDstIndexY, or for all channels in aDstMinScalar/aDstScalarIdx.
+    /// </summary>
+    /// <param name="aDstMin">Per-channel minimum value, can be nullptr if aDstIndexX and aDstIndexY are also
+    /// nullptr</param>
+    /// <param name="aDstIndexX">Per-channel X pixel index, can be nullptr if aDstMin and aDstIndexY are
+    /// also nullptr</param>
+    /// <param name="aDstIndexY">Per-channel Y pixel index, can be nullptr if aDstMin and
+    /// aDstIndexX are also nullptr</param>
+    /// <param name="aDstMinScalar">Minimum value for all channels, can be nullptr
+    /// if aDstScalarIdx also nullptr</param>
+    /// <param name="aDstScalarIdx">Pixel index of the minimum value, the .z
+    /// component gives the image channel of the value. Can be nullptr if aDstMinScalar also nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MinIndex(opp::cuda::DevVarView<T> &aDstMin,
+                  opp::cuda::DevVarView<same_vector_size_different_type_t<T, int>> &aDstIndexX,
+                  opp::cuda::DevVarView<same_vector_size_different_type_t<T, int>> &aDstIndexY,
+                  opp::cuda::DevVarView<remove_vector_t<T>> &aDstMinScalar,
+                  opp::cuda::DevVarView<Vector3<int>> &aDstScalarIdx, opp::cuda::DevVarView<byte> &aBuffer,
+                  const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Minimum pixel value and its pixel index where only pixels with mask != 0 are used. For multiple occurences of
+    /// the same value the index with the lowest flattened index (y * width + x) is returned.<para/> For multi-channel
+    /// images, the result is computed for each channel seperatly in aDstMin/aDstIndexX/aDstIndexY, or for all channels
+    /// in aDstMinScalar/aDstScalarIdx.
+    /// </summary>
+    /// <param name="aDstMin">Per-channel minimum value, can be nullptr if aDstIndexX and aDstIndexY are also
+    /// nullptr</param>
+    /// <param name="aDstIndexX">Per-channel X pixel index, can be nullptr if aDstMin and aDstIndexY are
+    /// also nullptr</param>
+    /// <param name="aDstIndexY">Per-channel Y pixel index, can be nullptr if aDstMin and
+    /// aDstIndexX are also nullptr</param>
+    /// <param name="aDstMinScalar">Minimum value for all channels, can be nullptr
+    /// if aDstScalarIdx also nullptr</param>
+    /// <param name="aDstScalarIdx">Pixel index of the minimum value, the .z
+    /// component gives the image channel of the value. Can be nullptr if aDstMinScalar also nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MinIndexMasked(opp::cuda::DevVarView<T> &aDstMin,
+                        opp::cuda::DevVarView<same_vector_size_different_type_t<T, int>> &aDstIndexX,
+                        opp::cuda::DevVarView<same_vector_size_different_type_t<T, int>> &aDstIndexY,
+                        opp::cuda::DevVarView<remove_vector_t<T>> &aDstMinScalar,
+                        opp::cuda::DevVarView<Vector3<int>> &aDstScalarIdx, const ImageView<Pixel8uC1> &aMask,
+                        opp::cuda::DevVarView<byte> &aBuffer,
+                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Minimum pixel value and its pixel index. For multiple occurences of the same value the index with the lowest
+    /// flattened index (y * width + x) is returned.
+    /// </summary>
+    /// <param name="aDstMin">Minimum value</param>
+    /// <param name="aDstIndexX">X pixel index</param>
+    /// <param name="aDstIndexY">Y pixel index</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MinIndex(opp::cuda::DevVarView<T> &aDstMin,
+                  opp::cuda::DevVarView<same_vector_size_different_type_t<T, int>> &aDstIndexX,
+                  opp::cuda::DevVarView<same_vector_size_different_type_t<T, int>> &aDstIndexY,
+                  opp::cuda::DevVarView<byte> &aBuffer,
+                  const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Minimum pixel value and its pixel index where only pixels with mask != 0 are used. For multiple occurences of
+    /// the same value the index with the lowest flattened index (y * width + x) is returned.
+    /// </summary>
+    /// <param name="aDstMin">Minimum value</param>
+    /// <param name="aDstIndexX">X pixel index</param>
+    /// <param name="aDstIndexY">Y pixel index</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MinIndexMasked(opp::cuda::DevVarView<T> &aDstMin,
+                        opp::cuda::DevVarView<same_vector_size_different_type_t<T, int>> &aDstIndexX,
+                        opp::cuda::DevVarView<same_vector_size_different_type_t<T, int>> &aDstIndexY,
+                        const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region MaxIndex
+    /// <summary>
+    /// Returns the required temporary buffer size for MinIndex.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MaxIndexBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for MinIndexMasked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MaxIndexMaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Maximum pixel value and its pixel index. For multiple occurences of the same value the index with the lowest
+    /// flattened index (y * width + x) is returned.<para/> For multi-channel images, the result is computed for each
+    /// channel seperatly in aDstMin/aDstIndexX/aDstIndexY, or for all channels in aDstMinScalar/aDstScalarIdx.
+    /// </summary>
+    /// <param name="aDstMin">Per-channel maximum value, can be nullptr if aDstIndexX and aDstIndexY are also
+    /// nullptr</param>
+    /// <param name="aDstIndexX">Per-channel X pixel index, can be nullptr if aDstMin and aDstIndexY are
+    /// also nullptr</param>
+    /// <param name="aDstIndexY">Per-channel Y pixel index, can be nullptr if aDstMin and
+    /// aDstIndexX are also nullptr</param>
+    /// <param name="aDstMinScalar">Maximum value for all channels, can be nullptr
+    /// if aDstScalarIdx also nullptr</param>
+    /// <param name="aDstScalarIdx">Pixel index of the maximum value, the .z
+    /// component gives the image channel of the value. Can be nullptr if aDstMinScalar also nullptr</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MaxIndex(opp::cuda::DevVarView<T> &aDstMax,
+                  opp::cuda::DevVarView<same_vector_size_different_type_t<T, int>> &aDstIndexX,
+                  opp::cuda::DevVarView<same_vector_size_different_type_t<T, int>> &aDstIndexY,
+                  opp::cuda::DevVarView<remove_vector_t<T>> &aDstMaxScalar,
+                  opp::cuda::DevVarView<Vector3<int>> &aDstScalarIdx, opp::cuda::DevVarView<byte> &aBuffer,
+                  const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Maximum pixel value and its pixel index where only pixels with mask != 0 are used. For multiple occurences of
+    /// the same value the index with the lowest flattened index (y * width + x) is returned.<para/> For multi-channel
+    /// images, the result is computed for each channel seperatly in aDstMin/aDstIndexX/aDstIndexY, or for all channels
+    /// in aDstMinScalar/aDstScalarIdx.
+    /// </summary>
+    /// <param name="aDstMin">Per-channel maximum value, can be nullptr if aDstIndexX and aDstIndexY are also
+    /// nullptr</param>
+    /// <param name="aDstIndexX">Per-channel X pixel index, can be nullptr if aDstMin and aDstIndexY are
+    /// also nullptr</param>
+    /// <param name="aDstIndexY">Per-channel Y pixel index, can be nullptr if aDstMin and
+    /// aDstIndexX are also nullptr</param>
+    /// <param name="aDstMinScalar">Maximum value for all channels, can be nullptr
+    /// if aDstScalarIdx also nullptr</param>
+    /// <param name="aDstScalarIdx">Pixel index of the maximum value, the .z
+    /// component gives the image channel of the value. Can be nullptr if aDstMinScalar also nullptr</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MaxIndexMasked(opp::cuda::DevVarView<T> &aDstMax,
+                        opp::cuda::DevVarView<same_vector_size_different_type_t<T, int>> &aDstIndexX,
+                        opp::cuda::DevVarView<same_vector_size_different_type_t<T, int>> &aDstIndexY,
+                        opp::cuda::DevVarView<remove_vector_t<T>> &aDstMaxScalar,
+                        opp::cuda::DevVarView<Vector3<int>> &aDstScalarIdx, const ImageView<Pixel8uC1> &aMask,
+                        opp::cuda::DevVarView<byte> &aBuffer,
+                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Maximum pixel value and its pixel index. For multiple occurences of the same value the index with the lowest
+    /// flattened index (y * width + x) is returned.
+    /// </summary>
+    /// <param name="aDstMin">Maximum value</param>
+    /// <param name="aDstIndexX">X pixel index</param>
+    /// <param name="aDstIndexY">Y pixel index</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MaxIndex(opp::cuda::DevVarView<T> &aDstMax,
+                  opp::cuda::DevVarView<same_vector_size_different_type_t<T, int>> &aDstIndexX,
+                  opp::cuda::DevVarView<same_vector_size_different_type_t<T, int>> &aDstIndexY,
+                  opp::cuda::DevVarView<byte> &aBuffer,
+                  const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Maximum pixel value and its pixel index where only pixels with mask != 0 are used. For multiple occurences of
+    /// the same value the index with the lowest flattened index (y * width + x) is returned.
+    /// </summary>
+    /// <param name="aDstMin">Maximum value</param>
+    /// <param name="aDstIndexX">X pixel index</param>
+    /// <param name="aDstIndexY">Y pixel index</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MaxIndexMasked(opp::cuda::DevVarView<T> &aDstMax,
+                        opp::cuda::DevVarView<same_vector_size_different_type_t<T, int>> &aDstIndexX,
+                        opp::cuda::DevVarView<same_vector_size_different_type_t<T, int>> &aDstIndexY,
+                        const ImageView<Pixel8uC1> &aMask, opp::cuda::DevVarView<byte> &aBuffer,
+                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+#pragma region MinMaxIndex
+    /// <summary>
+    /// Returns the required temporary buffer size for MinMaxIndex.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MinMaxIndexBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for MinMaxIndexMasked.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MinMaxIndexMaskedBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Minimum and maximum pixel value and their pixel indices. For multiple occurences of the same value the index
+    /// with the lowest flattened index (y * width + x) is returned.<para/> For multi-channel images, the result is
+    /// computed for each channel seperatly in aDstMin/aDstMax/aDstIdx, or for all channels in
+    /// aDstMinScalar/aDstMaxScalar/aDstScalarIdx.
+    /// </summary>
+    /// <param name="aDstMin">Minimum value per channel (array with size of active channels).
+    /// Can be nullptr if aDstMax and aDstIdx are also nullptr.</param>
+    /// <param name="aDstMax">Maximum value per channel (array with size of active channels).
+    /// Can be nullptr if aDstMin and aDstIdx are also nullptr.</param>
+    /// <param name="aDstIdx">Pixel index for min and max value per channel (array with size of active channels).
+    /// Can be nullptr if aDstMin and aDstMax are also nullptr.</param>
+    /// <param name="aDstMinScalar">Minimum value for all channels (array with size of 1).
+    /// Can be nullptr if aDstMaxScalar and aDstScalarIdx are also nullptr.</param>
+    /// <param name="aDstMaxScalar">Maximum value for all channels (array with size of 1).
+    /// Can be nullptr if aDstMinScalar and aDstScalarIdx are also nullptr.</param>
+    /// <param name="aDstScalarIdx">Pixel index for min and max value for all channels (array with size of 1).
+    /// Can be nullptr if aDstMinScalar and aDstMaxScalar are also nullptr.</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MinMaxIndex(opp::cuda::DevVarView<T> &aDstMin, opp::cuda::DevVarView<T> &aDstMax,
+                     opp::cuda::DevVarView<IndexMinMax> &aDstIdx,
+                     opp::cuda::DevVarView<remove_vector_t<T>> &aDstMinScalar,
+                     opp::cuda::DevVarView<remove_vector_t<T>> &aDstMaxScalar,
+                     opp::cuda::DevVarView<IndexMinMaxChannel> &aDstScalarIdx, opp::cuda::DevVarView<byte> &aBuffer,
+                     const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Minimum and maximum pixel value and their pixel indices where only pixels with mask != 0 are used. For multiple
+    /// occurences of the same value the index with the lowest flattened index (y * width + x) is returned.<para/> For
+    /// multi-channel images, the result is computed for each channel seperatly in aDstMin/aDstMax/aDstIdx, or for all
+    /// channels in aDstMinScalar/aDstMaxScalar/aDstScalarIdx.
+    /// </summary>
+    /// <param name="aDstMin">Minimum value per channel (array with size of active channels).
+    /// Can be nullptr if aDstMax and aDstIdx are also nullptr.</param>
+    /// <param name="aDstMax">Maximum value per channel (array with size of active channels).
+    /// Can be nullptr if aDstMin and aDstIdx are also nullptr.</param>
+    /// <param name="aDstIdx">Pixel index for min and max value per channel (array with size of active channels).
+    /// Can be nullptr if aDstMin and aDstMax are also nullptr.</param>
+    /// <param name="aDstMinScalar">Minimum value for all channels (array with size of 1).
+    /// Can be nullptr if aDstMaxScalar and aDstScalarIdx are also nullptr.</param>
+    /// <param name="aDstMaxScalar">Maximum value for all channels (array with size of 1).
+    /// Can be nullptr if aDstMinScalar and aDstScalarIdx are also nullptr.</param>
+    /// <param name="aDstScalarIdx">Pixel index for min and max value for all channels (array with size of 1).
+    /// Can be nullptr if aDstMinScalar and aDstMaxScalar are also nullptr.</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MinMaxIndexMasked(opp::cuda::DevVarView<T> &aDstMin, opp::cuda::DevVarView<T> &aDstMax,
+                           opp::cuda::DevVarView<IndexMinMax> &aDstIdx,
+                           opp::cuda::DevVarView<remove_vector_t<T>> &aDstMinScalar,
+                           opp::cuda::DevVarView<remove_vector_t<T>> &aDstMaxScalar,
+                           opp::cuda::DevVarView<IndexMinMaxChannel> &aDstScalarIdx, const ImageView<Pixel8uC1> &aMask,
+                           opp::cuda::DevVarView<byte> &aBuffer,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Minimum and maximum pixel value and their pixel indices. For multiple occurences of the same value the index
+    /// with the lowest flattened index (y * width + x) is returned.
+    /// </summary>
+    /// <param name="aDstMin">Minimum value</param>
+    /// <param name="aDstMax">Maximum value</param>
+    /// <param name="aDstIdx">Pixel indices for min/max value</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MinMaxIndex(opp::cuda::DevVarView<T> &aDstMin, opp::cuda::DevVarView<T> &aDstMax,
+                     opp::cuda::DevVarView<IndexMinMax> &aDstIdx, opp::cuda::DevVarView<byte> &aBuffer,
+                     const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+    /// <summary>
+    /// Minimum and maximum pixel value and their pixel indices where only pixels with mask != 0 are used. For multiple
+    /// occurences of the same value the index with the lowest flattened index (y * width + x) is returned.
+    /// </summary>
+    /// <param name="aDstMin">Minimum value</param>
+    /// <param name="aDstMax">Maximum value</param>
+    /// <param name="aDstIdx">Pixel indices for min/max value</param>
+    /// <param name="aMask"></param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void MinMaxIndexMasked(opp::cuda::DevVarView<T> &aDstMin, opp::cuda::DevVarView<T> &aDstMax,
+                           opp::cuda::DevVarView<IndexMinMax> &aDstIdx, const ImageView<Pixel8uC1> &aMask,
+                           opp::cuda::DevVarView<byte> &aBuffer,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region Integral
+    /// <summary>
+    /// Returns the required temporary buffer size for Integral.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t IntegralBufferSize(
+        ImageView<same_vector_size_different_type_t<T, int>> &aDst,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealIntVector<T> && NoAlpha<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for Integral.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t IntegralBufferSize(
+        ImageView<same_vector_size_different_type_t<T, float>> &aDst,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && NoAlpha<T> && (!std::same_as<double, remove_vector<T>>);
+    /// <summary>
+    /// Returns the required temporary buffer size for Integral.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t IntegralBufferSize(
+        ImageView<same_vector_size_different_type_t<T, long64>> &aDst,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealIntVector<T> && NoAlpha<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for Integral.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t IntegralBufferSize(
+        ImageView<same_vector_size_different_type_t<T, double>> &aDst,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && NoAlpha<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for SqrIntegral.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t SqrIntegralBufferSize(
+        ImageView<same_vector_size_different_type_t<T, int>> &aDst,
+        ImageView<same_vector_size_different_type_t<T, int>> &aSqr,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealIntVector<T> && NoAlpha<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for SqrIntegral.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t SqrIntegralBufferSize(
+        ImageView<same_vector_size_different_type_t<T, int>> &aDst,
+        ImageView<same_vector_size_different_type_t<T, long64>> &aSqr,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealIntVector<T> && NoAlpha<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for SqrIntegral.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t SqrIntegralBufferSize(
+        ImageView<same_vector_size_different_type_t<T, float>> &aDst,
+        ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && NoAlpha<T> && (!std::same_as<double, remove_vector<T>>);
+    /// <summary>
+    /// Returns the required temporary buffer size for SqrIntegral.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t SqrIntegralBufferSize(
+        ImageView<same_vector_size_different_type_t<T, double>> &aDst,
+        ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && NoAlpha<T>;
+
+    /// <summary>
+    /// Computes the integral image.
+    /// </summary>
+    /// <param name="aDst">ROI of destination image must be 1 pixel larger in width and height than source ROI.</param>
+    /// <param name="aVal">The value to add to aDst image pixels</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    /// <returns></returns>
+    ImageView<same_vector_size_different_type_t<T, int>> &Integral(
+        ImageView<same_vector_size_different_type_t<T, int>> &aDst,
+        const same_vector_size_different_type_t<T, int> &aVal, opp::cuda::DevVarView<byte> &aBuffer,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealIntVector<T> && NoAlpha<T>;
+
+    /// <summary>
+    /// Computes the integral image.
+    /// </summary>
+    /// <param name="aDst">ROI of destination image must be 1 pixel larger in width and height than source ROI.</param>
+    /// <param name="aVal">The value to add to aDst image pixels</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    /// <returns></returns>
+    ImageView<same_vector_size_different_type_t<T, float>> &Integral(
+        ImageView<same_vector_size_different_type_t<T, float>> &aDst,
+        const same_vector_size_different_type_t<T, float> &aVal, opp::cuda::DevVarView<byte> &aBuffer,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && NoAlpha<T> && (!std::same_as<double, remove_vector<T>>);
+
+    /// <summary>
+    /// Computes the integral image.
+    /// </summary>
+    /// <param name="aDst">ROI of destination image must be 1 pixel larger in width and height than source ROI.</param>
+    /// <param name="aVal">The value to add to aDst image pixels</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    /// <returns></returns>
+    ImageView<same_vector_size_different_type_t<T, long64>> &Integral(
+        ImageView<same_vector_size_different_type_t<T, long64>> &aDst,
+        const same_vector_size_different_type_t<T, long64> &aVal, opp::cuda::DevVarView<byte> &aBuffer,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealIntVector<T> && NoAlpha<T>;
+
+    /// <summary>
+    /// Computes the integral image.
+    /// </summary>
+    /// <param name="aDst">ROI of destination image must be 1 pixel larger in width and height than source ROI.</param>
+    /// <param name="aVal">The value to add to aDst image pixels</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    /// <returns></returns>
+    ImageView<same_vector_size_different_type_t<T, double>> &Integral(
+        ImageView<same_vector_size_different_type_t<T, double>> &aDst,
+        const same_vector_size_different_type_t<T, double> &aVal, opp::cuda::DevVarView<byte> &aBuffer,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && NoAlpha<T>;
+
+    /// <summary>
+    /// Computes the integral image and the squared integral image.
+    /// </summary>
+    /// <param name="aDst">ROI of destination image must be 1 pixel larger in width and height than source ROI.</param>
+    /// <param name="aSqr">ROI of destination image must be 1 pixel larger in width and height than source ROI.</param>
+    /// <param name="aVal">The value to add to aDst image pixels.</param>
+    /// <param name="aValSqr">The value to add to aSqr image pixels</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void SqrIntegral(ImageView<same_vector_size_different_type_t<T, int>> &aDst,
+                     ImageView<same_vector_size_different_type_t<T, int>> &aSqr,
+                     const same_vector_size_different_type_t<T, int> &aVal,
+                     const same_vector_size_different_type_t<T, int> &aValSqr, opp::cuda::DevVarView<byte> &aBuffer,
+                     const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealIntVector<T> && NoAlpha<T>;
+
+    /// <summary>
+    /// Computes the integral image and the squared integral image.
+    /// </summary>
+    /// <param name="aDst">ROI of destination image must be 1 pixel larger in width and height than source ROI.</param>
+    /// <param name="aSqr">ROI of destination image must be 1 pixel larger in width and height than source ROI.</param>
+    /// <param name="aVal">The value to add to aDst image pixels.</param>
+    /// <param name="aValSqr">The value to add to aSqr image pixels</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void SqrIntegral(ImageView<same_vector_size_different_type_t<T, int>> &aDst,
+                     ImageView<same_vector_size_different_type_t<T, long64>> &aSqr,
+                     const same_vector_size_different_type_t<T, int> &aVal,
+                     const same_vector_size_different_type_t<T, long64> &aValSqr, opp::cuda::DevVarView<byte> &aBuffer,
+                     const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealIntVector<T> && NoAlpha<T>;
+
+    /// <summary>
+    /// Computes the integral image and the squared integral image.
+    /// </summary>
+    /// <param name="aDst">ROI of destination image must be 1 pixel larger in width and height than source ROI.</param>
+    /// <param name="aSqr">ROI of destination image must be 1 pixel larger in width and height than source ROI.</param>
+    /// <param name="aVal">The value to add to aDst image pixels.</param>
+    /// <param name="aValSqr">The value to add to aSqr image pixels</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void SqrIntegral(ImageView<same_vector_size_different_type_t<T, float>> &aDst,
+                     ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
+                     const same_vector_size_different_type_t<T, float> &aVal,
+                     const same_vector_size_different_type_t<T, double> &aValSqr, opp::cuda::DevVarView<byte> &aBuffer,
+                     const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && NoAlpha<T> && (!std::same_as<double, remove_vector<T>>);
+
+    /// <summary>
+    /// Computes the integral image and the squared integral image.
+    /// </summary>
+    /// <param name="aDst">ROI of destination image must be 1 pixel larger in width and height than source ROI.</param>
+    /// <param name="aSqr">ROI of destination image must be 1 pixel larger in width and height than source ROI.</param>
+    /// <param name="aVal">The value to add to aDst image pixels.</param>
+    /// <param name="aValSqr">The value to add to aSqr image pixels</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void SqrIntegral(ImageView<same_vector_size_different_type_t<T, double>> &aDst,
+                     ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
+                     const same_vector_size_different_type_t<T, double> &aVal,
+                     const same_vector_size_different_type_t<T, double> &aValSqr, opp::cuda::DevVarView<byte> &aBuffer,
+                     const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && NoAlpha<T>;
+#pragma endregion
 #pragma region MinEvery
     /// <summary>
     /// aDst = min(this, aSrc2) (minimum per pixel, per channel)
     /// </summary>
     ImageView<T> &MinEvery(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
 
     /// <summary>
@@ -2231,7 +4651,7 @@ template <PixelType T> class ImageView
     /// aDst = max(this, aSrc2) (maximum per pixel, per channel)
     /// </summary>
     ImageView<T> &MaxEvery(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
 
     /// <summary>
@@ -2241,6 +4661,105 @@ template <PixelType T> class ImageView
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealVector<T>;
 #pragma endregion
+
+#pragma region Histogram
+    /// <summary>
+    /// Compute levels with even distribution, depending on aHistorgamEvenMode, this function tries to give identical
+    /// results as the same function in NPP or as the methods used in the CUB backend used by OPP for histogram
+    /// computation.
+    /// </summary>
+    /// <param name="aHPtrLevels">A host pointer to array which receives the levels being computed.
+    /// The array needs to be of size aLevels.</ param>
+    /// <param name="aLevels">The number of levels being computed. aLevels must be at least 2</param>
+    /// <param name="aLowerLevel">Lower boundary value of the lowest level.</param>
+    /// <param name="aUpperLevel">Upper boundary value of the greatest level.</param>
+    /// <param name="aHistorgamEvenMode">Switch compatibility mode: CUB (default) or NPP.</param>
+    void EvenLevels(int *aHPtrLevels, int aLevels, int aLowerLevel, int aUpperLevel,
+                    HistorgamEvenMode aHistorgamEvenMode = HistorgamEvenMode::Default);
+
+    /// <summary>
+    /// Returns the required temporary buffer size for HistogramEven.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    /// <param name="aLevels">aLevels - 1 = number of histogram bins, per channel</param>
+    [[nodiscard]] size_t HistogramEvenBufferSize(
+        const same_vector_size_different_type_t<T, int> &aLevels,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// The aLowerLevel (inclusive) and aUpperLevel (exclusive) define the boundaries of the range,
+    /// which are evenly segmented into aHist.Size() bins.
+    /// </summary>
+    /// <param name="aHist">host array of device memory pointers to the computed histograms
+    /// (one for each active channel). The size of aHist[channel] gives the number of bins used.</param>
+    /// <param name="aLowerLevel">lower level (inclusive, per channel)</param>
+    /// <param name="aUpperLevel">upper level (exclusive, per channel)</param>
+    /// <param name="aBuffer"></param>
+    /// <param name="aStreamCtx"></param>
+    void HistogramEven(opp::cuda::DevVarView<int> aHist[vector_active_size_v<T>],
+                       const hist_even_level_types_for_t<T> &aLowerLevel,
+                       const hist_even_level_types_for_t<T> &aUpperLevel, opp::cuda::DevVarView<byte> &aBuffer,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// The aLowerLevel (inclusive) and aUpperLevel (exclusive) define the boundaries of the range,
+    /// which are evenly segmented into aHist.Size() bins.
+    /// </summary>
+    /// <param name="aHist">device memory pointer to the computed histogram.
+    /// The size of aHist gives the number of bins used.</param>
+    /// <param name="aLowerLevel">lower level (inclusive)</param>
+    /// <param name="aUpperLevel">upper level (exclusive)</param>
+    /// <param name="aBuffer"></param>
+    /// <param name="aStreamCtx"></param>
+    void HistogramEven(opp::cuda::DevVarView<int> &aHist, const hist_even_level_types_for_t<T> &aLowerLevel,
+                       const hist_even_level_types_for_t<T> &aUpperLevel, opp::cuda::DevVarView<byte> &aBuffer,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Returns the required temporary buffer size for HistogramRange.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    /// <param name="aNumLevels">aNumLevels - 1 = number of histogram bins, per channel</param>
+    [[nodiscard]] size_t HistogramRangeBufferSize(
+        const same_vector_size_different_type_t<T, int> &aNumLevels,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Computes the histogram of an image within specified ranges.
+    /// </summary>
+    /// <param name="aHist">host array of device memory pointers to the computed histograms
+    /// (one for each active channel). The size of aHist[channel] gives the number of bins used.</param>
+    /// <param name="aLevels">host array of device memory pointers to the array
+    /// with the range defintions, one array per channel. The levels array must be one element
+    /// larger than the histogram array, as number of levels = number of bins + 1.</param>
+    /// <param name="aBuffer"></param>
+    /// <param name="aStreamCtx"></param>
+    void HistogramRange(opp::cuda::DevVarView<int> aHist[vector_active_size_v<T>],
+                        opp::cuda::DevVarView<hist_range_types_for_t<T>> aLevels[vector_active_size_v<T>],
+                        opp::cuda::DevVarView<byte> &aBuffer,
+                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T> && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Computes the histogram of an image within specified ranges.
+    /// </summary>
+    /// <param name="aHist">device memory pointer to the computed histogram.
+    /// The size of aHist gives the number of bins used.</param>
+    /// <param name="aLevels">device memory pointer to the array with the range defintion.
+    /// The levels array must be one element larger than the histogram array, as number of
+    /// levels = number of bins + 1.</param>
+    /// <param name="aBuffer"></param>
+    /// <param name="aStreamCtx"></param>
+    void HistogramRange(opp::cuda::DevVarView<int> &aHist,
+                        const opp::cuda::DevVarView<hist_range_types_for_t<T>> &aLevels,
+                        opp::cuda::DevVarView<byte> &aBuffer,
+                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
 #pragma endregion
 
 #pragma region Threshold and Compare
@@ -2249,63 +4768,63 @@ template <PixelType T> class ImageView
     /// aDst pixel is set to 255 if all color channels in this and aSrc2 fulfill aCompare, 0 otherwise.
     /// </summary>
     ImageView<Pixel8uC1> &Compare(const ImageView<T> &aSrc2, CompareOp aCompare, ImageView<Pixel8uC1> &aDst,
-                                  const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
+                                  const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
     /// aDst pixel is set to 255 if all color channels in this and aConst fulfill aCompare, 0 otherwise.
     /// </summary>
     ImageView<Pixel8uC1> &Compare(const T &aConst, CompareOp aCompare, ImageView<Pixel8uC1> &aDst,
-                                  const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
+                                  const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
     /// aDst pixel is set to 255 if all color channels in this and aConst fulfill aCompare, 0 otherwise.
     /// </summary>
     ImageView<Pixel8uC1> &Compare(const opp::cuda::DevVarView<T> &aConst, CompareOp aCompare,
                                   ImageView<Pixel8uC1> &aDst,
-                                  const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
+                                  const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
     /// aDst pixel is set to 255 if all color channels for abs(this - aSrc2) are &lt;= aEpsilon, 0 otherwise.
     /// </summary>
-    ImageView<Pixel8uC1> &CompareEqEps(const ImageView<T> &aSrc2, complex_basetype_t<remove_vector_t<T>> aEpsilon,
-                                       ImageView<Pixel8uC1> &aDst,
-                                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<Pixel8uC1> &CompareEqEps(
+        const ImageView<T> &aSrc2, complex_basetype_t<remove_vector_t<T>> aEpsilon, ImageView<Pixel8uC1> &aDst,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst pixel is set to 255 if all color channels for abs(this - aConst) are &lt;= aEpsilon, 0 otherwise.
     /// </summary>
-    ImageView<Pixel8uC1> &CompareEqEps(const T &aConst, complex_basetype_t<remove_vector_t<T>> aEpsilon,
-                                       ImageView<Pixel8uC1> &aDst,
-                                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<Pixel8uC1> &CompareEqEps(
+        const T &aConst, complex_basetype_t<remove_vector_t<T>> aEpsilon, ImageView<Pixel8uC1> &aDst,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// aDst pixel is set to 255 if all color channels for abs(this - aConst) are &lt;= aEpsilon, 0 otherwise.
     /// </summary>
-    ImageView<Pixel8uC1> &CompareEqEps(const opp::cuda::DevVarView<T> &aConst,
-                                       complex_basetype_t<remove_vector_t<T>> aEpsilon, ImageView<Pixel8uC1> &aDst,
-                                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+    ImageView<Pixel8uC1> &CompareEqEps(
+        const opp::cuda::DevVarView<T> &aConst, complex_basetype_t<remove_vector_t<T>> aEpsilon,
+        ImageView<Pixel8uC1> &aDst, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealOrComplexFloatingVector<T>;
 #pragma endregion
 #pragma region Threshold
     ImageView<T> &Threshold(const T &aThreshold, CompareOp aCompare, ImageView<T> &aDst,
-                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
     ImageView<T> &Threshold(const opp::cuda::DevVarView<T> &aThreshold, CompareOp aCompare, ImageView<T> &aDst,
-                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
     ImageView<T> &ThresholdLT(const T &aThreshold, ImageView<T> &aDst,
-                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
     ImageView<T> &ThresholdLT(const opp::cuda::DevVarView<T> &aThreshold, ImageView<T> &aDst,
-                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
     ImageView<T> &ThresholdGT(const T &aThreshold, ImageView<T> &aDst,
-                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
     ImageView<T> &ThresholdGT(const opp::cuda::DevVarView<T> &aThreshold, ImageView<T> &aDst,
-                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
     ImageView<T> &Threshold(const T &aThreshold, CompareOp aCompare,
                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
@@ -2327,13 +4846,13 @@ template <PixelType T> class ImageView
         requires RealVector<T>;
 
     ImageView<T> &Threshold(const T &aThreshold, const T &aValue, CompareOp aCompare, ImageView<T> &aDst,
-                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
     ImageView<T> &ThresholdLT(const T &aThreshold, const T &aValue, ImageView<T> &aDst,
-                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
     ImageView<T> &ThresholdGT(const T &aThreshold, const T &aValue, ImageView<T> &aDst,
-                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
     ImageView<T> &Threshold(const T &aThreshold, const T &aValue, CompareOp aCompare,
                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
@@ -2346,7 +4865,7 @@ template <PixelType T> class ImageView
         requires RealVector<T>;
     ImageView<T> &ThresholdLTGT(const T &aThresholdLT, const T &aValueLT, const T &aThresholdGT, const T &aValueGT,
                                 ImageView<T> &aDst,
-                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
     ImageView<T> &ThresholdLTGT(const T &aThresholdLT, const T &aValueLT, const T &aThresholdGT, const T &aValueGT,
                                 const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())

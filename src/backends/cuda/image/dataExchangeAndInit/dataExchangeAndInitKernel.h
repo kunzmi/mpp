@@ -8,3 +8,4 @@
 #include "set.h"
 #include "setMasked.h"
 #include "swapChannel.h"
+#include "transpose.h"

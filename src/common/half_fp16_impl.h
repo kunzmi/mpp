@@ -144,6 +144,10 @@ DEVICE_CODE INLINE HalfFp16::operator float() const
 }
 
 #ifdef IS_CUDA_COMPILER
+DEVICE_CODE INLINE HalfFp16::operator __half() const
+{
+    return value;
+}
 DEVICE_CODE INLINE HalfFp16::operator int() const
 {
     return __half2int_rz(value);
@@ -167,6 +171,10 @@ DEVICE_CODE INLINE HalfFp16::operator byte() const
 DEVICE_CODE INLINE HalfFp16::operator sbyte() const
 {
     return __half2char_rz(value);
+}
+DEVICE_CODE INLINE HalfFp16::operator double() const
+{
+    return __half2float(value);
 }
 #endif
 

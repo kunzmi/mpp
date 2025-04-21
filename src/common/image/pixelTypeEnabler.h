@@ -26,6 +26,12 @@ concept oppEnablePixelType = enable_pixel_type_v<T>;
 #ifndef OPPi_ENABLE_BFLOAT16_TYPE
 #define OPPi_ENABLE_BFLOAT16_TYPE 1
 #endif
+#ifndef OPPi_ENABLE_INT64_TYPE
+#define OPPi_ENABLE_INT64_TYPE 1
+#endif
+#ifndef OPPi_ENABLE_UINT64_TYPE
+#define OPPi_ENABLE_UINT64_TYPE 1
+#endif
 #ifndef OPPi_ENABLE_INT32_TYPE
 #define OPPi_ENABLE_INT32_TYPE 1
 #endif
@@ -56,6 +62,9 @@ concept oppEnablePixelType = enable_pixel_type_v<T>;
 #endif
 #ifndef OPPi_ENABLE_COMPLEX_BFLOAT16_TYPE
 #define OPPi_ENABLE_COMPLEX_BFLOAT16_TYPE 1
+#endif
+#ifndef OPPi_ENABLE_COMPLEX_INT64_TYPE
+#define OPPi_ENABLE_COMPLEX_INT64_TYPE 1
 #endif
 #ifndef OPPi_ENABLE_COMPLEX_INT32_TYPE
 #define OPPi_ENABLE_COMPLEX_INT32_TYPE 1
@@ -184,6 +193,60 @@ template <> struct enable_pixel_type<Pixel16bfC4> : std::bool_constant<true>
 #endif
 #if (OPPi_ENABLE_BFLOAT16_TYPE) && (OPPi_ENABLE_FOURALPHA_CHANNEL)
 template <> struct enable_pixel_type<Pixel16bfC4A> : std::bool_constant<true>
+{
+};
+#endif
+
+// int64
+#if (OPPi_ENABLE_INT64_TYPE) && (OPPi_ENABLE_ONE_CHANNEL)
+template <> struct enable_pixel_type<Pixel64sC1> : std::bool_constant<true>
+{
+};
+#endif
+#if (OPPi_ENABLE_INT64_TYPE) && (OPPi_ENABLE_TWO_CHANNEL)
+template <> struct enable_pixel_type<Pixel64sC2> : std::bool_constant<true>
+{
+};
+#endif
+#if (OPPi_ENABLE_INT64_TYPE) && (OPPi_ENABLE_THREE_CHANNEL)
+template <> struct enable_pixel_type<Pixel64sC3> : std::bool_constant<true>
+{
+};
+#endif
+#if (OPPi_ENABLE_INT64_TYPE) && (OPPi_ENABLE_FOUR_CHANNEL)
+template <> struct enable_pixel_type<Pixel64sC4> : std::bool_constant<true>
+{
+};
+#endif
+#if (OPPi_ENABLE_INT64_TYPE) && (OPPi_ENABLE_FOURALPHA_CHANNEL)
+template <> struct enable_pixel_type<Pixel64sC4A> : std::bool_constant<true>
+{
+};
+#endif
+
+// uint64
+#if (OPPi_ENABLE_UINT64_TYPE) && (OPPi_ENABLE_ONE_CHANNEL)
+template <> struct enable_pixel_type<Pixel64uC1> : std::bool_constant<true>
+{
+};
+#endif
+#if (OPPi_ENABLE_UINT64_TYPE) && (OPPi_ENABLE_TWO_CHANNEL)
+template <> struct enable_pixel_type<Pixel64uC2> : std::bool_constant<true>
+{
+};
+#endif
+#if (OPPi_ENABLE_UINT64_TYPE) && (OPPi_ENABLE_THREE_CHANNEL)
+template <> struct enable_pixel_type<Pixel64uC3> : std::bool_constant<true>
+{
+};
+#endif
+#if (OPPi_ENABLE_UINT64_TYPE) && (OPPi_ENABLE_FOUR_CHANNEL)
+template <> struct enable_pixel_type<Pixel64uC4> : std::bool_constant<true>
+{
+};
+#endif
+#if (OPPi_ENABLE_UINT64_TYPE) && (OPPi_ENABLE_FOURALPHA_CHANNEL)
+template <> struct enable_pixel_type<Pixel64uC4A> : std::bool_constant<true>
 {
 };
 #endif
@@ -434,6 +497,28 @@ template <> struct enable_pixel_type<Pixel16bfcC3> : std::bool_constant<true>
 #endif
 #if (OPPi_ENABLE_COMPLEX_BFLOAT16_TYPE) && (OPPi_ENABLE_FOUR_CHANNEL)
 template <> struct enable_pixel_type<Pixel16bfcC4> : std::bool_constant<true>
+{
+};
+#endif
+
+// complex int64
+#if (OPPi_ENABLE_COMPLEX_INT64_TYPE) && (OPPi_ENABLE_ONE_CHANNEL)
+template <> struct enable_pixel_type<Pixel64scC1> : std::bool_constant<true>
+{
+};
+#endif
+#if (OPPi_ENABLE_COMPLEX_INT64_TYPE) && (OPPi_ENABLE_TWO_CHANNEL)
+template <> struct enable_pixel_type<Pixel64scC2> : std::bool_constant<true>
+{
+};
+#endif
+#if (OPPi_ENABLE_COMPLEX_INT64_TYPE) && (OPPi_ENABLE_THREE_CHANNEL)
+template <> struct enable_pixel_type<Pixel64scC3> : std::bool_constant<true>
+{
+};
+#endif
+#if (OPPi_ENABLE_COMPLEX_INT64_TYPE) && (OPPi_ENABLE_FOUR_CHANNEL)
+template <> struct enable_pixel_type<Pixel64scC4> : std::bool_constant<true>
 {
 };
 #endif

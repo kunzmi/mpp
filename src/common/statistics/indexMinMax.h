@@ -8,12 +8,12 @@ namespace opp
 
 // In order to reduce the number of passed pointers to the Min/Max with Index functions, we define a small structure
 // containing the computed indices (one struct per image channel)
-struct MinMaxIndex
+struct IndexMinMax
 {
     Vector2<int> IndexMin;
     Vector2<int> IndexMax;
 };
-struct MinMaxIndexChannel
+struct IndexMinMaxChannel
 {
     Vector2<int> IndexMin;
     int ChannelMin;

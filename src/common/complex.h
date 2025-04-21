@@ -35,6 +35,7 @@ template <RealSignedNumber T> struct Complex;
 
 using c_short    = Complex<short>;
 using c_int      = Complex<int>;
+using c_long     = Complex<long64>;
 using c_float    = Complex<float>;
 using c_double   = Complex<double>;
 using c_HalfFp16 = Complex<HalfFp16>;
@@ -57,13 +58,18 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// <summary>
     /// Initializes complex number with only real part, imag = 0
     /// </summary>
-    DEVICE_CODE Complex(T aVal) noexcept; // NOLINT
+    DEVICE_CODE constexpr Complex(T aVal) noexcept : real(aVal), imag(static_cast<T>(0)) // NOLINT
+    {
+    }
 
     /// <summary>
     /// Initializes complex number with only real part, imag = 0 (avoid confusion with the array constructor)
     /// </summary>
-    DEVICE_CODE Complex(int aVal) noexcept // NOLINT
-        requires(!IsInt<T>);
+    DEVICE_CODE constexpr Complex(int aVal) noexcept // NOLINT
+        requires(!IsInt<T>)
+        : real(static_cast<T>(aVal)), imag(static_cast<T>(0))
+    {
+    }
 
     /// <summary>
     /// Initializes complex number with real = aVal[0], imag = aVal[1]

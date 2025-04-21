@@ -839,4 +839,71 @@ inline std::wostream &operator<<(std::wostream &aOs, const BorderType &aBorderTy
     return aOs;
 }
 #pragma endregion
+
+#pragma region HistorgamEvenMode
+/// <summary>
+/// Defines how to evenly spread an integer distribution<para/>
+/// NPP uses a different definition on how two create evenly spaced bins for histograms for integer data. OPP supports
+/// both definitions in its EvenLevels function.
+/// </summary>
+enum class HistorgamEvenMode // NOLINT(performance-enum-size)
+{
+    /// <summary>
+    /// Tries to reproduce the same even distribution as used in the CUB implementiation (used as backend for
+    /// HistogramEven)
+    /// </summary>
+    Default,
+    /// <summary>
+    /// Tries to reproduce the same even distribution as used in the NPP implementation of EvenLevels and HistogramEven
+    /// </summary>
+    NPP
+};
+
+template <HistorgamEvenMode T> struct historgam_even_mode_name
+{
+    static constexpr char value[] = "Unknown";
+};
+template <> struct historgam_even_mode_name<HistorgamEvenMode::Default>
+{
+    static constexpr char value[] = "Default";
+};
+template <> struct historgam_even_mode_name<HistorgamEvenMode::NPP>
+{
+    static constexpr char value[] = "NPP";
+};
+
+inline std::ostream &operator<<(std::ostream &aOs, const HistorgamEvenMode &aHistorgamEvenMode)
+{
+    switch (aHistorgamEvenMode)
+    {
+        case opp::HistorgamEvenMode::Default:
+            aOs << historgam_even_mode_name<HistorgamEvenMode::Default>::value;
+            break;
+        case opp::HistorgamEvenMode::NPP:
+            aOs << historgam_even_mode_name<HistorgamEvenMode::NPP>::value;
+            break;
+        default:
+            aOs << "Unknown";
+            break;
+    }
+    return aOs;
+}
+
+inline std::wostream &operator<<(std::wostream &aOs, const HistorgamEvenMode &aHistorgamEvenMode)
+{
+    switch (aHistorgamEvenMode)
+    {
+        case opp::HistorgamEvenMode::Default:
+            aOs << historgam_even_mode_name<HistorgamEvenMode::Default>::value;
+            break;
+        case opp::HistorgamEvenMode::NPP:
+            aOs << historgam_even_mode_name<HistorgamEvenMode::NPP>::value;
+            break;
+        default:
+            aOs << "Unknown";
+            break;
+    }
+    return aOs;
+}
+#pragma endregion
 } // namespace opp

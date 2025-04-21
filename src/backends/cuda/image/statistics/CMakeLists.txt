@@ -1,18 +1,61 @@
 add_library(backends.cuda.image.statistics 
+	averageError.cu
+	averageErrorMasked.cu
+	averageRelativeError.cu
+	averageRelativeErrorMasked.cu
 	countInRange.cu
-	mean.cu
-	meanStd.cu
+	countInRangeMasked.cu
+	dotProduct.cu
+	dotProductMasked.cu
+	integral.cu
+	integralSqr.cu
 	max.cu
-	min.cu
+	maxMasked.cu
 	maxIdx.cu
+	maxIdxMasked.cu
+	maxRelativeError.cu
+	maxRelativeErrorMasked.cu
+	mean.cu
+	meanMasked.cu
+	meanStd.cu
+	meanStdMasked.cu
+	min.cu
+	minMasked.cu
 	minIdx.cu
+	minIdxMasked.cu
 	minMax.cu
+	minMaxMasked.cu
 	minMaxEvery.cu
 	minMaxIdx.cu
+	minMaxIdxMasked.cu
+	mse.cu
+	mseMasked.cu
+	normDiffInf.cu
+	normDiffInfMasked.cu
+	normDiffL1.cu
+	normDiffL1Masked.cu
+	normDiffL2.cu
+	normDiffL2Masked.cu
 	normInf.cu
+	normInfMasked.cu
 	normL1.cu
+	normL1Masked.cu
 	normL2.cu
+	normL2Masked.cu
+	normRelInf.cu
+	normRelInfMasked.cu
+	normRelL1.cu
+	normRelL1Masked.cu
+	normRelL2.cu
+	normRelL2Masked.cu
+	psnr.cu
+	qualityIndex.cu
+	ssim.cu
 	sum.cu
+	sumMasked.cu
+
+	histogramEven.cu
+	histogramRange.cu
 	)
 	
 target_include_directories(backends.cuda.image.statistics  PUBLIC 

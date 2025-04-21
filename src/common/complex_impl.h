@@ -37,23 +37,6 @@ namespace opp
 #pragma region Constructors
 
 /// <summary>
-/// Initializes complex number with only real part, imag = 0
-/// </summary>
-template <RealSignedNumber T> DEVICE_CODE Complex<T>::Complex(T aVal) noexcept : real(aVal), imag(static_cast<T>(0))
-{
-}
-
-/// <summary>
-/// Initializes complex number with only real part, imag = 0 (avoid confusion with the array constructor)
-/// </summary>
-template <RealSignedNumber T>
-DEVICE_CODE Complex<T>::Complex(int aVal) noexcept
-    requires(!IsInt<T>)
-    : real(static_cast<T>(aVal)), imag(static_cast<T>(0))
-{
-}
-
-/// <summary>
 /// Initializes complex number with real = aVal[0], imag = aVal[1]
 /// </summary>
 template <RealSignedNumber T> DEVICE_CODE Complex<T>::Complex(T aVal[2]) noexcept : real(aVal[0]), imag(aVal[1])

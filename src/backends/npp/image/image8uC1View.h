@@ -750,7 +750,7 @@ class Image8uC1View : public ImageView<Pixel8uC1>
     // NppStatus nppiLabelMarkersUF_8u32u_C1R_Ctx(Npp8u * pSrc, int nSrcStep, Npp32u * pDst, int nDstStep, NppiSize oSizeROI, NppiNorm eNorm, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
     Image32uC1View &LabelMarkersUF(Image32uC1View &pDst, NppiNorm eNorm, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
 
-    // NppStatus nppiSegmentWatershedGetBufferSize_8u_C1R(NppiSize oSizeROI, int * hpDeviceMemoryBufferSize)
+    // NppStatus nppiSegmentWatershedGetBufferSize_8u_C1R(NppiSize oSizeROI, size_t * hpDeviceMemoryBufferSize)
     [[nodiscard]] size_t SegmentWatershedGetBufferSize() const;
 
     // NppStatus nppiSegmentWatershed_8u_C1IR_Ctx(Npp8u * pSrcDst, Npp32s nSrcDstStep, Npp32u * pMarkerLabels, Npp32s nMarkerLabelsStep, NppiNorm eNorm, NppiWatershedSegmentBoundaryType eSegmentBoundaryType, NppiSize oSizeROI, Npp8u * pDeviceMemoryBuffer, NppStreamContext nppStreamCtx)

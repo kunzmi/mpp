@@ -303,8 +303,21 @@ __global__ void reduction2AlongYKernel(const SrcT1 *__restrict__ aSrc1, const Sr
             DstT2 res2;
             aPostOp2(result1, result2, res2);
             aPostOp1(result1);
-            *aDst1 = result1;
-            *aDst2 = res2;
+
+            // don't overwrite alpha channel if it exists:
+            if constexpr (has_alpha_channel_v<DstT1>)
+            {
+                Vector3<remove_vector_t<DstT1>> *dstVec3_1 = reinterpret_cast<Vector3<remove_vector_t<DstT1>> *>(aDst1);
+                *dstVec3_1                                 = result1.XYZ();
+
+                Vector3<remove_vector_t<DstT2>> *dstVec3_2 = reinterpret_cast<Vector3<remove_vector_t<DstT2>> *>(aDst2);
+                *dstVec3_2                                 = res2.XYZ();
+            }
+            else
+            {
+                *aDst1 = result1;
+                *aDst2 = res2;
+            }
         }
     }
 }
@@ -320,8 +333,7 @@ void InvokeReduction2AlongYKernel(const dim3 &aBlockSize, uint aSharedMemory, in
 {
     dim3 blocksPerGrid(1, 1, 1);
 
-    int size = aSize / ConfigBlockSize<"DefaultReductionX">::value.y;
-    size     = std::max(size, 1);
+    const int size = DIV_UP(aSize, ConfigBlockSize<"DefaultReductionX">::value.y);
 
     reduction2AlongYKernel<SrcT1, SrcT2, DstT1, DstT2, reductionOp1, reductionOp2, NeutralValue1, NeutralValue2,
                            postOp1, postOp2><<<blocksPerGrid, aBlockSize, aSharedMemory, aStream>>>(

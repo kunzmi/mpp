@@ -12,6 +12,8 @@ add_library(backends.cuda.image.dataExchangeAndInit
 	setMasked.cu
 
 	swapChannel.cu
+
+	transpose.cu
 	)
 	
 target_include_directories(backends.cuda.image.dataExchangeAndInit  PUBLIC 
