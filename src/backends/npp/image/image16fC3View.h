@@ -170,10 +170,10 @@ class Image16fC3View : public ImageView<Pixel16fC3>
     Image16fC3View &Resize(Image16fC3View &pDst, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiWarpAffine_16f_C3R_Ctx(const Npp16f * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp16f * pDst, int nDstStep, NppiRect oDstROI, const double[2][3] aCoeffs, int eInterpolation, NppStreamContext nppStreamCtx)
-    Image16fC3View &WarpAffine(Image16fC3View &pDst, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &WarpAffine(Image16fC3View &pDst, const AffineTransformation<double> &aCoeffs, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiWarpPerspective_16f_C3R_Ctx(const Npp16f * pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp16f * pDst, int nDstStep, NppiRect oDstROI, const double[3][3] aCoeffs, int eInterpolation, NppStreamContext nppStreamCtx)
-    Image16fC3View &WarpPerspective(Image16fC3View &pDst, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const;
+    Image16fC3View &WarpPerspective(Image16fC3View &pDst, const PerspectiveTransformation<double> &aCoeffs, int eInterpolation, const NppStreamContext &nppStreamCtx) const;
 
 #endif // OPPi_ENABLE_HALFFLOAT16_TYPE && OPPi_ENABLE_THREE_CHANNEL
     //NOLINTEND(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)

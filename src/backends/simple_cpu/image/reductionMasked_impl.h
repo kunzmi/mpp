@@ -16,7 +16,7 @@ namespace opp::image::cpuSimple
 /// runs aOp on every pixel of an image. Inplace and outplace operation, no mask.
 /// </summary>
 template <typename DstT, typename functor>
-size_t reduction(const ImageView<Pixel8uC1> &aMask, const Size2D &aSize, DstT &aDst, functor aOp)
+size_t reduction(const ImageView<Pixel8uC1> &aMask, const Size2D &aSize, DstT &aDst, const functor &aOp)
 {
     size_t pixelsInMask = 0;
     for (auto &pixelIterator : aSize)
@@ -36,7 +36,7 @@ size_t reduction(const ImageView<Pixel8uC1> &aMask, const Size2D &aSize, DstT &a
 /// runs aOp on every pixel of an image. Inplace and outplace operation, no mask.
 /// </summary>
 template <typename DstT, typename functor>
-size_t reduction(const ImageView<Pixel8uC1> &aMask, const Size2D &aSize, DstT &aDst1, DstT &aDst2, functor aOp)
+size_t reduction(const ImageView<Pixel8uC1> &aMask, const Size2D &aSize, DstT &aDst1, DstT &aDst2, const functor &aOp)
 {
     size_t pixelsInMask = 0;
     for (auto &pixelIterator : aSize)

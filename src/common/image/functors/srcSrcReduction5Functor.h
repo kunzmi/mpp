@@ -9,8 +9,8 @@
 #include <common/roundFunctor.h>
 #include <common/statistics/operators.h>
 #include <common/tupel.h>
-#include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vectorTypes.h>
 #include <concepts>
 
 // disable warning for pragma unroll when compiling with host compiler:
@@ -58,7 +58,7 @@ struct SrcSrcReduction5Functor
 
 #pragma region run naive on one pixel
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT1 &aDst1, DstT2 &aDst2, DstT3 &aDst3, DstT4 &aDst4,
-                                DstT5 &aDst5)
+                                DstT5 &aDst5) const
     {
         const SrcT pixelSrc1 = *gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         const SrcT pixelSrc2 = *gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
@@ -72,7 +72,7 @@ struct SrcSrcReduction5Functor
 
 #pragma region run sequential on pixel tupel
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT1 &aDst1, DstT2 &aDst2, DstT3 &aDst3, DstT4 &aDst4,
-                                DstT5 &aDst5, bool /*isTupel*/)
+                                DstT5 &aDst5, bool /*isTupel*/) const
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
@@ -95,7 +95,7 @@ struct SrcSrcReduction5Functor
     }
 
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT1 &aDst1, DstT2 &aDst2, DstT3 &aDst3, DstT4 &aDst4,
-                                DstT5 &aDst5, const MaskTupel<tupelSize> &aMaskTupel, int &maskCount)
+                                DstT5 &aDst5, const MaskTupel<tupelSize> &aMaskTupel, int &maskCount) const
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
@@ -122,7 +122,7 @@ struct SrcSrcReduction5Functor
     }
 
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT1 &aDst1, DstT2 &aDst2, DstT3 &aDst3, DstT4 &aDst4,
-                                DstT5 &aDst5, const MaskTupel<tupelSize> &aMaskTupel)
+                                DstT5 &aDst5, const MaskTupel<tupelSize> &aMaskTupel) const
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);

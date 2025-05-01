@@ -1,24 +1,30 @@
 #pragma once
 #include <common/defines.h>
+#include <common/image/quad.h>
+#include <common/image/roi.h>
+#include <common/safeCast.h>
 #include <common/vectorTypes.h>
+#include <iomanip>
+#include <ios>
 #include <istream>
 #include <ostream>
+#include <string>
 #include <utility>
 
 namespace opp::image
 {
 /// <summary>
 /// A 3x2 AffineTransformation that represents a 2D affine transformation.<para/>
-/// The last row is assumend to be [0 0 1]. <para/>
-/// Inner storage order is row major order
+/// The last row of the matrix is assumend to be [0 0 1] and is not explicitly stored.<para/>
+/// Inner storage order is row major order.
 /// </summary>
-class AffineTransformation
+template <RealFloatingPoint T> class AffineTransformation
 {
   private:
     static constexpr int const mCols = 3;
     static constexpr int const mRows = 2;
     static constexpr int const mSize = mCols * mRows;
-    double mData[mSize]; // use a standard C-array as we want to use AffineTransformation also on GPU
+    T mData[mSize]; // use a standard C-array as we want to use AffineTransformation also on GPU
     static constexpr size_t GetIndex(int aRow, int aCol);
 
   public:
@@ -30,12 +36,12 @@ class AffineTransformation
     /// <summary>
     /// All values filled with value aX
     /// </summary>
-    explicit AffineTransformation(double aX) noexcept;
+    explicit AffineTransformation(T aX) noexcept;
 
     /// <summary>
     /// All values filled with aValues
     /// </summary>
-    explicit AffineTransformation(double aValues[mSize]) noexcept;
+    explicit AffineTransformation(T aValues[mSize]) noexcept;
 
     /// <summary>
     /// Creates a new AffineTransformation with the given entries:<para/>
@@ -43,15 +49,32 @@ class AffineTransformation
     /// a10, a11, a12 <para/>
     ///   0,   0,   1
     /// </summary>
-    AffineTransformation(double a00, double a01, double a02, double a10, double a11, double a12) noexcept;
+    AffineTransformation(T a00, T a01, T a02, T a10, T a11, T a12) noexcept;
 
     /// <summary>
     /// Estimates an affine transformation for three given points
     /// </summary>
-    AffineTransformation(const std::pair<Vec2d, Vec2d> &aP0, const std::pair<Vec2d, Vec2d> &aP1,
-                         const std::pair<Vec2d, Vec2d> &aP2) noexcept;
+    AffineTransformation(const std::pair<Vector2<T>, Vector2<T>> &aP0, const std::pair<Vector2<T>, Vector2<T>> &aP1,
+                         const std::pair<Vector2<T>, Vector2<T>> &aP2) noexcept;
+
+    /// <summary>
+    /// Estimates an affine transformation for a ROI and corresponding coordinates given as a Quad (fourth component is
+    /// ignored)
+    /// </summary>
+    AffineTransformation(const Roi &aRoi, const Quad<T> &aQuad) noexcept;
+
+    /// <summary>
+    /// Estimates an affine transformation from aSrcQuad to corresponding coordinates given in aDstQuad (fourth
+    /// component is ignored)
+    /// </summary>
+    AffineTransformation(const Quad<T> &aSrcQuad, const Quad<T> &aDstQuad) noexcept;
 
     ~AffineTransformation() = default;
+
+    // for conversion
+    template <RealFloatingPoint T2>
+    explicit AffineTransformation(const AffineTransformation<T2> &aOther) noexcept
+        requires(!std::same_as<T, T2>);
 
     // in the following lines, clang-tidy detects 't' in "default" as a magic number :(
 
@@ -63,43 +86,43 @@ class AffineTransformation
     bool operator==(const AffineTransformation &aOther) const;
     bool operator!=(const AffineTransformation &aOther) const;
 
-    double &operator()(int aRow, int aCol);
-    double const &operator()(int aRow, int aCol) const;
+    T &operator()(int aRow, int aCol);
+    T const &operator()(int aRow, int aCol) const;
 
     /// <summary>
     /// Row-major order
     /// </summary>
-    double &operator[](int aFlatIndex);
+    T &operator[](int aFlatIndex);
 
     /// <summary>
     /// Row-major order
     /// </summary>
-    double const &operator[](int aFlatIndex) const;
+    T const &operator[](int aFlatIndex) const;
 
     /// <summary>
     /// Row-major order
     /// </summary>
-    double &operator[](size_t aFlatIndex);
+    T &operator[](size_t aFlatIndex);
 
     /// <summary>
     /// Row-major order
     /// </summary>
-    double const &operator[](size_t aFlatIndex) const;
+    T const &operator[](size_t aFlatIndex) const;
 
     /// <summary>
     /// Pointer to inner data array
     /// </summary>
-    [[nodiscard]] const double *Data() const;
+    [[nodiscard]] const T *Data() const;
 
     /// <summary>
     /// Pointer to inner data array
     /// </summary>
-    [[nodiscard]] double *Data();
+    [[nodiscard]] T *Data();
 
     /// <summary>
     /// Element wise addition
     /// </summary>
-    AffineTransformation &operator+=(double aOther);
+    AffineTransformation &operator+=(T aOther);
 
     /// <summary>
     /// Element wise addition
@@ -114,7 +137,7 @@ class AffineTransformation
     /// <summary>
     /// Element wise subtraction
     /// </summary>
-    AffineTransformation &operator-=(double aOther);
+    AffineTransformation &operator-=(T aOther);
 
     /// <summary>
     /// Element wise subtraction
@@ -129,7 +152,7 @@ class AffineTransformation
     /// <summary>
     /// Element wise multiplication
     /// </summary>
-    AffineTransformation &operator*=(double aOther);
+    AffineTransformation &operator*=(T aOther);
 
     /// <summary>
     /// Matrix-Matrix multiplication
@@ -144,12 +167,62 @@ class AffineTransformation
     /// <summary>
     /// Element wise division
     /// </summary>
-    AffineTransformation &operator/=(double aOther);
+    AffineTransformation &operator/=(T aOther);
 
-    friend std::ostream &operator<<(std::ostream &aOs, const AffineTransformation &aMat);
-    friend std::wostream &operator<<(std::wostream &aOs, const AffineTransformation &aMat);
-    friend std::istream &operator>>(std::istream &aIs, AffineTransformation &aMat);
-    friend std::wistream &operator>>(std::wistream &aIs, AffineTransformation &aMat);
+    friend std::ostream &operator<<(std::ostream &aOs, const AffineTransformation<T> &aMat)
+    {
+        std::streamsize maxSize = 0;
+        for (const auto &elem : aMat.mData)
+        {
+            maxSize = std::max(std::streamsize(std::to_string(elem).length()), maxSize);
+        }
+
+        // clang tidy gets a bit crazy with std::streamsize...
+        // NOLINTBEGIN
+        aOs << '(' << std::setw(maxSize) << std::to_string(aMat[0]) << " " << std::setw(maxSize)
+            << std::to_string(aMat[1]) << " " << std::setw(maxSize) << std::to_string(aMat[2]) << ')' << std::endl;
+        aOs << '(' << std::setw(maxSize) << std::to_string(aMat[3]) << " " << std::setw(maxSize)
+            << std::to_string(aMat[4]) << " " << std::setw(maxSize) << std::to_string(aMat[5]) << ')' << std::endl;
+        aOs << '(' << std::setw(maxSize) << std::to_string(0.0) << " " << std::setw(maxSize) << std::to_string(0.0)
+            << " " << std::setw(maxSize) << std::to_string(1.0) << ')' << std::endl;
+        return aOs;
+        // NOLINTEND
+    }
+    friend std::wostream &operator<<(std::wostream &aOs, const AffineTransformation<T> &aMat)
+    {
+        std::streamsize maxSize = 0;
+        for (const auto &elem : aMat.mData)
+        {
+            maxSize = std::max(std::streamsize(std::to_wstring(elem).length()), maxSize);
+        }
+
+        // clang tidy gets a bit crazy with std::streamsize...
+        // NOLINTBEGIN
+        aOs << '(' << std::setw(maxSize) << std::to_wstring(aMat[0]) << " " << std::setw(maxSize)
+            << std::to_wstring(aMat[1]) << " " << std::setw(maxSize) << std::to_wstring(aMat[2]) << ')' << std::endl;
+        aOs << '(' << std::setw(maxSize) << std::to_wstring(aMat[3]) << " " << std::setw(maxSize)
+            << std::to_wstring(aMat[4]) << " " << std::setw(maxSize) << std::to_wstring(aMat[5]) << ')' << std::endl;
+        aOs << '(' << std::setw(maxSize) << std::to_wstring(0.0) << " " << std::setw(maxSize) << std::to_wstring(0.0)
+            << " " << std::setw(maxSize) << std::to_wstring(1.0) << ')' << std::endl;
+        return aOs;
+        // NOLINTEND
+    }
+    friend std::istream &operator>>(std::istream &aIs, AffineTransformation<T> &aMat)
+    {
+        for (size_t i = 0; i < to_size_t(AffineTransformation<T>::mSize); i++)
+        {
+            aIs >> aMat[i];
+        }
+        return aIs;
+    }
+    friend std::wistream &operator>>(std::wistream &aIs, AffineTransformation<T> &aMat)
+    {
+        for (size_t i = 0; i < to_size_t(AffineTransformation<T>::mSize); i++)
+        {
+            aIs >> aMat[i];
+        }
+        return aIs;
+    }
 
     /// <summary>
     /// AffineTransformation inverse
@@ -159,69 +232,90 @@ class AffineTransformation
     /// <summary>
     /// AffineTransformation determinante
     /// </summary>
-    [[nodiscard]] double Det() const;
+    [[nodiscard]] T Det() const;
 
     /// <summary>
     /// AffineTransformation trace (sum of the diagonal elements)
     /// </summary>
-    [[nodiscard]] double Trace() const;
+    [[nodiscard]] T Trace() const;
 
     /// <summary>
     /// The AffineTransformation diagonal elements
     /// </summary>
-    [[nodiscard]] Vec3d Diagonal() const;
+    [[nodiscard]] Vector3<T> Diagonal() const;
 
     /// <summary>
     /// AffineTransformation for image rotation
     /// </summary>
-    [[nodiscard]] static AffineTransformation GetRotation(double aAngleInDeg) noexcept;
+    [[nodiscard]] static AffineTransformation GetRotation(T aAngleInDeg) noexcept;
     /// <summary>
     /// AffineTransformation for image scaling
     /// </summary>
-    [[nodiscard]] static AffineTransformation GetScale(double aScale) noexcept;
+    [[nodiscard]] static AffineTransformation GetScale(T aScale) noexcept;
     /// <summary>
     /// AffineTransformation for image scaling (different for x and y)
     /// </summary>
-    [[nodiscard]] static AffineTransformation GetScale(const Vec2d &aScale) noexcept;
+    [[nodiscard]] static AffineTransformation GetScale(const Vector2<T> &aScale) noexcept;
     /// <summary>
     /// AffineTransformation for image translation
     /// </summary>
-    [[nodiscard]] static AffineTransformation GetTranslation(const Vec2d &aShift) noexcept;
+    [[nodiscard]] static AffineTransformation GetTranslation(const Vector2<T> &aShift) noexcept;
     /// <summary>
     /// AffineTransformation for image shearing
     /// </summary>
-    [[nodiscard]] static AffineTransformation GetShear(const Vec2d &aShear) noexcept;
+    [[nodiscard]] static AffineTransformation GetShear(const Vector2<T> &aShear) noexcept;
 };
 
-AffineTransformation operator+(const AffineTransformation &aLeft, double aRight);
-AffineTransformation operator+(double aLeft, const AffineTransformation &aRight);
-AffineTransformation operator-(const AffineTransformation &aLeft, double aRight);
-AffineTransformation operator-(double aLeft, const AffineTransformation &aRight);
+template <RealFloatingPoint T> AffineTransformation<T> operator+(const AffineTransformation<T> &aLeft, T aRight);
+template <RealFloatingPoint T> AffineTransformation<T> operator+(T aLeft, const AffineTransformation<T> &aRight);
+template <RealFloatingPoint T> AffineTransformation<T> operator-(const AffineTransformation<T> &aLeft, T aRight);
+template <RealFloatingPoint T> AffineTransformation<T> operator-(T aLeft, const AffineTransformation<T> &aRight);
 
-AffineTransformation operator*(const AffineTransformation &aLeft, double aRight);
-AffineTransformation operator*(double aLeft, const AffineTransformation &aRight);
-AffineTransformation operator/(const AffineTransformation &aLeft, double aRight);
+template <RealFloatingPoint T> AffineTransformation<T> operator*(const AffineTransformation<T> &aLeft, T aRight);
+template <RealFloatingPoint T> AffineTransformation<T> operator*(T aLeft, const AffineTransformation<T> &aRight);
+template <RealFloatingPoint T> AffineTransformation<T> operator/(const AffineTransformation<T> &aLeft, T aRight);
 
 /// <summary>
 /// Matrix - vector multiplication <para/>
 /// assuming vector is column vector
 /// </summary>
-Vec3d operator*(const AffineTransformation &aLeft, const Vec3d &aRight);
+template <RealFloatingPoint T> Vector3<T> operator*(const AffineTransformation<T> &aLeft, const Vector3<T> &aRight);
 
 /// <summary>
 /// Vector-Matrix multiplication <para/>
 /// assuming vector is row vector
 /// </summary>
-Vec3d operator*(const Vec3d &aLeft, const AffineTransformation &aRight);
+template <RealFloatingPoint T> Vector3<T> operator*(const Vector3<T> &aLeft, const AffineTransformation<T> &aRight);
+
+/// <summary>
+/// Transform every point in a Quad
+/// </summary>
+template <RealFloatingPoint T> Quad<T> operator*(const AffineTransformation<T> &aLeft, const Quad<T> &aRight);
+
+/// <summary>
+/// Transform every corner point of a ROI
+/// </summary>
+template <RealFloatingPoint T> Quad<T> operator*(const AffineTransformation<T> &aLeft, const Roi &aRight);
 
 /// <summary>
 /// affine matrix - vector multiplication <para/>
 /// assuming vector is column vector and z element is 1<para/>
 /// Implemented in header so that we have this operator also on GPU
 /// </summary>
-DEVICE_CODE inline Vec2d operator*(const AffineTransformation &aLeft, const Vec2d &aRight)
+DEVICE_CODE inline Vec2d operator*(const AffineTransformation<double> &aLeft, const Vec2d &aRight)
 {
     return Vec2d{aLeft[0] * aRight.x + aLeft[1] * aRight.y + aLeft[2],
+                 aLeft[3] * aRight.x + aLeft[4] * aRight.y + aLeft[5]};
+}
+
+/// <summary>
+/// affine matrix - vector multiplication <para/>
+/// assuming vector is column vector and z element is 1<para/>
+/// Implemented in header so that we have this operator also on GPU
+/// </summary>
+DEVICE_CODE inline Vec2f operator*(const AffineTransformation<float> &aLeft, const Vec2f &aRight)
+{
+    return Vec2f{aLeft[0] * aRight.x + aLeft[1] * aRight.y + aLeft[2],
                  aLeft[3] * aRight.x + aLeft[4] * aRight.y + aLeft[5]};
 }
 } // namespace opp::image

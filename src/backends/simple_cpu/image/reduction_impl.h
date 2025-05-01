@@ -15,7 +15,7 @@ namespace opp::image::cpuSimple
 /// <summary>
 /// runs aOp on every pixel of an image. Inplace and outplace operation, no mask.
 /// </summary>
-template <typename DstT, typename functor> void reduction(const Size2D &aSize, DstT &aDst, functor aOp)
+template <typename DstT, typename functor> void reduction(const Size2D &aSize, DstT &aDst, const functor &aOp)
 {
     for (auto &pixelIterator : aSize)
     {
@@ -28,7 +28,8 @@ template <typename DstT, typename functor> void reduction(const Size2D &aSize, D
 /// <summary>
 /// runs aOp on every pixel of an image. Inplace and outplace operation, no mask.
 /// </summary>
-template <typename DstT, typename functor> void reduction(const Size2D &aSize, DstT &aDst1, DstT &aDst2, functor aOp)
+template <typename DstT, typename functor>
+void reduction(const Size2D &aSize, DstT &aDst1, DstT &aDst2, const functor &aOp)
 {
     for (auto &pixelIterator : aSize)
     {
@@ -42,7 +43,7 @@ template <typename DstT, typename functor> void reduction(const Size2D &aSize, D
 /// runs aOp on every pixel of an image. Inplace and outplace operation, no mask.
 /// </summary>
 template <typename DstT, typename functor>
-void reduction(const Size2D &aSize, DstT &aDst1, DstT &aDst2, DstT &aDst3, DstT &aDst4, DstT &aDst5, functor aOp)
+void reduction(const Size2D &aSize, DstT &aDst1, DstT &aDst2, DstT &aDst3, DstT &aDst4, DstT &aDst5, const functor &aOp)
 {
     for (auto &pixelIterator : aSize)
     {

@@ -17,8 +17,12 @@
 #include <backends/npp/nppException.h>  //NOLINT
 #include <common/defines.h> //NOLINT
 #include <common/exception.h> //NOLINT
+#include <common/image/affineTransformation.h> //NOLINT
 #include <common/image/border.h> //NOLINT
+#include <common/image/bound.h> //NOLINT
+#include <common/image/matrix.h> //NOLINT
 #include <common/image/pixelTypes.h> //NOLINT
+#include <common/image/quad.h> //NOLINT
 #include <common/image/roi.h> //NOLINT
 #include <common/image/roiException.h>  //NOLINT
 #include <common/image/size2D.h>  //NOLINT
@@ -2345,14 +2349,14 @@ Image32fC3View &Image32fC3View::Mirror(NppiAxis flip, const NppStreamContext &np
     return *this;
 }
 
-Image32fC3View &Image32fC3View::WarpAffine(Image32fC3View &pDst, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image32fC3View &Image32fC3View::WarpAffine(Image32fC3View &pDst, const AffineTransformation<double> &aCoeffs, int eInterpolation, const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiWarpAffine_32f_C3R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiWarpAffine_32f_C3R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), reinterpret_cast<const double(*)[3]>(&aCoeffs), eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-void Image32fC3View::WarpAffine(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx)
+void Image32fC3View::WarpAffine(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, const AffineTransformation<double> &aCoeffs, int eInterpolation, const NppStreamContext &nppStreamCtx)
 {
     const Npp32f * srcList[] = { reinterpret_cast<const Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel2.Pointer()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
@@ -2372,17 +2376,17 @@ void Image32fC3View::WarpAffine(const Image32fC1View &aSrcChannel0, const Image3
     {
         throw INVALIDARGUMENT(aDstChannel2, "Not all destination image planes have the same image pitch. First image pitch is " << aDstChannel0.Pitch() << " but the pitch for plane no 2 is " << aDstChannel2.Pitch());
     }
-    nppSafeCall(nppiWarpAffine_32f_P3R_Ctx(srcList, aSrcChannel0.NppiSizeFull(), to_int(aSrcChannel0.Pitch()), aSrcChannel0.NppiRectRoi(), dstList, to_int(aDstChannel0.Pitch()), aDstChannel0.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx));
+    nppSafeCall(nppiWarpAffine_32f_P3R_Ctx(srcList, aSrcChannel0.NppiSizeFull(), to_int(aSrcChannel0.Pitch()), aSrcChannel0.NppiRectRoi(), dstList, to_int(aDstChannel0.Pitch()), aDstChannel0.NppiRectRoi(), reinterpret_cast<const double(*)[3]>(&aCoeffs), eInterpolation, nppStreamCtx));
 }
 
-Image32fC3View &Image32fC3View::WarpAffineBack(Image32fC3View &pDst, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image32fC3View &Image32fC3View::WarpAffineBack(Image32fC3View &pDst, const AffineTransformation<double> &aCoeffs, int eInterpolation, const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiWarpAffineBack_32f_C3R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiWarpAffineBack_32f_C3R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), reinterpret_cast<const double(*)[3]>(&aCoeffs), eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-void Image32fC3View::WarpAffineBack(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx)
+void Image32fC3View::WarpAffineBack(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, const AffineTransformation<double> &aCoeffs, int eInterpolation, const NppStreamContext &nppStreamCtx)
 {
     const Npp32f * srcList[] = { reinterpret_cast<const Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel2.Pointer()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
@@ -2402,17 +2406,17 @@ void Image32fC3View::WarpAffineBack(const Image32fC1View &aSrcChannel0, const Im
     {
         throw INVALIDARGUMENT(aDstChannel2, "Not all destination image planes have the same image pitch. First image pitch is " << aDstChannel0.Pitch() << " but the pitch for plane no 2 is " << aDstChannel2.Pitch());
     }
-    nppSafeCall(nppiWarpAffineBack_32f_P3R_Ctx(srcList, aSrcChannel0.NppiSizeFull(), to_int(aSrcChannel0.Pitch()), aSrcChannel0.NppiRectRoi(), dstList, to_int(aDstChannel0.Pitch()), aDstChannel0.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx));
+    nppSafeCall(nppiWarpAffineBack_32f_P3R_Ctx(srcList, aSrcChannel0.NppiSizeFull(), to_int(aSrcChannel0.Pitch()), aSrcChannel0.NppiRectRoi(), dstList, to_int(aDstChannel0.Pitch()), aDstChannel0.NppiRectRoi(), reinterpret_cast<const double(*)[3]>(&aCoeffs), eInterpolation, nppStreamCtx));
 }
 
-Image32fC3View &Image32fC3View::WarpAffineQuad(const double aSrcQuad[4][2], Image32fC3View &pDst, const double aDstQuad[4][2], int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image32fC3View &Image32fC3View::WarpAffineQuad(const Quad<double> &aSrcQuad, Image32fC3View &pDst, const Quad<double> &aDstQuad, int eInterpolation, const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiWarpAffineQuad_32f_C3R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), aSrcQuad, reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), aDstQuad, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiWarpAffineQuad_32f_C3R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<const double(*)[2]>(&aSrcQuad), reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), reinterpret_cast<const double(*)[2]>(&aDstQuad), eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-void Image32fC3View::WarpAffineQuad(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, const double aSrcQuad[4][2], const double aDstQuad[4][2], int eInterpolation, const NppStreamContext &nppStreamCtx)
+void Image32fC3View::WarpAffineQuad(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, const Quad<double> &aSrcQuad, const Quad<double> &aDstQuad, int eInterpolation, const NppStreamContext &nppStreamCtx)
 {
     const Npp32f * srcList[] = { reinterpret_cast<const Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel2.Pointer()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
@@ -2432,17 +2436,17 @@ void Image32fC3View::WarpAffineQuad(const Image32fC1View &aSrcChannel0, const Im
     {
         throw INVALIDARGUMENT(aDstChannel2, "Not all destination image planes have the same image pitch. First image pitch is " << aDstChannel0.Pitch() << " but the pitch for plane no 2 is " << aDstChannel2.Pitch());
     }
-    nppSafeCall(nppiWarpAffineQuad_32f_P3R_Ctx(srcList, aSrcChannel0.NppiSizeFull(), to_int(aSrcChannel0.Pitch()), aSrcChannel0.NppiRectRoi(), aSrcQuad, dstList, to_int(aDstChannel0.Pitch()), aDstChannel0.NppiRectRoi(), aDstQuad, eInterpolation, nppStreamCtx));
+    nppSafeCall(nppiWarpAffineQuad_32f_P3R_Ctx(srcList, aSrcChannel0.NppiSizeFull(), to_int(aSrcChannel0.Pitch()), aSrcChannel0.NppiRectRoi(), reinterpret_cast<const double(*)[2]>(&aSrcQuad), dstList, to_int(aDstChannel0.Pitch()), aDstChannel0.NppiRectRoi(), reinterpret_cast<const double(*)[2]>(&aDstQuad), eInterpolation, nppStreamCtx));
 }
 
-Image32fC3View &Image32fC3View::WarpPerspective(Image32fC3View &pDst, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image32fC3View &Image32fC3View::WarpPerspective(Image32fC3View &pDst, const PerspectiveTransformation<double> &aCoeffs, int eInterpolation, const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiWarpPerspective_32f_C3R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiWarpPerspective_32f_C3R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), reinterpret_cast<const double(*)[3]>(&aCoeffs), eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-void Image32fC3View::WarpPerspective(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx)
+void Image32fC3View::WarpPerspective(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, const PerspectiveTransformation<double> &aCoeffs, int eInterpolation, const NppStreamContext &nppStreamCtx)
 {
     const Npp32f * srcList[] = { reinterpret_cast<const Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel2.Pointer()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
@@ -2462,17 +2466,17 @@ void Image32fC3View::WarpPerspective(const Image32fC1View &aSrcChannel0, const I
     {
         throw INVALIDARGUMENT(aDstChannel2, "Not all destination image planes have the same image pitch. First image pitch is " << aDstChannel0.Pitch() << " but the pitch for plane no 2 is " << aDstChannel2.Pitch());
     }
-    nppSafeCall(nppiWarpPerspective_32f_P3R_Ctx(srcList, aSrcChannel0.NppiSizeFull(), to_int(aSrcChannel0.Pitch()), aSrcChannel0.NppiRectRoi(), dstList, to_int(aDstChannel0.Pitch()), aDstChannel0.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx));
+    nppSafeCall(nppiWarpPerspective_32f_P3R_Ctx(srcList, aSrcChannel0.NppiSizeFull(), to_int(aSrcChannel0.Pitch()), aSrcChannel0.NppiRectRoi(), dstList, to_int(aDstChannel0.Pitch()), aDstChannel0.NppiRectRoi(), reinterpret_cast<const double(*)[3]>(&aCoeffs), eInterpolation, nppStreamCtx));
 }
 
-Image32fC3View &Image32fC3View::WarpPerspectiveBack(Image32fC3View &pDst, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image32fC3View &Image32fC3View::WarpPerspectiveBack(Image32fC3View &pDst, const PerspectiveTransformation<double> &aCoeffs, int eInterpolation, const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiWarpPerspectiveBack_32f_C3R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiWarpPerspectiveBack_32f_C3R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), reinterpret_cast<const double(*)[3]>(&aCoeffs), eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-void Image32fC3View::WarpPerspectiveBack(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx)
+void Image32fC3View::WarpPerspectiveBack(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, const PerspectiveTransformation<double> &aCoeffs, int eInterpolation, const NppStreamContext &nppStreamCtx)
 {
     const Npp32f * srcList[] = { reinterpret_cast<const Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel2.Pointer()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
@@ -2492,17 +2496,17 @@ void Image32fC3View::WarpPerspectiveBack(const Image32fC1View &aSrcChannel0, con
     {
         throw INVALIDARGUMENT(aDstChannel2, "Not all destination image planes have the same image pitch. First image pitch is " << aDstChannel0.Pitch() << " but the pitch for plane no 2 is " << aDstChannel2.Pitch());
     }
-    nppSafeCall(nppiWarpPerspectiveBack_32f_P3R_Ctx(srcList, aSrcChannel0.NppiSizeFull(), to_int(aSrcChannel0.Pitch()), aSrcChannel0.NppiRectRoi(), dstList, to_int(aDstChannel0.Pitch()), aDstChannel0.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx));
+    nppSafeCall(nppiWarpPerspectiveBack_32f_P3R_Ctx(srcList, aSrcChannel0.NppiSizeFull(), to_int(aSrcChannel0.Pitch()), aSrcChannel0.NppiRectRoi(), dstList, to_int(aDstChannel0.Pitch()), aDstChannel0.NppiRectRoi(), reinterpret_cast<const double(*)[3]>(&aCoeffs), eInterpolation, nppStreamCtx));
 }
 
-Image32fC3View &Image32fC3View::WarpPerspectiveQuad(const double aSrcQuad[4][2], Image32fC3View &pDst, const double aDstQuad[4][2], int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image32fC3View &Image32fC3View::WarpPerspectiveQuad(const Quad<double> &aSrcQuad, Image32fC3View &pDst, const Quad<double> &aDstQuad, int eInterpolation, const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiWarpPerspectiveQuad_32f_C3R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), aSrcQuad, reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), aDstQuad, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiWarpPerspectiveQuad_32f_C3R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<const double(*)[2]>(&aSrcQuad), reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), reinterpret_cast<const double(*)[2]>(&aDstQuad), eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-void Image32fC3View::WarpPerspectiveQuad(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, const double aSrcQuad[4][2], const double aDstQuad[4][2], int eInterpolation, const NppStreamContext &nppStreamCtx)
+void Image32fC3View::WarpPerspectiveQuad(const Image32fC1View &aSrcChannel0, const Image32fC1View &aSrcChannel1, const Image32fC1View &aSrcChannel2, Image32fC1View &aDstChannel0, Image32fC1View &aDstChannel1, Image32fC1View &aDstChannel2, const Quad<double> &aSrcQuad, const Quad<double> &aDstQuad, int eInterpolation, const NppStreamContext &nppStreamCtx)
 {
     const Npp32f * srcList[] = { reinterpret_cast<const Npp32f *>(aSrcChannel0.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel1.Pointer()), reinterpret_cast<const Npp32f *>(aSrcChannel2.Pointer()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
@@ -2522,7 +2526,7 @@ void Image32fC3View::WarpPerspectiveQuad(const Image32fC1View &aSrcChannel0, con
     {
         throw INVALIDARGUMENT(aDstChannel2, "Not all destination image planes have the same image pitch. First image pitch is " << aDstChannel0.Pitch() << " but the pitch for plane no 2 is " << aDstChannel2.Pitch());
     }
-    nppSafeCall(nppiWarpPerspectiveQuad_32f_P3R_Ctx(srcList, aSrcChannel0.NppiSizeFull(), to_int(aSrcChannel0.Pitch()), aSrcChannel0.NppiRectRoi(), aSrcQuad, dstList, to_int(aDstChannel0.Pitch()), aDstChannel0.NppiRectRoi(), aDstQuad, eInterpolation, nppStreamCtx));
+    nppSafeCall(nppiWarpPerspectiveQuad_32f_P3R_Ctx(srcList, aSrcChannel0.NppiSizeFull(), to_int(aSrcChannel0.Pitch()), aSrcChannel0.NppiRectRoi(), reinterpret_cast<const double(*)[2]>(&aSrcQuad), dstList, to_int(aDstChannel0.Pitch()), aDstChannel0.NppiRectRoi(), reinterpret_cast<const double(*)[2]>(&aDstQuad), eInterpolation, nppStreamCtx));
 }
 
 #endif // OPPi_ENABLE_FLOAT_TYPE && OPPi_ENABLE_THREE_CHANNEL

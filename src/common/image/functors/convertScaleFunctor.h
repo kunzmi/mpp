@@ -77,7 +77,10 @@ struct ConvertScaleFunctor : public ImageFunctor<false>
 #pragma endregion
 
 #pragma region run naive on one pixel
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+    /// <summary>
+    /// Returns true if the value has been successfully set
+    /// </summary>
+    DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         ComputeT temp         = static_cast<ComputeT>(*pixelSrc1);
@@ -95,12 +98,14 @@ struct ConvertScaleFunctor : public ImageFunctor<false>
             round(temp);
         }
         aDst = static_cast<DstT>(temp);
+        return true;
     }
     /// <summary>
     /// For float32 to half-float16 or bfloat16 (real and complex numbers), we'll use the special constructor including
     /// the rounding mode to get the correct rounding-conversion.
+    /// Returns true if the value has been successfully set
     /// </summary>
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+    DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
         requires((std::same_as<pixel_basetype_t<SrcT>, float> &&
                   (std::same_as<pixel_basetype_t<DstT>, BFloat16> || std::same_as<pixel_basetype_t<DstT>, HalfFp16>)) ||
                  (std::same_as<pixel_basetype_t<SrcT>, Complex<float>> &&
@@ -119,11 +124,12 @@ struct ConvertScaleFunctor : public ImageFunctor<false>
             temp *= ScaleFactor;
         }
         aDst = DstT(temp, roundingMode);
+        return true;
     }
 #pragma endregion
 
 #pragma region run sequential on pixel tupel
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
 
@@ -154,7 +160,7 @@ struct ConvertScaleFunctor : public ImageFunctor<false>
     /// For float32 to half-float16 or bfloat16 (real and complex numbers), we'll use the special constructor including
     /// the rounding mode to get the correct rounding-conversion.
     /// </summary>
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires((std::same_as<pixel_basetype_t<SrcT>, float> &&
                   (std::same_as<pixel_basetype_t<DstT>, BFloat16> || std::same_as<pixel_basetype_t<DstT>, HalfFp16>)) ||
                  (std::same_as<pixel_basetype_t<SrcT>, Complex<float>> &&

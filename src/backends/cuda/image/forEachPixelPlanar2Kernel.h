@@ -97,10 +97,13 @@ __global__ void forEachPixelPlanar2Kernel(Vector1<remove_vector_t<DstT>> *__rest
         res.y = pixelOut2->x;
     }
 
-    aFunctor(pixelX, pixelY, res);
-
-    *pixelOut1 = res.x;
-    *pixelOut2 = res.y;
+    // for nearly all functors aOp will evaluate to constant true.
+    // Only transformerFunctor is capable of returning false if a source pixel is outside of the src-roi
+    if (aFunctor(pixelX, pixelY, res))
+    {
+        *pixelOut1 = res.x;
+        *pixelOut2 = res.y;
+    }
     return;
 }
 

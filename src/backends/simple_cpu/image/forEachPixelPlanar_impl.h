@@ -18,8 +18,8 @@ namespace opp::image::cpuSimple
 /// <summary>
 /// runs aFunctor on every pixel of an image. Inplace and outplace operation, no mask. Planar 2 channel destination.
 /// </summary>
-template <typename DstT, typename funcType>
-void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, funcType aFunctor)
+template <typename DstT, typename functor>
+void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, const functor &aFunctor)
 {
     using DstPlaneT = Vector1<remove_vector_t<DstT>>;
 
@@ -34,16 +34,19 @@ void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, funcType
         DstPlaneT &pixelOut2 = pixelIterator2.Value();
 
         // load the destination pixel in case of inplace operation:
-        if constexpr (funcType::DoLoadBeforeOp)
+        if constexpr (functor::DoLoadBeforeOp)
         {
             res.x = pixelOut1.x;
             res.y = pixelOut2.x;
         }
 
-        aFunctor(pixelX, pixelY, res);
-
-        pixelOut1 = res.x;
-        pixelOut2 = res.y;
+        // for nearly all functors aOp will evaluate to constant true.
+        // Only transformerFunctor is capable of returning false if a source pixel is outside of the src-roi
+        if (aFunctor(pixelX, pixelY, res))
+        {
+            pixelOut1 = res.x;
+            pixelOut2 = res.y;
+        }
 
         ++pixelIterator2;
     }
@@ -52,8 +55,8 @@ void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, funcType
 /// <summary>
 /// runs aFunctor on every pixel of an image. Inplace and outplace operation, no mask. Planar 3 channel destination.
 /// </summary>
-template <typename DstT, typename funcType>
-void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, ImageView<DstT> &aDst3, funcType aFunctor)
+template <typename DstT, typename functor>
+void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, ImageView<DstT> &aDst3, const functor &aFunctor)
 {
     using DstPlaneT = Vector1<remove_vector_t<DstT>>;
 
@@ -70,18 +73,21 @@ void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, ImageVie
         DstPlaneT &pixelOut3 = pixelIterator3.Value();
 
         // load the destination pixel in case of inplace operation:
-        if constexpr (funcType::DoLoadBeforeOp)
+        if constexpr (functor::DoLoadBeforeOp)
         {
             res.x = pixelOut1.x;
             res.y = pixelOut2.x;
             res.z = pixelOut3.x;
         }
 
-        aFunctor(pixelX, pixelY, res);
-
-        pixelOut1 = res.x;
-        pixelOut2 = res.y;
-        pixelOut3 = res.z;
+        // for nearly all functors aOp will evaluate to constant true.
+        // Only transformerFunctor is capable of returning false if a source pixel is outside of the src-roi
+        if (aFunctor(pixelX, pixelY, res))
+        {
+            pixelOut1 = res.x;
+            pixelOut2 = res.y;
+            pixelOut3 = res.z;
+        }
 
         ++pixelIterator2;
         ++pixelIterator3;
@@ -91,9 +97,9 @@ void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, ImageVie
 /// <summary>
 /// runs aFunctor on every pixel of an image. Inplace and outplace operation, no mask. Planar 4 channel destination.
 /// </summary>
-template <typename DstT, typename funcType>
+template <typename DstT, typename functor>
 void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, ImageView<DstT> &aDst3, ImageView<DstT> &aDst4,
-                        funcType aFunctor)
+                        const functor &aFunctor)
 {
     using DstPlaneT = Vector1<remove_vector_t<DstT>>;
 
@@ -112,7 +118,7 @@ void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, ImageVie
         DstPlaneT &pixelOut4 = pixelIterator4.Value();
 
         // load the destination pixel in case of inplace operation:
-        if constexpr (funcType::DoLoadBeforeOp)
+        if constexpr (functor::DoLoadBeforeOp)
         {
             res.x = pixelOut1.x;
             res.y = pixelOut2.x;
@@ -120,12 +126,15 @@ void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, ImageVie
             res.w = pixelOut4.x;
         }
 
-        aFunctor(pixelX, pixelY, res);
-
-        pixelOut1 = res.x;
-        pixelOut2 = res.y;
-        pixelOut3 = res.z;
-        pixelOut4 = res.w;
+        // for nearly all functors aOp will evaluate to constant true.
+        // Only transformerFunctor is capable of returning false if a source pixel is outside of the src-roi
+        if (aFunctor(pixelX, pixelY, res))
+        {
+            pixelOut1 = res.x;
+            pixelOut2 = res.y;
+            pixelOut3 = res.z;
+            pixelOut4 = res.w;
+        }
 
         ++pixelIterator2;
         ++pixelIterator3;

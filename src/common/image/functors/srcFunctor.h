@@ -59,23 +59,31 @@ struct SrcFunctor : public ImageFunctor<false>
 #pragma endregion
 
 #pragma region run naive on one pixel
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+    /// <summary>
+    /// Returns true if the value has been successfully set
+    /// </summary>
+    DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
         requires std::same_as<ComputeT, DstT>
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         Op(static_cast<ComputeT>(*pixelSrc1), aDst);
+        return true;
     }
 
     // for copy sub-channel and dup (SrcT == ComputeT)
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+    DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
         requires std::same_as<remove_vector_t<ComputeT>, remove_vector_t<DstT>> &&
                  (vector_size_v<ComputeT> != vector_size_v<DstT>)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         Op(*pixelSrc1, aDst);
+        return true;
     }
 
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+    /// <summary>
+    /// Returns true if the value has been successfully set
+    /// </summary>
+    DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
         requires(!std::same_as<ComputeT, DstT>) && (!(ComplexVector<ComputeT> && RealVector<DstT>)) &&
                 (!(RealVector<ComputeT> && ComplexVector<DstT>)) && (vector_size_v<ComputeT> == vector_size_v<DstT>)
     {
@@ -85,9 +93,13 @@ struct SrcFunctor : public ImageFunctor<false>
         round(temp); // NOP for integer ComputeT
         // DstT constructor will clamp temp to value range of DstT
         aDst = static_cast<DstT>(temp);
+        return true;
     }
 
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+    /// <summary>
+    /// Returns true if the value has been successfully set
+    /// </summary>
+    DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
         requires(!std::same_as<ComputeT, DstT>) && ((ComplexVector<ComputeT> && RealVector<DstT>))
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
@@ -99,19 +111,21 @@ struct SrcFunctor : public ImageFunctor<false>
         }
         // DstT constructor will clamp temp to value range of DstT
         aDst = static_cast<DstT>(temp);
+        return true;
     }
 
     // Needed for the conversion real->Complex
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+    DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
         requires(!std::same_as<ComputeT, DstT>) && ((RealVector<ComputeT> && ComplexVector<DstT>))
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         Op(*pixelSrc1, aDst);
+        return true;
     }
 #pragma endregion
 
 #pragma region run SIMD on pixel tupel
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires std::same_as<ComputeT_SIMD, DstT>
     {
         static_assert(OpSIMD.has_simd, "Trying to run a SIMD operation that is not implemented for this type.");
@@ -124,7 +138,7 @@ struct SrcFunctor : public ImageFunctor<false>
 #pragma endregion
 
 #pragma region run sequential on pixel tupel
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires std::same_as<ComputeT, DstT> && //
                  std::same_as<ComputeT_SIMD, voidType>
     {
@@ -140,7 +154,7 @@ struct SrcFunctor : public ImageFunctor<false>
     }
 
     // for copy sub-channel and dup (SrcT == ComputeT)
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires std::same_as<remove_vector_t<ComputeT>, remove_vector_t<DstT>> && //
                  (vector_size_v<ComputeT> != vector_size_v<DstT>) &&               //
                  std::same_as<ComputeT_SIMD, voidType>
@@ -156,7 +170,7 @@ struct SrcFunctor : public ImageFunctor<false>
         }
     }
 
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires(!std::same_as<ComputeT, DstT>) && //
                 std::same_as<ComputeT_SIMD, voidType> && (!(ComplexVector<ComputeT> && RealVector<DstT>)) &&
                 (!(RealVector<ComputeT> && ComplexVector<DstT>)) && (vector_size_v<ComputeT> == vector_size_v<DstT>)
@@ -176,7 +190,7 @@ struct SrcFunctor : public ImageFunctor<false>
         }
     }
 
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires(!std::same_as<ComputeT, DstT>) && //
                 std::same_as<ComputeT_SIMD, voidType> && ((ComplexVector<ComputeT> && RealVector<DstT>))
     {
@@ -199,7 +213,7 @@ struct SrcFunctor : public ImageFunctor<false>
     }
 
     // Needed for the conversion real->Complex
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires(!std::same_as<ComputeT, DstT>) && //
                 std::same_as<ComputeT_SIMD, voidType> && ((RealVector<ComputeT> && ComplexVector<DstT>))
     {

@@ -20,12 +20,12 @@ template <PixelType T> class ImageView;
 /// Returns the number of active pixels inside the mask.
 /// </summary>
 template <typename DstT, typename functor>
-size_t reduction(const ImageView<Pixel8uC1> &aMask, const Size2D &aSize, DstT &aDst, functor aOp);
+size_t reduction(const ImageView<Pixel8uC1> &aMask, const Size2D &aSize, DstT &aDst, const functor &aOp);
 
 /// <summary>
 /// runs reduction aOp on every pixel of an image. Only pixel with mask != 0 are taken into account.
 /// Returns the number of active pixels inside the mask.
 /// </summary>
 template <typename DstT, typename functor>
-size_t reduction(const ImageView<Pixel8uC1> &aMask, const Size2D &aSize, DstT &aDst1, DstT &aDst2, functor aOp);
+size_t reduction(const ImageView<Pixel8uC1> &aMask, const Size2D &aSize, DstT &aDst1, DstT &aDst2, const functor &aOp);
 } // namespace opp::image::cpuSimple

@@ -9,8 +9,8 @@
 #include <common/roundFunctor.h>
 #include <common/statistics/operators.h>
 #include <common/tupel.h>
-#include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
+#include <common/vector_typetraits.h>
 #include <concepts>
 
 // disable warning for pragma unroll when compiling with host compiler:
@@ -45,7 +45,7 @@ template <size_t tupelSize, typename SrcT, typename DstT, typename operation> st
 #pragma endregion
 
 #pragma region run naive on one pixel
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst) const
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         Op(*pixelSrc1, aDst);
@@ -53,7 +53,7 @@ template <size_t tupelSize, typename SrcT, typename DstT, typename operation> st
 #pragma endregion
 
 #pragma region run sequential on pixel tupel
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst, bool /*isTupel*/)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst, bool /*isTupel*/) const
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
 
@@ -67,7 +67,7 @@ template <size_t tupelSize, typename SrcT, typename DstT, typename operation> st
         }
     }
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst, const MaskTupel<tupelSize> &aMaskTupel,
-                                int &maskCount)
+                                int &maskCount) const
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
 
@@ -84,7 +84,7 @@ template <size_t tupelSize, typename SrcT, typename DstT, typename operation> st
             }
         }
     }
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst, const MaskTupel<tupelSize> &aMaskTupel)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst, const MaskTupel<tupelSize> &aMaskTupel) const
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
 

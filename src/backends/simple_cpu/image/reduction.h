@@ -18,14 +18,16 @@ template <PixelType T> class ImageView;
 /// <summary>
 /// runs reduction aOp on every pixel of an image. No mask.
 /// </summary>
-template <typename DstT, typename functor> void reduction(const Size2D &aSize, DstT &aDst, functor aOp);
-/// <summary>
-/// runs reduction aOp on every pixel of an image. No mask.
-/// </summary>
-template <typename DstT, typename functor> void reduction(const Size2D &aSize, DstT &aDst1, DstT &aDst2, functor aOp);
+template <typename DstT, typename functor> void reduction(const Size2D &aSize, DstT &aDst, const functor &aOp);
 /// <summary>
 /// runs reduction aOp on every pixel of an image. No mask.
 /// </summary>
 template <typename DstT, typename functor>
-void reduction(const Size2D &aSize, DstT &aDst1, DstT &aDst2, DstT &aDst3, DstT &aDst4, DstT &aDst5, functor aOp);
+void reduction(const Size2D &aSize, DstT &aDst1, DstT &aDst2, const functor &aOp);
+/// <summary>
+/// runs reduction aOp on every pixel of an image. No mask.
+/// </summary>
+template <typename DstT, typename functor>
+void reduction(const Size2D &aSize, DstT &aDst1, DstT &aDst2, DstT &aDst3, DstT &aDst4, DstT &aDst5,
+               const functor &aOp);
 } // namespace opp::image::cpuSimple

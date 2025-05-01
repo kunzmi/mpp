@@ -3594,8 +3594,12 @@ ImageView<same_vector_size_different_type_t<T, int>> &ImageView<T>::Integral(
     opp::cuda::DevVarView<byte> &aBuffer, const opp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T> && NoAlpha<T>
 {
-    // aDst must be one pixel larger in width and height:
-    checkSameSize(ROI().Size(), aDst.ROI().Size() - 1);
+    if (SizeRoi() != aDst.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION(
+            "ROI of destination image must be one pixel larger in width and height than original ROI. Original size: "
+            << SizeRoi() << " provided destination image size: " << aDst.SizeRoi());
+    }
 
     using DstT = same_vector_size_different_type_t<T, int>;
 
@@ -3620,8 +3624,12 @@ ImageView<same_vector_size_different_type_t<T, float>> &ImageView<T>::Integral(
     const opp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && NoAlpha<T> && (!std::same_as<double, remove_vector<T>>)
 {
-    // aDst must be one pixel larger in width and height:
-    checkSameSize(ROI().Size(), aDst.ROI().Size() - 1);
+    if (SizeRoi() != aDst.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION(
+            "ROI of destination image must be one pixel larger in width and height than original ROI. Original size: "
+            << SizeRoi() << " provided destination image size: " << aDst.SizeRoi());
+    }
 
     using DstT = same_vector_size_different_type_t<T, float>;
 
@@ -3646,8 +3654,12 @@ ImageView<same_vector_size_different_type_t<T, long64>> &ImageView<T>::Integral(
     const opp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T> && NoAlpha<T>
 {
-    // aDst must be one pixel larger in width and height:
-    checkSameSize(ROI().Size(), aDst.ROI().Size() - 1);
+    if (SizeRoi() != aDst.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION(
+            "ROI of destination image must be one pixel larger in width and height than original ROI. Original size: "
+            << SizeRoi() << " provided destination image size: " << aDst.SizeRoi());
+    }
 
     using DstT = same_vector_size_different_type_t<T, long64>;
 
@@ -3672,8 +3684,12 @@ ImageView<same_vector_size_different_type_t<T, double>> &ImageView<T>::Integral(
     const opp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && NoAlpha<T>
 {
-    // aDst must be one pixel larger in width and height:
-    checkSameSize(ROI().Size(), aDst.ROI().Size() - 1);
+    if (SizeRoi() != aDst.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION(
+            "ROI of destination image must be one pixel larger in width and height than original ROI. Original size: "
+            << SizeRoi() << " provided destination image size: " << aDst.SizeRoi());
+    }
 
     using DstT = same_vector_size_different_type_t<T, double>;
 
@@ -3699,9 +3715,18 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, in
                                opp::cuda::DevVarView<byte> &aBuffer, const opp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T> && NoAlpha<T>
 {
-    // aDst and aSqr must be one pixel larger in width and height:
-    checkSameSize(ROI().Size(), aDst.ROI().Size() - 1);
-    checkSameSize(ROI().Size(), aSqr.ROI().Size() - 1);
+    if (SizeRoi() != aDst.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION(
+            "ROI of destination image must be one pixel larger in width and height than original ROI. Original size: "
+            << SizeRoi() << " provided destination image size: " << aDst.SizeRoi());
+    }
+    if (SizeRoi() != aSqr.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION("ROI of destination image (squared) must be one pixel larger in width and height than "
+                           "original ROI. Original size: "
+                           << SizeRoi() << " provided destination image (squared) size: " << aSqr.SizeRoi());
+    }
 
     using DstT    = same_vector_size_different_type_t<T, int>;
     using DstSqrT = same_vector_size_different_type_t<T, int>;
@@ -3730,9 +3755,18 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, in
                                opp::cuda::DevVarView<byte> &aBuffer, const opp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T> && NoAlpha<T>
 {
-    // aDst and aSqr must be one pixel larger in width and height:
-    checkSameSize(ROI().Size(), aDst.ROI().Size() - 1);
-    checkSameSize(ROI().Size(), aSqr.ROI().Size() - 1);
+    if (SizeRoi() != aDst.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION(
+            "ROI of destination image must be one pixel larger in width and height than original ROI. Original size: "
+            << SizeRoi() << " provided destination image size: " << aDst.SizeRoi());
+    }
+    if (SizeRoi() != aSqr.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION("ROI of destination image (squared) must be one pixel larger in width and height than "
+                           "original ROI. Original size: "
+                           << SizeRoi() << " provided destination image (squared) size: " << aSqr.SizeRoi());
+    }
 
     using DstT    = same_vector_size_different_type_t<T, int>;
     using DstSqrT = same_vector_size_different_type_t<T, long64>;
@@ -3761,9 +3795,18 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, fl
                                opp::cuda::DevVarView<byte> &aBuffer, const opp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && NoAlpha<T> && (!std::same_as<double, remove_vector<T>>)
 {
-    // aDst and aSqr must be one pixel larger in width and height:
-    checkSameSize(ROI().Size(), aDst.ROI().Size() - 1);
-    checkSameSize(ROI().Size(), aSqr.ROI().Size() - 1);
+    if (SizeRoi() != aDst.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION(
+            "ROI of destination image must be one pixel larger in width and height than original ROI. Original size: "
+            << SizeRoi() << " provided destination image size: " << aDst.SizeRoi());
+    }
+    if (SizeRoi() != aSqr.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION("ROI of destination image (squared) must be one pixel larger in width and height than "
+                           "original ROI. Original size: "
+                           << SizeRoi() << " provided destination image (squared) size: " << aSqr.SizeRoi());
+    }
 
     using DstT    = same_vector_size_different_type_t<T, float>;
     using DstSqrT = same_vector_size_different_type_t<T, double>;
@@ -3792,9 +3835,18 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, do
                                opp::cuda::DevVarView<byte> &aBuffer, const opp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && NoAlpha<T>
 {
-    // aDst and aSqr must be one pixel larger in width and height:
-    checkSameSize(ROI().Size(), aDst.ROI().Size() - 1);
-    checkSameSize(ROI().Size(), aSqr.ROI().Size() - 1);
+    if (SizeRoi() != aDst.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION(
+            "ROI of destination image must be one pixel larger in width and height than original ROI. Original size: "
+            << SizeRoi() << " provided destination image size: " << aDst.SizeRoi());
+    }
+    if (SizeRoi() != aSqr.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION("ROI of destination image (squared) must be one pixel larger in width and height than "
+                           "original ROI. Original size: "
+                           << SizeRoi() << " provided destination image (squared) size: " << aSqr.SizeRoi());
+    }
 
     using DstT    = same_vector_size_different_type_t<T, double>;
     using DstSqrT = same_vector_size_different_type_t<T, double>;

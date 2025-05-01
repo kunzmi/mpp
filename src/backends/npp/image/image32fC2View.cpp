@@ -10,8 +10,12 @@
 #include <backends/npp/nppException.h>  //NOLINT
 #include <common/defines.h> //NOLINT
 #include <common/exception.h> //NOLINT
+#include <common/image/affineTransformation.h> //NOLINT
 #include <common/image/border.h> //NOLINT
+#include <common/image/bound.h> //NOLINT
+#include <common/image/matrix.h> //NOLINT
 #include <common/image/pixelTypes.h> //NOLINT
+#include <common/image/quad.h> //NOLINT
 #include <common/image/roi.h> //NOLINT
 #include <common/image/roiException.h>  //NOLINT
 #include <common/image/size2D.h>  //NOLINT

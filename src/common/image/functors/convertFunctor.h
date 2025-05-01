@@ -50,7 +50,10 @@ struct ConvertFunctor : public ImageFunctor<false>
 #pragma endregion
 
 #pragma region run naive on one pixel
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+    /// <summary>
+    /// Returns true if the value has been successfully set
+    /// </summary>
+    DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         SrcT pixelSrc         = *pixelSrc1;
@@ -60,13 +63,15 @@ struct ConvertFunctor : public ImageFunctor<false>
             round(pixelSrc);
         }
         aDst = static_cast<DstT>(pixelSrc);
+        return true;
     }
 
     /// <summary>
     /// For float32 to half-float16 or bfloat16 (real and complex numbers), we'll use the special constructor including
     /// the rounding mode to get the correct rounding-conversion.
+    /// Returns true if the value has been successfully set
     /// </summary>
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+    DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
         requires((std::same_as<pixel_basetype_t<SrcT>, float> &&
                   (std::same_as<pixel_basetype_t<DstT>, BFloat16> || std::same_as<pixel_basetype_t<DstT>, HalfFp16>)) ||
                  (std::same_as<pixel_basetype_t<SrcT>, Complex<float>> &&
@@ -76,11 +81,12 @@ struct ConvertFunctor : public ImageFunctor<false>
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         aDst                  = DstT(*pixelSrc1, roundingMode);
+        return true;
     }
 #pragma endregion
 
 #pragma region run SIMD on pixel tupel
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires std::same_as<SrcT, Vector1<float>> &&
                  (std::same_as<DstT, Vector1<BFloat16>> || std::same_as<DstT, Vector1<HalfFp16>>) &&
                  (roundingMode == RoundingMode::NearestTiesToEven) && (!std::same_as<operation_SIMD, voidType>)
@@ -94,7 +100,7 @@ struct ConvertFunctor : public ImageFunctor<false>
 #pragma endregion
 
 #pragma region run sequential on pixel tupel
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
 
@@ -116,7 +122,7 @@ struct ConvertFunctor : public ImageFunctor<false>
     /// For float32 to half-float16 or bfloat16 (real and complex numbers), we'll use the special constructor including
     /// the rounding mode to get the correct rounding-conversion.
     /// </summary>
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires((std::same_as<pixel_basetype_t<SrcT>, float> &&
                   (std::same_as<pixel_basetype_t<DstT>, BFloat16> || std::same_as<pixel_basetype_t<DstT>, HalfFp16>)) ||
                  (std::same_as<pixel_basetype_t<SrcT>, Complex<float>> &&

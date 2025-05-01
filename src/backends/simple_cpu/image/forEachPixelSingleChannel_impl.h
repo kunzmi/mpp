@@ -18,8 +18,8 @@ namespace opp::image::cpuSimple
 /// <summary>
 /// runs aFunctor on every pixel (only one channel of a multi-channel pixel) of an image. no inplace operation, no mask.
 /// </summary>
-template <typename DstT, typename funcType>
-void forEachPixelSingleChannel(ImageView<DstT> &aDst, Channel aDstChannel, funcType aFunctor)
+template <typename DstT, typename functor>
+void forEachPixelSingleChannel(ImageView<DstT> &aDst, Channel aDstChannel, const functor &aFunctor)
 {
     for (auto &pixelIterator : aDst)
     {

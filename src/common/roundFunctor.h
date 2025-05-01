@@ -2,14 +2,14 @@
 #include <common/defines.h>
 #include <common/numberTypes.h>
 #include <common/opp_defs.h>
-#include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
+#include <common/vector_typetraits.h>
 
 namespace opp
 {
 template <RoundingMode roundingMode, typename T> struct RoundFunctor
 {
-    DEVICE_CODE void operator()(T &aVec)
+    DEVICE_CODE void operator()(T &aVec) const
         requires RealOrComplexFloatingVector<T>
     {
         if constexpr (roundingMode == RoundingMode::NearestTiesToEven)
@@ -47,7 +47,7 @@ template <RoundingMode roundingMode, typename T> struct RoundFunctor
         }
     }
 
-    DEVICE_CODE void operator()(T & /*aVec*/)
+    DEVICE_CODE void operator()(T & /*aVec*/) const
         requires RealOrComplexIntVector<T>
     { // NOP
     }

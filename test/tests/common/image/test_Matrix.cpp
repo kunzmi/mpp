@@ -218,7 +218,7 @@ TEST_CASE("Matrix<double>", "[Common.Image]")
     CHECK(ss.str() ==
           "( 2.000000  4.000000  6.000000)\n( 8.000000 10.000000 12.000000)\n(14.000000 16.000000 18.000000)\n");
 
-    AffineTransformation affine(2, 3, 4, 5, 6, 7);
+    AffineTransformation<double> affine(2, 3, 4, 5, 6, 7);
     Matrix<double> matAffine(affine);
     CHECK(matAffine[0] == 2);
     CHECK(matAffine[1] == 3);

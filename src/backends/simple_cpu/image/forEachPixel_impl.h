@@ -15,7 +15,7 @@ namespace opp::image::cpuSimple
 /// <summary>
 /// runs aOp on every pixel of an image. Inplace and outplace operation, no mask.
 /// </summary>
-template <typename DstT, typename functor> void forEachPixel(ImageView<DstT> &aDst, functor aOp)
+template <typename DstT, typename functor> void forEachPixel(ImageView<DstT> &aDst, const functor &aOp)
 {
     for (auto &pixelIterator : aDst)
     {
@@ -41,22 +41,25 @@ template <typename DstT, typename functor> void forEachPixel(ImageView<DstT> &aD
             }
         }
 
-        // if we don't load the pixel anyhow but we still need just the alpha channel, load it:
-        if constexpr (!functor::DoLoadBeforeOp && //
-                      (has_alpha_channel_v<DstT> && !load_full_vector_for_alpha_v<DstT>))
+        // for nearly all functors aOp will evaluate to constant true.
+        // Only transformerFunctor is capable of returning false if a source pixel is outside of the src-roi
+        if (aOp(pixelX, pixelY, res))
         {
-            alphaChannel = pixelOut.w;
+            // if we don't load the pixel anyhow but we still need just the alpha channel, load it:
+            if constexpr (!functor::DoLoadBeforeOp && //
+                          (has_alpha_channel_v<DstT> && !load_full_vector_for_alpha_v<DstT>))
+            {
+                alphaChannel = pixelOut.w;
+            }
+
+            // restore alpha channel value:
+            if constexpr (has_alpha_channel_v<DstT>)
+            {
+                res.w = alphaChannel;
+            }
+
+            pixelOut = res;
         }
-
-        aOp(pixelX, pixelY, res);
-
-        // restore alpha channel value:
-        if constexpr (has_alpha_channel_v<DstT>)
-        {
-            res.w = alphaChannel;
-        }
-
-        pixelOut = res;
     }
 }
 } // namespace opp::image::cpuSimple

@@ -5,7 +5,7 @@
 #include <backends/cuda/image/forEachPixelMaskedKernel.h>
 #include <backends/cuda/streamCtx.h>
 #include <backends/cuda/templateRegistry.h>
-#include <common/arithmetic/binary_operators.h>
+#include <common/dataExchangeAndInit/operators.h>
 #include <common/defines.h>
 #include <common/image/functors/srcFunctor.h>
 #include <common/image/pixelTypeEnabler.h>

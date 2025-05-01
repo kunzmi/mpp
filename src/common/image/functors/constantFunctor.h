@@ -38,14 +38,18 @@ template <size_t tupelSize, typename DstT> struct ConstantFunctor : public Image
 #pragma endregion
 
 #pragma region run naive on one pixel
-    DEVICE_CODE void operator()(int /*aPixelX*/, int /*aPixelY*/, DstT &aDst)
+    /// <summary>
+    /// Returns true if the value has been successfully set
+    /// </summary>
+    DEVICE_CODE bool operator()(int /*aPixelX*/, int /*aPixelY*/, DstT &aDst) const
     {
         aDst = Constant;
+        return true;
     }
 #pragma endregion
 
 #pragma region run sequential on pixel tupel
-    DEVICE_CODE void operator()(int /*aPixelX*/, int /*aPixelY*/, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int /*aPixelX*/, int /*aPixelY*/, Tupel<DstT, tupelSize> &aDst) const
     {
 #pragma unroll
         for (size_t i = 0; i < tupelSize; i++)

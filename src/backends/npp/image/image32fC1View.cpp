@@ -20,8 +20,12 @@
 #include <backends/npp/nppException.h>  //NOLINT
 #include <common/defines.h> //NOLINT
 #include <common/exception.h> //NOLINT
+#include <common/image/affineTransformation.h> //NOLINT
 #include <common/image/border.h> //NOLINT
+#include <common/image/bound.h> //NOLINT
+#include <common/image/matrix.h> //NOLINT
 #include <common/image/pixelTypes.h> //NOLINT
+#include <common/image/quad.h> //NOLINT
 #include <common/image/roi.h> //NOLINT
 #include <common/image/roiException.h>  //NOLINT
 #include <common/image/size2D.h>  //NOLINT
@@ -2695,44 +2699,44 @@ Image32fC1View &Image32fC1View::Mirror(NppiAxis flip, const NppStreamContext &np
     return *this;
 }
 
-Image32fC1View &Image32fC1View::WarpAffine(Image32fC1View &pDst, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image32fC1View::WarpAffine(Image32fC1View &pDst, const AffineTransformation<double> &aCoeffs, int eInterpolation, const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiWarpAffine_32f_C1R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiWarpAffine_32f_C1R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), reinterpret_cast<const double(*)[3]>(&aCoeffs), eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image32fC1View &Image32fC1View::WarpAffineBack(Image32fC1View &pDst, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image32fC1View::WarpAffineBack(Image32fC1View &pDst, const AffineTransformation<double> &aCoeffs, int eInterpolation, const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiWarpAffineBack_32f_C1R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiWarpAffineBack_32f_C1R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), reinterpret_cast<const double(*)[3]>(&aCoeffs), eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image32fC1View &Image32fC1View::WarpAffineQuad(const double aSrcQuad[4][2], Image32fC1View &pDst, const double aDstQuad[4][2], int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image32fC1View::WarpAffineQuad(const Quad<double> &aSrcQuad, Image32fC1View &pDst, const Quad<double> &aDstQuad, int eInterpolation, const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiWarpAffineQuad_32f_C1R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), aSrcQuad, reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), aDstQuad, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiWarpAffineQuad_32f_C1R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<const double(*)[2]>(&aSrcQuad), reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), reinterpret_cast<const double(*)[2]>(&aDstQuad), eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image32fC1View &Image32fC1View::WarpPerspective(Image32fC1View &pDst, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image32fC1View::WarpPerspective(Image32fC1View &pDst, const PerspectiveTransformation<double> &aCoeffs, int eInterpolation, const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiWarpPerspective_32f_C1R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiWarpPerspective_32f_C1R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), reinterpret_cast<const double(*)[3]>(&aCoeffs), eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image32fC1View &Image32fC1View::WarpPerspectiveBack(Image32fC1View &pDst, const double aCoeffs[3][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image32fC1View::WarpPerspectiveBack(Image32fC1View &pDst, const PerspectiveTransformation<double> &aCoeffs, int eInterpolation, const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiWarpPerspectiveBack_32f_C1R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiWarpPerspectiveBack_32f_C1R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), reinterpret_cast<const double(*)[3]>(&aCoeffs), eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-Image32fC1View &Image32fC1View::WarpPerspectiveQuad(const double aSrcQuad[4][2], Image32fC1View &pDst, const double aDstQuad[4][2], int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image32fC1View &Image32fC1View::WarpPerspectiveQuad(const Quad<double> &aSrcQuad, Image32fC1View &pDst, const Quad<double> &aDstQuad, int eInterpolation, const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiWarpPerspectiveQuad_32f_C1R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), aSrcQuad, reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), aDstQuad, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiWarpPerspectiveQuad_32f_C1R_Ctx(reinterpret_cast<const Npp32f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<const double(*)[2]>(&aSrcQuad), reinterpret_cast<Npp32f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), reinterpret_cast<const double(*)[2]>(&aDstQuad), eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }

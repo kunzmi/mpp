@@ -16,7 +16,7 @@ namespace opp::image::cpuSimple
 /// runs aOp on every pixel of an image. Inplace and outplace operation, with mask.
 /// </summary>
 template <class DstT, class functor>
-void forEachPixel(const ImageView<Pixel8uC1> &aMask, ImageView<DstT> &aDst, functor aOp)
+void forEachPixel(const ImageView<Pixel8uC1> &aMask, ImageView<DstT> &aDst, const functor &aOp)
 {
     for (auto &pixelIterator : aDst)
     {

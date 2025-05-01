@@ -51,7 +51,10 @@ struct InplaceDevConstantScaleFunctor : public ImageFunctor<true>
 #pragma endregion
 
 #pragma region run naive on one pixel
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+    /// <summary>
+    /// Returns true if the value has been successfully set
+    /// </summary>
+    DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
         requires RealOrComplexIntegral<pixel_basetype_t<DstT>> && //
                  RealOrComplexFloatingPoint<pixel_basetype_t<ComputeT>>
     {
@@ -68,11 +71,12 @@ struct InplaceDevConstantScaleFunctor : public ImageFunctor<true>
         round(temp);
         // DstT constructor will clamp temp to value range of DstT
         aDst = static_cast<DstT>(temp);
+        return true;
     }
 #pragma endregion
 
 #pragma region run sequential on pixel tupel
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires RealOrComplexIntegral<pixel_basetype_t<DstT>> && //
                  RealOrComplexFloatingPoint<pixel_basetype_t<ComputeT>>
     {

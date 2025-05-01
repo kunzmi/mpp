@@ -54,6 +54,70 @@ DEVICE_CODE constexpr double RAD_TO_DEG(double aDeg)
 }
 
 /// <summary>
+/// Normalized sinc function: sin(pi * x) / (pi * x). Uses __sinf intrinsic.
+/// </summary>
+DEVICE_ONLY_CODE inline float sinc(float aVal)
+{
+    if (aVal == 0.0f)
+    {
+        return 1.0f;
+    }
+    aVal *= std::numbers::pi_v<float>;
+#ifdef IS_CUDA_COMPILER
+    return __sinf(aVal) / aVal;
+#endif
+#ifdef IS_HOST_COMPILER
+    return std::sin(aVal) / aVal;
+#endif
+}
+
+/// <summary>
+/// Normalized sinc function: sin(pi * x) / (pi * x)
+/// </summary>
+DEVICE_CODE inline double sinc(double aVal)
+{
+    if (aVal == 0.0)
+    {
+        return 1.0;
+    }
+    aVal *= std::numbers::pi_v<double>;
+#ifdef IS_CUDA_COMPILER
+    return sin(aVal) / aVal;
+#endif
+#ifdef IS_HOST_COMPILER
+    return std::sin(aVal) / aVal;
+#endif
+}
+
+/// <summary>
+/// Normalized sinc function: sin(pi * x) / (pi * x). Does not perform check for x == 0. Uses __sinf intrinsic.
+/// </summary>
+DEVICE_ONLY_CODE inline float sinc_never0(float aVal)
+{
+    aVal *= std::numbers::pi_v<float>;
+#ifdef IS_CUDA_COMPILER
+    return __sinf(aVal) / aVal;
+#endif
+#ifdef IS_HOST_COMPILER
+    return std::sin(aVal) / aVal;
+#endif
+}
+
+/// <summary>
+/// Normalized sinc function: sin(pi * x) / (pi * x). Does not perform check for x == 0.
+/// </summary>
+DEVICE_CODE inline double sinc_never0(double aVal)
+{
+    aVal *= std::numbers::pi_v<double>;
+#ifdef IS_CUDA_COMPILER
+    return sin(aVal) / aVal;
+#endif
+#ifdef IS_HOST_COMPILER
+    return std::sin(aVal) / aVal;
+#endif
+}
+
+/// <summary>
 /// Converts the integer scaling argument to a float multiplication factor according to the NPP/IPP convention:
 /// factor = 2^-aScale
 /// </summary>

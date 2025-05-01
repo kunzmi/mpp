@@ -314,14 +314,16 @@ DEVICE_CODE Vector2<T>::operator half2 &()
 /// the element, returns true if each element comparison is true
 /// </summary>
 template <Number T>
-DEVICE_CODE bool Vector2<T>::EqEps(Vector2 aLeft, Vector2 aRight, T aEpsilon)
+DEVICE_CODE bool Vector2<T>::EqEps(const Vector2 &aLeft, const Vector2 &aRight, T aEpsilon)
     requires NativeFloatingPoint<T> && HostCode<T>
 {
-    MakeNANandINFValid(aLeft.x, aRight.x);
-    MakeNANandINFValid(aLeft.y, aRight.y);
+    Vector2<T> left  = aLeft;
+    Vector2<T> right = aRight;
+    MakeNANandINFValid(left.x, right.x);
+    MakeNANandINFValid(left.y, right.y);
 
-    bool res = std::abs(aLeft.x - aRight.x) <= aEpsilon;
-    res &= std::abs(aLeft.y - aRight.y) <= aEpsilon;
+    bool res = std::abs(left.x - right.x) <= aEpsilon;
+    res &= std::abs(left.y - right.y) <= aEpsilon;
     return res;
 }
 
@@ -330,14 +332,16 @@ DEVICE_CODE bool Vector2<T>::EqEps(Vector2 aLeft, Vector2 aRight, T aEpsilon)
 /// the element, returns true if each element comparison is true
 /// </summary>
 template <Number T>
-DEVICE_CODE bool Vector2<T>::EqEps(Vector2 aLeft, Vector2 aRight, T aEpsilon)
+DEVICE_CODE bool Vector2<T>::EqEps(const Vector2 &aLeft, const Vector2 &aRight, T aEpsilon)
     requires NativeFloatingPoint<T> && DeviceCode<T>
 {
-    MakeNANandINFValid(aLeft.x, aRight.x);
-    MakeNANandINFValid(aLeft.y, aRight.y);
+    Vector2<T> left  = aLeft;
+    Vector2<T> right = aRight;
+    MakeNANandINFValid(left.x, right.x);
+    MakeNANandINFValid(left.y, right.y);
 
-    bool res = abs(aLeft.x - aRight.x) <= aEpsilon;
-    res &= abs(aLeft.y - aRight.y) <= aEpsilon;
+    bool res = abs(left.x - right.x) <= aEpsilon;
+    res &= abs(left.y - right.y) <= aEpsilon;
     return res;
 }
 
@@ -346,14 +350,16 @@ DEVICE_CODE bool Vector2<T>::EqEps(Vector2 aLeft, Vector2 aRight, T aEpsilon)
 /// the element, returns true if each element comparison is true
 /// </summary>
 template <Number T>
-DEVICE_CODE bool Vector2<T>::EqEps(Vector2 aLeft, Vector2 aRight, T aEpsilon)
+DEVICE_CODE bool Vector2<T>::EqEps(const Vector2 &aLeft, const Vector2 &aRight, T aEpsilon)
     requires Is16BitFloat<T>
 {
-    MakeNANandINFValid(aLeft.x, aRight.x);
-    MakeNANandINFValid(aLeft.y, aRight.y);
+    Vector2<T> left  = aLeft;
+    Vector2<T> right = aRight;
+    MakeNANandINFValid(left.x, right.x);
+    MakeNANandINFValid(left.y, right.y);
 
-    bool res = T::Abs(aLeft.x - aRight.x) <= aEpsilon;
-    res &= T::Abs(aLeft.y - aRight.y) <= aEpsilon;
+    bool res = T::Abs(left.x - right.x) <= aEpsilon;
+    res &= T::Abs(left.y - right.y) <= aEpsilon;
     return res;
 }
 
@@ -2640,15 +2646,17 @@ template <Number T> DEVICE_CODE const T *Vector2<T>::data() const
 /// the element, returns 0xFF per element for true, 0x00 for false
 /// </summary>
 template <Number T>
-Vector2<byte> Vector2<T>::CompareEQEps(Vector2<T> aLeft, Vector2<T> aRight, T aEpsilon)
+Vector2<byte> Vector2<T>::CompareEQEps(const Vector2<T> &aLeft, const Vector2<T> &aRight, T aEpsilon)
     requires NativeFloatingPoint<T> && HostCode<T>
 {
-    MakeNANandINFValid(aLeft.x, aRight.x);
-    MakeNANandINFValid(aLeft.y, aRight.y);
+    Vector2<T> left  = aLeft;
+    Vector2<T> right = aRight;
+    MakeNANandINFValid(left.x, right.x);
+    MakeNANandINFValid(left.y, right.y);
 
     Vector2<byte> ret; // NOLINT
-    ret.x = static_cast<byte>(static_cast<int>(std::abs(aLeft.x - aRight.x) <= aEpsilon) * TRUE_VALUE);
-    ret.y = static_cast<byte>(static_cast<int>(std::abs(aLeft.y - aRight.y) <= aEpsilon) * TRUE_VALUE);
+    ret.x = static_cast<byte>(static_cast<int>(std::abs(left.x - right.x) <= aEpsilon) * TRUE_VALUE);
+    ret.y = static_cast<byte>(static_cast<int>(std::abs(left.y - right.y) <= aEpsilon) * TRUE_VALUE);
     return ret;
 }
 
@@ -2657,15 +2665,17 @@ Vector2<byte> Vector2<T>::CompareEQEps(Vector2<T> aLeft, Vector2<T> aRight, T aE
 /// the element, returns 0xFF per element for true, 0x00 for false
 /// </summary>
 template <Number T>
-DEVICE_CODE Vector2<byte> Vector2<T>::CompareEQEps(Vector2<T> aLeft, Vector2<T> aRight, T aEpsilon)
+DEVICE_CODE Vector2<byte> Vector2<T>::CompareEQEps(const Vector2<T> &aLeft, const Vector2<T> &aRight, T aEpsilon)
     requires NativeFloatingPoint<T> && DeviceCode<T>
 {
-    MakeNANandINFValid(aLeft.x, aRight.x);
-    MakeNANandINFValid(aLeft.y, aRight.y);
+    Vector2<T> left  = aLeft;
+    Vector2<T> right = aRight;
+    MakeNANandINFValid(left.x, right.x);
+    MakeNANandINFValid(left.y, right.y);
 
     Vector2<byte> ret; // NOLINT
-    ret.x = static_cast<byte>(static_cast<int>(abs(aLeft.x - aRight.x) <= aEpsilon) * TRUE_VALUE);
-    ret.y = static_cast<byte>(static_cast<int>(abs(aLeft.y - aRight.y) <= aEpsilon) * TRUE_VALUE);
+    ret.x = static_cast<byte>(static_cast<int>(abs(left.x - right.x) <= aEpsilon) * TRUE_VALUE);
+    ret.y = static_cast<byte>(static_cast<int>(abs(left.y - right.y) <= aEpsilon) * TRUE_VALUE);
     return ret;
 }
 
@@ -2674,15 +2684,17 @@ DEVICE_CODE Vector2<byte> Vector2<T>::CompareEQEps(Vector2<T> aLeft, Vector2<T> 
 /// the element, returns 0xFF per element for true, 0x00 for false
 /// </summary>
 template <Number T>
-DEVICE_CODE Vector2<byte> Vector2<T>::CompareEQEps(Vector2<T> aLeft, Vector2<T> aRight, T aEpsilon)
+DEVICE_CODE Vector2<byte> Vector2<T>::CompareEQEps(const Vector2<T> &aLeft, const Vector2<T> &aRight, T aEpsilon)
     requires Is16BitFloat<T>
 {
-    MakeNANandINFValid(aLeft.x, aRight.x);
-    MakeNANandINFValid(aLeft.y, aRight.y);
+    Vector2<T> left  = aLeft;
+    Vector2<T> right = aRight;
+    MakeNANandINFValid(left.x, right.x);
+    MakeNANandINFValid(left.y, right.y);
 
     Vector2<byte> ret; // NOLINT
-    ret.x = static_cast<byte>(static_cast<int>(T::Abs(aLeft.x - aRight.x) <= aEpsilon) * TRUE_VALUE);
-    ret.y = static_cast<byte>(static_cast<int>(T::Abs(aLeft.y - aRight.y) <= aEpsilon) * TRUE_VALUE);
+    ret.x = static_cast<byte>(static_cast<int>(T::Abs(left.x - right.x) <= aEpsilon) * TRUE_VALUE);
+    ret.y = static_cast<byte>(static_cast<int>(T::Abs(left.y - right.y) <= aEpsilon) * TRUE_VALUE);
     return ret;
 }
 

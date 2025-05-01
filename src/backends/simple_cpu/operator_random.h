@@ -2,8 +2,8 @@
 #include <common/defines.h>
 #include <common/image/pixelTypes.h>
 #include <common/opp_defs.h>
-#include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vectorTypes.h>
 #include <concepts>
 #include <random>
 
@@ -11,7 +11,7 @@ namespace opp
 {
 template <AnyVector T> struct FillRandom
 {
-    std::default_random_engine engine;
+    mutable std::default_random_engine engine;
 
     FillRandom() = default;
 
@@ -19,7 +19,7 @@ template <AnyVector T> struct FillRandom
     {
     }
 
-    void operator()(T &aDst)
+    void operator()(T &aDst) const
         requires NativeFloatingPoint<remove_vector_t<T>>
     {
         std::uniform_real_distribution<remove_vector_t<T>> uniform_dist(0, 1);
@@ -37,7 +37,7 @@ template <AnyVector T> struct FillRandom
             aDst.w = uniform_dist(engine);
         }
     }
-    void operator()(T &aDst)
+    void operator()(T &aDst) const
         requires IsHalfFp16<remove_vector_t<T>>
     {
         std::uniform_real_distribution<float> uniform_dist(0, 1);
@@ -55,7 +55,7 @@ template <AnyVector T> struct FillRandom
             aDst.w = static_cast<HalfFp16>(uniform_dist(engine));
         }
     }
-    void operator()(T &aDst)
+    void operator()(T &aDst) const
         requires IsBFloat16<remove_vector_t<T>>
     {
         std::uniform_real_distribution<float> uniform_dist(0, 1);
@@ -73,7 +73,7 @@ template <AnyVector T> struct FillRandom
             aDst.w = static_cast<BFloat16>(uniform_dist(engine));
         }
     }
-    void operator()(T &aDst)
+    void operator()(T &aDst) const
         requires NativeIntegral<remove_vector_t<T>> && (!ByteSizeType<remove_vector_t<T>>)
     {
         std::uniform_int_distribution<remove_vector_t<T>> uniform_dist(numeric_limits<remove_vector_t<T>>::lowest(),
@@ -92,7 +92,7 @@ template <AnyVector T> struct FillRandom
             aDst.w = uniform_dist(engine);
         }
     }
-    void operator()(T &aDst)
+    void operator()(T &aDst) const
         requires NativeIntegral<remove_vector_t<T>> && (ByteSizeType<remove_vector_t<T>>)
     {
         std::uniform_int_distribution<int> uniform_dist(numeric_limits<remove_vector_t<T>>::lowest(),
@@ -111,7 +111,7 @@ template <AnyVector T> struct FillRandom
             aDst.w = static_cast<remove_vector_t<T>>(uniform_dist(engine));
         }
     }
-    void operator()(T &aDst)
+    void operator()(T &aDst) const
         requires ComplexFloatingPoint<remove_vector_t<T>>
     {
         std::uniform_real_distribution<complex_basetype_t<remove_vector_t<T>>> uniform_dist(0, 1);
@@ -129,7 +129,7 @@ template <AnyVector T> struct FillRandom
             aDst.w = remove_vector_t<T>(uniform_dist(engine), uniform_dist(engine));
         }
     }
-    void operator()(T &aDst)
+    void operator()(T &aDst) const
         requires ComplexIntegral<remove_vector_t<T>>
     {
         std::uniform_int_distribution<complex_basetype_t<remove_vector_t<T>>> uniform_dist(
@@ -153,8 +153,8 @@ template <AnyVector T> struct FillRandom
 
 template <AnyVector T> struct FillRandomNormal
 {
-    std::default_random_engine engine;
-    std::normal_distribution<double> normal_dist;
+    mutable std::default_random_engine engine;
+    mutable std::normal_distribution<double> normal_dist;
 
     FillRandomNormal() = default;
 
@@ -162,7 +162,7 @@ template <AnyVector T> struct FillRandomNormal
     {
     }
 
-    void operator()(T &aDst)
+    void operator()(T &aDst) const
         requires NativeFloatingPoint<remove_vector_t<T>>
     {
         aDst.x = static_cast<remove_vector_t<T>>(normal_dist(engine));
@@ -179,7 +179,7 @@ template <AnyVector T> struct FillRandomNormal
             aDst.w = static_cast<remove_vector_t<T>>(normal_dist(engine));
         }
     }
-    void operator()(T &aDst)
+    void operator()(T &aDst) const
         requires IsHalfFp16<remove_vector_t<T>>
     {
         aDst.x = static_cast<HalfFp16>(normal_dist(engine));
@@ -196,7 +196,7 @@ template <AnyVector T> struct FillRandomNormal
             aDst.w = static_cast<HalfFp16>(normal_dist(engine));
         }
     }
-    void operator()(T &aDst)
+    void operator()(T &aDst) const
         requires IsBFloat16<remove_vector_t<T>>
     {
         aDst.x = static_cast<BFloat16>(normal_dist(engine));
@@ -213,7 +213,7 @@ template <AnyVector T> struct FillRandomNormal
             aDst.w = static_cast<BFloat16>(normal_dist(engine));
         }
     }
-    void operator()(T &aDst)
+    void operator()(T &aDst) const
         requires NativeIntegral<remove_vector_t<T>> && (!ByteSizeType<remove_vector_t<T>>)
     {
         aDst.x = static_cast<remove_vector_t<T>>(normal_dist(engine));
@@ -230,7 +230,7 @@ template <AnyVector T> struct FillRandomNormal
             aDst.w = static_cast<remove_vector_t<T>>(normal_dist(engine));
         }
     }
-    void operator()(T &aDst)
+    void operator()(T &aDst) const
         requires NativeIntegral<remove_vector_t<T>> && (ByteSizeType<remove_vector_t<T>>)
     {
         aDst.x = static_cast<remove_vector_t<T>>(normal_dist(engine));
@@ -247,7 +247,7 @@ template <AnyVector T> struct FillRandomNormal
             aDst.w = static_cast<remove_vector_t<T>>(normal_dist(engine));
         }
     }
-    void operator()(T &aDst)
+    void operator()(T &aDst) const
         requires ComplexFloatingPoint<remove_vector_t<T>>
     {
         aDst.x = remove_vector_t<T>(static_cast<complex_basetype_t<remove_vector_t<T>>>(normal_dist(engine)),
@@ -268,7 +268,7 @@ template <AnyVector T> struct FillRandomNormal
                                         static_cast<complex_basetype_t<remove_vector_t<T>>>(normal_dist(engine)));
         }
     }
-    void operator()(T &aDst)
+    void operator()(T &aDst) const
         requires ComplexIntegral<remove_vector_t<T>>
     {
         aDst.x = remove_vector_t<T>(static_cast<complex_basetype_t<remove_vector_t<T>>>(normal_dist(engine)),

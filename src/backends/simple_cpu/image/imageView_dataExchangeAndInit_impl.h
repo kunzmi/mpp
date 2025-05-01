@@ -5,10 +5,9 @@
 #include <backends/simple_cpu/image/forEachPixelSingleChannel.h>
 #include <backends/simple_cpu/image/imageView.h>
 #include <backends/simple_cpu/operator_random.h>
-#include <common/arithmetic/binary_operators.h>
-#include <common/arithmetic/unary_operators.h>
 #include <common/bfloat16.h>
 #include <common/complex.h>
+#include <common/dataExchangeAndInit/operators.h>
 #include <common/defines.h>
 #include <common/exception.h>
 #include <common/half_fp16.h>
@@ -51,9 +50,9 @@
 #include <common/opp_defs.h>
 #include <common/safeCast.h>
 #include <common/utilities.h>
-#include <common/vector_typetraits.h>
 #include <common/vector1.h>
 #include <common/vectorTypes.h>
+#include <common/vector_typetraits.h>
 #include <concepts>
 #include <cstddef>
 #include <type_traits>
@@ -572,6 +571,16 @@ template <PixelType T> ImageView<T> &ImageView<T>::SetMasked(const T &aConst, co
 
     return *this;
 }
+
+template <PixelType T> ImageView<T> &ImageView<T>::Set(remove_vector_t<T> aConst, Channel aChannel)
+{
+    for (auto &pixelIterator : *this)
+    {
+        pixelIterator.Value()[aChannel] = aConst;
+    }
+
+    return *this;
+}
 #pragma endregion
 
 #pragma region Swap Channel
@@ -668,7 +677,13 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::Transpose(ImageView<T> &aDst) const
     requires NoAlpha<T>
 {
-    checkSameSize(ROI().Size(), Size2D(aDst.SizeRoi().y, aDst.SizeRoi().x));
+    if (SizeRoi() != Size2D(aDst.SizeRoi().y, aDst.SizeRoi().x))
+    {
+        throw ROIEXCEPTION(
+            "Width of destination image ROI must be the same as the height of the source image ROI, and height "
+            "of the destination image ROI must be the same as the width of the source image ROI. Source ROI size: "
+            << SizeRoi() << " provided destination image ROI size: " << aDst.SizeRoi());
+    }
 
     for (auto &pixelIterator : aDst)
     {

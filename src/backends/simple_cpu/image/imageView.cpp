@@ -1,6 +1,7 @@
 #include "imageView.h"
 #include "imageView_arithmetic_impl.h"          //NOLINT(misc-include-cleaner)
 #include "imageView_dataExchangeAndInit_impl.h" //NOLINT(misc-include-cleaner)
+#include "imageView_geometryTransforms_impl.h"  //NOLINT(misc-include-cleaner)
 #include "imageView_statistics_impl.h"          //NOLINT(misc-include-cleaner)
 #include "imageView_thresholdAndCompare_impl.h" //NOLINT(misc-include-cleaner)
 #include <backends/simple_cpu/image/forEachPixel.h>
@@ -20,6 +21,13 @@
 
 namespace opp::image::cpuSimple
 {
+
+using Image32fC1View  = ImageView<Pixel32fC1>;
+using Image32fC2View  = ImageView<Pixel32fC2>;
+using Image32fC3View  = ImageView<Pixel32fC3>;
+using Image32fC4View  = ImageView<Pixel32fC4>;
+using Image32fC4AView = ImageView<Pixel32fC4A>;
+
 template class ImageView<Pixel8uC1>;
 template class ImageView<Pixel8uC2>;
 template class ImageView<Pixel8uC3>;
@@ -323,10 +331,58 @@ template ImageView<Pixel32fcC3> &ImageView<Pixel32fcC3>::SwapChannel<Pixel32fcC3
 template ImageView<Pixel32fcC4> &ImageView<Pixel32fcC4>::SwapChannel<Pixel32fcC4>(
     ImageView<Pixel32fcC4> &aDst, const ChannelList<vector_active_size_v<Pixel32fcC4>> &aDstChannels) const;
 
-using Image32fC1View  = ImageView<Pixel32fC1>;
-using Image32fC2View  = ImageView<Pixel32fC2>;
-using Image32fC3View  = ImageView<Pixel32fC3>;
-using Image32fC4View  = ImageView<Pixel32fC4>;
-using Image32fC4AView = ImageView<Pixel32fC4A>;
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define InstantiateAffine_For(pixelT, coordT)                                                                          \
+    template ImageView<pixelT> &ImageView<pixelT>::WarpAffine(                                                         \
+        ImageView<pixelT> &aDst, const AffineTransformation<coordT> &aAffine, InterpolationMode aInterpolation,        \
+        BorderType aBorder, Roi aAllowedReadRoi) const;                                                                \
+    template ImageView<pixelT> &ImageView<pixelT>::WarpAffine(                                                         \
+        ImageView<pixelT> &aDst, const AffineTransformation<coordT> &aAffine, InterpolationMode aInterpolation,        \
+        BorderType aBorder, pixelT aConstant, Roi aAllowedReadRoi) const;
+
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define ForAllChannelsNoAlpha(type)                                                                                    \
+    InstantiateAffine_For(Pixel##type##C1, float);                                                                     \
+    InstantiateAffine_For(Pixel##type##C2, float);                                                                     \
+    InstantiateAffine_For(Pixel##type##C3, float);                                                                     \
+    InstantiateAffine_For(Pixel##type##C4, float);                                                                     \
+    InstantiateAffine_For(Pixel##type##C1, double);                                                                    \
+    InstantiateAffine_For(Pixel##type##C2, double);                                                                    \
+    InstantiateAffine_For(Pixel##type##C3, double);                                                                    \
+    InstantiateAffine_For(Pixel##type##C4, double);
+
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define ForAllChannelsWithAlpha(type)                                                                                  \
+    InstantiateAffine_For(Pixel##type##C1, float);                                                                     \
+    InstantiateAffine_For(Pixel##type##C2, float);                                                                     \
+    InstantiateAffine_For(Pixel##type##C3, float);                                                                     \
+    InstantiateAffine_For(Pixel##type##C4, float);                                                                     \
+    InstantiateAffine_For(Pixel##type##C4A, float);                                                                    \
+    InstantiateAffine_For(Pixel##type##C1, double);                                                                    \
+    InstantiateAffine_For(Pixel##type##C2, double);                                                                    \
+    InstantiateAffine_For(Pixel##type##C3, double);                                                                    \
+    InstantiateAffine_For(Pixel##type##C4, double);                                                                    \
+    InstantiateAffine_For(Pixel##type##C4A, double);
+
+ForAllChannelsWithAlpha(8u);
+ForAllChannelsWithAlpha(8s);
+
+ForAllChannelsWithAlpha(16u);
+ForAllChannelsWithAlpha(16s);
+
+ForAllChannelsWithAlpha(32u);
+ForAllChannelsWithAlpha(32s);
+
+ForAllChannelsWithAlpha(16f);
+ForAllChannelsWithAlpha(16bf);
+ForAllChannelsWithAlpha(32f);
+ForAllChannelsWithAlpha(64f);
+
+ForAllChannelsNoAlpha(16sc);
+ForAllChannelsNoAlpha(32sc);
+ForAllChannelsNoAlpha(32fc);
+#undef InstantiateAffine_For
+#undef ForAllChannelsWithAlpha
+#undef ForAllChannelsNoAlpha
 
 } // namespace opp::image::cpuSimple

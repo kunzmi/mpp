@@ -60,7 +60,10 @@ struct SrcPlanar4Functor : public ImageFunctor<false>
 #pragma endregion
 
 #pragma region run naive on one pixel
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+    /// <summary>
+    /// Returns true if the value has been successfully set
+    /// </summary>
+    DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
         requires std::same_as<ComputeT, DstT>
     {
         const SrcPlane *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
@@ -69,9 +72,13 @@ struct SrcPlanar4Functor : public ImageFunctor<false>
         const SrcPlane *pixelSrc4 = gotoPtr(Src4, SrcPitch4, aPixelX, aPixelY);
         const ComputeT pixelSrc(pixelSrc1->x, pixelSrc2->x, pixelSrc3->x, pixelSrc4->x);
         Op(pixelSrc, aDst);
+        return true;
     }
 
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+    /// <summary>
+    /// Returns true if the value has been successfully set
+    /// </summary>
+    DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
         requires(!std::same_as<ComputeT, DstT>)
     {
         const SrcPlane *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
@@ -84,11 +91,12 @@ struct SrcPlanar4Functor : public ImageFunctor<false>
         round(temp); // NOP for integer ComputeT
         // DstT constructor will clamp temp to value range of DstT
         aDst = static_cast<DstT>(temp);
+        return true;
     }
 #pragma endregion
 
 #pragma region run sequential on pixel tupel
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires std::same_as<ComputeT, DstT>
     {
         const SrcPlane *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
@@ -119,7 +127,7 @@ struct SrcPlanar4Functor : public ImageFunctor<false>
         }
     }
 
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires(!std::same_as<ComputeT, DstT>)
     {
         const SrcPlane *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);

@@ -110,28 +110,32 @@ __global__ void forEachPixelKernel(DstT *__restrict__ aDst, size_t aPitchDst, Si
             alphaChannel = res.w;
         }
     }
-    // if we don't load the pixel anyhow but we still need just the alpha channel, load it:
-    if constexpr (!funcType::DoLoadBeforeOp && //
-                  (has_alpha_channel_v<DstT> && !load_full_vector_for_alpha_v<DstT>))
+
+    // for nearly all functors aOp will evaluate to constant true.
+    // Only transformerFunctor is capable of returning false if a source pixel is outside of the src-roi
+    if (aFunctor(pixelX, pixelY, res))
     {
-        alphaChannel = pixelOut->w;
+        // if we don't load the pixel anyhow but we still need just the alpha channel, load it:
+        if constexpr (!funcType::DoLoadBeforeOp && //
+                      (has_alpha_channel_v<DstT> && !load_full_vector_for_alpha_v<DstT>))
+        {
+            alphaChannel = pixelOut->w;
+        }
+
+        // restore alpha channel value:
+        if constexpr (has_alpha_channel_v<DstT>)
+        {
+            res.w = alphaChannel;
+        }
+
+        *pixelOut = res;
     }
-
-    aFunctor(pixelX, pixelY, res);
-
-    // restore alpha channel value:
-    if constexpr (has_alpha_channel_v<DstT>)
-    {
-        res.w = alphaChannel;
-    }
-
-    *pixelOut = res;
     return;
 }
 
 template <typename DstT, size_t TupelSize, int WarpAlignmentInBytes, typename funcType>
-void InvokeForEachPixelKernel(const dim3 &aBlockSize, uint aSharedMemory, int aWarpSize, cudaStream_t aStream, DstT *aDst,
-                              size_t aPitchDst, const Size2D &aSize, const funcType &aFunctor)
+void InvokeForEachPixelKernel(const dim3 &aBlockSize, uint aSharedMemory, int aWarpSize, cudaStream_t aStream,
+                              DstT *aDst, size_t aPitchDst, const Size2D &aSize, const funcType &aFunctor)
 {
     ThreadSplit<WarpAlignmentInBytes, TupelSize> ts(aDst, aSize.x, aWarpSize);
 

@@ -3,19 +3,19 @@
 #include <common/image/pixelTypes.h>
 #include <common/numeric_limits.h>
 #include <common/opp_defs.h>
-#include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vectorTypes.h>
 #include <concepts>
 
 namespace opp
 {
 template <AnyVector T> struct AbsDiff
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
     {
         aDst = T::AbsDiff(aSrc1, aSrc2);
     }
-    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
     {
         aSrcDst.AbsDiff(aSrc1);
     }
@@ -23,11 +23,11 @@ template <AnyVector T> struct AbsDiff
 
 template <AnyVector T> struct Add
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
     {
         aDst = aSrc1 + aSrc2;
     }
-    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
     {
         aSrcDst += aSrc1;
     }
@@ -35,11 +35,11 @@ template <AnyVector T> struct Add
 
 template <AnyVector T> struct Sub
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
     {
         aDst = aSrc1 - aSrc2;
     }
-    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
     {
         aSrcDst -= aSrc1;
     }
@@ -50,7 +50,7 @@ template <AnyVector T> struct Sub
 /// </summary>
 template <AnyVector T> struct SubInv
 {
-    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
     {
         aSrcDst.SubInv(aSrc1);
     }
@@ -58,11 +58,11 @@ template <AnyVector T> struct SubInv
 
 template <AnyVector T> struct Mul
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
     {
         aDst = aSrc1 * aSrc2;
     }
-    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
     {
         aSrcDst *= aSrc1;
     }
@@ -72,12 +72,12 @@ template <AnyVector T> struct Mul
 template <ComplexVector T> struct ConjMul
 {
     // aSrc1 * conj(aSrc2)
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
     {
         aDst = T::ConjMul(aSrc1, aSrc2);
     }
     // aSrcDst * conj(aSrc1)
-    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
     {
         aSrcDst.ConjMul(aSrc1);
     }
@@ -88,15 +88,15 @@ template <ComplexVector T> struct ConjMul
 // casting to integer, but NPP returns 255...
 template <AnyVector T, AnyVector DstT> struct Div
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
     {
         aDst = aSrc1 / aSrc2;
     }
-    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
     {
         aSrcDst /= aSrc1;
     }
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
         requires std::same_as<DstT, Vector1<byte>> || std::same_as<DstT, Vector3<byte>> ||
                  std::same_as<DstT, Vector4<byte>> // not Vector4A though
     {
@@ -131,7 +131,7 @@ template <AnyVector T, AnyVector DstT> struct Div
         }
         aDst /= aSrc2;
     }
-    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
         requires std::same_as<DstT, Vector1<byte>> || std::same_as<DstT, Vector3<byte>> ||
                  std::same_as<DstT, Vector4<byte>> // not Vector4A though
     {
@@ -169,11 +169,11 @@ template <AnyVector T, AnyVector DstT> struct Div
 /// </summary>
 template <AnyVector T, AnyVector DstT> struct DivInv
 {
-    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
     {
         aSrcDst.DivInv(aSrc1);
     }
-    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
         requires std::same_as<DstT, Vector1<byte>> || std::same_as<DstT, Vector3<byte>> ||
                  std::same_as<DstT, Vector4<byte>> // not Vector4A though
     {
@@ -209,11 +209,11 @@ template <AnyVector T, AnyVector DstT> struct DivInv
 
 template <RealIntVector T> struct And
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
     {
         aDst = T::And(aSrc1, aSrc2);
     }
-    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
     {
         aSrcDst.And(aSrc1);
     }
@@ -221,11 +221,11 @@ template <RealIntVector T> struct And
 
 template <RealIntVector T> struct Or
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
     {
         aDst = T::Or(aSrc1, aSrc2);
     }
-    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
     {
         aSrcDst.Or(aSrc1);
     }
@@ -233,11 +233,11 @@ template <RealIntVector T> struct Or
 
 template <RealIntVector T> struct Xor
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
     {
         aDst = T::Xor(aSrc1, aSrc2);
     }
-    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
     {
         aSrcDst.Xor(aSrc1);
     }
@@ -251,11 +251,11 @@ template <RealIntVector T> struct LShift
     {
     }
 
-    DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, T &aDst) const
     {
         aDst = T::LShift(aSrc1, Shift);
     }
-    DEVICE_CODE void operator()(T &aSrcDst)
+    DEVICE_CODE void operator()(T &aSrcDst) const
     {
         aSrcDst.LShift(Shift);
     }
@@ -269,11 +269,11 @@ template <RealIntVector T> struct RShift
     {
     }
 
-    DEVICE_CODE void operator()(const T &aSrc1, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, T &aDst) const
     {
         aDst = T::RShift(aSrc1, Shift);
     }
-    DEVICE_CODE void operator()(T &aSrcDst)
+    DEVICE_CODE void operator()(T &aSrcDst) const
     {
         aSrcDst.RShift(Shift);
     }
@@ -281,7 +281,7 @@ template <RealIntVector T> struct RShift
 
 template <AnyVector T> struct AddSqr
 {
-    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
     {
         aSrcDst += T::Sqr(aSrc1);
     }
@@ -289,11 +289,11 @@ template <AnyVector T> struct AddSqr
 
 template <RealVector T> struct Min
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
     {
         aDst = T::Min(aSrc1, aSrc2);
     }
-    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
     {
         aSrcDst.Min(aSrc1);
     }
@@ -301,11 +301,11 @@ template <RealVector T> struct Min
 
 template <RealVector T> struct Max
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
     {
         aDst = T::Max(aSrc1, aSrc2);
     }
-    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
     {
         aSrcDst.Max(aSrc1);
     }
@@ -319,7 +319,7 @@ template <RealOrComplexFloatingVector T> struct EqEps
     {
     }
 
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
     {
         aDst = static_cast<byte>(static_cast<int>(T::EqEps(aSrc1, aSrc2, eps)) * TRUE_VALUE);
     }
@@ -327,7 +327,7 @@ template <RealOrComplexFloatingVector T> struct EqEps
 
 template <AnyVector T> struct Eq
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
     {
         aDst = static_cast<byte>(static_cast<int>(aSrc1 == aSrc2) * TRUE_VALUE);
     }
@@ -335,7 +335,7 @@ template <AnyVector T> struct Eq
 
 template <RealVector T> struct Ge
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
     {
         aDst = static_cast<byte>(static_cast<int>(aSrc1 >= aSrc2) * TRUE_VALUE);
     }
@@ -343,7 +343,7 @@ template <RealVector T> struct Ge
 
 template <RealVector T> struct Gt
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
     {
         aDst = static_cast<byte>(static_cast<int>(aSrc1 > aSrc2) * TRUE_VALUE);
     }
@@ -351,7 +351,7 @@ template <RealVector T> struct Gt
 
 template <RealVector T> struct Le
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
     {
         aDst = static_cast<byte>(static_cast<int>(aSrc1 <= aSrc2) * TRUE_VALUE);
     }
@@ -359,7 +359,7 @@ template <RealVector T> struct Le
 
 template <RealVector T> struct Lt
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
     {
         aDst = static_cast<byte>(static_cast<int>(aSrc1 < aSrc2) * TRUE_VALUE);
     }
@@ -367,7 +367,7 @@ template <RealVector T> struct Lt
 
 template <AnyVector T> struct NEq
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
     {
         aDst = static_cast<byte>(static_cast<int>(aSrc1 != aSrc2) * TRUE_VALUE);
     }
@@ -375,7 +375,7 @@ template <AnyVector T> struct NEq
 
 template <AnyVector T> struct CompareEq
 {
-    void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst)
+    void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst) const
     {
         aDst = T::CompareEQ(aSrc1, aSrc2);
     }
@@ -383,7 +383,7 @@ template <AnyVector T> struct CompareEq
 
 template <RealVector T> struct CompareGe
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst) const
     {
         aDst = T::CompareGE(aSrc1, aSrc2);
     }
@@ -391,7 +391,7 @@ template <RealVector T> struct CompareGe
 
 template <RealVector T> struct CompareGt
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst) const
     {
         aDst = T::CompareGT(aSrc1, aSrc2);
     }
@@ -399,7 +399,7 @@ template <RealVector T> struct CompareGt
 
 template <RealVector T> struct CompareLe
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst) const
     {
         aDst = T::CompareLE(aSrc1, aSrc2);
     }
@@ -407,7 +407,7 @@ template <RealVector T> struct CompareLe
 
 template <RealVector T> struct CompareLt
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst) const
     {
         aDst = T::CompareLT(aSrc1, aSrc2);
     }
@@ -415,7 +415,7 @@ template <RealVector T> struct CompareLt
 
 template <AnyVector T> struct CompareNEq
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst) const
     {
         aDst = T::CompareNEQ(aSrc1, aSrc2);
     }
@@ -431,7 +431,7 @@ template <RealVector T, AlphaCompositionOp alphaOp> struct AlphaCompositionC
     {
     }
 
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
     {
         aDst.x = ComputePixel(aSrc1.x, aSrc2.x);
         if constexpr (vector_size_v<T> >= 2)
@@ -447,7 +447,7 @@ template <RealVector T, AlphaCompositionOp alphaOp> struct AlphaCompositionC
             aDst.w = ComputePixel(aSrc1.w, aSrc2.w);
         }
     }
-    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
     {
         aSrcDst.x = ComputePixel(aSrcDst.x, aSrc1.x);
         if constexpr (vector_size_v<T> >= 2)
@@ -465,7 +465,7 @@ template <RealVector T, AlphaCompositionOp alphaOp> struct AlphaCompositionC
     }
 
   private:
-    DEVICE_CODE remove_vector_t<T> ComputePixel(remove_vector_t<T> aSrc1, remove_vector_t<T> aSrc2)
+    DEVICE_CODE remove_vector_t<T> ComputePixel(remove_vector_t<T> aSrc1, remove_vector_t<T> aSrc2) const
     {
         switch (alphaOp)
         {
@@ -503,7 +503,7 @@ template <RealVector T, AlphaCompositionOp alphaOp> struct AlphaCompositionC
 
 template <RealVector T, AlphaCompositionOp alphaOp> struct AlphaComposition
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
         requires(vector_size_v<T> == 1)
     {
         // One channel version, so only alpha? Doesn't exist in NPP but adding it makes AlphaComposition valid for all
@@ -513,7 +513,7 @@ template <RealVector T, AlphaCompositionOp alphaOp> struct AlphaComposition
 
         aDst.x = ComputeAlpha(alphaSrc1, alphaSrc2);
     }
-    DEVICE_CODE void operator()(const T &aSrc2, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc2, T &aSrcDst) const
         requires(vector_size_v<T> == 1)
     {
         const remove_vector_t<T> alphaSrc1 = aSrcDst.x;
@@ -521,7 +521,7 @@ template <RealVector T, AlphaCompositionOp alphaOp> struct AlphaComposition
 
         aSrcDst.x = ComputeAlpha(alphaSrc1, alphaSrc2);
     }
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
         requires(vector_size_v<T> == 2)
     {
         // Two channel version is named nppiAlphaComp_8u_AC1R, but it is a 2 channel function...
@@ -531,7 +531,7 @@ template <RealVector T, AlphaCompositionOp alphaOp> struct AlphaComposition
         aDst.x = ComputePixel(aSrc1.x, aSrc2.x, alphaSrc1, alphaSrc2);
         aDst.y = ComputeAlpha(alphaSrc1, alphaSrc2);
     }
-    DEVICE_CODE void operator()(const T &aSrc2, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc2, T &aSrcDst) const
         requires(vector_size_v<T> == 2)
     {
         const remove_vector_t<T> alphaSrc1 = aSrcDst.y;
@@ -540,7 +540,7 @@ template <RealVector T, AlphaCompositionOp alphaOp> struct AlphaComposition
         aSrcDst.x = ComputePixel(aSrcDst.x, aSrc2.x, alphaSrc1, alphaSrc2);
         aSrcDst.y = ComputeAlpha(alphaSrc1, alphaSrc2);
     }
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
         requires(vector_size_v<T> == 3)
     {
         // Three channel version doesn't exist in NPP, but for completness...
@@ -551,7 +551,7 @@ template <RealVector T, AlphaCompositionOp alphaOp> struct AlphaComposition
         aDst.y = ComputePixel(aSrc1.y, aSrc2.y, alphaSrc1, alphaSrc2);
         aDst.z = ComputeAlpha(alphaSrc1, alphaSrc2);
     }
-    DEVICE_CODE void operator()(const T &aSrc2, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc2, T &aSrcDst) const
         requires(vector_size_v<T> == 3)
     {
         const remove_vector_t<T> alphaSrc1 = aSrcDst.z;
@@ -561,7 +561,7 @@ template <RealVector T, AlphaCompositionOp alphaOp> struct AlphaComposition
         aSrcDst.y = ComputePixel(aSrcDst.y, aSrc2.y, alphaSrc1, alphaSrc2);
         aSrcDst.z = ComputeAlpha(alphaSrc1, alphaSrc2);
     }
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
         requires(vector_size_v<T> == 4)
     {
         const remove_vector_t<T> alphaSrc1 = aSrc1.w;
@@ -572,7 +572,7 @@ template <RealVector T, AlphaCompositionOp alphaOp> struct AlphaComposition
         aDst.z = ComputePixel(aSrc1.z, aSrc2.z, alphaSrc1, alphaSrc2);
         aDst.w = ComputeAlpha(alphaSrc1, alphaSrc2);
     }
-    DEVICE_CODE void operator()(const T &aSrc2, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc2, T &aSrcDst) const
         requires(vector_size_v<T> == 4)
     {
         const remove_vector_t<T> alphaSrc1 = aSrcDst.w;
@@ -586,7 +586,7 @@ template <RealVector T, AlphaCompositionOp alphaOp> struct AlphaComposition
 
   protected:
     DEVICE_CODE remove_vector_t<T> ComputePixel(remove_vector_t<T> aSrc1, remove_vector_t<T> aSrc2,
-                                                remove_vector_t<T> aAlpha1, remove_vector_t<T> aAlpha2)
+                                                remove_vector_t<T> aAlpha1, remove_vector_t<T> aAlpha2) const
     {
         switch (alphaOp)
         {
@@ -619,7 +619,7 @@ template <RealVector T, AlphaCompositionOp alphaOp> struct AlphaComposition
         }
         return remove_vector_t<T>();
     }
-    DEVICE_CODE remove_vector_t<T> ComputeAlpha(remove_vector_t<T> aAlpha1, remove_vector_t<T> aAlpha2)
+    DEVICE_CODE remove_vector_t<T> ComputeAlpha(remove_vector_t<T> aAlpha1, remove_vector_t<T> aAlpha2) const
     {
         switch (alphaOp)
         {
@@ -664,7 +664,7 @@ template <RealVector T, AlphaCompositionOp alphaOp> struct AlphaComposition
 template <RealVector T, remove_vector_t<T> alphaMax, remove_vector_t<T> alphaMaxInv, AlphaCompositionOp alphaOp>
 struct AlphaCompositionScale : public AlphaComposition<T, alphaOp>
 {
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
         requires(vector_size_v<T> == 1)
     {
         // One channel version, so only alpha? Doesn't exist in NPP but adding it makes AlphaComposition valid for all
@@ -674,7 +674,7 @@ struct AlphaCompositionScale : public AlphaComposition<T, alphaOp>
 
         aDst.x = AlphaComposition<T, alphaOp>::ComputeAlpha(alphaSrc1, alphaSrc2) * alphaMax;
     }
-    DEVICE_CODE void operator()(const T &aSrc2, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc2, T &aSrcDst) const
         requires(vector_size_v<T> == 1)
     {
         const remove_vector_t<T> alphaSrc1 = aSrcDst.x * alphaMaxInv;
@@ -682,7 +682,7 @@ struct AlphaCompositionScale : public AlphaComposition<T, alphaOp>
 
         aSrcDst.x = AlphaComposition<T, alphaOp>::ComputeAlpha(alphaSrc1, alphaSrc2) * alphaMax;
     }
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
         requires(vector_size_v<T> == 2)
     {
         // Two channel version is named nppiAlphaComp_8u_AC1R, but it is a 2 channel function...
@@ -692,7 +692,7 @@ struct AlphaCompositionScale : public AlphaComposition<T, alphaOp>
         aDst.x = AlphaComposition<T, alphaOp>::ComputePixel(aSrc1.x, aSrc2.x, alphaSrc1, alphaSrc2);
         aDst.y = AlphaComposition<T, alphaOp>::ComputeAlpha(alphaSrc1, alphaSrc2) * alphaMax;
     }
-    DEVICE_CODE void operator()(const T &aSrc2, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc2, T &aSrcDst) const
         requires(vector_size_v<T> == 2)
     {
         const remove_vector_t<T> alphaSrc1 = aSrcDst.y * alphaMaxInv;
@@ -701,7 +701,7 @@ struct AlphaCompositionScale : public AlphaComposition<T, alphaOp>
         aSrcDst.x = AlphaComposition<T, alphaOp>::ComputePixel(aSrcDst.x, aSrc2.x, alphaSrc1, alphaSrc2);
         aSrcDst.y = AlphaComposition<T, alphaOp>::ComputeAlpha(alphaSrc1, alphaSrc2) * alphaMax;
     }
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
         requires(vector_size_v<T> == 3)
     {
         // Three channel version doesn't exist in NPP, but for completness...
@@ -712,7 +712,7 @@ struct AlphaCompositionScale : public AlphaComposition<T, alphaOp>
         aDst.y = AlphaComposition<T, alphaOp>::ComputePixel(aSrc1.y, aSrc2.y, alphaSrc1, alphaSrc2);
         aDst.z = AlphaComposition<T, alphaOp>::ComputeAlpha(alphaSrc1, alphaSrc2) * alphaMax;
     }
-    DEVICE_CODE void operator()(const T &aSrc2, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc2, T &aSrcDst) const
         requires(vector_size_v<T> == 3)
     {
         const remove_vector_t<T> alphaSrc1 = aSrcDst.z * alphaMaxInv;
@@ -722,7 +722,7 @@ struct AlphaCompositionScale : public AlphaComposition<T, alphaOp>
         aSrcDst.y = AlphaComposition<T, alphaOp>::ComputePixel(aSrcDst.y, aSrc2.y, alphaSrc1, alphaSrc2);
         aSrcDst.z = AlphaComposition<T, alphaOp>::ComputeAlpha(alphaSrc1, alphaSrc2) * alphaMax;
     }
-    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst)
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
         requires(vector_size_v<T> == 4)
     {
         const remove_vector_t<T> alphaSrc1 = aSrc1.w * alphaMaxInv;
@@ -733,7 +733,7 @@ struct AlphaCompositionScale : public AlphaComposition<T, alphaOp>
         aDst.z = AlphaComposition<T, alphaOp>::ComputePixel(aSrc1.z, aSrc2.z, alphaSrc1, alphaSrc2);
         aDst.w = AlphaComposition<T, alphaOp>::ComputeAlpha(alphaSrc1, alphaSrc2) * alphaMax;
     }
-    DEVICE_CODE void operator()(const T &aSrc2, T &aSrcDst)
+    DEVICE_CODE void operator()(const T &aSrc2, T &aSrcDst) const
         requires(vector_size_v<T> == 4)
     {
         const remove_vector_t<T> alphaSrc1 = aSrcDst.w * alphaMaxInv;

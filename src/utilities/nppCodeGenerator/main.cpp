@@ -199,11 +199,11 @@ int main()
 
         /*for (const auto &f : functions)
         {
-            if (f.name == "nppiMinEvery_8u_C4IR_Ctx")
+            if (f.name == "nppiWarpAffine_8u_C3R_Ctx")
             {
                 ConvertedFunction cf(f);
             }
-        }*/
+        } */
 
         std::vector<Function> batchFunc;
         std::vector<Function> convertedFuncCheck;

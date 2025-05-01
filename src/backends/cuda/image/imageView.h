@@ -694,6 +694,19 @@ template <PixelType T> class ImageView
     /// </summary>
     ImageView<T> &SetMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get());
+    /// <summary>
+    /// Set channel aChannel of all pixels in current ROI to aConst
+    /// </summary>
+    ImageView<T> &Set(remove_vector_t<T> aConst, Channel aChannel,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires(vector_size_v<T> > 1);
+
+    /// <summary>
+    /// Set channel aChannel of all pixels in current ROI to aConst
+    /// </summary>
+    ImageView<T> &Set(const opp::cuda::DevVarView<remove_vector_t<T>> &aConst, Channel aChannel,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires(vector_size_v<T> > 1);
 #pragma endregion
 #pragma region Swap Channel
     /// <summary>

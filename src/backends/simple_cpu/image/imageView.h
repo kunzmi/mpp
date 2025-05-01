@@ -8,6 +8,7 @@
 #include <common/complex.h>
 #include <common/defines.h>
 #include <common/half_fp16.h>
+#include <common/image/affineTransformation.h>
 #include <common/image/border.h>
 #include <common/image/channel.h>
 #include <common/image/functors/constantFunctor.h>
@@ -25,6 +26,7 @@
 #include <common/image/functors/srcSrcFunctor.h>
 #include <common/image/functors/srcSrcScaleFunctor.h>
 #include <common/image/gotoPtr.h>
+#include <common/image/matrix.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
 #include <common/image/roiException.h>
@@ -1200,6 +1202,8 @@ template <PixelType T> class ImageView
     ImageView<T> &Set(const T &aConst);
 
     ImageView<T> &SetMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask);
+
+    ImageView<T> &Set(remove_vector_t<T> aConst, Channel aChannel);
 #pragma endregion
 #pragma region Swap Channel
     /// <summary>
@@ -1783,6 +1787,36 @@ template <PixelType T> class ImageView
         ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst) const
         requires RealSignedVector<T> && (!FourChannelAlpha<T>);
 #pragma endregion
+#pragma endregion
+
+#pragma region Geometric Transforms
+    /// <summary>
+    /// WarpAffine<para/>
+    /// Depending on BorderType, the behaviour for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behaviour is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    template <RealFloatingPoint CoordT>
+    ImageView<T> &WarpAffine(ImageView<T> &aDst, const AffineTransformation<CoordT> &aAffine,
+                             InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                             Roi aAllowedReadRoi = Roi()) const;
+    /// <summary>
+    /// WarpAffine
+    /// Depending on BorderType, the behaviour for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behaviour is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    template <RealFloatingPoint CoordT>
+    ImageView<T> &WarpAffine(ImageView<T> &aDst, const AffineTransformation<CoordT> &aAffine,
+                             InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi()) const;
 #pragma endregion
 
 #pragma region Statistics

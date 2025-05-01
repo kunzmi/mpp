@@ -10,11 +10,11 @@
 #include "opp_defs.h"
 #include "safeCast.h"
 #include "staticCast.h"
-#include "vector_typetraits.h"
 #include "vector2.h"
 #include "vector3.h"
 #include "vector4.h"
 #include "vector4A.h"
+#include "vector_typetraits.h"
 #include <cmath>
 #include <common/utilities.h>
 #include <concepts>
@@ -384,18 +384,20 @@ DEVICE_CODE Vector4<T>::operator uint &()
 /// the element, returns true if each element comparison is true
 /// </summary>
 template <Number T>
-DEVICE_CODE bool Vector4<T>::EqEps(Vector4<T> aLeft, Vector4<T> aRight, T aEpsilon)
+DEVICE_CODE bool Vector4<T>::EqEps(const Vector4<T> &aLeft, const Vector4<T> &aRight, T aEpsilon)
     requires NativeFloatingPoint<T> && HostCode<T>
 {
-    MakeNANandINFValid(aLeft.x, aRight.x);
-    MakeNANandINFValid(aLeft.y, aRight.y);
-    MakeNANandINFValid(aLeft.z, aRight.z);
-    MakeNANandINFValid(aLeft.w, aRight.w);
+    Vector4<T> left  = aLeft;
+    Vector4<T> right = aRight;
+    MakeNANandINFValid(left.x, right.x);
+    MakeNANandINFValid(left.y, right.y);
+    MakeNANandINFValid(left.z, right.z);
+    MakeNANandINFValid(left.w, right.w);
 
-    bool res = std::abs(aLeft.x - aRight.x) <= aEpsilon;
-    res &= std::abs(aLeft.y - aRight.y) <= aEpsilon;
-    res &= std::abs(aLeft.z - aRight.z) <= aEpsilon;
-    res &= std::abs(aLeft.w - aRight.w) <= aEpsilon;
+    bool res = std::abs(left.x - right.x) <= aEpsilon;
+    res &= std::abs(left.y - right.y) <= aEpsilon;
+    res &= std::abs(left.z - right.z) <= aEpsilon;
+    res &= std::abs(left.w - right.w) <= aEpsilon;
     return res;
 }
 
@@ -404,18 +406,20 @@ DEVICE_CODE bool Vector4<T>::EqEps(Vector4<T> aLeft, Vector4<T> aRight, T aEpsil
 /// the element, returns true if each element comparison is true
 /// </summary>
 template <Number T>
-DEVICE_CODE bool Vector4<T>::EqEps(Vector4<T> aLeft, Vector4<T> aRight, T aEpsilon)
+DEVICE_CODE bool Vector4<T>::EqEps(const Vector4<T> &aLeft, const Vector4<T> &aRight, T aEpsilon)
     requires NativeFloatingPoint<T> && DeviceCode<T>
 {
-    MakeNANandINFValid(aLeft.x, aRight.x);
-    MakeNANandINFValid(aLeft.y, aRight.y);
-    MakeNANandINFValid(aLeft.z, aRight.z);
-    MakeNANandINFValid(aLeft.w, aRight.w);
+    Vector4<T> left  = aLeft;
+    Vector4<T> right = aRight;
+    MakeNANandINFValid(left.x, right.x);
+    MakeNANandINFValid(left.y, right.y);
+    MakeNANandINFValid(left.z, right.z);
+    MakeNANandINFValid(left.w, right.w);
 
-    bool res = abs(aLeft.x - aRight.x) <= aEpsilon;
-    res &= abs(aLeft.y - aRight.y) <= aEpsilon;
-    res &= abs(aLeft.z - aRight.z) <= aEpsilon;
-    res &= abs(aLeft.w - aRight.w) <= aEpsilon;
+    bool res = abs(left.x - right.x) <= aEpsilon;
+    res &= abs(left.y - right.y) <= aEpsilon;
+    res &= abs(left.z - right.z) <= aEpsilon;
+    res &= abs(left.w - right.w) <= aEpsilon;
     return res;
 }
 
@@ -424,18 +428,20 @@ DEVICE_CODE bool Vector4<T>::EqEps(Vector4<T> aLeft, Vector4<T> aRight, T aEpsil
 /// the element, returns true if each element comparison is true
 /// </summary>
 template <Number T>
-DEVICE_CODE bool Vector4<T>::EqEps(Vector4<T> aLeft, Vector4<T> aRight, T aEpsilon)
+DEVICE_CODE bool Vector4<T>::EqEps(const Vector4<T> &aLeft, const Vector4<T> &aRight, T aEpsilon)
     requires Is16BitFloat<T>
 {
-    MakeNANandINFValid(aLeft.x, aRight.x);
-    MakeNANandINFValid(aLeft.y, aRight.y);
-    MakeNANandINFValid(aLeft.z, aRight.z);
-    MakeNANandINFValid(aLeft.w, aRight.w);
+    Vector4<T> left  = aLeft;
+    Vector4<T> right = aRight;
+    MakeNANandINFValid(left.x, right.x);
+    MakeNANandINFValid(left.y, right.y);
+    MakeNANandINFValid(left.z, right.z);
+    MakeNANandINFValid(left.w, right.w);
 
-    bool res = T::Abs(aLeft.x - aRight.x) <= aEpsilon;
-    res &= T::Abs(aLeft.y - aRight.y) <= aEpsilon;
-    res &= T::Abs(aLeft.z - aRight.z) <= aEpsilon;
-    res &= T::Abs(aLeft.w - aRight.w) <= aEpsilon;
+    bool res = T::Abs(left.x - right.x) <= aEpsilon;
+    res &= T::Abs(left.y - right.y) <= aEpsilon;
+    res &= T::Abs(left.z - right.z) <= aEpsilon;
+    res &= T::Abs(left.w - right.w) <= aEpsilon;
     return res;
 }
 
@@ -4034,19 +4040,21 @@ DEVICE_CODE Vector4<T> &Vector4<T>::RoundZero()
 /// the element, returns 0xFF per element for true, 0x00 for false
 /// </summary>
 template <Number T>
-Vector4<byte> Vector4<T>::CompareEQEps(Vector4<T> aLeft, Vector4<T> aRight, T aEpsilon)
+Vector4<byte> Vector4<T>::CompareEQEps(const Vector4<T> &aLeft, const Vector4<T> &aRight, T aEpsilon)
     requires NativeFloatingPoint<T> && HostCode<T>
 {
-    MakeNANandINFValid(aLeft.x, aRight.x);
-    MakeNANandINFValid(aLeft.y, aRight.y);
-    MakeNANandINFValid(aLeft.z, aRight.z);
-    MakeNANandINFValid(aLeft.w, aRight.w);
+    Vector4<T> left  = aLeft;
+    Vector4<T> right = aRight;
+    MakeNANandINFValid(left.x, right.x);
+    MakeNANandINFValid(left.y, right.y);
+    MakeNANandINFValid(left.z, right.z);
+    MakeNANandINFValid(left.w, right.w);
 
     Vector4<byte> ret; // NOLINT
-    ret.x = static_cast<byte>(static_cast<int>(std::abs(aLeft.x - aRight.x) <= aEpsilon) * TRUE_VALUE);
-    ret.y = static_cast<byte>(static_cast<int>(std::abs(aLeft.y - aRight.y) <= aEpsilon) * TRUE_VALUE);
-    ret.z = static_cast<byte>(static_cast<int>(std::abs(aLeft.z - aRight.z) <= aEpsilon) * TRUE_VALUE);
-    ret.w = static_cast<byte>(static_cast<int>(std::abs(aLeft.w - aRight.w) <= aEpsilon) * TRUE_VALUE);
+    ret.x = static_cast<byte>(static_cast<int>(std::abs(left.x - right.x) <= aEpsilon) * TRUE_VALUE);
+    ret.y = static_cast<byte>(static_cast<int>(std::abs(left.y - right.y) <= aEpsilon) * TRUE_VALUE);
+    ret.z = static_cast<byte>(static_cast<int>(std::abs(left.z - right.z) <= aEpsilon) * TRUE_VALUE);
+    ret.w = static_cast<byte>(static_cast<int>(std::abs(left.w - right.w) <= aEpsilon) * TRUE_VALUE);
     return ret;
 }
 
@@ -4055,19 +4063,21 @@ Vector4<byte> Vector4<T>::CompareEQEps(Vector4<T> aLeft, Vector4<T> aRight, T aE
 /// the element, returns 0xFF per element for true, 0x00 for false
 /// </summary>
 template <Number T>
-DEVICE_CODE Vector4<byte> Vector4<T>::CompareEQEps(Vector4<T> aLeft, Vector4<T> aRight, T aEpsilon)
+DEVICE_CODE Vector4<byte> Vector4<T>::CompareEQEps(const Vector4<T> &aLeft, const Vector4<T> &aRight, T aEpsilon)
     requires NativeFloatingPoint<T> && DeviceCode<T>
 {
-    MakeNANandINFValid(aLeft.x, aRight.x);
-    MakeNANandINFValid(aLeft.y, aRight.y);
-    MakeNANandINFValid(aLeft.z, aRight.z);
-    MakeNANandINFValid(aLeft.w, aRight.w);
+    Vector4<T> left  = aLeft;
+    Vector4<T> right = aRight;
+    MakeNANandINFValid(left.x, right.x);
+    MakeNANandINFValid(left.y, right.y);
+    MakeNANandINFValid(left.z, right.z);
+    MakeNANandINFValid(left.w, right.w);
 
     Vector4<byte> ret; // NOLINT
-    ret.x = static_cast<byte>(static_cast<int>(abs(aLeft.x - aRight.x) <= aEpsilon) * TRUE_VALUE);
-    ret.y = static_cast<byte>(static_cast<int>(abs(aLeft.y - aRight.y) <= aEpsilon) * TRUE_VALUE);
-    ret.z = static_cast<byte>(static_cast<int>(abs(aLeft.z - aRight.z) <= aEpsilon) * TRUE_VALUE);
-    ret.w = static_cast<byte>(static_cast<int>(abs(aLeft.w - aRight.w) <= aEpsilon) * TRUE_VALUE);
+    ret.x = static_cast<byte>(static_cast<int>(abs(left.x - right.x) <= aEpsilon) * TRUE_VALUE);
+    ret.y = static_cast<byte>(static_cast<int>(abs(left.y - right.y) <= aEpsilon) * TRUE_VALUE);
+    ret.z = static_cast<byte>(static_cast<int>(abs(left.z - right.z) <= aEpsilon) * TRUE_VALUE);
+    ret.w = static_cast<byte>(static_cast<int>(abs(left.w - right.w) <= aEpsilon) * TRUE_VALUE);
     return ret;
 }
 
@@ -4076,19 +4086,21 @@ DEVICE_CODE Vector4<byte> Vector4<T>::CompareEQEps(Vector4<T> aLeft, Vector4<T> 
 /// the element, returns 0xFF per element for true, 0x00 for false
 /// </summary>
 template <Number T>
-DEVICE_CODE Vector4<byte> Vector4<T>::CompareEQEps(Vector4<T> aLeft, Vector4<T> aRight, T aEpsilon)
+DEVICE_CODE Vector4<byte> Vector4<T>::CompareEQEps(const Vector4<T> &aLeft, const Vector4<T> &aRight, T aEpsilon)
     requires Is16BitFloat<T>
 {
-    MakeNANandINFValid(aLeft.x, aRight.x);
-    MakeNANandINFValid(aLeft.y, aRight.y);
-    MakeNANandINFValid(aLeft.z, aRight.z);
-    MakeNANandINFValid(aLeft.w, aRight.w);
+    Vector4<T> left  = aLeft;
+    Vector4<T> right = aRight;
+    MakeNANandINFValid(left.x, right.x);
+    MakeNANandINFValid(left.y, right.y);
+    MakeNANandINFValid(left.z, right.z);
+    MakeNANandINFValid(left.w, right.w);
 
     Vector4<byte> ret; // NOLINT
-    ret.x = static_cast<byte>(static_cast<int>(T::Abs(aLeft.x - aRight.x) <= aEpsilon) * TRUE_VALUE);
-    ret.y = static_cast<byte>(static_cast<int>(T::Abs(aLeft.y - aRight.y) <= aEpsilon) * TRUE_VALUE);
-    ret.z = static_cast<byte>(static_cast<int>(T::Abs(aLeft.z - aRight.z) <= aEpsilon) * TRUE_VALUE);
-    ret.w = static_cast<byte>(static_cast<int>(T::Abs(aLeft.w - aRight.w) <= aEpsilon) * TRUE_VALUE);
+    ret.x = static_cast<byte>(static_cast<int>(T::Abs(left.x - right.x) <= aEpsilon) * TRUE_VALUE);
+    ret.y = static_cast<byte>(static_cast<int>(T::Abs(left.y - right.y) <= aEpsilon) * TRUE_VALUE);
+    ret.z = static_cast<byte>(static_cast<int>(T::Abs(left.z - right.z) <= aEpsilon) * TRUE_VALUE);
+    ret.w = static_cast<byte>(static_cast<int>(T::Abs(left.w - right.w) <= aEpsilon) * TRUE_VALUE);
     return ret;
 }
 

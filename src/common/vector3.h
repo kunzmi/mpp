@@ -117,21 +117,21 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
     /// the element, returns true if each element comparison is true
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static bool EqEps(Vector3 aLeft, Vector3 aRight, T aEpsilon)
+    DEVICE_CODE [[nodiscard]] static bool EqEps(const Vector3 &aLeft, const Vector3 &aRight, T aEpsilon)
         requires NativeFloatingPoint<T> && HostCode<T>;
 
     /// <summary>
     /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
     /// the element, returns true if each element comparison is true
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static bool EqEps(Vector3 aLeft, Vector3 aRight, T aEpsilon)
+    DEVICE_CODE [[nodiscard]] static bool EqEps(const Vector3 &aLeft, const Vector3 &aRight, T aEpsilon)
         requires NativeFloatingPoint<T> && DeviceCode<T>;
 
     /// <summary>
     /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
     /// the element, returns true if each element comparison is true
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static bool EqEps(Vector3 aLeft, Vector3 aRight, T aEpsilon)
+    DEVICE_CODE [[nodiscard]] static bool EqEps(const Vector3 &aLeft, const Vector3 &aRight, T aEpsilon)
         requires Is16BitFloat<T>;
 
     /// <summary>
@@ -911,21 +911,23 @@ template <Number T> struct alignas(sizeof(T)) Vector3
     /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
     /// the element, returns 0xFF per element for true, 0x00 for false
     /// </summary>
-    [[nodiscard]] static Vector3<byte> CompareEQEps(Vector3<T> aLeft, Vector3<T> aRight, T aEpsilon)
+    [[nodiscard]] static Vector3<byte> CompareEQEps(const Vector3<T> &aLeft, const Vector3<T> &aRight, T aEpsilon)
         requires NativeFloatingPoint<T> && HostCode<T>;
 
     /// <summary>
     /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
     /// the element, returns 0xFF per element for true, 0x00 for false
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector3<byte> CompareEQEps(Vector3<T> aLeft, Vector3<T> aRight, T aEpsilon)
+    DEVICE_CODE [[nodiscard]] static Vector3<byte> CompareEQEps(const Vector3<T> &aLeft, const Vector3<T> &aRight,
+                                                                T aEpsilon)
         requires NativeFloatingPoint<T> && DeviceCode<T>;
 
     /// <summary>
     /// Element wise comparison equal with epsilon margin, if both elements to compare are NAN/INF result is true for
     /// the element, returns 0xFF per element for true, 0x00 for false
     /// </summary>
-    DEVICE_CODE [[nodiscard]] static Vector3<byte> CompareEQEps(Vector3<T> aLeft, Vector3<T> aRight, T aEpsilon)
+    DEVICE_CODE [[nodiscard]] static Vector3<byte> CompareEQEps(const Vector3<T> &aLeft, const Vector3<T> &aRight,
+                                                                T aEpsilon)
         requires Is16BitFloat<T>;
 
     /// <summary>

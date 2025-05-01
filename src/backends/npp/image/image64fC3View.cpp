@@ -10,8 +10,12 @@
 #include <backends/npp/nppException.h>  //NOLINT
 #include <common/defines.h> //NOLINT
 #include <common/exception.h> //NOLINT
+#include <common/image/affineTransformation.h> //NOLINT
 #include <common/image/border.h> //NOLINT
+#include <common/image/bound.h> //NOLINT
+#include <common/image/matrix.h> //NOLINT
 #include <common/image/pixelTypes.h> //NOLINT
+#include <common/image/quad.h> //NOLINT
 #include <common/image/roi.h> //NOLINT
 #include <common/image/roiException.h>  //NOLINT
 #include <common/image/size2D.h>  //NOLINT
@@ -265,14 +269,14 @@ void Image64fC3View::Remap(const Image64fC1View &aSrcChannel0, const Image64fC1V
     nppSafeCall(nppiRemap_64f_P3R_Ctx(srcList, aSrcChannel0.NppiSizeFull(), to_int(aSrcChannel0.Pitch()), aSrcChannel0.NppiRectRoi(), reinterpret_cast<const Npp64f *>(pXMap.PointerRoi()), to_int(pXMap.Pitch()), reinterpret_cast<const Npp64f *>(pYMap.PointerRoi()), to_int(pYMap.Pitch()), dstList, to_int(aDstChannel0.Pitch()), aDstChannel0.NppiSizeRoi(), eInterpolation, nppStreamCtx));
 }
 
-Image64fC3View &Image64fC3View::WarpAffine(Image64fC3View &pDst, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx) const
+Image64fC3View &Image64fC3View::WarpAffine(Image64fC3View &pDst, const AffineTransformation<double> &aCoeffs, int eInterpolation, const NppStreamContext &nppStreamCtx) const
 {
-    nppSafeCallExt(nppiWarpAffine_64f_C3R_Ctx(reinterpret_cast<const Npp64f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp64f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx),
+    nppSafeCallExt(nppiWarpAffine_64f_C3R_Ctx(reinterpret_cast<const Npp64f *>(Pointer()), NppiSizeFull(), to_int(Pitch()), NppiRectRoi(), reinterpret_cast<Npp64f *>(pDst.Pointer()), to_int(pDst.Pitch()), pDst.NppiRectRoi(), reinterpret_cast<const double(*)[3]>(&aCoeffs), eInterpolation, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
 }
 
-void Image64fC3View::WarpAffine(const Image64fC1View &aSrcChannel0, const Image64fC1View &aSrcChannel1, const Image64fC1View &aSrcChannel2, Image64fC1View &aDstChannel0, Image64fC1View &aDstChannel1, Image64fC1View &aDstChannel2, const double aCoeffs[2][3], int eInterpolation, const NppStreamContext &nppStreamCtx)
+void Image64fC3View::WarpAffine(const Image64fC1View &aSrcChannel0, const Image64fC1View &aSrcChannel1, const Image64fC1View &aSrcChannel2, Image64fC1View &aDstChannel0, Image64fC1View &aDstChannel1, Image64fC1View &aDstChannel2, const AffineTransformation<double> &aCoeffs, int eInterpolation, const NppStreamContext &nppStreamCtx)
 {
     const Npp64f * srcList[] = { reinterpret_cast<const Npp64f *>(aSrcChannel0.Pointer()), reinterpret_cast<const Npp64f *>(aSrcChannel1.Pointer()), reinterpret_cast<const Npp64f *>(aSrcChannel2.Pointer()) };
     if (aSrcChannel0.Pitch() != aSrcChannel1.Pitch())
@@ -292,7 +296,7 @@ void Image64fC3View::WarpAffine(const Image64fC1View &aSrcChannel0, const Image6
     {
         throw INVALIDARGUMENT(aDstChannel2, "Not all destination image planes have the same image pitch. First image pitch is " << aDstChannel0.Pitch() << " but the pitch for plane no 2 is " << aDstChannel2.Pitch());
     }
-    nppSafeCall(nppiWarpAffine_64f_P3R_Ctx(srcList, aSrcChannel0.NppiSizeFull(), to_int(aSrcChannel0.Pitch()), aSrcChannel0.NppiRectRoi(), dstList, to_int(aDstChannel0.Pitch()), aDstChannel0.NppiRectRoi(), aCoeffs, eInterpolation, nppStreamCtx));
+    nppSafeCall(nppiWarpAffine_64f_P3R_Ctx(srcList, aSrcChannel0.NppiSizeFull(), to_int(aSrcChannel0.Pitch()), aSrcChannel0.NppiRectRoi(), dstList, to_int(aDstChannel0.Pitch()), aDstChannel0.NppiRectRoi(), reinterpret_cast<const double(*)[3]>(&aCoeffs), eInterpolation, nppStreamCtx));
 }
 
 #endif // OPPi_ENABLE_DOUBLE_TYPE && OPPi_ENABLE_THREE_CHANNEL

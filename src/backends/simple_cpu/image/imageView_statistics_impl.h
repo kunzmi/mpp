@@ -3234,7 +3234,7 @@ void ImageView<T>::MinIndex(T &aDstMin, same_vector_size_different_type_t<T, int
     constexpr size_t TupelSize = 1;
 
     const opp::MinIdx<SrcT> redOpMin;
-    SrcReductionMinIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
+    const SrcReductionMinIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
 
     std::vector<T> tempVal(to_size_t(SizeRoi().y));
     std::vector<idxT> tempIdxX(to_size_t(SizeRoi().y));
@@ -3324,7 +3324,7 @@ void ImageView<T>::MinIndexMasked(T &aDstMin, same_vector_size_different_type_t<
     constexpr size_t TupelSize = 1;
 
     const opp::MinIdx<SrcT> redOpMin;
-    SrcReductionMinIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
+    const SrcReductionMinIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
 
     std::vector<T> tempVal(to_size_t(SizeRoi().y));
     std::vector<idxT> tempIdxX(to_size_t(SizeRoi().y));
@@ -3416,7 +3416,7 @@ void ImageView<T>::MinIndex(T &aDstMin, same_vector_size_different_type_t<T, int
     constexpr size_t TupelSize = 1;
 
     const opp::MinIdx<SrcT> redOpMin;
-    SrcReductionMinIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
+    const SrcReductionMinIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
 
     std::vector<T> tempVal(to_size_t(SizeRoi().y));
     std::vector<idxT> tempIdxX(to_size_t(SizeRoi().y));
@@ -3462,7 +3462,7 @@ void ImageView<T>::MinIndexMasked(T &aDstMin, same_vector_size_different_type_t<
     constexpr size_t TupelSize = 1;
 
     const opp::MinIdx<SrcT> redOpMin;
-    SrcReductionMinIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
+    const SrcReductionMinIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
 
     std::vector<T> tempVal(to_size_t(SizeRoi().y));
     std::vector<idxT> tempIdxX(to_size_t(SizeRoi().y));
@@ -3513,7 +3513,7 @@ void ImageView<T>::MaxIndex(T &aDstMax, same_vector_size_different_type_t<T, int
     constexpr size_t TupelSize = 1;
 
     const opp::MaxIdx<SrcT> redOpMax;
-    SrcReductionMaxIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
+    const SrcReductionMaxIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
 
     std::vector<T> tempVal(to_size_t(SizeRoi().y));
     std::vector<idxT> tempIdxX(to_size_t(SizeRoi().y));
@@ -3603,7 +3603,7 @@ void ImageView<T>::MaxIndexMasked(T &aDstMax, same_vector_size_different_type_t<
     constexpr size_t TupelSize = 1;
 
     const opp::MaxIdx<SrcT> redOpMax;
-    SrcReductionMaxIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
+    const SrcReductionMaxIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
 
     std::vector<T> tempVal(to_size_t(SizeRoi().y));
     std::vector<idxT> tempIdxX(to_size_t(SizeRoi().y));
@@ -3695,7 +3695,7 @@ void ImageView<T>::MaxIndex(T &aDstMax, same_vector_size_different_type_t<T, int
     constexpr size_t TupelSize = 1;
 
     const opp::MaxIdx<SrcT> redOpMax;
-    SrcReductionMaxIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
+    const SrcReductionMaxIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
 
     std::vector<T> tempVal(to_size_t(SizeRoi().y));
     std::vector<idxT> tempIdxX(to_size_t(SizeRoi().y));
@@ -3741,7 +3741,7 @@ void ImageView<T>::MaxIndexMasked(T &aDstMax, same_vector_size_different_type_t<
     constexpr size_t TupelSize = 1;
 
     const opp::MaxIdx<SrcT> redOpMax;
-    SrcReductionMaxIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
+    const SrcReductionMaxIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
 
     std::vector<T> tempVal(to_size_t(SizeRoi().y));
     std::vector<idxT> tempIdxX(to_size_t(SizeRoi().y));
@@ -4024,7 +4024,12 @@ ImageView<same_vector_size_different_type_t<T, int>> &ImageView<T>::Integral(
     const same_vector_size_different_type_t<T, int> &aVal) const
     requires RealIntVector<T>
 {
-    checkSameSize(ROI().Size(), aDst.ROI().Size() - 1);
+    if (SizeRoi() != aDst.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION(
+            "ROI of destination image must be one pixel larger in width and height than original ROI. Original size: "
+            << SizeRoi() << " provided destination image size: " << aDst.SizeRoi());
+    }
 
     using DstT = same_vector_size_different_type_t<T, int>;
 
@@ -4054,7 +4059,12 @@ ImageView<same_vector_size_different_type_t<T, float>> &ImageView<T>::Integral(
     const same_vector_size_different_type_t<T, float> &aVal) const
     requires RealVector<T> && (!std::same_as<double, remove_vector<T>>)
 {
-    checkSameSize(ROI().Size(), aDst.ROI().Size() - 1);
+    if (SizeRoi() != aDst.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION(
+            "ROI of destination image must be one pixel larger in width and height than original ROI. Original size: "
+            << SizeRoi() << " provided destination image size: " << aDst.SizeRoi());
+    }
 
     using DstT = same_vector_size_different_type_t<T, float>;
 
@@ -4084,7 +4094,12 @@ ImageView<same_vector_size_different_type_t<T, long64>> &ImageView<T>::Integral(
     const same_vector_size_different_type_t<T, long64> &aVal) const
     requires RealIntVector<T>
 {
-    checkSameSize(ROI().Size(), aDst.ROI().Size() - 1);
+    if (SizeRoi() != aDst.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION(
+            "ROI of destination image must be one pixel larger in width and height than original ROI. Original size: "
+            << SizeRoi() << " provided destination image size: " << aDst.SizeRoi());
+    }
 
     using DstT = same_vector_size_different_type_t<T, long64>;
 
@@ -4114,7 +4129,12 @@ ImageView<same_vector_size_different_type_t<T, double>> &ImageView<T>::Integral(
     const same_vector_size_different_type_t<T, double> &aVal) const
     requires RealVector<T>
 {
-    checkSameSize(ROI().Size(), aDst.ROI().Size() - 1);
+    if (SizeRoi() != aDst.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION(
+            "ROI of destination image must be one pixel larger in width and height than original ROI. Original size: "
+            << SizeRoi() << " provided destination image size: " << aDst.SizeRoi());
+    }
 
     using DstT = same_vector_size_different_type_t<T, double>;
 
@@ -4147,8 +4167,18 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, in
                                const same_vector_size_different_type_t<T, int> &aValSqr) const
     requires RealIntVector<T>
 {
-    checkSameSize(ROI().Size(), aDst.ROI().Size() - 1);
-    checkSameSize(ROI().Size(), aSqr.ROI().Size() - 1);
+    if (SizeRoi() != aDst.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION(
+            "ROI of destination image must be one pixel larger in width and height than original ROI. Original size: "
+            << SizeRoi() << " provided destination image size: " << aDst.SizeRoi());
+    }
+    if (SizeRoi() != aSqr.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION("ROI of destination image (squared) must be one pixel larger in width and height than "
+                           "original ROI. Original size: "
+                           << SizeRoi() << " provided destination image (squared) size: " << aSqr.SizeRoi());
+    }
 
     using DstT    = same_vector_size_different_type_t<T, int>;
     using DstTSqr = same_vector_size_different_type_t<T, int>;
@@ -4183,8 +4213,18 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, in
                                const same_vector_size_different_type_t<T, long64> &aValSqr) const
     requires RealIntVector<T>
 {
-    checkSameSize(ROI().Size(), aDst.ROI().Size() - 1);
-    checkSameSize(ROI().Size(), aSqr.ROI().Size() - 1);
+    if (SizeRoi() != aDst.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION(
+            "ROI of destination image must be one pixel larger in width and height than original ROI. Original size: "
+            << SizeRoi() << " provided destination image size: " << aDst.SizeRoi());
+    }
+    if (SizeRoi() != aSqr.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION("ROI of destination image (squared) must be one pixel larger in width and height than "
+                           "original ROI. Original size: "
+                           << SizeRoi() << " provided destination image (squared) size: " << aSqr.SizeRoi());
+    }
 
     using DstT    = same_vector_size_different_type_t<T, int>;
     using DstTSqr = same_vector_size_different_type_t<T, long64>;
@@ -4219,8 +4259,18 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, fl
                                const same_vector_size_different_type_t<T, double> &aValSqr) const
     requires RealVector<T> && (!std::same_as<double, remove_vector<T>>)
 {
-    checkSameSize(ROI().Size(), aDst.ROI().Size() - 1);
-    checkSameSize(ROI().Size(), aSqr.ROI().Size() - 1);
+    if (SizeRoi() != aDst.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION(
+            "ROI of destination image must be one pixel larger in width and height than original ROI. Original size: "
+            << SizeRoi() << " provided destination image size: " << aDst.SizeRoi());
+    }
+    if (SizeRoi() != aSqr.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION("ROI of destination image (squared) must be one pixel larger in width and height than "
+                           "original ROI. Original size: "
+                           << SizeRoi() << " provided destination image (squared) size: " << aSqr.SizeRoi());
+    }
 
     using DstT    = same_vector_size_different_type_t<T, float>;
     using DstTSqr = same_vector_size_different_type_t<T, double>;
@@ -4257,8 +4307,18 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, do
                                const same_vector_size_different_type_t<T, double> &aValSqr) const
     requires RealVector<T>
 {
-    checkSameSize(ROI().Size(), aDst.ROI().Size() - 1);
-    checkSameSize(ROI().Size(), aSqr.ROI().Size() - 1);
+    if (SizeRoi() != aDst.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION(
+            "ROI of destination image must be one pixel larger in width and height than original ROI. Original size: "
+            << SizeRoi() << " provided destination image size: " << aDst.SizeRoi());
+    }
+    if (SizeRoi() != aSqr.SizeRoi() - 1)
+    {
+        throw ROIEXCEPTION("ROI of destination image (squared) must be one pixel larger in width and height than "
+                           "original ROI. Original size: "
+                           << SizeRoi() << " provided destination image (squared) size: " << aSqr.SizeRoi());
+    }
 
     using DstT    = same_vector_size_different_type_t<T, double>;
     using DstTSqr = same_vector_size_different_type_t<T, double>;

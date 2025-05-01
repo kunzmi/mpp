@@ -6,6 +6,7 @@
 #include "dup.h"
 #include "scale.h"
 #include "set.h"
+#include "setChannel.h"
 #include "setMasked.h"
 #include "swapChannel.h"
 #include "transpose.h"

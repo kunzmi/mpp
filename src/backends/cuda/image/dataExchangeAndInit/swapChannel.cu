@@ -3,10 +3,9 @@
 #include "swapChannel.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelKernel.h>
-#include <backends/cuda/simd_operators/unary_operators.h>
 #include <backends/cuda/streamCtx.h>
 #include <backends/cuda/templateRegistry.h>
-#include <common/arithmetic/unary_operators.h>
+#include <common/dataExchangeAndInit/operators.h>
 #include <common/defines.h>
 #include <common/image/channel.h>
 #include <common/image/channelList.h>

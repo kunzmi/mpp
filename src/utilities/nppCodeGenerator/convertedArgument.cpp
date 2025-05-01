@@ -1075,6 +1075,32 @@ ConvertedArgument::ConvertedArgument( // NOLINT(hicpp-function-size,readability-
     {
         mType = "const " + mFunction.GetImageViewType() + " &";
     }
+    else if (aArgument->name == "aCoeffs" && mFunction.Name().substr(0, 10) == "WarpAffine")
+    {
+        mType = "const AffineTransformation<double> &";
+        mName = "aCoeffs"; // remove the "[3][2]"
+        mCall = "reinterpret_cast<const double(*)[3]>(&aCoeffs)";
+    }
+    else if (aArgument->name == "aSrcQuad" &&
+             (mFunction.Name().substr(0, 10) == "WarpAffine" || mFunction.Name().substr(0, 10) == "WarpPerspe"))
+    {
+        mType = "const Quad<double> &";
+        mName = "aSrcQuad"; // remove the "[4][2]"
+        mCall = "reinterpret_cast<const double(*)[2]>(&aSrcQuad)";
+    }
+    else if (aArgument->name == "aDstQuad" &&
+             (mFunction.Name().substr(0, 10) == "WarpAffine" || mFunction.Name().substr(0, 10) == "WarpPerspe"))
+    {
+        mType = "const Quad<double> &";
+        mName = "aDstQuad"; // remove the "[4][2]"
+        mCall = "reinterpret_cast<const double(*)[2]>(&aDstQuad)";
+    }
+    else if (aArgument->name == "aCoeffs" && mFunction.Name().substr(0, 10) == "WarpPerspe")
+    {
+        mType = "const PerspectiveTransformation<double> &";
+        mName = "aCoeffs"; // remove the "[3][3]"
+        mCall = "reinterpret_cast<const double(*)[3]>(&aCoeffs)";
+    }
 }
 ConvertedArgument::ConvertedArgument(const Argument *aArgument, ConvertedArgument *aLinkedArgument,
                                      const ConvertedFunction &aFunction)

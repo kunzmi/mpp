@@ -1,4 +1,5 @@
 #pragma once
+#include <common/defines.h>
 #include <ostream>
 
 namespace opp
@@ -902,6 +903,221 @@ inline std::wostream &operator<<(std::wostream &aOs, const HistorgamEvenMode &aH
         default:
             aOs << "Unknown";
             break;
+    }
+    return aOs;
+}
+#pragma endregion
+
+#pragma region InterpolationMode
+/// <summary>
+/// Pixel interpolation modes
+/// </summary>
+enum class InterpolationMode // NOLINT(performance-enum-size)
+{
+    /// <summary>
+    /// Undefined interpolation mode
+    /// </summary>
+    Undefined = 0,
+    /// <summary>
+    /// Nearest Neighbor interpolation mode
+    /// </summary>
+    NearestNeighbor = 1,
+    /// <summary>
+    /// Bi-Linear interpolation mode
+    /// </summary>
+    Linear = 2,
+    /// <summary>
+    /// Bi-Cubic interpolation mode using Cubic Hermite Splines, named 'cubic' in Matlab
+    /// </summary>
+    CubicHermiteSpline = 3,
+    /// <summary>
+    /// Bi-Cubic interpolation mode using Lagrange polynomials, named 'Cubic' in NPP (and IPP?)
+    /// </summary>
+    CubicLagrange = 4,
+    /// <summary>
+    /// Bi-Cubic interpolation mode with two-parameter cubic filter (B=1, C=0)
+    /// </summary>
+    Cubic2ParamBSpline = 5,
+    /// <summary>
+    /// Bi-Cubic interpolation mode with two-parameter cubic filter (B=0, C=1/2)
+    /// </summary>
+    Cubic2ParamCatmullRom = 6,
+    /// <summary>
+    /// Bi-Cubic interpolation mode with two-parameter cubic filter (B=1/2, C=3/10)
+    /// </summary>
+    Cubic2ParamB05C03 = 7,
+    /// <summary>
+    /// Super Sampling interpolation mode<para/>
+    /// Note: The super sampling interpolation mode can only be used if width and height of the destination image are
+    /// smaller than the source image.
+    /// </summary>
+    Super = 8,
+    /// <summary>
+    /// Interpolation with the 2-lobed Lanczos Window Function<para/>
+    /// The interpolation algorithm uses source image intensities at 16 pixels in the neighborhood of the point in the
+    /// source image.
+    /// </summary>
+    Lanczos2Lobed = 9,
+    /// <summary>
+    /// Interpolation with the 3-lobed Lanczos Window Function<para/>
+    /// The interpolation algorithm uses source image intensities at 36 pixels in the neighborhood of the point in the
+    /// source image.
+    /// Note: This is the same as Lanczos in NPP.
+    /// </summary>
+    Lanczos3Lobed = 10,
+    /// <summary>
+    /// For future versions of OPP, currently not implemented...
+    /// </summary>
+    SmoothEdge = 0x8000000
+};
+
+template <InterpolationMode T> struct interpolation_mode_name
+{
+    static constexpr char value[] = "Unknown";
+};
+template <> struct interpolation_mode_name<InterpolationMode::Undefined>
+{
+    static constexpr char value[] = "Undefined";
+};
+template <> struct interpolation_mode_name<InterpolationMode::NearestNeighbor>
+{
+    static constexpr char value[] = "NearestNeighbor";
+};
+template <> struct interpolation_mode_name<InterpolationMode::Linear>
+{
+    static constexpr char value[] = "Linear";
+};
+template <> struct interpolation_mode_name<InterpolationMode::CubicHermiteSpline>
+{
+    static constexpr char value[] = "CubicHermiteSpline";
+};
+template <> struct interpolation_mode_name<InterpolationMode::CubicLagrange>
+{
+    static constexpr char value[] = "CubicLagrange";
+};
+template <> struct interpolation_mode_name<InterpolationMode::Cubic2ParamBSpline>
+{
+    static constexpr char value[] = "Cubic2ParamBSpline";
+};
+template <> struct interpolation_mode_name<InterpolationMode::Cubic2ParamCatmullRom>
+{
+    static constexpr char value[] = "Cubic2ParamCatmullRom";
+};
+template <> struct interpolation_mode_name<InterpolationMode::Cubic2ParamB05C03>
+{
+    static constexpr char value[] = "Cubic2ParamB05C03";
+};
+template <> struct interpolation_mode_name<InterpolationMode::Super>
+{
+    static constexpr char value[] = "Super";
+};
+template <> struct interpolation_mode_name<InterpolationMode::Lanczos2Lobed>
+{
+    static constexpr char value[] = "Lanczos2Lobed";
+};
+template <> struct interpolation_mode_name<InterpolationMode::Lanczos3Lobed>
+{
+    static constexpr char value[] = "Lanczos3Lobed";
+};
+template <> struct interpolation_mode_name<InterpolationMode::SmoothEdge>
+{
+    static constexpr char value[] = "SmoothEdge";
+};
+
+inline std::ostream &operator<<(std::ostream &aOs, const InterpolationMode &aInterpolationMode)
+{
+    switch (static_cast<InterpolationMode>(static_cast<uint>(aInterpolationMode) &
+                                           (static_cast<uint>(InterpolationMode::SmoothEdge) - 1)))
+    {
+        case opp::InterpolationMode::Undefined:
+            aOs << interpolation_mode_name<InterpolationMode::Undefined>::value;
+            break;
+        case opp::InterpolationMode::NearestNeighbor:
+            aOs << interpolation_mode_name<InterpolationMode::NearestNeighbor>::value;
+            break;
+        case opp::InterpolationMode::Linear:
+            aOs << interpolation_mode_name<InterpolationMode::Linear>::value;
+            break;
+        case opp::InterpolationMode::CubicHermiteSpline:
+            aOs << interpolation_mode_name<InterpolationMode::CubicHermiteSpline>::value;
+            break;
+        case opp::InterpolationMode::CubicLagrange:
+            aOs << interpolation_mode_name<InterpolationMode::CubicLagrange>::value;
+            break;
+        case opp::InterpolationMode::Cubic2ParamBSpline:
+            aOs << interpolation_mode_name<InterpolationMode::Cubic2ParamBSpline>::value;
+            break;
+        case opp::InterpolationMode::Cubic2ParamCatmullRom:
+            aOs << interpolation_mode_name<InterpolationMode::Cubic2ParamCatmullRom>::value;
+            break;
+        case opp::InterpolationMode::Cubic2ParamB05C03:
+            aOs << interpolation_mode_name<InterpolationMode::Cubic2ParamB05C03>::value;
+            break;
+        case opp::InterpolationMode::Super:
+            aOs << interpolation_mode_name<InterpolationMode::Super>::value;
+            break;
+        case opp::InterpolationMode::Lanczos2Lobed:
+            aOs << interpolation_mode_name<InterpolationMode::Lanczos2Lobed>::value;
+            break;
+        case opp::InterpolationMode::Lanczos3Lobed:
+            aOs << interpolation_mode_name<InterpolationMode::Lanczos3Lobed>::value;
+            break;
+        default:
+            aOs << "Unknown";
+            break;
+    }
+    if ((static_cast<uint>(aInterpolationMode) & static_cast<uint>(InterpolationMode::SmoothEdge)) != 0)
+    {
+        aOs << " | SmoothEdge";
+    }
+    return aOs;
+}
+
+inline std::wostream &operator<<(std::wostream &aOs, const InterpolationMode &aInterpolationMode)
+{
+    switch (static_cast<InterpolationMode>(static_cast<uint>(aInterpolationMode) &
+                                           (static_cast<uint>(InterpolationMode::SmoothEdge) - 1)))
+    {
+        case opp::InterpolationMode::Undefined:
+            aOs << interpolation_mode_name<InterpolationMode::Undefined>::value;
+            break;
+        case opp::InterpolationMode::NearestNeighbor:
+            aOs << interpolation_mode_name<InterpolationMode::NearestNeighbor>::value;
+            break;
+        case opp::InterpolationMode::Linear:
+            aOs << interpolation_mode_name<InterpolationMode::Linear>::value;
+            break;
+        case opp::InterpolationMode::CubicHermiteSpline:
+            aOs << interpolation_mode_name<InterpolationMode::CubicHermiteSpline>::value;
+            break;
+        case opp::InterpolationMode::CubicLagrange:
+            aOs << interpolation_mode_name<InterpolationMode::CubicLagrange>::value;
+            break;
+        case opp::InterpolationMode::Cubic2ParamBSpline:
+            aOs << interpolation_mode_name<InterpolationMode::Cubic2ParamBSpline>::value;
+            break;
+        case opp::InterpolationMode::Cubic2ParamCatmullRom:
+            aOs << interpolation_mode_name<InterpolationMode::Cubic2ParamCatmullRom>::value;
+            break;
+        case opp::InterpolationMode::Cubic2ParamB05C03:
+            aOs << interpolation_mode_name<InterpolationMode::Cubic2ParamB05C03>::value;
+            break;
+        case opp::InterpolationMode::Super:
+            aOs << interpolation_mode_name<InterpolationMode::Super>::value;
+            break;
+        case opp::InterpolationMode::Lanczos2Lobed:
+            aOs << interpolation_mode_name<InterpolationMode::Lanczos2Lobed>::value;
+            break;
+        case opp::InterpolationMode::Lanczos3Lobed:
+            aOs << interpolation_mode_name<InterpolationMode::Lanczos3Lobed>::value;
+            break;
+        default:
+            aOs << "Unknown";
+            break;
+    }
+    if ((static_cast<uint>(aInterpolationMode) & static_cast<uint>(InterpolationMode::SmoothEdge)) != 0)
+    {
+        aOs << " | SmoothEdge";
     }
     return aOs;
 }

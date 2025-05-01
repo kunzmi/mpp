@@ -20,5 +20,5 @@ template <PixelType T> class ImageView;
 /// runs aFunctor on every pixel (only one channel of a multi-channel pixel) of an image. no inplace operation, no mask.
 /// </summary>
 template <typename DstT, typename functor>
-void forEachPixelSingleChannel(ImageView<DstT> &aDst, Channel aDstChannel, functor aOp);
+void forEachPixelSingleChannel(ImageView<DstT> &aDst, Channel aDstChannel, const functor &aOp);
 } // namespace opp::image::cpuSimple

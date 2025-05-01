@@ -20,18 +20,18 @@ template <PixelType T> class ImageView;
 /// runs aFunctor on every pixel of an image. Inplace and outplace operation, no mask. Planar 2 channel destination.
 /// </summary>
 template <typename DstT, typename functor>
-void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, functor aOp);
+void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, const functor &aOp);
 
 /// <summary>
 /// runs aFunctor on every pixel of an image. Inplace and outplace operation, no mask. Planar 3 channel destination.
 /// </summary>
 template <typename DstT, typename functor>
-void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, ImageView<DstT> &aDst3, functor aOp);
+void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, ImageView<DstT> &aDst3, const functor &aOp);
 
 /// <summary>
 /// runs aFunctor on every pixel of an image. Inplace and outplace operation, no mask. Planar 4 channel destination.
 /// </summary>
 template <typename DstT, typename functor>
 void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, ImageView<DstT> &aDst3, ImageView<DstT> &aDst4,
-                        functor aOp);
+                        const functor &aOp);
 } // namespace opp::image::cpuSimple

@@ -7,8 +7,13 @@
 #include <backends/cuda/stream.h>
 #include <backends/npp/nppException.h>
 #include <common/defines.h>
+#include <common/image/affineTransformation.h>
+#include <common/image/border.h>
+#include <common/image/bound.h>
 #include <common/image/gotoPtr.h>
+#include <common/image/matrix.h>
 #include <common/image/pixelTypes.h>
+#include <common/image/quad.h>
 #include <common/image/roi.h>
 #include <common/image/roiException.h>
 #include <common/image/size2D.h>
@@ -19,6 +24,7 @@
 #include <nppcore.h>
 #include <nppdefs.h>
 #include <nppi_filtering_functions.h>
+#include <nppi_geometry_transforms.h>
 #include <nppi_statistics_functions.h>
 #include <utility>
 #include <vector>
@@ -635,55 +641,62 @@ template <PixelType T> class ImageView
                                          int aInterpolation) const
     {
         NppiRect retValue{};
-        nppSafeCall(nppiGetResizeRect(NppiSizeRoi(), &retValue, aXFactor, aYFactor, aXShift, aYShift, aInterpolation));
+        nppSafeCall(nppiGetResizeRect(NppiRectRoi(), &retValue, aXFactor, aYFactor, aXShift, aYShift, aInterpolation));
         return retValue;
     }
 
     [[nodiscard]] NppiPoint GetResizeTiledSourceOffset(NppiRect aDstRectROI) const
     {
         NppiPoint retValue{};
-        nppSafeCall(nppiGetResizeTiledSourceOffset(NppiSizeRoi(), aDstRectROI, &retValue));
+        nppSafeCall(nppiGetResizeTiledSourceOffset(NppiRectRoi(), aDstRectROI, &retValue));
         return retValue;
     }
 
-    void GetRotateQuad(double aQuad[4][2], double aAngle, double aShiftX, double aShiftY) const
+    void GetRotateQuad(Quad<double> &aQuad, double aAngle, double aShiftX, double aShiftY) const
     {
-        nppSafeCall(nppiGetRotateQuad(NppiSizeRoi(), aQuad, aAngle, aShiftX, aShiftY));
+        nppSafeCall(nppiGetRotateQuad(NppiRectRoi(), reinterpret_cast<double(*)[2]>(&aQuad), aAngle, aShiftX, aShiftY));
     }
 
-    void GetRotateBound(double aBoundingBox[2][2], double aAngle, double aShiftX, double aShiftY) const
+    void GetRotateBound(Bound<double> &aBoundingBox, double aAngle, double aShiftX, double aShiftY) const
     {
-        nppSafeCall(nppiGetRotateBound(NppiSizeRoi(), aBoundingBox, aAngle, aShiftX, aShiftY));
+        nppSafeCall(
+            nppiGetRotateBound(NppiRectRoi(), reinterpret_cast<double(*)[2]>(&aBoundingBox), aAngle, aShiftX, aShiftY));
     }
 
-    void GetAffineTransform(const double aQuad[4][2], double aCoeffs[2][3]) const
+    void GetAffineTransform(const Quad<double> &aQuad, AffineTransformation<double> &aCoeffs) const
     {
-        nppSafeCall(nppiGetAffineTransform(NppiSizeRoi(), aQuad, aCoeffs));
+        nppSafeCall(nppiGetAffineTransform(NppiRectRoi(), reinterpret_cast<const double(*)[2]>(&aQuad),
+                                           reinterpret_cast<double(*)[3]>(&aCoeffs)));
     }
 
-    void GetAffineQuad(double aQuad[4][2], const double aCoeffs[2][3]) const
+    void GetAffineQuad(Quad<double> &aQuad, const AffineTransformation<double> &aCoeffs) const
     {
-        nppSafeCall(nppiGetAffineQuad(NppiSizeRoi(), aQuad, aCoeffs));
+        nppSafeCall(nppiGetAffineQuad(NppiRectRoi(), reinterpret_cast<double(*)[2]>(&aQuad),
+                                      reinterpret_cast<const double(*)[3]>(&aCoeffs)));
     }
 
-    void GetAffineBound(double aBound[2][2], const double aCoeffs[2][3]) const
+    void GetAffineBound(Bound<double> &aBound, const AffineTransformation<double> &aCoeffs) const
     {
-        nppSafeCall(nppiGetAffineBound(NppiSizeRoi(), aBound, aCoeffs));
+        nppSafeCall(nppiGetAffineBound(NppiRectRoi(), reinterpret_cast<double(*)[2]>(&aBound),
+                                       reinterpret_cast<const double(*)[3]>(&aCoeffs)));
     }
 
-    void GetPerspectiveTransform(const double aQuad[4][2], double aCoeffs[3][3]) const
+    void GetPerspectiveTransform(const Quad<double> &aQuad, PerspectiveTransformation<double> &aCoeffs) const
     {
-        nppSafeCall(nppiGetPerspectiveTransform(NppiSizeRoi(), aQuad, aCoeffs));
+        nppSafeCall(nppiGetPerspectiveTransform(NppiRectRoi(), reinterpret_cast<const double(*)[2]>(&aQuad),
+                                                reinterpret_cast<double(*)[3]>(&aCoeffs)));
     }
 
-    void GetPerspectiveQuad(double aQuad[4][2], const double aCoeffs[3][3]) const
+    void GetPerspectiveQuad(Quad<double> &aQuad, const PerspectiveTransformation<double> &aCoeffs) const
     {
-        nppSafeCall(nppiGetPerspectiveQuad(NppiSizeRoi(), aQuad, aCoeffs));
+        nppSafeCall(nppiGetPerspectiveQuad(NppiRectRoi(), reinterpret_cast<double(*)[2]>(&aQuad),
+                                           reinterpret_cast<const double(*)[3]>(&aCoeffs)));
     }
 
-    void GetPerspectiveBound(double aBound[2][2], const double aCoeffs[3][3]) const
+    void GetPerspectiveBound(Bound<double> &aBound, const PerspectiveTransformation<double> &aCoeffs) const
     {
-        nppSafeCall(nppiGetPerspectiveBound(NppiSizeRoi(), aBound, aCoeffs));
+        nppSafeCall(nppiGetPerspectiveBound(NppiRectRoi(), reinterpret_cast<double(*)[2]>(&aBound),
+                                            reinterpret_cast<const double(*)[3]>(&aCoeffs)));
     }
 };
 } // namespace opp::image::npp

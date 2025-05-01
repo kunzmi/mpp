@@ -1,8 +1,8 @@
 #pragma once
 #include <common/complex.h>
 #include <common/defines.h>
-#include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
+#include <common/vector_typetraits.h>
 #include <concepts>
 #include <ostream>
 
@@ -1336,6 +1336,56 @@ template <> struct default_ext_compute_type_for<Pixel16uC4A>
 };
 
 template <typename T> using default_ext_compute_type_for_t = typename default_ext_compute_type_for<T>::type;
+#pragma endregion
+
+#pragma region Coordinate type for interpolation
+template <typename T> struct coordinate_type_interpolation_for
+{
+    // float is default for all types except double:
+    using type = float;
+};
+// 64f
+template <> struct coordinate_type_interpolation_for<Pixel64fC1>
+{
+    using type = double;
+};
+template <> struct coordinate_type_interpolation_for<Pixel64fC2>
+{
+    using type = double;
+};
+template <> struct coordinate_type_interpolation_for<Pixel64fC3>
+{
+    using type = double;
+};
+template <> struct coordinate_type_interpolation_for<Pixel64fC4>
+{
+    using type = double;
+};
+template <> struct coordinate_type_interpolation_for<Pixel64fC4A>
+{
+    using type = double;
+};
+
+// 64fc
+template <> struct coordinate_type_interpolation_for<Pixel64fcC1>
+{
+    using type = double;
+};
+template <> struct coordinate_type_interpolation_for<Pixel64fcC2>
+{
+    using type = double;
+};
+template <> struct coordinate_type_interpolation_for<Pixel64fcC3>
+{
+    using type = double;
+};
+template <> struct coordinate_type_interpolation_for<Pixel64fcC4>
+{
+    using type = double;
+};
+
+template <typename T> using coordinate_type_interpolation_for_t = typename coordinate_type_interpolation_for<T>::type;
+
 #pragma endregion
 
 #pragma region Link the type PixelType with the enum PixelType

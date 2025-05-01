@@ -9,8 +9,8 @@
 #include <common/roundFunctor.h>
 #include <common/statistics/operators.h>
 #include <common/tupel.h>
-#include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
+#include <common/vector_typetraits.h>
 #include <concepts>
 
 // disable warning for pragma unroll when compiling with host compiler:
@@ -47,7 +47,7 @@ template <size_t tupelSize, typename SrcT> struct SrcReductionMinMaxIdxFunctor
 #pragma region run naive on one pixel
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, SrcT &aDstMin, SrcT &aDstMax,
                                 same_vector_size_different_type_t<SrcT, int> &aIdxXMin,
-                                same_vector_size_different_type_t<SrcT, int> &aIdxXMax)
+                                same_vector_size_different_type_t<SrcT, int> &aIdxXMax) const
     {
         const SrcT pixelSrc1 = *gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         OpMin(pixelSrc1, aPixelX, aDstMin, aIdxXMin);
@@ -58,7 +58,7 @@ template <size_t tupelSize, typename SrcT> struct SrcReductionMinMaxIdxFunctor
 #pragma region run sequential on pixel tupel
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, SrcT &aDstMin, SrcT &aDstMax,
                                 same_vector_size_different_type_t<SrcT, int> &aIdxXMin,
-                                same_vector_size_different_type_t<SrcT, int> &aIdxXMax, bool /*isTupel*/)
+                                same_vector_size_different_type_t<SrcT, int> &aIdxXMax, bool /*isTupel*/) const
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
 
@@ -75,7 +75,7 @@ template <size_t tupelSize, typename SrcT> struct SrcReductionMinMaxIdxFunctor
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, SrcT &aDstMin, SrcT &aDstMax,
                                 same_vector_size_different_type_t<SrcT, int> &aIdxXMin,
                                 same_vector_size_different_type_t<SrcT, int> &aIdxXMax,
-                                const MaskTupel<tupelSize> &aMaskTupel)
+                                const MaskTupel<tupelSize> &aMaskTupel) const
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
 

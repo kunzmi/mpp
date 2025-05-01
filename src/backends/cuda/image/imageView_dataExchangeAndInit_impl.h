@@ -423,6 +423,25 @@ ImageView<T> &ImageView<T>::SetMasked(const opp::cuda::DevVarView<T> &aConst, co
 
     return *this;
 }
+
+template <PixelType T>
+ImageView<T> &ImageView<T>::Set(remove_vector_t<T> aConst, Channel aChannel, const opp::cuda::StreamCtx &aStreamCtx)
+    requires(vector_size_v<T> > 1)
+{
+    InvokeSetChannelC(aConst, aChannel, PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
+
+    return *this;
+}
+
+template <PixelType T>
+ImageView<T> &ImageView<T>::Set(const opp::cuda::DevVarView<remove_vector_t<T>> &aConst, Channel aChannel,
+                                const opp::cuda::StreamCtx &aStreamCtx)
+    requires(vector_size_v<T> > 1)
+{
+    InvokeSetChannelDevC(aConst.Pointer(), aChannel, PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
+
+    return *this;
+}
 #pragma endregion
 
 #pragma region Swap Channel
@@ -506,7 +525,13 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::Transpose(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
     requires NoAlpha<T>
 {
-    checkSameSize(ROI().Size(), Size2D(aDst.SizeRoi().y, aDst.SizeRoi().x));
+    if (SizeRoi() != Size2D(aDst.SizeRoi().y, aDst.SizeRoi().x))
+    {
+        throw ROIEXCEPTION(
+            "Width of destination image ROI must be the same as the height of the source image ROI, and height "
+            "of the destination image ROI must be the same as the width of the source image ROI. Source ROI size: "
+            << SizeRoi() << " provided destination image ROI size: " << aDst.SizeRoi());
+    }
 
     InvokeTransposeSrc(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aDst.SizeRoi(), aStreamCtx);
 

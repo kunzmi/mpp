@@ -9,6 +9,7 @@ add_library(backends.cuda.image.dataExchangeAndInit
 	scale.cu
 
 	set.cu
+	setChannel.cu
 	setMasked.cu
 
 	swapChannel.cu

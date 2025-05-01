@@ -47,13 +47,20 @@ struct InplaceDevConstantFunctor : public ImageFunctor<true>
 #pragma endregion
 
 #pragma region run naive on one pixel
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+    /// <summary>
+    /// Returns true if the value has been successfully set
+    /// </summary>
+    DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
         requires std::same_as<ComputeT, DstT>
     {
         Op(static_cast<ComputeT>(*Constant), aDst);
+        return true;
     }
 
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+    /// <summary>
+    /// Returns true if the value has been successfully set
+    /// </summary>
+    DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
         requires(!std::same_as<ComputeT, DstT>)
     {
         ComputeT temp(aDst);
@@ -61,11 +68,12 @@ struct InplaceDevConstantFunctor : public ImageFunctor<true>
         round(temp); // NOP for integer ComputeT
         // DstT constructor will clamp temp to value range of DstT
         aDst = static_cast<DstT>(temp);
+        return true;
     }
 #pragma endregion
 
 #pragma region run sequential on pixel tupel
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires std::same_as<ComputeT, DstT>
     {
         ComputeT _constant = static_cast<ComputeT>(*Constant);
@@ -76,7 +84,7 @@ struct InplaceDevConstantFunctor : public ImageFunctor<true>
         }
     }
 
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires(!std::same_as<ComputeT, DstT>)
     {
         ComputeT _constant = static_cast<ComputeT>(*Constant);

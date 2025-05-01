@@ -1,0 +1,1 @@
+addCatchTest(test_affineTransform.cpp "common;common.fileIO;backends.cuda;backends.npp;backends.npp.image;backends.simple_cpu;CUDA::cudart" "NPP_GeometricTransforms_Affine")

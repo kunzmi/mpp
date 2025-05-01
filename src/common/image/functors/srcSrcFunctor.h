@@ -9,8 +9,8 @@
 #include <common/opp_defs.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
-#include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vectorTypes.h>
 #include <concepts>
 
 // disable warning for pragma unroll when compiling with host compiler:
@@ -62,25 +62,27 @@ struct SrcSrcFunctor : public ImageFunctor<false>
 
 #pragma region run naive on one pixel
     // Case ComputeT==DstT, no conversion, no rounding
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+    DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
         requires std::same_as<ComputeT, DstT> && (!SrcIsSameAsCompute)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
         Op(static_cast<ComputeT>(*pixelSrc1), static_cast<ComputeT>(*pixelSrc2), aDst);
+        return true;
     }
     // For compare
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+    DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
         requires std::same_as<SrcT, ComputeT> && //
                  (SrcIsSameAsCompute)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
         Op(*pixelSrc1, *pixelSrc2, aDst);
+        return true;
     }
 
     // Case ComputeT==Floating, DstT==Integral, conversion and rounding of result
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+    DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
         requires(!std::same_as<ComputeT, DstT>) && (!(RealVector<ComputeT> && ComplexVector<DstT>)) &&
                 (!SrcIsSameAsCompute)
     {
@@ -92,21 +94,23 @@ struct SrcSrcFunctor : public ImageFunctor<false>
         round(temp); // NOP for integer ComputeT
         // DstT constructor will clamp temp to value range of DstT
         aDst = static_cast<DstT>(temp);
+        return true;
     }
 
     // Needed for the conversion real->Complex
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst)
+    DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
         requires(!std::same_as<ComputeT, DstT>) && ((RealVector<ComputeT> && ComplexVector<DstT>)) &&
                 (!SrcIsSameAsCompute)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         const SrcT *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
         Op(*pixelSrc1, *pixelSrc2, aDst);
+        return true;
     }
 #pragma endregion
 
 #pragma region run SIMD on pixel tupel
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires std::same_as<ComputeT_SIMD, DstT> && (!SrcIsSameAsCompute)
     {
         static_assert(OpSIMD.has_simd, "Trying to run a SIMD operation that is not implemented for this type.");
@@ -121,7 +125,7 @@ struct SrcSrcFunctor : public ImageFunctor<false>
 #pragma endregion
 
 #pragma region run sequential on pixel tupel
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires std::same_as<ComputeT, DstT> && //
                  std::same_as<ComputeT_SIMD, voidType> && (!SrcIsSameAsCompute)
     {
@@ -137,7 +141,7 @@ struct SrcSrcFunctor : public ImageFunctor<false>
             Op(static_cast<ComputeT>(tupelSrc1.value[i]), static_cast<ComputeT>(tupelSrc2.value[i]), aDst.value[i]);
         }
     }
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires std::same_as<SrcT, ComputeT> && //
                  (SrcIsSameAsCompute) &&         //
                  std::same_as<ComputeT_SIMD, voidType>
@@ -155,7 +159,7 @@ struct SrcSrcFunctor : public ImageFunctor<false>
         }
     }
 
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires(!std::same_as<ComputeT, DstT>) && //
                 std::same_as<ComputeT_SIMD, voidType> && (!(RealVector<ComputeT> && ComplexVector<DstT>)) &&
                 (!SrcIsSameAsCompute)
@@ -178,7 +182,7 @@ struct SrcSrcFunctor : public ImageFunctor<false>
     }
 
     // Needed for the conversion real->Complex
-    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst)
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires(!std::same_as<ComputeT, DstT>) && //
                 std::same_as<ComputeT_SIMD, voidType> && ((RealVector<ComputeT> && ComplexVector<DstT>)) &&
                 (!SrcIsSameAsCompute)

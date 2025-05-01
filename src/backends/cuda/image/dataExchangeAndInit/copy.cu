@@ -9,7 +9,7 @@
 #include <backends/cuda/image/forEachPixelSingleChannelKernel.h>
 #include <backends/cuda/streamCtx.h>
 #include <backends/cuda/templateRegistry.h>
-#include <common/arithmetic/unary_operators.h>
+#include <common/dataExchangeAndInit/operators.h>
 #include <common/defines.h>
 #include <common/image/channel.h>
 #include <common/image/functors/srcFunctor.h>

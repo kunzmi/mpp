@@ -35,6 +35,11 @@
 #include <numeric>
 #include <vector>
 
+#include <common/image/functors/borderControl.h>
+#include <common/image/functors/interpolator.h>
+#include <common/image/functors/transformer.h>
+#include <common/image/functors/transformerFunctor.h>
+
 using namespace opp;
 using namespace opp::cuda;
 using namespace opp::image;
