@@ -97,7 +97,16 @@ template <RealFloatingPoint T> class AffineTransformation
     /// <summary>
     /// Row-major order
     /// </summary>
-    T const &operator[](int aFlatIndex) const;
+    DEVICE_CODE const T &operator[](int aFlatIndex) const
+    {
+#ifdef IS_HOST_COMPILER
+        assert(aFlatIndex >= 0);
+        assert(aFlatIndex < mSize);
+        return mData[to_size_t(aFlatIndex)]; // NOLINT
+#else
+        return mData[static_cast<size_t>(aFlatIndex)]; // NOLINT
+#endif
+    }
 
     /// <summary>
     /// Row-major order
@@ -107,7 +116,13 @@ template <RealFloatingPoint T> class AffineTransformation
     /// <summary>
     /// Row-major order
     /// </summary>
-    T const &operator[](size_t aFlatIndex) const;
+    DEVICE_CODE T const &operator[](size_t aFlatIndex) const
+    {
+#ifdef IS_HOST_COMPILER
+        assert(to_int(aFlatIndex) < mSize);
+#endif
+        return mData[aFlatIndex]; // NOLINT --> non constant array index
+    }
 
     /// <summary>
     /// Pointer to inner data array
@@ -245,7 +260,7 @@ template <RealFloatingPoint T> class AffineTransformation
     [[nodiscard]] Vector3<T> Diagonal() const;
 
     /// <summary>
-    /// AffineTransformation for image rotation
+    /// AffineTransformation for image rotation (counter-clock wise)
     /// </summary>
     [[nodiscard]] static AffineTransformation GetRotation(T aAngleInDeg) noexcept;
     /// <summary>

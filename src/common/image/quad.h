@@ -104,5 +104,14 @@ template <RealFloatingPoint T> struct Quad
         aIs >> aQuad.P0 >> aQuad.P1 >> aQuad.P2 >> aQuad.P3;
         return aIs;
     }
+
+    bool operator==(const Quad &aOther) const
+    {
+        return aOther.P0 == P0 && aOther.P1 == P1 && aOther.P2 == P2 && aOther.P3 == P3;
+    }
+    bool operator!=(const Quad &aOther) const
+    {
+        return aOther.P0 != P0 || aOther.P1 != P1 || aOther.P2 != P2 || aOther.P3 != P3;
+    }
 };
 } // namespace opp::image

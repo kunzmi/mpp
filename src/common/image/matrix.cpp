@@ -261,12 +261,12 @@ template <RealFloatingPoint T> T &Matrix<T>::operator[](int aFlatIndex)
     return mData[to_size_t(aFlatIndex)]; // NOLINT
 }
 
-template <RealFloatingPoint T> const T &Matrix<T>::operator[](int aFlatIndex) const
-{
-    assert(aFlatIndex >= 0);
-    assert(aFlatIndex < mSize);
-    return mData[to_size_t(aFlatIndex)]; // NOLINT
-}
+// template <RealFloatingPoint T> const T &Matrix<T>::operator[](int aFlatIndex) const
+//{
+//     assert(aFlatIndex >= 0);
+//     assert(aFlatIndex < mSize);
+//     return mData[to_size_t(aFlatIndex)]; // NOLINT
+// }
 
 template <RealFloatingPoint T> T &Matrix<T>::operator[](size_t aFlatIndex)
 {
@@ -274,11 +274,11 @@ template <RealFloatingPoint T> T &Matrix<T>::operator[](size_t aFlatIndex)
     return mData[aFlatIndex]; // NOLINT
 }
 
-template <RealFloatingPoint T> const T &Matrix<T>::operator[](size_t aFlatIndex) const
-{
-    assert(to_int(aFlatIndex) < mSize);
-    return mData[aFlatIndex]; // NOLINT
-}
+// template <RealFloatingPoint T> const T &Matrix<T>::operator[](size_t aFlatIndex) const
+//{
+//     assert(to_int(aFlatIndex) < mSize);
+//     return mData[aFlatIndex]; // NOLINT
+// }
 
 template <RealFloatingPoint T> const T *Matrix<T>::Data() const
 {

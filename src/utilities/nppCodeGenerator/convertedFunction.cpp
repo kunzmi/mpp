@@ -527,7 +527,9 @@ ConvertedFunction::ConvertedFunction(const Function &aFunction)
         std::stringstream ss;
 
         if (!IsGeometryFunction() && !IsInputPlanar() && !IsOutputPlanar() &&
-            mName.find("Pyramid") == std::string::npos && mName.find("Integral") == std::string::npos)
+            mName.find("Pyramid") == std::string::npos && mName.find("Integral") == std::string::npos &&
+            mName != "CopyWrapBorder" && mName != "CopyReplicateBorder" && mName != "CopyConstBorder" &&
+            mName != "CopyWrapBorderA" && mName != "CopyReplicateBorderA" && mName != "CopyConstBorderA")
         {
             // If it is a geometry function, the ROIs may differ
             // in the planar case we can have different ROIs due to different samplings

@@ -54,5 +54,14 @@ template <RealFloatingPoint T> struct Bound
         aIs >> aBound.Min >> aBound.Max;
         return aIs;
     }
+
+    bool operator==(const Bound &aOther) const
+    {
+        return aOther.Min == Min && aOther.Max == Max;
+    }
+    bool operator!=(const Bound &aOther) const
+    {
+        return aOther.Min != Min || aOther.Max != Max;
+    }
 };
 } // namespace opp::image

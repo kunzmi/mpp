@@ -2,6 +2,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <common/defines.h>
 #include <common/image/matrix.h>
+#include <common/image/quad.h>
+#include <common/image/roi.h>
 #include <common/vectorTypes.h>
 #include <cstddef>
 #include <sstream>
@@ -107,6 +109,26 @@ TEST_CASE("Matrix<float>", "[Common.Image]")
 
     CHECK(ss.str() ==
           "( 2.000000  4.000000  6.000000)\n( 8.000000 10.000000 12.000000)\n(14.000000 16.000000 18.000000)\n");
+
+    Roi roi(0, 0, 512, 512);
+    Quad<float> quadRot30({162.297501f, -93.702515f}, {604.836487f, 161.797485f}, {349.336487f, 604.336426f},
+                          {-93.202499f, 348.836456f});
+
+    AffineTransformation<float> shift1 = AffineTransformation<float>::GetTranslation({-256, -256});
+    AffineTransformation<float> rot    = AffineTransformation<float>::GetRotation(-30);
+    AffineTransformation<float> shift2 = AffineTransformation<float>::GetTranslation({256, 256});
+    AffineTransformation<float> affine = shift2 * rot * shift1;
+    Matrix<float> perspective(affine);
+
+    Matrix<float> perspectiveFromQuad(roi, quadRot30);
+
+    Matrix<float> diffPerspective = perspective - perspectiveFromQuad;
+    float diff                    = 0;
+    for (size_t i = 0; i < 9; i++)
+    {
+        diff += std::abs(diffPerspective.Data()[i]);
+    }
+    CHECK(diff < 1e-7f);
 }
 
 TEST_CASE("Matrix<double>", "[Common.Image]")
@@ -262,4 +284,25 @@ TEST_CASE("Matrix<double>", "[Common.Image]")
     CHECK(transform[6] == Approx(transform2[6]).margin(0.00001));
     CHECK(transform[7] == Approx(transform2[7]).margin(0.00001));
     CHECK(transform2[8] == 1);
+
+    Roi roi(0, 0, 512, 512);
+    Quad<double> quadRot30(
+        {162.29749663118366243, -93.702503368816280727}, {604.83647796503191785, 161.79749663118369085},
+        {349.33647796503191785, 604.33647796503191785}, {-93.202503368816309148, 348.83647796503191785});
+
+    AffineTransformation<double> shift1  = AffineTransformation<double>::GetTranslation({-256, -256});
+    AffineTransformation<double> rot     = AffineTransformation<double>::GetRotation(-30);
+    AffineTransformation<double> shift2  = AffineTransformation<double>::GetTranslation({256, 256});
+    AffineTransformation<double> affine2 = shift2 * rot * shift1;
+    Matrix<double> perspective(affine2);
+
+    Matrix<double> perspectiveFromQuad(roi, quadRot30);
+
+    Matrix<double> diffPerspective = perspective - perspectiveFromQuad;
+    double diff                    = 0;
+    for (size_t i = 0; i < 9; i++)
+    {
+        diff += std::abs(diffPerspective.Data()[i]);
+    }
+    CHECK(diff < 1e-15);
 }

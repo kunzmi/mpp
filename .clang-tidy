@@ -1,15 +1,15 @@
 ---
-Checks:		'*,-abseil-*,-altera-*,-fuchsia-*,-google-*,-llvm*,-zircon-*,-modernize-use-trailing-return-type,-*-avoid-c-arrays,-*-uppercase-literal-suffix,-*-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-reinterpret-cast,-*-use-auto,-readability-identifier-length,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-hicpp-no-array-decay,-readability-function-cognitive-complexity,-performance-avoid-endl'
+Checks:		'*,-abseil-*,-altera-*,-fuchsia-*,-google-*,-llvm*,-zircon-*,-modernize-use-trailing-return-type,-*-avoid-c-arrays,-*-uppercase-literal-suffix,-*-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-reinterpret-cast,-*-use-auto,-readability-identifier-length,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-hicpp-no-array-decay,-readability-function-cognitive-complexity,-performance-avoid-endl,-readability-magic-numbers,-cppcoreguidelines-avoid-magic-numbers,-bugprone-implicit-widening-of-multiplication-result'
 WarningsAsErrors: '-*'
 FormatStyle:     none
 CheckOptions:
 - key:   readability-identifier-naming.ParameterPrefix
   value: 'a'
-- key:   cppcoreguidelines-avoid-magic-numbers.IgnoredIntegerValues
-  value: "1;2;3;4;5;6;7;8;9;10;16;32;64"
-- key:   readability-magic-numbers.IgnoredIntegerValues
-  value: "1;2;3;4;5;6;7;8;9;10;16;32;64"
 - key:   bugprone-easily-swappable-parameters.MinimumLength
   value: "3"
 
-
+# 80% of clang-tidy time was spent on these three checks: 
+# readability-magic-numbers
+# cppcoreguidelines-avoid-magic-numbers
+# bugprone-implicit-widening-of-multiplication-result
+# why they are disabled...

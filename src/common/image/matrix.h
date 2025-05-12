@@ -112,7 +112,16 @@ template <RealFloatingPoint T> class Matrix
     /// <summary>
     /// Row-major order
     /// </summary>
-    const T &operator[](int aFlatIndex) const;
+    DEVICE_CODE const T &operator[](int aFlatIndex) const
+    {
+#ifdef IS_HOST_COMPILER
+        assert(aFlatIndex >= 0);
+        assert(aFlatIndex < mSize);
+        return mData[to_size_t(aFlatIndex)]; // NOLINT
+#else
+        return mData[static_cast<size_t>(aFlatIndex)]; // NOLINT
+#endif
+    }
 
     /// <summary>
     /// Row-major order
@@ -122,7 +131,13 @@ template <RealFloatingPoint T> class Matrix
     /// <summary>
     /// Row-major order
     /// </summary>
-    const T &operator[](size_t aFlatIndex) const;
+    DEVICE_CODE const T &operator[](size_t aFlatIndex) const
+    {
+#ifdef IS_HOST_COMPILER
+        assert(to_int(aFlatIndex) < mSize);
+#endif
+        return mData[aFlatIndex]; // NOLINT
+    }
 
     /// <summary>
     /// Pointer to inner data array

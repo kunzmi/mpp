@@ -1122,4 +1122,555 @@ inline std::wostream &operator<<(std::wostream &aOs, const InterpolationMode &aI
     return aOs;
 }
 #pragma endregion
+
+#pragma region MaskSize
+/// <summary>
+/// Mask sizes for fixed size filters
+/// </summary>
+enum class MaskSize // NOLINT(performance-enum-size)
+{
+    /// <summary>
+    /// 1 x 3 filter mask.
+    /// </summary>
+    Mask_1x3,
+    /// <summary>
+    /// 1 x 5 filter mask.
+    /// </summary>
+    Mask_1x5,
+    /// <summary>
+    /// 3 x 1 filter mask.
+    /// </summary>
+    Mask_3x1 = 100,
+    /// <summary>
+    /// 5 x 1 filter mask.
+    /// </summary>
+    Mask_5x1,
+    /// <summary>
+    /// 3 x 3 filter mask.
+    /// </summary>
+    Mask_3x3 = 200,
+    /// <summary>
+    /// 5 x 5 filter mask.
+    /// </summary>
+    Mask_5x5,
+    /// <summary>
+    /// 7 x 7 filter mask.
+    /// </summary>
+    Mask_7x7 = 400,
+    /// <summary>
+    /// 9 x 9 filter mask.
+    /// </summary>
+    Mask_9x9 = 500,
+    /// <summary>
+    /// 11 x 11 filter mask.
+    /// </summary>
+    Mask_11x11 = 600,
+    /// <summary>
+    /// 13 x 13 filter mask.
+    /// </summary>
+    Mask_13x13 = 700,
+    /// <summary>
+    /// 15 x 15 filter mask.
+    /// </summary>
+    Mask_15x15 = 800
+};
+
+template <MaskSize T> struct mask_size_name
+{
+    static constexpr char value[] = "Unknown";
+};
+template <> struct mask_size_name<MaskSize::Mask_1x3>
+{
+    static constexpr char value[] = "Mask 1 x 3";
+};
+template <> struct mask_size_name<MaskSize::Mask_1x5>
+{
+    static constexpr char value[] = "Mask 1 x 5";
+};
+template <> struct mask_size_name<MaskSize::Mask_3x1>
+{
+    static constexpr char value[] = "Mask 3 x 1";
+};
+template <> struct mask_size_name<MaskSize::Mask_5x1>
+{
+    static constexpr char value[] = "Mask 5 x 1";
+};
+template <> struct mask_size_name<MaskSize::Mask_3x3>
+{
+    static constexpr char value[] = "Mask 3 x 3";
+};
+template <> struct mask_size_name<MaskSize::Mask_5x5>
+{
+    static constexpr char value[] = "Mask 5 x 5";
+};
+template <> struct mask_size_name<MaskSize::Mask_7x7>
+{
+    static constexpr char value[] = "Mask 7 x 7";
+};
+template <> struct mask_size_name<MaskSize::Mask_9x9>
+{
+    static constexpr char value[] = "Mask 9 x 9";
+};
+template <> struct mask_size_name<MaskSize::Mask_11x11>
+{
+    static constexpr char value[] = "Mask 11 x 11";
+};
+template <> struct mask_size_name<MaskSize::Mask_13x13>
+{
+    static constexpr char value[] = "Mask 13 x 13";
+};
+template <> struct mask_size_name<MaskSize::Mask_15x15>
+{
+    static constexpr char value[] = "Mask 15 x 15";
+};
+
+inline std::ostream &operator<<(std::ostream &aOs, const MaskSize &aMaskSize)
+{
+    switch (aMaskSize)
+    {
+        case opp::MaskSize::Mask_1x3:
+            aOs << mask_size_name<MaskSize::Mask_1x3>::value;
+            break;
+        case opp::MaskSize::Mask_1x5:
+            aOs << mask_size_name<MaskSize::Mask_1x5>::value;
+            break;
+        case opp::MaskSize::Mask_3x1:
+            aOs << mask_size_name<MaskSize::Mask_3x1>::value;
+            break;
+        case opp::MaskSize::Mask_5x1:
+            aOs << mask_size_name<MaskSize::Mask_5x1>::value;
+            break;
+        case opp::MaskSize::Mask_3x3:
+            aOs << mask_size_name<MaskSize::Mask_3x3>::value;
+            break;
+        case opp::MaskSize::Mask_5x5:
+            aOs << mask_size_name<MaskSize::Mask_5x5>::value;
+            break;
+        case opp::MaskSize::Mask_7x7:
+            aOs << mask_size_name<MaskSize::Mask_7x7>::value;
+            break;
+        case opp::MaskSize::Mask_9x9:
+            aOs << mask_size_name<MaskSize::Mask_9x9>::value;
+            break;
+        case opp::MaskSize::Mask_11x11:
+            aOs << mask_size_name<MaskSize::Mask_11x11>::value;
+            break;
+        case opp::MaskSize::Mask_13x13:
+            aOs << mask_size_name<MaskSize::Mask_13x13>::value;
+            break;
+        case opp::MaskSize::Mask_15x15:
+            aOs << mask_size_name<MaskSize::Mask_15x15>::value;
+            break;
+        default:
+            aOs << "Unknown";
+            break;
+    }
+    return aOs;
+}
+
+inline std::wostream &operator<<(std::wostream &aOs, const MaskSize &aMaskSize)
+{
+    switch (aMaskSize)
+    {
+        case opp::MaskSize::Mask_1x3:
+            aOs << mask_size_name<MaskSize::Mask_1x3>::value;
+            break;
+        case opp::MaskSize::Mask_1x5:
+            aOs << mask_size_name<MaskSize::Mask_1x5>::value;
+            break;
+        case opp::MaskSize::Mask_3x1:
+            aOs << mask_size_name<MaskSize::Mask_3x1>::value;
+            break;
+        case opp::MaskSize::Mask_5x1:
+            aOs << mask_size_name<MaskSize::Mask_5x1>::value;
+            break;
+        case opp::MaskSize::Mask_3x3:
+            aOs << mask_size_name<MaskSize::Mask_3x3>::value;
+            break;
+        case opp::MaskSize::Mask_5x5:
+            aOs << mask_size_name<MaskSize::Mask_5x5>::value;
+            break;
+        case opp::MaskSize::Mask_7x7:
+            aOs << mask_size_name<MaskSize::Mask_7x7>::value;
+            break;
+        case opp::MaskSize::Mask_9x9:
+            aOs << mask_size_name<MaskSize::Mask_9x9>::value;
+            break;
+        case opp::MaskSize::Mask_11x11:
+            aOs << mask_size_name<MaskSize::Mask_11x11>::value;
+            break;
+        case opp::MaskSize::Mask_13x13:
+            aOs << mask_size_name<MaskSize::Mask_13x13>::value;
+            break;
+        case opp::MaskSize::Mask_15x15:
+            aOs << mask_size_name<MaskSize::Mask_15x15>::value;
+            break;
+        default:
+            aOs << "Unknown";
+            break;
+    }
+    return aOs;
+}
+#pragma endregion
+
+#pragma region FixedFilter
+/// <summary>
+/// Filters with a fixed coeffient matrix
+/// </summary>
+enum class FixedFilter // NOLINT(performance-enum-size)
+{
+    /// <summary>
+    /// Gauss filter. Possible mask sizes: 3x3, 5x5, 7x7, 9x9, 11x11, 13x13 and 15x15.<para/>
+    /// Filter kernels for Gauss filter are calculated using a sigma value of 0.4 + (filter width / 3.0) * 0.6.<para/>
+    /// Note: In NPP the sigma value is given as 0.4 + (filter width / 2) * 0.6, but the values actually used are "width
+    /// / 3". Further, the kernel values are normalized to get an exact sum equal to 1.
+    /// </summary>
+    Gauss,
+    /// <summary>
+    /// High pass filter. Possible mask sizes: 3x3 and 5x5.<para/>
+    /// Used filters are:<para/>
+    /// -1 -1 -1<para/>
+    /// -1 8 -1<para/>
+    /// -1 -1 -1<para/>
+    /// and<para/>
+    /// -1 -1 -1 -1 -1<para/>
+    /// -1 -1 -1 -1 -1<para/>
+    /// -1 -1 24 -1 -1<para/>
+    /// -1 -1 -1 -1 -1<para/>
+    /// -1 -1 -1 -1 -1<para/>
+    /// </summary>
+    HighPass,
+    /// <summary>
+    /// Low pass filter. Possible mask sizes: 3x3 and 5x5.<para/>
+    /// Used filters are:<para/>
+    /// 1/9 1/9 1/9<para/>
+    /// 1/9 1/9 1/9<para/>
+    /// 1/9 1/9 1/9<para/>
+    /// and<para/>
+    /// 1/25 1/25 1/25 1/25 1/25 <para/>
+    /// 1/25 1/25 1/25 1/25 1/25 <para/>
+    /// 1/25 1/25 1/25 1/25 1/25 <para/>
+    /// 1/25 1/25 1/25 1/25 1/25 <para/>
+    /// 1/25 1/25 1/25 1/25 1/25 <para/>
+    /// </summary>
+    LowPass,
+    /// <summary>
+    /// Laplace filter. Possible mask sizes: 3x3 and 5x5.<para/>
+    /// Used filters are:<para/>
+    /// -1 -1 -1<para/>
+    /// -1 8 -1<para/>
+    /// -1 -1 -1<para/>
+    /// and<para/>
+    /// -1 -3 -4 -3 -1<para/>
+    /// -3  0  6  0 -3<para/>
+    /// -4  6 20  6 -4<para/>
+    /// -3  0  6  0 -3<para/>
+    /// -1 -3 -4 -3 -1<para/>
+    /// </summary>
+    Laplace,
+    /// <summary>
+    /// Horizontal Prewitt filter. Possible mask size: 3x3.<para/>
+    /// Used filter is:<para/>
+    ///  1  1  1<para/>
+    ///  0  0  0<para/>
+    /// -1 -1 -1<para/>
+    /// </summary>
+    PrewittHoriz,
+    /// <summary>
+    /// Vertical Prewitt filter. Possible mask size: 3x3.<para/>
+    /// Used filter is:<para/>
+    /// -1 0 1<para/>
+    /// -1 0 1<para/>
+    /// -1 0 1<para/>
+    /// </summary>
+    PrewittVert,
+    /// <summary>
+    /// Roberts down filter. Possible mask size: 3x3.<para/>
+    /// Used filter is:<para/>
+    /// 0  0  0<para/>
+    /// 0  1  0<para/>
+    /// 0  0 -1<para/>
+    /// </summary>
+    RobertsDown,
+    /// <summary>
+    /// Roberts up filter. Possible mask size: 3x3.<para/>
+    /// Used filter is:<para/>
+    ///  0 0 0<para/>
+    ///  0 1 0<para/>
+    /// -1 0 0<para/>
+    /// </summary>
+    RobertsUp,
+    /// <summary>
+    /// Horizontal Scharr filter. Possible mask size: 3x3.<para/>
+    /// Used filter is:<para/>
+    ///  3  10  3<para/>
+    ///  0   0  0<para/>
+    /// -3 -10 -3<para/>
+    /// </summary>
+    ScharrHoriz,
+    /// <summary>
+    /// Vertical Prewitt filter. Possible mask size: 3x3.<para/>
+    /// Used filter is:<para/>
+    ///  -3 0 3<para/>
+    /// -10 0 10<para/>
+    ///  -3 0 3<para/>
+    /// </summary>
+    ScharrVert,
+    /// <summary>
+    /// Sharpen filter. Possible mask size: 3x3.<para/>
+    /// Used filter is:<para/>
+    /// -1/8 -1/8 -1/8<para/>
+    /// -1/8 16/8 -1/8<para/>
+    /// -1/8 -1/8 -1/8<para/>
+    /// </summary>
+    Sharpen,
+    /// <summary>
+    /// Second cross derivative Sobel filter. Possible mask sizes: 3x3 and 5x5.<para/>
+    /// Used filters are:<para/>
+    /// -1 0  1<para/>
+    ///  0 0  0<para/>
+    ///  1 0 -1<para/>
+    /// and<para/>
+    /// -1 -2  0  2  1<para/>
+    /// -2 -4  0  4  2<para/>
+    ///  0  0  0  0  0<para/>
+    /// -2 -4  0  4  2<para/>
+    /// -1 -2  0  2  1<para/>
+    /// </summary>
+    SobelCross,
+    /// <summary>
+    /// Horizontal Sobel filter. Possible mask sizes: 3x3 and 5x5.<para/>
+    /// Used filters are:<para/>
+    ///  1  2  1<para/>
+    ///  0  0  0<para/>
+    /// -1 -2 -1<para/>
+    /// and<para/>
+    ///  1  4   6  4  1<para/>
+    ///  2  8  12  8  2<para/>
+    ///  0  0   0  0  0<para/>
+    /// -2 -8 -12 -8 -2<para/>
+    /// -1 -4  -6 -4 -1<para/>
+    /// </summary>
+    SobelHoriz,
+    /// <summary>
+    /// Vertical Sobel filter. Possible mask sizes: 3x3 and 5x5.<para/>
+    /// Used filters are:<para/>
+    /// -1 0 1<para/>
+    /// -2 0 2<para/>
+    /// -1 0 1<para/>
+    /// and<para/>
+    /// -1  -2 0  2  1<para/>
+    /// -4  -8 0  8  4<para/>
+    /// -6 -12 0 12  6<para/>
+    /// -4  -8 0  8  4<para/>
+    /// -1  -2 0  2  1<para/>
+    /// </summary>
+    SobelVert,
+    /// <summary>
+    /// Second derivative horizontal Sobel filter. Possible mask sizes: 3x3 and 5x5.<para/>
+    /// Used filters are:<para/>
+    ///  1  2  1<para/>
+    /// -2 -4 -2<para/>
+    ///  1  2  1<para/>
+    /// and<para/>
+    ///  1  4   6  4  1<para/>
+    ///  0  0   0  0  0<para/>
+    /// -2 -8 -12 -8 -2<para/>
+    ///  0  0   0  0  0<para/>
+    ///  1  4   6  4  1<para/>
+    /// </summary>
+    SobelHorizSecond,
+    /// <summary>
+    /// Second derivative vertical Sobel filter. Possible mask sizes: 3x3 and 5x5.<para/>
+    /// Used filters are:<para/>
+    /// 1 -2 1<para/>
+    /// 2  4 2<para/>
+    /// 1 -2 1<para/>
+    /// and<para/>
+    /// 1  0  -2  0  1<para/>
+    /// 4  0  -8  0  4<para/>
+    /// 6  0 -12  0  6<para/>
+    /// 4  0  -8  0  4<para/>
+    /// 1  0  -2  0  1<para/>
+    /// </summary>
+    SobelVertSecond
+};
+
+template <FixedFilter T> struct fixed_filter_name
+{
+    static constexpr char value[] = "Unknown";
+};
+template <> struct fixed_filter_name<FixedFilter::HighPass>
+{
+    static constexpr char value[] = "HighPass";
+};
+template <> struct fixed_filter_name<FixedFilter::LowPass>
+{
+    static constexpr char value[] = "LowPass";
+};
+template <> struct fixed_filter_name<FixedFilter::Laplace>
+{
+    static constexpr char value[] = "Laplace";
+};
+template <> struct fixed_filter_name<FixedFilter::PrewittHoriz>
+{
+    static constexpr char value[] = "PrewittHoriz";
+};
+template <> struct fixed_filter_name<FixedFilter::PrewittVert>
+{
+    static constexpr char value[] = "PrewittVert";
+};
+template <> struct fixed_filter_name<FixedFilter::RobertsDown>
+{
+    static constexpr char value[] = "RobertsDown";
+};
+template <> struct fixed_filter_name<FixedFilter::RobertsUp>
+{
+    static constexpr char value[] = "RobertsUp";
+};
+template <> struct fixed_filter_name<FixedFilter::ScharrHoriz>
+{
+    static constexpr char value[] = "ScharrHoriz";
+};
+template <> struct fixed_filter_name<FixedFilter::ScharrVert>
+{
+    static constexpr char value[] = "ScharrVert";
+};
+template <> struct fixed_filter_name<FixedFilter::Sharpen>
+{
+    static constexpr char value[] = "Sharpen";
+};
+template <> struct fixed_filter_name<FixedFilter::SobelCross>
+{
+    static constexpr char value[] = "SobelCross";
+};
+template <> struct fixed_filter_name<FixedFilter::SobelHoriz>
+{
+    static constexpr char value[] = "SobelHoriz";
+};
+template <> struct fixed_filter_name<FixedFilter::SobelVert>
+{
+    static constexpr char value[] = "SobelVert";
+};
+template <> struct fixed_filter_name<FixedFilter::SobelHorizSecond>
+{
+    static constexpr char value[] = "SobelHorizSecond";
+};
+template <> struct fixed_filter_name<FixedFilter::SobelVertSecond>
+{
+    static constexpr char value[] = "SobelVertSecond";
+};
+
+inline std::ostream &operator<<(std::ostream &aOs, const FixedFilter &aFixedFilter)
+{
+    switch (aFixedFilter)
+    {
+        case opp::FixedFilter::HighPass:
+            aOs << fixed_filter_name<FixedFilter::HighPass>::value;
+            break;
+        case opp::FixedFilter::LowPass:
+            aOs << fixed_filter_name<FixedFilter::LowPass>::value;
+            break;
+        case opp::FixedFilter::Laplace:
+            aOs << fixed_filter_name<FixedFilter::Laplace>::value;
+            break;
+        case opp::FixedFilter::PrewittHoriz:
+            aOs << fixed_filter_name<FixedFilter::PrewittHoriz>::value;
+            break;
+        case opp::FixedFilter::PrewittVert:
+            aOs << fixed_filter_name<FixedFilter::PrewittVert>::value;
+            break;
+        case opp::FixedFilter::RobertsDown:
+            aOs << fixed_filter_name<FixedFilter::RobertsDown>::value;
+            break;
+        case opp::FixedFilter::RobertsUp:
+            aOs << fixed_filter_name<FixedFilter::RobertsUp>::value;
+            break;
+        case opp::FixedFilter::ScharrHoriz:
+            aOs << fixed_filter_name<FixedFilter::ScharrHoriz>::value;
+            break;
+        case opp::FixedFilter::ScharrVert:
+            aOs << fixed_filter_name<FixedFilter::ScharrVert>::value;
+            break;
+        case opp::FixedFilter::Sharpen:
+            aOs << fixed_filter_name<FixedFilter::Sharpen>::value;
+            break;
+        case opp::FixedFilter::SobelCross:
+            aOs << fixed_filter_name<FixedFilter::SobelCross>::value;
+            break;
+        case opp::FixedFilter::SobelHoriz:
+            aOs << fixed_filter_name<FixedFilter::SobelHoriz>::value;
+            break;
+        case opp::FixedFilter::SobelVert:
+            aOs << fixed_filter_name<FixedFilter::SobelVert>::value;
+            break;
+        case opp::FixedFilter::SobelHorizSecond:
+            aOs << fixed_filter_name<FixedFilter::SobelHorizSecond>::value;
+            break;
+        case opp::FixedFilter::SobelVertSecond:
+            aOs << fixed_filter_name<FixedFilter::SobelVertSecond>::value;
+            break;
+        default:
+            aOs << "Unknown";
+            break;
+    }
+    return aOs;
+}
+
+inline std::wostream &operator<<(std::wostream &aOs, const FixedFilter &aFixedFilter)
+{
+    switch (aFixedFilter)
+    {
+        case opp::FixedFilter::HighPass:
+            aOs << fixed_filter_name<FixedFilter::HighPass>::value;
+            break;
+        case opp::FixedFilter::LowPass:
+            aOs << fixed_filter_name<FixedFilter::LowPass>::value;
+            break;
+        case opp::FixedFilter::Laplace:
+            aOs << fixed_filter_name<FixedFilter::Laplace>::value;
+            break;
+        case opp::FixedFilter::PrewittHoriz:
+            aOs << fixed_filter_name<FixedFilter::PrewittHoriz>::value;
+            break;
+        case opp::FixedFilter::PrewittVert:
+            aOs << fixed_filter_name<FixedFilter::PrewittVert>::value;
+            break;
+        case opp::FixedFilter::RobertsDown:
+            aOs << fixed_filter_name<FixedFilter::RobertsDown>::value;
+            break;
+        case opp::FixedFilter::RobertsUp:
+            aOs << fixed_filter_name<FixedFilter::RobertsUp>::value;
+            break;
+        case opp::FixedFilter::ScharrHoriz:
+            aOs << fixed_filter_name<FixedFilter::ScharrHoriz>::value;
+            break;
+        case opp::FixedFilter::ScharrVert:
+            aOs << fixed_filter_name<FixedFilter::ScharrVert>::value;
+            break;
+        case opp::FixedFilter::Sharpen:
+            aOs << fixed_filter_name<FixedFilter::Sharpen>::value;
+            break;
+        case opp::FixedFilter::SobelCross:
+            aOs << fixed_filter_name<FixedFilter::SobelCross>::value;
+            break;
+        case opp::FixedFilter::SobelHoriz:
+            aOs << fixed_filter_name<FixedFilter::SobelHoriz>::value;
+            break;
+        case opp::FixedFilter::SobelVert:
+            aOs << fixed_filter_name<FixedFilter::SobelVert>::value;
+            break;
+        case opp::FixedFilter::SobelHorizSecond:
+            aOs << fixed_filter_name<FixedFilter::SobelHorizSecond>::value;
+            break;
+        case opp::FixedFilter::SobelVertSecond:
+            aOs << fixed_filter_name<FixedFilter::SobelVertSecond>::value;
+            break;
+        default:
+            aOs << "Unknown";
+            break;
+    }
+    return aOs;
+}
+#pragma endregion
 } // namespace opp

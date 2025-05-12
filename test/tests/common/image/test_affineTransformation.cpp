@@ -3,6 +3,8 @@
 #include <common/defines.h>
 #include <common/image/affineTransformation.h>
 #include <common/image/matrix.h>
+#include <common/image/quad.h>
+#include <common/image/roi.h>
 #include <common/vectorTypes.h>
 #include <cstddef>
 #include <sstream>
@@ -137,8 +139,8 @@ TEST_CASE("AffineTransformation<double>", "[Common.Image]")
     CHECK(0 == Approx(transformAffine[7]).margin(0.00001));
     CHECK(1 == Approx(transformAffine[8]).margin(0.00001));
 
-    AffineTransformation<double> rot45 = AffineTransformation<double>::GetRotation(45);
-    AffineTransformation<double> rot90 = AffineTransformation<double>::GetRotation(90);
+    AffineTransformation<double> rot45 = AffineTransformation<double>::GetRotation(-45);
+    AffineTransformation<double> rot90 = AffineTransformation<double>::GetRotation(-90);
     AffineTransformation<double> shift = AffineTransformation<double>::GetTranslation(Vec2d(100, 200));
     AffineTransformation<double> shear = AffineTransformation<double>::GetShear(Vec2d(0.2, 0.3));
     AffineTransformation<double> scale = AffineTransformation<double>::GetScale(Vec2d(1.1, 1.2));
@@ -177,6 +179,26 @@ TEST_CASE("AffineTransformation<double>", "[Common.Image]")
     CHECK(scale[3] == Approx(0).margin(0.00001));
     CHECK(scale[4] == Approx(1.2).margin(0.00001));
     CHECK(scale[5] == Approx(0).margin(0.00001));
+
+    Roi roi(0, 0, 512, 512);
+    Quad<double> quadRot30(
+        {162.29749663118366243, -93.702503368816280727}, {604.83647796503191785, 161.79749663118369085},
+        {349.33647796503191785, 604.33647796503191785}, {-93.202503368816309148, 348.83647796503191785});
+
+    AffineTransformation<double> shift1 = AffineTransformation<double>::GetTranslation({-256, -256});
+    AffineTransformation<double> rot    = AffineTransformation<double>::GetRotation(-30);
+    AffineTransformation<double> shift2 = AffineTransformation<double>::GetTranslation({256, 256});
+    AffineTransformation<double> affine = shift2 * rot * shift1;
+
+    AffineTransformation<double> affineFromQuad(roi, quadRot30);
+
+    AffineTransformation<double> diffAffine = affine - affineFromQuad;
+    double diff                             = 0;
+    for (size_t i = 0; i < 6; i++)
+    {
+        diff += std::abs(diffAffine.Data()[i]);
+    }
+    CHECK(diff < 1e-15);
 }
 
 TEST_CASE("AffineTransformation<float>", "[Common.Image]")
@@ -304,8 +326,8 @@ TEST_CASE("AffineTransformation<float>", "[Common.Image]")
     CHECK(0 == Approx(transformAffine[7]).margin(0.00001));
     CHECK(1 == Approx(transformAffine[8]).margin(0.00001));
 
-    AffineTransformation<float> rot45 = AffineTransformation<float>::GetRotation(45);
-    AffineTransformation<float> rot90 = AffineTransformation<float>::GetRotation(90);
+    AffineTransformation<float> rot45 = AffineTransformation<float>::GetRotation(-45);
+    AffineTransformation<float> rot90 = AffineTransformation<float>::GetRotation(-90);
     AffineTransformation<float> shift = AffineTransformation<float>::GetTranslation(Vec2f(100, 200));
     AffineTransformation<float> shear = AffineTransformation<float>::GetShear(Vec2f(0.2f, 0.3f));
     AffineTransformation<float> scale = AffineTransformation<float>::GetScale(Vec2f(1.1f, 1.2f));
@@ -344,4 +366,23 @@ TEST_CASE("AffineTransformation<float>", "[Common.Image]")
     CHECK(scale[3] == Approx(0).margin(0.00001));
     CHECK(scale[4] == Approx(1.2).margin(0.00001));
     CHECK(scale[5] == Approx(0).margin(0.00001));
+
+    Roi roi(0, 0, 512, 512);
+    Quad<float> quadRot30({162.297501f, -93.702515f}, {604.836487f, 161.797485f}, {349.336487f, 604.336426f},
+                          {-93.202499f, 348.836456f});
+
+    AffineTransformation<float> shift1 = AffineTransformation<float>::GetTranslation({-256, -256});
+    AffineTransformation<float> rot    = AffineTransformation<float>::GetRotation(-30);
+    AffineTransformation<float> shift2 = AffineTransformation<float>::GetTranslation({256, 256});
+    AffineTransformation<float> affine = shift2 * rot * shift1;
+
+    AffineTransformation<float> affineFromQuad(roi, quadRot30);
+
+    AffineTransformation<float> diffAffine = affine - affineFromQuad;
+    float diff                             = 0;
+    for (size_t i = 0; i < 6; i++)
+    {
+        diff += std::abs(diffAffine.Data()[i]);
+    }
+    CHECK(diff < 1e-6f);
 }

@@ -166,7 +166,6 @@ Image8uC3View &Image8uC3View::Copy(const Image8uC1View &aSrcChannel0, const Imag
 
 Image8uC3View &Image8uC3View::CopyConstBorder(Image8uC3View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const Pixel8uC3 &aValue, const NppStreamContext &nppStreamCtx) const
 {
-    checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiCopyConstBorder_8u_C3R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDst.NppiSizeRoi(), nTopBorderHeight, nLeftBorderWidth, aValue.data(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
@@ -174,7 +173,6 @@ Image8uC3View &Image8uC3View::CopyConstBorder(Image8uC3View &pDst, int nTopBorde
 
 Image8uC3View &Image8uC3View::CopyReplicateBorder(Image8uC3View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const NppStreamContext &nppStreamCtx) const
 {
-    checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiCopyReplicateBorder_8u_C3R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDst.NppiSizeRoi(), nTopBorderHeight, nLeftBorderWidth, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
@@ -182,7 +180,6 @@ Image8uC3View &Image8uC3View::CopyReplicateBorder(Image8uC3View &pDst, int nTopB
 
 Image8uC3View &Image8uC3View::CopyWrapBorder(Image8uC3View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const NppStreamContext &nppStreamCtx) const
 {
-    checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiCopyWrapBorder_8u_C3R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDst.NppiSizeRoi(), nTopBorderHeight, nLeftBorderWidth, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;

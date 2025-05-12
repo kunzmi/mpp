@@ -217,12 +217,12 @@ template <RealFloatingPoint T> T &AffineTransformation<T>::operator[](int aFlatI
     return mData[to_size_t(aFlatIndex)]; // NOLINT --> non constant array index
 }
 
-template <RealFloatingPoint T> T const &AffineTransformation<T>::operator[](int aFlatIndex) const
-{
-    assert(aFlatIndex >= 0);
-    assert(aFlatIndex < mSize);
-    return mData[to_size_t(aFlatIndex)]; // NOLINT --> non constant array index
-}
+// template <RealFloatingPoint T> T const &AffineTransformation<T>::operator[](int aFlatIndex) const
+//{
+//     assert(aFlatIndex >= 0);
+//     assert(aFlatIndex < mSize);
+//     return mData[to_size_t(aFlatIndex)]; // NOLINT --> non constant array index
+// }
 
 template <RealFloatingPoint T> T &AffineTransformation<T>::operator[](size_t aFlatIndex)
 {
@@ -230,11 +230,11 @@ template <RealFloatingPoint T> T &AffineTransformation<T>::operator[](size_t aFl
     return mData[aFlatIndex]; // NOLINT --> non constant array index
 }
 
-template <RealFloatingPoint T> T const &AffineTransformation<T>::operator[](size_t aFlatIndex) const
-{
-    assert(to_int(aFlatIndex) < mSize);
-    return mData[aFlatIndex]; // NOLINT --> non constant array index
-}
+// template <RealFloatingPoint T> T const &AffineTransformation<T>::operator[](size_t aFlatIndex) const
+//{
+//     assert(to_int(aFlatIndex) < mSize);
+//     return mData[aFlatIndex]; // NOLINT --> non constant array index
+// }
 
 template <RealFloatingPoint T> AffineTransformation<T> &AffineTransformation<T>::operator+=(T aOther)
 {
@@ -358,8 +358,8 @@ template <RealFloatingPoint T> AffineTransformation<T> AffineTransformation<T>::
     const T s     = std::sin(angle);
 
     rot(0, 0) = c;
-    rot(0, 1) = -s;
-    rot(1, 0) = s;
+    rot(0, 1) = s;
+    rot(1, 0) = -s;
     rot(1, 1) = c;
 
     return rot;

@@ -4,6 +4,8 @@
 #include "imageView.h"
 #include "imageView_arithmetic_impl.h"          //NOLINT(misc-include-cleaner)
 #include "imageView_dataExchangeAndInit_impl.h" //NOLINT(misc-include-cleaner)
+#include "imageView_filtering_impl.h" //NOLINT(misc-include-cleaner)
+#include "imageView_geometryTransforms_impl.h"  //NOLINT(misc-include-cleaner)
 #include "imageView_statistics_impl.h"          //NOLINT(misc-include-cleaner)
 #include "imageView_thresholdAndCompare_impl.h" //NOLINT(misc-include-cleaner)
 #include <backends/cuda/streamCtx.h>            //NOLINT(misc-include-cleaner)
@@ -210,5 +212,591 @@ using Image32fC4AView = ImageView<Pixel32fC4A>;
 
 template class ImageView<Pixel32fcC1>;
 using Image32fcC1View = ImageView<Pixel32fcC1>;
+
+//#pragma region Instantiate Affine
+//
+//// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+//#define InstantiateAffine_For(pixelT)                                                                                  \
+//    template ImageView<pixelT> &ImageView<pixelT>::WarpAffine(                                                         \
+//        ImageView<pixelT> &aDst, const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,        \
+//        BorderType aBorder, Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx) const;                        \
+//    template ImageView<pixelT> &ImageView<pixelT>::WarpAffine(                                                         \
+//        ImageView<pixelT> &aDst, const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,        \
+//        BorderType aBorder, pixelT aConstant, Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx) const;      \
+//    template ImageView<pixelT> &ImageView<pixelT>::WarpAffineBack(                                                     \
+//        ImageView<pixelT> &aDst, const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,        \
+//        BorderType aBorder, Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx) const;                        \
+//    template ImageView<pixelT> &ImageView<pixelT>::WarpAffineBack(                                                     \
+//        ImageView<pixelT> &aDst, const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,        \
+//        BorderType aBorder, pixelT aConstant, Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx) const;
+//
+//// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+//#define InstantiateAffinePlanar_For(pixelT)                                                                            \
+//    template void ImageView<pixelT##C4>::WarpAffine(ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc1,            \
+//                                                    ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc2,            \
+//                                                    ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc3,            \
+//                                                    ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc4,            \
+//                                                    ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst1,            \
+//                                                    ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst2,            \
+//                                                    ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst3,            \
+//                                                    ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst4,            \
+//                                                    const AffineTransformation<double> &aAffine,                       \
+//                                                    InterpolationMode aInterpolation, BorderType aBorder,              \
+//                                                    Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx);      \
+//    template void ImageView<pixelT##C4>::WarpAffine(                                                                   \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc3,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc4,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst3,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst4, const AffineTransformation<double> &aAffine,           \
+//        InterpolationMode aInterpolation, BorderType aBorder, pixelT##C4 aConstant, Roi aAllowedReadRoi,               \
+//        const opp::cuda::StreamCtx &aStreamCtx);                                                                       \
+//    template void ImageView<pixelT##C4>::WarpAffineBack(ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc1,        \
+//                                                        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc2,        \
+//                                                        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc3,        \
+//                                                        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc4,        \
+//                                                        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst1,        \
+//                                                        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst2,        \
+//                                                        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst3,        \
+//                                                        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst4,        \
+//                                                        const AffineTransformation<double> &aAffine,                   \
+//                                                        InterpolationMode aInterpolation, BorderType aBorder,          \
+//                                                        Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx);  \
+//    template void ImageView<pixelT##C4>::WarpAffineBack(                                                               \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc3,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc4,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst3,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst4, const AffineTransformation<double> &aAffine,           \
+//        InterpolationMode aInterpolation, BorderType aBorder, pixelT##C4 aConstant, Roi aAllowedReadRoi,               \
+//        const opp::cuda::StreamCtx &aStreamCtx);                                                                       \
+//                                                                                                                       \
+//    template void ImageView<pixelT##C3>::WarpAffine(ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc1,            \
+//                                                    ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc2,            \
+//                                                    ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc3,            \
+//                                                    ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst1,            \
+//                                                    ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst2,            \
+//                                                    ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst3,            \
+//                                                    const AffineTransformation<double> &aAffine,                       \
+//                                                    InterpolationMode aInterpolation, BorderType aBorder,              \
+//                                                    Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx);      \
+//    template void ImageView<pixelT##C3>::WarpAffine(                                                                   \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc3,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst3, const AffineTransformation<double> &aAffine,           \
+//        InterpolationMode aInterpolation, BorderType aBorder, pixelT##C3 aConstant, Roi aAllowedReadRoi,               \
+//        const opp::cuda::StreamCtx &aStreamCtx);                                                                       \
+//    template void ImageView<pixelT##C3>::WarpAffineBack(ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc1,        \
+//                                                        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc2,        \
+//                                                        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc3,        \
+//                                                        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst1,        \
+//                                                        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst2,        \
+//                                                        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst3,        \
+//                                                        const AffineTransformation<double> &aAffine,                   \
+//                                                        InterpolationMode aInterpolation, BorderType aBorder,          \
+//                                                        Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx);  \
+//    template void ImageView<pixelT##C3>::WarpAffineBack(                                                               \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc3,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst3, const AffineTransformation<double> &aAffine,           \
+//        InterpolationMode aInterpolation, BorderType aBorder, pixelT##C3 aConstant, Roi aAllowedReadRoi,               \
+//        const opp::cuda::StreamCtx &aStreamCtx);                                                                       \
+//                                                                                                                       \
+//    template void ImageView<pixelT##C2>::WarpAffine(ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc1,            \
+//                                                    ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc2,            \
+//                                                    ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst1,            \
+//                                                    ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst2,            \
+//                                                    const AffineTransformation<double> &aAffine,                       \
+//                                                    InterpolationMode aInterpolation, BorderType aBorder,              \
+//                                                    Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx);      \
+//    template void ImageView<pixelT##C2>::WarpAffine(                                                                   \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst2, const AffineTransformation<double> &aAffine,           \
+//        InterpolationMode aInterpolation, BorderType aBorder, pixelT##C2 aConstant, Roi aAllowedReadRoi,               \
+//        const opp::cuda::StreamCtx &aStreamCtx);                                                                       \
+//    template void ImageView<pixelT##C2>::WarpAffineBack(ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc1,        \
+//                                                        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc2,        \
+//                                                        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst1,        \
+//                                                        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst2,        \
+//                                                        const AffineTransformation<double> &aAffine,                   \
+//                                                        InterpolationMode aInterpolation, BorderType aBorder,          \
+//                                                        Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx);  \
+//    template void ImageView<pixelT##C2>::WarpAffineBack(                                                               \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst2, const AffineTransformation<double> &aAffine,           \
+//        InterpolationMode aInterpolation, BorderType aBorder, pixelT##C2 aConstant, Roi aAllowedReadRoi,               \
+//        const opp::cuda::StreamCtx &aStreamCtx);
+//
+//// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+//#define InstantiateGeomTransform_For(pixelT) InstantiateAffine_For(pixelT);
+//
+//// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+//#define ForAllChannelsNoAlpha(type)                                                                                    \
+//    InstantiateGeomTransform_For(Pixel##type##C1);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C2);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C3);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C4);                                                                     \
+//    InstantiateAffinePlanar_For(Pixel##type);
+//
+//// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+//#define ForAllChannelsWithAlpha(type)                                                                                  \
+//    InstantiateGeomTransform_For(Pixel##type##C1);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C2);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C3);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C4);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C4A);                                                                    \
+//    InstantiateAffinePlanar_For(Pixel##type);
+//
+//ForAllChannelsWithAlpha(8u);
+//// ForAllChannelsWithAlpha(8s);
+////
+//// ForAllChannelsWithAlpha(16u);
+//// ForAllChannelsWithAlpha(16s);
+////
+//// ForAllChannelsWithAlpha(32u);
+//// ForAllChannelsWithAlpha(32s);
+////
+//// ForAllChannelsWithAlpha(16f);
+//// ForAllChannelsWithAlpha(16bf);
+//// ForAllChannelsWithAlpha(32f);
+//// ForAllChannelsWithAlpha(64f);
+////
+//// ForAllChannelsNoAlpha(16sc);
+//// ForAllChannelsNoAlpha(32sc);
+//// ForAllChannelsNoAlpha(32fc);
+//
+//#undef InstantiateAffinePlanar_For
+//#undef InstantiateAffine_For
+//#undef InstantiateGeomTransform_For
+//#undef ForAllChannelsWithAlpha
+//#undef ForAllChannelsNoAlpha
+//#pragma endregion
+//
+//#pragma region Instantiate Perspective
+//
+//// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+//#define InstantiatePerspective_For(pixelT)                                                                             \
+//    template ImageView<pixelT> &ImageView<pixelT>::WarpPerspective(                                                    \
+//        ImageView<pixelT> &aDst, const PerspectiveTransformation<double> &aPerspective,                                \
+//        InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi,                                     \
+//        const opp::cuda::StreamCtx &aStreamCtx) const;                                                                 \
+//    template ImageView<pixelT> &ImageView<pixelT>::WarpPerspective(                                                    \
+//        ImageView<pixelT> &aDst, const PerspectiveTransformation<double> &aPerspective,                                \
+//        InterpolationMode aInterpolation, BorderType aBorder, pixelT aConstant, Roi aAllowedReadRoi,                   \
+//        const opp::cuda::StreamCtx &aStreamCtx) const;                                                                 \
+//    template ImageView<pixelT> &ImageView<pixelT>::WarpPerspectiveBack(                                                \
+//        ImageView<pixelT> &aDst, const PerspectiveTransformation<double> &aPerspective,                                \
+//        InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi,                                     \
+//        const opp::cuda::StreamCtx &aStreamCtx) const;                                                                 \
+//    template ImageView<pixelT> &ImageView<pixelT>::WarpPerspectiveBack(                                                \
+//        ImageView<pixelT> &aDst, const PerspectiveTransformation<double> &aPerspective,                                \
+//        InterpolationMode aInterpolation, BorderType aBorder, pixelT aConstant, Roi aAllowedReadRoi,                   \
+//        const opp::cuda::StreamCtx &aStreamCtx) const;
+//
+//// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+//#define InstantiatePerspectivePlanar_For(pixelT)                                                                       \
+//    template void ImageView<pixelT##C4>::WarpPerspective(ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc1,       \
+//                                                         ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc2,       \
+//                                                         ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc3,       \
+//                                                         ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc4,       \
+//                                                         ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst1,       \
+//                                                         ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst2,       \
+//                                                         ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst3,       \
+//                                                         ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst4,       \
+//                                                         const PerspectiveTransformation<double> &aPerspective,        \
+//                                                         InterpolationMode aInterpolation, BorderType aBorder,         \
+//                                                         Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx); \
+//    template void ImageView<pixelT##C4>::WarpPerspective(                                                              \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc3,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc4,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst3,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst4, const PerspectiveTransformation<double> &aPerspective, \
+//        InterpolationMode aInterpolation, BorderType aBorder, pixelT##C4 aConstant, Roi aAllowedReadRoi,               \
+//        const opp::cuda::StreamCtx &aStreamCtx);                                                                       \
+//    template void ImageView<pixelT##C4>::WarpPerspectiveBack(                                                          \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc3,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc4,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst3,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst4, const PerspectiveTransformation<double> &aPerspective, \
+//        InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi,                                     \
+//        const opp::cuda::StreamCtx &aStreamCtx);                                                                       \
+//    template void ImageView<pixelT##C4>::WarpPerspectiveBack(                                                          \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc3,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc4,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst3,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst4, const PerspectiveTransformation<double> &aPerspective, \
+//        InterpolationMode aInterpolation, BorderType aBorder, pixelT##C4 aConstant, Roi aAllowedReadRoi,               \
+//        const opp::cuda::StreamCtx &aStreamCtx);                                                                       \
+//                                                                                                                       \
+//    template void ImageView<pixelT##C3>::WarpPerspective(ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc1,       \
+//                                                         ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc2,       \
+//                                                         ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc3,       \
+//                                                         ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst1,       \
+//                                                         ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst2,       \
+//                                                         ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst3,       \
+//                                                         const PerspectiveTransformation<double> &aPerspective,        \
+//                                                         InterpolationMode aInterpolation, BorderType aBorder,         \
+//                                                         Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx); \
+//    template void ImageView<pixelT##C3>::WarpPerspective(                                                              \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc3,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst3, const PerspectiveTransformation<double> &aPerspective, \
+//        InterpolationMode aInterpolation, BorderType aBorder, pixelT##C3 aConstant, Roi aAllowedReadRoi,               \
+//        const opp::cuda::StreamCtx &aStreamCtx);                                                                       \
+//    template void ImageView<pixelT##C3>::WarpPerspectiveBack(                                                          \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc3,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst3, const PerspectiveTransformation<double> &aPerspective, \
+//        InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi,                                     \
+//        const opp::cuda::StreamCtx &aStreamCtx);                                                                       \
+//    template void ImageView<pixelT##C3>::WarpPerspectiveBack(                                                          \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc3,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst3, const PerspectiveTransformation<double> &aPerspective, \
+//        InterpolationMode aInterpolation, BorderType aBorder, pixelT##C3 aConstant, Roi aAllowedReadRoi,               \
+//        const opp::cuda::StreamCtx &aStreamCtx);                                                                       \
+//                                                                                                                       \
+//    template void ImageView<pixelT##C2>::WarpPerspective(ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc1,       \
+//                                                         ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc2,       \
+//                                                         ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst1,       \
+//                                                         ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst2,       \
+//                                                         const PerspectiveTransformation<double> &aPerspective,        \
+//                                                         InterpolationMode aInterpolation, BorderType aBorder,         \
+//                                                         Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx); \
+//    template void ImageView<pixelT##C2>::WarpPerspective(                                                              \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst2, const PerspectiveTransformation<double> &aPerspective, \
+//        InterpolationMode aInterpolation, BorderType aBorder, pixelT##C2 aConstant, Roi aAllowedReadRoi,               \
+//        const opp::cuda::StreamCtx &aStreamCtx);                                                                       \
+//    template void ImageView<pixelT##C2>::WarpPerspectiveBack(                                                          \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst2, const PerspectiveTransformation<double> &aPerspective, \
+//        InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi,                                     \
+//        const opp::cuda::StreamCtx &aStreamCtx);                                                                       \
+//    template void ImageView<pixelT##C2>::WarpPerspectiveBack(                                                          \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst2, const PerspectiveTransformation<double> &aPerspective, \
+//        InterpolationMode aInterpolation, BorderType aBorder, pixelT##C2 aConstant, Roi aAllowedReadRoi,               \
+//        const opp::cuda::StreamCtx &aStreamCtx);
+//
+//// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+//#define InstantiateGeomTransform_For(pixelT) InstantiatePerspective_For(pixelT);
+//
+//// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+//#define ForAllChannelsNoAlpha(type)                                                                                    \
+//    InstantiateGeomTransform_For(Pixel##type##C1);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C2);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C3);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C4);                                                                     \
+//    InstantiatePerspectivePlanar_For(Pixel##type);
+//
+//// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+//#define ForAllChannelsWithAlpha(type)                                                                                  \
+//    InstantiateGeomTransform_For(Pixel##type##C1);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C2);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C3);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C4);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C4A);                                                                    \
+//    InstantiatePerspectivePlanar_For(Pixel##type);
+//
+//ForAllChannelsWithAlpha(8u);
+//// ForAllChannelsWithAlpha(8s);
+////
+//// ForAllChannelsWithAlpha(16u);
+//// ForAllChannelsWithAlpha(16s);
+////
+//// ForAllChannelsWithAlpha(32u);
+//// ForAllChannelsWithAlpha(32s);
+////
+//// ForAllChannelsWithAlpha(16f);
+//// ForAllChannelsWithAlpha(16bf);
+//// ForAllChannelsWithAlpha(32f);
+//// ForAllChannelsWithAlpha(64f);
+////
+//// ForAllChannelsNoAlpha(16sc);
+//// ForAllChannelsNoAlpha(32sc);
+//// ForAllChannelsNoAlpha(32fc);
+//
+//#undef InstantiatePerspectivePlanar_For
+//#undef InstantiatePerspective_For
+//#undef InstantiateGeomTransform_For
+//#undef ForAllChannelsWithAlpha
+//#undef ForAllChannelsNoAlpha
+//#pragma endregion
+//
+//#pragma region Instantiate Rotate
+//
+//// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+//#define InstantiateRotate_For(pixelT)                                                                                  \
+//    template ImageView<pixelT> &ImageView<pixelT>::Rotate(                                                             \
+//        ImageView<pixelT> &aDst, double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,  \
+//        BorderType aBorder, Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx) const;                        \
+//    template ImageView<pixelT> &ImageView<pixelT>::Rotate(                                                             \
+//        ImageView<pixelT> &aDst, double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,  \
+//        BorderType aBorder, pixelT aConstant, Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx) const;
+//
+//// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+//#define InstantiateRotatePlanar_For(pixelT)                                                                            \
+//    template void ImageView<pixelT##C4>::Rotate(ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc1,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc2,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc3,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc4,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst1,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst2,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst3,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst4,                \
+//                                                double aAngleInDeg, const Vector2<double> &aShift,                     \
+//                                                InterpolationMode aInterpolation, BorderType aBorder,                  \
+//                                                Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx);          \
+//    template void ImageView<pixelT##C4>::Rotate(                                                                       \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc3,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc4,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst3,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst4, double aAngleInDeg, const Vector2<double> &aShift,     \
+//        InterpolationMode aInterpolation, BorderType aBorder, pixelT##C4 aConstant, Roi aAllowedReadRoi,               \
+//        const opp::cuda::StreamCtx &aStreamCtx);                                                                       \
+//                                                                                                                       \
+//    template void ImageView<pixelT##C3>::Rotate(ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc1,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc2,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc3,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst1,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst2,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst3,                \
+//                                                double aAngleInDeg, const Vector2<double> &aShift,                     \
+//                                                InterpolationMode aInterpolation, BorderType aBorder,                  \
+//                                                Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx);          \
+//    template void ImageView<pixelT##C3>::Rotate(                                                                       \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc3,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst3, double aAngleInDeg, const Vector2<double> &aShift,     \
+//        InterpolationMode aInterpolation, BorderType aBorder, pixelT##C3 aConstant, Roi aAllowedReadRoi,               \
+//        const opp::cuda::StreamCtx &aStreamCtx);                                                                       \
+//                                                                                                                       \
+//    template void ImageView<pixelT##C2>::Rotate(ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc1,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc2,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst1,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst2,                \
+//                                                double aAngleInDeg, const Vector2<double> &aShift,                     \
+//                                                InterpolationMode aInterpolation, BorderType aBorder,                  \
+//                                                Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx);          \
+//    template void ImageView<pixelT##C2>::Rotate(                                                                       \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst2, double aAngleInDeg, const Vector2<double> &aShift,     \
+//        InterpolationMode aInterpolation, BorderType aBorder, pixelT##C2 aConstant, Roi aAllowedReadRoi,               \
+//        const opp::cuda::StreamCtx &aStreamCtx);
+//
+//// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+//#define InstantiateGeomTransform_For(pixelT) InstantiateRotate_For(pixelT);
+//
+//// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+//#define ForAllChannelsNoAlpha(type)                                                                                    \
+//    InstantiateGeomTransform_For(Pixel##type##C1);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C2);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C3);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C4);                                                                     \
+//    InstantiateRotatePlanar_For(Pixel##type);
+//
+//// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+//#define ForAllChannelsWithAlpha(type)                                                                                  \
+//    InstantiateGeomTransform_For(Pixel##type##C1);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C2);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C3);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C4);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C4A);                                                                    \
+//    InstantiateRotatePlanar_For(Pixel##type);
+//
+//ForAllChannelsWithAlpha(8u);
+//// ForAllChannelsWithAlpha(8s);
+////
+//// ForAllChannelsWithAlpha(16u);
+//// ForAllChannelsWithAlpha(16s);
+////
+//// ForAllChannelsWithAlpha(32u);
+//// ForAllChannelsWithAlpha(32s);
+////
+//// ForAllChannelsWithAlpha(16f);
+//// ForAllChannelsWithAlpha(16bf);
+//// ForAllChannelsWithAlpha(32f);
+//// ForAllChannelsWithAlpha(64f);
+////
+//// ForAllChannelsNoAlpha(16sc);
+//// ForAllChannelsNoAlpha(32sc);
+//// ForAllChannelsNoAlpha(32fc);
+//
+//#undef InstantiateRotatePlanar_For
+//#undef InstantiateRotate_For
+//#undef InstantiateGeomTransform_For
+//#undef ForAllChannelsWithAlpha
+//#undef ForAllChannelsNoAlpha
+//#pragma endregion
+//
+//#pragma region Instantiate Resize
+//
+//// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+//#define InstantiateResize_For(pixelT)                                                                                  \
+//    template ImageView<pixelT> &ImageView<pixelT>::Resize(                                                             \
+//        ImageView<pixelT> &aDst, const Vector2<double> &aScale, const Vector2<double> &aShift,                         \
+//        InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi,                                     \
+//        const opp::cuda::StreamCtx &aStreamCtx) const;                                                                 \
+//    template ImageView<pixelT> &ImageView<pixelT>::Resize(                                                             \
+//        ImageView<pixelT> &aDst, const Vector2<double> &aScale, const Vector2<double> &aShift,                         \
+//        InterpolationMode aInterpolation, BorderType aBorder, pixelT aConstant, Roi aAllowedReadRoi,                   \
+//        const opp::cuda::StreamCtx &aStreamCtx) const;
+//
+//// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+//#define InstantiateResizePlanar_For(pixelT)                                                                            \
+//    template void ImageView<pixelT##C2>::Resize(ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc1,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc2,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst1,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst2,                \
+//                                                const Vector2<double> &aScale, const Vector2<double> &aShift,          \
+//                                                InterpolationMode aInterpolation, BorderType aBorder,                  \
+//                                                Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx);          \
+//    template void ImageView<pixelT##C2>::Resize(                                                                       \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aSrc2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C2>>> &aDst2, const Vector2<double> &aScale,                         \
+//        const Vector2<double> &aShift, InterpolationMode aInterpolation, BorderType aBorder, pixelT##C2 aConstant,     \
+//        Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx);                                                  \
+//                                                                                                                       \
+//    template void ImageView<pixelT##C3>::Resize(ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc1,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc2,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc3,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst1,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst2,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst3,                \
+//                                                const Vector2<double> &aScale, const Vector2<double> &aShift,          \
+//                                                InterpolationMode aInterpolation, BorderType aBorder,                  \
+//                                                Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx);          \
+//    template void ImageView<pixelT##C3>::Resize(                                                                       \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aSrc3,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C3>>> &aDst3, const Vector2<double> &aScale,                         \
+//        const Vector2<double> &aShift, InterpolationMode aInterpolation, BorderType aBorder, pixelT##C3 aConstant,     \
+//        Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx);                                                  \
+//                                                                                                                       \
+//    template void ImageView<pixelT##C4>::Resize(ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc1,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc2,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc3,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc4,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst1,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst2,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst3,                \
+//                                                ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst4,                \
+//                                                const Vector2<double> &aScale, const Vector2<double> &aShift,          \
+//                                                InterpolationMode aInterpolation, BorderType aBorder,                  \
+//                                                Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx);          \
+//    template void ImageView<pixelT##C4>::Resize(                                                                       \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc3,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aSrc4,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst1,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst2,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst3,                                                        \
+//        ImageView<Vector1<remove_vector_t<pixelT##C4>>> &aDst4, const Vector2<double> &aScale,                         \
+//        const Vector2<double> &aShift, InterpolationMode aInterpolation, BorderType aBorder, pixelT##C4 aConstant,     \
+//        Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx);
+//
+//// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+//#define InstantiateGeomTransform_For(pixelT) InstantiateResize_For(pixelT);
+//
+//// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+//#define ForAllChannelsNoAlpha(type)                                                                                    \
+//    InstantiateGeomTransform_For(Pixel##type##C1);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C2);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C3);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C4);                                                                     \
+//    InstantiateResizePlanar_For(Pixel##type);
+//
+//// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+//#define ForAllChannelsWithAlpha(type)                                                                                  \
+//    InstantiateGeomTransform_For(Pixel##type##C1);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C2);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C3);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C4);                                                                     \
+//    InstantiateGeomTransform_For(Pixel##type##C4A);                                                                    \
+//    InstantiateResizePlanar_For(Pixel##type);
+//
+//ForAllChannelsWithAlpha(8u);
+//// ForAllChannelsWithAlpha(8s);
+////
+//// ForAllChannelsWithAlpha(16u);
+//// ForAllChannelsWithAlpha(16s);
+////
+//// ForAllChannelsWithAlpha(32u);
+//// ForAllChannelsWithAlpha(32s);
+////
+//// ForAllChannelsWithAlpha(16f);
+//// ForAllChannelsWithAlpha(16bf);
+//// ForAllChannelsWithAlpha(32f);
+//// ForAllChannelsWithAlpha(64f);
+////
+//// ForAllChannelsNoAlpha(16sc);
+//// ForAllChannelsNoAlpha(32sc);
+//// ForAllChannelsNoAlpha(32fc);
+//
+//#undef InstantiateResizePlanar_For
+//#undef InstantiateResize_For
+//#undef InstantiateGeomTransform_For
+//#undef ForAllChannelsWithAlpha
+//#undef ForAllChannelsNoAlpha
+//#pragma endregion
 } // namespace opp::image::cuda
 #endif // OPP_ENABLE_CUDA_BACKEND

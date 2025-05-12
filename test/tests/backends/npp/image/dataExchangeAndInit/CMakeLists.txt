@@ -1,3 +1,4 @@
+addCatchTest(test_copy.cpp "common;backends.cuda;backends.npp;backends.npp.image;backends.simple_cpu;CUDA::cudart" "NPP_DataExchangeAndInit_Copy")
 addCatchTest(test_dup.cpp "common;backends.cuda;backends.npp;backends.npp.image;backends.simple_cpu;CUDA::cudart" "NPP_DataExchangeAndInit_Dup")
 addCatchTest(test_swapChannels.cpp "common;backends.cuda;backends.npp;backends.npp.image;backends.simple_cpu;CUDA::cudart" "NPP_DataExchangeAndInit_SwapChannels")
 addCatchTest(test_transpose.cpp "common;backends.cuda;backends.npp;backends.npp.image;backends.simple_cpu;CUDA::cudart" "NPP_DataExchangeAndInit_Transpose")

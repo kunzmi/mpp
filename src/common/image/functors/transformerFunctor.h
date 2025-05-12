@@ -22,11 +22,10 @@ namespace opp::image
 /// <summary>
 /// Computes an output pixel from src image with geometric coordinate transformation
 /// </summary>
-template <size_t tupelSize, typename DstT, typename CoordTransformerT, typename BorderControlT, typename InterpolatorT,
+template <size_t tupelSize, typename DstT, typename CoordTransformerT, bool checkIfInsideROI, typename InterpolatorT,
           typename TransformerT, RoundingMode roundingMode = RoundingMode::NearestTiesAwayFromZero>
 struct TransformerFunctor : public ImageFunctor<false>
 {
-    BorderControlT BorderControl;
     InterpolatorT Interpolator;
     TransformerT Transformer;
     Vector2<CoordTransformerT> SourceRoi;
@@ -38,9 +37,8 @@ struct TransformerFunctor : public ImageFunctor<false>
     {
     }
 
-    TransformerFunctor(BorderControlT aBorderControl, InterpolatorT aInterpolator, TransformerT aTransformer,
-                       const Size2D &aSourceRoi)
-        : BorderControl(aBorderControl), Interpolator(aInterpolator), Transformer(aTransformer),
+    TransformerFunctor(InterpolatorT aInterpolator, TransformerT aTransformer, const Size2D &aSourceRoi)
+        : Interpolator(aInterpolator), Transformer(aTransformer),
           SourceRoi(Vector2<CoordTransformerT>(aSourceRoi) - static_cast<CoordTransformerT>(0.5))
     {
     }
@@ -55,10 +53,10 @@ struct TransformerFunctor : public ImageFunctor<false>
         // either int2, float2 or double2, depending on transformer type
         const auto coordTransformed = Transformer(aPixelX, aPixelY);
 
-        if constexpr (BorderControlT::only_for_interpolation)
+        if constexpr (checkIfInsideROI)
         {
-            if (coordTransformed.x < static_cast<CoordTransformerT>(0) || coordTransformed.x >= SourceRoi.x ||
-                coordTransformed.y < static_cast<CoordTransformerT>(0) || coordTransformed.y >= SourceRoi.y)
+            if (coordTransformed.x < static_cast<CoordTransformerT>(-0.5) || coordTransformed.x >= SourceRoi.x ||
+                coordTransformed.y < static_cast<CoordTransformerT>(-0.5) || coordTransformed.y >= SourceRoi.y)
             {
                 return false;
             }
@@ -88,10 +86,9 @@ struct TransformerFunctor : public ImageFunctor<false>
             // either int2, float2 or double2, depending on transformer type
             const auto coordTransformed = Transformer(aPixelX + static_cast<int>(i), aPixelY);
 
-            if constexpr (BorderControlT::only_for_interpolation)
+            if constexpr (checkIfInsideROI)
             {
-                static_assert(!BorderControlT::only_for_interpolation,
-                              "abortIfOutsideRoi is not supported in combination with Tupels.");
+                static_assert(!checkIfInsideROI, "abortIfOutsideRoi is not supported in combination with Tupels.");
             }
 
             auto pixel = Interpolator(static_cast<InterpolatorT::coordinate_type>(coordTransformed.x),

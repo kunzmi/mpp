@@ -163,35 +163,59 @@ template <typename PixelT, typename BorderControlT, typename CoordT, Interpolati
 
             PixelT f0  = borderControl(ix0 + 1, iy0 + 0);
             PixelT f1  = borderControl(ix0 + 2, iy0 + 0);
-            PixelT fx0 = (f1 - borderControl(ix0 + 0, iy0 + 0)) / 2;
-            PixelT fx1 = (borderControl(ix0 + 3, iy0 + 0) - f0) / 2;
+            PixelT fx0 = (f1 - PixelT(borderControl(ix0 + 0, iy0 + 0))) / static_cast<remove_vector_t<PixelT>>(2);
+            PixelT fx1 = (PixelT(borderControl(ix0 + 3, iy0 + 0)) - f0) / static_cast<remove_vector_t<PixelT>>(2);
 
             const PixelT py0 =
-                f0 + fx0 * diffX + (-3 * f0 + 3 * f1 - 2 * fx0 - fx1) * diffX2 + (2 * f0 - 2 * f1 + fx0 + fx1) * diffX3;
+                f0 + fx0 * diffX +
+                (static_cast<remove_vector_t<PixelT>>(-3) * f0 + static_cast<remove_vector_t<PixelT>>(3) * f1 -
+                 static_cast<remove_vector_t<PixelT>>(2) * fx0 - fx1) *
+                    diffX2 +
+                (static_cast<remove_vector_t<PixelT>>(2) * f0 - static_cast<remove_vector_t<PixelT>>(2) * f1 + fx0 +
+                 fx1) *
+                    diffX3;
 
             f0  = borderControl(ix0 + 1, iy0 + 1);
             f1  = borderControl(ix0 + 2, iy0 + 1);
-            fx0 = (f1 - borderControl(ix0 + 0, iy0 + 1)) / 2;
-            fx1 = (borderControl(ix0 + 3, iy0 + 1) - f0) / 2;
+            fx0 = (f1 - PixelT(borderControl(ix0 + 0, iy0 + 1))) / static_cast<remove_vector_t<PixelT>>(2);
+            fx1 = (PixelT(borderControl(ix0 + 3, iy0 + 1)) - f0) / static_cast<remove_vector_t<PixelT>>(2);
 
             const PixelT py1 =
-                f0 + fx0 * diffX + (-3 * f0 + 3 * f1 - 2 * fx0 - fx1) * diffX2 + (2 * f0 - 2 * f1 + fx0 + fx1) * diffX3;
+                f0 + fx0 * diffX +
+                (static_cast<remove_vector_t<PixelT>>(-3) * f0 + static_cast<remove_vector_t<PixelT>>(3) * f1 -
+                 static_cast<remove_vector_t<PixelT>>(2) * fx0 - fx1) *
+                    diffX2 +
+                (static_cast<remove_vector_t<PixelT>>(2) * f0 - static_cast<remove_vector_t<PixelT>>(2) * f1 + fx0 +
+                 fx1) *
+                    diffX3;
 
             f0  = borderControl(ix0 + 1, iy0 + 2);
             f1  = borderControl(ix0 + 2, iy0 + 2);
-            fx0 = (f1 - borderControl(ix0 + 0, iy0 + 2)) / 2;
-            fx1 = (borderControl(ix0 + 3, iy0 + 2) - f0) / 2;
+            fx0 = (f1 - PixelT(borderControl(ix0 + 0, iy0 + 2))) / static_cast<remove_vector_t<PixelT>>(2);
+            fx1 = (PixelT(borderControl(ix0 + 3, iy0 + 2)) - f0) / static_cast<remove_vector_t<PixelT>>(2);
 
             const PixelT py2 =
-                f0 + fx0 * diffX + (-3 * f0 + 3 * f1 - 2 * fx0 - fx1) * diffX2 + (2 * f0 - 2 * f1 + fx0 + fx1) * diffX3;
+                f0 + fx0 * diffX +
+                (static_cast<remove_vector_t<PixelT>>(-3) * f0 + static_cast<remove_vector_t<PixelT>>(3) * f1 -
+                 static_cast<remove_vector_t<PixelT>>(2) * fx0 - fx1) *
+                    diffX2 +
+                (static_cast<remove_vector_t<PixelT>>(2) * f0 - static_cast<remove_vector_t<PixelT>>(2) * f1 + fx0 +
+                 fx1) *
+                    diffX3;
 
             f0  = borderControl(ix0 + 1, iy0 + 3);
             f1  = borderControl(ix0 + 2, iy0 + 3);
-            fx0 = (f1 - borderControl(ix0 + 0, iy0 + 3)) / 2;
-            fx1 = (borderControl(ix0 + 3, iy0 + 3) - f0) / 2;
+            fx0 = (f1 - PixelT(borderControl(ix0 + 0, iy0 + 3))) / static_cast<remove_vector_t<PixelT>>(2);
+            fx1 = (PixelT(borderControl(ix0 + 3, iy0 + 3)) - f0) / static_cast<remove_vector_t<PixelT>>(2);
 
             const PixelT py3 =
-                f0 + fx0 * diffX + (-3 * f0 + 3 * f1 - 2 * fx0 - fx1) * diffX2 + (2 * f0 - 2 * f1 + fx0 + fx1) * diffX3;
+                f0 + fx0 * diffX +
+                (static_cast<remove_vector_t<PixelT>>(-3) * f0 + static_cast<remove_vector_t<PixelT>>(3) * f1 -
+                 static_cast<remove_vector_t<PixelT>>(2) * fx0 - fx1) *
+                    diffX2 +
+                (static_cast<remove_vector_t<PixelT>>(2) * f0 - static_cast<remove_vector_t<PixelT>>(2) * f1 + fx0 +
+                 fx1) *
+                    diffX3;
 
             const CoordT diffY  = aPixelY - y0;
             const CoordT diffY2 = diffY * diffY;
@@ -199,10 +223,15 @@ template <typename PixelT, typename BorderControlT, typename CoordT, Interpolati
 
             f0  = py1;
             f1  = py2;
-            fx0 = (f1 - py0) / 2;
-            fx1 = (py3 - f0) / 2;
-            return f0 + fx0 * diffY + (-3 * f0 + 3 * f1 - 2 * fx0 - fx1) * diffY2 +
-                   (2 * f0 - 2 * f1 + fx0 + fx1) * diffY3;
+            fx0 = (f1 - py0) / static_cast<remove_vector_t<PixelT>>(2);
+            fx1 = (py3 - f0) / static_cast<remove_vector_t<PixelT>>(2);
+            return f0 + fx0 * diffY +
+                   (static_cast<remove_vector_t<PixelT>>(-3) * f0 + static_cast<remove_vector_t<PixelT>>(3) * f1 -
+                    static_cast<remove_vector_t<PixelT>>(2) * fx0 - fx1) *
+                       diffY2 +
+                   (static_cast<remove_vector_t<PixelT>>(2) * f0 - static_cast<remove_vector_t<PixelT>>(2) * f1 + fx0 +
+                    fx1) *
+                       diffY3;
         }
         else if constexpr (Interpol == InterpolationMode::CubicLagrange)
         {
@@ -216,10 +245,10 @@ template <typename PixelT, typename BorderControlT, typename CoordT, Interpolati
             const CoordT xx2 = aPixelX - x0 + static_cast<CoordT>(1) - static_cast<CoordT>(2);
             const CoordT xx3 = aPixelX - x0 + static_cast<CoordT>(1) - static_cast<CoordT>(3);
 
-            const CoordT wx0 = xx1 * xx2 * xx3 / -6;
-            const CoordT wx1 = xx0 * xx2 * xx3 / 2;
-            const CoordT wx2 = xx0 * xx1 * xx3 / -2;
-            const CoordT wx3 = xx0 * xx1 * xx2 / 6;
+            const CoordT wx0 = xx1 * xx2 * xx3 / static_cast<CoordT>(-6);
+            const CoordT wx1 = xx0 * xx2 * xx3 / static_cast<CoordT>(2);
+            const CoordT wx2 = xx0 * xx1 * xx3 / static_cast<CoordT>(-2);
+            const CoordT wx3 = xx0 * xx1 * xx2 / static_cast<CoordT>(6);
 
             PixelT f0 = borderControl(ix0 + 0, iy0 + 0);
             PixelT f1 = borderControl(ix0 + 1, iy0 + 0);
@@ -254,10 +283,10 @@ template <typename PixelT, typename BorderControlT, typename CoordT, Interpolati
             const CoordT yy2 = aPixelY - y0 + static_cast<CoordT>(1) - static_cast<CoordT>(2);
             const CoordT yy3 = aPixelY - y0 + static_cast<CoordT>(1) - static_cast<CoordT>(3);
 
-            const CoordT wy0 = yy1 * yy2 * yy3 / -6;
-            const CoordT wy1 = yy0 * yy2 * yy3 / 2;
-            const CoordT wy2 = yy0 * yy1 * yy3 / -2;
-            const CoordT wy3 = yy0 * yy1 * yy2 / 6;
+            const CoordT wy0 = yy1 * yy2 * yy3 / static_cast<CoordT>(-6);
+            const CoordT wy1 = yy0 * yy2 * yy3 / static_cast<CoordT>(2);
+            const CoordT wy2 = yy0 * yy1 * yy3 / static_cast<CoordT>(-2);
+            const CoordT wy3 = yy0 * yy1 * yy2 / static_cast<CoordT>(6);
 
             return py0 * wy0 + py1 * wy1 + py2 * wy2 + py3 * wy3;
         }
@@ -529,28 +558,28 @@ template <typename PixelT, typename BorderControlT, typename CoordT, Interpolati
             {
                 for (int x = ixMinFull; x < ixMaxFull; x++)
                 {
-                    pixelRes += borderControl(x, y);
+                    pixelRes += PixelT(borderControl(x, y));
                 }
-                pixelRes += borderControl(ixMinFull - 1, y) * wxMin;
+                pixelRes += PixelT(borderControl(ixMinFull - 1, y)) * wxMin;
 
-                pixelRes += borderControl(ixMaxFull, y) * wxMax;
+                pixelRes += PixelT(borderControl(ixMaxFull, y)) * wxMax;
             }
 
             for (int x = ixMinFull; x < ixMaxFull; x++)
             {
-                pixelRes += borderControl(x, iyMinFull - 1) * wyMin;
+                pixelRes += PixelT(borderControl(x, iyMinFull - 1)) * wyMin;
             }
-            pixelRes += borderControl(ixMinFull - 1, iyMinFull - 1) * wxMin * wyMin;
+            pixelRes += PixelT(borderControl(ixMinFull - 1, iyMinFull - 1)) * wxMin * wyMin;
 
-            pixelRes += borderControl(ixMaxFull, iyMinFull - 1) * wxMax * wyMin;
+            pixelRes += PixelT(borderControl(ixMaxFull, iyMinFull - 1)) * wxMax * wyMin;
 
             for (int x = ixMinFull; x < ixMaxFull; x++)
             {
-                pixelRes += borderControl(x, iyMaxFull) * wyMax;
+                pixelRes += PixelT(borderControl(x, iyMaxFull)) * wyMax;
             }
-            pixelRes += borderControl(ixMinFull - 1, iyMaxFull) * wxMin * wyMax;
+            pixelRes += PixelT(borderControl(ixMinFull - 1, iyMaxFull)) * wxMin * wyMax;
 
-            pixelRes += borderControl(ixMaxFull, iyMaxFull) * wxMax * wyMax;
+            pixelRes += PixelT(borderControl(ixMaxFull, iyMaxFull)) * wxMax * wyMax;
 
             return pixelRes * SuperParams.SumWeightsInv;
         }

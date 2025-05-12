@@ -78,6 +78,7 @@ class TIFFFile : public FileReader, public FileWriter
     void ReadPlaneNoCompression(size_t aIdx);
     void ReadPlaneLZWCompression(size_t aIdx);
     void ReadPlaneDeflateCompression(size_t aIdx);
+    void ReadPlanePackBitsCompression(size_t aIdx);
     void DecodeDifferencingPredictor(size_t aIdx);
 
     static void EncodeDifferencingPredictor(void *aData, opp::image::PixelTypeEnum aDataType, uint aWidth,

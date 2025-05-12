@@ -67,7 +67,7 @@ template <PixelType T> class Image : public ImageView<T>
             return *this;
         }
         ImageView<T>::PointerRef()    = aOther.PointerRef();
-        ImageView<T>::PointerRoiRef() = aOther.ointerRoiRef();
+        ImageView<T>::PointerRoiRef() = aOther.PointerRoiRef();
         ImageView<T>::PitchRef()      = aOther.PitchRef();
         ImageView<T>::ROIRef()        = aOther.ROIRef();
         ImageView<T>::SizeAllocRef()  = aOther.SizeAllocRef();
@@ -78,6 +78,7 @@ template <PixelType T> class Image : public ImageView<T>
         aOther.PitchRef()      = 0;
         aOther.ROIRef()        = Roi();
         aOther.SizeAllocRef()  = Size2D();
+        return *this;
     }
 
     static bool CanLoad(const std::filesystem::path &aFilename)

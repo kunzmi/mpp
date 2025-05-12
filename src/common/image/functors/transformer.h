@@ -17,6 +17,7 @@
 #else
 #define STD
 #endif
+#include <common/vector1.h>
 #include <numbers>
 
 namespace opp::image
@@ -43,7 +44,7 @@ template <typename CoordT, MirrorAxis mirrorAxis> struct TransformerMirror
         {
             CoordT x = static_cast<CoordT>(roiSize.x) - static_cast<CoordT>(aPixelX) - static_cast<CoordT>(1);
 
-            return {x, static_cast<CoordT>(aPixelX)};
+            return {x, static_cast<CoordT>(aPixelY)};
         }
         else if constexpr (mirrorAxis == MirrorAxis::Both)
         {
@@ -78,13 +79,14 @@ template <typename CoordT> struct TransformerMap
 
 template <typename CoordT> struct TransformerMap2
 {
-    const CoordT *RESTRICT PointerMapX;
-    const CoordT *RESTRICT PointerMapY;
+    const Vector1<CoordT> *RESTRICT PointerMapX;
+    const Vector1<CoordT> *RESTRICT PointerMapY;
     const size_t MapPitchX;
     const size_t MapPitchY;
 
 #pragma region Constructors
-    TransformerMap2(const CoordT *aPointerMapX, size_t aMapPitchX, const CoordT *aPointerMapY, size_t aMapPitchY)
+    TransformerMap2(const Vector1<CoordT> *aPointerMapX, size_t aMapPitchX, const Vector1<CoordT> *aPointerMapY,
+                    size_t aMapPitchY)
         : PointerMapX(aPointerMapX), PointerMapY(aPointerMapY), MapPitchX(aMapPitchX), MapPitchY(aMapPitchY)
     {
     }
@@ -92,7 +94,8 @@ template <typename CoordT> struct TransformerMap2
 
     DEVICE_CODE Vector2<CoordT> operator()(int aPixelX, int aPixelY) const
     {
-        return {*gotoPtr(PointerMapX, MapPitchX, aPixelX, aPixelY), *gotoPtr(PointerMapY, MapPitchY, aPixelX, aPixelY)};
+        return {gotoPtr(PointerMapX, MapPitchX, aPixelX, aPixelY)->x,
+                gotoPtr(PointerMapY, MapPitchY, aPixelX, aPixelY)->x};
     }
 };
 

@@ -1,8 +1,8 @@
 #pragma once
 #include <common/complex.h>
 #include <common/defines.h>
-#include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vectorTypes.h>
 #include <concepts>
 #include <ostream>
 
@@ -1338,6 +1338,92 @@ template <> struct default_ext_compute_type_for<Pixel16uC4A>
 template <typename T> using default_ext_compute_type_for_t = typename default_ext_compute_type_for<T>::type;
 #pragma endregion
 
+#pragma region Compute type for geometry operations
+template <typename T> struct geometry_compute_type_for
+{
+    using type = default_compute_type_for_t<T>;
+};
+// 16f
+template <> struct geometry_compute_type_for<Pixel16fC1>
+{
+    using type = Pixel32fC1;
+};
+template <> struct geometry_compute_type_for<Pixel16fC2>
+{
+    using type = Pixel32fC2;
+};
+template <> struct geometry_compute_type_for<Pixel16fC3>
+{
+    using type = Pixel32fC3;
+};
+template <> struct geometry_compute_type_for<Pixel16fC4>
+{
+    using type = Pixel32fC4;
+};
+template <> struct geometry_compute_type_for<Pixel16fC4A>
+{
+    using type = Pixel32fC4A;
+};
+// 16fc
+template <> struct geometry_compute_type_for<Pixel16fcC1>
+{
+    using type = Pixel32fcC1;
+};
+template <> struct geometry_compute_type_for<Pixel16fcC2>
+{
+    using type = Pixel32fcC2;
+};
+template <> struct geometry_compute_type_for<Pixel16fcC3>
+{
+    using type = Pixel32fcC3;
+};
+template <> struct geometry_compute_type_for<Pixel16fcC4>
+{
+    using type = Pixel32fcC4;
+};
+// 16bf
+template <> struct geometry_compute_type_for<Pixel16bfC1>
+{
+    using type = Pixel32fC1;
+};
+template <> struct geometry_compute_type_for<Pixel16bfC2>
+{
+    using type = Pixel32fC2;
+};
+template <> struct geometry_compute_type_for<Pixel16bfC3>
+{
+    using type = Pixel32fC3;
+};
+template <> struct geometry_compute_type_for<Pixel16bfC4>
+{
+    using type = Pixel32fC4;
+};
+template <> struct geometry_compute_type_for<Pixel16bfC4A>
+{
+    using type = Pixel32fC4A;
+};
+// 16bfc
+template <> struct geometry_compute_type_for<Pixel16bfcC1>
+{
+    using type = Pixel32fcC1;
+};
+template <> struct geometry_compute_type_for<Pixel16bfcC2>
+{
+    using type = Pixel32fcC2;
+};
+template <> struct geometry_compute_type_for<Pixel16bfcC3>
+{
+    using type = Pixel32fcC3;
+};
+template <> struct geometry_compute_type_for<Pixel16bfcC4>
+{
+    using type = Pixel32fcC4;
+};
+
+template <typename T> using geometry_compute_type_for_t = typename geometry_compute_type_for<T>::type;
+
+#pragma endregion
+
 #pragma region Coordinate type for interpolation
 template <typename T> struct coordinate_type_interpolation_for
 {
@@ -1385,6 +1471,147 @@ template <> struct coordinate_type_interpolation_for<Pixel64fcC4>
 };
 
 template <typename T> using coordinate_type_interpolation_for_t = typename coordinate_type_interpolation_for<T>::type;
+
+#pragma endregion
+
+#pragma region Compute type for integer filter
+
+template <typename T> struct filter_integer_compute_type_for_scalar
+{
+    using type = remove_vector_t<default_compute_type_for_t<T>>;
+};
+template <> struct filter_integer_compute_type_for_scalar<byte>
+{
+    using type = int;
+};
+template <> struct filter_integer_compute_type_for_scalar<sbyte>
+{
+    using type = int;
+};
+template <> struct filter_integer_compute_type_for_scalar<short>
+{
+    using type = int;
+};
+template <> struct filter_integer_compute_type_for_scalar<ushort>
+{
+    using type = int;
+};
+template <> struct filter_integer_compute_type_for_scalar<int>
+{
+    using type = int;
+};
+template <> struct filter_integer_compute_type_for_scalar<uint>
+{
+    using type = long64;
+};
+template <> struct filter_integer_compute_type_for_scalar<HalfFp16>
+{
+    using type = float;
+};
+template <> struct filter_integer_compute_type_for_scalar<BFloat16>
+{
+    using type = float;
+};
+template <> struct filter_integer_compute_type_for_scalar<float>
+{
+    using type = float;
+};
+template <> struct filter_integer_compute_type_for_scalar<double>
+{
+    using type = double;
+};
+template <> struct filter_integer_compute_type_for_scalar<c_int>
+{
+    using type = c_int;
+};
+template <> struct filter_integer_compute_type_for_scalar<c_short>
+{
+    using type = c_int;
+};
+template <> struct filter_integer_compute_type_for_scalar<c_float>
+{
+    using type = c_float;
+};
+
+template <typename T>
+using filter_integer_compute_type_for_t =
+    same_vector_size_different_type_t<T, typename filter_integer_compute_type_for_scalar<remove_vector_t<T>>::type>;
+
+template <typename T> struct filtertype_for
+{
+    using type = float;
+};
+template <typename T>
+    requires RealOrComplexIntVector<T>
+struct filtertype_for<T>
+{
+    using type = int;
+};
+template <typename T> using filtertype_for_t = typename filtertype_for<T>::type;
+#pragma endregion
+
+#pragma region Compute type for floating point filter
+
+template <typename T> struct filter_compute_type_for_scalar
+{
+    using type = remove_vector_t<default_compute_type_for_t<T>>;
+};
+template <> struct filter_compute_type_for_scalar<byte>
+{
+    using type = float;
+};
+template <> struct filter_compute_type_for_scalar<sbyte>
+{
+    using type = float;
+};
+template <> struct filter_compute_type_for_scalar<short>
+{
+    using type = float;
+};
+template <> struct filter_compute_type_for_scalar<ushort>
+{
+    using type = float;
+};
+template <> struct filter_compute_type_for_scalar<int>
+{
+    using type = float;
+};
+template <> struct filter_compute_type_for_scalar<uint>
+{
+    using type = float;
+};
+template <> struct filter_compute_type_for_scalar<HalfFp16>
+{
+    using type = float;
+};
+template <> struct filter_compute_type_for_scalar<BFloat16>
+{
+    using type = float;
+};
+template <> struct filter_compute_type_for_scalar<float>
+{
+    using type = float;
+};
+template <> struct filter_compute_type_for_scalar<double>
+{
+    using type = double;
+};
+template <> struct filter_compute_type_for_scalar<c_int>
+{
+    using type = c_float;
+};
+template <> struct filter_compute_type_for_scalar<c_short>
+{
+    using type = c_float;
+};
+template <> struct filter_compute_type_for_scalar<c_float>
+{
+    using type = c_float;
+};
+
+template <typename T>
+using filter_compute_type_for_t =
+    same_vector_size_different_type_t<T, typename filter_compute_type_for_scalar<remove_vector_t<T>>::type>;
 
 #pragma endregion
 
@@ -1495,7 +1722,7 @@ template <> struct pixel_type<PixelTypeEnum::PTE16fC4A>
     using type = Pixel16fC4A;
 };
 
-// 16f
+// 16fc
 template <> struct pixel_type<PixelTypeEnum::PTE16fcC1>
 {
     using type = Pixel16fcC1;

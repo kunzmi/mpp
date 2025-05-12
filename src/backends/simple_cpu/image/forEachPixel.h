@@ -19,4 +19,10 @@ template <PixelType T> class ImageView;
 /// runs aOp on every pixel of an image. Inplace and outplace operation, no mask.
 /// </summary>
 template <typename DstT, typename functor> void forEachPixel(ImageView<DstT> &aDst, const functor &aOp);
+
+/// <summary>
+/// runs aOp on every pixel in roi (0,0, aSize). Inplace operation, no mask.
+/// </summary>
+template <typename DstT, typename functor, bool xUneven = false>
+void forEachPixel(ImageView<DstT> &aDst, const Size2D aSize, const functor &aOp);
 } // namespace opp::image::cpuSimple

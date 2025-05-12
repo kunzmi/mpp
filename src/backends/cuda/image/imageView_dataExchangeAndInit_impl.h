@@ -288,6 +288,40 @@ ImageView<T> &ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aSrcCha
 }
 #pragma endregion
 
+#pragma region Copy (with border control)
+template <PixelType T>
+ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst, const Vector2<int> &aLowerBorderSize, BorderType aBorder,
+                                 const opp::cuda::StreamCtx &aStreamCtx) const
+{
+    InvokeCopyBorder(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aLowerBorderSize, aBorder, {0}, SizeRoi(),
+                     aStreamCtx);
+
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst, const Vector2<int> &aLowerBorderSize, BorderType aBorder,
+                                 const T &aConstant, const opp::cuda::StreamCtx &aStreamCtx) const
+{
+    InvokeCopyBorder(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aLowerBorderSize, aBorder, aConstant,
+                     SizeRoi(), aStreamCtx);
+
+    return aDst;
+}
+#pragma endregion
+
+#pragma region Copy subpix
+template <PixelType T>
+ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst, const Pixel32fC2 &aDelta, InterpolationMode aInterpolation,
+                                 const opp::cuda::StreamCtx &aStreamCtx) const
+{
+    InvokeCopySubpix(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aDelta, aInterpolation, SizeRoi(),
+                     aStreamCtx);
+
+    return aDst;
+}
+#pragma endregion
+
 #pragma region Dup
 template <PixelType T>
 template <PixelType TTo>

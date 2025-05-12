@@ -1,8 +1,10 @@
 add_library(backends.cuda.image.dataExchangeAndInit 
 	convert.cu
-
+	
 	copy.cu
+	copyBorder.cu
 	copyMasked.cu
+	copySubpix.cu
 	
 	dup.cu
 

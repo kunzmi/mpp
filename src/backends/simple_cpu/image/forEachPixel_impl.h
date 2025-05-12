@@ -62,4 +62,52 @@ template <typename DstT, typename functor> void forEachPixel(ImageView<DstT> &aD
         }
     }
 }
+
+/// <summary>
+/// runs aOp on every pixel in roi (0,0, aSize). Inplace operation, no mask.
+/// </summary>
+template <typename DstT, typename functor, bool xUneven>
+void forEachPixel(ImageView<DstT> &aDst, const Size2D aSize, const functor &aOp)
+{
+    for (auto &pixelIterator : aSize)
+    {
+        int pixelX = pixelIterator.Pixel.x;
+        int pixelY = pixelIterator.Pixel.y;
+
+        int otherX = 0;
+        int otherY = 0;
+
+        if constexpr (xUneven)
+        {
+            if (pixelX == aSize.x - 1 && pixelY > aSize.y / 2)
+            {
+                continue;
+            }
+        }
+
+        DstT &pixel = aDst(pixelX, pixelY);
+
+        aOp(pixelX, pixelY, otherX, otherY);
+
+        DstT &otherPixel = aDst(otherX, otherY);
+
+        DstT temp = otherPixel;
+
+        // keep alpha channel value (simpleCPU version):
+        if constexpr (has_alpha_channel_v<DstT>)
+        {
+            otherPixel.x = pixel.x;
+            otherPixel.y = pixel.y;
+            otherPixel.z = pixel.z;
+            pixel.x      = temp.x;
+            pixel.y      = temp.y;
+            pixel.z      = temp.z;
+        }
+        else
+        {
+            otherPixel = pixel;
+            pixel      = temp;
+        }
+    }
+}
 } // namespace opp::image::cpuSimple

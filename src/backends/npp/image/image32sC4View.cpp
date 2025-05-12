@@ -197,7 +197,6 @@ Image32sC4View &Image32sC4View::Copy(const Image32sC1View &aSrcChannel0, const I
 
 Image32sC4View &Image32sC4View::CopyConstBorder(Image32sC4View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const Pixel32sC4 &aValue, const NppStreamContext &nppStreamCtx) const
 {
-    checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiCopyConstBorder_32s_C4R_Ctx(reinterpret_cast<const Npp32s *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<Npp32s *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDst.NppiSizeRoi(), nTopBorderHeight, nLeftBorderWidth, aValue.data(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
@@ -205,7 +204,6 @@ Image32sC4View &Image32sC4View::CopyConstBorder(Image32sC4View &pDst, int nTopBo
 
 Image32sC4View &Image32sC4View::CopyConstBorderA(Image32sC4View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const Pixel32sC3 &aValue, const NppStreamContext &nppStreamCtx) const
 {
-    checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiCopyConstBorder_32s_AC4R_Ctx(reinterpret_cast<const Npp32s *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<Npp32s *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDst.NppiSizeRoi(), nTopBorderHeight, nLeftBorderWidth, aValue.data(), nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
@@ -213,7 +211,6 @@ Image32sC4View &Image32sC4View::CopyConstBorderA(Image32sC4View &pDst, int nTopB
 
 Image32sC4View &Image32sC4View::CopyReplicateBorder(Image32sC4View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const NppStreamContext &nppStreamCtx) const
 {
-    checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiCopyReplicateBorder_32s_C4R_Ctx(reinterpret_cast<const Npp32s *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<Npp32s *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDst.NppiSizeRoi(), nTopBorderHeight, nLeftBorderWidth, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
@@ -221,7 +218,6 @@ Image32sC4View &Image32sC4View::CopyReplicateBorder(Image32sC4View &pDst, int nT
 
 Image32sC4View &Image32sC4View::CopyReplicateBorderA(Image32sC4View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const NppStreamContext &nppStreamCtx) const
 {
-    checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiCopyReplicateBorder_32s_AC4R_Ctx(reinterpret_cast<const Npp32s *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<Npp32s *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDst.NppiSizeRoi(), nTopBorderHeight, nLeftBorderWidth, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
@@ -229,7 +225,6 @@ Image32sC4View &Image32sC4View::CopyReplicateBorderA(Image32sC4View &pDst, int n
 
 Image32sC4View &Image32sC4View::CopyWrapBorder(Image32sC4View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const NppStreamContext &nppStreamCtx) const
 {
-    checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiCopyWrapBorder_32s_C4R_Ctx(reinterpret_cast<const Npp32s *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<Npp32s *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDst.NppiSizeRoi(), nTopBorderHeight, nLeftBorderWidth, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;
@@ -237,7 +232,6 @@ Image32sC4View &Image32sC4View::CopyWrapBorder(Image32sC4View &pDst, int nTopBor
 
 Image32sC4View &Image32sC4View::CopyWrapBorderA(Image32sC4View &pDst, int nTopBorderHeight, int nLeftBorderWidth, const NppStreamContext &nppStreamCtx) const
 {
-    checkSameSize(ROI(), pDst.ROI());
     nppSafeCallExt(nppiCopyWrapBorder_32s_AC4R_Ctx(reinterpret_cast<const Npp32s *>(PointerRoi()), to_int(Pitch()), NppiSizeRoi(), reinterpret_cast<Npp32s *>(pDst.PointerRoi()), to_int(pDst.Pitch()), pDst.NppiSizeRoi(), nTopBorderHeight, nLeftBorderWidth, nppStreamCtx),
                    "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
     return pDst;

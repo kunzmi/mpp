@@ -1146,6 +1146,27 @@ template <PixelType T> class ImageView
                               ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel3,
                               ImageView<Vector1<remove_vector_t<T>>> &aSrcChannel4, ImageView<T> &aDst)
         requires(FourChannelNoAlpha<T>);
+
+    // the following are implemented in imageView_geometryTransforms_impl.h:
+    /// <summary>
+    /// Copy image with border.
+    /// </summary>
+    /// <param name="aDst">Destination image</param>
+    /// <param name="aLowerBorderSize">Size of the border to add on the lower coordinate side
+    /// (usually left and top side of the image)</param>
+    /// <param name="aBorder">Border control paramter</param>
+    /// <param name="aConstant">Constant value needed in case BorderType::Constant</param>
+    ImageView<T> &Copy(ImageView<T> &aDst, const Vector2<int> &aLowerBorderSize, BorderType aBorder,
+                       T aConstant = {0}) const;
+
+    /// <summary>
+    /// Copy subpix.
+    /// </summary>
+    /// <param name="aDst">Destination image</param>
+    /// <param name="aDelta">Fractional part of source image coordinate</param>
+    /// <param name="aInterpolation">Interpolation mode to use</param>
+    ImageView<T> &Copy(ImageView<T> &aDst, const Pixel32fC2 &aDelta, InterpolationMode aInterpolation) const;
+
 #pragma endregion
 #pragma region Dup
     /// <summary>
@@ -1790,33 +1811,1385 @@ template <PixelType T> class ImageView
 #pragma endregion
 
 #pragma region Geometric Transforms
+#pragma region Affine
     /// <summary>
-    /// WarpAffine<para/>
-    /// Depending on BorderType, the behaviour for pixels that fall outside the source image roi differs:
-    /// For BorderType::None, the behaviour is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
     /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
     /// roi.<para/>
     /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
     /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    template <RealFloatingPoint CoordT>
-    ImageView<T> &WarpAffine(ImageView<T> &aDst, const AffineTransformation<CoordT> &aAffine,
+    ImageView<T> &WarpAffine(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
                              InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
                              Roi aAllowedReadRoi = Roi()) const;
     /// <summary>
-    /// WarpAffine
-    /// Depending on BorderType, the behaviour for pixels that fall outside the source image roi differs:
-    /// For BorderType::None, the behaviour is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
     /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
     /// roi.<para/>
     /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
     /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    template <RealFloatingPoint CoordT>
-    ImageView<T> &WarpAffine(ImageView<T> &aDst, const AffineTransformation<CoordT> &aAffine,
+    ImageView<T> &WarpAffine(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
                              InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi()) const;
+
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
+                           BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
+                           BorderType aBorder, Roi aAllowedReadRoi = Roi())
+        requires TwoChannel<T>;
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
+                           BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
+                           BorderType aBorder, Roi aAllowedReadRoi = Roi())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
+                           BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+        requires FourChannelNoAlpha<T>;
+
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
+                           BorderType aBorder, Roi aAllowedReadRoi = Roi())
+        requires FourChannelNoAlpha<T>;
+
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    ImageView<T> &WarpAffineBack(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
+                                 InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                                 Roi aAllowedReadRoi = Roi()) const;
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to
+    /// use must be provided.
+    /// </summary>
+    ImageView<T> &WarpAffineBack(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
+                                 InterpolationMode aInterpolation, BorderType aBorder,
+                                 Roi aAllowedReadRoi = Roi()) const;
+
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpAffineBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                               ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                               const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
+                               BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+        requires TwoChannel<T>;
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to
+    /// use must be provided.
+    /// </summary>
+    static void WarpAffineBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                               ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                               const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
+                               BorderType aBorder, Roi aAllowedReadRoi = Roi())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpAffineBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                               ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                               ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                               const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
+                               BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+        requires ThreeChannel<T>;
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to
+    /// use must be provided.
+    /// </summary>
+    static void WarpAffineBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                               ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                               ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                               const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
+                               BorderType aBorder, Roi aAllowedReadRoi = Roi())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpAffineBack(
+        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+        const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+        Roi aAllowedReadRoi = Roi())
+        requires FourChannelNoAlpha<T>;
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to
+    /// use must be provided.
+    /// </summary>
+    static void WarpAffineBack(
+        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+        const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, BorderType aBorder,
+        Roi aAllowedReadRoi = Roi())
+        requires FourChannelNoAlpha<T>;
+#pragma endregion
+
+#pragma region Perspective
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    ImageView<T> &WarpPerspective(ImageView<T> &aDst, const PerspectiveTransformation<double> &aPerspective,
+                                  InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                                  Roi aAllowedReadRoi = Roi()) const;
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    ImageView<T> &WarpPerspective(ImageView<T> &aDst, const PerspectiveTransformation<double> &aPerspective,
+                                  InterpolationMode aInterpolation, BorderType aBorder,
+                                  Roi aAllowedReadRoi = Roi()) const;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspective(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
+                                BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspective(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
+                                BorderType aBorder, Roi aAllowedReadRoi = Roi())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspective(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                                const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
+                                BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspective(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                                const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
+                                BorderType aBorder, Roi aAllowedReadRoi = Roi())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspective(
+        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
+        T aConstant, Roi aAllowedReadRoi = Roi())
+        requires FourChannelNoAlpha<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspective(
+        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
+        Roi aAllowedReadRoi = Roi())
+        requires FourChannelNoAlpha<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    ImageView<T> &WarpPerspectiveBack(ImageView<T> &aDst, const PerspectiveTransformation<double> &aPerspective,
+                                      InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                                      Roi aAllowedReadRoi = Roi()) const;
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    ImageView<T> &WarpPerspectiveBack(ImageView<T> &aDst, const PerspectiveTransformation<double> &aPerspective,
+                                      InterpolationMode aInterpolation, BorderType aBorder,
+                                      Roi aAllowedReadRoi = Roi()) const;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspectiveBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                    const PerspectiveTransformation<double> &aPerspective,
+                                    InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                                    Roi aAllowedReadRoi = Roi())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspectiveBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                    const PerspectiveTransformation<double> &aPerspective,
+                                    InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspectiveBack(
+        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
+        T aConstant, Roi aAllowedReadRoi = Roi())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspectiveBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                                    const PerspectiveTransformation<double> &aPerspective,
+                                    InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspectiveBack(
+        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
+        T aConstant, Roi aAllowedReadRoi = Roi())
+        requires FourChannelNoAlpha<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspectiveBack(
+        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
+        Roi aAllowedReadRoi = Roi())
+        requires FourChannelNoAlpha<T>;
+#pragma endregion
+
+#pragma region Rotate
+    /// <summary>
+    /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
+    /// rotation around pixel(0,0) and a shift after rotation.<para/> Depending on BorderType, the behavior for pixels
+    /// that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP: pixels
+    /// outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    ImageView<T> &Rotate(ImageView<T> &aDst, double aAngleInDeg, const Vector2<double> &aShift,
+                         InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                         Roi aAllowedReadRoi = Roi()) const;
+    /// <summary>
+    /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
+    /// rotation around pixel(0,0) and a shift after rotation.<para/> Depending on BorderType, the behavior for pixels
+    /// that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP: pixels
+    /// outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    ImageView<T> &Rotate(ImageView<T> &aDst, double aAngleInDeg, const Vector2<double> &aShift,
+                         InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi()) const;
+
+    /// <summary>
+    /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
+    /// rotation around pixel(0,0) and a shift after rotation.<para/> Depending on BorderType, the behavior for pixels
+    /// that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP: pixels
+    /// outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
+                       BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+        requires TwoChannel<T>;
+    /// <summary>
+    /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
+    /// rotation around pixel(0,0) and a shift after rotation.<para/> Depending on BorderType, the behavior for pixels
+    /// that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP: pixels
+    /// outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
+                       BorderType aBorder, Roi aAllowedReadRoi = Roi())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
+    /// rotation around pixel(0,0) and a shift after rotation.<para/> Depending on BorderType, the behavior for pixels
+    /// that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP: pixels
+    /// outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
+                       BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+        requires ThreeChannel<T>;
+    /// <summary>
+    /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
+    /// rotation around pixel(0,0) and a shift after rotation.<para/> Depending on BorderType, the behavior for pixels
+    /// that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP: pixels
+    /// outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
+                       BorderType aBorder, Roi aAllowedReadRoi = Roi())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
+    /// rotation around pixel(0,0) and a shift after rotation.<para/> Depending on BorderType, the behavior for pixels
+    /// that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP: pixels
+    /// outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
+                       BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+        requires FourChannelNoAlpha<T>;
+    /// <summary>
+    /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
+    /// rotation around pixel(0,0) and a shift after rotation.<para/> Depending on BorderType, the behavior for pixels
+    /// that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP: pixels
+    /// outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
+                       BorderType aBorder, Roi aAllowedReadRoi = Roi())
+        requires FourChannelNoAlpha<T>;
+#pragma endregion
+
+#pragma region Resize
+    /// <summary>
+    /// Resize<para/>
+    /// Simplified API to rescale from source image ROI to destination image ROI.<para/>
+    /// NOTE: the result is NOT the same as in NPP using the same function. The shift applied in NPP for the same
+    /// function don't make much sense to me, in OPP Resize matches the input extent [-0.5 .. srcWidth-0.5[ to the
+    /// output [-0.5 .. dstWidth-0.5[. Whereas NPP applies different strategies for up-and downscaling. In order to get
+    /// the same results as in NPP, use a user defined scaling factor of <para/> Vec2d scaleFactor =
+    /// Vec2d(dstImg.SizeRoi()) / Vec2d(srcImg.SizeRoi());<para/> and a shift given by ResizeGetNPPShift().
+    /// </summary>
+    ImageView<T> &Resize(ImageView<T> &aDst, InterpolationMode aInterpolation) const;
+
+    /// <summary>
+    /// Resize<para/>
+    /// Simplified API to rescale from source image ROI to destination image ROI.<para/>
+    /// NOTE: the result is NOT the same as in NPP using the same function. The shift applied in NPP for the same
+    /// function don't make much sense to me, in OPP Resize matches the input extent [-0.5 .. srcWidth-0.5[ to the
+    /// output [-0.5 .. dstWidth-0.5[. Whereas NPP applies different strategies for up-and downscaling. In order to get
+    /// the same results as in NPP, use a user defined scaling factor of <para/> Vec2d scaleFactor =
+    /// Vec2d(dstImg.SizeRoi()) / Vec2d(srcImg.SizeRoi());<para/> and a shift given by ResizeGetNPPShift().
+    /// </summary>
+    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       InterpolationMode aInterpolation)
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// Resize<para/>
+    /// Simplified API to rescale from source image ROI to destination image ROI.<para/>
+    /// NOTE: the result is NOT the same as in NPP using the same function. The shift applied in NPP for the same
+    /// function don't make much sense to me, in OPP Resize matches the input extent [-0.5 .. srcWidth-0.5[ to the
+    /// output [-0.5 .. dstWidth-0.5[. Whereas NPP applies different strategies for up-and downscaling. In order to get
+    /// the same results as in NPP, use a user defined scaling factor of <para/> Vec2d scaleFactor =
+    /// Vec2d(dstImg.SizeRoi()) / Vec2d(srcImg.SizeRoi());<para/> and a shift given by ResizeGetNPPShift().
+    /// </summary>
+    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                       InterpolationMode aInterpolation)
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// Resize<para/>
+    /// Simplified API to rescale from source image ROI to destination image ROI.<para/>
+    /// NOTE: the result is NOT the same as in NPP using the same function. The shift applied in NPP for the same
+    /// function don't make much sense to me, in OPP Resize matches the input extent [-0.5 .. srcWidth-0.5[ to the
+    /// output [-0.5 .. dstWidth-0.5[. Whereas NPP applies different strategies for up-and downscaling. In order to get
+    /// the same results as in NPP, use a user defined scaling factor of <para/> Vec2d scaleFactor =
+    /// Vec2d(dstImg.SizeRoi()) / Vec2d(srcImg.SizeRoi());<para/> and a shift given by ResizeGetNPPShift().
+    /// </summary>
+    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+                       InterpolationMode aInterpolation)
+        requires FourChannelNoAlpha<T>;
+
+    /// <summary>
+    /// Returns a shift to be used in OPP resize method that matches to the result given by the NPP Resize-function.
+    /// </summary>
+    Vec2d ResizeGetNPPShift(ImageView<T> &aDst) const;
+
+    /// <summary>
+    /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
+    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
+    /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
+    /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
+    /// exactly matches
+    /// [-0.5 .. dstWidth-0.5[.<para/> This shift is given by (as in NPP):<para/> InvScaleFactor = 1 / aScale;<para/>
+    /// AdjustedShift  = aShift * InvScaleFactor + ((1 - InvScaleFactor) * 0.5);<para/>
+    /// The output pixel with integer coordinate (X,Y) is then mapped to the source pixel:<para/>
+    /// SrcX = InvScaleFactor.x * X - AdjustedShift.x;<para/>
+    /// SrcY = InvScaleFactor.y * Y - AdjustedShift.y;<para/>
+    /// Depending on BorderType, the behavior for
+    /// pixels that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP:
+    /// pixels outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    ImageView<T> &Resize(ImageView<T> &aDst, const Vector2<double> &aScale, const Vector2<double> &aShift,
+                         InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                         Roi aAllowedReadRoi = Roi()) const;
+
+    /// <summary>
+    /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
+    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
+    /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
+    /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
+    /// exactly matches
+    /// [-0.5 .. dstWidth-0.5[.<para/> This shift is given by (as in NPP):<para/> InvScaleFactor = 1 / aScale;<para/>
+    /// AdjustedShift  = aShift * InvScaleFactor + ((1 - InvScaleFactor) * 0.5);<para/>
+    /// The output pixel with integer coordinate (X,Y) is then mapped to the source pixel:<para/>
+    /// SrcX = InvScaleFactor.x * X - AdjustedShift.x;<para/>
+    /// SrcY = InvScaleFactor.y * Y - AdjustedShift.y;<para/>
+    /// Depending on BorderType, the behavior for
+    /// pixels that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP:
+    /// pixels outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    ImageView<T> &Resize(ImageView<T> &aDst, const Vector2<double> &aScale, const Vector2<double> &aShift,
+                         InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi()) const;
+
+    /// <summary>
+    /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
+    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
+    /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
+    /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
+    /// exactly matches
+    /// [-0.5 .. dstWidth-0.5[.<para/> This shift is given by (as in NPP):<para/> InvScaleFactor = 1 / aScale;<para/>
+    /// AdjustedShift  = aShift * InvScaleFactor + ((1 - InvScaleFactor) * 0.5);<para/>
+    /// The output pixel with integer coordinate (X,Y) is then mapped to the source pixel:<para/>
+    /// SrcX = InvScaleFactor.x * X - AdjustedShift.x;<para/>
+    /// SrcY = InvScaleFactor.y * Y - AdjustedShift.y;<para/>
+    /// Depending on BorderType, the behavior for
+    /// pixels that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP:
+    /// pixels outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
+                       BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
+    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
+    /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
+    /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
+    /// exactly matches
+    /// [-0.5 .. dstWidth-0.5[.<para/> This shift is given by (as in NPP):<para/> InvScaleFactor = 1 / aScale;<para/>
+    /// AdjustedShift  = aShift * InvScaleFactor + ((1 - InvScaleFactor) * 0.5);<para/>
+    /// The output pixel with integer coordinate (X,Y) is then mapped to the source pixel:<para/>
+    /// SrcX = InvScaleFactor.x * X - AdjustedShift.x;<para/>
+    /// SrcY = InvScaleFactor.y * Y - AdjustedShift.y;<para/>
+    /// Depending on BorderType, the behavior for
+    /// pixels that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP:
+    /// pixels outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
+                       BorderType aBorder, Roi aAllowedReadRoi = Roi())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
+    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
+    /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
+    /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
+    /// exactly matches
+    /// [-0.5 .. dstWidth-0.5[.<para/> This shift is given by (as in NPP):<para/> InvScaleFactor = 1 / aScale;<para/>
+    /// AdjustedShift  = aShift * InvScaleFactor + ((1 - InvScaleFactor) * 0.5);<para/>
+    /// The output pixel with integer coordinate (X,Y) is then mapped to the source pixel:<para/>
+    /// SrcX = InvScaleFactor.x * X - AdjustedShift.x;<para/>
+    /// SrcY = InvScaleFactor.y * Y - AdjustedShift.y;<para/>
+    /// Depending on BorderType, the behavior for
+    /// pixels that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP:
+    /// pixels outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                       const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
+                       BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
+    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
+    /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
+    /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
+    /// exactly matches
+    /// [-0.5 .. dstWidth-0.5[.<para/> This shift is given by (as in NPP):<para/> InvScaleFactor = 1 / aScale;<para/>
+    /// AdjustedShift  = aShift * InvScaleFactor + ((1 - InvScaleFactor) * 0.5);<para/>
+    /// The output pixel with integer coordinate (X,Y) is then mapped to the source pixel:<para/>
+    /// SrcX = InvScaleFactor.x * X - AdjustedShift.x;<para/>
+    /// SrcY = InvScaleFactor.y * Y - AdjustedShift.y;<para/>
+    /// Depending on BorderType, the behavior for
+    /// pixels that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP:
+    /// pixels outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                       const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
+                       BorderType aBorder, Roi aAllowedReadRoi = Roi())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
+    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
+    /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
+    /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
+    /// exactly matches
+    /// [-0.5 .. dstWidth-0.5[.<para/> This shift is given by (as in NPP):<para/> InvScaleFactor = 1 / aScale;<para/>
+    /// AdjustedShift  = aShift * InvScaleFactor + ((1 - InvScaleFactor) * 0.5);<para/>
+    /// The output pixel with integer coordinate (X,Y) is then mapped to the source pixel:<para/>
+    /// SrcX = InvScaleFactor.x * X - AdjustedShift.x;<para/>
+    /// SrcY = InvScaleFactor.y * Y - AdjustedShift.y;<para/>
+    /// Depending on BorderType, the behavior for
+    /// pixels that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP:
+    /// pixels outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+                       const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
+                       BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+        requires FourChannelNoAlpha<T>;
+
+    /// <summary>
+    /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
+    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
+    /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
+    /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
+    /// exactly matches
+    /// [-0.5 .. dstWidth-0.5[.<para/> This shift is given by (as in NPP):<para/> InvScaleFactor = 1 / aScale;<para/>
+    /// AdjustedShift  = aShift * InvScaleFactor + ((1 - InvScaleFactor) * 0.5);<para/>
+    /// The output pixel with integer coordinate (X,Y) is then mapped to the source pixel:<para/>
+    /// SrcX = InvScaleFactor.x * X - AdjustedShift.x;<para/>
+    /// SrcY = InvScaleFactor.y * Y - AdjustedShift.y;<para/>
+    /// Depending on BorderType, the behavior for
+    /// pixels that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP:
+    /// pixels outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+                       const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
+                       BorderType aBorder, Roi aAllowedReadRoi = Roi())
+        requires FourChannelNoAlpha<T>;
+#pragma endregion
+
+#pragma region Mirror
+    /// <summary>
+    /// Mirror<para/>
+    /// Mirror an image along the provided axis
+    /// </summary>
+    ImageView<T> &Mirror(ImageView<T> &aDst, MirrorAxis aAxis) const;
+
+    /// <summary>
+    /// Mirror<para/>
+    /// Mirror an image along the provided axis (inplace operation)
+    /// </summary>
+    ImageView<T> &Mirror(MirrorAxis aAxis);
+#pragma endregion
+
+#pragma region Remap
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    ImageView<T> &Remap(ImageView<T> &aDst, const ImageView<Pixel32fC2> &aCoordinateMap,
+                        InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                        Roi aAllowedReadRoi = Roi()) const;
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    ImageView<T> &Remap(ImageView<T> &aDst, const ImageView<Pixel32fC2> &aCoordinateMap,
+                        InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi()) const;
+
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    ImageView<T> &Remap(ImageView<T> &aDst, const ImageView<Pixel32fC1> &aCoordinateMapX,
+                        const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation,
+                        BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi()) const;
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    ImageView<T> &Remap(ImageView<T> &aDst, const ImageView<Pixel32fC1> &aCoordinateMapX,
+                        const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation,
+                        BorderType aBorder, Roi aAllowedReadRoi = Roi()) const;
+
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, BorderType aBorder,
+                      T aConstant, Roi aAllowedReadRoi = Roi())
+        requires TwoChannel<T>;
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, BorderType aBorder,
+                      Roi aAllowedReadRoi = Roi())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
+                      InterpolationMode aInterpolation, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+        requires TwoChannel<T>;
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
+                      InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, BorderType aBorder,
+                      T aConstant, Roi aAllowedReadRoi = Roi())
+        requires ThreeChannel<T>;
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, BorderType aBorder,
+                      Roi aAllowedReadRoi = Roi())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                      const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
+                      InterpolationMode aInterpolation, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+        requires ThreeChannel<T>;
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                      const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
+                      InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, BorderType aBorder,
+                      T aConstant, Roi aAllowedReadRoi = Roi())
+        requires FourChannelNoAlpha<T>;
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, BorderType aBorder,
+                      Roi aAllowedReadRoi = Roi())
+        requires FourChannelNoAlpha<T>;
+
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+                      const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
+                      InterpolationMode aInterpolation, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+        requires FourChannelNoAlpha<T>;
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+                      const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
+                      InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi())
+        requires FourChannelNoAlpha<T>;
+#pragma endregion
 #pragma endregion
 
 #pragma region Statistics

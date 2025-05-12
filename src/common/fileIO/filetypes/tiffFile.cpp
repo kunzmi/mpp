@@ -1211,8 +1211,11 @@ void TIFFFile::ReadPlane(size_t aIdx)
             ReadPlaneDeflateCompression(aIdx);
             DecodeDifferencingPredictor(aIdx);
             return;
-        case TIFFCompression::CCITTGroup3:
         case TIFFCompression::PackBits:
+            ReadPlanePackBitsCompression(aIdx);
+            DecodeDifferencingPredictor(aIdx);
+            return;
+        case TIFFCompression::CCITTGroup3:
         case TIFFCompression::EER7Bit:
         case TIFFCompression::EER8Bit:
             break;
@@ -1628,6 +1631,106 @@ void TIFFFile::ReadPlaneDeflateCompression(size_t aIdx)
             throw FILEIOEXCEPTION(
                 FileName(),
                 "Cannot read TIFF file: Error while decoding DEFLATE compression. Additional info: " << ex.what());
+        }
+
+        if (!IsLittleEndian())
+        {
+            size_t elementSize = to_size_t(mBitsPerSample) / 8;
+            size_t dataSize    = decodedSize / elementSize;
+
+            // complex data types:
+            if (mSampleFormat == TIFFSampleFormat::COMPLEXIEEEFP || mSampleFormat == TIFFSampleFormat::COMPLEXINT)
+            {
+                elementSize /= 2;
+                dataSize *= 2;
+            }
+
+            EndianSwap(mData.data() + mReadSegments[aIdx][stripe].DestinationOffset, dataSize, elementSize);
+        }
+    }
+}
+
+void TIFFFile::ReadPlanePackBitsCompression(size_t aIdx)
+{
+    // twice the uncompressed size should be sufficient...
+    std::vector<byte> tempBuffer(mReadSegments[aIdx][0].RowsPerStrip * to_size_t(mWidth) * to_size_t(mBitsPerSample) /
+                                 8 * to_size_t(mSamplesPerPixel) * 2);
+
+    size_t colorPlane = 0;
+    for (size_t stripe = 0; stripe < mReadSegments[aIdx].size(); stripe++)
+    {
+        std::fill(tempBuffer.begin(), tempBuffer.end(), byte(0));
+
+        const size_t offset = mReadSegments[aIdx][stripe].DataOffset;
+        const size_t toRead = mReadSegments[aIdx][stripe].DataSize;
+        SeekRead(offset, std::ios_base::beg);
+
+        if (toRead > 0)
+        {
+            Read(reinterpret_cast<char *>(tempBuffer.data()), toRead);
+        }
+
+        size_t decodedSize = 0;
+
+        if (mIsPlanar)
+        {
+            decodedSize = mReadSegments[aIdx][stripe].RowsPerStrip * to_size_t(mWidth) * to_size_t(mBitsPerSample) / 8;
+        }
+        else
+        {
+            decodedSize = mReadSegments[aIdx][stripe].RowsPerStrip * to_size_t(mWidth) * to_size_t(mBitsPerSample) / 8 *
+                          to_size_t(mSamplesPerPixel);
+        }
+        const size_t planeSize = GetImageSizeInBytes();
+        if (mIsPlanar)
+        {
+            if (mReadSegments[aIdx][stripe].DestinationOffset + decodedSize -
+                    aIdx * planeSize * to_size_t(mSamplesPerPixel) - colorPlane * planeSize >
+                planeSize)
+            {
+                decodedSize = planeSize - mReadSegments[aIdx][stripe].DestinationOffset -
+                              (aIdx * planeSize * to_size_t(mSamplesPerPixel) - colorPlane * planeSize);
+                colorPlane++;
+            }
+        }
+        else
+        {
+            if (mReadSegments[aIdx][stripe].DestinationOffset + decodedSize - aIdx * planeSize > planeSize)
+            {
+                decodedSize = planeSize - mReadSegments[aIdx][stripe].DestinationOffset - aIdx * planeSize;
+            }
+        }
+
+        sbyte *packedBits  = reinterpret_cast<sbyte *>(tempBuffer.data());
+        sbyte *destination = reinterpret_cast<sbyte *>(mData.data()) + mReadSegments[aIdx][stripe].DestinationOffset;
+
+        for (size_t idxEncoded = 0, idxDecoded = 0; idxEncoded < toRead;)
+        {
+            const sbyte marker = packedBits[idxEncoded];
+            if (marker == -128) // should never happen, but if it does, skip to next marker
+            {
+                idxEncoded++;
+            }
+            else if (marker < 0) // repeated byte
+            {
+                const size_t count = to_size_t((-to_int(marker)) + 1);
+                for (size_t i = 0; i < count; i++)
+                {
+                    destination[idxDecoded] = packedBits[idxEncoded + 1];
+                    idxDecoded++;
+                }
+                idxEncoded += 2;
+            }
+            else if (marker >= 0) // uncompressed data
+            {
+                const size_t count = to_size_t(marker) + 1;
+                for (size_t i = 0; i < count; i++)
+                {
+                    destination[idxDecoded] = packedBits[idxEncoded + i + 1];
+                    idxDecoded++;
+                }
+                idxEncoded += count + 1;
+            }
         }
 
         if (!IsLittleEndian())
