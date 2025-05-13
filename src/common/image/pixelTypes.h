@@ -1550,6 +1550,43 @@ struct filtertype_for<T>
 template <typename T> using filtertype_for_t = typename filtertype_for<T>::type;
 #pragma endregion
 
+#pragma region Alternative Filter output type
+template <typename T> struct alternative_filter_output_type_for_scalar
+{
+    using type                            = T;
+    static constexpr bool has_alternative = false;
+};
+template <> struct alternative_filter_output_type_for_scalar<byte>
+{
+    using type                            = short;
+    static constexpr bool has_alternative = true;
+};
+template <> struct alternative_filter_output_type_for_scalar<sbyte>
+{
+    using type                            = short;
+    static constexpr bool has_alternative = true;
+};
+template <> struct alternative_filter_output_type_for_scalar<short>
+{
+    using type                            = int;
+    static constexpr bool has_alternative = true;
+};
+template <> struct alternative_filter_output_type_for_scalar<ushort>
+{
+    using type                            = int;
+    static constexpr bool has_alternative = true;
+};
+
+template <typename T>
+using alternative_filter_output_type_for_t =
+    same_vector_size_different_type_t<T, typename alternative_filter_output_type_for_scalar<remove_vector_t<T>>::type>;
+
+template <class T>
+inline constexpr bool has_alternative_filter_output_type_for_v =
+    alternative_filter_output_type_for_scalar<remove_vector_t<T>>::has_alternative;
+
+#pragma endregion
+
 #pragma region Compute type for floating point filter
 
 template <typename T> struct filter_compute_type_for_scalar

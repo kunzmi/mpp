@@ -105,6 +105,7 @@ template <> struct FixedFilterKernel<opp::FixedFilter::LowPass, 3, float>
 {
     MYCONST float Values[3][3] = {
         {1 / 9.0f, 1 / 9.0f, 1 / 9.0f}, {1 / 9.0f, 1 / 9.0f, 1 / 9.0f}, {1 / 9.0f, 1 / 9.0f, 1 / 9.0f}};
+    MYCONST float Scaling = 1;
 
     MYCONST bool NeedsScaling = false;
 };
@@ -176,6 +177,7 @@ template <> struct FixedFilterKernel<opp::FixedFilter::Sharpen, 3, float>
 {
     MYCONST float Values[3][3] = {
         {-1 / 8.0f, -1 / 8.0f, -1 / 8.0f}, {-1 / 8.0f, 16 / 8.0f, -1 / 8.0f}, {-1 / 8.0f, -1 / 8.0f, -1 / 8.0f}};
+    MYCONST float Scaling = 1;
 
     MYCONST bool NeedsScaling = false;
 };
@@ -241,7 +243,7 @@ template <> struct FixedFilterKernel<opp::FixedFilter::LowPass, 5, int>
                                 {1, 1, 1, 1, 1}};
     MYCONST int Scaling      = 25;
 
-    MYCONST bool NeedsScaling = false;
+    MYCONST bool NeedsScaling = true;
 };
 template <> struct FixedFilterKernel<opp::FixedFilter::LowPass, 5, float>
 {
@@ -250,6 +252,7 @@ template <> struct FixedFilterKernel<opp::FixedFilter::LowPass, 5, float>
                                   {1 / 25.0f, 1 / 25.0f, 1 / 25.0f, 1 / 25.0f, 1 / 25.0f}, //
                                   {1 / 25.0f, 1 / 25.0f, 1 / 25.0f, 1 / 25.0f, 1 / 25.0f}, //
                                   {1 / 25.0f, 1 / 25.0f, 1 / 25.0f, 1 / 25.0f, 1 / 25.0f}};
+    MYCONST float Scaling      = 1;
 
     MYCONST bool NeedsScaling = false;
 };

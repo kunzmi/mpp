@@ -1,6 +1,6 @@
 #if OPP_ENABLE_CUDA_BACKEND
 
-#include "highpass.h"
+#include "scharrVert.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/fixedFilterKernel.h>
 #include <backends/cuda/streamCtx.h>
@@ -53,9 +53,10 @@ struct pixel_block_size_y<T>
 };
 
 template <typename SrcT, typename DstT>
-void InvokeHighpass(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, MaskSize aMaskSize,
-                    BorderType aBorderType, const SrcT &aConstant, const Size2D &aAllowedReadRoiSize,
-                    const Vector2<int> &aOffsetToActualRoi, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+void InvokeScharrVert(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, MaskSize aMaskSize,
+                      BorderType aBorderType, const SrcT &aConstant, const Size2D &aAllowedReadRoiSize,
+                      const Vector2<int> &aOffsetToActualRoi, const Size2D &aSize,
+                      const opp::cuda::StreamCtx &aStreamCtx)
 {
     if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
     {
@@ -75,7 +76,7 @@ void InvokeHighpass(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPi
                 constexpr int filterSize  = 3;
                 constexpr int centerPixel = 1;
 
-                using FixedFilterKernelT = FixedFilterKernel<opp::FixedFilter::HighPass, filterSize, FilterT>;
+                using FixedFilterKernelT = FixedFilterKernel<opp::FixedFilter::ScharrVert, filterSize, FilterT>;
 
                 switch (aBorderType)
                 {
@@ -147,95 +148,13 @@ void InvokeHighpass(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPi
                     break;
                     default:
                         throw INVALIDARGUMENT(
-                            aBorderType, aBorderType << " is not a supported border type mode for HighPass filter.");
-                        break;
-                }
-            }
-            break;
-            case MaskSize::Mask_5x5:
-            {
-                constexpr int filterSize  = 5;
-                constexpr int centerPixel = 2;
-
-                using FixedFilterKernelT = FixedFilterKernel<opp::FixedFilter::HighPass, filterSize, FilterT>;
-
-                switch (aBorderType)
-                {
-                    case opp::BorderType::None:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
-                    }
-                    break;
-                    case opp::BorderType::Constant:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
-
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
-                    }
-                    break;
-                    case opp::BorderType::Replicate:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
-                    }
-                    break;
-                    case opp::BorderType::Mirror:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
-                    }
-                    break;
-                    case opp::BorderType::MirrorReplicate:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
-                    }
-                    break;
-                    case opp::BorderType::Wrap:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
-                    }
-                    break;
-                    default:
-                        throw INVALIDARGUMENT(
-                            aBorderType, aBorderType << " is not a supported border type mode for HighPass filter.");
+                            aBorderType, aBorderType << " is not a supported border type mode for ScharrVert filter.");
                         break;
                 }
             }
             break;
             default:
-                throw INVALIDARGUMENT(aMaskSize, "Invalid MaskSize for HighPass filter: " << aMaskSize);
+                throw INVALIDARGUMENT(aMaskSize, "Invalid MaskSize for ScharrVert filter: " << aMaskSize);
                 break;
         }
     }
@@ -244,7 +163,7 @@ void InvokeHighpass(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPi
 #pragma region Instantiate
 
 #define Instantiate_For(typeSrc, typeDst)                                                                              \
-    template void InvokeHighpass<typeSrc, typeDst>(                                                                    \
+    template void InvokeScharrVert<typeSrc, typeDst>(                                                                  \
         const typeSrc *aSrc1, size_t aPitchSrc1, typeDst *aDst, size_t aPitchDst, MaskSize aMaskSize,                  \
         BorderType aBorderType, const typeSrc &aConstant, const Size2D &aAllowedReadRoiSize,                           \
         const Vector2<int> &aOffsetToActualRoi, const Size2D &aSize, const StreamCtx &aStreamCtx);

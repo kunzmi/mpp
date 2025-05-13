@@ -102,14 +102,7 @@ __global__ void fixedFilterKernel(BorderControlT aSrcWithBC, DstT *__restrict__ 
                                 if (pixelDstX >= 0 && pixelDstX < TupelSize)
                                 {
                                     const ComputeT srcPx = line[rx] * filterKernel.Values[ky][kx];
-                                    if (filterKernel.NeedsScaling)
-                                    {
-                                        result[pixelDstY][pixelDstX] += srcPx / filterKernel.Scaling;
-                                    }
-                                    else
-                                    {
-                                        result[pixelDstY][pixelDstX] += srcPx;
-                                    }
+                                    result[pixelDstY][pixelDstX] += srcPx;
                                 }
                             }
                         }
@@ -128,6 +121,11 @@ __global__ void fixedFilterKernel(BorderControlT aSrcWithBC, DstT *__restrict__ 
 #pragma unroll
                     for (size_t t = 0; t < TupelSize; t++)
                     {
+                        if (filterKernel.NeedsScaling)
+                        {
+                            result[bl][t] = result[bl][t] / filterKernel.Scaling;
+                        }
+
                         if constexpr (RealOrComplexFloatingVector<ComputeT> && RealOrComplexIntVector<DstT>)
                         {
                             round(result[bl][t]);
@@ -184,14 +182,7 @@ __global__ void fixedFilterKernel(BorderControlT aSrcWithBC, DstT *__restrict__ 
                             if (pixelDstX >= 0 && pixelDstX < blockWidth)
                             {
                                 const ComputeT srcPx = line[rx] * filterKernel.Values[ky][kx];
-                                if (filterKernel.NeedsScaling)
-                                {
-                                    result[pixelDstY][pixelDstX] += srcPx / filterKernel.Scaling;
-                                }
-                                else
-                                {
-                                    result[pixelDstY][pixelDstX] += srcPx;
-                                }
+                                result[pixelDstY][pixelDstX] += srcPx;
                             }
                         }
                     }
@@ -211,6 +202,11 @@ __global__ void fixedFilterKernel(BorderControlT aSrcWithBC, DstT *__restrict__ 
                     {
                         DstT *pixelsOut = gotoPtr(aDst, aPitchDst, pixelX + bc, pixelY + bl);
                         DstT res;
+
+                        if (filterKernel.NeedsScaling)
+                        {
+                            result[bl][bc] = result[bl][bc] / filterKernel.Scaling;
+                        }
 
                         if constexpr (RealOrComplexFloatingVector<ComputeT> && RealOrComplexIntVector<DstT>)
                         {

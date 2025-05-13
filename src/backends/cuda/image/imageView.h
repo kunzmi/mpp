@@ -2312,6 +2312,13 @@ template <PixelType T> class ImageView
     ImageView<T> &FixedFilter(ImageView<T> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize, BorderType aBorder,
                               T aConstant, Roi aAllowedReadRoi = Roi(),
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// </summary>
+    ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
+        ImageView<alternative_filter_output_type_for_t<T>> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize,
+        BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(has_alternative_filter_output_type_for_v<T>);
 #pragma endregion
 #pragma endregion
 

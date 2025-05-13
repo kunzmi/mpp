@@ -1,6 +1,23 @@
 add_library(backends.cuda.image.filtering 
-	gaussFixed.cu
+	gaussFixed_part1.cu
+	gaussFixed_part2.cu
+	gaussFixed_part3.cu
+	gaussFixed_part4.cu
 	highpass.cu
+	laplace.cu
+	lowpass.cu
+	prewittHoriz.cu
+	prewittVert.cu
+	robertsDown.cu
+	robertsUp.cu
+	scharrHoriz.cu
+	scharrVert.cu
+	sharpen.cu
+	sobelCross.cu
+	sobelHoriz.cu
+	sobelHorizSecond.cu
+	sobelVert.cu
+	sobelVertSecond.cu
 	)
 	
 target_include_directories(backends.cuda.image.filtering  PUBLIC 

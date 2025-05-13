@@ -1,6 +1,6 @@
 #if OPP_ENABLE_CUDA_BACKEND
 
-#include "highpass.h"
+#include "lowpass.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/fixedFilterKernel.h>
 #include <backends/cuda/streamCtx.h>
@@ -53,16 +53,16 @@ struct pixel_block_size_y<T>
 };
 
 template <typename SrcT, typename DstT>
-void InvokeHighpass(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, MaskSize aMaskSize,
-                    BorderType aBorderType, const SrcT &aConstant, const Size2D &aAllowedReadRoiSize,
-                    const Vector2<int> &aOffsetToActualRoi, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+void InvokeLowpass(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, MaskSize aMaskSize,
+                   BorderType aBorderType, const SrcT &aConstant, const Size2D &aAllowedReadRoiSize,
+                   const Vector2<int> &aOffsetToActualRoi, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
 {
     if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
     {
         OPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
-        using ComputeT             = filter_integer_compute_type_for_t<SrcT>;
+        using ComputeT             = filter_compute_type_for_t<SrcT>;
         using FilterT              = filtertype_for_t<ComputeT>;
 
         constexpr int pixelBlockSizeX = pixel_block_size_x<DstT>::value;
@@ -75,7 +75,7 @@ void InvokeHighpass(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPi
                 constexpr int filterSize  = 3;
                 constexpr int centerPixel = 1;
 
-                using FixedFilterKernelT = FixedFilterKernel<opp::FixedFilter::HighPass, filterSize, FilterT>;
+                using FixedFilterKernelT = FixedFilterKernel<opp::FixedFilter::LowPass, filterSize, FilterT>;
 
                 switch (aBorderType)
                 {
@@ -147,7 +147,7 @@ void InvokeHighpass(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPi
                     break;
                     default:
                         throw INVALIDARGUMENT(
-                            aBorderType, aBorderType << " is not a supported border type mode for HighPass filter.");
+                            aBorderType, aBorderType << " is not a supported border type mode for Lowpass filter.");
                         break;
                 }
             }
@@ -157,7 +157,7 @@ void InvokeHighpass(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPi
                 constexpr int filterSize  = 5;
                 constexpr int centerPixel = 2;
 
-                using FixedFilterKernelT = FixedFilterKernel<opp::FixedFilter::HighPass, filterSize, FilterT>;
+                using FixedFilterKernelT = FixedFilterKernel<opp::FixedFilter::LowPass, filterSize, FilterT>;
 
                 switch (aBorderType)
                 {
@@ -229,13 +229,13 @@ void InvokeHighpass(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPi
                     break;
                     default:
                         throw INVALIDARGUMENT(
-                            aBorderType, aBorderType << " is not a supported border type mode for HighPass filter.");
+                            aBorderType, aBorderType << " is not a supported border type mode for Lowpass filter.");
                         break;
                 }
             }
             break;
             default:
-                throw INVALIDARGUMENT(aMaskSize, "Invalid MaskSize for HighPass filter: " << aMaskSize);
+                throw INVALIDARGUMENT(aMaskSize, "Invalid MaskSize for LowPass filter: " << aMaskSize);
                 break;
         }
     }
@@ -243,46 +243,43 @@ void InvokeHighpass(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPi
 
 #pragma region Instantiate
 
-#define Instantiate_For(typeSrc, typeDst)                                                                              \
-    template void InvokeHighpass<typeSrc, typeDst>(                                                                    \
-        const typeSrc *aSrc1, size_t aPitchSrc1, typeDst *aDst, size_t aPitchDst, MaskSize aMaskSize,                  \
-        BorderType aBorderType, const typeSrc &aConstant, const Size2D &aAllowedReadRoiSize,                           \
-        const Vector2<int> &aOffsetToActualRoi, const Size2D &aSize, const StreamCtx &aStreamCtx);
+#define Instantiate_For(typeSrcIsTypeDst)                                                                              \
+    template void InvokeLowpass<typeSrcIsTypeDst, typeSrcIsTypeDst>(                                                   \
+        const typeSrcIsTypeDst *aSrc1, size_t aPitchSrc1, typeSrcIsTypeDst *aDst, size_t aPitchDst,                    \
+        MaskSize aMaskSize, BorderType aBorderType, const typeSrcIsTypeDst &aConstant,                                 \
+        const Size2D &aAllowedReadRoiSize, const Vector2<int> &aOffsetToActualRoi, const Size2D &aSize,                \
+        const StreamCtx &aStreamCtx);
 
-#define ForAllChannelsNoAlpha(typeSrc, typeDst)                                                                        \
-    Instantiate_For(Pixel##typeSrc##C1, Pixel##typeDst##C1);                                                           \
-    Instantiate_For(Pixel##typeSrc##C2, Pixel##typeDst##C2);                                                           \
-    Instantiate_For(Pixel##typeSrc##C3, Pixel##typeDst##C3);                                                           \
-    Instantiate_For(Pixel##typeSrc##C4, Pixel##typeDst##C4);
+#define ForAllChannelsNoAlpha(type)                                                                                    \
+    Instantiate_For(Pixel##type##C1);                                                                                  \
+    Instantiate_For(Pixel##type##C2);                                                                                  \
+    Instantiate_For(Pixel##type##C3);                                                                                  \
+    Instantiate_For(Pixel##type##C4);
 
-#define ForAllChannelsWithAlpha(typeSrc, typeDst)                                                                      \
-    Instantiate_For(Pixel##typeSrc##C1, Pixel##typeDst##C1);                                                           \
-    Instantiate_For(Pixel##typeSrc##C2, Pixel##typeDst##C2);                                                           \
-    Instantiate_For(Pixel##typeSrc##C3, Pixel##typeDst##C3);                                                           \
-    Instantiate_For(Pixel##typeSrc##C4, Pixel##typeDst##C4);                                                           \
-    Instantiate_For(Pixel##typeSrc##C4A, Pixel##typeDst##C4A);
+#define ForAllChannelsWithAlpha(type)                                                                                  \
+    Instantiate_For(Pixel##type##C1);                                                                                  \
+    Instantiate_For(Pixel##type##C2);                                                                                  \
+    Instantiate_For(Pixel##type##C3);                                                                                  \
+    Instantiate_For(Pixel##type##C4);                                                                                  \
+    Instantiate_For(Pixel##type##C4A);
 
-ForAllChannelsWithAlpha(8u, 8u);
-ForAllChannelsWithAlpha(8s, 8s);
-ForAllChannelsWithAlpha(8u, 16s);
-ForAllChannelsWithAlpha(8s, 16s);
+ForAllChannelsWithAlpha(8u);
+ForAllChannelsWithAlpha(8s);
 
-ForAllChannelsWithAlpha(16u, 16u);
-ForAllChannelsWithAlpha(16s, 16s);
-ForAllChannelsWithAlpha(16u, 32s);
-ForAllChannelsWithAlpha(16s, 32s);
+ForAllChannelsWithAlpha(16u);
+ForAllChannelsWithAlpha(16s);
 
-ForAllChannelsWithAlpha(32u, 32u);
-ForAllChannelsWithAlpha(32s, 32s);
+ForAllChannelsWithAlpha(32u);
+ForAllChannelsWithAlpha(32s);
 
-ForAllChannelsWithAlpha(16f, 16f);
-ForAllChannelsWithAlpha(16bf, 16bf);
-ForAllChannelsWithAlpha(32f, 32f);
-ForAllChannelsWithAlpha(64f, 64f);
+ForAllChannelsWithAlpha(16f);
+ForAllChannelsWithAlpha(16bf);
+ForAllChannelsWithAlpha(32f);
+ForAllChannelsWithAlpha(64f);
 
-ForAllChannelsNoAlpha(16sc, 16sc);
-ForAllChannelsNoAlpha(32sc, 32sc);
-ForAllChannelsNoAlpha(32fc, 32fc);
+ForAllChannelsNoAlpha(16sc);
+ForAllChannelsNoAlpha(32sc);
+ForAllChannelsNoAlpha(32fc);
 
 #undef Instantiate_For
 #undef ForAllChannelsWithAlpha

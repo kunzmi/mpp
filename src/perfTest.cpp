@@ -11,11 +11,13 @@
 #include <backends/cuda/image/statistics/ssim.h>
 #include <backends/cuda/stream.h>
 #include <backends/cuda/streamCtx.h>
+#include <backends/npp/image/image16s.h>       // NOLINT(misc-include-cleaner)
+#include <backends/npp/image/image16sC1View.h> // NOLINT(misc-include-cleaner)
 #include <backends/npp/image/image16u.h>       // NOLINT(misc-include-cleaner)
 #include <backends/npp/image/image16uC1View.h> // NOLINT(misc-include-cleaner)
 #include <backends/npp/image/image32f.h>       // NOLINT(misc-include-cleaner)
-#include <backends/npp/image/image32fC1View.h> // NOLINT(misc-include-cleaner)
 #include <backends/npp/image/image32fc.h>
+#include <backends/npp/image/image32fC1View.h> // NOLINT(misc-include-cleaner)
 #include <backends/npp/image/image32s.h> // NOLINT(misc-include-cleaner)
 #include <backends/npp/image/image64f.h>
 #include <backends/npp/image/image8u.h>       // NOLINT(misc-include-cleaner)
@@ -62,17 +64,17 @@ int main()
 
         std::cout << "Hello world! This is " << OPP_PROJECT_NAME << " version " << OPP_VERSION << "!" << std::endl;
 
-        cpu::Image<Pixel32fC1> cpu_src1(imgWidth, imgHeight);
+        cpu::Image<Pixel8uC1> cpu_src1(imgWidth, imgHeight);
         // cpu::ImageView<Pixel8u3> cpu_src1A(cpu_src1);
-        /*cpu::Image<Pixel8uC1> cpu_src1 =
-            cpu::Image<Pixel8uC1>::Load("C:\\Users\\kunz_\\source\\repos\\oppV1\\opp\\test\\testData\\bird256bw.tif");*/
-        cpu::Image<Pixel32fC1> cpu_dst(imgWidth, imgHeight);
+        // cpu::Image<Pixel8uC1> cpu_src1 = cpu::Image<Pixel8uC1>::Load(
+        //    "C:\\Users\\kunz_\\source\\repos\\oppV1\\opp\\test\\testData\\bird256bw.tif"); /**/
+        cpu::Image<Pixel8uC1> cpu_dst(imgWidth, imgHeight);
 
-        Image<Pixel32fC1> opp_src1(imgWidth, imgHeight);
-        Image<Pixel32fC1> opp_dst(imgWidth, imgHeight);
+        Image<Pixel8uC1> opp_src1(imgWidth, imgHeight);
+        Image<Pixel8uC1> opp_dst(imgWidth, imgHeight);
 
-        nv::Image32fC1 npp_src1(imgWidth, imgHeight);
-        nv::Image32fC1 npp_dst(imgWidth, imgHeight);
+        nv::Image8uC1 npp_src1(imgWidth, imgHeight);
+        nv::Image8uC1 npp_dst(imgWidth, imgHeight);
 
         DevVar<float> filter(15 * 15);
 
@@ -115,20 +117,23 @@ int main()
 
         npp_src1.SetRoi(-1);
         npp_dst.SetRoi(-1); */
-        const BorderType opp_boder = BorderType::Replicate;
+        const BorderType opp_boder  = BorderType::Replicate;
+        const NppiMaskSize nppMask  = NppiMaskSize::NPP_MASK_SIZE_5_X_5;
+        const MaskSize oppMask      = MaskSize::Mask_5x5;
+        const FixedFilter oppFilter = FixedFilter::Gauss;
 
         // npp_src1.FilterBorder32f(npp_dst, filter, {15, 15}, {6, 6}, NppiBorderType::NPP_BORDER_REPLICATE, nppCtx);
 
-        opp_src1.FixedFilter(opp_dst, FixedFilter::Gauss, MaskSize::Mask_15x15, opp_boder, {0}, Roi(), oppCtx);
+        opp_src1.FixedFilter(opp_dst, oppFilter, oppMask, opp_boder, {0}, Roi(), oppCtx);
 
-        npp_src1.FilterGaussBorder(npp_dst, NppiMaskSize::NPP_MASK_SIZE_15_X_15, NppiBorderType::NPP_BORDER_REPLICATE,
-                                   nppCtx);
+        npp_src1.FilterLowPassBorder(npp_dst, nppMask, NppiBorderType::NPP_BORDER_REPLICATE, nppCtx);
+        // npp_src1.FilterBoxBorder(npp_dst, {3, 3}, {1, 1}, NppiBorderType::NPP_BORDER_REPLICATE, nppCtx);
 
-        /*cpu_src1.Save("f:\\highpassOrig.tif");
-        cpu_dst << opp_dst;
-        cpu_dst.Save("f:\\highpassOpp.tif");
+        // cpu_src1.Save("f:\\lowpassOrig.tif");
+        /*cpu_dst << opp_dst;
+        cpu_dst.Save("f:\\lowpassOpp.tif");
         cpu_dst << npp_dst;
-        cpu_dst.Save("f:\\highpassNpp.tif"); */
+        cpu_dst.Save("f:\\lowpassNpp.tif"); */
 
         std::vector<float> runtimeOPP(iterations);
         std::vector<float> runtimeNPP(iterations);
@@ -148,7 +153,7 @@ int main()
             startIterOPP.Record();
             for (size_t r = 0; r < repeats; r++)
             {
-                opp_src1.FixedFilter(opp_dst, FixedFilter::Gauss, MaskSize::Mask_15x15, opp_boder, {0}, Roi(), oppCtx);
+                opp_src1.FixedFilter(opp_dst, oppFilter, oppMask, opp_boder, {0}, Roi(), oppCtx);
             }
             endIterOPP.Record();
             endIterOPP.Synchronize();
@@ -165,8 +170,8 @@ int main()
             startIterNPP.Record();
             for (size_t r = 0; r < repeats; r++)
             {
-                npp_src1.FilterGaussBorder(npp_dst, NppiMaskSize::NPP_MASK_SIZE_15_X_15,
-                                           NppiBorderType::NPP_BORDER_REPLICATE, nppCtx);
+                npp_src1.FilterLowPassBorder(npp_dst, nppMask, NppiBorderType::NPP_BORDER_REPLICATE, nppCtx);
+                // npp_src1.FilterBoxBorder(npp_dst, {3, 3}, {1, 1}, NppiBorderType::NPP_BORDER_REPLICATE, nppCtx);
             }
             endIterNPP.Record();
             endIterNPP.Synchronize();
