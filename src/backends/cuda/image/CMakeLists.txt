@@ -3,6 +3,7 @@ add_subdirectory(arithmetic)
 add_subdirectory(dataExchangeAndInit)
 add_subdirectory(filtering)
 add_subdirectory(geometryTransforms)
+add_subdirectory(morphology)
 add_subdirectory(statistics)
 add_subdirectory(thresholdAndCompare)
 
@@ -22,6 +23,7 @@ target_link_libraries(backends.cuda.image PUBLIC
 						backends.cuda.image.dataExchangeAndInit 
 						backends.cuda.image.filtering 
 						backends.cuda.image.geometryTransforms 
+						backends.cuda.image.morphology 
 						backends.cuda.image.statistics 
 						backends.cuda.image.thresholdAndCompare 
 						backends.cuda

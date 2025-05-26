@@ -1,0 +1,16 @@
+#pragma once
+// all headers in filtering:
+#include "blackHat.h"
+#include "dilation.h"
+#include "dilationGray.h"
+#include "erosion.h"
+#include "erosionGray.h"
+#include "fixedSizeBlackHat.h"
+#include "fixedSizeDilation.h"
+#include "fixedSizeDilationGray.h"
+#include "fixedSizeErosion.h"
+#include "fixedSizeErosionGray.h"
+#include "fixedSizeMorphologyGradient.h"
+#include "fixedSizeTopHat.h"
+#include "morphologyGradient.h"
+#include "topHat.h"

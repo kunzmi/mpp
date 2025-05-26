@@ -4,7 +4,8 @@
 #include "imageView.h"
 #include "imageView_arithmetic_impl.h"          //NOLINT(misc-include-cleaner)
 #include "imageView_dataExchangeAndInit_impl.h" //NOLINT(misc-include-cleaner)
-#include "imageView_filtering_impl.h" //NOLINT(misc-include-cleaner)
+#include "imageView_filtering_impl.h"           //NOLINT(misc-include-cleaner)
+#include "imageView_morphology_impl.h"          //NOLINT(misc-include-cleaner)
 #include "imageView_geometryTransforms_impl.h"  //NOLINT(misc-include-cleaner)
 #include "imageView_statistics_impl.h"          //NOLINT(misc-include-cleaner)
 #include "imageView_thresholdAndCompare_impl.h" //NOLINT(misc-include-cleaner)
@@ -98,6 +99,8 @@ template ImageView<Pixel8uC3> &ImageView<Pixel8uC3>::SwapChannel<Pixel8uC3>(
 template ImageView<Pixel8uC4> &ImageView<Pixel8uC4>::SwapChannel<Pixel8uC4>(
     ImageView<Pixel8uC4> &aDst, const ChannelList<vector_active_size_v<Pixel8uC4>> &aDstChannels,
     const opp::cuda::StreamCtx &aStreamCtx) const;
+
+template class ImageView<Pixel16sC1>;
 
 template class ImageView<Pixel16uC1>;
 template class ImageView<Pixel16uC2>;

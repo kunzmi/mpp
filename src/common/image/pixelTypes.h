@@ -1,8 +1,8 @@
 #pragma once
 #include <common/complex.h>
 #include <common/defines.h>
-#include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
+#include <common/vector_typetraits.h>
 #include <concepts>
 #include <ostream>
 
@@ -1079,6 +1079,50 @@ template <> struct default_compute_type_for<Pixel16bfcC4>
     using type = Pixel16bfcC4;
 };
 
+// 64u -> 64f
+template <> struct default_compute_type_for<Pixel64uC1>
+{
+    using type = Pixel64fC1;
+};
+template <> struct default_compute_type_for<Pixel64uC2>
+{
+    using type = Pixel64fC2;
+};
+template <> struct default_compute_type_for<Pixel64uC3>
+{
+    using type = Pixel64fC3;
+};
+template <> struct default_compute_type_for<Pixel64uC4>
+{
+    using type = Pixel64fC4;
+};
+template <> struct default_compute_type_for<Pixel64uC4A>
+{
+    using type = Pixel64fC4A;
+};
+
+// 64s -> 64f
+template <> struct default_compute_type_for<Pixel64sC1>
+{
+    using type = Pixel64fC1;
+};
+template <> struct default_compute_type_for<Pixel64sC2>
+{
+    using type = Pixel64fC2;
+};
+template <> struct default_compute_type_for<Pixel64sC3>
+{
+    using type = Pixel64fC3;
+};
+template <> struct default_compute_type_for<Pixel64sC4>
+{
+    using type = Pixel64fC4;
+};
+template <> struct default_compute_type_for<Pixel64sC4A>
+{
+    using type = Pixel64fC4A;
+};
+
 // 32s -> 64f
 template <> struct default_compute_type_for<Pixel32sC1>
 {
@@ -1504,6 +1548,14 @@ template <> struct filter_integer_compute_type_for_scalar<uint>
 {
     using type = long64;
 };
+template <> struct filter_integer_compute_type_for_scalar<long64>
+{
+    using type = long64;
+};
+template <> struct filter_integer_compute_type_for_scalar<ulong64>
+{
+    using type = long64; // well, we can't do better for this, otherwise we'd lose the negative values
+};
 template <> struct filter_integer_compute_type_for_scalar<HalfFp16>
 {
     using type = float;
@@ -1546,6 +1598,12 @@ template <typename T>
 struct filtertype_for<T>
 {
     using type = int;
+};
+template <typename T>
+    requires std::same_as<remove_vector_t<T>, double>
+struct filtertype_for<T>
+{
+    using type = double;
 };
 template <typename T> using filtertype_for_t = typename filtertype_for<T>::type;
 #pragma endregion
@@ -1616,6 +1674,14 @@ template <> struct filter_compute_type_for_scalar<int>
 template <> struct filter_compute_type_for_scalar<uint>
 {
     using type = float;
+};
+template <> struct filter_compute_type_for_scalar<long64>
+{
+    using type = double;
+};
+template <> struct filter_compute_type_for_scalar<ulong64>
+{
+    using type = double;
 };
 template <> struct filter_compute_type_for_scalar<HalfFp16>
 {

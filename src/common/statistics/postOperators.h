@@ -52,9 +52,10 @@ template <AnyVector T> struct SumThenSqrtScalar
 };
 template <AnyVector T> struct DivScalar
 {
-    const complex_basetype_t<remove_vector_t<T>> Divisor;
+    const complex_basetype_t<remove_vector_t<T>> InvDivisor;
     DEVICE_CODE DivScalar(complex_basetype_t<remove_vector_t<T>> aDivisor)
-        : Divisor(aDivisor * static_cast<complex_basetype_t<remove_vector_t<T>>>(vector_active_size_v<T>))
+        : InvDivisor(static_cast<complex_basetype_t<remove_vector_t<T>>>(1) /
+                     (aDivisor * static_cast<complex_basetype_t<remove_vector_t<T>>>(vector_active_size_v<T>)))
     {
     }
 
@@ -73,16 +74,17 @@ template <AnyVector T> struct DivScalar
         {
             res += aSrc.w;
         }
-        return res /= Divisor;
+        return res *= InvDivisor;
     }
 };
 template <AnyVector T> struct PSNRScalar
 {
-    const remove_vector_t<T> Divisor; // pixel count for MSE
+    const remove_vector_t<T> InvDivisor; // pixel count for MSE
     const remove_vector_t<T> ValueRangeSqr;
 
     DEVICE_CODE PSNRScalar(remove_vector_t<T> aDivisor, remove_vector_t<T> aValueRange)
-        : Divisor(aDivisor * static_cast<remove_vector_t<T>>(vector_active_size_v<T>)),
+        : InvDivisor(static_cast<remove_vector_t<T>>(1) /
+                     (aDivisor * static_cast<remove_vector_t<T>>(vector_active_size_v<T>))),
           ValueRangeSqr(aValueRange * aValueRange)
     {
     }
@@ -102,7 +104,7 @@ template <AnyVector T> struct PSNRScalar
         {
             mse += aSrc.w;
         }
-        mse /= Divisor;
+        mse *= InvDivisor;
 
         mse = ValueRangeSqr / mse;
         return static_cast<remove_vector_t<T>>(10) * log10(mse);
@@ -192,29 +194,29 @@ template <AnyVector T> struct SqrtPostOp
 
 template <AnyVector T> struct DivPostOp
 {
-    const remove_vector_t<T> Divisor;
-    DEVICE_CODE DivPostOp(remove_vector_t<T> aDivisor) : Divisor(aDivisor)
+    const remove_vector_t<T> InvDivisor;
+    DEVICE_CODE DivPostOp(remove_vector_t<T> aDivisor) : InvDivisor(static_cast<remove_vector_t<T>>(1) / aDivisor)
     {
     }
 
     DEVICE_CODE void operator()(T &aSrcDst) const
     {
-        aSrcDst /= Divisor;
+        aSrcDst *= InvDivisor;
     }
 };
 
 template <AnyVector T> struct PSNR
 {
-    const remove_vector_t<T> Divisor; // pixel count for MSE
+    const remove_vector_t<T> InvDivisor; // pixel count for MSE
     const remove_vector_t<T> ValueRangeSqr;
     DEVICE_CODE PSNR(remove_vector_t<T> aDivisor, remove_vector_t<T> aValueRange)
-        : Divisor(aDivisor), ValueRangeSqr(aValueRange * aValueRange)
+        : InvDivisor(static_cast<remove_vector_t<T>>(1) / aDivisor), ValueRangeSqr(aValueRange * aValueRange)
     {
     }
 
     DEVICE_CODE void operator()(T &aSrcDst) const
     {
-        aSrcDst /= Divisor; // == MSE
+        aSrcDst *= InvDivisor; // == MSE
 
         aSrcDst.DivInv(ValueRangeSqr);
         constexpr remove_vector_t<T> ten = static_cast<remove_vector_t<T>>(10);
@@ -238,7 +240,11 @@ template <AnyVector T> struct PSNR
 template <AnyVector T> struct StdDeviation
 {
     const remove_vector_t<T> Divisor;
-    DEVICE_CODE StdDeviation(remove_vector_t<T> aDivisor) : Divisor(aDivisor)
+    const remove_vector_t<T> InvDivisor;
+    const remove_vector_t<T> Inv_DivisorMinusOne;
+    DEVICE_CODE StdDeviation(remove_vector_t<T> aDivisor)
+        : Divisor(aDivisor), InvDivisor(static_cast<remove_vector_t<T>>(1) / aDivisor),
+          Inv_DivisorMinusOne(static_cast<remove_vector_t<T>>(1) / (aDivisor - static_cast<remove_vector_t<T>>(1)))
     {
     }
 
@@ -247,7 +253,7 @@ template <AnyVector T> struct StdDeviation
         // aSrc is supposed to be the sum of all elements
         // aSrcDstSqr is supposed to be the sum of all elements squared
         // StdDev is computed as sqrt((sum(elements^2) - sum(elements)^2 / elementCount) / (elementCount -  1))
-        aDst = (aSrcSqr - (aSrc * aSrc) / Divisor) / (Divisor - static_cast<remove_vector_t<T>>(1));
+        aDst = (aSrcSqr - (aSrc * aSrc) * InvDivisor) * Inv_DivisorMinusOne;
         aDst.Sqrt();
     }
 
@@ -296,37 +302,37 @@ template <AnyVector T> struct StdDeviation
 
         remove_vector_t<T> temp;
         temp   = aSrc.x.real * aSrc.x.real;
-        temp   = (aSrcSqr.x.real - temp / Divisor) / (Divisor - static_cast<remove_vector_t<T>>(1));
+        temp   = (aSrcSqr.x.real - temp * InvDivisor) * Inv_DivisorMinusOne;
         aDst.x = temp; // temp is std(real part) squared
         temp   = aSrc.x.imag * aSrc.x.imag;
-        temp   = (aSrcSqr.x.imag - temp / Divisor) / (Divisor - static_cast<remove_vector_t<T>>(1));
+        temp   = (aSrcSqr.x.imag - temp * InvDivisor) * Inv_DivisorMinusOne;
         aDst.x += temp;
 
         if constexpr (vector_active_size_v<T> > 1)
         {
             temp   = aSrc.y.real * aSrc.y.real;
-            temp   = (aSrcSqr.y.real - temp / Divisor) / (Divisor - static_cast<remove_vector_t<T>>(1));
+            temp   = (aSrcSqr.y.real - temp * InvDivisor) * Inv_DivisorMinusOne;
             aDst.y = temp;
             temp   = aSrc.y.imag * aSrc.y.imag;
-            temp   = (aSrcSqr.y.imag - temp / Divisor) / (Divisor - static_cast<remove_vector_t<T>>(1));
+            temp   = (aSrcSqr.y.imag - temp * InvDivisor) * Inv_DivisorMinusOne;
             aDst.y += temp;
         }
         if constexpr (vector_active_size_v<T> > 2)
         {
             temp   = aSrc.z.real * aSrc.z.real;
-            temp   = (aSrcSqr.z.real - temp / Divisor) / (Divisor - static_cast<remove_vector_t<T>>(1));
+            temp   = (aSrcSqr.z.real - temp * InvDivisor) * Inv_DivisorMinusOne;
             aDst.z = temp;
             temp   = aSrc.z.imag * aSrc.z.imag;
-            temp   = (aSrcSqr.z.imag - temp / Divisor) / (Divisor - static_cast<remove_vector_t<T>>(1));
+            temp   = (aSrcSqr.z.imag - temp * InvDivisor) * Inv_DivisorMinusOne;
             aDst.z += temp;
         }
         if constexpr (vector_active_size_v<T> > 3)
         {
             temp   = aSrc.w.real * aSrc.w.real;
-            temp   = (aSrcSqr.w.real - temp / Divisor) / (Divisor - static_cast<remove_vector_t<T>>(1));
+            temp   = (aSrcSqr.w.real - temp * InvDivisor) * Inv_DivisorMinusOne;
             aDst.w = temp;
             temp   = aSrc.w.imag * aSrc.w.imag;
-            temp   = (aSrcSqr.w.imag - temp / Divisor) / (Divisor - static_cast<remove_vector_t<T>>(1));
+            temp   = (aSrcSqr.w.imag - temp * InvDivisor) * Inv_DivisorMinusOne;
             aDst.w += temp;
         }
         aDst.Sqrt();
@@ -468,9 +474,11 @@ template <AnyVector T> struct NormRelL2Post
 template <AnyVector T> struct QualityIndex
 {
     const remove_vector_t<T> PixelCount;
-    const remove_vector_t<T> PixelCount_1;
+    const remove_vector_t<T> InvPixelCount;
+    const remove_vector_t<T> InvPixelCount_1;
     DEVICE_CODE QualityIndex(remove_vector_t<T> aPixelCount)
-        : PixelCount(aPixelCount), PixelCount_1(aPixelCount - static_cast<remove_vector_t<T>>(1))
+        : PixelCount(aPixelCount), InvPixelCount(static_cast<remove_vector_t<T>>(1) / aPixelCount),
+          InvPixelCount_1(static_cast<remove_vector_t<T>>(1) / (aPixelCount - static_cast<remove_vector_t<T>>(1)))
     {
     }
 
@@ -478,13 +486,13 @@ template <AnyVector T> struct QualityIndex
                                 const T &aSumSrc1Src2, T &aDst) const
     {
         // formulas see https://ece.uwaterloo.ca/~z70wang/publications/quality_2c.pdf
-        T meanSrc1 = aSumSrc1 / PixelCount;
-        T meanSrc2 = aSumSrc2 / PixelCount;
-        T varSrc1  = (aSumSrc1Sqr - (aSumSrc1 * aSumSrc1) / PixelCount) / (PixelCount_1);
+        T meanSrc1 = aSumSrc1 * InvPixelCount;
+        T meanSrc2 = aSumSrc2 * InvPixelCount;
+        T varSrc1  = (aSumSrc1Sqr - (aSumSrc1 * aSumSrc1) * InvPixelCount) * (InvPixelCount_1);
 
-        T varSrc2 = (aSumSrc2Sqr - (aSumSrc2 * aSumSrc2) / PixelCount) / (PixelCount_1);
+        T varSrc2 = (aSumSrc2Sqr - (aSumSrc2 * aSumSrc2) * InvPixelCount) * (InvPixelCount_1);
 
-        T crossVar = (aSumSrc1Src2 - PixelCount * meanSrc1 * meanSrc2) / PixelCount_1;
+        T crossVar = (aSumSrc1Src2 - PixelCount * meanSrc1 * meanSrc2) * InvPixelCount_1;
 
         aDst = (static_cast<remove_vector_t<T>>(4) * crossVar * meanSrc1 * meanSrc2) /
                ((varSrc1 + varSrc2) * (meanSrc1 * meanSrc1 + meanSrc2 * meanSrc2));
@@ -494,12 +502,14 @@ template <AnyVector T> struct QualityIndex
 template <AnyVector T> struct SSIM
 {
     const remove_vector_t<T> PixelCount;
-    const remove_vector_t<T> PixelCount_1;
+    const remove_vector_t<T> InvPixelCount;
+    const remove_vector_t<T> InvPixelCount_1;
     const remove_vector_t<T> C1;
     const remove_vector_t<T> C2;
     DEVICE_CODE SSIM(remove_vector_t<T> aPixelCount, remove_vector_t<T> aDynamicRange, remove_vector_t<T> aK1,
                      remove_vector_t<T> aK2)
-        : PixelCount(aPixelCount), PixelCount_1(aPixelCount - static_cast<remove_vector_t<T>>(1)),
+        : PixelCount(aPixelCount), InvPixelCount(static_cast<remove_vector_t<T>>(1) / aPixelCount),
+          InvPixelCount_1(static_cast<remove_vector_t<T>>(1) / (aPixelCount - static_cast<remove_vector_t<T>>(1))),
           C1(aK1 * aK1 * aDynamicRange * aDynamicRange), C2(aK2 * aK2 * aDynamicRange * aDynamicRange)
     {
     }
@@ -509,13 +519,13 @@ template <AnyVector T> struct SSIM
     {
         // formulas see https://en.wikipedia.org/wiki/Structural_similarity_index_measure
 
-        T meanSrc1 = aSumSrc1 / PixelCount;
-        T meanSrc2 = aSumSrc2 / PixelCount;
-        T varSrc1  = (aSumSrc1Sqr - (aSumSrc1 * aSumSrc1) / PixelCount) / (PixelCount_1);
+        T meanSrc1 = aSumSrc1 * InvPixelCount;
+        T meanSrc2 = aSumSrc2 * InvPixelCount;
+        T varSrc1  = (aSumSrc1Sqr - (aSumSrc1 * aSumSrc1) * InvPixelCount) * InvPixelCount_1;
 
-        T varSrc2 = (aSumSrc2Sqr - (aSumSrc2 * aSumSrc2) / PixelCount) / (PixelCount_1);
+        T varSrc2 = (aSumSrc2Sqr - (aSumSrc2 * aSumSrc2) * InvPixelCount) * InvPixelCount_1;
 
-        T crossVar = (aSumSrc1Src2 - PixelCount * meanSrc1 * meanSrc2) / PixelCount_1;
+        T crossVar = (aSumSrc1Src2 - PixelCount * meanSrc1 * meanSrc2) * InvPixelCount_1;
 
         aDst = (static_cast<remove_vector_t<T>>(2) * meanSrc1 * meanSrc2 + C1) *
                (static_cast<remove_vector_t<T>>(2) * crossVar + C2) /

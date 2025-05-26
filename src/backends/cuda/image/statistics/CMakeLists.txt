@@ -5,6 +5,9 @@ add_library(backends.cuda.image.statistics
 	averageRelativeErrorMasked.cu
 	countInRange.cu
 	countInRangeMasked.cu
+	crossCorrelation.cu
+	crossCorrelationCoefficient.cu
+	crossCorrelationNormalized.cu
 	dotProduct.cu
 	dotProductMasked.cu
 	integral.cu
@@ -50,6 +53,7 @@ add_library(backends.cuda.image.statistics
 	normRelL2Masked.cu
 	psnr.cu
 	qualityIndex.cu
+	squareDistanceNormalized.cu
 	ssim.cu
 	sum.cu
 	sumMasked.cu

@@ -4103,5 +4103,110 @@ void ImageView<T>::HistogramRange(opp::cuda::DevVarView<int> &aHist,
                                 histLevelCount, histLevels, SizeRoi(), aStreamCtx);
 }
 #pragma endregion
+
+#pragma region Cross Correlation
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelation(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                                      BorderType aBorder, T aConstant, Roi aAllowedReadRoi,
+                                                      const opp::cuda::StreamCtx &aStreamCtx) const
+    requires SingleChannel<T> && (sizeof(T) < 8)
+{
+
+    if (aAllowedReadRoi == Roi())
+    {
+        aAllowedReadRoi = ROI();
+    }
+
+    checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
+
+    const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
+    const T *allowedPtr          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
+
+    InvokeCrossCorrelation(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aTemplate.PointerRoi(),
+                           aTemplate.Pitch(), aTemplate.SizeRoi(), aBorder, aConstant, aAllowedReadRoi.Size(),
+                           roiOffset, SizeRoi(), aStreamCtx);
+
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationNormalized(const ImageView<T> &aTemplate,
+                                                                ImageView<Pixel32fC1> &aDst, BorderType aBorder,
+                                                                T aConstant, Roi aAllowedReadRoi,
+                                                                const opp::cuda::StreamCtx &aStreamCtx) const
+    requires SingleChannel<T> && (sizeof(T) < 8)
+{
+
+    if (aAllowedReadRoi == Roi())
+    {
+        aAllowedReadRoi = ROI();
+    }
+
+    checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
+
+    const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
+    const T *allowedPtr          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
+
+    InvokeCrossCorrelationNormalized(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aTemplate.PointerRoi(),
+                                     aTemplate.Pitch(), aTemplate.SizeRoi(), aBorder, aConstant, aAllowedReadRoi.Size(),
+                                     roiOffset, SizeRoi(), aStreamCtx);
+
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::SquareDistanceNormalized(const ImageView<T> &aTemplate,
+                                                              ImageView<Pixel32fC1> &aDst, BorderType aBorder,
+                                                              T aConstant, Roi aAllowedReadRoi,
+                                                              const opp::cuda::StreamCtx &aStreamCtx) const
+    requires SingleChannel<T> && (sizeof(T) < 8)
+{
+
+    if (aAllowedReadRoi == Roi())
+    {
+        aAllowedReadRoi = ROI();
+    }
+
+    checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
+
+    const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
+    const T *allowedPtr          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
+
+    InvokeSquareDistanceNormalized(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aTemplate.PointerRoi(),
+                                   aTemplate.Pitch(), aTemplate.SizeRoi(), aBorder, aConstant, aAllowedReadRoi.Size(),
+                                   roiOffset, SizeRoi(), aStreamCtx);
+
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationCoefficient(const ImageView<Pixel32fC2> &aSrcBoxFiltered,
+                                                                 const ImageView<T> &aTemplate,
+                                                                 const opp::cuda::DevVarView<double> &aMeanTemplate,
+                                                                 ImageView<Pixel32fC1> &aDst, BorderType aBorder,
+                                                                 T aConstant, Roi aAllowedReadRoi,
+                                                                 const opp::cuda::StreamCtx &aStreamCtx) const
+    requires SingleChannel<T> && (sizeof(T) < 8)
+{
+
+    if (aAllowedReadRoi == Roi())
+    {
+        aAllowedReadRoi = ROI();
+    }
+
+    checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
+
+    const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
+    const T *allowedPtr          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
+
+    InvokeCrossCorrelationCoefficient(allowedPtr, Pitch(), aSrcBoxFiltered.PointerRoi(), aSrcBoxFiltered.Pitch(),
+                                      aDst.PointerRoi(), aDst.Pitch(), aTemplate.PointerRoi(), aTemplate.Pitch(),
+                                      aTemplate.SizeRoi(), aMeanTemplate.Pointer(), aBorder, aConstant,
+                                      aAllowedReadRoi.Size(), roiOffset, SizeRoi(), aStreamCtx);
+
+    return aDst;
+}
+
+#pragma endregion
 } // namespace opp::image::cuda
 #endif // OPP_ENABLE_CUDA_BACKEND

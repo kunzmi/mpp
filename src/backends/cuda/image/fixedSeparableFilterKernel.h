@@ -56,7 +56,7 @@ __global__ void fixedSeparableFilterKernel(BorderControlT aSrcWithBC, DstT *__re
         constexpr int extendedBlockW = myWarpSize * TupelSize + (kernelSize - 1);
         constexpr int extendedBlockH = blockHeight + (kernelSize - 1);
 
-        ComputeT(*buffer)[extendedBlockW + 1] = (ComputeT(*)[extendedBlockW + 1])(sharedBuffer);
+        ComputeT(*buffer)[extendedBlockW] = (ComputeT(*)[extendedBlockW])(sharedBuffer);
 
         // as threads in warp-aligned area are always the full warp, no need to check for X pixel limits here
         if (aSplit.ThreadIsAlignedToWarp(threadX))
@@ -125,6 +125,11 @@ __global__ void fixedSeparableFilterKernel(BorderControlT aSrcWithBC, DstT *__re
                                 buffer[bl + threadIdx.y * blockHeight][elementIndex] * filterKernel.ValuesSeparable[i];
                         }
 
+                        if (filterKernel.NeedsScaling)
+                        {
+                            temp = temp / filterKernel.Scaling;
+                        }
+
                         if constexpr (RealOrComplexFloatingVector<ComputeT> && RealOrComplexIntVector<DstT>)
                         {
                             round(temp);
@@ -150,7 +155,7 @@ __global__ void fixedSeparableFilterKernel(BorderControlT aSrcWithBC, DstT *__re
         constexpr int extendedBlockW = myWarpSize + (kernelSize - 1);
         constexpr int extendedBlockH = blockHeight + (kernelSize - 1);
 
-        ComputeT(*buffer)[extendedBlockW + 1] = (ComputeT(*)[extendedBlockW + 1])(sharedBuffer);
+        ComputeT(*buffer)[extendedBlockW] = (ComputeT(*)[extendedBlockW])(sharedBuffer);
 
 #pragma unroll
         for (int i = 0; i < extendedBlockW; i += myWarpSize)
@@ -215,6 +220,11 @@ __global__ void fixedSeparableFilterKernel(BorderControlT aSrcWithBC, DstT *__re
                         temp += buffer[bl + threadIdx.y * blockHeight][elementIndex] * filterKernel.ValuesSeparable[i];
                     }
 
+                    if (filterKernel.NeedsScaling)
+                    {
+                        temp = temp / filterKernel.Scaling;
+                    }
+
                     if constexpr (RealOrComplexFloatingVector<ComputeT> && RealOrComplexIntVector<DstT>)
                     {
                         round(temp);
@@ -271,7 +281,7 @@ void InvokeFixedSeparableFilterKernelDefault(const BorderControlT &aSrcWithBC, D
 
         constexpr int WarpAlignmentInBytes = ConfigWarpAlignment<"Default">::value;
         const uint extendedBlockW          = BlockSize.x * TupelSize + (kernelSize - 1);
-        const uint SharedMemory            = sizeof(ComputeT) * (extendedBlockW + 1) * blockHeight * BlockSize.y;
+        const uint SharedMemory            = sizeof(ComputeT) * (extendedBlockW)*blockHeight * BlockSize.y;
 
         InvokeFixedSeparableFilterKernel<ComputeT, DstT, TupelSize, WarpAlignmentInBytes, kernelSize, blockHeight,
                                          roundingMode, BorderControlT, FixedFilterKernelT>(

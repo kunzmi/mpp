@@ -11,13 +11,15 @@ namespace opp::cuda
 // All "InvokeKernel..." functions will have a static const member that will register here
 
 // This will only be active if the #define is activated
-#define OPP_CUDA_TEMPLATE_REGISTRY_IS_ACTIVE 1
+// #define OPP_CUDA_TEMPLATE_REGISTRY_IS_ACTIVE 1
 
 #ifndef OPP_CUDA_TEMPLATE_REGISTRY_IS_ACTIVE
 // empty define so that nothing is done
 #define OPP_CUDA_REGISTER_TEMPALTE
+#define OPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE
 #define OPP_CUDA_REGISTER_TEMPALTE_SRC_DST
 #define OPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE
+#define OPP_CUDA_REGISTER_TEMPALTE_COMPUTE_DST
 #endif
 
 #ifdef OPP_CUDA_TEMPLATE_REGISTRY_IS_ACTIVE

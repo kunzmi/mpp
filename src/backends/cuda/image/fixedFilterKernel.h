@@ -69,7 +69,6 @@ __global__ void fixedFilterKernel(BorderControlT aSrcWithBC, DstT *__restrict__ 
 
         if (aSplit.ThreadIsAlignedToWarp(threadX))
         {
-            ComputeT line[extendedBlockW];
             ComputeT result[blockHeight][TupelSize] = {0};
 
 #pragma unroll
@@ -78,15 +77,11 @@ __global__ void fixedFilterKernel(BorderControlT aSrcWithBC, DstT *__restrict__ 
                 const int srcPixelY = ry - kernelCenterY + pixelY;
 
 #pragma unroll
-                for (int i = 0; i < extendedBlockW; i++)
-                {
-                    const int srcPixelX = pixelX - kernelCenterX + i;
-                    line[i]             = ComputeT(aSrcWithBC(srcPixelX, srcPixelY));
-                }
-
-#pragma unroll
                 for (int rx = 0; rx < extendedBlockW; rx++)
                 {
+                    const int srcPixelX = pixelX - kernelCenterX + rx;
+                    ComputeT srcPixel   = ComputeT(aSrcWithBC(srcPixelX, srcPixelY));
+
 #pragma unroll
                     for (int ky = 0; ky < kernelHeight; ky++)
                     {
@@ -101,8 +96,7 @@ __global__ void fixedFilterKernel(BorderControlT aSrcWithBC, DstT *__restrict__ 
                             {
                                 if (pixelDstX >= 0 && pixelDstX < TupelSize)
                                 {
-                                    const ComputeT srcPx = line[rx] * filterKernel.Values[ky][kx];
-                                    result[pixelDstY][pixelDstX] += srcPx;
+                                    result[pixelDstY][pixelDstX] += srcPixel * filterKernel.Values[ky][kx];
                                 }
                             }
                         }
@@ -147,9 +141,8 @@ __global__ void fixedFilterKernel(BorderControlT aSrcWithBC, DstT *__restrict__ 
     }
 
     {
-        constexpr int extendedBlockW = blockWidth + (kernelWidth - 1);
-        constexpr int extendedBlockH = blockHeight + (kernelHeight - 1);
-        ComputeT line[extendedBlockW];
+        constexpr int extendedBlockW             = blockWidth + (kernelWidth - 1);
+        constexpr int extendedBlockH             = blockHeight + (kernelHeight - 1);
         ComputeT result[blockHeight][blockWidth] = {0};
 
 #pragma unroll
@@ -158,15 +151,10 @@ __global__ void fixedFilterKernel(BorderControlT aSrcWithBC, DstT *__restrict__ 
             const int srcPixelY = ry - kernelCenterY + pixelY;
 
 #pragma unroll
-            for (int i = 0; i < extendedBlockW; i++)
-            {
-                const int srcPixelX = pixelX - kernelCenterX + i;
-                line[i]             = ComputeT(aSrcWithBC(srcPixelX, srcPixelY));
-            }
-
-#pragma unroll
             for (int rx = 0; rx < extendedBlockW; rx++)
             {
+                const int srcPixelX = pixelX - kernelCenterX + rx;
+                ComputeT srcPixel   = ComputeT(aSrcWithBC(srcPixelX, srcPixelY));
 #pragma unroll
                 for (int ky = 0; ky < kernelHeight; ky++)
                 {
@@ -181,8 +169,7 @@ __global__ void fixedFilterKernel(BorderControlT aSrcWithBC, DstT *__restrict__ 
                         {
                             if (pixelDstX >= 0 && pixelDstX < blockWidth)
                             {
-                                const ComputeT srcPx = line[rx] * filterKernel.Values[ky][kx];
-                                result[pixelDstY][pixelDstX] += srcPx;
+                                result[pixelDstY][pixelDstX] += srcPixel * filterKernel.Values[ky][kx];
                             }
                         }
                     }

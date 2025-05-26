@@ -1673,4 +1673,82 @@ inline std::wostream &operator<<(std::wostream &aOs, const FixedFilter &aFixedFi
     return aOs;
 }
 #pragma endregion
+
+#pragma region Norm
+/// <summary>
+/// Distance norm
+/// </summary>
+enum class Norm // NOLINT(performance-enum-size)
+{
+    /// <summary>
+    /// Infinity norm (maximum)
+    /// </summary>
+    Inf,
+    /// <summary>
+    /// L1 norm (sum of absolute values)
+    /// </summary>
+    L1,
+    /// <summary>
+    /// L2 norm (square root of sum of squares)
+    /// </summary>
+    L2
+};
+
+template <Norm T> struct norm_name
+{
+    static constexpr char value[] = "Unknown";
+};
+template <> struct norm_name<Norm::Inf>
+{
+    static constexpr char value[] = "Inf";
+};
+template <> struct norm_name<Norm::L1>
+{
+    static constexpr char value[] = "L1";
+};
+template <> struct norm_name<Norm::L2>
+{
+    static constexpr char value[] = "L2";
+};
+
+inline std::ostream &operator<<(std::ostream &aOs, const Norm &aNorm)
+{
+    switch (aNorm)
+    {
+        case Norm::Inf:
+            aOs << norm_name<Norm::Inf>::value;
+            break;
+        case Norm::L1:
+            aOs << norm_name<Norm::L1>::value;
+            break;
+        case Norm::L2:
+            aOs << norm_name<Norm::L2>::value;
+            break;
+        default:
+            aOs << "Unknown";
+            break;
+    }
+    return aOs;
+}
+
+inline std::wostream &operator<<(std::wostream &aOs, const Norm &aNorm)
+{
+    switch (aNorm)
+    {
+        case Norm::Inf:
+            aOs << norm_name<Norm::Inf>::value;
+            break;
+        case Norm::L1:
+            aOs << norm_name<Norm::L1>::value;
+            break;
+        case Norm::L2:
+            aOs << norm_name<Norm::L2>::value;
+            break;
+        default:
+            aOs << "Unknown";
+            break;
+    }
+    return aOs;
+}
+#pragma endregion
 } // namespace opp

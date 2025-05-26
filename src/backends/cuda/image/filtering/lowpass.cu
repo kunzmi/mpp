@@ -3,6 +3,7 @@
 #include "lowpass.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/fixedFilterKernel.h>
+#include <backends/cuda/image/fixedSeparableFilterKernel.h>
 #include <backends/cuda/streamCtx.h>
 #include <backends/cuda/templateRegistry.h>
 #include <common/defines.h>
@@ -43,7 +44,7 @@ template <typename T>
     requires(sizeof(remove_vector_t<T>) == 2)
 struct pixel_block_size_y<T>
 {
-    constexpr static int value = 4;
+    constexpr static int value = 2;
 };
 template <typename T>
     requires(sizeof(remove_vector_t<T>) == 1)
@@ -154,8 +155,7 @@ void InvokeLowpass(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPit
             break;
             case MaskSize::Mask_5x5:
             {
-                constexpr int filterSize  = 5;
-                constexpr int centerPixel = 2;
+                constexpr int filterSize = 5;
 
                 using FixedFilterKernelT = FixedFilterKernel<opp::FixedFilter::LowPass, filterSize, FilterT>;
 
@@ -166,10 +166,10 @@ void InvokeLowpass(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPit
                         using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
                         const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
 
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
+                        InvokeFixedSeparableFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, pixelBlockSizeY,
+                                                                RoundingMode::NearestTiesToEven, BCType,
+                                                                FixedFilterKernelT>(bc, aDst, aPitchDst, aSize,
+                                                                                    aStreamCtx);
                     }
                     break;
                     case opp::BorderType::Constant:
@@ -177,10 +177,10 @@ void InvokeLowpass(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPit
                         using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
                         const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
 
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
+                        InvokeFixedSeparableFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, pixelBlockSizeY,
+                                                                RoundingMode::NearestTiesToEven, BCType,
+                                                                FixedFilterKernelT>(bc, aDst, aPitchDst, aSize,
+                                                                                    aStreamCtx);
                     }
                     break;
                     case opp::BorderType::Replicate:
@@ -188,10 +188,10 @@ void InvokeLowpass(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPit
                         using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
                         const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
 
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
+                        InvokeFixedSeparableFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, pixelBlockSizeY,
+                                                                RoundingMode::NearestTiesToEven, BCType,
+                                                                FixedFilterKernelT>(bc, aDst, aPitchDst, aSize,
+                                                                                    aStreamCtx);
                     }
                     break;
                     case opp::BorderType::Mirror:
@@ -199,10 +199,10 @@ void InvokeLowpass(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPit
                         using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
                         const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
 
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
+                        InvokeFixedSeparableFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, pixelBlockSizeY,
+                                                                RoundingMode::NearestTiesToEven, BCType,
+                                                                FixedFilterKernelT>(bc, aDst, aPitchDst, aSize,
+                                                                                    aStreamCtx);
                     }
                     break;
                     case opp::BorderType::MirrorReplicate:
@@ -210,10 +210,10 @@ void InvokeLowpass(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPit
                         using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
                         const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
 
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
+                        InvokeFixedSeparableFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, pixelBlockSizeY,
+                                                                RoundingMode::NearestTiesToEven, BCType,
+                                                                FixedFilterKernelT>(bc, aDst, aPitchDst, aSize,
+                                                                                    aStreamCtx);
                     }
                     break;
                     case opp::BorderType::Wrap:
@@ -221,10 +221,10 @@ void InvokeLowpass(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPit
                         using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
                         const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
 
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
+                        InvokeFixedSeparableFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, pixelBlockSizeY,
+                                                                RoundingMode::NearestTiesToEven, BCType,
+                                                                FixedFilterKernelT>(bc, aDst, aPitchDst, aSize,
+                                                                                    aStreamCtx);
                     }
                     break;
                     default:

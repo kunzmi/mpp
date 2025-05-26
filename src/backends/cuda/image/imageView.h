@@ -2,11 +2,13 @@
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
 #if OPP_ENABLE_CUDA_BACKEND
 
+#include "morphology/morphologyComputeT.h"
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/devVarView.h>
 #include <backends/cuda/image/arithmetic/addSquareProductWeightedOutputType.h>
 #include <backends/cuda/image/arithmetic/arithmeticKernel.h>
 #include <backends/cuda/image/dataExchangeAndInit/dataExchangeAndInitKernel.h>
+#include <backends/cuda/image/filtering/windowSumResultType.h>
 #include <backends/cuda/image/geometryTransforms/geometryTransformsKernel.h>
 #include <backends/cuda/image/statistics/statisticsKernel.h>
 #include <backends/cuda/streamCtx.h>
@@ -15,6 +17,7 @@
 #include <common/defines.h>
 #include <common/half_fp16.h>
 #include <common/image/border.h>
+#include <common/image/filterArea.h>
 #include <common/image/functors/imageFunctors.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
@@ -2320,6 +2323,223 @@ template <PixelType T> class ImageView
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(has_alternative_filter_output_type_for_v<T>);
 #pragma endregion
+#pragma region Separable Filter
+    /// <summary>
+    /// </summary>
+    ImageView<T> &SeparableFilter(ImageView<T> &aDst,
+                                  const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+                                  int aFilterSize, int aFilterCenter, BorderType aBorder, T aConstant,
+                                  Roi aAllowedReadRoi                    = Roi(),
+                                  const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /*/// <summary>
+    /// </summary>
+    ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
+        ImageView<alternative_filter_output_type_for_t<T>> &aDst, opp::FixedFilter aFilter, MaskSize aFilterSize,
+        BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(has_alternative_filter_output_type_for_v<T>);*/
+#pragma endregion
+#pragma region Column Filter
+    /// <summary>
+    /// </summary>
+    ImageView<T> &ColumnFilter(ImageView<T> &aDst,
+                               const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+                               int aFilterSize, int aFilterCenter, BorderType aBorder, T aConstant,
+                               Roi aAllowedReadRoi                    = Roi(),
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// </summary>
+    ImageView<window_sum_result_type_t<T>> &ColumnWindowSum(
+        ImageView<window_sum_result_type_t<T>> &aDst,
+        complex_basetype_t<remove_vector_t<window_sum_result_type_t<T>>> aScalingValue, int aFilterSize,
+        int aFilterCenter, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+#pragma endregion
+#pragma region Row Filter
+    /// <summary>
+    /// </summary>
+    ImageView<T> &RowFilter(ImageView<T> &aDst,
+                            const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+                            int aFilterSize, int aFilterCenter, BorderType aBorder, T aConstant,
+                            Roi aAllowedReadRoi                    = Roi(),
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// </summary>
+    ImageView<window_sum_result_type_t<T>> &RowWindowSum(
+        ImageView<window_sum_result_type_t<T>> &aDst,
+        complex_basetype_t<remove_vector_t<window_sum_result_type_t<T>>> aScalingValue, int aFilterSize,
+        int aFilterCenter, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+#pragma endregion
+#pragma region Box Filter
+    /// <summary>
+    /// </summary>
+    ImageView<T> &BoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder, T aConstant,
+                            Roi aAllowedReadRoi                    = Roi(),
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// </summary>
+    ImageView<same_vector_size_different_type_t<T, float>> &BoxFilter(
+        ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+        T aConstant, Roi aAllowedReadRoi = Roi(),
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealIntVector<T>;
+    /// <summary>
+    /// </summary>
+    ImageView<Pixel32fC2> &BoxFilter(
+        ImageView<Pixel32fC2> &aDst, const FilterArea &aFilterArea, BorderType aBorder, T aConstant,
+        Roi aAllowedReadRoi                    = Roi(),
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && SingleChannel<T> && (sizeof(T) < 8);
+#pragma endregion
+#pragma region Min/Max Filter
+    /// <summary>
+    /// </summary>
+    ImageView<T> &MaxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder, T aConstant,
+                            Roi aAllowedReadRoi                    = Roi(),
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// </summary>
+    ImageView<T> &MinFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder, T aConstant,
+                            Roi aAllowedReadRoi                    = Roi(),
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+#pragma endregion
+#pragma region Wiener Filter
+    /// <summary>
+    /// </summary>
+    ImageView<T> &WienerFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
+                               const filter_compute_type_for_t<T> &aNoise, BorderType aBorder, T aConstant,
+                               Roi aAllowedReadRoi                    = Roi(),
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+#pragma endregion
+#pragma region Threshold Adaptive Box Filter
+    /// <summary>
+    /// </summary>
+    ImageView<T> &ThresholdAdaptiveBoxFilter(
+        ImageView<T> &aDst, const FilterArea &aFilterArea, const filter_compute_type_for_t<T> &aDelta, const T &aValGT,
+        const T &aValLE, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+#pragma endregion
+#pragma region Filter
+    /// <summary>
+    /// </summary>
+    ImageView<T> &Filter(ImageView<T> &aDst,
+                         const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+                         const FilterArea &aFilterArea, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+#pragma endregion
+#pragma region Bilateral Gauss Filter
+    void PrecomputeBilateralGaussFilter(
+        opp::cuda::DevVarView<float> &aPreCompGeomDistCoeff, const FilterArea &aFilterArea, float aPosSquareSigma,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// </summary>
+    ImageView<T> &BilateralGaussFilter(
+        ImageView<T> &aDst, const FilterArea &aFilterArea, const opp::cuda::DevVarView<float> &aPreCompGeomDistCoeff,
+        float aValSquareSigma, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && RealVector<T> &&
+                 (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
+    /// <summary>
+    /// </summary>
+    ImageView<T> &BilateralGaussFilter(
+        ImageView<T> &aDst, const FilterArea &aFilterArea, const opp::cuda::DevVarView<float> &aPreCompGeomDistCoeff,
+        float aValSquareSigma, opp::Norm aNorm, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(!SingleChannel<T>) && RealVector<T> &&
+                (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
+#pragma endregion
+#pragma region Gradient Vector
+    /// <summary>
+    /// </summary>
+    void GradientVectorSobel(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY, ImageView<Pixel16sC1> &aDstMag,
+                             ImageView<Pixel32fC1> &aDstAngle, ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm,
+                             MaskSize aMaskSize, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+    /// <summary>
+    /// </summary>
+    void GradientVectorSobel(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY, ImageView<Pixel32fC1> &aDstMag,
+                             ImageView<Pixel32fC1> &aDstAngle, ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm,
+                             MaskSize aMaskSize, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+
+    /// <summary>
+    /// </summary>
+    void GradientVectorScharr(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
+                              ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                              ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, BorderType aBorder,
+                              T aConstant, Roi aAllowedReadRoi = Roi(),
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+    /// <summary>
+    /// </summary>
+    void GradientVectorScharr(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
+                              ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                              ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, BorderType aBorder,
+                              T aConstant, Roi aAllowedReadRoi = Roi(),
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+
+    /// <summary>
+    /// </summary>
+    void GradientVectorPrewitt(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
+                               ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                               ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
+                               BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+    /// <summary>
+    /// </summary>
+    void GradientVectorPrewitt(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
+                               ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                               ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
+                               BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+#pragma endregion
+#pragma region Unsharp Filter
+    /// <summary>
+    /// </summary>
+    ImageView<T> &UnsharpFilter(ImageView<T> &aDst,
+                                const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+                                int aFilterSize, int aFilterCenter,
+                                remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aWeight,
+                                remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aThreshold,
+                                BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+#pragma endregion
+#pragma region Harris Corner Response
+    /// <summary>
+    /// </summary>
+    ImageView<Pixel32fC1> &HarrisCornerResponse(
+        ImageView<Pixel32fC1> &aDst, const FilterArea aAvgWindowSize, float aK, float aScale, BorderType aBorder,
+        T aConstant, Roi aAllowedReadRoi = Roi(),
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires std::same_as<T, Pixel32fC4>;
+#pragma endregion
+#pragma region Canny edge
+    /// <summary>
+    /// </summary>
+    ImageView<Pixel8uC1> &CannyEdge(const ImageView<Pixel32fC1> &aSrcAngle, ImageView<Pixel8uC1> &aTemp,
+                                    ImageView<Pixel8uC1> &aDst, T aLowThreshold, T aHighThreshold,
+                                    Roi aAllowedReadRoi                    = Roi(),
+                                    const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires std::same_as<T, Pixel16sC1> || std::same_as<T, Pixel32fC1>;
+#pragma endregion
 #pragma endregion
 
 #pragma region Geometric Transforms
@@ -3750,6 +3970,93 @@ template <PixelType T> class ImageView
                       InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi(),
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires FourChannelNoAlpha<T>;
+#pragma endregion
+#pragma endregion
+
+#pragma region Morphology
+#pragma region No mask Erosion/Dilation
+    /// <summary>
+    /// </summary>
+    ImageView<T> &Dilation(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder, T aConstant,
+                           Roi aAllowedReadRoi                    = Roi(),
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// </summary>
+    ImageView<T> &Erosion(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder, T aConstant,
+                          Roi aAllowedReadRoi                    = Roi(),
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+#pragma endregion
+#pragma region Erosion
+    /// <summary>
+    /// </summary>
+    ImageView<T> &Erosion(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                          const FilterArea &aFilterArea, BorderType aBorder, T aConstant, Roi aAllowedReadRoi,
+                          const opp::cuda::StreamCtx &aStreamCtx) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// </summary>
+    ImageView<T> &ErosionGray(ImageView<T> &aDst, const opp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
+                              const FilterArea &aFilterArea, BorderType aBorder, T aConstant, Roi aAllowedReadRoi,
+                              const opp::cuda::StreamCtx &aStreamCtx) const
+        requires RealVector<T>;
+#pragma endregion
+#pragma region Dilation
+    /// <summary>
+    /// </summary>
+    ImageView<T> &Dilation(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                           const FilterArea &aFilterArea, BorderType aBorder, T aConstant, Roi aAllowedReadRoi,
+                           const opp::cuda::StreamCtx &aStreamCtx) const
+        requires RealVector<T>;
+    /// <summary>
+    /// </summary>
+    ImageView<T> &DilationGray(ImageView<T> &aDst, const opp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
+                               const FilterArea &aFilterArea, BorderType aBorder, T aConstant, Roi aAllowedReadRoi,
+                               const opp::cuda::StreamCtx &aStreamCtx) const
+        requires RealVector<T>;
+#pragma endregion
+#pragma region Open
+    /// <summary>
+    /// </summary>
+    ImageView<T> &Open(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                       const FilterArea &aFilterArea, BorderType aBorder, T aConstant, Roi aAllowedReadRoi,
+                       const opp::cuda::StreamCtx &aStreamCtx) const
+        requires RealVector<T>;
+#pragma endregion
+#pragma region Close
+    /// <summary>
+    /// </summary>
+    ImageView<T> &Close(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                        const FilterArea &aFilterArea, BorderType aBorder, T aConstant, Roi aAllowedReadRoi,
+                        const opp::cuda::StreamCtx &aStreamCtx) const
+        requires RealVector<T>;
+#pragma endregion
+#pragma region TopHat
+    /// <summary>
+    /// </summary>
+    ImageView<T> &TopHat(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                         const FilterArea &aFilterArea, BorderType aBorder, T aConstant, Roi aAllowedReadRoi,
+                         const opp::cuda::StreamCtx &aStreamCtx) const
+        requires RealVector<T>;
+#pragma endregion
+#pragma region BlackHat
+    /// <summary>
+    /// </summary>
+    ImageView<T> &BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                           const FilterArea &aFilterArea, BorderType aBorder, T aConstant, Roi aAllowedReadRoi,
+                           const opp::cuda::StreamCtx &aStreamCtx) const
+        requires RealVector<T>;
+#pragma endregion
+#pragma region Morphology Gradient
+    /// <summary>
+    /// </summary>
+    ImageView<T> &MorphologyGradient(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                                     const FilterArea &aFilterArea, BorderType aBorder, T aConstant,
+                                     Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx) const
+        requires RealVector<T>;
 #pragma endregion
 #pragma endregion
 
@@ -6252,6 +6559,42 @@ template <PixelType T> class ImageView
                         opp::cuda::DevVarView<byte> &aBuffer,
                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealVector<T> && (vector_active_size_v<T> == 1);
+#pragma endregion
+
+#pragma region Cross Correlation
+    /// <summary>
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelation(
+        const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst, BorderType aBorder, T aConstant,
+        Roi aAllowedReadRoi                    = Roi(),
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelationNormalized(
+        const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst, BorderType aBorder, T aConstant,
+        Roi aAllowedReadRoi                    = Roi(),
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// </summary>
+    ImageView<Pixel32fC1> &SquareDistanceNormalized(
+        const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst, BorderType aBorder, T aConstant,
+        Roi aAllowedReadRoi                    = Roi(),
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelationCoefficient(
+        const ImageView<Pixel32fC2> &aSrcBoxFiltered, const ImageView<T> &aTemplate,
+        const opp::cuda::DevVarView<double> &aMeanTemplate, ImageView<Pixel32fC1> &aDst, BorderType aBorder,
+        T aConstant, Roi aAllowedReadRoi = Roi(),
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && (sizeof(T) < 8);
+
 #pragma endregion
 #pragma endregion
 

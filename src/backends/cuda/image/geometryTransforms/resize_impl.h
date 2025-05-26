@@ -181,6 +181,23 @@ void InvokeResizeSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aP
                                                                                functor);
                 }
                 break;
+                case opp::InterpolationMode::Super:
+                {
+                    // assuming that we already checked that scaleFactors are < 1
+                    Vector2<CoordT> scaleFactor = Vector2<CoordT>(aScale);
+
+                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                    using InterpolatorT =
+                        Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol, InterpolationMode::Super>;
+                    const InterpolatorT interpol(aBC, scaleFactor.x, scaleFactor.y);
+                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
+                                                        InterpolatorT, TransformerResize<CoordT>, roundingMode>;
+                    const FunctorT functor(interpol, resize, aSizeSrc);
+
+                    InvokeForEachPixelKernelDefault<SrcT, tupelSize, FunctorT>(aDst, aPitchDst, aSizeDst, aStreamCtx,
+                                                                               functor);
+                }
+                break;
                 default:
                     throw INVALIDARGUMENT(aInterpolation,
                                           aInterpolation << " is not a supported interpolation mode for Resize.");
