@@ -15,12 +15,12 @@ namespace opp::image::cuda
 {
 template <typename SrcT, typename DstT>
 void InvokeBilateralGaussFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst,
-                                const FilterArea &aFilterArea, const float *aPreCompGeomDistCoeff,
+                                const FilterArea &aFilterArea, const Pixel32fC1 *aPreCompGeomDistCoeff,
                                 float aValSquareSigma, opp::Norm aNorm, BorderType aBorderType, const SrcT &aConstant,
                                 const Size2D &aAllowedReadRoiSize, const Vector2<int> &aOffsetToActualRoi,
                                 const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx);
 
-void InvokePrecomputeBilateralGaussFilter(float *aPreCompGeomDistCoeff, const FilterArea &aFilterArea,
+void InvokePrecomputeBilateralGaussFilter(Pixel32fC1 *aPreCompGeomDistCoeff, const FilterArea &aFilterArea,
                                           float aPosSquareSigma, const opp::cuda::StreamCtx &aStreamCtx);
 
 } // namespace opp::image::cuda

@@ -67,7 +67,7 @@ __device__ __forceinline__ float getWeight(const ComputeT &aPixel00, const Compu
 template <int WarpAlignmentInBytes, int TupelSize, class ComputeT, class DstT, int blockWidth, int blockHeight,
           RoundingMode roundingMode, typename BorderControlT, Norm norm>
 __global__ void bilateralGaussFilterKernel(BorderControlT aSrcWithBC, DstT *__restrict__ aDst, size_t aPitchDst,
-                                           FilterArea aFilterArea, const float *__restrict__ aPreCompGeomDistCoeff,
+                                           FilterArea aFilterArea, const Pixel32fC1 *__restrict__ aPreCompGeomDistCoeff,
                                            float aValSquareSigma, Size2D aSize,
                                            ThreadSplit<WarpAlignmentInBytes, TupelSize> aSplit)
 {
@@ -141,7 +141,7 @@ __global__ void bilateralGaussFilterKernel(BorderControlT aSrcWithBC, DstT *__re
                             {
                                 const float wColor =
                                     getWeight<ComputeT, norm>(pixel00[by][bx], srcPixel, aValSquareSigma);
-                                const float wDist  = aPreCompGeomDistCoeff[filterY * aFilterArea.Size.x + filterX];
+                                const float wDist  = aPreCompGeomDistCoeff[filterY * aFilterArea.Size.x + filterX].x;
                                 const float weight = wDist * wColor;
                                 sumWeights[by][bx] += weight;
                                 result[by][bx] += srcPixel * weight;
@@ -224,7 +224,7 @@ __global__ void bilateralGaussFilterKernel(BorderControlT aSrcWithBC, DstT *__re
                             filterX < aFilterArea.Size.x)
                         {
                             const float wColor = getWeight<ComputeT, norm>(pixel00[by][bx], srcPixel, aValSquareSigma);
-                            const float wDist  = aPreCompGeomDistCoeff[filterY * aFilterArea.Size.x + filterX];
+                            const float wDist  = aPreCompGeomDistCoeff[filterY * aFilterArea.Size.x + filterX].x;
                             const float weight = wDist * wColor;
                             sumWeights[by][bx] += weight;
                             result[by][bx] += srcPixel * weight;
@@ -274,7 +274,7 @@ template <typename ComputeT, typename DstT, size_t TupelSize, int WarpAlignmentI
           RoundingMode roundingMode, typename BorderControlT, Norm norm>
 void InvokeBilateralGaussFilterKernel(const dim3 &aBlockSize, uint aSharedMemory, int aWarpSize, cudaStream_t aStream,
                                       const BorderControlT &aSrcWithBC, DstT *aDst, size_t aPitchDst,
-                                      const FilterArea &aFilterArea, const float *aPreCompGeomDistCoeff,
+                                      const FilterArea &aFilterArea, const Pixel32fC1 *aPreCompGeomDistCoeff,
                                       float aValSquareSigma, const Size2D &aSize)
 {
     ThreadSplit<WarpAlignmentInBytes, TupelSize> ts(aDst, aSize.x, aWarpSize);
@@ -293,7 +293,7 @@ void InvokeBilateralGaussFilterKernel(const dim3 &aBlockSize, uint aSharedMemory
 template <typename ComputeT, typename DstT, size_t TupelSize, int blockWidth, int blockHeight,
           RoundingMode roundingMode, typename BorderControlT, Norm norm>
 void InvokeBilateralGaussFilterKernelDefault(const BorderControlT &aSrcWithBC, DstT *aDst, size_t aPitchDst,
-                                             const FilterArea &aFilterArea, const float *aPreCompGeomDistCoeff,
+                                             const FilterArea &aFilterArea, const Pixel32fC1 *aPreCompGeomDistCoeff,
                                              float aValSquareSigma, const Size2D &aSize,
                                              const opp::cuda::StreamCtx &aStreamCtx)
 {

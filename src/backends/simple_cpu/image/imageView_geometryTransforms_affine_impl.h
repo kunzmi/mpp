@@ -26,9 +26,9 @@
 #include <common/opp_defs.h>
 #include <common/safeCast.h>
 #include <common/utilities.h>
-#include <common/vector_typetraits.h>
 #include <common/vector1.h>
 #include <common/vectorTypes.h>
+#include <common/vector_typetraits.h>
 #include <concepts>
 #include <cstddef>
 #include <type_traits>
@@ -46,20 +46,20 @@ ImageView<T> &ImageView<T>::WarpAffine(ImageView<T> &aDst, const AffineTransform
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    return this->WarpAffineBack(aDst, aAffine.Inverse(), aInterpolation, aBorder, {0}, aAllowedReadRoi);
+    return this->WarpAffineBack(aDst, aAffine.Inverse(), aInterpolation, {0}, aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::WarpAffine(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
-                                       InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                                       InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
                                        Roi aAllowedReadRoi) const
 {
-    return this->WarpAffineBack(aDst, aAffine.Inverse(), aInterpolation, aBorder, aConstant, aAllowedReadRoi);
+    return this->WarpAffineBack(aDst, aAffine.Inverse(), aInterpolation, aConstant, aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                              ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+void ImageView<T>::WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                              const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                               const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
@@ -71,27 +71,27 @@ void ImageView<T>::WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aDst1, aDst2, aAffine.Inverse(), aInterpolation, aBorder, {0},
+    ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aDst1, aDst2, aAffine.Inverse(), aInterpolation, {0}, aBorder,
                                  aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                              ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+void ImageView<T>::WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                              const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                               const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                              BorderType aBorder, T aConstant, Roi aAllowedReadRoi)
+                              T aConstant, BorderType aBorder, Roi aAllowedReadRoi)
     requires TwoChannel<T>
 {
-    ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aDst1, aDst2, aAffine.Inverse(), aInterpolation, aBorder, aConstant,
+    ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aDst1, aDst2, aAffine.Inverse(), aInterpolation, aConstant, aBorder,
                                  aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                              ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                              ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+void ImageView<T>::WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                              const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                              const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst3,
@@ -104,29 +104,29 @@ void ImageView<T>::WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, aAffine.Inverse(), aInterpolation, aBorder,
-                                 {0}, aAllowedReadRoi);
+    ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, aAffine.Inverse(), aInterpolation, {0},
+                                 aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                              ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                              ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+void ImageView<T>::WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                              const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                              const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst3,
                               const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                              BorderType aBorder, T aConstant, Roi aAllowedReadRoi)
+                              T aConstant, BorderType aBorder, Roi aAllowedReadRoi)
     requires ThreeChannel<T>
 {
-    ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, aAffine.Inverse(), aInterpolation, aBorder,
-                                 aConstant, aAllowedReadRoi);
+    ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, aAffine.Inverse(), aInterpolation, aConstant,
+                                 aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
 void ImageView<T>::WarpAffine(
-    ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-    ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
     ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
     ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
     const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, BorderType aBorder,
@@ -139,21 +139,21 @@ void ImageView<T>::WarpAffine(
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
     ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aSrc3, aSrc4, aDst1, aDst2, aDst3, aDst4, aAffine.Inverse(),
-                                 aInterpolation, aBorder, {0}, aAllowedReadRoi);
+                                 aInterpolation, {0}, aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
 void ImageView<T>::WarpAffine(
-    ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-    ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
     ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
     ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-    const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+    const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
     Roi aAllowedReadRoi)
     requires FourChannelNoAlpha<T>
 {
     ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aSrc3, aSrc4, aDst1, aDst2, aDst3, aDst4, aAffine.Inverse(),
-                                 aInterpolation, aBorder, aConstant, aAllowedReadRoi);
+                                 aInterpolation, aConstant, aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
@@ -166,12 +166,12 @@ ImageView<T> &ImageView<T>::WarpAffineBack(ImageView<T> &aDst, const AffineTrans
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    return this->WarpAffineBack(aDst, aAffine, aInterpolation, aBorder, {0}, aAllowedReadRoi);
+    return this->WarpAffineBack(aDst, aAffine, aInterpolation, {0}, aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::WarpAffineBack(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
-                                           InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                                           InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
                                            Roi aAllowedReadRoi) const
 {
     if (aAllowedReadRoi == Roi())
@@ -368,8 +368,8 @@ ImageView<T> &ImageView<T>::WarpAffineBack(ImageView<T> &aDst, const AffineTrans
 }
 
 template <PixelType T>
-void ImageView<T>::WarpAffineBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+void ImageView<T>::WarpAffineBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                   const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
@@ -381,16 +381,16 @@ void ImageView<T>::WarpAffineBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aDst1, aDst2, aAffine, aInterpolation, aBorder, {0}, aAllowedReadRoi);
+    ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aDst1, aDst2, aAffine, aInterpolation, {0}, aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::WarpAffineBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+void ImageView<T>::WarpAffineBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                   const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                                  BorderType aBorder, T aConstant, Roi aAllowedReadRoi)
+                                  T aConstant, BorderType aBorder, Roi aAllowedReadRoi)
     requires TwoChannel<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI())
@@ -602,9 +602,9 @@ void ImageView<T>::WarpAffineBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
 }
 
 template <PixelType T>
-void ImageView<T>::WarpAffineBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+void ImageView<T>::WarpAffineBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst3,
@@ -617,19 +617,19 @@ void ImageView<T>::WarpAffineBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, aAffine, aInterpolation, aBorder, {0},
+    ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, aAffine, aInterpolation, {0}, aBorder,
                                  aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::WarpAffineBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+void ImageView<T>::WarpAffineBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst3,
                                   const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                                  BorderType aBorder, T aConstant, Roi aAllowedReadRoi)
+                                  T aConstant, BorderType aBorder, Roi aAllowedReadRoi)
     requires ThreeChannel<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI())
@@ -850,8 +850,8 @@ void ImageView<T>::WarpAffineBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
 
 template <PixelType T>
 void ImageView<T>::WarpAffineBack(
-    ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-    ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
     ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
     ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
     const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, BorderType aBorder,
@@ -863,17 +863,17 @@ void ImageView<T>::WarpAffineBack(
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aSrc3, aSrc4, aDst1, aDst2, aDst3, aDst4, aAffine, aInterpolation,
-                                 aBorder, {0}, aAllowedReadRoi);
+    ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aSrc3, aSrc4, aDst1, aDst2, aDst3, aDst4, aAffine, aInterpolation, {0},
+                                 aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
 void ImageView<T>::WarpAffineBack(
-    ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-    ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
     ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
     ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-    const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+    const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
     Roi aAllowedReadRoi)
     requires FourChannelNoAlpha<T>
 {

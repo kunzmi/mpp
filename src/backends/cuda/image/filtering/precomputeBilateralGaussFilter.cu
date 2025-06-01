@@ -22,7 +22,7 @@ using namespace opp::cuda;
 namespace opp::image::cuda
 {
 
-void InvokePrecomputeBilateralGaussFilter(float *aPreCompGeomDistCoeff, const FilterArea &aFilterArea,
+void InvokePrecomputeBilateralGaussFilter(Pixel32fC1 *aPreCompGeomDistCoeff, const FilterArea &aFilterArea,
                                           float aPosSquareSigma, const opp::cuda::StreamCtx &aStreamCtx)
 {
     InvokePrecomputeGeometryDistanceCoeffKernelDefault(aPreCompGeomDistCoeff, aFilterArea, aPosSquareSigma, aStreamCtx);

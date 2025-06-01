@@ -21,12 +21,20 @@ template class ImageView<Pixel8uC3>;
 template class ImageView<Pixel8uC4>;
 template class ImageView<Pixel8uC4A>;
 
+template <> ImageView<Pixel8uC1> ImageView<Pixel8uC1>::Null = ImageView<Pixel8uC1>(nullptr, Size2D(0, 0), 0);
+template <> ImageView<Pixel8uC2> ImageView<Pixel8uC2>::Null = ImageView<Pixel8uC2>(nullptr, Size2D(0, 0), 0);
+template <> ImageView<Pixel8uC3> ImageView<Pixel8uC3>::Null = ImageView<Pixel8uC3>(nullptr, Size2D(0, 0), 0);
+template <> ImageView<Pixel8uC4> ImageView<Pixel8uC4>::Null = ImageView<Pixel8uC4>(nullptr, Size2D(0, 0), 0);
+template <> ImageView<Pixel8uC4A> ImageView<Pixel8uC4A>::Null = ImageView<Pixel8uC4A>(nullptr, Size2D(0, 0), 0);
+
 using Image8uC1View  = ImageView<Pixel8uC1>;
 using Image8uC2View  = ImageView<Pixel8uC2>;
 using Image8uC3View  = ImageView<Pixel8uC3>;
 using Image8uC4View  = ImageView<Pixel8uC4>;
 using Image8uC4AView = ImageView<Pixel8uC4A>;
 
+template ImageView<Pixel32fC1> &ImageView<Pixel8uC1>::Convert<Pixel32fC1>(ImageView<Pixel32fC1> &aDst,
+                                                                          const opp::cuda::StreamCtx &aStreamCtx) const;
 template ImageView<Pixel32fC3> &ImageView<Pixel8uC3>::Convert<Pixel32fC3>(ImageView<Pixel32fC3> &aDst,
                                                                           const opp::cuda::StreamCtx &aStreamCtx) const;
 template ImageView<Pixel8uC3> &ImageView<Pixel32fC3>::Convert<Pixel8uC3>(ImageView<Pixel8uC3> &aDst,
@@ -101,12 +109,19 @@ template ImageView<Pixel8uC4> &ImageView<Pixel8uC4>::SwapChannel<Pixel8uC4>(
     const opp::cuda::StreamCtx &aStreamCtx) const;
 
 template class ImageView<Pixel16sC1>;
+template <> ImageView<Pixel16sC1> ImageView<Pixel16sC1>::Null = ImageView<Pixel16sC1>(nullptr, Size2D(0, 0), 0);
 
 template class ImageView<Pixel16uC1>;
 template class ImageView<Pixel16uC2>;
 template class ImageView<Pixel16uC3>;
 template class ImageView<Pixel16uC4>;
 template class ImageView<Pixel16uC4A>;
+
+template <> ImageView<Pixel16uC1> ImageView<Pixel16uC1>::Null = ImageView<Pixel16uC1>(nullptr, Size2D(0, 0), 0);
+template <> ImageView<Pixel16uC2> ImageView<Pixel16uC2>::Null = ImageView<Pixel16uC2>(nullptr, Size2D(0, 0), 0);
+template <> ImageView<Pixel16uC3> ImageView<Pixel16uC3>::Null = ImageView<Pixel16uC3>(nullptr, Size2D(0, 0), 0);
+template <> ImageView<Pixel16uC4> ImageView<Pixel16uC4>::Null = ImageView<Pixel16uC4>(nullptr, Size2D(0, 0), 0);
+template <> ImageView<Pixel16uC4A> ImageView<Pixel16uC4A>::Null = ImageView<Pixel16uC4A>(nullptr, Size2D(0, 0), 0);
 
 using Image16uC1View  = ImageView<Pixel16uC1>;
 using Image16uC2View  = ImageView<Pixel16uC2>;
@@ -207,6 +222,12 @@ template class ImageView<Pixel32fC3>;
 template class ImageView<Pixel32fC4>;
 template class ImageView<Pixel32fC4A>;
 
+template <> ImageView<Pixel32fC1> ImageView<Pixel32fC1>::Null = ImageView<Pixel32fC1>(nullptr, Size2D(0, 0), 0);
+template <> ImageView<Pixel32fC2> ImageView<Pixel32fC2>::Null = ImageView<Pixel32fC2>(nullptr, Size2D(0, 0), 0);
+template <> ImageView<Pixel32fC3> ImageView<Pixel32fC3>::Null = ImageView<Pixel32fC3>(nullptr, Size2D(0, 0), 0);
+template <> ImageView<Pixel32fC4> ImageView<Pixel32fC4>::Null = ImageView<Pixel32fC4>(nullptr, Size2D(0, 0), 0);
+template <> ImageView<Pixel32fC4A> ImageView<Pixel32fC4A>::Null = ImageView<Pixel32fC4A>(nullptr, Size2D(0, 0), 0);
+
 using Image32fC1View  = ImageView<Pixel32fC1>;
 using Image32fC2View  = ImageView<Pixel32fC2>;
 using Image32fC3View  = ImageView<Pixel32fC3>;
@@ -214,7 +235,8 @@ using Image32fC4View  = ImageView<Pixel32fC4>;
 using Image32fC4AView = ImageView<Pixel32fC4A>;
 
 template class ImageView<Pixel32fcC1>;
-using Image32fcC1View = ImageView<Pixel32fcC1>;
+using Image32fcC1View                             = ImageView<Pixel32fcC1>;
+template <> ImageView<Pixel32fcC1> ImageView<Pixel32fcC1>::Null = ImageView<Pixel32fcC1>(nullptr, Size2D(0, 0), 0);
 
 //#pragma region Instantiate Affine
 //

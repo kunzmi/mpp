@@ -21,8 +21,8 @@ __device__ float getWeight(int aIndexX, int aIndexY, int aCenterX, int aCenterY,
     return __expf(-distSqr / (2.0f * aPosSquareSigma));
 }
 
-__global__ void precomputeGeometryDistanceCoeffKernel(float *__restrict__ aPreCompGeomDistCoeff, FilterArea aFilterArea,
-                                                      float aPosSquareSigma)
+__global__ void precomputeGeometryDistanceCoeffKernel(Pixel32fC1 *__restrict__ aPreCompGeomDistCoeff,
+                                                      FilterArea aFilterArea, float aPosSquareSigma)
 {
     const int pixelX = blockIdx.x * blockDim.x + threadIdx.x;
     const int pixelY = blockIdx.y * blockDim.y + threadIdx.y;
@@ -38,7 +38,7 @@ __global__ void precomputeGeometryDistanceCoeffKernel(float *__restrict__ aPreCo
 }
 
 void InvokePrecomputeGeometryDistanceCoeffKernel(const dim3 &aBlockSize, uint aSharedMemory, cudaStream_t aStream,
-                                                 float *aPreCompGeomDistCoeff, const FilterArea &aFilterArea,
+                                                 Pixel32fC1 *aPreCompGeomDistCoeff, const FilterArea &aFilterArea,
                                                  float aPosSquareSigma)
 {
     dim3 blocksPerGrid(DIV_UP(aFilterArea.Size.x, aBlockSize.x), DIV_UP(aFilterArea.Size.y, aBlockSize.y), 1);
@@ -50,8 +50,9 @@ void InvokePrecomputeGeometryDistanceCoeffKernel(const dim3 &aBlockSize, uint aS
                                              << " SharedMemory: " << aSharedMemory << " Stream: " << aStream);
 }
 
-void InvokePrecomputeGeometryDistanceCoeffKernelDefault(float *aPreCompGeomDistCoeff, const FilterArea &aFilterArea,
-                                                        float aPosSquareSigma, const opp::cuda::StreamCtx &aStreamCtx)
+void InvokePrecomputeGeometryDistanceCoeffKernelDefault(Pixel32fC1 *aPreCompGeomDistCoeff,
+                                                        const FilterArea &aFilterArea, float aPosSquareSigma,
+                                                        const opp::cuda::StreamCtx &aStreamCtx)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {

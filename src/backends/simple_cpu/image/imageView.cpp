@@ -1,11 +1,13 @@
 #include "imageView.h"
 #include "imageView_arithmetic_impl.h"                     //NOLINT(misc-include-cleaner)
 #include "imageView_dataExchangeAndInit_impl.h"            //NOLINT(misc-include-cleaner)
+#include "imageView_filtering_impl.h"                      //NOLINT(misc-include-cleaner)
 #include "imageView_geometryTransforms_affine_impl.h"      //NOLINT(misc-include-cleaner)
 #include "imageView_geometryTransforms_impl.h"             //NOLINT(misc-include-cleaner)
 #include "imageView_geometryTransforms_perspective_impl.h" //NOLINT(misc-include-cleaner)
 #include "imageView_geometryTransforms_resize_impl.h"      //NOLINT(misc-include-cleaner)
 #include "imageView_geometryTransforms_rotate_impl.h"      //NOLINT(misc-include-cleaner)
+#include "imageView_morphology_impl.h"                     //NOLINT(misc-include-cleaner)
 #include "imageView_statistics_impl.h"                     //NOLINT(misc-include-cleaner)
 #include "imageView_thresholdAndCompare_impl.h"            //NOLINT(misc-include-cleaner)
 #include <backends/simple_cpu/image/forEachPixel.h>

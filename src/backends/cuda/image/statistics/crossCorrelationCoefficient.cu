@@ -54,10 +54,10 @@ struct pixel_block_size_y<T>
 template <typename SrcT, typename DstT>
 void InvokeCrossCorrelationCoefficient(const SrcT *aSrc1, size_t aPitchSrc1, const Pixel32fC2 *aSrcBoxFiltered,
                                        size_t aPitchSrcBoxFiltered, DstT *aDst, size_t aPitchDst, const SrcT *aTemplate,
-                                       size_t aPitchTemplate, const Size2D &aSizeTemplate, const double *aMeanTemplate,
-                                       BorderType aBorderType, const SrcT &aConstant, const Size2D &aAllowedReadRoiSize,
-                                       const Vector2<int> &aOffsetToActualRoi, const Size2D &aSize,
-                                       const opp::cuda::StreamCtx &aStreamCtx)
+                                       size_t aPitchTemplate, const Size2D &aSizeTemplate,
+                                       const Pixel64fC1 *aMeanTemplate, BorderType aBorderType, const SrcT &aConstant,
+                                       const Size2D &aAllowedReadRoiSize, const Vector2<int> &aOffsetToActualRoi,
+                                       const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
 {
     if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
     {
@@ -158,7 +158,7 @@ void InvokeCrossCorrelationCoefficient(const SrcT *aSrc1, size_t aPitchSrc1, con
     template void InvokeCrossCorrelationCoefficient<typeSrc, typeDst>(                                                 \
         const typeSrc *aSrc1, size_t aPitchSrc1, const Pixel32fC2 *aSrcBoxFiltered, size_t aPitchSrcBoxFiltered,       \
         typeDst *aDst, size_t aPitchDst, const typeSrc *aTemplate, size_t aPitchTemplate, const Size2D &aSizeTemplate, \
-        const double *aMeanTemplate, BorderType aBorderType, const typeSrc &aConstant,                                 \
+        const Pixel64fC1 *aMeanTemplate, BorderType aBorderType, const typeSrc &aConstant,                             \
         const Size2D &aAllowedReadRoiSize, const Vector2<int> &aOffsetToActualRoi, const Size2D &aSize,                \
         const StreamCtx &aStreamCtx);
 

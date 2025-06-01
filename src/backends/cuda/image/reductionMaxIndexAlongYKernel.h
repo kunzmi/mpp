@@ -223,7 +223,7 @@ void InvokeReductionMaxIdxAlongYKernel(const dim3 &aBlockSize, uint aSharedMemor
     const int size = DIV_UP(aSize, ConfigBlockSize<"DefaultReductionX">::value.y);
 
     reductionMaxIdxAlongYKernel<SrcT><<<blocksPerGrid, aBlockSize, aSharedMemory, aStream>>>(
-        aSrcMax, aSrcMaxIdxX, aDstMax, aDstMaxIdxX, aDstMaxIdxY, aDstScalarMax, aDstScalarIdxMax, aSize);
+        aSrcMax, aSrcMaxIdxX, aDstMax, aDstMaxIdxX, aDstMaxIdxY, aDstScalarMax, aDstScalarIdxMax, size);
 
     peekAndCheckLastCudaError("Block size: " << aBlockSize << " Grid size: " << blocksPerGrid
                                              << " SharedMemory: " << aSharedMemory << " Stream: " << aStream);

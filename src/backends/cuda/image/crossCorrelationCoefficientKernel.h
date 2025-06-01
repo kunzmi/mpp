@@ -31,7 +31,7 @@ __global__ void crossCorrelationCoefficientKernelSharedMem(BorderControlT aSrcWi
                                                            size_t aPitchSrcBoxFiltered, DstT *__restrict__ aDst,
                                                            size_t aPitchDst, const SrcT *__restrict__ aTemplate,
                                                            size_t aPitchTemplate, Size2D aTemplateSize,
-                                                           const double *__restrict__ aMeanTemplate, Size2D aSize,
+                                                           const Pixel64fC1 *__restrict__ aMeanTemplate, Size2D aSize,
                                                            ThreadSplit<WarpAlignmentInBytes, TupelSize> aSplit)
 {
     RoundFunctor<roundingMode, ComputeT> round;
@@ -170,8 +170,15 @@ __global__ void crossCorrelationCoefficientKernelSharedMem(BorderControlT aSrcWi
                     for (size_t t = 0; t < TupelSize; t++)
                     {
                         ComputeT norm = meanBox[bl][t].y * sumBuffer[0];
-                        norm.Sqrt();
-                        result[bl][t] /= norm;
+                        if (norm <= ComputeT(0))
+                        {
+                            result[bl][t] = ComputeT(0);
+                        }
+                        else
+                        {
+                            norm.Sqrt();
+                            result[bl][t] /= norm;
+                        }
 
                         if constexpr (RealOrComplexFloatingVector<ComputeT> && RealOrComplexIntVector<DstT>)
                         {
@@ -255,8 +262,15 @@ __global__ void crossCorrelationCoefficientKernelSharedMem(BorderControlT aSrcWi
                         DstT res;
 
                         ComputeT norm = meanBox[bl][bc].y * sumBuffer[0];
-                        norm.Sqrt();
-                        result[bl][bc] /= norm;
+                        if (norm <= ComputeT(0))
+                        {
+                            result[bl][bc] = ComputeT(0);
+                        }
+                        else
+                        {
+                            norm.Sqrt();
+                            result[bl][bc] /= norm;
+                        }
 
                         if constexpr (RealOrComplexFloatingVector<ComputeT> && RealOrComplexIntVector<DstT>)
                         {
@@ -290,7 +304,7 @@ __global__ void crossCorrelationCoefficientKernel(BorderControlT aSrcWithBC,
                                                   size_t aPitchSrcBoxFiltered, DstT *__restrict__ aDst,
                                                   size_t aPitchDst, const SrcT *__restrict__ aTemplate,
                                                   size_t aPitchTemplate, Size2D aTemplateSize,
-                                                  const double *__restrict__ aMeanTemplate, Size2D aSize,
+                                                  const Pixel64fC1 *__restrict__ aMeanTemplate, Size2D aSize,
                                                   ThreadSplit<WarpAlignmentInBytes, TupelSize> aSplit)
 {
     RoundFunctor<roundingMode, ComputeT> round;
@@ -542,7 +556,7 @@ void InvokeCrossCorrelationCoefficientKernel(const dim3 &aBlockSize, uint aShare
                                              cudaStream_t aStream, const BorderControlT &aSrcWithBC,
                                              const Pixel32fC2 *aSrcBoxFiltered, size_t aPitchSrcBoxFiltered, DstT *aDst,
                                              size_t aPitchDst, const SrcT *aTemplate, size_t aPitchTemplate,
-                                             const double *aMeanTemplate, const Size2D &aTemplateSize,
+                                             const Pixel64fC1 *aMeanTemplate, const Size2D &aTemplateSize,
                                              const Size2D &aSize)
 {
     ThreadSplit<WarpAlignmentInBytes, TupelSize> ts(aDst, aSize.x, aWarpSize);
@@ -576,7 +590,7 @@ template <typename ComputeT, typename DstT, size_t TupelSize, typename SrcT, int
 void InvokeCrossCorrelationCoefficientKernelDefault(const BorderControlT &aSrcWithBC, const Pixel32fC2 *aSrcBoxFiltered,
                                                     size_t aPitchSrcBoxFiltered, DstT *aDst, size_t aPitchDst,
                                                     const SrcT *aTemplate, size_t aPitchTemplate,
-                                                    const Size2D &aTemplateSize, const double *aMeanTemplate,
+                                                    const Size2D &aTemplateSize, const Pixel64fC1 *aMeanTemplate,
                                                     const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)

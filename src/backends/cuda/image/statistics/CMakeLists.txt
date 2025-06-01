@@ -33,6 +33,7 @@ add_library(backends.cuda.image.statistics
 	minMaxIdxMasked.cu
 	mse.cu
 	mseMasked.cu
+	msssim.cu
 	normDiffInf.cu
 	normDiffInfMasked.cu
 	normDiffL1.cu
@@ -53,6 +54,8 @@ add_library(backends.cuda.image.statistics
 	normRelL2Masked.cu
 	psnr.cu
 	qualityIndex.cu
+	qualityIndexWindow.cu
+	rectStdDev.cu
 	squareDistanceNormalized.cu
 	ssim.cu
 	sum.cu

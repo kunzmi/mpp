@@ -1,10 +1,11 @@
 #if OPP_ENABLE_CUDA_BACKEND
 
+#include "msssim.h"
 #include "ssim.h"
+#include <backends/cuda/image/SSIMFilterKernel.h>
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/reductionAlongXKernel.h>
 #include <backends/cuda/image/reductionAlongYKernel.h>
-#include <backends/cuda/image/SSIMFilterKernel.h>
 #include <backends/cuda/streamCtx.h>
 #include <backends/cuda/templateRegistry.h>
 #include <common/defines.h>
@@ -45,20 +46,26 @@ struct pixel_block_size_y<T>
 };
 
 template <typename SrcT, typename DstT>
-void InvokeSSIMSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aTempBuffer,
-                      DstT *aTempBufferAvg, DstT *aDst, remove_vector_t<DstT> aDynamicRange, remove_vector_t<DstT> aK1,
-                      remove_vector_t<DstT> aK2, const Size2D &aAllowedReadRoiSize1,
-                      const Vector2<int> &aOffsetToActualRoi1, const Size2D &aAllowedReadRoiSize2,
-                      const Vector2<int> &aOffsetToActualRoi2, const Size2D &aSize,
-                      const opp::cuda::StreamCtx &aStreamCtx)
+void InvokeMSSSIMSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aTempBuffer,
+                        DstT *aTempBufferAvg, DstT *aDst, int aIteration, remove_vector_t<DstT> aDynamicRange,
+                        remove_vector_t<DstT> aK1, remove_vector_t<DstT> aK2, const Size2D &aAllowedReadRoiSize1,
+                        const Vector2<int> &aOffsetToActualRoi1, const Size2D &aAllowedReadRoiSize2,
+                        const Vector2<int> &aOffsetToActualRoi2, const Size2D &aSize,
+                        const opp::cuda::StreamCtx &aStreamCtx)
 {
     if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
     {
         OPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
-        using ComputeT             = DstT;
-        using FilterT              = FixedFilterKernelSSIM;
+        if (aIteration < 0 || aIteration >= 5)
+        {
+            throw INVALIDARGUMENT(aIteration, "The iteration must be in range 0..4.");
+        }
+
+        static constexpr float weights[] = {0.0448f, 0.2856f, 0.3000f, 0.2363f, 0.1333f}; // sums up to 1
+        constexpr size_t TupelSize       = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+        using ComputeT                   = DstT;
+        using FilterT                    = FixedFilterKernelSSIM;
 
         constexpr int pixelBlockSizeY = pixel_block_size_y<DstT>::value;
         constexpr int filterSize      = 11;
@@ -67,11 +74,22 @@ void InvokeSSIMSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, s
         const BCType bc1(aSrc1, aPitchSrc1, aAllowedReadRoiSize1, aOffsetToActualRoi1);
         const BCType bc2(aSrc2, aPitchSrc2, aAllowedReadRoiSize2, aOffsetToActualRoi2);
 
-        const opp::SSIM<DstT> postOp(aDynamicRange, aK1, aK2);
+        if (aIteration < 4)
+        {
+            const opp::MSSSIM<DstT> postOp(aDynamicRange, aK2);
 
-        InvokeSSIMFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, pixelBlockSizeY, BCType, FilterT,
-                                      opp::SSIM<DstT>>(bc1, bc2, aTempBuffer, aSize.x * sizeof(DstT), postOp, aSize,
-                                                       aStreamCtx);
+            InvokeSSIMFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, pixelBlockSizeY, BCType, FilterT,
+                                          opp::MSSSIM<DstT>>(bc1, bc2, aTempBuffer, aSize.x * sizeof(DstT), postOp,
+                                                             aSize, aStreamCtx);
+        }
+        else
+        {
+            const opp::SSIM<DstT> postOp(aDynamicRange, aK1, aK2);
+
+            InvokeSSIMFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, pixelBlockSizeY, BCType, FilterT,
+                                          opp::SSIM<DstT>>(bc1, bc2, aTempBuffer, aSize.x * sizeof(DstT), postOp, aSize,
+                                                           aStreamCtx);
+        }
 
         using sumSrc = SrcReductionFunctor<TupelSize, ComputeT, ComputeT, opp::Sum<ComputeT, ComputeT>>;
 
@@ -83,35 +101,39 @@ void InvokeSSIMSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, s
                                            ReductionInitValue::Zero>(aTempBuffer, aTempBufferAvg, aSize, aStreamCtx,
                                                                      functor);
 
-        const opp::DivPostOp<DstT> postOpAvg(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(aSize.TotalSize()));
         const opp::DivScalar<DstT> postOpScalar(
             static_cast<complex_basetype_t<remove_vector_t<DstT>>>(aSize.TotalSize()));
+        if (aIteration == 0)
+        {
+            const opp::DivPostOp<DstT> postOpAvg(
+                static_cast<complex_basetype_t<remove_vector_t<DstT>>>(aSize.TotalSize()) /
+                weights[to_size_t(aIteration)]);
 
-        InvokeReductionAlongYKernelDefault<ComputeT, DstT, opp::Sum<DstT, DstT>, ReductionInitValue::Zero,
-                                           opp::DivPostOp<DstT>, opp::DivScalar<DstT>>(
-            aTempBufferAvg, aDst, nullptr, aSize.y, postOpAvg, postOpScalar, aStreamCtx);
+            InvokeReductionAlongYKernelDefault<ComputeT, DstT, opp::Sum<DstT, DstT>, ReductionInitValue::Zero,
+                                               opp::DivPostOp<DstT>, opp::DivScalar<DstT>>(
+                aTempBufferAvg, aDst + aIteration, nullptr, aSize.y, postOpAvg, postOpScalar, aStreamCtx);
+        }
+        else
+        {
+            const opp::DivAddToPostOp<DstT> postOpAvg(
+                static_cast<complex_basetype_t<remove_vector_t<DstT>>>(aSize.TotalSize()) /
+                    weights[to_size_t(aIteration)],
+                aDst);
 
-        // const opp::DivPostOp<DstT> postOpMean(
-        //     static_cast<complex_basetype_t<remove_vector_t<DstT>>>(aSize.TotalSize()));
-        // const opp::DivScalar<DstT> postOpScalar(
-        //     static_cast<complex_basetype_t<remove_vector_t<DstT>>>(aSize.TotalSize()));
-
-        //// InvokeReductionAlongYKernelDefault divides size by blockSize of X-reduction kernel, compensate for it here:
-        // int sizeData = aSize.x * aSize.y * ConfigBlockSize<"DefaultReductionX">::value.y;
-
-        // InvokeReductionAlongYKernelDefault<ComputeT, DstT, opp::Sum<DstT, DstT>, ReductionInitValue::Zero,
-        //                                    opp::DivPostOp<DstT>, opp::DivScalar<DstT>>(
-        //     aTempBuffer, aDst, nullptr, sizeData, postOpMean, postOpScalar, aStreamCtx);
+            InvokeReductionAlongYKernelDefault<ComputeT, DstT, opp::Sum<DstT, DstT>, ReductionInitValue::Zero,
+                                               opp::DivAddToPostOp<DstT>, opp::DivScalar<DstT>>(
+                aTempBufferAvg, aDst, nullptr, aSize.y, postOpAvg, postOpScalar, aStreamCtx);
+        }
     }
 }
 
 #pragma region Instantiate
 
 #define Instantiate_For(typeSrc)                                                                                       \
-    template void InvokeSSIMSrcSrc<typeSrc, ssim_types_for_rt<typeSrc>>(                                               \
+    template void InvokeMSSSIMSrcSrc<typeSrc, ssim_types_for_rt<typeSrc>>(                                             \
         const typeSrc *aSrc1, size_t aPitchSrc1, const typeSrc *aSrc2, size_t aPitchSrc2,                              \
         ssim_types_for_rt<typeSrc> *aTempBuffer, ssim_types_for_rt<typeSrc> *aTempBufferAvg,                           \
-        ssim_types_for_rt<typeSrc> *aDst, remove_vector_t<ssim_types_for_rt<typeSrc>> aDynamicRange,                   \
+        ssim_types_for_rt<typeSrc> *aDst, int aIteration, remove_vector_t<ssim_types_for_rt<typeSrc>> aDynamicRange,   \
         remove_vector_t<ssim_types_for_rt<typeSrc>> aK1, remove_vector_t<ssim_types_for_rt<typeSrc>> aK2,              \
         const Size2D &aAllowedReadRoiSize1, const Vector2<int> &aOffsetToActualRoi1,                                   \
         const Size2D &aAllowedReadRoiSize2, const Vector2<int> &aOffsetToActualRoi2, const Size2D &aSize,              \

@@ -69,7 +69,7 @@ void InvokeErosionGray(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
         using FilterT              = morph_gray_compute_type_t<SrcT>;
         using MorphOp              = opp::ErodeGray<DstT, FilterT>;
-        using PostOp               = opp::Nothing<DstT>;
+        using PostOp               = opp::NothingMorph<DstT>;
 
         constexpr int pixelBlockSizeX = pixel_block_size_x<DstT>::value;
         constexpr int pixelBlockSizeY = pixel_block_size_y<DstT>::value;

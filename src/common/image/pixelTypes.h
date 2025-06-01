@@ -1649,7 +1649,7 @@ inline constexpr bool has_alternative_filter_output_type_for_v =
 
 template <typename T> struct filter_compute_type_for_scalar
 {
-    using type = remove_vector_t<default_compute_type_for_t<T>>;
+    using type = float;
 };
 template <> struct filter_compute_type_for_scalar<byte>
 {
@@ -1710,6 +1710,10 @@ template <> struct filter_compute_type_for_scalar<c_short>
 template <> struct filter_compute_type_for_scalar<c_float>
 {
     using type = c_float;
+};
+template <> struct filter_compute_type_for_scalar<c_double>
+{
+    using type = c_double;
 };
 
 template <typename T>

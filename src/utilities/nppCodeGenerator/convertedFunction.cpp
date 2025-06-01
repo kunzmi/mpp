@@ -1,5 +1,5 @@
-#include "convertedArgument.h"
 #include "convertedFunction.h"
+#include "convertedArgument.h"
 #include <algorithm>
 #include <common/safeCast.h>
 #include <cstddef>
@@ -526,7 +526,7 @@ ConvertedFunction::ConvertedFunction(const Function &aFunction)
     {
         std::stringstream ss;
 
-        if (!IsGeometryFunction() && !IsInputPlanar() && !IsOutputPlanar() &&
+        if (!IsDistanceMeasureFuntion() && !IsGeometryFunction() && !IsInputPlanar() && !IsOutputPlanar() &&
             mName.find("Pyramid") == std::string::npos && mName.find("Integral") == std::string::npos &&
             mName != "CopyWrapBorder" && mName != "CopyReplicateBorder" && mName != "CopyConstBorder" &&
             mName != "CopyWrapBorderA" && mName != "CopyReplicateBorderA" && mName != "CopyConstBorderA")
@@ -1394,6 +1394,11 @@ bool ConvertedFunction::IsGeometryFunction() const
 bool ConvertedFunction::IsCFAToRGBFunction() const
 {
     return sCFAToRGBWithAllocPointer.contains(mName);
+}
+
+bool ConvertedFunction::IsDistanceMeasureFuntion() const
+{
+    return sDistanceMeasureNoROICheck.contains(mName);
 }
 
 std::vector<ConvertedArgument *> ConvertedFunction::GetInputImages()

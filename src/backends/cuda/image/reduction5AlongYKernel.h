@@ -208,8 +208,7 @@ void InvokeReduction5AlongYKernel(const dim3 &aBlockSize, uint aSharedMemory, in
     reduction5AlongYKernel<SrcT1, SrcT2, SrcT3, SrcT4, SrcT5, ComputeT1, ComputeT2, ComputeT3, ComputeT4, ComputeT5,
                            DstT, reductionOp1, reductionOp2, reductionOp3, reductionOp4, reductionOp5, NeutralValue1,
                            NeutralValue2, NeutralValue3, NeutralValue4, NeutralValue5, postOp>
-        <<<blocksPerGrid, aBlockSize, aSharedMemory, aStream>>>(aSrc1, aSrc2, aSrc3, aSrc4, aSrc5, aDst, aSize,
-                                                                aPostOp);
+        <<<blocksPerGrid, aBlockSize, aSharedMemory, aStream>>>(aSrc1, aSrc2, aSrc3, aSrc4, aSrc5, aDst, size, aPostOp);
 
     peekAndCheckLastCudaError("Block size: " << aBlockSize << " Grid size: " << blocksPerGrid
                                              << " SharedMemory: " << aSharedMemory << " Stream: " << aStream);

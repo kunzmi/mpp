@@ -25,9 +25,9 @@
 #include <common/opp_defs.h>
 #include <common/safeCast.h>
 #include <common/utilities.h>
-#include <common/vector_typetraits.h>
 #include <common/vector1.h>
 #include <common/vectorTypes.h>
+#include <common/vector_typetraits.h>
 #include <concepts>
 #include <cstddef>
 #include <type_traits>
@@ -46,20 +46,20 @@ ImageView<T> &ImageView<T>::WarpPerspective(ImageView<T> &aDst, const Perspectiv
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    return this->WarpPerspectiveBack(aDst, aPerspective.Inverse(), aInterpolation, aBorder, {0}, aAllowedReadRoi);
+    return this->WarpPerspectiveBack(aDst, aPerspective.Inverse(), aInterpolation, {0}, aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::WarpPerspective(ImageView<T> &aDst, const PerspectiveTransformation<double> &aPerspective,
-                                            InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                                            InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
                                             Roi aAllowedReadRoi) const
 {
-    return this->WarpPerspectiveBack(aDst, aPerspective.Inverse(), aInterpolation, aBorder, aConstant, aAllowedReadRoi);
+    return this->WarpPerspectiveBack(aDst, aPerspective.Inverse(), aInterpolation, aConstant, aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::WarpPerspective(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                   ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+void ImageView<T>::WarpPerspective(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                    const PerspectiveTransformation<double> &aPerspective,
@@ -71,28 +71,28 @@ void ImageView<T>::WarpPerspective(ImageView<Vector1<remove_vector_t<T>>> &aSrc1
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    ImageView<T>::WarpPerspectiveBack(aSrc1, aSrc2, aDst1, aDst2, aPerspective.Inverse(), aInterpolation, aBorder, {0},
+    ImageView<T>::WarpPerspectiveBack(aSrc1, aSrc2, aDst1, aDst2, aPerspective.Inverse(), aInterpolation, {0}, aBorder,
                                       aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::WarpPerspective(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                   ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+void ImageView<T>::WarpPerspective(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                    const PerspectiveTransformation<double> &aPerspective,
-                                   InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                                   InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
                                    Roi aAllowedReadRoi)
     requires TwoChannel<T>
 {
-    ImageView<T>::WarpPerspectiveBack(aSrc1, aSrc2, aDst1, aDst2, aPerspective.Inverse(), aInterpolation, aBorder,
-                                      aConstant, aAllowedReadRoi);
+    ImageView<T>::WarpPerspectiveBack(aSrc1, aSrc2, aDst1, aDst2, aPerspective.Inverse(), aInterpolation, aConstant,
+                                      aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::WarpPerspective(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                   ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                   ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+void ImageView<T>::WarpPerspective(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDst3,
@@ -106,26 +106,26 @@ void ImageView<T>::WarpPerspective(ImageView<Vector1<remove_vector_t<T>>> &aSrc1
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
     ImageView<T>::WarpPerspectiveBack(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, aPerspective.Inverse(), aInterpolation,
-                                      aBorder, {0}, aAllowedReadRoi);
+                                      {0}, aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
 void ImageView<T>::WarpPerspective(
-    ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-    ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
     ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
-    T aConstant, Roi aAllowedReadRoi)
+    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+    BorderType aBorder, Roi aAllowedReadRoi)
     requires ThreeChannel<T>
 {
     ImageView<T>::WarpPerspectiveBack(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, aPerspective.Inverse(), aInterpolation,
-                                      aBorder, aConstant, aAllowedReadRoi);
+                                      aConstant, aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
 void ImageView<T>::WarpPerspective(
-    ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-    ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
     ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
     ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
     const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
@@ -138,21 +138,21 @@ void ImageView<T>::WarpPerspective(
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
     ImageView<T>::WarpPerspectiveBack(aSrc1, aSrc2, aSrc3, aSrc4, aDst1, aDst2, aDst3, aDst4, aPerspective.Inverse(),
-                                      aInterpolation, aBorder, {0}, aAllowedReadRoi);
+                                      aInterpolation, {0}, aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
 void ImageView<T>::WarpPerspective(
-    ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-    ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
     ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
     ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
-    T aConstant, Roi aAllowedReadRoi)
+    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+    BorderType aBorder, Roi aAllowedReadRoi)
     requires FourChannelNoAlpha<T>
 {
     ImageView<T>::WarpPerspectiveBack(aSrc1, aSrc2, aSrc3, aSrc4, aDst1, aDst2, aDst3, aDst4, aPerspective.Inverse(),
-                                      aInterpolation, aBorder, aConstant, aAllowedReadRoi);
+                                      aInterpolation, aConstant, aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
@@ -166,13 +166,13 @@ ImageView<T> &ImageView<T>::WarpPerspectiveBack(ImageView<T> &aDst,
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    return this->WarpPerspectiveBack(aDst, aPerspective, aInterpolation, aBorder, {0}, aAllowedReadRoi);
+    return this->WarpPerspectiveBack(aDst, aPerspective, aInterpolation, {0}, aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::WarpPerspectiveBack(ImageView<T> &aDst,
                                                 const PerspectiveTransformation<double> &aPerspective,
-                                                InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                                                InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
                                                 Roi aAllowedReadRoi) const
 {
     if (aAllowedReadRoi == Roi())
@@ -369,8 +369,8 @@ ImageView<T> &ImageView<T>::WarpPerspectiveBack(ImageView<T> &aDst,
 }
 
 template <PixelType T>
-void ImageView<T>::WarpPerspectiveBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                       ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+void ImageView<T>::WarpPerspectiveBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                        ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                        ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                        const PerspectiveTransformation<double> &aPerspective,
@@ -382,17 +382,17 @@ void ImageView<T>::WarpPerspectiveBack(ImageView<Vector1<remove_vector_t<T>>> &a
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    ImageView<T>::WarpPerspectiveBack(aSrc1, aSrc2, aDst1, aDst2, aPerspective, aInterpolation, aBorder, {0},
+    ImageView<T>::WarpPerspectiveBack(aSrc1, aSrc2, aDst1, aDst2, aPerspective, aInterpolation, {0}, aBorder,
                                       aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::WarpPerspectiveBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                       ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+void ImageView<T>::WarpPerspectiveBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                        ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                        ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                        const PerspectiveTransformation<double> &aPerspective,
-                                       InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                                       InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
                                        Roi aAllowedReadRoi)
     requires TwoChannel<T>
 {
@@ -605,9 +605,9 @@ void ImageView<T>::WarpPerspectiveBack(ImageView<Vector1<remove_vector_t<T>>> &a
 }
 
 template <PixelType T>
-void ImageView<T>::WarpPerspectiveBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                       ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+void ImageView<T>::WarpPerspectiveBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                        ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                        ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                        ImageView<Vector1<remove_vector_t<T>>> &aDst3,
@@ -620,17 +620,17 @@ void ImageView<T>::WarpPerspectiveBack(ImageView<Vector1<remove_vector_t<T>>> &a
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    ImageView<T>::WarpPerspectiveBack(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, aPerspective, aInterpolation, aBorder,
-                                      {0}, aAllowedReadRoi);
+    ImageView<T>::WarpPerspectiveBack(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, aPerspective, aInterpolation, {0},
+                                      aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
 void ImageView<T>::WarpPerspectiveBack(
-    ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-    ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
     ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
-    T aConstant, Roi aAllowedReadRoi)
+    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+    BorderType aBorder, Roi aAllowedReadRoi)
     requires ThreeChannel<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI())
@@ -851,8 +851,8 @@ void ImageView<T>::WarpPerspectiveBack(
 
 template <PixelType T>
 void ImageView<T>::WarpPerspectiveBack(
-    ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-    ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
     ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
     ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
     const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
@@ -865,17 +865,17 @@ void ImageView<T>::WarpPerspectiveBack(
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
     ImageView<T>::WarpPerspectiveBack(aSrc1, aSrc2, aSrc3, aSrc4, aDst1, aDst2, aDst3, aDst4, aPerspective,
-                                      aInterpolation, aBorder, {0}, aAllowedReadRoi);
+                                      aInterpolation, {0}, aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
 void ImageView<T>::WarpPerspectiveBack(
-    ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-    ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
     ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
     ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
-    T aConstant, Roi aAllowedReadRoi)
+    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+    BorderType aBorder, Roi aAllowedReadRoi)
     requires FourChannelNoAlpha<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI() || aSrc1.ROI() != aSrc4.ROI())

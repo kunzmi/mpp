@@ -3,13 +3,13 @@
 #include <common/defines.h>
 #include <common/image/gotoPtr.h>
 #include <common/opp_defs.h>
-#include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vectorTypes.h>
 #include <concepts>
 
 namespace opp
 {
-template <typename DstT> struct Nothing
+template <typename DstT> struct NothingMorph
 {
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, DstT &aDst) const
     {

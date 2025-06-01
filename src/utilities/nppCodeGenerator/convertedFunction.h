@@ -30,6 +30,22 @@ class ConvertedFunction
         "WarpPerspectiveBack",
         "WarpPerspectiveQuad"};
 
+    // These distance measure functions don't check their ROI
+    inline static const std::unordered_set<std::string> sDistanceMeasureNoROICheck = { // NOLINT
+        "SqrDistanceFull_Norm",
+        "SqrDistanceSame_Norm",
+        "SqrDistanceValid_Norm",
+        "CrossCorrFull_Norm",
+        "CrossCorrFull_NormLevel",
+        "CrossCorrFull_NormLevelAdvanced",
+        "CrossCorrSame_Norm",
+        "CrossCorrSame_NormLevel",
+        "CrossCorrSame_NormLevelAdvanced",
+        "CrossCorrValid",
+        "CrossCorrValid_Norm",
+        "CrossCorrValid_NormLevel",
+        "CrossCorrValid_NormLevelAdvanced"};
+
     // These functions take the allocated pointer as input
     inline static const std::unordered_set<std::string> sCFAToRGBWithAllocPointer = { // NOLINT
         "CFAToRGB", "CFAToRGBA"};
@@ -58,7 +74,7 @@ class ConvertedFunction
         "nppiSet_16u_C3CR_Ctx", "nppiSet_16u_C4CR_Ctx", "nppiSet_32s_C3CR_Ctx", "nppiSet_32s_C4CR_Ctx",
         "nppiSet_32f_C3CR_Ctx", "nppiSet_32f_C4CR_Ctx"};
 
-    // These functions need an additional "Float" in theie name to have unique names
+    // These functions need an additional "Float" in their name to have unique names
     inline static const std::unordered_set<std::string> sAddFloatToName = { // NOLINT
         "nppiFullNormLevelGetBufferHostSize_8u32f_C3R_Ctx",  "nppiSameNormLevelGetBufferHostSize_8u32f_C3R_Ctx",
         "nppiValidNormLevelGetBufferHostSize_8u32f_C3R_Ctx", "nppiFullNormLevelGetBufferHostSize_8u32f_C4R_Ctx",
@@ -150,6 +166,7 @@ class ConvertedFunction
     bool IsFullROIFunction() const;
     bool IsGeometryFunction() const;
     bool IsCFAToRGBFunction() const;
+    bool IsDistanceMeasureFuntion() const;
 
     bool IsCopyInsert() const;
     bool IsCopyExtract() const;

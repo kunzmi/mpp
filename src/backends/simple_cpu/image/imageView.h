@@ -1810,6 +1810,1074 @@ template <PixelType T> class ImageView
 #pragma endregion
 #pragma endregion
 
+#pragma region Filtering
+#pragma region Fixed Filter
+    /// <summary>
+    /// Applies an opp::FixedFilter to the source image.
+    /// </summary>
+    ImageView<T> &FixedFilter(ImageView<T> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
+                              BorderType aBorder, const Roi &aAllowedReadRoi) const;
+    /// <summary>
+    /// Applies an opp::FixedFilter to the source image.
+    /// </summary>
+    ImageView<T> &FixedFilter(ImageView<T> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize, BorderType aBorder,
+                              const Roi &aAllowedReadRoi) const;
+
+    /// <summary>
+    /// Applies an opp::FixedFilter to the source image.
+    /// </summary>
+    ImageView<T> &FixedFilter(ImageView<T> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
+                              BorderType aBorder) const;
+    /// <summary>
+    /// Applies an opp::FixedFilter to the source image.
+    /// </summary>
+    ImageView<T> &FixedFilter(ImageView<T> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize,
+                              BorderType aBorder) const;
+
+    /// <summary>
+    /// Applies an opp::FixedFilter to the source image.
+    /// </summary>
+    ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
+        ImageView<alternative_filter_output_type_for_t<T>> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize,
+        T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires(has_alternative_filter_output_type_for_v<T>);
+    /// <summary>
+    /// Applies an opp::FixedFilter to the source image.
+    /// </summary>
+    ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
+        ImageView<alternative_filter_output_type_for_t<T>> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize,
+        BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires(has_alternative_filter_output_type_for_v<T>);
+
+    /// <summary>
+    /// Applies an opp::FixedFilter to the source image.
+    /// </summary>
+    ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
+        ImageView<alternative_filter_output_type_for_t<T>> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize,
+        T aConstant, BorderType aBorder) const
+        requires(has_alternative_filter_output_type_for_v<T>);
+    /// <summary>
+    /// Applies an opp::FixedFilter to the source image.
+    /// </summary>
+    ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
+        ImageView<alternative_filter_output_type_for_t<T>> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize,
+        BorderType aBorder) const
+        requires(has_alternative_filter_output_type_for_v<T>);
+#pragma endregion
+
+#pragma region Separable Filter
+    /// <summary>
+    /// Applies an user defined seperable filter to the image. Note that the filter parameters must sum up to 1.
+    /// </summary>
+    ImageView<T> &SeparableFilter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
+                                  int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder,
+                                  const Roi &aAllowedReadRoi) const;
+    /// <summary>
+    /// Applies an user defined seperable filter to the image. Note that the filter parameters must sum up to 1.
+    /// </summary>
+    ImageView<T> &SeparableFilter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
+                                  int aFilterSize, int aFilterCenter, BorderType aBorder,
+                                  const Roi &aAllowedReadRoi) const;
+    /// <summary>
+    /// Applies an user defined seperable filter to the image. Note that the filter parameters must sum up to 1.
+    /// </summary>
+    ImageView<T> &SeparableFilter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
+                                  int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder) const;
+    /// <summary>
+    /// Applies an user defined seperable filter to the image. Note that the filter parameters must sum up to 1.
+    /// </summary>
+    ImageView<T> &SeparableFilter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
+                                  int aFilterSize, int aFilterCenter, BorderType aBorder) const;
+#pragma endregion
+#pragma region Column Filter
+
+    /// <summary>
+    /// Applies an user defined column wise filter to the image. Note that the filter parameters must sum up to 1.
+    /// </summary>
+    ImageView<T> &ColumnFilter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
+                               int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder) const;
+    /// <summary>
+    /// Applies an user defined column wise filter to the image. Note that the filter parameters must sum up to 1.
+    /// </summary>
+    ImageView<T> &ColumnFilter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
+                               int aFilterSize, int aFilterCenter, BorderType aBorder) const;
+    /// <summary>
+    /// Applies an user defined column wise filter to the image. Note that the filter parameters must sum up to 1.
+    /// </summary>
+    ImageView<T> &ColumnFilter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
+                               int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder,
+                               const Roi &aAllowedReadRoi) const;
+    /// <summary>
+    /// Applies an user defined column wise filter to the image. Note that the filter parameters must sum up to 1.
+    /// </summary>
+    ImageView<T> &ColumnFilter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
+                               int aFilterSize, int aFilterCenter, BorderType aBorder,
+                               const Roi &aAllowedReadRoi) const;
+
+    /// <summary>
+    /// Applies a column wise box-filter to the image, i.e. the pixels are summed up along columns with the specified
+    /// length. The result is then scaled by aScalingValue.
+    /// </summary>
+    ImageView<same_vector_size_different_type_t<T, float>> &ColumnWindowSum(
+        ImageView<same_vector_size_different_type_t<T, float>> &aDst,
+        complex_basetype_t<remove_vector_t<same_vector_size_different_type_t<T, float>>> aScalingValue, int aFilterSize,
+        int aFilterCenter, T aConstant, BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Applies a column wise box-filter to the image, i.e. the pixels are summed up along columns with the specified
+    /// length. The result is then scaled by aScalingValue.
+    /// </summary>
+    ImageView<same_vector_size_different_type_t<T, float>> &ColumnWindowSum(
+        ImageView<same_vector_size_different_type_t<T, float>> &aDst,
+        complex_basetype_t<remove_vector_t<same_vector_size_different_type_t<T, float>>> aScalingValue, int aFilterSize,
+        int aFilterCenter, BorderType aBorder) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Applies a column wise box-filter to the image, i.e. the pixels are summed up along columns with the specified
+    /// length. The result is then scaled by aScalingValue.
+    /// </summary>
+    ImageView<same_vector_size_different_type_t<T, float>> &ColumnWindowSum(
+        ImageView<same_vector_size_different_type_t<T, float>> &aDst,
+        complex_basetype_t<remove_vector_t<same_vector_size_different_type_t<T, float>>> aScalingValue, int aFilterSize,
+        int aFilterCenter, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Applies a column wise box-filter to the image, i.e. the pixels are summed up along columns with the specified
+    /// length. The result is then scaled by aScalingValue.
+    /// </summary>
+    ImageView<same_vector_size_different_type_t<T, float>> &ColumnWindowSum(
+        ImageView<same_vector_size_different_type_t<T, float>> &aDst,
+        complex_basetype_t<remove_vector_t<same_vector_size_different_type_t<T, float>>> aScalingValue, int aFilterSize,
+        int aFilterCenter, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+#pragma endregion
+#pragma region Row Filter
+    /// <summary>
+    /// Applies an user defined row wise filter to the image. Note that the filter parameters must sum up to 1.
+    /// </summary>
+    ImageView<T> &RowFilter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
+                            int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder) const;
+    /// <summary>
+    /// Applies an user defined row wise filter to the image. Note that the filter parameters must sum up to 1.
+    /// </summary>
+    ImageView<T> &RowFilter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
+                            int aFilterSize, int aFilterCenter, BorderType aBorder) const;
+
+    /// <summary>
+    /// Applies an user defined row wise filter to the image. Note that the filter parameters must sum up to 1.
+    /// </summary>
+    ImageView<T> &RowFilter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
+                            int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder,
+                            const Roi &aAllowedReadRoi) const;
+    /// <summary>
+    /// Applies an user defined row wise filter to the image. Note that the filter parameters must sum up to 1.
+    /// </summary>
+    ImageView<T> &RowFilter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
+                            int aFilterSize, int aFilterCenter, BorderType aBorder, const Roi &aAllowedReadRoi) const;
+
+    /// <summary>
+    /// Applies a row wise box-filter to the image, i.e. the pixels are summed up along rows with the specified
+    /// length. The result is then scaled by aScalingValue.
+    /// </summary>
+    ImageView<same_vector_size_different_type_t<T, float>> &RowWindowSum(
+        ImageView<same_vector_size_different_type_t<T, float>> &aDst,
+        complex_basetype_t<remove_vector_t<same_vector_size_different_type_t<T, float>>> aScalingValue, int aFilterSize,
+        int aFilterCenter, T aConstant, BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Applies a row wise box-filter to the image, i.e. the pixels are summed up along rows with the specified
+    /// length. The result is then scaled by aScalingValue.
+    /// </summary>
+    ImageView<same_vector_size_different_type_t<T, float>> &RowWindowSum(
+        ImageView<same_vector_size_different_type_t<T, float>> &aDst,
+        complex_basetype_t<remove_vector_t<same_vector_size_different_type_t<T, float>>> aScalingValue, int aFilterSize,
+        int aFilterCenter, BorderType aBorder) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Applies a row wise box-filter to the image, i.e. the pixels are summed up along rows with the specified
+    /// length. The result is then scaled by aScalingValue.
+    /// </summary>
+    ImageView<same_vector_size_different_type_t<T, float>> &RowWindowSum(
+        ImageView<same_vector_size_different_type_t<T, float>> &aDst,
+        complex_basetype_t<remove_vector_t<same_vector_size_different_type_t<T, float>>> aScalingValue, int aFilterSize,
+        int aFilterCenter, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Applies a row wise box-filter to the image, i.e. the pixels are summed up along rows with the specified
+    /// length. The result is then scaled by aScalingValue.
+    /// </summary>
+    ImageView<same_vector_size_different_type_t<T, float>> &RowWindowSum(
+        ImageView<same_vector_size_different_type_t<T, float>> &aDst,
+        complex_basetype_t<remove_vector_t<same_vector_size_different_type_t<T, float>>> aScalingValue, int aFilterSize,
+        int aFilterCenter, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+#pragma endregion
+#pragma region Box Filter
+    /// <summary>
+    /// Applies an averaging box-filter to the image.
+    /// </summary>
+    ImageView<T> &BoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder) const;
+    /// <summary>
+    /// Applies an averaging box-filter to the image.
+    /// </summary>
+    ImageView<T> &BoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder) const;
+    /// <summary>
+    /// Applies an averaging box-filter to the image.
+    /// </summary>
+    ImageView<T> &BoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                            const Roi &aAllowedReadRoi) const;
+    /// <summary>
+    /// Applies an averaging box-filter to the image.
+    /// </summary>
+    ImageView<T> &BoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+                            const Roi &aAllowedReadRoi) const;
+    /// <summary>
+    /// Applies an averaging box-filter to the image.
+    /// </summary>
+    ImageView<same_vector_size_different_type_t<T, float>> &BoxFilter(
+        ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea, T aConstant,
+        BorderType aBorder) const
+        requires RealIntVector<T>;
+    /// <summary>
+    /// Applies an averaging box-filter to the image.
+    /// </summary>
+    ImageView<same_vector_size_different_type_t<T, float>> &BoxFilter(
+        ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea,
+        BorderType aBorder) const
+        requires RealIntVector<T>;
+    /// <summary>
+    /// Applies an averaging box-filter to the image.
+    /// </summary>
+    ImageView<same_vector_size_different_type_t<T, float>> &BoxFilter(
+        ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea, T aConstant,
+        BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealIntVector<T>;
+    /// <summary>
+    /// Applies an averaging box-filter to the image.
+    /// </summary>
+    ImageView<same_vector_size_different_type_t<T, float>> &BoxFilter(
+        ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+        const Roi &aAllowedReadRoi) const
+        requires RealIntVector<T>;
+
+    /// <summary>
+    /// A specialised box filter for one-channel images that returns in first channel result image the mean value under
+    /// the box area and in the second channel the summed squared pixel values. The result can then be used in the
+    /// CrossCorrelationCoefficient function.
+    /// </summary>
+    ImageView<Pixel32fC2> &BoxAndSumSquareFilter(ImageView<Pixel32fC2> &aDst, const FilterArea &aFilterArea,
+                                                 T aConstant, BorderType aBorder) const
+        requires RealVector<T> && SingleChannel<T> && (sizeof(T) < 8);
+    /// <summary>
+    /// A specialised box filter for one-channel images that returns in first channel result image the mean value under
+    /// the box area and in the second channel the summed squared pixel values. The result can then be used in the
+    /// CrossCorrelationCoefficient function.
+    /// </summary>
+    ImageView<Pixel32fC2> &BoxAndSumSquareFilter(ImageView<Pixel32fC2> &aDst, const FilterArea &aFilterArea,
+                                                 BorderType aBorder) const
+        requires RealVector<T> && SingleChannel<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// A specialised box filter for one-channel images that returns in first channel result image the mean value under
+    /// the box area and in the second channel the summed squared pixel values. The result can then be used in the
+    /// CrossCorrelationCoefficient function.
+    /// </summary>
+    ImageView<Pixel32fC2> &BoxAndSumSquareFilter(ImageView<Pixel32fC2> &aDst, const FilterArea &aFilterArea,
+                                                 T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T> && SingleChannel<T> && (sizeof(T) < 8);
+    /// <summary>
+    /// A specialised box filter for one-channel images that returns in first channel result image the mean value under
+    /// the box area and in the second channel the summed squared pixel values. The result can then be used in the
+    /// CrossCorrelationCoefficient function.
+    /// </summary>
+    ImageView<Pixel32fC2> &BoxAndSumSquareFilter(ImageView<Pixel32fC2> &aDst, const FilterArea &aFilterArea,
+                                                 BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T> && SingleChannel<T> && (sizeof(T) < 8);
+#pragma endregion
+#pragma region Min/Max Filter
+    /// <summary>
+    /// The filter finds in the neighborhood of each pixel defined in aFilterArea the maximum pixel value.
+    /// </summary>
+    ImageView<T> &MaxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// The filter finds in the neighborhood of each pixel defined in aFilterArea the maximum pixel value.
+    /// </summary>
+    ImageView<T> &MaxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// The filter finds in the neighborhood of each pixel defined in aFilterArea the maximum pixel value.
+    /// </summary>
+    ImageView<T> &MaxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                            const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+    /// <summary>
+    /// The filter finds in the neighborhood of each pixel defined in aFilterArea the maximum pixel value.
+    /// </summary>
+    ImageView<T> &MaxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+                            const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// The filter finds in the neighborhood of each pixel defined in aFilterArea the minimum pixel value.
+    /// </summary>
+    ImageView<T> &MinFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// The filter finds in the neighborhood of each pixel defined in aFilterArea the minimum pixel value.
+    /// </summary>
+    ImageView<T> &MinFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// The filter finds in the neighborhood of each pixel defined in aFilterArea the minimum pixel value.
+    /// </summary>
+    ImageView<T> &MinFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                            const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+    /// <summary>
+    /// The filter finds in the neighborhood of each pixel defined in aFilterArea the minimum pixel value.
+    /// </summary>
+    ImageView<T> &MinFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+                            const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+
+#pragma endregion
+#pragma region Wiener Filter
+    /// <summary>
+    /// Applies Wiener filter to the image.
+    /// </summary>
+    ImageView<T> &WienerFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
+                               const filter_compute_type_for_t<T> &aNoise, T aConstant, BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Applies Wiener filter to the image.
+    /// </summary>
+    ImageView<T> &WienerFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
+                               const filter_compute_type_for_t<T> &aNoise, BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Applies Wiener filter to the image.
+    /// </summary>
+    ImageView<T> &WienerFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
+                               const filter_compute_type_for_t<T> &aNoise, T aConstant, BorderType aBorder,
+                               const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Applies Wiener filter to the image.
+    /// </summary>
+    ImageView<T> &WienerFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
+                               const filter_compute_type_for_t<T> &aNoise, BorderType aBorder,
+                               const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+
+#pragma endregion
+#pragma region Threshold Adaptive Box Filter
+    /// <summary>
+    /// Computes the average pixel values of the pixels under a mask.
+    /// Once the neighborhood average around a source pixel is determined the souce pixel is compared to the average
+    /// aDelta and if the source pixel is greater than that average the corresponding destination pixel is set to
+    /// aValGT, otherwise aValLE.
+    /// </summary>
+    ImageView<T> &ThresholdAdaptiveBoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
+                                             const filter_compute_type_for_t<T> &aDelta, const T &aValGT,
+                                             const T &aValLE, T aConstant, BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Computes the average pixel values of the pixels under a mask.
+    /// Once the neighborhood average around a source pixel is determined the souce pixel is compared to the average
+    /// aDelta and if the source pixel is greater than that average the corresponding destination pixel is set to
+    /// aValGT, otherwise aValLE.
+    /// </summary>
+    ImageView<T> &ThresholdAdaptiveBoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
+                                             const filter_compute_type_for_t<T> &aDelta, const T &aValGT,
+                                             const T &aValLE, BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Computes the average pixel values of the pixels under a mask.
+    /// Once the neighborhood average around a source pixel is determined the souce pixel is compared to the average
+    /// aDelta and if the source pixel is greater than that average the corresponding destination pixel is set to
+    /// aValGT, otherwise aValLE.
+    /// </summary>
+    ImageView<T> &ThresholdAdaptiveBoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
+                                             const filter_compute_type_for_t<T> &aDelta, const T &aValGT,
+                                             const T &aValLE, T aConstant, BorderType aBorder,
+                                             const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Computes the average pixel values of the pixels under a mask.
+    /// Once the neighborhood average around a source pixel is determined the souce pixel is compared to the average
+    /// aDelta and if the source pixel is greater than that average the corresponding destination pixel is set to
+    /// aValGT, otherwise aValLE.
+    /// </summary>
+    ImageView<T> &ThresholdAdaptiveBoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
+                                             const filter_compute_type_for_t<T> &aDelta, const T &aValGT,
+                                             const T &aValLE, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+
+#pragma endregion
+#pragma region Filter
+    /// <summary>
+    /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
+    /// Note that the filter is applied in "cross-correlation orientation" and not in "convolution orientation", i.e.
+    /// the filter has the same orientation as the image (same behavior as in NPP).
+    /// </summary>
+    ImageView<T> &Filter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
+                         const FilterArea &aFilterArea, T aConstant, BorderType aBorder) const;
+    /// <summary>
+    /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
+    /// Note that the filter is applied in "cross-correlation orientation" and not in "convolution orientation", i.e.
+    /// the filter has the same orientation as the image (same behavior as in NPP).
+    /// </summary>
+    ImageView<T> &Filter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
+                         const FilterArea &aFilterArea, BorderType aBorder) const;
+    /// <summary>
+    /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
+    /// Note that the filter is applied in "cross-correlation orientation" and not in "convolution orientation", i.e.
+    /// the filter has the same orientation as the image (same behavior as in NPP).
+    /// </summary>
+    ImageView<T> &Filter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
+                         const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                         const Roi &aAllowedReadRoi) const;
+    /// <summary>
+    /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
+    /// Note that the filter is applied in "cross-correlation orientation" and not in "convolution orientation", i.e.
+    /// the filter has the same orientation as the image (same behavior as in NPP).
+    /// </summary>
+    ImageView<T> &Filter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
+                         const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi) const;
+
+#pragma endregion
+#pragma region Bilateral Gauss Filter
+    /// <summary>
+    /// This function pre-computes the geometrical distance coefficients for bilateral Gauss filtering. The result of
+    /// this function can be passed to BilateralGaussFilter.
+    /// </summary>
+    /// <param name="aPreCompGeomDistCoeff"></param>
+    /// <param name="aFilterArea"></param>
+    /// <param name="aPosSquareSigma"></param>
+    /// <param name="aStreamCtx"></param>
+    void PrecomputeBilateralGaussFilter(float *aPreCompGeomDistCoeff, const FilterArea &aFilterArea,
+                                        float aPosSquareSigma) const;
+
+    /// <summary>
+    /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().
+    /// </summary>
+    ImageView<T> &BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
+                                       const float *aPreCompGeomDistCoeff, float aValSquareSigma, T aConstant,
+                                       BorderType aBorder) const
+        requires SingleChannel<T> && RealVector<T> &&
+                 (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
+
+    /// <summary>
+    /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().
+    /// </summary>
+    ImageView<T> &BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
+                                       const float *aPreCompGeomDistCoeff, float aValSquareSigma,
+                                       BorderType aBorder) const
+        requires SingleChannel<T> && RealVector<T> &&
+                 (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
+
+    /// <summary>
+    /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().
+    /// </summary>
+    ImageView<T> &BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
+                                       const float *aPreCompGeomDistCoeff, float aValSquareSigma, T aConstant,
+                                       BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires SingleChannel<T> && RealVector<T> &&
+                 (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
+
+    /// <summary>
+    /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().
+    /// </summary>
+    ImageView<T> &BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
+                                       const float *aPreCompGeomDistCoeff, float aValSquareSigma, BorderType aBorder,
+                                       const Roi &aAllowedReadRoi) const
+        requires SingleChannel<T> && RealVector<T> &&
+                 (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
+    /// <summary>
+    /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().
+    /// </summary>
+    ImageView<T> &BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
+                                       const float *aPreCompGeomDistCoeff, float aValSquareSigma, opp::Norm aNorm,
+                                       T aConstant, BorderType aBorder) const
+        requires(!SingleChannel<T>) && RealVector<T> &&
+                (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
+    /// <summary>
+    /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().
+    /// </summary>
+    ImageView<T> &BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
+                                       const float *aPreCompGeomDistCoeff, float aValSquareSigma, opp::Norm aNorm,
+                                       BorderType aBorder) const
+        requires(!SingleChannel<T>) && RealVector<T> &&
+                (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
+    /// <summary>
+    /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().
+    /// </summary>
+    ImageView<T> &BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
+                                       const float *aPreCompGeomDistCoeff, float aValSquareSigma, opp::Norm aNorm,
+                                       T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires(!SingleChannel<T>) && RealVector<T> &&
+                (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
+    /// <summary>
+    /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().
+    /// </summary>
+    ImageView<T> &BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
+                                       const float *aPreCompGeomDistCoeff, float aValSquareSigma, opp::Norm aNorm,
+                                       BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires(!SingleChannel<T>) && RealVector<T> &&
+                (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
+#pragma endregion
+#pragma region Gradient Vector
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorSobel(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY, ImageView<Pixel16sC1> &aDstMag,
+                             ImageView<Pixel32fC1> &aDstAngle, ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm,
+                             MaskSize aMaskSize, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorSobel(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY, ImageView<Pixel16sC1> &aDstMag,
+                             ImageView<Pixel32fC1> &aDstAngle, ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm,
+                             MaskSize aMaskSize, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorSobel(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY, ImageView<Pixel32fC1> &aDstMag,
+                             ImageView<Pixel32fC1> &aDstAngle, ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm,
+                             MaskSize aMaskSize, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorSobel(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY, ImageView<Pixel32fC1> &aDstMag,
+                             ImageView<Pixel32fC1> &aDstAngle, ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm,
+                             MaskSize aMaskSize, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorScharr(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
+                              ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                              ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, T aConstant,
+                              BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorScharr(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
+                              ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                              ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, BorderType aBorder,
+                              const Roi &aAllowedReadRoi) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorScharr(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
+                              ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                              ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, T aConstant,
+                              BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorScharr(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
+                              ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                              ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, BorderType aBorder,
+                              const Roi &aAllowedReadRoi) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorPrewitt(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
+                               ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                               ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, T aConstant,
+                               BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorPrewitt(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
+                               ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                               ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
+                               BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorPrewitt(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
+                               ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                               ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, T aConstant,
+                               BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorPrewitt(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
+                               ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                               ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
+                               BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorSobel(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY, ImageView<Pixel16sC1> &aDstMag,
+                             ImageView<Pixel32fC1> &aDstAngle, ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm,
+                             MaskSize aMaskSize, T aConstant, BorderType aBorder) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorSobel(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY, ImageView<Pixel16sC1> &aDstMag,
+                             ImageView<Pixel32fC1> &aDstAngle, ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm,
+                             MaskSize aMaskSize, BorderType aBorder) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorSobel(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY, ImageView<Pixel32fC1> &aDstMag,
+                             ImageView<Pixel32fC1> &aDstAngle, ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm,
+                             MaskSize aMaskSize, T aConstant, BorderType aBorder) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorSobel(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY, ImageView<Pixel32fC1> &aDstMag,
+                             ImageView<Pixel32fC1> &aDstAngle, ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm,
+                             MaskSize aMaskSize, BorderType aBorder) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorScharr(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
+                              ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                              ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, T aConstant,
+                              BorderType aBorder) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorScharr(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
+                              ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                              ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
+                              BorderType aBorder) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorScharr(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
+                              ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                              ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, T aConstant,
+                              BorderType aBorder) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorScharr(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
+                              ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                              ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
+                              BorderType aBorder) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorPrewitt(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
+                               ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                               ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, T aConstant,
+                               BorderType aBorder) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorPrewitt(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
+                               ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                               ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
+                               BorderType aBorder) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorPrewitt(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
+                               ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                               ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, T aConstant,
+                               BorderType aBorder) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorPrewitt(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
+                               ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                               ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
+                               BorderType aBorder) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+#pragma endregion
+#pragma region Unsharp Filter
+    /// <summary>
+    /// Smoothes the orginal images using the user defined filter aFilter (coefficients should sum up to 1) and then
+    /// subtracts the result from the original to obtain a high-pass filtered image. After thresholding and weighting,
+    /// the result is added to the original image using the following pseudo-formula:<para/>
+    /// HighPass = Image - Filter(Image)<para/>
+    /// Result = Image + nWeight * HighPass * (| HighPass | &gt;= nThreshold) <para/>
+    /// where nWeight is the amount, nThreshold is the threshold, and &gt;= indicates a Boolean operation, 1 if true, or
+    /// 0 otherwise.
+    /// </summary>
+    ImageView<T> &UnsharpFilter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
+                                int aFilterSize, int aFilterCenter,
+                                remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aWeight,
+                                remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aThreshold, T aConstant,
+                                BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Smoothes the orginal images using the user defined filter aFilter (coefficients should sum up to 1) and then
+    /// subtracts the result from the original to obtain a high-pass filtered image. After thresholding and weighting,
+    /// the result is added to the original image using the following pseudo-formula:<para/>
+    /// HighPass = Image - Filter(Image)<para/>
+    /// Result = Image + nWeight * HighPass * (| HighPass | &gt;= nThreshold) <para/>
+    /// where nWeight is the amount, nThreshold is the threshold, and &gt;= indicates a Boolean operation, 1 if true, or
+    /// 0 otherwise.
+    /// </summary>
+    ImageView<T> &UnsharpFilter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
+                                int aFilterSize, int aFilterCenter,
+                                remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aWeight,
+                                remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aThreshold,
+                                BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Smoothes the orginal images using the user defined filter aFilter (coefficients should sum up to 1) and then
+    /// subtracts the result from the original to obtain a high-pass filtered image. After thresholding and weighting,
+    /// the result is added to the original image using the following pseudo-formula:<para/>
+    /// HighPass = Image - Filter(Image)<para/>
+    /// Result = Image + nWeight * HighPass * (| HighPass | &gt;= nThreshold) <para/>
+    /// where nWeight is the amount, nThreshold is the threshold, and &gt;= indicates a Boolean operation, 1 if true, or
+    /// 0 otherwise.
+    /// </summary>
+    ImageView<T> &UnsharpFilter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
+                                int aFilterSize, int aFilterCenter,
+                                remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aWeight,
+                                remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aThreshold, T aConstant,
+                                BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Smoothes the orginal images using the user defined filter aFilter (coefficients should sum up to 1) and then
+    /// subtracts the result from the original to obtain a high-pass filtered image. After thresholding and weighting,
+    /// the result is added to the original image using the following pseudo-formula:<para/>
+    /// HighPass = Image - Filter(Image)<para/>
+    /// Result = Image + nWeight * HighPass * (| HighPass | &gt;= nThreshold) <para/>
+    /// where nWeight is the amount, nThreshold is the threshold, and &gt;= indicates a Boolean operation, 1 if true, or
+    /// 0 otherwise.
+    /// </summary>
+    ImageView<T> &UnsharpFilter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
+                                int aFilterSize, int aFilterCenter,
+                                remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aWeight,
+                                remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aThreshold,
+                                BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+#pragma endregion
+#pragma region Harris Corner Response
+    /// <summary>
+    /// From a covariance matrix for each pixel obtained from one of the GradientVector functions, this function
+    /// computes the Harris Corner response.
+    /// </summary>
+    ImageView<Pixel32fC1> &HarrisCornerResponse(ImageView<Pixel32fC1> &aDst, const FilterArea &aAvgWindowSize, float aK,
+                                                float aScale, T aConstant, BorderType aBorder) const
+        requires std::same_as<T, Pixel32fC4>;
+    /// <summary>
+    /// From a covariance matrix for each pixel obtained from one of the GradientVector functions, this function
+    /// computes the Harris Corner response.
+    /// </summary>
+    ImageView<Pixel32fC1> &HarrisCornerResponse(ImageView<Pixel32fC1> &aDst, const FilterArea &aAvgWindowSize, float aK,
+                                                float aScale, BorderType aBorder) const
+        requires std::same_as<T, Pixel32fC4>;
+    /// <summary>
+    /// From a covariance matrix for each pixel obtained from one of the GradientVector functions, this function
+    /// computes the Harris Corner response.
+    /// </summary>
+    ImageView<Pixel32fC1> &HarrisCornerResponse(ImageView<Pixel32fC1> &aDst, const FilterArea &aAvgWindowSize, float aK,
+                                                float aScale, T aConstant, BorderType aBorder,
+                                                const Roi &aAllowedReadRoi) const
+        requires std::same_as<T, Pixel32fC4>;
+    /// <summary>
+    /// From a covariance matrix for each pixel obtained from one of the GradientVector functions, this function
+    /// computes the Harris Corner response.
+    /// </summary>
+    ImageView<Pixel32fC1> &HarrisCornerResponse(ImageView<Pixel32fC1> &aDst, const FilterArea &aAvgWindowSize, float aK,
+                                                float aScale, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires std::same_as<T, Pixel32fC4>;
+
+#pragma endregion
+#pragma region Canny edge
+    /// <summary>
+    /// For an gradient magnitude image and an gradient orientation image obtained from one of the gradient vector
+    /// functions, this function performs canny edge detection.
+    /// </summary>
+    ImageView<Pixel8uC1> &CannyEdge(const ImageView<Pixel32fC1> &aSrcAngle, ImageView<Pixel8uC1> &aTemp,
+                                    ImageView<Pixel8uC1> &aDst, T aLowThreshold, T aHighThreshold) const
+        requires std::same_as<T, Pixel16sC1> || std::same_as<T, Pixel32fC1>;
+    /// <summary>
+    /// For an gradient magnitude image and an gradient orientation image obtained from one of the gradient vector
+    /// functions, this function performs canny edge detection.
+    /// </summary>
+    ImageView<Pixel8uC1> &CannyEdge(const ImageView<Pixel32fC1> &aSrcAngle, ImageView<Pixel8uC1> &aTemp,
+                                    ImageView<Pixel8uC1> &aDst, T aLowThreshold, T aHighThreshold,
+                                    const Roi &aAllowedReadRoi) const
+        requires std::same_as<T, Pixel16sC1> || std::same_as<T, Pixel32fC1>;
+
+#pragma endregion
+#pragma endregion
+
 #pragma region Geometric Transforms
 #pragma region Affine
     /// <summary>
@@ -1826,7 +2894,7 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     ImageView<T> &WarpAffine(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
-                             InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                             InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
                              Roi aAllowedReadRoi = Roi()) const;
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
@@ -1857,10 +2925,11 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                            ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                           BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, T aConstant,
+                           BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires TwoChannel<T>;
 
     /// <summary>
@@ -1876,7 +2945,8 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                            ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                            const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
                            BorderType aBorder, Roi aAllowedReadRoi = Roi())
@@ -1894,11 +2964,13 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                           ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                           ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                           BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+    static void WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, const AffineTransformation<double> &aAffine,
+                           InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                           Roi aAllowedReadRoi = Roi())
         requires ThreeChannel<T>;
 
     /// <summary>
@@ -1914,11 +2986,12 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                           ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                           ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                           BorderType aBorder, Roi aAllowedReadRoi = Roi())
+    static void WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, const AffineTransformation<double> &aAffine,
+                           InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires ThreeChannel<T>;
 
     /// <summary>
@@ -1934,12 +3007,14 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                           ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                            ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                           BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, T aConstant,
+                           BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires FourChannelNoAlpha<T>;
 
     /// <summary>
@@ -1955,8 +3030,10 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                           ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                            ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                            const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
@@ -1977,7 +3054,7 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     ImageView<T> &WarpAffineBack(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
-                                 InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                                 InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
                                  Roi aAllowedReadRoi = Roi()) const;
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -2010,12 +3087,12 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpAffineBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                               ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void WarpAffineBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                               BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+                               T aConstant, BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires TwoChannel<T>;
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -2031,8 +3108,8 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to
     /// use must be provided.
     /// </summary>
-    static void WarpAffineBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                               ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void WarpAffineBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
@@ -2052,14 +3129,14 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpAffineBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                               ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                               ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+    static void WarpAffineBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                ImageView<Vector1<remove_vector_t<T>>> &aDst3,
                                const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                               BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+                               T aConstant, BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires ThreeChannel<T>;
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -2075,9 +3152,9 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to
     /// use must be provided.
     /// </summary>
-    static void WarpAffineBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                               ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                               ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+    static void WarpAffineBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                ImageView<Vector1<remove_vector_t<T>>> &aDst3,
@@ -2099,11 +3176,11 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     static void WarpAffineBack(
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
         ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-        const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+        const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
         Roi aAllowedReadRoi = Roi())
         requires FourChannelNoAlpha<T>;
     /// <summary>
@@ -2121,8 +3198,8 @@ template <PixelType T> class ImageView
     /// use must be provided.
     /// </summary>
     static void WarpAffineBack(
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
         ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
         const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, BorderType aBorder,
@@ -2145,7 +3222,7 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     ImageView<T> &WarpPerspective(ImageView<T> &aDst, const PerspectiveTransformation<double> &aPerspective,
-                                  InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                                  InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
                                   Roi aAllowedReadRoi = Roi()) const;
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
@@ -2177,12 +3254,12 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpPerspective(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void WarpPerspective(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                 const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
-                                BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+                                T aConstant, BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires TwoChannel<T>;
 
     /// <summary>
@@ -2198,8 +3275,8 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpPerspective(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void WarpPerspective(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                 const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
@@ -2219,14 +3296,14 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpPerspective(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+    static void WarpPerspective(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDst3,
                                 const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
-                                BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+                                T aConstant, BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires ThreeChannel<T>;
 
     /// <summary>
@@ -2242,9 +3319,9 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpPerspective(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+    static void WarpPerspective(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDst3,
@@ -2266,12 +3343,12 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     static void WarpPerspective(
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
         ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
-        T aConstant, Roi aAllowedReadRoi = Roi())
+        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+        BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires FourChannelNoAlpha<T>;
 
     /// <summary>
@@ -2288,8 +3365,8 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     static void WarpPerspective(
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
         ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
         const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
@@ -2310,7 +3387,7 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     ImageView<T> &WarpPerspectiveBack(ImageView<T> &aDst, const PerspectiveTransformation<double> &aPerspective,
-                                      InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                                      InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
                                       Roi aAllowedReadRoi = Roi()) const;
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
@@ -2342,12 +3419,12 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpPerspectiveBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                    ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void WarpPerspectiveBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                     ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                     const PerspectiveTransformation<double> &aPerspective,
-                                    InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                                    InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
                                     Roi aAllowedReadRoi = Roi())
         requires TwoChannel<T>;
 
@@ -2364,8 +3441,8 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpPerspectiveBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                    ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void WarpPerspectiveBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                     ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                     const PerspectiveTransformation<double> &aPerspective,
@@ -2386,11 +3463,11 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     static void WarpPerspectiveBack(
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
         ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
-        T aConstant, Roi aAllowedReadRoi = Roi())
+        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+        BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires ThreeChannel<T>;
 
     /// <summary>
@@ -2406,9 +3483,9 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpPerspectiveBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                    ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                    ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+    static void WarpPerspectiveBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                     ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                     ImageView<Vector1<remove_vector_t<T>>> &aDst3,
@@ -2430,12 +3507,12 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     static void WarpPerspectiveBack(
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
         ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
-        T aConstant, Roi aAllowedReadRoi = Roi())
+        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+        BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires FourChannelNoAlpha<T>;
 
     /// <summary>
@@ -2452,8 +3529,8 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     static void WarpPerspectiveBack(
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
         ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
         const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
@@ -2475,7 +3552,7 @@ template <PixelType T> class ImageView
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     ImageView<T> &Rotate(ImageView<T> &aDst, double aAngleInDeg, const Vector2<double> &aShift,
-                         InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                         InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
                          Roi aAllowedReadRoi = Roi()) const;
     /// <summary>
     /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
@@ -2504,10 +3581,11 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                       BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation, T aConstant,
+                       BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires TwoChannel<T>;
     /// <summary>
     /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
@@ -2521,7 +3599,8 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                        double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
                        BorderType aBorder, Roi aAllowedReadRoi = Roi())
@@ -2539,11 +3618,12 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                       ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                       BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+    static void Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, double aAngleInDeg, const Vector2<double> &aShift,
+                       InterpolationMode aInterpolation, T aConstant, BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires ThreeChannel<T>;
     /// <summary>
     /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
@@ -2557,11 +3637,12 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                       ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                       BorderType aBorder, Roi aAllowedReadRoi = Roi())
+    static void Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, double aAngleInDeg, const Vector2<double> &aShift,
+                       InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires ThreeChannel<T>;
 
     /// <summary>
@@ -2576,12 +3657,14 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                       BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation, T aConstant,
+                       BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires FourChannelNoAlpha<T>;
     /// <summary>
     /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
@@ -2595,8 +3678,10 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                        double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
@@ -2611,7 +3696,7 @@ template <PixelType T> class ImageView
     /// NOTE: the result is NOT the same as in NPP using the same function. The shift applied in NPP for the same
     /// function don't make much sense to me, in OPP Resize matches the input extent [-0.5 .. srcWidth-0.5[ to the
     /// output [-0.5 .. dstWidth-0.5[. Whereas NPP applies different strategies for up-and downscaling. In order to get
-    /// the same results as in NPP, use a user defined scaling factor of <para/> Vec2d scaleFactor =
+    /// the same results as in NPP, use an user defined scaling factor of <para/> Vec2d scaleFactor =
     /// Vec2d(dstImg.SizeRoi()) / Vec2d(srcImg.SizeRoi());<para/> and a shift given by ResizeGetNPPShift().
     /// </summary>
     ImageView<T> &Resize(ImageView<T> &aDst, InterpolationMode aInterpolation) const;
@@ -2622,10 +3707,11 @@ template <PixelType T> class ImageView
     /// NOTE: the result is NOT the same as in NPP using the same function. The shift applied in NPP for the same
     /// function don't make much sense to me, in OPP Resize matches the input extent [-0.5 .. srcWidth-0.5[ to the
     /// output [-0.5 .. dstWidth-0.5[. Whereas NPP applies different strategies for up-and downscaling. In order to get
-    /// the same results as in NPP, use a user defined scaling factor of <para/> Vec2d scaleFactor =
+    /// the same results as in NPP, use an user defined scaling factor of <para/> Vec2d scaleFactor =
     /// Vec2d(dstImg.SizeRoi()) / Vec2d(srcImg.SizeRoi());<para/> and a shift given by ResizeGetNPPShift().
     /// </summary>
-    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                        InterpolationMode aInterpolation)
         requires TwoChannel<T>;
@@ -2636,13 +3722,14 @@ template <PixelType T> class ImageView
     /// NOTE: the result is NOT the same as in NPP using the same function. The shift applied in NPP for the same
     /// function don't make much sense to me, in OPP Resize matches the input extent [-0.5 .. srcWidth-0.5[ to the
     /// output [-0.5 .. dstWidth-0.5[. Whereas NPP applies different strategies for up-and downscaling. In order to get
-    /// the same results as in NPP, use a user defined scaling factor of <para/> Vec2d scaleFactor =
+    /// the same results as in NPP, use an user defined scaling factor of <para/> Vec2d scaleFactor =
     /// Vec2d(dstImg.SizeRoi()) / Vec2d(srcImg.SizeRoi());<para/> and a shift given by ResizeGetNPPShift().
     /// </summary>
-    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                       ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                       InterpolationMode aInterpolation)
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, InterpolationMode aInterpolation)
         requires ThreeChannel<T>;
 
     /// <summary>
@@ -2651,11 +3738,13 @@ template <PixelType T> class ImageView
     /// NOTE: the result is NOT the same as in NPP using the same function. The shift applied in NPP for the same
     /// function don't make much sense to me, in OPP Resize matches the input extent [-0.5 .. srcWidth-0.5[ to the
     /// output [-0.5 .. dstWidth-0.5[. Whereas NPP applies different strategies for up-and downscaling. In order to get
-    /// the same results as in NPP, use a user defined scaling factor of <para/> Vec2d scaleFactor =
+    /// the same results as in NPP, use an user defined scaling factor of <para/> Vec2d scaleFactor =
     /// Vec2d(dstImg.SizeRoi()) / Vec2d(srcImg.SizeRoi());<para/> and a shift given by ResizeGetNPPShift().
     /// </summary>
-    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                        InterpolationMode aInterpolation)
@@ -2689,7 +3778,7 @@ template <PixelType T> class ImageView
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     ImageView<T> &Resize(ImageView<T> &aDst, const Vector2<double> &aScale, const Vector2<double> &aShift,
-                         InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                         InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
                          Roi aAllowedReadRoi = Roi()) const;
 
     /// <summary>
@@ -2739,10 +3828,11 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                        const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                       BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+                       T aConstant, BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires TwoChannel<T>;
 
     /// <summary>
@@ -2767,7 +3857,8 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                        const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
                        BorderType aBorder, Roi aAllowedReadRoi = Roi())
@@ -2795,11 +3886,13 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                       ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                       const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                       BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Vector2<double> &aScale,
+                       const Vector2<double> &aShift, InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                       Roi aAllowedReadRoi = Roi())
         requires ThreeChannel<T>;
 
     /// <summary>
@@ -2824,11 +3917,13 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                       ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                       const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                       BorderType aBorder, Roi aAllowedReadRoi = Roi())
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Vector2<double> &aScale,
+                       const Vector2<double> &aShift, InterpolationMode aInterpolation, BorderType aBorder,
+                       Roi aAllowedReadRoi = Roi())
         requires ThreeChannel<T>;
 
     /// <summary>
@@ -2853,12 +3948,14 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                        const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                       BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+                       T aConstant, BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires FourChannelNoAlpha<T>;
 
     /// <summary>
@@ -2883,8 +3980,10 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                        const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
@@ -2920,7 +4019,7 @@ template <PixelType T> class ImageView
     /// value to use must be provided.
     /// </summary>
     ImageView<T> &Remap(ImageView<T> &aDst, const ImageView<Pixel32fC2> &aCoordinateMap,
-                        InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                        InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
                         Roi aAllowedReadRoi = Roi()) const;
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -2950,8 +4049,8 @@ template <PixelType T> class ImageView
     /// value to use must be provided.
     /// </summary>
     ImageView<T> &Remap(ImageView<T> &aDst, const ImageView<Pixel32fC1> &aCoordinateMapX,
-                        const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation,
-                        BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi()) const;
+                        const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation, T aConstant,
+                        BorderType aBorder, Roi aAllowedReadRoi = Roi()) const;
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
     /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
@@ -2980,10 +4079,11 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
     /// value to use must be provided.
     /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, BorderType aBorder,
-                      T aConstant, Roi aAllowedReadRoi = Roi())
+                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, T aConstant,
+                      BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires TwoChannel<T>;
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -2997,7 +4097,8 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
     /// value to use must be provided.
     /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                       const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, BorderType aBorder,
                       Roi aAllowedReadRoi = Roi())
@@ -3015,10 +4116,11 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
     /// value to use must be provided.
     /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                       const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
-                      InterpolationMode aInterpolation, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+                      InterpolationMode aInterpolation, T aConstant, BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires TwoChannel<T>;
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -3032,7 +4134,8 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
     /// value to use must be provided.
     /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                       const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
                       InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi())
@@ -3050,11 +4153,12 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
     /// value to use must be provided.
     /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                      ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, BorderType aBorder,
-                      T aConstant, Roi aAllowedReadRoi = Roi())
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst3, const ImageView<Pixel32fC2> &aCoordinateMap,
+                      InterpolationMode aInterpolation, T aConstant, BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires ThreeChannel<T>;
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -3068,47 +4172,11 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
     /// value to use must be provided.
     /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                      ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, BorderType aBorder,
-                      Roi aAllowedReadRoi = Roi())
-        requires ThreeChannel<T>;
-
-    /// <summary>
-    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
-    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
-    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
-    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
-    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
-    /// interpolated) according to the chosen BorderType.<para/>
-    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
-    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
-    /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
-    /// value to use must be provided.
-    /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                      ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                      const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
-                      InterpolationMode aInterpolation, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
-        requires ThreeChannel<T>;
-    /// <summary>
-    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
-    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
-    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
-    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
-    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
-    /// interpolated) according to the chosen BorderType.<para/>
-    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
-    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
-    /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
-    /// value to use must be provided.
-    /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                      ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                      const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst3, const ImageView<Pixel32fC2> &aCoordinateMap,
                       InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires ThreeChannel<T>;
 
@@ -3124,12 +4192,55 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
     /// value to use must be provided.
     /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst3, const ImageView<Pixel32fC1> &aCoordinateMapX,
+                      const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation, T aConstant,
+                      BorderType aBorder, Roi aAllowedReadRoi = Roi())
+        requires ThreeChannel<T>;
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst3, const ImageView<Pixel32fC1> &aCoordinateMapX,
+                      const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation,
+                      BorderType aBorder, Roi aAllowedReadRoi = Roi())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, BorderType aBorder,
-                      T aConstant, Roi aAllowedReadRoi = Roi())
+                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, T aConstant,
+                      BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires FourChannelNoAlpha<T>;
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -3143,8 +4254,10 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
     /// value to use must be provided.
     /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                       const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, BorderType aBorder,
@@ -3163,12 +4276,14 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
     /// value to use must be provided.
     /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                       const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
-                      InterpolationMode aInterpolation, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi())
+                      InterpolationMode aInterpolation, T aConstant, BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires FourChannelNoAlpha<T>;
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -3182,13 +4297,324 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
     /// value to use must be provided.
     /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                       const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
                       InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi())
         requires FourChannelNoAlpha<T>;
+#pragma endregion
+#pragma endregion
+
+#pragma region Morphology
+#pragma region No mask Erosion/Dilation
+    /// <summary>
+    /// Performs dilation on the entire mask area defined by aFilterArea (maximum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &Dilation(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                           const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs dilation on the entire mask area defined by aFilterArea (maximum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &Dilation(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+                           const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs erosion on the entire mask area defined by aFilterArea (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &Erosion(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                          const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs erosion on the entire mask area defined by aFilterArea (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &Erosion(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+                          const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Performs dilation on the entire mask area defined by aFilterArea (maximum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &Dilation(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs dilation on the entire mask area defined by aFilterArea (maximum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &Dilation(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs erosion on the entire mask area defined by aFilterArea (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &Erosion(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs erosion on the entire mask area defined by aFilterArea (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &Erosion(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder) const
+        requires RealVector<T>;
+
+#pragma endregion
+#pragma region Erosion
+    /// <summary>
+    /// Performs erosion on the mask area defined by aFilterArea and where aMask is != 0 (minimum pixel in the
+    /// neighborhood).
+    /// </summary>
+    ImageView<T> &Erosion(ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea, T aConstant,
+                          BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs erosion on the mask area defined by aFilterArea and where aMask is != 0 (minimum pixel in the
+    /// neighborhood).
+    /// </summary>
+    ImageView<T> &Erosion(ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea, BorderType aBorder,
+                          const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Performs gray-scale-erosion on the mask area defined by aFilterArea. The value of aMask is added to the pixel
+    /// value and clamped to pixel type value range before comparison (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &ErosionGray(ImageView<T> &aDst, const morph_gray_compute_type_t<T> *aMask,
+                              const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                              const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs gray-scale-erosion on the mask area defined by aFilterArea. The value of aMask is added to the pixel
+    /// value and clamped to pixel type value range before comparison (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &ErosionGray(ImageView<T> &aDst, const morph_gray_compute_type_t<T> *aMask,
+                              const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Performs erosion on the mask area defined by aFilterArea and where aMask is != 0 (minimum pixel in the
+    /// neighborhood).
+    /// </summary>
+    ImageView<T> &Erosion(ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea, T aConstant,
+                          BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs erosion on the mask area defined by aFilterArea and where aMask is != 0 (minimum pixel in the
+    /// neighborhood).
+    /// </summary>
+    ImageView<T> &Erosion(ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
+                          BorderType aBorder) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Performs gray-scale-erosion on the mask area defined by aFilterArea. The value of aMask is added to the pixel
+    /// value and clamped to pixel type value range before comparison (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &ErosionGray(ImageView<T> &aDst, const morph_gray_compute_type_t<T> *aMask,
+                              const FilterArea &aFilterArea, T aConstant, BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs gray-scale-erosion on the mask area defined by aFilterArea. The value of aMask is added to the pixel
+    /// value and clamped to pixel type value range before comparison (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &ErosionGray(ImageView<T> &aDst, const morph_gray_compute_type_t<T> *aMask,
+                              const FilterArea &aFilterArea, BorderType aBorder) const
+        requires RealVector<T>;
+#pragma endregion
+#pragma region Dilation
+    /// <summary>
+    /// Performs dilation on the mask area defined by aFilterArea and where aMask is != 0 (maximum pixel in the
+    /// neighborhood).
+    /// </summary>
+    ImageView<T> &Dilation(ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea, T aConstant,
+                           BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs dilation on the mask area defined by aFilterArea and where aMask is != 0 (maximum pixel in the
+    /// neighborhood).
+    /// </summary>
+    ImageView<T> &Dilation(ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
+                           BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs gray-scale-dilation on the mask area defined by aFilterArea. The value of aMask is added to the pixel
+    /// value and clamped to pixel type value range before comparison (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &DilationGray(ImageView<T> &aDst, const morph_gray_compute_type_t<T> *aMask,
+                               const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                               const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs gray-scale-dilation on the mask area defined by aFilterArea. The value of aMask is added to the pixel
+    /// value and clamped to pixel type value range before comparison (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &DilationGray(ImageView<T> &aDst, const morph_gray_compute_type_t<T> *aMask,
+                               const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Performs dilation on the mask area defined by aFilterArea and where aMask is != 0 (maximum pixel in the
+    /// neighborhood).
+    /// </summary>
+    ImageView<T> &Dilation(ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea, T aConstant,
+                           BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs dilation on the mask area defined by aFilterArea and where aMask is != 0 (maximum pixel in the
+    /// neighborhood).
+    /// </summary>
+    ImageView<T> &Dilation(ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
+                           BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs gray-scale-dilation on the mask area defined by aFilterArea. The value of aMask is added to the pixel
+    /// value and clamped to pixel type value range before comparison (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &DilationGray(ImageView<T> &aDst, const morph_gray_compute_type_t<T> *aMask,
+                               const FilterArea &aFilterArea, T aConstant, BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs gray-scale-dilation on the mask area defined by aFilterArea. The value of aMask is added to the pixel
+    /// value and clamped to pixel type value range before comparison (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &DilationGray(ImageView<T> &aDst, const morph_gray_compute_type_t<T> *aMask,
+                               const FilterArea &aFilterArea, BorderType aBorder) const
+        requires RealVector<T>;
+#pragma endregion
+#pragma region Open
+    /// <summary>
+    /// First applies erosion then dilation.
+    /// </summary>
+    ImageView<T> &Open(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
+                       T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+    /// <summary>
+    /// First applies erosion then dilation.
+    /// </summary>
+    ImageView<T> &Open(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
+                       BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// First applies erosion then dilation.
+    /// </summary>
+    ImageView<T> &Open(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
+                       T aConstant, BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// First applies erosion then dilation.
+    /// </summary>
+    ImageView<T> &Open(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
+                       BorderType aBorder) const
+        requires RealVector<T>;
+#pragma endregion
+#pragma region Close
+    /// <summary>
+    /// First applies dilation then erosion.
+    /// </summary>
+    ImageView<T> &Close(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
+                        T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+    /// <summary>
+    /// First applies dilation then erosion.
+    /// </summary>
+    ImageView<T> &Close(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
+                        BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// First applies dilation then erosion.
+    /// </summary>
+    ImageView<T> &Close(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
+                        T aConstant, BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// First applies dilation then erosion.
+    /// </summary>
+    ImageView<T> &Close(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
+                        BorderType aBorder) const
+        requires RealVector<T>;
+#pragma endregion
+#pragma region TopHat
+    /// <summary>
+    /// The result is the original image minus the result from morphological opening.
+    /// </summary>
+    ImageView<T> &TopHat(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
+                         T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+    /// <summary>
+    /// The result is the original image minus the result from morphological opening.
+    /// </summary>
+    ImageView<T> &TopHat(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
+                         BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// The result is the original image minus the result from morphological opening.
+    /// </summary>
+    ImageView<T> &TopHat(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
+                         T aConstant, BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// The result is the original image minus the result from morphological opening.
+    /// </summary>
+    ImageView<T> &TopHat(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
+                         BorderType aBorder) const
+        requires RealVector<T>;
+#pragma endregion
+#pragma region BlackHat
+    /// <summary>
+    /// The result is the result from morphological closing minus the original image.
+    /// </summary>
+    ImageView<T> &BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask,
+                           const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                           const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+    /// <summary>
+    /// The result is the result from morphological closing minus the original image.
+    /// </summary>
+    ImageView<T> &BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask,
+                           const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// The result is the result from morphological closing minus the original image.
+    /// </summary>
+    ImageView<T> &BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask,
+                           const FilterArea &aFilterArea, T aConstant, BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// The result is the result from morphological closing minus the original image.
+    /// </summary>
+    ImageView<T> &BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask,
+                           const FilterArea &aFilterArea, BorderType aBorder) const
+        requires RealVector<T>;
+#pragma endregion
+#pragma region Morphology Gradient
+    /// <summary>
+    /// Dilation minus erosion.
+    /// </summary>
+    ImageView<T> &MorphologyGradient(ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
+                                     T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Dilation minus erosion.
+    /// </summary>
+    ImageView<T> &MorphologyGradient(ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
+                                     BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Dilation minus erosion.
+    /// </summary>
+    ImageView<T> &MorphologyGradient(ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
+                                     T aConstant, BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Dilation minus erosion.
+    /// </summary>
+    ImageView<T> &MorphologyGradient(ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
+                                     BorderType aBorder) const
+        requires RealVector<T>;
 #pragma endregion
 #pragma endregion
 
@@ -3750,6 +5176,152 @@ template <PixelType T> class ImageView
     void HistogramRange(same_vector_size_different_type_t<T, int> *aHist, int aHistBinCount,
                         hist_range_types_for_t<T> *aLevels)
         requires RealVector<T>;
+#pragma endregion
+
+#pragma region Cross Correlation
+    /// <summary>
+    /// Computes the un-normalized cross-correlation.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelation(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst, T aConstant,
+                                            BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+    /// <summary>
+    /// Computes the un-normalized cross-correlation.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelation(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                            BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the normalized cross-correlation.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelationNormalized(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                                      T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the normalized cross-correlation.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelationNormalized(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                                      BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the normalized squared distance.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &SquareDistanceNormalized(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                                    T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the normalized squared distance.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &SquareDistanceNormalized(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                                    BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the cross-correlation coefficient (CrossCorr_NormLevel in NPP).<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelationCoefficient(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                                       T aConstant, BorderType aBorder,
+                                                       const Roi &aAllowedReadRoi) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the cross-correlation coefficient (CrossCorr_NormLevel in NPP).<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelationCoefficient(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                                       BorderType aBorder, const Roi &aAllowedReadRoi) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the un-normalized cross-correlation.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelation(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst, T aConstant,
+                                            BorderType aBorder) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+    /// <summary>
+    /// Computes the un-normalized cross-correlation.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelation(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                            BorderType aBorder) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the normalized cross-correlation.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelationNormalized(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                                      T aConstant, BorderType aBorder) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the normalized cross-correlation.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelationNormalized(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                                      BorderType aBorder) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the normalized squared distance.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &SquareDistanceNormalized(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                                    T aConstant, BorderType aBorder) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the normalized squared distance.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &SquareDistanceNormalized(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                                    BorderType aBorder) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the cross-correlation coefficient (CrossCorr_NormLevel in NPP).<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelationCoefficient(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                                       T aConstant, BorderType aBorder) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the cross-correlation coefficient (CrossCorr_NormLevel in NPP).<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelationCoefficient(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                                       BorderType aBorder) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
 #pragma endregion
 #pragma endregion
 

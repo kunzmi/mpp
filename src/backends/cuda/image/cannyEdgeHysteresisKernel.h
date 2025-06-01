@@ -36,9 +36,6 @@ __device__ DstT processOnePixel(int pixelX, int pixelY, BorderControlT &aSrcWith
         return Strong;
     }
 
-    // if current pixel is "Weak", check if along the edge if at least one neighbor is also at least weak. If not,
-    // reject the point.
-
     Pixel32fC1 angle = *gotoPtr(aSrcAngle, aPitchSrcAngle, pixelX, pixelY);
 
     // get quantized direction from angle, angles from atan2-function are given in range -pi..pi
@@ -46,21 +43,6 @@ __device__ DstT processOnePixel(int pixelX, int pixelY, BorderControlT &aSrcWith
     angle.x = round((angle.x / std::numbers::pi_v<float> * 180.0f + 180.0f) / 45.0f);
     int dir = static_cast<int>(angle.x) % 4; // the modulo maps the negative / opposite direction to the positive one
 
-    // pixel = DstT::Max(pixel, aSrcWithBC(pixelX - 1, pixelY - 1));
-    // pixel = DstT::Max(pixel, aSrcWithBC(pixelX + 0, pixelY - 1));
-    // pixel = DstT::Max(pixel, aSrcWithBC(pixelX + 1, pixelY - 1));
-
-    // pixel = DstT::Max(pixel, aSrcWithBC(pixelX - 1, pixelY));
-    // pixel = DstT::Max(pixel, aSrcWithBC(pixelX + 1, pixelY));
-
-    // pixel = DstT::Max(pixel, aSrcWithBC(pixelX - 1, pixelY + 1));
-    // pixel = DstT::Max(pixel, aSrcWithBC(pixelX + 0, pixelY + 1));
-    // pixel = DstT::Max(pixel, aSrcWithBC(pixelX + 1, pixelY + 1));
-
-    // if (pixel == Strong)
-    //{
-    //     return Strong;
-    // }
     int pixelMinus = 0;
     int pixelPlus  = 0;
     switch (dir)
@@ -91,7 +73,7 @@ __device__ DstT processOnePixel(int pixelX, int pixelY, BorderControlT &aSrcWith
 
     if (pixelMinus + pixelPlus >= Strong.x)
     {
-        // at least one of the neighbor pixels is at least "Weak"
+        // at least one of the neighbor pixels is at least "Strong"
         return Strong;
     }
     return Nothing;

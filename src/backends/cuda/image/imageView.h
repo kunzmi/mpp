@@ -124,9 +124,13 @@ template <PixelType T> class ImageView
     }
 
   public:
-    ImageView(T *aBasePointer, const SizePitched &aSizeAlloc)
+    ImageView(T *aBasePointer, const SizePitched &aSizeAlloc) noexcept
         : mPtr(aBasePointer), mPitch(aSizeAlloc.Pitch()), mPtrRoi(aBasePointer), mSizeAlloc(aSizeAlloc.Size()),
           mRoi(0, 0, aSizeAlloc.Size())
+    {
+    }
+    ImageView(T *aBasePointer, const Size2D &aSize, size_t aPitch) noexcept
+        : mPtr(aBasePointer), mPitch(aPitch), mPtrRoi(aBasePointer), mSizeAlloc(aSize), mRoi(0, 0, aSize)
     {
     }
     ImageView(T *aBasePointer, const SizePitched &aSizeAlloc, const Roi &aRoi)
@@ -156,6 +160,12 @@ template <PixelType T> class ImageView
         return ImageView<Vector4A<remove_vector_t<T>>>(reinterpret_cast<Vector4A<remove_vector_t<T>> *>(mPtr),
                                                        SizePitched(mSizeAlloc, mPitch), mRoi);
     }
+
+    /// <summary>
+    /// Null can be used when a nullptr should be passed as an optional output argument. It is not made const as the
+    /// optional output arguments need to be non-const...
+    /// </summary>
+    static ImageView<T> Null;
 #pragma endregion
 
 #pragma region Basics and Copy to device/host
@@ -2311,234 +2321,1184 @@ template <PixelType T> class ImageView
 #pragma region Filtering
 #pragma region Fixed Filter
     /// <summary>
+    /// Applies an opp::FixedFilter to the source image.
     /// </summary>
-    ImageView<T> &FixedFilter(ImageView<T> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize, BorderType aBorder,
-                              T aConstant, Roi aAllowedReadRoi = Roi(),
+    ImageView<T> &FixedFilter(ImageView<T> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
+                              BorderType aBorder, const Roi &aAllowedReadRoi,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
     /// <summary>
+    /// Applies an opp::FixedFilter to the source image.
+    /// </summary>
+    ImageView<T> &FixedFilter(ImageView<T> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize, BorderType aBorder,
+                              const Roi &aAllowedReadRoi,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// Applies an opp::FixedFilter to the source image.
+    /// </summary>
+    ImageView<T> &FixedFilter(ImageView<T> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
+                              BorderType aBorder,
+
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Applies an opp::FixedFilter to the source image.
+    /// </summary>
+    ImageView<T> &FixedFilter(ImageView<T> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize, BorderType aBorder,
+
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// Applies an opp::FixedFilter to the source image.
     /// </summary>
     ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
         ImageView<alternative_filter_output_type_for_t<T>> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize,
-        BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+        T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(has_alternative_filter_output_type_for_v<T>);
+    /// <summary>
+    /// Applies an opp::FixedFilter to the source image.
+    /// </summary>
+    ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
+        ImageView<alternative_filter_output_type_for_t<T>> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize,
+        BorderType aBorder, const Roi &aAllowedReadRoi,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(has_alternative_filter_output_type_for_v<T>);
+
+    /// <summary>
+    /// Applies an opp::FixedFilter to the source image.
+    /// </summary>
+    ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
+        ImageView<alternative_filter_output_type_for_t<T>> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize,
+        T aConstant, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(has_alternative_filter_output_type_for_v<T>);
+    /// <summary>
+    /// Applies an opp::FixedFilter to the source image.
+    /// </summary>
+    ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
+        ImageView<alternative_filter_output_type_for_t<T>> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize,
+        BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(has_alternative_filter_output_type_for_v<T>);
 #pragma endregion
 #pragma region Separable Filter
     /// <summary>
+    /// Applies an user defined seperable filter to the image. Note that the filter parameters must sum up to 1.
     /// </summary>
     ImageView<T> &SeparableFilter(ImageView<T> &aDst,
                                   const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
-                                  int aFilterSize, int aFilterCenter, BorderType aBorder, T aConstant,
-                                  Roi aAllowedReadRoi                    = Roi(),
+                                  int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder,
+                                  const Roi &aAllowedReadRoi,
                                   const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
-    /*/// <summary>
+    /// <summary>
+    /// Applies an user defined seperable filter to the image. Note that the filter parameters must sum up to 1.
     /// </summary>
-    ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
-        ImageView<alternative_filter_output_type_for_t<T>> &aDst, opp::FixedFilter aFilter, MaskSize aFilterSize,
-        BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
-        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
-        requires(has_alternative_filter_output_type_for_v<T>);*/
+    ImageView<T> &SeparableFilter(ImageView<T> &aDst,
+                                  const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+                                  int aFilterSize, int aFilterCenter, BorderType aBorder, const Roi &aAllowedReadRoi,
+                                  const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Applies an user defined seperable filter to the image. Note that the filter parameters must sum up to 1.
+    /// </summary>
+    ImageView<T> &SeparableFilter(ImageView<T> &aDst,
+                                  const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+                                  int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder,
+                                  const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Applies an user defined seperable filter to the image. Note that the filter parameters must sum up to 1.
+    /// </summary>
+    ImageView<T> &SeparableFilter(ImageView<T> &aDst,
+                                  const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+                                  int aFilterSize, int aFilterCenter, BorderType aBorder,
+                                  const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 #pragma endregion
 #pragma region Column Filter
+
     /// <summary>
+    /// Applies an user defined column wise filter to the image. Note that the filter parameters must sum up to 1.
     /// </summary>
     ImageView<T> &ColumnFilter(ImageView<T> &aDst,
                                const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
-                               int aFilterSize, int aFilterCenter, BorderType aBorder, T aConstant,
-                               Roi aAllowedReadRoi                    = Roi(),
+                               int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Applies an user defined column wise filter to the image. Note that the filter parameters must sum up to 1.
+    /// </summary>
+    ImageView<T> &ColumnFilter(ImageView<T> &aDst,
+                               const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+                               int aFilterSize, int aFilterCenter, BorderType aBorder,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Applies an user defined column wise filter to the image. Note that the filter parameters must sum up to 1.
+    /// </summary>
+    ImageView<T> &ColumnFilter(ImageView<T> &aDst,
+                               const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+                               int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder,
+                               const Roi &aAllowedReadRoi,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Applies an user defined column wise filter to the image. Note that the filter parameters must sum up to 1.
+    /// </summary>
+    ImageView<T> &ColumnFilter(ImageView<T> &aDst,
+                               const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+                               int aFilterSize, int aFilterCenter, BorderType aBorder, const Roi &aAllowedReadRoi,
                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
+    /// Applies a column wise box-filter to the image, i.e. the pixels are summed up along columns with the specified
+    /// length. The result is then scaled by aScalingValue.
     /// </summary>
     ImageView<window_sum_result_type_t<T>> &ColumnWindowSum(
         ImageView<window_sum_result_type_t<T>> &aDst,
         complex_basetype_t<remove_vector_t<window_sum_result_type_t<T>>> aScalingValue, int aFilterSize,
-        int aFilterCenter, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+        int aFilterCenter, T aConstant, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Applies a column wise box-filter to the image, i.e. the pixels are summed up along columns with the specified
+    /// length. The result is then scaled by aScalingValue.
+    /// </summary>
+    ImageView<window_sum_result_type_t<T>> &ColumnWindowSum(
+        ImageView<window_sum_result_type_t<T>> &aDst,
+        complex_basetype_t<remove_vector_t<window_sum_result_type_t<T>>> aScalingValue, int aFilterSize,
+        int aFilterCenter, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// Applies a column wise box-filter to the image, i.e. the pixels are summed up along columns with the specified
+    /// length. The result is then scaled by aScalingValue.
+    /// </summary>
+    ImageView<window_sum_result_type_t<T>> &ColumnWindowSum(
+        ImageView<window_sum_result_type_t<T>> &aDst,
+        complex_basetype_t<remove_vector_t<window_sum_result_type_t<T>>> aScalingValue, int aFilterSize,
+        int aFilterCenter, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Applies a column wise box-filter to the image, i.e. the pixels are summed up along columns with the specified
+    /// length. The result is then scaled by aScalingValue.
+    /// </summary>
+    ImageView<window_sum_result_type_t<T>> &ColumnWindowSum(
+        ImageView<window_sum_result_type_t<T>> &aDst,
+        complex_basetype_t<remove_vector_t<window_sum_result_type_t<T>>> aScalingValue, int aFilterSize,
+        int aFilterCenter, BorderType aBorder, const Roi &aAllowedReadRoi,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 #pragma endregion
 #pragma region Row Filter
     /// <summary>
+    /// Applies an user defined row wise filter to the image. Note that the filter parameters must sum up to 1.
     /// </summary>
     ImageView<T> &RowFilter(ImageView<T> &aDst,
                             const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
-                            int aFilterSize, int aFilterCenter, BorderType aBorder, T aConstant,
-                            Roi aAllowedReadRoi                    = Roi(),
+                            int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Applies an user defined row wise filter to the image. Note that the filter parameters must sum up to 1.
+    /// </summary>
+    ImageView<T> &RowFilter(ImageView<T> &aDst,
+                            const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+                            int aFilterSize, int aFilterCenter, BorderType aBorder,
                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
+    /// Applies an user defined row wise filter to the image. Note that the filter parameters must sum up to 1.
+    /// </summary>
+    ImageView<T> &RowFilter(ImageView<T> &aDst,
+                            const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+                            int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder,
+                            const Roi &aAllowedReadRoi,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Applies an user defined row wise filter to the image. Note that the filter parameters must sum up to 1.
+    /// </summary>
+    ImageView<T> &RowFilter(ImageView<T> &aDst,
+                            const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+                            int aFilterSize, int aFilterCenter, BorderType aBorder, const Roi &aAllowedReadRoi,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// Applies a row wise box-filter to the image, i.e. the pixels are summed up along rows with the specified
+    /// length. The result is then scaled by aScalingValue.
     /// </summary>
     ImageView<window_sum_result_type_t<T>> &RowWindowSum(
         ImageView<window_sum_result_type_t<T>> &aDst,
         complex_basetype_t<remove_vector_t<window_sum_result_type_t<T>>> aScalingValue, int aFilterSize,
-        int aFilterCenter, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+        int aFilterCenter, T aConstant, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Applies a row wise box-filter to the image, i.e. the pixels are summed up along rows with the specified
+    /// length. The result is then scaled by aScalingValue.
+    /// </summary>
+    ImageView<window_sum_result_type_t<T>> &RowWindowSum(
+        ImageView<window_sum_result_type_t<T>> &aDst,
+        complex_basetype_t<remove_vector_t<window_sum_result_type_t<T>>> aScalingValue, int aFilterSize,
+        int aFilterCenter, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// Applies a row wise box-filter to the image, i.e. the pixels are summed up along rows with the specified
+    /// length. The result is then scaled by aScalingValue.
+    /// </summary>
+    ImageView<window_sum_result_type_t<T>> &RowWindowSum(
+        ImageView<window_sum_result_type_t<T>> &aDst,
+        complex_basetype_t<remove_vector_t<window_sum_result_type_t<T>>> aScalingValue, int aFilterSize,
+        int aFilterCenter, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Applies a row wise box-filter to the image, i.e. the pixels are summed up along rows with the specified
+    /// length. The result is then scaled by aScalingValue.
+    /// </summary>
+    ImageView<window_sum_result_type_t<T>> &RowWindowSum(
+        ImageView<window_sum_result_type_t<T>> &aDst,
+        complex_basetype_t<remove_vector_t<window_sum_result_type_t<T>>> aScalingValue, int aFilterSize,
+        int aFilterCenter, BorderType aBorder, const Roi &aAllowedReadRoi,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 #pragma endregion
 #pragma region Box Filter
     /// <summary>
+    /// Applies an averaging box-filter to the image.
     /// </summary>
-    ImageView<T> &BoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder, T aConstant,
-                            Roi aAllowedReadRoi                    = Roi(),
+    ImageView<T> &BoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
     /// <summary>
+    /// Applies an averaging box-filter to the image.
+    /// </summary>
+    ImageView<T> &BoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Applies an averaging box-filter to the image.
+    /// </summary>
+    ImageView<T> &BoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                            const Roi &aAllowedReadRoi,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Applies an averaging box-filter to the image.
+    /// </summary>
+    ImageView<T> &BoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+                            const Roi &aAllowedReadRoi,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Applies an averaging box-filter to the image.
+    /// </summary>
+    ImageView<same_vector_size_different_type_t<T, float>> &BoxFilter(
+        ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea, T aConstant,
+        BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealIntVector<T>;
+    /// <summary>
+    /// Applies an averaging box-filter to the image.
     /// </summary>
     ImageView<same_vector_size_different_type_t<T, float>> &BoxFilter(
         ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
-        T aConstant, Roi aAllowedReadRoi = Roi(),
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealIntVector<T>;
     /// <summary>
+    /// Applies an averaging box-filter to the image.
     /// </summary>
-    ImageView<Pixel32fC2> &BoxFilter(
-        ImageView<Pixel32fC2> &aDst, const FilterArea &aFilterArea, BorderType aBorder, T aConstant,
-        Roi aAllowedReadRoi                    = Roi(),
+    ImageView<same_vector_size_different_type_t<T, float>> &BoxFilter(
+        ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea, T aConstant,
+        BorderType aBorder, const Roi &aAllowedReadRoi,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealIntVector<T>;
+    /// <summary>
+    /// Applies an averaging box-filter to the image.
+    /// </summary>
+    ImageView<same_vector_size_different_type_t<T, float>> &BoxFilter(
+        ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+        const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealIntVector<T>;
+
+    /// <summary>
+    /// A specialised box filter for one-channel images that returns in first channel result image the mean value under
+    /// the box area and in the second channel the summed squared pixel values. The result can then be used in the
+    /// CrossCorrelationCoefficient function.
+    /// </summary>
+    ImageView<Pixel32fC2> &BoxAndSumSquareFilter(
+        ImageView<Pixel32fC2> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && SingleChannel<T> && (sizeof(T) < 8);
+    /// <summary>
+    /// A specialised box filter for one-channel images that returns in first channel result image the mean value under
+    /// the box area and in the second channel the summed squared pixel values. The result can then be used in the
+    /// CrossCorrelationCoefficient function.
+    /// </summary>
+    ImageView<Pixel32fC2> &BoxAndSumSquareFilter(
+        ImageView<Pixel32fC2> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && SingleChannel<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// A specialised box filter for one-channel images that returns in first channel result image the mean value under
+    /// the box area and in the second channel the summed squared pixel values. The result can then be used in the
+    /// CrossCorrelationCoefficient function.
+    /// </summary>
+    ImageView<Pixel32fC2> &BoxAndSumSquareFilter(
+        ImageView<Pixel32fC2> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+        const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && SingleChannel<T> && (sizeof(T) < 8);
+    /// <summary>
+    /// A specialised box filter for one-channel images that returns in first channel result image the mean value under
+    /// the box area and in the second channel the summed squared pixel values. The result can then be used in the
+    /// CrossCorrelationCoefficient function.
+    /// </summary>
+    ImageView<Pixel32fC2> &BoxAndSumSquareFilter(
+        ImageView<Pixel32fC2> &aDst, const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T> && SingleChannel<T> && (sizeof(T) < 8);
 #pragma endregion
 #pragma region Min/Max Filter
     /// <summary>
+    /// The filter finds in the neighborhood of each pixel defined in aFilterArea the maximum pixel value.
     /// </summary>
-    ImageView<T> &MaxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder, T aConstant,
-                            Roi aAllowedReadRoi                    = Roi(),
+    ImageView<T> &MaxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
     /// <summary>
+    /// The filter finds in the neighborhood of each pixel defined in aFilterArea the maximum pixel value.
     /// </summary>
-    ImageView<T> &MinFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder, T aConstant,
-                            Roi aAllowedReadRoi                    = Roi(),
+    ImageView<T> &MaxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// The filter finds in the neighborhood of each pixel defined in aFilterArea the maximum pixel value.
+    /// </summary>
+    ImageView<T> &MaxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                            const Roi &aAllowedReadRoi,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// The filter finds in the neighborhood of each pixel defined in aFilterArea the maximum pixel value.
+    /// </summary>
+    ImageView<T> &MaxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+                            const Roi &aAllowedReadRoi,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// The filter finds in the neighborhood of each pixel defined in aFilterArea the minimum pixel value.
+    /// </summary>
+    ImageView<T> &MinFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// The filter finds in the neighborhood of each pixel defined in aFilterArea the minimum pixel value.
+    /// </summary>
+    ImageView<T> &MinFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// The filter finds in the neighborhood of each pixel defined in aFilterArea the minimum pixel value.
+    /// </summary>
+    ImageView<T> &MinFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                            const Roi &aAllowedReadRoi,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// The filter finds in the neighborhood of each pixel defined in aFilterArea the minimum pixel value.
+    /// </summary>
+    ImageView<T> &MinFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+                            const Roi &aAllowedReadRoi,
                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
 
 #pragma endregion
 #pragma region Wiener Filter
     /// <summary>
+    /// Applies Wiener filter to the image.
     /// </summary>
     ImageView<T> &WienerFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
-                               const filter_compute_type_for_t<T> &aNoise, BorderType aBorder, T aConstant,
-                               Roi aAllowedReadRoi                    = Roi(),
+                               const filter_compute_type_for_t<T> &aNoise, T aConstant, BorderType aBorder,
+
                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
+    /// <summary>
+    /// Applies Wiener filter to the image.
+    /// </summary>
+    ImageView<T> &WienerFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
+                               const filter_compute_type_for_t<T> &aNoise, BorderType aBorder,
+
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Applies Wiener filter to the image.
+    /// </summary>
+    ImageView<T> &WienerFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
+                               const filter_compute_type_for_t<T> &aNoise, T aConstant, BorderType aBorder,
+                               const Roi &aAllowedReadRoi,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Applies Wiener filter to the image.
+    /// </summary>
+    ImageView<T> &WienerFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
+                               const filter_compute_type_for_t<T> &aNoise, BorderType aBorder,
+                               const Roi &aAllowedReadRoi,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
 #pragma endregion
 #pragma region Threshold Adaptive Box Filter
     /// <summary>
+    /// Computes the average pixel values of the pixels under a mask.
+    /// Once the neighborhood average around a source pixel is determined the source pixel is compared to the average
+    /// aDelta and if the source pixel is greater than that average the corresponding destination pixel is set to
+    /// aValGT, otherwise aValLE.
     /// </summary>
     ImageView<T> &ThresholdAdaptiveBoxFilter(
         ImageView<T> &aDst, const FilterArea &aFilterArea, const filter_compute_type_for_t<T> &aDelta, const T &aValGT,
-        const T &aValLE, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+        const T &aValLE, T aConstant, BorderType aBorder,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
+    /// <summary>
+    /// Computes the average pixel values of the pixels under a mask.
+    /// Once the neighborhood average around a source pixel is determined the source pixel is compared to the average
+    /// aDelta and if the source pixel is greater than that average the corresponding destination pixel is set to
+    /// aValGT, otherwise aValLE.
+    /// </summary>
+    ImageView<T> &ThresholdAdaptiveBoxFilter(
+        ImageView<T> &aDst, const FilterArea &aFilterArea, const filter_compute_type_for_t<T> &aDelta, const T &aValGT,
+        const T &aValLE, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Computes the average pixel values of the pixels under a mask.
+    /// Once the neighborhood average around a source pixel is determined the source pixel is compared to the average
+    /// aDelta and if the source pixel is greater than that average the corresponding destination pixel is set to
+    /// aValGT, otherwise aValLE.
+    /// </summary>
+    ImageView<T> &ThresholdAdaptiveBoxFilter(
+        ImageView<T> &aDst, const FilterArea &aFilterArea, const filter_compute_type_for_t<T> &aDelta, const T &aValGT,
+        const T &aValLE, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Computes the average pixel values of the pixels under a mask.
+    /// Once the neighborhood average around a source pixel is determined the source pixel is compared to the average
+    /// aDelta and if the source pixel is greater than that average the corresponding destination pixel is set to
+    /// aValGT, otherwise aValLE.
+    /// </summary>
+    ImageView<T> &ThresholdAdaptiveBoxFilter(
+        ImageView<T> &aDst, const FilterArea &aFilterArea, const filter_compute_type_for_t<T> &aDelta, const T &aValGT,
+        const T &aValLE, BorderType aBorder, const Roi &aAllowedReadRoi,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
 #pragma endregion
 #pragma region Filter
     /// <summary>
+    /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
+    /// Note that the filter is applied in "cross-correlation orientation" and not in "convolution orientation", i.e.
+    /// the filter has the same orientation as the image (same behavior as in NPP).
     /// </summary>
     ImageView<T> &Filter(ImageView<T> &aDst,
                          const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
-                         const FilterArea &aFilterArea, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                         const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
+    /// Note that the filter is applied in "cross-correlation orientation" and not in "convolution orientation", i.e.
+    /// the filter has the same orientation as the image (same behavior as in NPP).
+    /// </summary>
+    ImageView<T> &Filter(ImageView<T> &aDst,
+                         const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+                         const FilterArea &aFilterArea, BorderType aBorder,
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
+    /// Note that the filter is applied in "cross-correlation orientation" and not in "convolution orientation", i.e.
+    /// the filter has the same orientation as the image (same behavior as in NPP).
+    /// </summary>
+    ImageView<T> &Filter(ImageView<T> &aDst,
+                         const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+                         const FilterArea &aFilterArea, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
+    /// Note that the filter is applied in "cross-correlation orientation" and not in "convolution orientation", i.e.
+    /// the filter has the same orientation as the image (same behavior as in NPP).
+    /// </summary>
+    ImageView<T> &Filter(ImageView<T> &aDst,
+                         const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+                         const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi,
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
 #pragma endregion
 #pragma region Bilateral Gauss Filter
+    /// <summary>
+    /// This function pre-computes the geometrical distance coefficients for bilateral Gauss filtering. The result of
+    /// this function can be passed to BilateralGaussFilter.
+    /// </summary>
+    /// <param name="aPreCompGeomDistCoeff"></param>
+    /// <param name="aFilterArea"></param>
+    /// <param name="aPosSquareSigma"></param>
+    /// <param name="aStreamCtx"></param>
     void PrecomputeBilateralGaussFilter(
-        opp::cuda::DevVarView<float> &aPreCompGeomDistCoeff, const FilterArea &aFilterArea, float aPosSquareSigma,
+        opp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff, const FilterArea &aFilterArea, float aPosSquareSigma,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
+    /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().
     /// </summary>
     ImageView<T> &BilateralGaussFilter(
-        ImageView<T> &aDst, const FilterArea &aFilterArea, const opp::cuda::DevVarView<float> &aPreCompGeomDistCoeff,
-        float aValSquareSigma, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+        ImageView<T> &aDst, const FilterArea &aFilterArea,
+        const opp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff, float aValSquareSigma, T aConstant,
+        BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && RealVector<T> &&
+                 (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
+
+    /// <summary>
+    /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().
+    /// </summary>
+    ImageView<T> &BilateralGaussFilter(
+        ImageView<T> &aDst, const FilterArea &aFilterArea,
+        const opp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff, float aValSquareSigma, BorderType aBorder,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires SingleChannel<T> && RealVector<T> &&
                  (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
+
     /// <summary>
+    /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().
     /// </summary>
     ImageView<T> &BilateralGaussFilter(
-        ImageView<T> &aDst, const FilterArea &aFilterArea, const opp::cuda::DevVarView<float> &aPreCompGeomDistCoeff,
-        float aValSquareSigma, opp::Norm aNorm, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+        ImageView<T> &aDst, const FilterArea &aFilterArea,
+        const opp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff, float aValSquareSigma, T aConstant,
+        BorderType aBorder, const Roi &aAllowedReadRoi,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && RealVector<T> &&
+                 (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
+
+    /// <summary>
+    /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().
+    /// </summary>
+    ImageView<T> &BilateralGaussFilter(
+        ImageView<T> &aDst, const FilterArea &aFilterArea,
+        const opp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff, float aValSquareSigma, BorderType aBorder,
+        const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && RealVector<T> &&
+                 (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
+    /// <summary>
+    /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().
+    /// </summary>
+    ImageView<T> &BilateralGaussFilter(
+        ImageView<T> &aDst, const FilterArea &aFilterArea,
+        const opp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff, float aValSquareSigma, opp::Norm aNorm,
+        T aConstant, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(!SingleChannel<T>) && RealVector<T> &&
+                (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
+    /// <summary>
+    /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().
+    /// </summary>
+    ImageView<T> &BilateralGaussFilter(
+        ImageView<T> &aDst, const FilterArea &aFilterArea,
+        const opp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff, float aValSquareSigma, opp::Norm aNorm,
+        BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(!SingleChannel<T>) && RealVector<T> &&
+                (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
+    /// <summary>
+    /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().
+    /// </summary>
+    ImageView<T> &BilateralGaussFilter(
+        ImageView<T> &aDst, const FilterArea &aFilterArea,
+        const opp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff, float aValSquareSigma, opp::Norm aNorm,
+        T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(!SingleChannel<T>) && RealVector<T> &&
+                (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
+    /// <summary>
+    /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().
+    /// </summary>
+    ImageView<T> &BilateralGaussFilter(
+        ImageView<T> &aDst, const FilterArea &aFilterArea,
+        const opp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff, float aValSquareSigma, opp::Norm aNorm,
+        BorderType aBorder, const Roi &aAllowedReadRoi,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(!SingleChannel<T>) && RealVector<T> &&
                 (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
 #pragma endregion
 #pragma region Gradient Vector
     /// <summary>
+    /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
     /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
     void GradientVectorSobel(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY, ImageView<Pixel16sC1> &aDstMag,
                              ImageView<Pixel32fC1> &aDstAngle, ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm,
-                             MaskSize aMaskSize, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                             MaskSize aMaskSize, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
     /// <summary>
+    /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
     /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorSobel(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY, ImageView<Pixel16sC1> &aDstMag,
+                             ImageView<Pixel32fC1> &aDstAngle, ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm,
+                             MaskSize aMaskSize, BorderType aBorder, const Roi &aAllowedReadRoi,
+                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
     void GradientVectorSobel(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY, ImageView<Pixel32fC1> &aDstMag,
                              ImageView<Pixel32fC1> &aDstAngle, ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm,
-                             MaskSize aMaskSize, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                             MaskSize aMaskSize, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorSobel(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY, ImageView<Pixel32fC1> &aDstMag,
+                             ImageView<Pixel32fC1> &aDstAngle, ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm,
+                             MaskSize aMaskSize, BorderType aBorder, const Roi &aAllowedReadRoi,
                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
                  std::same_as<remove_vector_t<T>, float>);
 
     /// <summary>
+    /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
     /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorScharr(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
+                              ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                              ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, T aConstant,
+                              BorderType aBorder, const Roi &aAllowedReadRoi,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
     void GradientVectorScharr(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
                               ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                               ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, BorderType aBorder,
-                              T aConstant, Roi aAllowedReadRoi = Roi(),
+                              const Roi &aAllowedReadRoi,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
     /// <summary>
+    /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
     /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorScharr(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
+                              ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                              ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, T aConstant,
+                              BorderType aBorder, const Roi &aAllowedReadRoi,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
     void GradientVectorScharr(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
                               ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                               ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, BorderType aBorder,
-                              T aConstant, Roi aAllowedReadRoi = Roi(),
+                              const Roi &aAllowedReadRoi,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
                  std::same_as<remove_vector_t<T>, float>);
 
     /// <summary>
+    /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
     /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorPrewitt(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
+                               ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                               ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, T aConstant,
+                               BorderType aBorder, const Roi &aAllowedReadRoi,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
     void GradientVectorPrewitt(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
                                ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                               BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                               BorderType aBorder, const Roi &aAllowedReadRoi,
                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+
     /// <summary>
+    /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
     /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorPrewitt(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
+                               ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                               ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, T aConstant,
+                               BorderType aBorder, const Roi &aAllowedReadRoi,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
     void GradientVectorPrewitt(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
                                ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                               BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                               BorderType aBorder, const Roi &aAllowedReadRoi,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorSobel(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY, ImageView<Pixel16sC1> &aDstMag,
+                             ImageView<Pixel32fC1> &aDstAngle, ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm,
+                             MaskSize aMaskSize, T aConstant, BorderType aBorder,
+                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorSobel(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY, ImageView<Pixel16sC1> &aDstMag,
+                             ImageView<Pixel32fC1> &aDstAngle, ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm,
+                             MaskSize aMaskSize, BorderType aBorder,
+                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorSobel(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY, ImageView<Pixel32fC1> &aDstMag,
+                             ImageView<Pixel32fC1> &aDstAngle, ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm,
+                             MaskSize aMaskSize, T aConstant, BorderType aBorder,
+                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorSobel(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY, ImageView<Pixel32fC1> &aDstMag,
+                             ImageView<Pixel32fC1> &aDstAngle, ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm,
+                             MaskSize aMaskSize, BorderType aBorder,
+                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorScharr(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
+                              ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                              ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, T aConstant,
+                              BorderType aBorder,
+
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorScharr(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
+                              ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                              ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, BorderType aBorder,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorScharr(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
+                              ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                              ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, T aConstant,
+                              BorderType aBorder,
+
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorScharr(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
+                              ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                              ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, BorderType aBorder,
+
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorPrewitt(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
+                               ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                               ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, T aConstant,
+                               BorderType aBorder,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorPrewitt(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
+                               ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                               ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
+                               BorderType aBorder,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorPrewitt(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
+                               ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                               ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize, T aConstant,
+                               BorderType aBorder,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
+                 std::same_as<remove_vector_t<T>, float>);
+
+    /// <summary>
+    /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// </summary>
+    /// <param name="aDstX">the X (vertical) gradient</param>
+    /// <param name="aDstY">the Y (horizontal) gradient</param>
+    /// <param name="aDstMag">the gradient magnitude</param>
+    /// <param name="aDstAngle">the orientation computed using atan2</param>
+    /// <param name="aDstCovariance">the covariance matrix stored in a Vector4 structure for
+    /// convenience (.x is the x^2 gradient, .y is the y^2 gradient, .z and .w are x*y gradient).</param>
+    /// <param name="aNorm">The norm used to compute aDstMag</param>
+    /// <param name="aMaskSize">Mask size for the fixed filter</param>
+    void GradientVectorPrewitt(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
+                               ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
+                               ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
+                               BorderType aBorder,
                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
                  std::same_as<remove_vector_t<T>, float>);
 #pragma endregion
 #pragma region Unsharp Filter
     /// <summary>
+    /// Smoothes the orginal images using the user defined filter aFilter (coefficients should sum up to 1) and then
+    /// subtracts the result from the original to obtain a high-pass filtered image. After thresholding and weighting,
+    /// the result is added to the original image using the following pseudo-formula:<para/>
+    /// HighPass = Image - Filter(Image)<para/>
+    /// Result = Image + nWeight * HighPass * (| HighPass | &gt;= nThreshold) <para/>
+    /// where nWeight is the amount, nThreshold is the threshold, and &gt;= indicates a Boolean operation, 1 if true, or
+    /// 0 otherwise.
+    /// </summary>
+    ImageView<T> &UnsharpFilter(ImageView<T> &aDst,
+                                const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+                                int aFilterSize, int aFilterCenter,
+                                remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aWeight,
+                                remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aThreshold, T aConstant,
+                                BorderType aBorder,
+                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Smoothes the orginal images using the user defined filter aFilter (coefficients should sum up to 1) and then
+    /// subtracts the result from the original to obtain a high-pass filtered image. After thresholding and weighting,
+    /// the result is added to the original image using the following pseudo-formula:<para/>
+    /// HighPass = Image - Filter(Image)<para/>
+    /// Result = Image + nWeight * HighPass * (| HighPass | &gt;= nThreshold) <para/>
+    /// where nWeight is the amount, nThreshold is the threshold, and &gt;= indicates a Boolean operation, 1 if true, or
+    /// 0 otherwise.
     /// </summary>
     ImageView<T> &UnsharpFilter(ImageView<T> &aDst,
                                 const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
                                 int aFilterSize, int aFilterCenter,
                                 remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aWeight,
                                 remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aThreshold,
-                                BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                                BorderType aBorder,
+                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Smoothes the orginal images using the user defined filter aFilter (coefficients should sum up to 1) and then
+    /// subtracts the result from the original to obtain a high-pass filtered image. After thresholding and weighting,
+    /// the result is added to the original image using the following pseudo-formula:<para/>
+    /// HighPass = Image - Filter(Image)<para/>
+    /// Result = Image + nWeight * HighPass * (| HighPass | &gt;= nThreshold) <para/>
+    /// where nWeight is the amount, nThreshold is the threshold, and &gt;= indicates a Boolean operation, 1 if true, or
+    /// 0 otherwise.
+    /// </summary>
+    ImageView<T> &UnsharpFilter(ImageView<T> &aDst,
+                                const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+                                int aFilterSize, int aFilterCenter,
+                                remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aWeight,
+                                remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aThreshold, T aConstant,
+                                BorderType aBorder, const Roi &aAllowedReadRoi,
+                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Smoothes the orginal images using the user defined filter aFilter (coefficients should sum up to 1) and then
+    /// subtracts the result from the original to obtain a high-pass filtered image. After thresholding and weighting,
+    /// the result is added to the original image using the following pseudo-formula:<para/>
+    /// HighPass = Image - Filter(Image)<para/>
+    /// Result = Image + nWeight * HighPass * (| HighPass | &gt;= nThreshold) <para/>
+    /// where nWeight is the amount, nThreshold is the threshold, and &gt;= indicates a Boolean operation, 1 if true, or
+    /// 0 otherwise.
+    /// </summary>
+    ImageView<T> &UnsharpFilter(ImageView<T> &aDst,
+                                const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+                                int aFilterSize, int aFilterCenter,
+                                remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aWeight,
+                                remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aThreshold,
+                                BorderType aBorder, const Roi &aAllowedReadRoi,
                                 const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
 #pragma endregion
 #pragma region Harris Corner Response
     /// <summary>
+    /// From a covariance matrix for each pixel obtained from one of the GradientVector functions, this function
+    /// computes the Harris Corner response.
     /// </summary>
     ImageView<Pixel32fC1> &HarrisCornerResponse(
-        ImageView<Pixel32fC1> &aDst, const FilterArea aAvgWindowSize, float aK, float aScale, BorderType aBorder,
-        T aConstant, Roi aAllowedReadRoi = Roi(),
+        ImageView<Pixel32fC1> &aDst, const FilterArea &aAvgWindowSize, float aK, float aScale, T aConstant,
+        BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires std::same_as<T, Pixel32fC4>;
+    /// <summary>
+    /// From a covariance matrix for each pixel obtained from one of the GradientVector functions, this function
+    /// computes the Harris Corner response.
+    /// </summary>
+    ImageView<Pixel32fC1> &HarrisCornerResponse(
+        ImageView<Pixel32fC1> &aDst, const FilterArea &aAvgWindowSize, float aK, float aScale, BorderType aBorder,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<T, Pixel32fC4>;
+    /// <summary>
+    /// From a covariance matrix for each pixel obtained from one of the GradientVector functions, this function
+    /// computes the Harris Corner response.
+    /// </summary>
+    ImageView<Pixel32fC1> &HarrisCornerResponse(
+        ImageView<Pixel32fC1> &aDst, const FilterArea &aAvgWindowSize, float aK, float aScale, T aConstant,
+        BorderType aBorder, const Roi &aAllowedReadRoi,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires std::same_as<T, Pixel32fC4>;
+    /// <summary>
+    /// From a covariance matrix for each pixel obtained from one of the GradientVector functions, this function
+    /// computes the Harris Corner response.
+    /// </summary>
+    ImageView<Pixel32fC1> &HarrisCornerResponse(
+        ImageView<Pixel32fC1> &aDst, const FilterArea &aAvgWindowSize, float aK, float aScale, BorderType aBorder,
+        const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires std::same_as<T, Pixel32fC4>;
+
 #pragma endregion
 #pragma region Canny edge
     /// <summary>
+    /// For an gradient magnitude image and an gradient orientation image obtained from one of the gradient vector
+    /// functions, this function performs canny edge detection.
     /// </summary>
     ImageView<Pixel8uC1> &CannyEdge(const ImageView<Pixel32fC1> &aSrcAngle, ImageView<Pixel8uC1> &aTemp,
                                     ImageView<Pixel8uC1> &aDst, T aLowThreshold, T aHighThreshold,
-                                    Roi aAllowedReadRoi                    = Roi(),
                                     const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<T, Pixel16sC1> || std::same_as<T, Pixel32fC1>;
+    /// <summary>
+    /// For an gradient magnitude image and an gradient orientation image obtained from one of the gradient vector
+    /// functions, this function performs canny edge detection.
+    /// </summary>
+    ImageView<Pixel8uC1> &CannyEdge(const ImageView<Pixel32fC1> &aSrcAngle, ImageView<Pixel8uC1> &aTemp,
+                                    ImageView<Pixel8uC1> &aDst, T aLowThreshold, T aHighThreshold,
+                                    const Roi &aAllowedReadRoi,
+                                    const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires std::same_as<T, Pixel16sC1> || std::same_as<T, Pixel32fC1>;
+
 #pragma endregion
 #pragma endregion
 
@@ -2558,8 +3518,8 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     ImageView<T> &WarpAffine(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
-                             InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
-                             Roi aAllowedReadRoi                    = Roi(),
+                             InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                             const Roi &aAllowedReadRoi,
                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
@@ -2575,7 +3535,7 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     ImageView<T> &WarpAffine(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
-                             InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+                             InterpolationMode aInterpolation, BorderType aBorder, const Roi &aAllowedReadRoi,
                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
@@ -2591,10 +3551,11 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                            ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                           BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, T aConstant,
+                           BorderType aBorder, const Roi &aAllowedReadRoi,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires TwoChannel<T>;
 
@@ -2611,10 +3572,11 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                            ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                            const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                           BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+                           BorderType aBorder, const Roi &aAllowedReadRoi,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires TwoChannel<T>;
     /// <summary>
@@ -2630,11 +3592,13 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                           ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                           ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                           BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+    static void WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, const AffineTransformation<double> &aAffine,
+                           InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                           const Roi &aAllowedReadRoi,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ThreeChannel<T>;
 
@@ -2651,11 +3615,12 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                           ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                           ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                           BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+    static void WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, const AffineTransformation<double> &aAffine,
+                           InterpolationMode aInterpolation, BorderType aBorder, const Roi &aAllowedReadRoi,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ThreeChannel<T>;
 
@@ -2672,12 +3637,14 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                           ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                            ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                           BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, T aConstant,
+                           BorderType aBorder, const Roi &aAllowedReadRoi,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires FourChannelNoAlpha<T>;
 
@@ -2694,12 +3661,14 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpAffine(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                           ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                            ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                            const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                           BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+                           BorderType aBorder, const Roi &aAllowedReadRoi,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires FourChannelNoAlpha<T>;
 
@@ -2717,8 +3686,8 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     ImageView<T> &WarpAffineBack(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
-                                 InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
-                                 Roi aAllowedReadRoi                    = Roi(),
+                                 InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                 const Roi &aAllowedReadRoi,
                                  const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -2735,7 +3704,7 @@ template <PixelType T> class ImageView
     /// use must be provided.
     /// </summary>
     ImageView<T> &WarpAffineBack(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
-                                 InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+                                 InterpolationMode aInterpolation, BorderType aBorder, const Roi &aAllowedReadRoi,
                                  const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
@@ -2751,12 +3720,12 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpAffineBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                               ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void WarpAffineBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                               BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                               T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires TwoChannel<T>;
     /// <summary>
@@ -2773,12 +3742,12 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to
     /// use must be provided.
     /// </summary>
-    static void WarpAffineBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                               ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void WarpAffineBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                               BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+                               BorderType aBorder, const Roi &aAllowedReadRoi,
                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires TwoChannel<T>;
 
@@ -2796,11 +3765,11 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     static void WarpAffineBack(
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
         ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-        const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
-        Roi aAllowedReadRoi = Roi(), const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+        const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ThreeChannel<T>;
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -2817,11 +3786,11 @@ template <PixelType T> class ImageView
     /// use must be provided.
     /// </summary>
     static void WarpAffineBack(
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
         ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
         const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, BorderType aBorder,
-        Roi aAllowedReadRoi = Roi(), const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ThreeChannel<T>;
 
     /// <summary>
@@ -2838,12 +3807,12 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     static void WarpAffineBack(
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
         ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-        const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
-        Roi aAllowedReadRoi = Roi(), const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+        const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires FourChannelNoAlpha<T>;
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -2860,12 +3829,342 @@ template <PixelType T> class ImageView
     /// use must be provided.
     /// </summary>
     static void WarpAffineBack(
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
         ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
         const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, BorderType aBorder,
-        Roi aAllowedReadRoi = Roi(), const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires FourChannelNoAlpha<T>;
+
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    ImageView<T> &WarpAffine(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
+                             InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    ImageView<T> &WarpAffine(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
+                             InterpolationMode aInterpolation, BorderType aBorder,
+                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, T aConstant,
+                           BorderType aBorder,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
+                           BorderType aBorder,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires TwoChannel<T>;
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, const AffineTransformation<double> &aAffine,
+                           InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, const AffineTransformation<double> &aAffine,
+                           InterpolationMode aInterpolation, BorderType aBorder,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, T aConstant,
+                           BorderType aBorder,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires FourChannelNoAlpha<T>;
+
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+                           const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
+                           BorderType aBorder,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires FourChannelNoAlpha<T>;
+
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    ImageView<T> &WarpAffineBack(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
+                                 InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                 const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to
+    /// use must be provided.
+    /// </summary>
+    ImageView<T> &WarpAffineBack(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
+                                 InterpolationMode aInterpolation, BorderType aBorder,
+                                 const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpAffineBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                               const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
+                               T aConstant, BorderType aBorder,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires TwoChannel<T>;
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to
+    /// use must be provided.
+    /// </summary>
+    static void WarpAffineBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                               const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
+                               BorderType aBorder,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpAffineBack(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+        const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires ThreeChannel<T>;
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to
+    /// use must be provided.
+    /// </summary>
+    static void WarpAffineBack(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+        const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpAffineBack(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+        const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires FourChannelNoAlpha<T>;
+    /// <summary>
+    /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
+    /// Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to
+    /// use must be provided.
+    /// </summary>
+    static void WarpAffineBack(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+        const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires FourChannelNoAlpha<T>;
 #pragma endregion
 
@@ -2884,8 +4183,8 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     ImageView<T> &WarpPerspective(ImageView<T> &aDst, const PerspectiveTransformation<double> &aPerspective,
-                                  InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
-                                  Roi aAllowedReadRoi                    = Roi(),
+                                  InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                  const Roi &aAllowedReadRoi,
                                   const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
@@ -2901,7 +4200,7 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     ImageView<T> &WarpPerspective(ImageView<T> &aDst, const PerspectiveTransformation<double> &aPerspective,
-                                  InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+                                  InterpolationMode aInterpolation, BorderType aBorder, const Roi &aAllowedReadRoi,
                                   const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
@@ -2917,12 +4216,12 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpPerspective(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void WarpPerspective(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                 const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
-                                BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                                T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                                 const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires TwoChannel<T>;
 
@@ -2939,12 +4238,12 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpPerspective(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void WarpPerspective(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                 const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
-                                BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+                                BorderType aBorder, const Roi &aAllowedReadRoi,
                                 const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires TwoChannel<T>;
 
@@ -2961,14 +4260,14 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpPerspective(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+    static void WarpPerspective(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDst3,
                                 const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
-                                BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                                T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                                 const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ThreeChannel<T>;
 
@@ -2986,11 +4285,11 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     static void WarpPerspective(
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
         ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
         const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
-        Roi aAllowedReadRoi = Roi(), const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ThreeChannel<T>;
 
     /// <summary>
@@ -3007,12 +4306,12 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     static void WarpPerspective(
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
         ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
-        T aConstant, Roi aAllowedReadRoi = Roi(),
+        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+        BorderType aBorder, const Roi &aAllowedReadRoi,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires FourChannelNoAlpha<T>;
 
@@ -3030,12 +4329,12 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     static void WarpPerspective(
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
         ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
         const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
-        Roi aAllowedReadRoi = Roi(), const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires FourChannelNoAlpha<T>;
 
     /// <summary>
@@ -3053,7 +4352,7 @@ template <PixelType T> class ImageView
     /// </summary>
     ImageView<T> &WarpPerspectiveBack(
         ImageView<T> &aDst, const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
-        BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+        T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
@@ -3070,7 +4369,7 @@ template <PixelType T> class ImageView
     /// </summary>
     ImageView<T> &WarpPerspectiveBack(
         ImageView<T> &aDst, const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
-        BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+        BorderType aBorder, const Roi &aAllowedReadRoi,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
@@ -3086,13 +4385,13 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpPerspectiveBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                    ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void WarpPerspectiveBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                     ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                     const PerspectiveTransformation<double> &aPerspective,
-                                    InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
-                                    Roi aAllowedReadRoi                    = Roi(),
+                                    InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                    const Roi &aAllowedReadRoi,
                                     const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires TwoChannel<T>;
 
@@ -3109,12 +4408,12 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void WarpPerspectiveBack(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                    ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void WarpPerspectiveBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                     ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                     const PerspectiveTransformation<double> &aPerspective,
-                                    InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+                                    InterpolationMode aInterpolation, BorderType aBorder, const Roi &aAllowedReadRoi,
                                     const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires TwoChannel<T>;
 
@@ -3132,11 +4431,11 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     static void WarpPerspectiveBack(
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
         ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
-        T aConstant, Roi aAllowedReadRoi = Roi(),
+        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+        BorderType aBorder, const Roi &aAllowedReadRoi,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ThreeChannel<T>;
 
@@ -3154,11 +4453,11 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     static void WarpPerspectiveBack(
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
         ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
         const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
-        Roi aAllowedReadRoi = Roi(), const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ThreeChannel<T>;
 
     /// <summary>
@@ -3175,12 +4474,12 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     static void WarpPerspectiveBack(
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
         ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
-        T aConstant, Roi aAllowedReadRoi = Roi(),
+        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+        BorderType aBorder, const Roi &aAllowedReadRoi,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires FourChannelNoAlpha<T>;
 
@@ -3198,12 +4497,339 @@ template <PixelType T> class ImageView
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     static void WarpPerspectiveBack(
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-        ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
         ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
         const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
-        Roi aAllowedReadRoi = Roi(), const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires FourChannelNoAlpha<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    ImageView<T> &WarpPerspective(ImageView<T> &aDst, const PerspectiveTransformation<double> &aPerspective,
+                                  InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                  const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    ImageView<T> &WarpPerspective(ImageView<T> &aDst, const PerspectiveTransformation<double> &aPerspective,
+                                  InterpolationMode aInterpolation, BorderType aBorder,
+                                  const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspective(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
+                                T aConstant, BorderType aBorder,
+                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspective(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
+                                BorderType aBorder,
+                                const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspective(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+        BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspective(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspective(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+        BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires FourChannelNoAlpha<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspective(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires FourChannelNoAlpha<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    ImageView<T> &WarpPerspectiveBack(
+        ImageView<T> &aDst, const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
+        T aConstant, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    ImageView<T> &WarpPerspectiveBack(
+        ImageView<T> &aDst, const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
+        BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspectiveBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                    const PerspectiveTransformation<double> &aPerspective,
+                                    InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                    const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspectiveBack(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                    const PerspectiveTransformation<double> &aPerspective,
+                                    InterpolationMode aInterpolation, BorderType aBorder,
+                                    const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspectiveBack(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+        BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspectiveBack(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspectiveBack(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+        BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires FourChannelNoAlpha<T>;
+
+    /// <summary>
+    /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
+    /// image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi differs:
+    /// For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and remain as
+    /// is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching outside the
+    /// roi.<para/>
+    /// For all other BorderType, the pixels outside the source image roi are filled (and interpolated) according to the
+    /// chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>
+    /// For BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void WarpPerspectiveBack(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+        const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires FourChannelNoAlpha<T>;
 #pragma endregion
 
@@ -3221,7 +4847,7 @@ template <PixelType T> class ImageView
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     ImageView<T> &Rotate(ImageView<T> &aDst, double aAngleInDeg, const Vector2<double> &aShift,
-                         InterpolationMode aInterpolation, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                         InterpolationMode aInterpolation, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
     /// <summary>
     /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
@@ -3236,7 +4862,7 @@ template <PixelType T> class ImageView
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     ImageView<T> &Rotate(ImageView<T> &aDst, double aAngleInDeg, const Vector2<double> &aShift,
-                         InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+                         InterpolationMode aInterpolation, BorderType aBorder, const Roi &aAllowedReadRoi,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
@@ -3251,10 +4877,11 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                       BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation, T aConstant,
+                       BorderType aBorder, const Roi &aAllowedReadRoi,
                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires TwoChannel<T>;
     /// <summary>
@@ -3269,10 +4896,11 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                        double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                       BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+                       BorderType aBorder, const Roi &aAllowedReadRoi,
                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires TwoChannel<T>;
 
@@ -3288,11 +4916,12 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                       ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                       BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+    static void Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, double aAngleInDeg, const Vector2<double> &aShift,
+                       InterpolationMode aInterpolation, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ThreeChannel<T>;
     /// <summary>
@@ -3307,11 +4936,12 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                       ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                       BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+    static void Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, double aAngleInDeg, const Vector2<double> &aShift,
+                       InterpolationMode aInterpolation, BorderType aBorder, const Roi &aAllowedReadRoi,
                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ThreeChannel<T>;
 
@@ -3327,12 +4957,14 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                       BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation, T aConstant,
+                       BorderType aBorder, const Roi &aAllowedReadRoi,
                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires FourChannelNoAlpha<T>;
     /// <summary>
@@ -3347,12 +4979,170 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                        double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                       BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+                       BorderType aBorder, const Roi &aAllowedReadRoi,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires FourChannelNoAlpha<T>;
+
+    /// <summary>
+    /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
+    /// rotation around pixel(0,0) and a shift after rotation.<para/> Depending on BorderType, the behavior for pixels
+    /// that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP: pixels
+    /// outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    ImageView<T> &Rotate(ImageView<T> &aDst, double aAngleInDeg, const Vector2<double> &aShift,
+                         InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
+    /// rotation around pixel(0,0) and a shift after rotation.<para/> Depending on BorderType, the behavior for pixels
+    /// that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP: pixels
+    /// outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    ImageView<T> &Rotate(ImageView<T> &aDst, double aAngleInDeg, const Vector2<double> &aShift,
+                         InterpolationMode aInterpolation, BorderType aBorder,
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
+    /// rotation around pixel(0,0) and a shift after rotation.<para/> Depending on BorderType, the behavior for pixels
+    /// that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP: pixels
+    /// outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation, T aConstant,
+                       BorderType aBorder,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires TwoChannel<T>;
+    /// <summary>
+    /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
+    /// rotation around pixel(0,0) and a shift after rotation.<para/> Depending on BorderType, the behavior for pixels
+    /// that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP: pixels
+    /// outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
+                       BorderType aBorder,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
+    /// rotation around pixel(0,0) and a shift after rotation.<para/> Depending on BorderType, the behavior for pixels
+    /// that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP: pixels
+    /// outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, double aAngleInDeg, const Vector2<double> &aShift,
+                       InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires ThreeChannel<T>;
+    /// <summary>
+    /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
+    /// rotation around pixel(0,0) and a shift after rotation.<para/> Depending on BorderType, the behavior for pixels
+    /// that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP: pixels
+    /// outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, double aAngleInDeg, const Vector2<double> &aShift,
+                       InterpolationMode aInterpolation, BorderType aBorder,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
+    /// rotation around pixel(0,0) and a shift after rotation.<para/> Depending on BorderType, the behavior for pixels
+    /// that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP: pixels
+    /// outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation, T aConstant,
+                       BorderType aBorder,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires FourChannelNoAlpha<T>;
+    /// <summary>
+    /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
+    /// rotation around pixel(0,0) and a shift after rotation.<para/> Depending on BorderType, the behavior for pixels
+    /// that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP: pixels
+    /// outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+                       double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
+                       BorderType aBorder,
                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires FourChannelNoAlpha<T>;
 #pragma endregion
@@ -3364,7 +5154,7 @@ template <PixelType T> class ImageView
     /// NOTE: the result is NOT the same as in NPP using the same function. The shift applied in NPP for the same
     /// function don't make much sense to me, in OPP Resize matches the input extent [-0.5 .. srcWidth-0.5[ to the
     /// output [-0.5 .. dstWidth-0.5[. Whereas NPP applies different strategies for up-and downscaling. In order to get
-    /// the same results as in NPP, use a user defined scaling factor of <para/> Vec2d scaleFactor =
+    /// the same results as in NPP, use an user defined scaling factor of <para/> Vec2d scaleFactor =
     /// Vec2d(dstImg.SizeRoi()) / Vec2d(srcImg.SizeRoi());<para/> and a shift given by ResizeGetNPPShift().
     /// </summary>
     ImageView<T> &Resize(ImageView<T> &aDst, InterpolationMode aInterpolation,
@@ -3376,10 +5166,11 @@ template <PixelType T> class ImageView
     /// NOTE: the result is NOT the same as in NPP using the same function. The shift applied in NPP for the same
     /// function don't make much sense to me, in OPP Resize matches the input extent [-0.5 .. srcWidth-0.5[ to the
     /// output [-0.5 .. dstWidth-0.5[. Whereas NPP applies different strategies for up-and downscaling. In order to get
-    /// the same results as in NPP, use a user defined scaling factor of <para/> Vec2d scaleFactor =
+    /// the same results as in NPP, use an user defined scaling factor of <para/> Vec2d scaleFactor =
     /// Vec2d(dstImg.SizeRoi()) / Vec2d(srcImg.SizeRoi());<para/> and a shift given by ResizeGetNPPShift().
     /// </summary>
-    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                        InterpolationMode aInterpolation,
                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
@@ -3391,13 +5182,14 @@ template <PixelType T> class ImageView
     /// NOTE: the result is NOT the same as in NPP using the same function. The shift applied in NPP for the same
     /// function don't make much sense to me, in OPP Resize matches the input extent [-0.5 .. srcWidth-0.5[ to the
     /// output [-0.5 .. dstWidth-0.5[. Whereas NPP applies different strategies for up-and downscaling. In order to get
-    /// the same results as in NPP, use a user defined scaling factor of <para/> Vec2d scaleFactor =
+    /// the same results as in NPP, use an user defined scaling factor of <para/> Vec2d scaleFactor =
     /// Vec2d(dstImg.SizeRoi()) / Vec2d(srcImg.SizeRoi());<para/> and a shift given by ResizeGetNPPShift().
     /// </summary>
-    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                       ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                       InterpolationMode aInterpolation,
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, InterpolationMode aInterpolation,
                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ThreeChannel<T>;
 
@@ -3407,11 +5199,13 @@ template <PixelType T> class ImageView
     /// NOTE: the result is NOT the same as in NPP using the same function. The shift applied in NPP for the same
     /// function don't make much sense to me, in OPP Resize matches the input extent [-0.5 .. srcWidth-0.5[ to the
     /// output [-0.5 .. dstWidth-0.5[. Whereas NPP applies different strategies for up-and downscaling. In order to get
-    /// the same results as in NPP, use a user defined scaling factor of <para/> Vec2d scaleFactor =
+    /// the same results as in NPP, use an user defined scaling factor of <para/> Vec2d scaleFactor =
     /// Vec2d(dstImg.SizeRoi()) / Vec2d(srcImg.SizeRoi());<para/> and a shift given by ResizeGetNPPShift().
     /// </summary>
-    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                        InterpolationMode aInterpolation,
@@ -3446,7 +5240,7 @@ template <PixelType T> class ImageView
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     ImageView<T> &Resize(ImageView<T> &aDst, const Vector2<double> &aScale, const Vector2<double> &aShift,
-                         InterpolationMode aInterpolation, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                         InterpolationMode aInterpolation, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
@@ -3472,7 +5266,7 @@ template <PixelType T> class ImageView
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
     ImageView<T> &Resize(ImageView<T> &aDst, const Vector2<double> &aScale, const Vector2<double> &aShift,
-                         InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+                         InterpolationMode aInterpolation, BorderType aBorder, const Roi &aAllowedReadRoi,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
@@ -3497,10 +5291,11 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                        const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                       BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                       T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires TwoChannel<T>;
 
@@ -3526,10 +5321,11 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                        const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                       BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+                       BorderType aBorder, const Roi &aAllowedReadRoi,
                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires TwoChannel<T>;
 
@@ -3555,11 +5351,13 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                       ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                       const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                       BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Vector2<double> &aScale,
+                       const Vector2<double> &aShift, InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                       const Roi &aAllowedReadRoi,
                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ThreeChannel<T>;
 
@@ -3585,11 +5383,13 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                       ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                       const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                       BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Vector2<double> &aScale,
+                       const Vector2<double> &aShift, InterpolationMode aInterpolation, BorderType aBorder,
+                       const Roi &aAllowedReadRoi,
                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ThreeChannel<T>;
 
@@ -3615,12 +5415,14 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                        const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                       BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                       T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires FourChannelNoAlpha<T>;
 
@@ -3646,12 +5448,254 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    static void Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                       ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                        const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                       BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+                       BorderType aBorder, const Roi &aAllowedReadRoi,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires FourChannelNoAlpha<T>;
+
+    /// <summary>
+    /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
+    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
+    /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
+    /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
+    /// exactly matches
+    /// [-0.5 .. dstWidth-0.5[.<para/> This shift is given by (as in NPP):<para/> InvScaleFactor = 1 / aScale;<para/>
+    /// AdjustedShift  = aShift * InvScaleFactor + ((1 - InvScaleFactor) * 0.5);<para/>
+    /// The output pixel with integer coordinate (X,Y) is then mapped to the source pixel:<para/>
+    /// SrcX = InvScaleFactor.x * X - AdjustedShift.x;<para/>
+    /// SrcY = InvScaleFactor.y * Y - AdjustedShift.y;<para/>
+    /// Depending on BorderType, the behavior for
+    /// pixels that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP:
+    /// pixels outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    ImageView<T> &Resize(ImageView<T> &aDst, const Vector2<double> &aScale, const Vector2<double> &aShift,
+                         InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
+    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
+    /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
+    /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
+    /// exactly matches
+    /// [-0.5 .. dstWidth-0.5[.<para/> This shift is given by (as in NPP):<para/> InvScaleFactor = 1 / aScale;<para/>
+    /// AdjustedShift  = aShift * InvScaleFactor + ((1 - InvScaleFactor) * 0.5);<para/>
+    /// The output pixel with integer coordinate (X,Y) is then mapped to the source pixel:<para/>
+    /// SrcX = InvScaleFactor.x * X - AdjustedShift.x;<para/>
+    /// SrcY = InvScaleFactor.y * Y - AdjustedShift.y;<para/>
+    /// Depending on BorderType, the behavior for
+    /// pixels that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP:
+    /// pixels outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    ImageView<T> &Resize(ImageView<T> &aDst, const Vector2<double> &aScale, const Vector2<double> &aShift,
+                         InterpolationMode aInterpolation, BorderType aBorder,
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
+    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
+    /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
+    /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
+    /// exactly matches
+    /// [-0.5 .. dstWidth-0.5[.<para/> This shift is given by (as in NPP):<para/> InvScaleFactor = 1 / aScale;<para/>
+    /// AdjustedShift  = aShift * InvScaleFactor + ((1 - InvScaleFactor) * 0.5);<para/>
+    /// The output pixel with integer coordinate (X,Y) is then mapped to the source pixel:<para/>
+    /// SrcX = InvScaleFactor.x * X - AdjustedShift.x;<para/>
+    /// SrcY = InvScaleFactor.y * Y - AdjustedShift.y;<para/>
+    /// Depending on BorderType, the behavior for
+    /// pixels that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP:
+    /// pixels outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
+                       T aConstant, BorderType aBorder,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
+    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
+    /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
+    /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
+    /// exactly matches
+    /// [-0.5 .. dstWidth-0.5[.<para/> This shift is given by (as in NPP):<para/> InvScaleFactor = 1 / aScale;<para/>
+    /// AdjustedShift  = aShift * InvScaleFactor + ((1 - InvScaleFactor) * 0.5);<para/>
+    /// The output pixel with integer coordinate (X,Y) is then mapped to the source pixel:<para/>
+    /// SrcX = InvScaleFactor.x * X - AdjustedShift.x;<para/>
+    /// SrcY = InvScaleFactor.y * Y - AdjustedShift.y;<para/>
+    /// Depending on BorderType, the behavior for
+    /// pixels that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP:
+    /// pixels outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
+                       BorderType aBorder,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
+    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
+    /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
+    /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
+    /// exactly matches
+    /// [-0.5 .. dstWidth-0.5[.<para/> This shift is given by (as in NPP):<para/> InvScaleFactor = 1 / aScale;<para/>
+    /// AdjustedShift  = aShift * InvScaleFactor + ((1 - InvScaleFactor) * 0.5);<para/>
+    /// The output pixel with integer coordinate (X,Y) is then mapped to the source pixel:<para/>
+    /// SrcX = InvScaleFactor.x * X - AdjustedShift.x;<para/>
+    /// SrcY = InvScaleFactor.y * Y - AdjustedShift.y;<para/>
+    /// Depending on BorderType, the behavior for
+    /// pixels that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP:
+    /// pixels outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Vector2<double> &aScale,
+                       const Vector2<double> &aShift, InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
+    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
+    /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
+    /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
+    /// exactly matches
+    /// [-0.5 .. dstWidth-0.5[.<para/> This shift is given by (as in NPP):<para/> InvScaleFactor = 1 / aScale;<para/>
+    /// AdjustedShift  = aShift * InvScaleFactor + ((1 - InvScaleFactor) * 0.5);<para/>
+    /// The output pixel with integer coordinate (X,Y) is then mapped to the source pixel:<para/>
+    /// SrcX = InvScaleFactor.x * X - AdjustedShift.x;<para/>
+    /// SrcY = InvScaleFactor.y * Y - AdjustedShift.y;<para/>
+    /// Depending on BorderType, the behavior for
+    /// pixels that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP:
+    /// pixels outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Vector2<double> &aScale,
+                       const Vector2<double> &aShift, InterpolationMode aInterpolation, BorderType aBorder,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
+    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
+    /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
+    /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
+    /// exactly matches
+    /// [-0.5 .. dstWidth-0.5[.<para/> This shift is given by (as in NPP):<para/> InvScaleFactor = 1 / aScale;<para/>
+    /// AdjustedShift  = aShift * InvScaleFactor + ((1 - InvScaleFactor) * 0.5);<para/>
+    /// The output pixel with integer coordinate (X,Y) is then mapped to the source pixel:<para/>
+    /// SrcX = InvScaleFactor.x * X - AdjustedShift.x;<para/>
+    /// SrcY = InvScaleFactor.y * Y - AdjustedShift.y;<para/>
+    /// Depending on BorderType, the behavior for
+    /// pixels that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP:
+    /// pixels outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+                       const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
+                       T aConstant, BorderType aBorder,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires FourChannelNoAlpha<T>;
+
+    /// <summary>
+    /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
+    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
+    /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
+    /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
+    /// exactly matches
+    /// [-0.5 .. dstWidth-0.5[.<para/> This shift is given by (as in NPP):<para/> InvScaleFactor = 1 / aScale;<para/>
+    /// AdjustedShift  = aShift * InvScaleFactor + ((1 - InvScaleFactor) * 0.5);<para/>
+    /// The output pixel with integer coordinate (X,Y) is then mapped to the source pixel:<para/>
+    /// SrcX = InvScaleFactor.x * X - AdjustedShift.x;<para/>
+    /// SrcY = InvScaleFactor.y * Y - AdjustedShift.y;<para/>
+    /// Depending on BorderType, the behavior for
+    /// pixels that fall outside the source image roi differs: For BorderType::None, the behavior is similiar to NPP:
+    /// pixels outside the roi are not written to and remain as is, though at the image border, BorderType::Replicate is
+    /// applied for interpolation kernels reaching outside the roi.<para/> For all other BorderType, the pixels outside
+    /// the source image roi are filled (and interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For
+    /// BorderType::Constant, the constant value to use must be provided.
+    /// </summary>
+    static void Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+                       const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
+                       BorderType aBorder,
                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires FourChannelNoAlpha<T>;
 #pragma endregion
@@ -3686,7 +5730,7 @@ template <PixelType T> class ImageView
     /// value to use must be provided.
     /// </summary>
     ImageView<T> &Remap(ImageView<T> &aDst, const ImageView<Pixel32fC2> &aCoordinateMap,
-                        InterpolationMode aInterpolation, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                        InterpolationMode aInterpolation, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -3701,7 +5745,7 @@ template <PixelType T> class ImageView
     /// value to use must be provided.
     /// </summary>
     ImageView<T> &Remap(ImageView<T> &aDst, const ImageView<Pixel32fC2> &aCoordinateMap,
-                        InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+                        InterpolationMode aInterpolation, BorderType aBorder, const Roi &aAllowedReadRoi,
                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
@@ -3717,8 +5761,8 @@ template <PixelType T> class ImageView
     /// value to use must be provided.
     /// </summary>
     ImageView<T> &Remap(ImageView<T> &aDst, const ImageView<Pixel32fC1> &aCoordinateMapX,
-                        const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation,
-                        BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                        const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation, T aConstant,
+                        BorderType aBorder, const Roi &aAllowedReadRoi,
                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -3734,7 +5778,7 @@ template <PixelType T> class ImageView
     /// </summary>
     ImageView<T> &Remap(ImageView<T> &aDst, const ImageView<Pixel32fC1> &aCoordinateMapX,
                         const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation,
-                        BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+                        BorderType aBorder, const Roi &aAllowedReadRoi,
                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
@@ -3749,10 +5793,11 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
     /// value to use must be provided.
     /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, BorderType aBorder,
-                      T aConstant, Roi aAllowedReadRoi = Roi(),
+                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, T aConstant,
+                      BorderType aBorder, const Roi &aAllowedReadRoi,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires TwoChannel<T>;
     /// <summary>
@@ -3767,47 +5812,11 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
     /// value to use must be provided.
     /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                       const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, BorderType aBorder,
-                      Roi aAllowedReadRoi                    = Roi(),
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
-        requires TwoChannel<T>;
-
-    /// <summary>
-    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
-    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
-    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
-    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
-    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
-    /// interpolated) according to the chosen BorderType.<para/>
-    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
-    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
-    /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
-    /// value to use must be provided.
-    /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                      const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
-                      InterpolationMode aInterpolation, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
-                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
-        requires TwoChannel<T>;
-    /// <summary>
-    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
-    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
-    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
-    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
-    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
-    /// interpolated) according to the chosen BorderType.<para/>
-    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
-    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
-    /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
-    /// value to use must be provided.
-    /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                      const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
-                      InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+                      const Roi &aAllowedReadRoi,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires TwoChannel<T>;
 
@@ -3823,11 +5832,51 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
     /// value to use must be provided.
     /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                      ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, BorderType aBorder,
-                      T aConstant, Roi aAllowedReadRoi = Roi(),
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
+                      InterpolationMode aInterpolation, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires TwoChannel<T>;
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
+                      InterpolationMode aInterpolation, BorderType aBorder, const Roi &aAllowedReadRoi,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst3, const ImageView<Pixel32fC2> &aCoordinateMap,
+                      InterpolationMode aInterpolation, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ThreeChannel<T>;
     /// <summary>
@@ -3842,11 +5891,12 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
     /// value to use must be provided.
     /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                      ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, BorderType aBorder,
-                      Roi aAllowedReadRoi                    = Roi(),
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst3, const ImageView<Pixel32fC2> &aCoordinateMap,
+                      InterpolationMode aInterpolation, BorderType aBorder, const Roi &aAllowedReadRoi,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ThreeChannel<T>;
 
@@ -3862,11 +5912,13 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
     /// value to use must be provided.
     /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                      ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                      const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
-                      InterpolationMode aInterpolation, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst3, const ImageView<Pixel32fC1> &aCoordinateMapX,
+                      const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation, T aConstant,
+                      BorderType aBorder, const Roi &aAllowedReadRoi,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ThreeChannel<T>;
     /// <summary>
@@ -3881,11 +5933,13 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
     /// value to use must be provided.
     /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                      ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                      const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
-                      InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst3, const ImageView<Pixel32fC1> &aCoordinateMapX,
+                      const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation,
+                      BorderType aBorder, const Roi &aAllowedReadRoi,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires ThreeChannel<T>;
 
@@ -3901,12 +5955,14 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
     /// value to use must be provided.
     /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, BorderType aBorder,
-                      T aConstant, Roi aAllowedReadRoi = Roi(),
+                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, T aConstant,
+                      BorderType aBorder, const Roi &aAllowedReadRoi,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires FourChannelNoAlpha<T>;
     /// <summary>
@@ -3921,12 +5977,14 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
     /// value to use must be provided.
     /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                       const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, BorderType aBorder,
-                      Roi aAllowedReadRoi                    = Roi(),
+                      const Roi &aAllowedReadRoi,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires FourChannelNoAlpha<T>;
 
@@ -3942,12 +6000,14 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
     /// value to use must be provided.
     /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                       const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
-                      InterpolationMode aInterpolation, BorderType aBorder, T aConstant, Roi aAllowedReadRoi = Roi(),
+                      InterpolationMode aInterpolation, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires FourChannelNoAlpha<T>;
     /// <summary>
@@ -3962,12 +6022,324 @@ template <PixelType T> class ImageView
     /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
     /// value to use must be provided.
     /// </summary>
-    static void Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                      ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                       ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                       const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
-                      InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi = Roi(),
+                      InterpolationMode aInterpolation, BorderType aBorder, const Roi &aAllowedReadRoi,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires FourChannelNoAlpha<T>;
+
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    ImageView<T> &Remap(ImageView<T> &aDst, const ImageView<Pixel32fC2> &aCoordinateMap,
+                        InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    ImageView<T> &Remap(ImageView<T> &aDst, const ImageView<Pixel32fC2> &aCoordinateMap,
+                        InterpolationMode aInterpolation, BorderType aBorder,
+                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    ImageView<T> &Remap(ImageView<T> &aDst, const ImageView<Pixel32fC1> &aCoordinateMapX,
+                        const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation, T aConstant,
+                        BorderType aBorder,
+                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    ImageView<T> &Remap(ImageView<T> &aDst, const ImageView<Pixel32fC1> &aCoordinateMapX,
+                        const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation,
+                        BorderType aBorder,
+                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, T aConstant,
+                      BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires TwoChannel<T>;
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, BorderType aBorder,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
+                      InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires TwoChannel<T>;
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
+                      InterpolationMode aInterpolation, BorderType aBorder,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires TwoChannel<T>;
+
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst3, const ImageView<Pixel32fC2> &aCoordinateMap,
+                      InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires ThreeChannel<T>;
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst3, const ImageView<Pixel32fC2> &aCoordinateMap,
+                      InterpolationMode aInterpolation, BorderType aBorder,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst3, const ImageView<Pixel32fC1> &aCoordinateMapX,
+                      const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation, T aConstant,
+                      BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires ThreeChannel<T>;
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst3, const ImageView<Pixel32fC1> &aCoordinateMapX,
+                      const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation,
+                      BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires ThreeChannel<T>;
+
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, T aConstant,
+                      BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires FourChannelNoAlpha<T>;
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+                      const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, BorderType aBorder,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires FourChannelNoAlpha<T>;
+
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/> For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+                      const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
+                      InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
+        requires FourChannelNoAlpha<T>;
+    /// <summary>
+    /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
+    /// source image.<para/> Depending on BorderType, the behavior for pixels that fall outside the source image roi
+    /// differs: For BorderType::None, the behavior is similiar to NPP: pixels outside the roi are not written to and
+    /// remain as is, though at the image border, BorderType::Replicate is applied for interpolation kernels reaching
+    /// outside the roi.<para/> For all other BorderType, the pixels outside the source image roi are filled (and
+    /// interpolated) according to the chosen BorderType.<para/>
+    /// For BorderType::Mirror, BorderType::MirrorReplicate and BorderType::Wrap, only pixels once the width or
+    /// height of the source image roi on each side is allowed for pixels outside the original roi. For transforms that
+    /// fall outside this expanded area, the pixel value is not defined. <para/>For BorderType::Constant, the constant
+    /// value to use must be provided.
+    /// </summary>
+    static void Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                      ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
+                      const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
+                      InterpolationMode aInterpolation, BorderType aBorder,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires FourChannelNoAlpha<T>;
 #pragma endregion
@@ -3976,86 +6348,357 @@ template <PixelType T> class ImageView
 #pragma region Morphology
 #pragma region No mask Erosion/Dilation
     /// <summary>
+    /// Performs dilation on the entire mask area defined by aFilterArea (maximum pixel in the neighborhood).
     /// </summary>
-    ImageView<T> &Dilation(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder, T aConstant,
-                           Roi aAllowedReadRoi                    = Roi(),
+    ImageView<T> &Dilation(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                           const Roi &aAllowedReadRoi,
                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
     /// <summary>
+    /// Performs dilation on the entire mask area defined by aFilterArea (maximum pixel in the neighborhood).
     /// </summary>
-    ImageView<T> &Erosion(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder, T aConstant,
-                          Roi aAllowedReadRoi                    = Roi(),
+    ImageView<T> &Dilation(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+                           const Roi &aAllowedReadRoi,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs erosion on the entire mask area defined by aFilterArea (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &Erosion(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                          const Roi &aAllowedReadRoi,
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs erosion on the entire mask area defined by aFilterArea (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &Erosion(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+                          const Roi &aAllowedReadRoi,
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Performs dilation on the entire mask area defined by aFilterArea (maximum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &Dilation(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs dilation on the entire mask area defined by aFilterArea (maximum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &Dilation(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs erosion on the entire mask area defined by aFilterArea (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &Erosion(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs erosion on the entire mask area defined by aFilterArea (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &Erosion(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+
                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
 
 #pragma endregion
 #pragma region Erosion
     /// <summary>
+    /// Performs erosion on the mask area defined by aFilterArea and where aMask is != 0 (minimum pixel in the
+    /// neighborhood).
     /// </summary>
     ImageView<T> &Erosion(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
-                          const FilterArea &aFilterArea, BorderType aBorder, T aConstant, Roi aAllowedReadRoi,
-                          const opp::cuda::StreamCtx &aStreamCtx) const
+                          const FilterArea &aFilterArea, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs erosion on the mask area defined by aFilterArea and where aMask is != 0 (minimum pixel in the
+    /// neighborhood).
+    /// </summary>
+    ImageView<T> &Erosion(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                          const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi,
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
 
     /// <summary>
+    /// Performs gray-scale-erosion on the mask area defined by aFilterArea. The value of aMask is added to the pixel
+    /// value and clamped to pixel type value range before comparison (minimum pixel in the neighborhood).
     /// </summary>
     ImageView<T> &ErosionGray(ImageView<T> &aDst, const opp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
-                              const FilterArea &aFilterArea, BorderType aBorder, T aConstant, Roi aAllowedReadRoi,
-                              const opp::cuda::StreamCtx &aStreamCtx) const
+                              const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                              const Roi &aAllowedReadRoi,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs gray-scale-erosion on the mask area defined by aFilterArea. The value of aMask is added to the pixel
+    /// value and clamped to pixel type value range before comparison (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &ErosionGray(ImageView<T> &aDst, const opp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
+                              const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Performs erosion on the mask area defined by aFilterArea and where aMask is != 0 (minimum pixel in the
+    /// neighborhood).
+    /// </summary>
+    ImageView<T> &Erosion(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                          const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs erosion on the mask area defined by aFilterArea and where aMask is != 0 (minimum pixel in the
+    /// neighborhood).
+    /// </summary>
+    ImageView<T> &Erosion(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                          const FilterArea &aFilterArea, BorderType aBorder,
+                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Performs gray-scale-erosion on the mask area defined by aFilterArea. The value of aMask is added to the pixel
+    /// value and clamped to pixel type value range before comparison (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &ErosionGray(ImageView<T> &aDst, const opp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
+                              const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs gray-scale-erosion on the mask area defined by aFilterArea. The value of aMask is added to the pixel
+    /// value and clamped to pixel type value range before comparison (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &ErosionGray(ImageView<T> &aDst, const opp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
+                              const FilterArea &aFilterArea, BorderType aBorder,
+                              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
 #pragma endregion
 #pragma region Dilation
     /// <summary>
+    /// Performs dilation on the mask area defined by aFilterArea and where aMask is != 0 (maximum pixel in the
+    /// neighborhood).
     /// </summary>
     ImageView<T> &Dilation(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
-                           const FilterArea &aFilterArea, BorderType aBorder, T aConstant, Roi aAllowedReadRoi,
-                           const opp::cuda::StreamCtx &aStreamCtx) const
+                           const FilterArea &aFilterArea, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
     /// <summary>
+    /// Performs dilation on the mask area defined by aFilterArea and where aMask is != 0 (maximum pixel in the
+    /// neighborhood).
+    /// </summary>
+    ImageView<T> &Dilation(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                           const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs gray-scale-dilation on the mask area defined by aFilterArea. The value of aMask is added to the pixel
+    /// value and clamped to pixel type value range before comparison (minimum pixel in the neighborhood).
     /// </summary>
     ImageView<T> &DilationGray(ImageView<T> &aDst, const opp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
-                               const FilterArea &aFilterArea, BorderType aBorder, T aConstant, Roi aAllowedReadRoi,
-                               const opp::cuda::StreamCtx &aStreamCtx) const
+                               const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                               const Roi &aAllowedReadRoi,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs gray-scale-dilation on the mask area defined by aFilterArea. The value of aMask is added to the pixel
+    /// value and clamped to pixel type value range before comparison (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &DilationGray(ImageView<T> &aDst, const opp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
+                               const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Performs dilation on the mask area defined by aFilterArea and where aMask is != 0 (maximum pixel in the
+    /// neighborhood).
+    /// </summary>
+    ImageView<T> &Dilation(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                           const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs dilation on the mask area defined by aFilterArea and where aMask is != 0 (maximum pixel in the
+    /// neighborhood).
+    /// </summary>
+    ImageView<T> &Dilation(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                           const FilterArea &aFilterArea, BorderType aBorder,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs gray-scale-dilation on the mask area defined by aFilterArea. The value of aMask is added to the pixel
+    /// value and clamped to pixel type value range before comparison (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &DilationGray(ImageView<T> &aDst, const opp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
+                               const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Performs gray-scale-dilation on the mask area defined by aFilterArea. The value of aMask is added to the pixel
+    /// value and clamped to pixel type value range before comparison (minimum pixel in the neighborhood).
+    /// </summary>
+    ImageView<T> &DilationGray(ImageView<T> &aDst, const opp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
+                               const FilterArea &aFilterArea, BorderType aBorder,
+                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
 #pragma endregion
 #pragma region Open
     /// <summary>
+    /// First applies erosion then dilation.
     /// </summary>
     ImageView<T> &Open(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
-                       const FilterArea &aFilterArea, BorderType aBorder, T aConstant, Roi aAllowedReadRoi,
-                       const opp::cuda::StreamCtx &aStreamCtx) const
+                       const FilterArea &aFilterArea, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// First applies erosion then dilation.
+    /// </summary>
+    ImageView<T> &Open(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                       const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// First applies erosion then dilation.
+    /// </summary>
+    ImageView<T> &Open(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                       const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// First applies erosion then dilation.
+    /// </summary>
+    ImageView<T> &Open(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                       const FilterArea &aFilterArea, BorderType aBorder,
+                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
 #pragma endregion
 #pragma region Close
     /// <summary>
+    /// First applies dilation then erosion.
     /// </summary>
     ImageView<T> &Close(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
-                        const FilterArea &aFilterArea, BorderType aBorder, T aConstant, Roi aAllowedReadRoi,
-                        const opp::cuda::StreamCtx &aStreamCtx) const
+                        const FilterArea &aFilterArea, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// First applies dilation then erosion.
+    /// </summary>
+    ImageView<T> &Close(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                        const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi,
+                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// First applies dilation then erosion.
+    /// </summary>
+    ImageView<T> &Close(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                        const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// First applies dilation then erosion.
+    /// </summary>
+    ImageView<T> &Close(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                        const FilterArea &aFilterArea, BorderType aBorder,
+                        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
 #pragma endregion
 #pragma region TopHat
     /// <summary>
+    /// The result is the original image minus the result from morphological opening.
     /// </summary>
     ImageView<T> &TopHat(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
-                         const FilterArea &aFilterArea, BorderType aBorder, T aConstant, Roi aAllowedReadRoi,
-                         const opp::cuda::StreamCtx &aStreamCtx) const
+                         const FilterArea &aFilterArea, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// The result is the original image minus the result from morphological opening.
+    /// </summary>
+    ImageView<T> &TopHat(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                         const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi,
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// The result is the original image minus the result from morphological opening.
+    /// </summary>
+    ImageView<T> &TopHat(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                         const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// The result is the original image minus the result from morphological opening.
+    /// </summary>
+    ImageView<T> &TopHat(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                         const FilterArea &aFilterArea, BorderType aBorder,
+                         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
 #pragma endregion
 #pragma region BlackHat
     /// <summary>
+    /// The result is the result from morphological closing minus the original image.
     /// </summary>
     ImageView<T> &BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
-                           const FilterArea &aFilterArea, BorderType aBorder, T aConstant, Roi aAllowedReadRoi,
-                           const opp::cuda::StreamCtx &aStreamCtx) const
+                           const FilterArea &aFilterArea, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// The result is the result from morphological closing minus the original image.
+    /// </summary>
+    ImageView<T> &BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                           const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// The result is the result from morphological closing minus the original image.
+    /// </summary>
+    ImageView<T> &BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                           const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// The result is the result from morphological closing minus the original image.
+    /// </summary>
+    ImageView<T> &BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+                           const FilterArea &aFilterArea, BorderType aBorder,
+                           const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
 #pragma endregion
 #pragma region Morphology Gradient
     /// <summary>
+    /// Dilation minus erosion.
     /// </summary>
-    ImageView<T> &MorphologyGradient(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
-                                     const FilterArea &aFilterArea, BorderType aBorder, T aConstant,
-                                     Roi aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx) const
+    ImageView<T> &MorphologyGradient(
+        ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea, T aConstant,
+        BorderType aBorder, const Roi &aAllowedReadRoi,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Dilation minus erosion.
+    /// </summary>
+    ImageView<T> &MorphologyGradient(
+        ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
+        BorderType aBorder, const Roi &aAllowedReadRoi,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Dilation minus erosion.
+    /// </summary>
+    ImageView<T> &MorphologyGradient(
+        ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea, T aConstant,
+        BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Dilation minus erosion.
+    /// </summary>
+    ImageView<T> &MorphologyGradient(
+        ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
+        BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
 #pragma endregion
 #pragma endregion
@@ -5678,7 +8321,8 @@ template <PixelType T> class ImageView
         requires RealVector<T>;
 
     /// <summary>
-    /// Computes the image quality index of two images.
+    /// Computes the image quality index of two images. This implementation is identical to the one in NPP computing a
+    /// global index without a sliding window.
     /// </summary>
     /// <param name="aSrc2">Second source image</param>
     /// <param name="aDst">Per channel result</param>
@@ -5687,6 +8331,26 @@ template <PixelType T> class ImageView
     void QualityIndex(const ImageView<T> &aSrc2, opp::cuda::DevVarView<qualityIndex_types_for_rt<T>> &aDst,
                       opp::cuda::DevVarView<byte> &aBuffer,
                       const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Returns the required temporary buffer size for QualityIndexWindow.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t QualityIndexWindowBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Computes the QualityIndex of two images. This function is implemented using a sliding window approach as is done
+    /// in the original paper / code with a window size of 11x11 pixels.
+    /// </summary>
+    /// <param name="aSrc2">Second source image</param>
+    /// <param name="aDst">Per channel result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
+    void QualityIndexWindow(const ImageView<T> &aSrc2, opp::cuda::DevVarView<qiw_types_for_rt<T>> &aDst,
+                            opp::cuda::DevVarView<byte> &aBuffer,
+                            const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
 #pragma endregion
 
@@ -5700,7 +8364,10 @@ template <PixelType T> class ImageView
         requires RealVector<T>;
 
     /// <summary>
-    /// Computes the SSIM of two images. TODO: Implement with image re-scaling
+    /// Computes the SSIM of two images.
+    /// Note: This implementation differs slightly from NPP as the exact parameters used are unknown. Here we follow the
+    /// reference matlab implementation provided here: https://ece.uwaterloo.ca/~z70wang/research/ssim/. The only
+    /// difference is in the filtering steps for image borders where OPP applies replication.
     /// </summary>
     /// <param name="aSrc2">Second source image</param>
     /// <param name="aDst">Per channel result</param>
@@ -5709,17 +8376,45 @@ template <PixelType T> class ImageView
     /// <param name="aK1">Stabilisation constant 1, Default=0.01</param>
     /// <param name="aK2">Stabilisation constant 2, Default=0.03</param>
     /// <param name="aStreamCtx"></param>
-    void SSIM(const ImageView<T> &aSrc2, opp::cuda::DevVarView<qualityIndex_types_for_rt<T>> &aDst,
-              opp::cuda::DevVarView<byte> &aBuffer,
-              // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-              remove_vector_t<qualityIndex_types_for_rt<T>> aDynamicRange =
-                  static_cast<remove_vector_t<qualityIndex_types_for_rt<T>>>(1.0),
-              remove_vector_t<qualityIndex_types_for_rt<T>> aK1 =
-                  static_cast<remove_vector_t<qualityIndex_types_for_rt<T>>>(0.01),
-              remove_vector_t<qualityIndex_types_for_rt<T>> aK2 =
-                  static_cast<remove_vector_t<qualityIndex_types_for_rt<T>>>(0.03),
-              // NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-              const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+    void SSIM(
+        const ImageView<T> &aSrc2, opp::cuda::DevVarView<ssim_types_for_rt<T>> &aDst,
+        opp::cuda::DevVarView<byte> &aBuffer,
+        remove_vector_t<ssim_types_for_rt<T>> aDynamicRange = static_cast<remove_vector_t<ssim_types_for_rt<T>>>(1.0),
+        remove_vector_t<ssim_types_for_rt<T>> aK1           = static_cast<remove_vector_t<ssim_types_for_rt<T>>>(0.01),
+        remove_vector_t<ssim_types_for_rt<T>> aK2           = static_cast<remove_vector_t<ssim_types_for_rt<T>>>(0.03),
+        const opp::cuda::StreamCtx &aStreamCtx              = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+#pragma endregion
+
+#pragma region MSSSIM
+    /// <summary>
+    /// Returns the required temporary buffer size for MSSSIM.<para/>
+    /// Note: the buffer size differs for varying ROI sizes.
+    /// </summary>
+    [[nodiscard]] size_t MSSSIMBufferSize(
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// Computes the Multi-Scale-SSIM of two images.
+    /// Note: This implementation differs slightly from NPP as the exact parameters used are unknown. Here we follow the
+    /// reference matlab implementation provided here: https://ece.uwaterloo.ca/~z70wang/research/ssim/. The only
+    /// difference is in the filtering steps for image borders where OPP applies replication.
+    /// </summary>
+    /// <param name="aSrc2">Second source image</param>
+    /// <param name="aDst">Per channel result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aDynamicRange">The value range of the image. Typically this is 2^BitsPerPixel - 1.</param>
+    /// <param name="aK1">Stabilisation constant 1, Default=0.01</param>
+    /// <param name="aK2">Stabilisation constant 2, Default=0.03</param>
+    /// <param name="aStreamCtx"></param>
+    void MSSSIM(
+        const ImageView<T> &aSrc2, opp::cuda::DevVarView<ssim_types_for_rt<T>> &aDst,
+        opp::cuda::DevVarView<byte> &aBuffer,
+        remove_vector_t<ssim_types_for_rt<T>> aDynamicRange = static_cast<remove_vector_t<ssim_types_for_rt<T>>>(1.0),
+        remove_vector_t<ssim_types_for_rt<T>> aK1           = static_cast<remove_vector_t<ssim_types_for_rt<T>>>(0.01),
+        remove_vector_t<ssim_types_for_rt<T>> aK2           = static_cast<remove_vector_t<ssim_types_for_rt<T>>>(0.03),
+        const opp::cuda::StreamCtx &aStreamCtx              = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
 #pragma endregion
 
@@ -6430,6 +9125,38 @@ template <PixelType T> class ImageView
                      const same_vector_size_different_type_t<T, double> &aValSqr, opp::cuda::DevVarView<byte> &aBuffer,
                      const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T> && NoAlpha<T>;
+
+    /// <summary>
+    /// Computes the standard deviation from integral square images.
+    /// </summary>
+    void RectStdDev(ImageView<same_vector_size_different_type_t<T, int>> &aSqr,
+                    ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea,
+                    const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, int>) && NoAlpha<T>;
+
+    /// <summary>
+    /// Computes the standard deviation from integral square images.
+    /// </summary>
+    void RectStdDev(ImageView<same_vector_size_different_type_t<T, long64>> &aSqr,
+                    ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea,
+                    const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, int>) && NoAlpha<T>;
+
+    /// <summary>
+    /// Computes the standard deviation from integral square images.
+    /// </summary>
+    void RectStdDev(ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
+                    ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea,
+                    const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, float>) && NoAlpha<T>;
+
+    /// <summary>
+    /// Computes the standard deviation from integral square images.
+    /// </summary>
+    void RectStdDev(ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
+                    ImageView<same_vector_size_different_type_t<T, double>> &aDst, const FilterArea &aFilterArea,
+                    const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(std::same_as<remove_vector_t<T>, double>) && NoAlpha<T>;
 #pragma endregion
 #pragma region MinEvery
     /// <summary>
@@ -6563,37 +9290,167 @@ template <PixelType T> class ImageView
 
 #pragma region Cross Correlation
     /// <summary>
+    /// Computes the un-normalized cross-correlation.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
     /// </summary>
     ImageView<Pixel32fC1> &CrossCorrelation(
-        const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst, BorderType aBorder, T aConstant,
-        Roi aAllowedReadRoi                    = Roi(),
+        const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst, T aConstant, BorderType aBorder,
+        const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+    /// <summary>
+    /// Computes the un-normalized cross-correlation.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelation(
+        const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst, BorderType aBorder, const Roi &aAllowedReadRoi,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
-        requires SingleChannel<T> && (sizeof(T) < 8);
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
 
     /// <summary>
+    /// Computes the normalized cross-correlation.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
     /// </summary>
     ImageView<Pixel32fC1> &CrossCorrelationNormalized(
-        const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst, BorderType aBorder, T aConstant,
-        Roi aAllowedReadRoi                    = Roi(),
-        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
-        requires SingleChannel<T> && (sizeof(T) < 8);
+        const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst, T aConstant, BorderType aBorder,
+        const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
 
     /// <summary>
+    /// Computes the normalized cross-correlation.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelationNormalized(
+        const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst, BorderType aBorder, const Roi &aAllowedReadRoi,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the normalized squared distance.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
     /// </summary>
     ImageView<Pixel32fC1> &SquareDistanceNormalized(
-        const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst, BorderType aBorder, T aConstant,
-        Roi aAllowedReadRoi                    = Roi(),
-        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
-        requires SingleChannel<T> && (sizeof(T) < 8);
+        const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst, T aConstant, BorderType aBorder,
+        const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
 
     /// <summary>
+    /// Computes the normalized squared distance.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &SquareDistanceNormalized(
+        const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst, BorderType aBorder, const Roi &aAllowedReadRoi,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the cross-correlation coefficient (CrossCorr_NormLevel in NPP).<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
     /// </summary>
     ImageView<Pixel32fC1> &CrossCorrelationCoefficient(
         const ImageView<Pixel32fC2> &aSrcBoxFiltered, const ImageView<T> &aTemplate,
-        const opp::cuda::DevVarView<double> &aMeanTemplate, ImageView<Pixel32fC1> &aDst, BorderType aBorder,
-        T aConstant, Roi aAllowedReadRoi = Roi(),
+        const opp::cuda::DevVarView<Pixel64fC1> &aMeanTemplate, ImageView<Pixel32fC1> &aDst, T aConstant,
+        BorderType aBorder, const Roi &aAllowedReadRoi,
         const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
-        requires SingleChannel<T> && (sizeof(T) < 8);
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the cross-correlation coefficient (CrossCorr_NormLevel in NPP).<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelationCoefficient(
+        const ImageView<Pixel32fC2> &aSrcBoxFiltered, const ImageView<T> &aTemplate,
+        const opp::cuda::DevVarView<Pixel64fC1> &aMeanTemplate, ImageView<Pixel32fC1> &aDst, BorderType aBorder,
+        const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the un-normalized cross-correlation.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelation(
+        const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst, T aConstant, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+    /// <summary>
+    /// Computes the un-normalized cross-correlation.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelation(
+        const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the normalized cross-correlation.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelationNormalized(
+        const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst, T aConstant, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the normalized cross-correlation.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelationNormalized(
+        const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the normalized squared distance.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &SquareDistanceNormalized(
+        const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst, T aConstant, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the normalized squared distance.<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &SquareDistanceNormalized(
+        const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the cross-correlation coefficient (CrossCorr_NormLevel in NPP).<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelationCoefficient(
+        const ImageView<Pixel32fC2> &aSrcBoxFiltered, const ImageView<T> &aTemplate,
+        const opp::cuda::DevVarView<Pixel64fC1> &aMeanTemplate, ImageView<Pixel32fC1> &aDst, T aConstant,
+        BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
+
+    /// <summary>
+    /// Computes the cross-correlation coefficient (CrossCorr_NormLevel in NPP).<para/>
+    /// Note: in order to compute the common "full" or "same" variant as e.g. in NPP, set the input and output ROIs
+    /// accordingly and use BorderType::Constant with aConstant = 0.
+    /// </summary>
+    ImageView<Pixel32fC1> &CrossCorrelationCoefficient(
+        const ImageView<Pixel32fC2> &aSrcBoxFiltered, const ImageView<T> &aTemplate,
+        const opp::cuda::DevVarView<Pixel64fC1> &aMeanTemplate, ImageView<Pixel32fC1> &aDst, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
 
 #pragma endregion
 #pragma endregion
@@ -6644,65 +9501,147 @@ template <PixelType T> class ImageView
         requires RealOrComplexFloatingVector<T>;
 #pragma endregion
 #pragma region Threshold
+    /// <summary>
+    /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
+    /// to aThreshold, otherwise it is set to sourcePixel.
+    /// </summary>
     ImageView<T> &Threshold(const T &aThreshold, CompareOp aCompare, ImageView<T> &aDst,
                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
+    /// <summary>
+    /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
+    /// to aThreshold, otherwise it is set to sourcePixel.
+    /// </summary>
     ImageView<T> &Threshold(const opp::cuda::DevVarView<T> &aThreshold, CompareOp aCompare, ImageView<T> &aDst,
                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
+    /// <summary>
+    /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
+    /// to aThreshold, otherwise it is set to sourcePixel.
+    /// </summary>
     ImageView<T> &ThresholdLT(const T &aThreshold, ImageView<T> &aDst,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
+    /// <summary>
+    /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
+    /// to aThreshold, otherwise it is set to sourcePixel.
+    /// </summary>
     ImageView<T> &ThresholdLT(const opp::cuda::DevVarView<T> &aThreshold, ImageView<T> &aDst,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
+    /// <summary>
+    /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
+    /// to aThreshold, otherwise it is set to sourcePixel.
+    /// </summary>
     ImageView<T> &ThresholdGT(const T &aThreshold, ImageView<T> &aDst,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
+    /// <summary>
+    /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
+    /// to aThreshold, otherwise it is set to sourcePixel.
+    /// </summary>
     ImageView<T> &ThresholdGT(const opp::cuda::DevVarView<T> &aThreshold, ImageView<T> &aDst,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
+    /// <summary>
+    /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
+    /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
+    /// </summary>
     ImageView<T> &Threshold(const T &aThreshold, CompareOp aCompare,
                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealVector<T>;
+    /// <summary>
+    /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
+    /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
+    /// </summary>
     ImageView<T> &Threshold(const opp::cuda::DevVarView<T> &aThreshold, CompareOp aCompare,
                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealVector<T>;
+    /// <summary>
+    /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
+    /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
+    /// </summary>
     ImageView<T> &ThresholdLT(const T &aThreshold,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealVector<T>;
+    /// <summary>
+    /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
+    /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
+    /// </summary>
     ImageView<T> &ThresholdLT(const opp::cuda::DevVarView<T> &aThreshold,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealVector<T>;
+    /// <summary>
+    /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
+    /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
+    /// </summary>
     ImageView<T> &ThresholdGT(const T &aThreshold,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealVector<T>;
+    /// <summary>
+    /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
+    /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
+    /// </summary>
     ImageView<T> &ThresholdGT(const opp::cuda::DevVarView<T> &aThreshold,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealVector<T>;
 
+    /// <summary>
+    /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
+    /// to aValue, otherwise it is set to sourcePixel.
+    /// </summary>
     ImageView<T> &Threshold(const T &aThreshold, const T &aValue, CompareOp aCompare, ImageView<T> &aDst,
                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
+    /// <summary>
+    /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
+    /// to aValue, otherwise it is set to sourcePixel.
+    /// </summary>
     ImageView<T> &ThresholdLT(const T &aThreshold, const T &aValue, ImageView<T> &aDst,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
+    /// <summary>
+    /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
+    /// to aValue, otherwise it is set to sourcePixel.
+    /// </summary>
     ImageView<T> &ThresholdGT(const T &aThreshold, const T &aValue, ImageView<T> &aDst,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
+    /// <summary>
+    /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
+    /// to aValue, otherwise it is set to sourcePixel. (Inplace operation)
+    /// </summary>
     ImageView<T> &Threshold(const T &aThreshold, const T &aValue, CompareOp aCompare,
                             const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealVector<T>;
+    /// <summary>
+    /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
+    /// to aValue, otherwise it is set to sourcePixel. (Inplace operation)
+    /// </summary>
     ImageView<T> &ThresholdLT(const T &aThreshold, const T &aValue,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealVector<T>;
+    /// <summary>
+    /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
+    /// to aValue, otherwise it is set to sourcePixel. (Inplace operation)
+    /// </summary>
     ImageView<T> &ThresholdGT(const T &aThreshold, const T &aValue,
                               const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealVector<T>;
+    /// <summary>
+    /// If for a comparison operation sourcePixel is less than aThresholdLT is true, the pixel is set
+    /// to aValueLT, else if sourcePixel is greater than aThresholdGT the pixel is set to aValueGT,
+    /// otherwise it is set to sourcePixel.
+    /// </summary>
     ImageView<T> &ThresholdLTGT(const T &aThresholdLT, const T &aValueLT, const T &aThresholdGT, const T &aValueGT,
                                 ImageView<T> &aDst,
                                 const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
+    /// <summary>
+    /// If for a comparison operation sourcePixel is less than aThresholdLT is true, the pixel is set
+    /// to aValueLT, else if sourcePixel is greater than aThresholdGT the pixel is set to aValueGT,
+    /// otherwise it is set to sourcePixel. (Inplace operation)
+    /// </summary>
     ImageView<T> &ThresholdLTGT(const T &aThresholdLT, const T &aValueLT, const T &aThresholdGT, const T &aValueGT,
                                 const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get())
         requires RealVector<T>;

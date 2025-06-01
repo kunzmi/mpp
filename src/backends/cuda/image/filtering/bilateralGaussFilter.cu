@@ -57,7 +57,7 @@ struct tupel_size<T>
 
 template <typename SrcT, typename DstT>
 void InvokeBilateralGaussFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst,
-                                const FilterArea &aFilterArea, const float *aPreCompGeomDistCoeff,
+                                const FilterArea &aFilterArea, const Pixel32fC1 *aPreCompGeomDistCoeff,
                                 float aValSquareSigma, opp::Norm aNorm, BorderType aBorderType, const SrcT &aConstant,
                                 const Size2D &aAllowedReadRoiSize, const Vector2<int> &aOffsetToActualRoi,
                                 const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
@@ -256,7 +256,7 @@ void InvokeBilateralGaussFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst
 #define Instantiate_For(typeSrc, typeDst)                                                                              \
     template void InvokeBilateralGaussFilter<typeSrc, typeDst>(                                                        \
         const typeSrc *aSrc1, size_t aPitchSrc1, typeDst *aDst, size_t aPitchDst, const FilterArea &aFilterArea,       \
-        const float *aPreCompGeomDistCoeff, float aValSquareSigma, opp::Norm aNorm, BorderType aBorderType,            \
+        const Pixel32fC1 *aPreCompGeomDistCoeff, float aValSquareSigma, opp::Norm aNorm, BorderType aBorderType,       \
         const typeSrc &aConstant, const Size2D &aAllowedReadRoiSize, const Vector2<int> &aOffsetToActualRoi,           \
         const Size2D &aSize, const StreamCtx &aStreamCtx);
 

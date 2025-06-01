@@ -100,12 +100,12 @@ __global__ void fixedSmallSizeSeparableWindowOpKernel(BorderControlT aSrcWithBC,
 #pragma unroll
                     for (int ky = 0; ky < filterSize; ky++)
                     {
-                        const int pixelDstY = ry + ky - filterSize + 1;
+                        const int pixelDstY = ry - ky;
 
 #pragma unroll
                         for (int kx = 0; kx < filterSize; kx++)
                         {
-                            const int pixelDstX = rx + kx - filterSize + 1;
+                            const int pixelDstX = rx - kx;
 
                             if (pixelDstY >= 0 && pixelDstY < blockHeight)
                             {
@@ -187,12 +187,12 @@ __global__ void fixedSmallSizeSeparableWindowOpKernel(BorderControlT aSrcWithBC,
 #pragma unroll
                 for (int ky = 0; ky < filterSize; ky++)
                 {
-                    const int pixelDstY = ry + ky - filterSize + 1;
+                    const int pixelDstY = ry - ky;
 
 #pragma unroll
                     for (int kx = 0; kx < filterSize; kx++)
                     {
-                        const int pixelDstX = rx + kx - filterSize + 1;
+                        const int pixelDstX = rx - kx;
 
                         if (pixelDstY >= 0 && pixelDstY < blockHeight)
                         {

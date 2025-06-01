@@ -1,4 +1,5 @@
 #pragma once
+#include <backends/simple_cpu/image/filterEachPixel_impl.h>
 #include <backends/simple_cpu/image/forEachPixel.h>
 #include <backends/simple_cpu/image/forEachPixelMasked.h>
 #include <backends/simple_cpu/image/forEachPixelPlanar.h>
@@ -2899,7 +2900,7 @@ void ImageView<T>::SSIM(const ImageView<T> &aSrc2, same_vector_size_different_ty
     DstT dst5(0);
     reduction(SizeRoi(), dst1, dst2, dst3, dst4, dst5, functor);
 
-    const opp::SSIM<DstT> postOp(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()), aDynamicRange, aK1, aK2);
+    const opp::SSIM<DstT> postOp(aDynamicRange, aK1, aK2);
 
     postOp(dst1, dst2, dst3, dst4, dst5, aDst);
 }
@@ -4442,6 +4443,182 @@ void ImageView<T>::HistogramRange(same_vector_size_different_type_t<T, int> *aHi
             }
         }
     }
+}
+#pragma endregion
+
+#pragma region Cross Correlation
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelation(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                                      BorderType aBorder, const Roi &aAllowedReadRoi) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    if (aBorder == BorderType::Constant)
+    {
+        throw INVALIDARGUMENT(aBorder,
+                              "When using BorderType::Constant, the constant value aConstant must be provided.");
+    }
+    return this->CrossCorrelation(aTemplate, aDst, {0}, aBorder, aAllowedReadRoi);
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelation(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                                      T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
+
+    crossCorrelationEachPixel(*this, aDst, aTemplate, aTemplate.SizeRoi(), aBorder, aConstant, aAllowedReadRoi);
+
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationNormalized(const ImageView<T> &aTemplate,
+                                                                ImageView<Pixel32fC1> &aDst, BorderType aBorder,
+                                                                const Roi &aAllowedReadRoi) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    if (aBorder == BorderType::Constant)
+    {
+        throw INVALIDARGUMENT(aBorder,
+                              "When using BorderType::Constant, the constant value aConstant must be provided.");
+    }
+    return this->CrossCorrelationNormalized(aTemplate, aDst, {0}, aBorder, aAllowedReadRoi);
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationNormalized(const ImageView<T> &aTemplate,
+                                                                ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                                BorderType aBorder, const Roi &aAllowedReadRoi) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
+
+    crossCorrelationNormalizedEachPixel(*this, aDst, aTemplate, aTemplate.SizeRoi(), aBorder, aConstant,
+                                        aAllowedReadRoi);
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::SquareDistanceNormalized(const ImageView<T> &aTemplate,
+                                                              ImageView<Pixel32fC1> &aDst, BorderType aBorder,
+                                                              const Roi &aAllowedReadRoi) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    if (aBorder == BorderType::Constant)
+    {
+        throw INVALIDARGUMENT(aBorder,
+                              "When using BorderType::Constant, the constant value aConstant must be provided.");
+    }
+    return this->SquareDistanceNormalized(aTemplate, aDst, {0}, aBorder, aAllowedReadRoi);
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::SquareDistanceNormalized(const ImageView<T> &aTemplate,
+                                                              ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                              BorderType aBorder, const Roi &aAllowedReadRoi) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
+
+    squareDistanceNormalizedEachPixel(*this, aDst, aTemplate, aTemplate.SizeRoi(), aBorder, aConstant, aAllowedReadRoi);
+
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationCoefficient(const ImageView<T> &aTemplate,
+                                                                 ImageView<Pixel32fC1> &aDst, BorderType aBorder,
+                                                                 const Roi &aAllowedReadRoi) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    if (aBorder == BorderType::Constant)
+    {
+        throw INVALIDARGUMENT(aBorder,
+                              "When using BorderType::Constant, the constant value aConstant must be provided.");
+    }
+    return this->CrossCorrelationCoefficient(aTemplate, aDst, {0}, aBorder, aAllowedReadRoi);
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationCoefficient(const ImageView<T> &aTemplate,
+                                                                 ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                                 BorderType aBorder, const Roi &aAllowedReadRoi) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
+
+    crossCorrelationCoefficientEachPixel(*this, aDst, aTemplate, aTemplate.SizeRoi(), aBorder, aConstant,
+                                         aAllowedReadRoi);
+
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelation(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                                      BorderType aBorder) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    return this->CrossCorrelation(aTemplate, aDst, aBorder, ROI());
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelation(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                                      T aConstant, BorderType aBorder) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    return this->CrossCorrelation(aTemplate, aDst, aConstant, aBorder, ROI());
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationNormalized(const ImageView<T> &aTemplate,
+                                                                ImageView<Pixel32fC1> &aDst, BorderType aBorder) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    return this->CrossCorrelationNormalized(aTemplate, aDst, aBorder, ROI());
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationNormalized(const ImageView<T> &aTemplate,
+                                                                ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                                BorderType aBorder) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    return this->CrossCorrelationNormalized(aTemplate, aDst, aConstant, aBorder, ROI());
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::SquareDistanceNormalized(const ImageView<T> &aTemplate,
+                                                              ImageView<Pixel32fC1> &aDst, BorderType aBorder) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    return this->SquareDistanceNormalized(aTemplate, aDst, aBorder, ROI());
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::SquareDistanceNormalized(const ImageView<T> &aTemplate,
+                                                              ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                              BorderType aBorder) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    return this->SquareDistanceNormalized(aTemplate, aDst, aConstant, aBorder, ROI());
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationCoefficient(const ImageView<T> &aTemplate,
+                                                                 ImageView<Pixel32fC1> &aDst, BorderType aBorder) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    return this->CrossCorrelationCoefficient(aTemplate, aDst, aBorder, ROI());
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationCoefficient(const ImageView<T> &aTemplate,
+                                                                 ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                                 BorderType aBorder) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    return this->CrossCorrelationCoefficient(aTemplate, aDst, aConstant, aBorder, ROI());
 }
 #pragma endregion
 } // namespace opp::image::cpuSimple

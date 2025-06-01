@@ -7,8 +7,8 @@
 
 namespace opp::image
 {
-// NVCC / Cuda cannot access the values defined as MYCONST from device code. To circumvent that restriction,
-// we'll define the filter matrices as const members for NVCC and as MYCONST for host compilers...
+// NVCC / Cuda cannot access the values defined as "static constexpr" from device code. To circumvent that restriction,
+// we'll define the filter matrices as const members for NVCC and as static constexpr for all other compilers...
 
 #ifdef IS_CUDA_COMPILER
 #define MYCONST const
@@ -18,6 +18,17 @@ namespace opp::image
 
 template <opp::FixedFilter filter, int filterSize, typename filterT> struct FixedFilterKernel
 {
+};
+
+// Special case for SSIM using a 11x11 Gauss filter with sigma 1.5:
+struct FixedFilterKernelSSIM
+{
+    MYCONST float ValuesSeparable[11] = {0.001028380084479f, 0.007598758135239f, 0.036000772128431f, 0.109360689509700f,
+                                         0.213005537711254f, 0.266011724861794f, 0.213005537711254f, 0.109360689509700f,
+                                         0.036000772128431f, 0.007598758135239f, 0.001028380084479f};
+    MYCONST float Scaling             = 1;
+
+    MYCONST bool NeedsScaling = false;
 };
 
 template <> struct FixedFilterKernel<opp::FixedFilter::Gauss, 3, float>
@@ -202,7 +213,7 @@ template <typename filterT> struct FixedFilterKernel<opp::FixedFilter::Laplace, 
 
 template <typename filterT> struct FixedFilterKernel<opp::FixedFilter::PrewittHoriz, 3, filterT>
 {
-    MYCONST filterT Values[3][3] = {{1, 1, 1}, {0, 0, 0}, {-1, -1, -1}};
+    MYCONST filterT Values[3][3] = {{-1, -1, -1}, {0, 0, 0}, {1, 1, 1}};
     MYCONST filterT Scaling      = 1;
 
     MYCONST bool NeedsScaling = false;
@@ -210,7 +221,7 @@ template <typename filterT> struct FixedFilterKernel<opp::FixedFilter::PrewittHo
 
 template <typename filterT> struct FixedFilterKernel<opp::FixedFilter::PrewittVert, 3, filterT>
 {
-    MYCONST filterT Values[3][3] = {{-1, 0, 1}, {-1, 0, 1}, {-1, 0, 1}};
+    MYCONST filterT Values[3][3] = {{1, 0, -1}, {1, 0, -1}, {1, 0, -1}};
     MYCONST filterT Scaling      = 1;
 
     MYCONST bool NeedsScaling = false;
@@ -218,7 +229,7 @@ template <typename filterT> struct FixedFilterKernel<opp::FixedFilter::PrewittVe
 
 template <typename filterT> struct FixedFilterKernel<opp::FixedFilter::RobertsDown, 3, filterT>
 {
-    MYCONST filterT Values[3][3] = {{0, 0, 0}, {0, 1, 0}, {0, 0, -1}};
+    MYCONST filterT Values[3][3] = {{-1, 0, 0}, {0, 1, 0}, {0, 0, 0}};
     MYCONST filterT Scaling      = 1;
 
     MYCONST bool NeedsScaling = false;
@@ -226,7 +237,7 @@ template <typename filterT> struct FixedFilterKernel<opp::FixedFilter::RobertsDo
 
 template <typename filterT> struct FixedFilterKernel<opp::FixedFilter::RobertsUp, 3, filterT>
 {
-    MYCONST filterT Values[3][3] = {{0, 0, 0}, {0, 1, 0}, {-1, 0, 0}};
+    MYCONST filterT Values[3][3] = {{0, 0, -1}, {0, 1, 0}, {0, 0, 0}};
     MYCONST filterT Scaling      = 1;
 
     MYCONST bool NeedsScaling = false;
@@ -234,7 +245,7 @@ template <typename filterT> struct FixedFilterKernel<opp::FixedFilter::RobertsUp
 
 template <typename filterT> struct FixedFilterKernel<opp::FixedFilter::ScharrHoriz, 3, filterT>
 {
-    MYCONST filterT Values[3][3] = {{3, 10, 3}, {0, 0, 0}, {-3, -10, -3}};
+    MYCONST filterT Values[3][3] = {{-3, -10, -3}, {0, 0, 0}, {3, 10, 3}};
     MYCONST filterT Scaling      = 1;
 
     MYCONST bool NeedsScaling = false;
@@ -242,7 +253,7 @@ template <typename filterT> struct FixedFilterKernel<opp::FixedFilter::ScharrHor
 
 template <typename filterT> struct FixedFilterKernel<opp::FixedFilter::ScharrVert, 3, filterT>
 {
-    MYCONST filterT Values[3][3] = {{-3, 0, 3}, {-10, 0, 10}, {-3, 0, 3}};
+    MYCONST filterT Values[3][3] = {{3, 0, -3}, {10, 0, -10}, {3, 0, -3}};
     MYCONST filterT Scaling      = 1;
 
     MYCONST bool NeedsScaling = false;
@@ -282,7 +293,7 @@ template <typename filterT> struct FixedFilterKernel<opp::FixedFilter::SobelCros
 
 template <typename filterT> struct FixedFilterKernel<opp::FixedFilter::SobelHoriz, 3, filterT>
 {
-    MYCONST filterT Values[3][3] = {{1, 2, 1}, {0, 0, 0}, {-1, -2, -1}};
+    MYCONST filterT Values[3][3] = {{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}};
     MYCONST filterT Scaling      = 1;
 
     MYCONST bool NeedsScaling = false;
@@ -290,7 +301,7 @@ template <typename filterT> struct FixedFilterKernel<opp::FixedFilter::SobelHori
 
 template <typename filterT> struct FixedFilterKernel<opp::FixedFilter::SobelVert, 3, filterT>
 {
-    MYCONST filterT Values[3][3] = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
+    MYCONST filterT Values[3][3] = {{1, 0, -1}, {2, 0, -2}, {1, 0, -1}};
     MYCONST filterT Scaling      = 1;
 
     MYCONST bool NeedsScaling = false;
@@ -387,11 +398,11 @@ template <typename filterT> struct FixedFilterKernel<opp::FixedFilter::SobelCros
 
 template <typename filterT> struct FixedFilterKernel<opp::FixedFilter::SobelHoriz, 5, filterT>
 {
-    MYCONST filterT Values[5][5] = {{1, 4, 6, 4, 1},       //
-                                    {2, 8, 12, 8, 2},      //
-                                    {0, 0, 0, 0, 0},       //
+    MYCONST filterT Values[5][5] = {{-1, -4, -6, -4, -1},  //
                                     {-2, -8, -12, -8, -2}, //
-                                    {-1, -4, -6, -4, -1}};
+                                    {0, 0, 0, 0, 0},       //
+                                    {2, 8, 12, 8, 2},      //
+                                    {1, 4, 6, 4, 1}};
     MYCONST filterT Scaling      = 1;
 
     MYCONST bool NeedsScaling = false;
@@ -399,11 +410,11 @@ template <typename filterT> struct FixedFilterKernel<opp::FixedFilter::SobelHori
 
 template <typename filterT> struct FixedFilterKernel<opp::FixedFilter::SobelVert, 5, filterT>
 {
-    MYCONST filterT Values[5][5] = {{-1, -2, 0, 2, 1},   //
-                                    {-4, -8, 0, 8, 4},   //
-                                    {-6, -12, 0, 12, 6}, //
-                                    {-4, -8, 0, 8, 4},   //
-                                    {-1, -2, 0, 2, 1}};
+    MYCONST filterT Values[5][5] = {{1, 2, 0, -2, -1},   //
+                                    {4, 8, 0, -8, -4},   //
+                                    {6, 12, 0, -12, -6}, //
+                                    {4, 8, 0, -8, -4},   //
+                                    {1, 2, 0, -2, -1}};
     MYCONST filterT Scaling      = 1;
 
     MYCONST bool NeedsScaling = false;

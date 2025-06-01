@@ -84,12 +84,12 @@ __global__ void gradientVectorKernel(BorderControlT aSrcWithBC, DstT *__restrict
 #pragma unroll
                     for (int ky = 0; ky < kernelHeight; ky++)
                     {
-                        const int pixelDstY = ry + ky - kernelHeight + 1;
+                        const int pixelDstY = ry - ky;
 
 #pragma unroll
                         for (int kx = 0; kx < kernelWidth; kx++)
                         {
-                            const int pixelDstX = rx + kx - kernelWidth + 1;
+                            const int pixelDstX = rx - kx;
 
                             if (pixelDstY >= 0 && pixelDstY < blockHeight)
                             {
@@ -283,12 +283,12 @@ __global__ void gradientVectorKernel(BorderControlT aSrcWithBC, DstT *__restrict
 #pragma unroll
                 for (int ky = 0; ky < kernelHeight; ky++)
                 {
-                    const int pixelDstY = ry + ky - kernelHeight + 1;
+                    const int pixelDstY = ry - ky;
 
 #pragma unroll
                     for (int kx = 0; kx < kernelWidth; kx++)
                     {
-                        const int pixelDstX = rx + kx - kernelWidth + 1;
+                        const int pixelDstX = rx - kx;
 
                         if (pixelDstY >= 0 && pixelDstY < blockHeight)
                         {

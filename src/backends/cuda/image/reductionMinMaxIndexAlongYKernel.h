@@ -319,7 +319,7 @@ void InvokeReductionMinMaxIdxAlongYKernel(const dim3 &aBlockSize, uint aSharedMe
 
     reductionMinMaxIdxAlongYKernel<SrcT><<<blocksPerGrid, aBlockSize, aSharedMemory, aStream>>>(
         aSrcMin, aSrcMax, aSrcMinIdxX, aSrcMaxIdxX, aDstMin, aDstMax, aDstIdx, aDstScalarMin, aDstScalarMax,
-        aDstScalarIdx, aSize);
+        aDstScalarIdx, size);
 
     peekAndCheckLastCudaError("Block size: " << aBlockSize << " Grid size: " << blocksPerGrid
                                              << " SharedMemory: " << aSharedMemory << " Stream: " << aStream);

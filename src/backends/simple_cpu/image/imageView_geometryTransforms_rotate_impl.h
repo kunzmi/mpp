@@ -46,11 +46,12 @@ ImageView<T> &ImageView<T>::Rotate(ImageView<T> &aDst, double aAngleInDeg, const
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    return this->Rotate(aDst, aAngleInDeg, aShift, aInterpolation, aBorder, {0}, aAllowedReadRoi);
+    return this->Rotate(aDst, aAngleInDeg, aShift, aInterpolation, {0}, aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+void ImageView<T>::Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
                           BorderType aBorder, Roi aAllowedReadRoi)
@@ -61,16 +62,18 @@ void ImageView<T>::Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageVi
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    ImageView<T>::Rotate(aSrc1, aSrc2, aDst1, aDst2, aAngleInDeg, aShift, aInterpolation, aBorder, {0},
+    ImageView<T>::Rotate(aSrc1, aSrc2, aDst1, aDst2, aAngleInDeg, aShift, aInterpolation, {0}, aBorder,
                          aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                          ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                          ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                          double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                          BorderType aBorder, Roi aAllowedReadRoi)
+void ImageView<T>::Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                          ImageView<Vector1<remove_vector_t<T>>> &aDst3, double aAngleInDeg,
+                          const Vector2<double> &aShift, InterpolationMode aInterpolation, BorderType aBorder,
+                          Roi aAllowedReadRoi)
     requires ThreeChannel<T>
 {
     if (aBorder == BorderType::Constant)
@@ -78,13 +81,15 @@ void ImageView<T>::Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageVi
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    ImageView<T>::Rotate(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, aAngleInDeg, aShift, aInterpolation, aBorder, {0},
+    ImageView<T>::Rotate(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, aAngleInDeg, aShift, aInterpolation, {0}, aBorder,
                          aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                          ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+void ImageView<T>::Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                           double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
@@ -97,12 +102,12 @@ void ImageView<T>::Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageVi
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
     ImageView<T>::Rotate(aSrc1, aSrc2, aSrc3, aSrc4, aDst1, aDst2, aDst3, aDst4, aAngleInDeg, aShift, aInterpolation,
-                         aBorder, {0}, aAllowedReadRoi);
+                         {0}, aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Rotate(ImageView<T> &aDst, double aAngleInDeg, const Vector2<double> &aShift,
-                                   InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                                   InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
                                    Roi aAllowedReadRoi) const
 {
     // The rotation and shift are given from source to destination, with shift applied after rotation. As we compute
@@ -110,14 +115,15 @@ ImageView<T> &ImageView<T>::Rotate(ImageView<T> &aDst, double aAngleInDeg, const
 
     const AffineTransformation<double> rotate =
         AffineTransformation<double>::GetRotation(-aAngleInDeg) * AffineTransformation<double>::GetTranslation(-aShift);
-    return this->WarpAffineBack(aDst, rotate, aInterpolation, aBorder, aConstant, aAllowedReadRoi);
+    return this->WarpAffineBack(aDst, rotate, aInterpolation, aConstant, aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+void ImageView<T>::Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                          BorderType aBorder, T aConstant, Roi aAllowedReadRoi)
+                          T aConstant, BorderType aBorder, Roi aAllowedReadRoi)
     requires TwoChannel<T>
 {
     // The rotation and shift are given from source to destination, with shift applied after rotation. As we compute
@@ -125,16 +131,18 @@ void ImageView<T>::Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageVi
 
     const AffineTransformation<double> rotate =
         AffineTransformation<double>::GetRotation(-aAngleInDeg) * AffineTransformation<double>::GetTranslation(-aShift);
-    ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aDst1, aDst2, rotate, aInterpolation, aBorder, aConstant,
+    ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aDst1, aDst2, rotate, aInterpolation, aConstant, aBorder,
                                  aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                          ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                          ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                          double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                          BorderType aBorder, T aConstant, Roi aAllowedReadRoi)
+void ImageView<T>::Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                          ImageView<Vector1<remove_vector_t<T>>> &aDst3, double aAngleInDeg,
+                          const Vector2<double> &aShift, InterpolationMode aInterpolation, T aConstant,
+                          BorderType aBorder, Roi aAllowedReadRoi)
     requires ThreeChannel<T>
 {
     // The rotation and shift are given from source to destination, with shift applied after rotation. As we compute
@@ -142,17 +150,19 @@ void ImageView<T>::Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageVi
 
     const AffineTransformation<double> rotate =
         AffineTransformation<double>::GetRotation(-aAngleInDeg) * AffineTransformation<double>::GetTranslation(-aShift);
-    ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, rotate, aInterpolation, aBorder, aConstant,
+    ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, rotate, aInterpolation, aConstant, aBorder,
                                  aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                          ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+void ImageView<T>::Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                           double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                          BorderType aBorder, T aConstant, Roi aAllowedReadRoi)
+                          T aConstant, BorderType aBorder, Roi aAllowedReadRoi)
     requires FourChannelNoAlpha<T>
 {
     // The rotation and shift are given from source to destination, with shift applied after rotation. As we compute
@@ -161,7 +171,7 @@ void ImageView<T>::Rotate(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageVi
     const AffineTransformation<double> rotate =
         AffineTransformation<double>::GetRotation(-aAngleInDeg) * AffineTransformation<double>::GetTranslation(-aShift);
     ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aSrc3, aSrc4, aDst1, aDst2, aDst3, aDst4, rotate, aInterpolation,
-                                 aBorder, aConstant, aAllowedReadRoi);
+                                 aConstant, aBorder, aAllowedReadRoi);
 }
 #pragma endregion
 } // namespace opp::image::cpuSimple

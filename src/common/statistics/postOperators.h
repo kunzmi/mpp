@@ -205,6 +205,22 @@ template <AnyVector T> struct DivPostOp
     }
 };
 
+template <AnyVector T> struct DivAddToPostOp
+{
+    const remove_vector_t<T> InvDivisor;
+    const T *SrcToAdd;
+    DEVICE_CODE DivAddToPostOp(remove_vector_t<T> aDivisor, const T *aSrcToAdd)
+        : InvDivisor(static_cast<remove_vector_t<T>>(1) / aDivisor), SrcToAdd(aSrcToAdd)
+    {
+    }
+
+    DEVICE_CODE void operator()(T &aSrcDst) const
+    {
+        aSrcDst *= InvDivisor;
+        aSrcDst += *SrcToAdd;
+    }
+};
+
 template <AnyVector T> struct PSNR
 {
     const remove_vector_t<T> InvDivisor; // pixel count for MSE
@@ -499,18 +515,27 @@ template <AnyVector T> struct QualityIndex
     }
 };
 
+template <AnyVector T> struct QualityIndexWindow
+{
+    DEVICE_CODE void operator()(const T &aSumSrc1, const T &aSumSrc1Sqr, const T &aSumSrc2, const T &aSumSrc2Sqr,
+                                const T &aSumSrc1Src2, T &aDst) const
+    {
+        // formulas see https://ece.uwaterloo.ca/~z70wang/publications/quality_2c.pdf
+        T varSrc1  = aSumSrc1Sqr - aSumSrc1 * aSumSrc1;
+        T varSrc2  = aSumSrc2Sqr - aSumSrc2 * aSumSrc2;
+        T crossVar = aSumSrc1Src2 - aSumSrc1 * aSumSrc2;
+
+        aDst = (static_cast<remove_vector_t<T>>(4) * crossVar * aSumSrc1 * aSumSrc2) /
+               ((varSrc1 + varSrc2) * (aSumSrc1 * aSumSrc1 + aSumSrc2 * aSumSrc2));
+    }
+};
+
 template <AnyVector T> struct SSIM
 {
-    const remove_vector_t<T> PixelCount;
-    const remove_vector_t<T> InvPixelCount;
-    const remove_vector_t<T> InvPixelCount_1;
     const remove_vector_t<T> C1;
     const remove_vector_t<T> C2;
-    DEVICE_CODE SSIM(remove_vector_t<T> aPixelCount, remove_vector_t<T> aDynamicRange, remove_vector_t<T> aK1,
-                     remove_vector_t<T> aK2)
-        : PixelCount(aPixelCount), InvPixelCount(static_cast<remove_vector_t<T>>(1) / aPixelCount),
-          InvPixelCount_1(static_cast<remove_vector_t<T>>(1) / (aPixelCount - static_cast<remove_vector_t<T>>(1))),
-          C1(aK1 * aK1 * aDynamicRange * aDynamicRange), C2(aK2 * aK2 * aDynamicRange * aDynamicRange)
+    DEVICE_CODE SSIM(remove_vector_t<T> aDynamicRange, remove_vector_t<T> aK1, remove_vector_t<T> aK2)
+        : C1(aK1 * aK1 * aDynamicRange * aDynamicRange), C2(aK2 * aK2 * aDynamicRange * aDynamicRange)
     {
     }
 
@@ -518,18 +543,38 @@ template <AnyVector T> struct SSIM
                                 const T &aSumSrc1Src2, T &aDst) const
     {
         // formulas see https://en.wikipedia.org/wiki/Structural_similarity_index_measure
+        // the window function is assumed to sum up to 1, so no division by window size
 
-        T meanSrc1 = aSumSrc1 * InvPixelCount;
-        T meanSrc2 = aSumSrc2 * InvPixelCount;
-        T varSrc1  = (aSumSrc1Sqr - (aSumSrc1 * aSumSrc1) * InvPixelCount) * InvPixelCount_1;
+        T varSrc1  = aSumSrc1Sqr - aSumSrc1 * aSumSrc1;
+        T varSrc2  = aSumSrc2Sqr - aSumSrc2 * aSumSrc2;
+        T crossVar = aSumSrc1Src2 - aSumSrc1 * aSumSrc2;
 
-        T varSrc2 = (aSumSrc2Sqr - (aSumSrc2 * aSumSrc2) * InvPixelCount) * InvPixelCount_1;
-
-        T crossVar = (aSumSrc1Src2 - PixelCount * meanSrc1 * meanSrc2) * InvPixelCount_1;
-
-        aDst = (static_cast<remove_vector_t<T>>(2) * meanSrc1 * meanSrc2 + C1) *
+        aDst = (static_cast<remove_vector_t<T>>(2) * aSumSrc1 * aSumSrc2 + C1) *
                (static_cast<remove_vector_t<T>>(2) * crossVar + C2) /
-               ((meanSrc1 * meanSrc1 + meanSrc2 * meanSrc2 + C1) * (varSrc1 + varSrc2 + C2));
+               ((aSumSrc1 * aSumSrc1 + aSumSrc2 * aSumSrc2 + C1) * (varSrc1 + varSrc2 + C2));
+    }
+};
+
+template <AnyVector T> struct MSSSIM
+{
+    const remove_vector_t<T> C2;
+    DEVICE_CODE MSSSIM(remove_vector_t<T> aDynamicRange, remove_vector_t<T> aK2)
+        : C2(aK2 * aK2 * aDynamicRange * aDynamicRange)
+    {
+    }
+
+    DEVICE_CODE void operator()(const T &aSumSrc1, const T &aSumSrc1Sqr, const T &aSumSrc2, const T &aSumSrc2Sqr,
+                                const T &aSumSrc1Src2, T &aDst) const
+    {
+        // formulas see https://en.wikipedia.org/wiki/Structural_similarity_index_measure
+        // the window function is assumed to sum up to 1, so no division by window size
+        // same as SSIM, but skipping the mean terms
+
+        T varSrc1  = aSumSrc1Sqr - aSumSrc1 * aSumSrc1;
+        T varSrc2  = aSumSrc2Sqr - aSumSrc2 * aSumSrc2;
+        T crossVar = aSumSrc1Src2 - aSumSrc1 * aSumSrc2;
+
+        aDst = (static_cast<remove_vector_t<T>>(2) * crossVar + C2) / (varSrc1 + varSrc2 + C2);
     }
 };
 

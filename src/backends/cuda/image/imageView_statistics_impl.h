@@ -21,6 +21,7 @@
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
 #include <common/opp_defs.h>
+#include <common/safeCast.h>
 #include <common/scratchBuffer.h>
 #include <common/scratchBufferException.h>
 #include <common/utilities.h>
@@ -41,8 +42,7 @@ template <PixelType T> size_t ImageView<T>::AverageErrorBufferSize(const opp::cu
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -57,8 +57,7 @@ template <PixelType T> size_t ImageView<T>::AverageErrorMaskedBufferSize(const o
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ulong64> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ulong64> buffers(nullptr, BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -78,8 +77,7 @@ void ImageView<T>::AverageError(const ImageView<T> &aSrc2, opp::cuda::DevVarView
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -105,8 +103,8 @@ void ImageView<T>::AverageErrorMasked(const ImageView<T> &aSrc2,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ulong64> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT, ulong64> buffers(aBuffer.Pointer(),
+                                             BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -129,8 +127,7 @@ void ImageView<T>::AverageError(const ImageView<T> &aSrc2, opp::cuda::DevVarView
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -155,8 +152,8 @@ void ImageView<T>::AverageErrorMasked(const ImageView<T> &aSrc2,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ulong64> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT, ulong64> buffers(aBuffer.Pointer(),
+                                             BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -177,8 +174,7 @@ template <PixelType T> size_t ImageView<T>::AverageRelativeErrorBufferSize(const
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -194,8 +190,7 @@ size_t ImageView<T>::AverageRelativeErrorMaskedBufferSize(const opp::cuda::Strea
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ulong64> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ulong64> buffers(nullptr, BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -216,8 +211,7 @@ void ImageView<T>::AverageRelativeError(
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -244,8 +238,8 @@ void ImageView<T>::AverageRelativeErrorMasked(
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ulong64> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT, ulong64> buffers(aBuffer.Pointer(),
+                                             BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -270,8 +264,7 @@ void ImageView<T>::AverageRelativeError(const ImageView<T> &aSrc2,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -296,8 +289,8 @@ void ImageView<T>::AverageRelativeErrorMasked(const ImageView<T> &aSrc2,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ulong64> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT, ulong64> buffers(aBuffer.Pointer(),
+                                             BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -318,8 +311,7 @@ template <PixelType T> size_t ImageView<T>::DotProductBufferSize(const opp::cuda
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -345,8 +337,7 @@ void ImageView<T>::DotProduct(const ImageView<T> &aSrc2, opp::cuda::DevVarView<d
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -371,8 +362,7 @@ void ImageView<T>::DotProductMasked(const ImageView<T> &aSrc2, opp::cuda::DevVar
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -395,8 +385,7 @@ void ImageView<T>::DotProduct(const ImageView<T> &aSrc2, opp::cuda::DevVarView<d
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -420,8 +409,7 @@ void ImageView<T>::DotProductMasked(const ImageView<T> &aSrc2, opp::cuda::DevVar
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -442,8 +430,7 @@ template <PixelType T> size_t ImageView<T>::MSEBufferSize(const opp::cuda::Strea
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -458,8 +445,7 @@ template <PixelType T> size_t ImageView<T>::MSEMaskedBufferSize(const opp::cuda:
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ulong64> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ulong64> buffers(nullptr, BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -479,8 +465,7 @@ void ImageView<T>::MSE(const ImageView<T> &aSrc2, opp::cuda::DevVarView<mse_type
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -505,8 +490,8 @@ void ImageView<T>::MSEMasked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<ms
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ulong64> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT, ulong64> buffers(aBuffer.Pointer(),
+                                             BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -529,8 +514,7 @@ void ImageView<T>::MSE(const ImageView<T> &aSrc2, opp::cuda::DevVarView<mse_type
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -554,8 +538,8 @@ void ImageView<T>::MSEMasked(const ImageView<T> &aSrc2, opp::cuda::DevVarView<ms
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ulong64> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT, ulong64> buffers(aBuffer.Pointer(),
+                                             BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -576,8 +560,7 @@ template <PixelType T> size_t ImageView<T>::MaximumErrorBufferSize(const opp::cu
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -603,8 +586,7 @@ void ImageView<T>::MaximumError(const ImageView<T> &aSrc2, opp::cuda::DevVarView
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -630,8 +612,7 @@ void ImageView<T>::MaximumErrorMasked(const ImageView<T> &aSrc2,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -654,8 +635,7 @@ void ImageView<T>::MaximumError(const ImageView<T> &aSrc2, opp::cuda::DevVarView
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -680,8 +660,7 @@ void ImageView<T>::MaximumErrorMasked(const ImageView<T> &aSrc2,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -702,8 +681,7 @@ template <PixelType T> size_t ImageView<T>::MaximumRelativeErrorBufferSize(const
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -731,8 +709,7 @@ void ImageView<T>::MaximumRelativeError(
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -758,8 +735,7 @@ void ImageView<T>::MaximumRelativeErrorMasked(
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -784,8 +760,7 @@ void ImageView<T>::MaximumRelativeError(const ImageView<T> &aSrc2,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -810,8 +785,7 @@ void ImageView<T>::MaximumRelativeErrorMasked(const ImageView<T> &aSrc2,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -888,8 +862,7 @@ size_t ImageView<T>::NormDiffL1BufferSize(const opp::cuda::StreamCtx &aStreamCtx
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -917,8 +890,7 @@ void ImageView<T>::NormDiffL1(const ImageView<T> &aSrc2, opp::cuda::DevVarView<n
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -943,8 +915,7 @@ void ImageView<T>::NormDiffL1Masked(const ImageView<T> &aSrc2, opp::cuda::DevVar
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -967,8 +938,7 @@ void ImageView<T>::NormDiffL1(const ImageView<T> &aSrc2, opp::cuda::DevVarView<n
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -992,8 +962,7 @@ void ImageView<T>::NormDiffL1Masked(const ImageView<T> &aSrc2, opp::cuda::DevVar
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1016,8 +985,7 @@ size_t ImageView<T>::NormDiffL2BufferSize(const opp::cuda::StreamCtx &aStreamCtx
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -1045,8 +1013,7 @@ void ImageView<T>::NormDiffL2(const ImageView<T> &aSrc2, opp::cuda::DevVarView<n
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1071,8 +1038,7 @@ void ImageView<T>::NormDiffL2Masked(const ImageView<T> &aSrc2, opp::cuda::DevVar
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1095,8 +1061,7 @@ void ImageView<T>::NormDiffL2(const ImageView<T> &aSrc2, opp::cuda::DevVarView<n
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1120,8 +1085,7 @@ void ImageView<T>::NormDiffL2Masked(const ImageView<T> &aSrc2, opp::cuda::DevVar
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1144,8 +1108,7 @@ size_t ImageView<T>::NormRelInfBufferSize(const opp::cuda::StreamCtx &aStreamCtx
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -1173,8 +1136,8 @@ void ImageView<T>::NormRelInf(const ImageView<T> &aSrc2, opp::cuda::DevVarView<n
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(),
+                                              BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1199,8 +1162,8 @@ void ImageView<T>::NormRelInfMasked(const ImageView<T> &aSrc2, opp::cuda::DevVar
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(),
+                                              BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1223,8 +1186,8 @@ void ImageView<T>::NormRelInf(const ImageView<T> &aSrc2, opp::cuda::DevVarView<n
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(),
+                                              BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1248,8 +1211,8 @@ void ImageView<T>::NormRelInfMasked(const ImageView<T> &aSrc2, opp::cuda::DevVar
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(),
+                                              BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1272,8 +1235,7 @@ size_t ImageView<T>::NormRelL1BufferSize(const opp::cuda::StreamCtx &aStreamCtx)
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -1301,8 +1263,8 @@ void ImageView<T>::NormRelL1(const ImageView<T> &aSrc2, opp::cuda::DevVarView<no
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(),
+                                              BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1327,8 +1289,8 @@ void ImageView<T>::NormRelL1Masked(const ImageView<T> &aSrc2, opp::cuda::DevVarV
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(),
+                                              BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1351,8 +1313,8 @@ void ImageView<T>::NormRelL1(const ImageView<T> &aSrc2, opp::cuda::DevVarView<no
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(),
+                                              BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1376,8 +1338,8 @@ void ImageView<T>::NormRelL1Masked(const ImageView<T> &aSrc2, opp::cuda::DevVarV
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(),
+                                              BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1400,8 +1362,7 @@ size_t ImageView<T>::NormRelL2BufferSize(const opp::cuda::StreamCtx &aStreamCtx)
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -1429,8 +1390,8 @@ void ImageView<T>::NormRelL2(const ImageView<T> &aSrc2, opp::cuda::DevVarView<no
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(),
+                                              BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1455,8 +1416,8 @@ void ImageView<T>::NormRelL2Masked(const ImageView<T> &aSrc2, opp::cuda::DevVarV
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(),
+                                              BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1479,8 +1440,8 @@ void ImageView<T>::NormRelL2(const ImageView<T> &aSrc2, opp::cuda::DevVarView<no
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(),
+                                              BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1504,8 +1465,8 @@ void ImageView<T>::NormRelL2Masked(const ImageView<T> &aSrc2, opp::cuda::DevVarV
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(),
+                                              BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1528,8 +1489,7 @@ size_t ImageView<T>::PSNRBufferSize(const opp::cuda::StreamCtx &aStreamCtx) cons
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -1550,8 +1510,7 @@ void ImageView<T>::PSNR(const ImageView<T> &aSrc2, opp::cuda::DevVarView<mse_typ
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1574,8 +1533,7 @@ void ImageView<T>::PSNR(const ImageView<T> &aSrc2, opp::cuda::DevVarView<mse_typ
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1597,10 +1555,9 @@ size_t ImageView<T>::QualityIndexBufferSize(const opp::cuda::StreamCtx &aStreamC
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 5> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor),
-                                               to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor),
-                                               to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT, ComputeT, ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT, ComputeT, ComputeT, ComputeT> buffers(
+        nullptr, BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor, SizeRoi().y / divisor, SizeRoi().y / divisor,
+                             SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -1619,10 +1576,9 @@ void ImageView<T>::QualityIndex(const ImageView<T> &aSrc2, opp::cuda::DevVarView
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 5> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor),
-                                               to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor),
-                                               to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT, ComputeT, ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT, ComputeT, ComputeT, ComputeT> buffers(
+        aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor, SizeRoi().y / divisor,
+                                       SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1630,56 +1586,242 @@ void ImageView<T>::QualityIndex(const ImageView<T> &aSrc2, opp::cuda::DevVarView
                              buffers.template Get<1>(), buffers.template Get<2>(), buffers.template Get<3>(),
                              buffers.template Get<4>(), aDst.Pointer(), SizeRoi(), aStreamCtx);
 }
-#pragma endregion
-
-#pragma region SSIM
 template <PixelType T>
-size_t ImageView<T>::SSIMBufferSize(const opp::cuda::StreamCtx &aStreamCtx) const
+size_t ImageView<T>::QualityIndexWindowBufferSize(const opp::cuda::StreamCtx & /*aStreamCtx*/) const
     requires RealVector<T>
 {
-    using ComputeT = qualityIndex_types_for_ct1<T>;
+    using DstT = qiw_types_for_rt<T>;
 
-    int divisor = 1;
-    if (aStreamCtx.ComputeCapabilityMajor < std::numeric_limits<int>::max())
-    {
-        divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
-    }
-
-    const std::array<size_t, 5> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor),
-                                               to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor),
-                                               to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT, ComputeT, ComputeT, ComputeT> buffers(nullptr, bufferSizes);
-
+    ScratchBuffer<DstT, DstT> buffers(nullptr, BufferSizes{SizeRoi().TotalSize(), SizeRoi().y});
     return buffers.GetTotalBufferSize();
 }
 
 template <PixelType T>
-void ImageView<T>::SSIM(const ImageView<T> &aSrc2, opp::cuda::DevVarView<qualityIndex_types_for_rt<T>> &aDst,
-                        opp::cuda::DevVarView<byte> &aBuffer,
-                        remove_vector_t<qualityIndex_types_for_rt<T>> aDynamicRange,
-                        remove_vector_t<qualityIndex_types_for_rt<T>> aK1,
-                        remove_vector_t<qualityIndex_types_for_rt<T>> aK2, const opp::cuda::StreamCtx &aStreamCtx) const
+void ImageView<T>::QualityIndexWindow(const ImageView<T> &aSrc2, opp::cuda::DevVarView<qiw_types_for_rt<T>> &aDst,
+                                      opp::cuda::DevVarView<byte> &aBuffer,
+                                      const opp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
-    using ComputeT = qualityIndex_types_for_ct1<T>;
 
-    int divisor = 1;
-    if (aStreamCtx.ComputeCapabilityMajor < std::numeric_limits<int>::max())
+    using DstT = qiw_types_for_rt<T>;
+
+    const Vector2<int> roiOffset(0, 0);
+
+    ScratchBuffer<DstT, DstT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().TotalSize(), SizeRoi().y});
+    CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
+
+    InvokeQIWSrcSrc(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), buffers.template Get<0>(),
+                    buffers.template Get<1>(), aDst.Pointer(), SizeRoi(), roiOffset, SizeRoi(), roiOffset, SizeRoi(),
+                    aStreamCtx);
+}
+#pragma endregion
+
+#pragma region SSIM
+template <PixelType T>
+size_t ImageView<T>::SSIMBufferSize(const opp::cuda::StreamCtx & /*aStreamCtx*/) const
+    requires RealVector<T>
+{
+    using DstT = ssim_types_for_rt<T>;
+
+    const int minSize       = SizeRoi().Min();
+    const float scaleFactor = std::max(1.0f, std::round(to_float(SizeRoi().Min()) / 256.0f));
+
+    if (scaleFactor > 1)
     {
-        divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
+        const Size2D scaledRoi = SizeRoi() / to_int(scaleFactor);
+
+        ScratchBuffer<T, T, DstT, DstT> buffers(nullptr,
+                                                BufferSizes{scaledRoi, scaledRoi, scaledRoi.TotalSize(), scaledRoi.y});
+        return buffers.GetTotalBufferSize();
     }
 
-    const std::array<size_t, 5> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor),
-                                               to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor),
-                                               to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT, ComputeT, ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<DstT, DstT> buffers(nullptr, BufferSizes{SizeRoi().TotalSize(), SizeRoi().y});
+    return buffers.GetTotalBufferSize();
+}
+
+template <PixelType T>
+void ImageView<T>::SSIM(const ImageView<T> &aSrc2, opp::cuda::DevVarView<ssim_types_for_rt<T>> &aDst,
+                        opp::cuda::DevVarView<byte> &aBuffer, remove_vector_t<ssim_types_for_rt<T>> aDynamicRange,
+                        remove_vector_t<ssim_types_for_rt<T>> aK1, remove_vector_t<ssim_types_for_rt<T>> aK2,
+                        const opp::cuda::StreamCtx &aStreamCtx) const
+    requires RealVector<T>
+{
+    checkSameSize(ROI(), aSrc2.ROI());
+
+    using DstT = ssim_types_for_rt<T>;
+
+    const int minSize       = SizeRoi().Min();
+    const float scaleFactor = std::max(1.0f, std::round(to_float(SizeRoi().Min()) / 256.0f));
+
+    const Vector2<int> roiOffset(0, 0);
+
+    if (scaleFactor > 1)
+    {
+        const Size2D scaledRoi = SizeRoi() / to_int(scaleFactor);
+
+        ScratchBuffer<T, T, DstT, DstT> buffers(aBuffer.Pointer(),
+                                                BufferSizes{scaledRoi, scaledRoi, scaledRoi.TotalSize(), scaledRoi.y});
+
+        CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
+        assert(buffers.GetSubBufferPitch(0) == buffers.GetSubBufferPitch(1));
+
+        const size_t pitchTmp = buffers.GetSubBufferPitch(0);
+
+        ImageView<T> resizeSrc1(buffers.template Get<0>(), scaledRoi, pitchTmp);
+        ImageView<T> resizeSrc2(buffers.template Get<1>(), scaledRoi, pitchTmp);
+
+        if constexpr (SingleChannel<T>)
+        {
+            using twoChannel = ImageView<Vector2<remove_vector_t<T>>>;
+            twoChannel::Resize(*this, aSrc2, resizeSrc1, resizeSrc2, 1.0 / to_double(scaleFactor), 0,
+                               InterpolationMode::Super, BorderType::Replicate, Roi(), aStreamCtx);
+        }
+        else
+        {
+            this->Resize(resizeSrc1, 1.0 / to_double(scaleFactor), 0, InterpolationMode::Super, BorderType::Replicate,
+                         Roi(), aStreamCtx);
+            aSrc2.Resize(resizeSrc2, 1.0 / to_double(scaleFactor), 0, InterpolationMode::Super, BorderType::Replicate,
+                         Roi(), aStreamCtx);
+        }
+
+        InvokeSSIMSrcSrc(resizeSrc1.PointerRoi(), resizeSrc1.Pitch(), resizeSrc2.PointerRoi(), resizeSrc2.Pitch(),
+                         buffers.template Get<2>(), buffers.template Get<3>(), aDst.Pointer(), aDynamicRange, aK1, aK2,
+                         scaledRoi, roiOffset, scaledRoi, roiOffset, scaledRoi, aStreamCtx);
+    }
+    else
+    {
+        ScratchBuffer<DstT, DstT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().TotalSize(), SizeRoi().y});
+        CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
+
+        InvokeSSIMSrcSrc(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), buffers.template Get<0>(),
+                         buffers.template Get<1>(), aDst.Pointer(), aDynamicRange, aK1, aK2, SizeRoi(), roiOffset,
+                         SizeRoi(), roiOffset, SizeRoi(), aStreamCtx);
+    }
+}
+#pragma endregion
+
+#pragma region MSSSIM
+template <PixelType T>
+size_t ImageView<T>::MSSSIMBufferSize(const opp::cuda::StreamCtx & /*aStreamCtx*/) const
+    requires RealVector<T>
+{
+    using DstT = ssim_types_for_rt<T>;
+
+    const Size2D scaledRoi1 = SizeRoi() / 2;
+    const Size2D scaledRoi2 = scaledRoi1 / 2;
+
+    ScratchBuffer<T, T, T, T, DstT, DstT> buffers(
+        nullptr, BufferSizes{scaledRoi1, scaledRoi1, scaledRoi2, scaledRoi2, SizeRoi().TotalSize(), SizeRoi().y});
+    return buffers.GetTotalBufferSize();
+}
+
+template <PixelType T>
+void ImageView<T>::MSSSIM(const ImageView<T> &aSrc2, opp::cuda::DevVarView<ssim_types_for_rt<T>> &aDst,
+                          opp::cuda::DevVarView<byte> &aBuffer, remove_vector_t<ssim_types_for_rt<T>> aDynamicRange,
+                          remove_vector_t<ssim_types_for_rt<T>> aK1, remove_vector_t<ssim_types_for_rt<T>> aK2,
+                          const opp::cuda::StreamCtx &aStreamCtx) const
+    requires RealVector<T>
+{
+    checkSameSize(ROI(), aSrc2.ROI());
+
+    using DstT       = ssim_types_for_rt<T>;
+    using twoChannel = ImageView<Vector2<remove_vector_t<T>>>;
+
+    const Vector2<int> roiOffset(0, 0);
+
+    const Size2D scaledRoi1 = SizeRoi() / 2;
+    const Size2D scaledRoi2 = scaledRoi1 / 2;
+
+    ScratchBuffer<T, T, T, T, DstT, DstT> buffers(
+        aBuffer.Pointer(),
+        BufferSizes{scaledRoi1, scaledRoi1, scaledRoi2, scaledRoi2, SizeRoi().TotalSize(), SizeRoi().y});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
-    InvokeSSIMSrcSrc(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), buffers.template Get<0>(),
-                     buffers.template Get<1>(), buffers.template Get<2>(), buffers.template Get<3>(),
-                     buffers.template Get<4>(), aDst.Pointer(), aDynamicRange, aK1, aK2, SizeRoi(), aStreamCtx);
+    ImageView<T> resizeSrc11(buffers.template Get<0>(), scaledRoi1, buffers.GetSubBufferPitch(0));
+    ImageView<T> resizeSrc12(buffers.template Get<1>(), scaledRoi1, buffers.GetSubBufferPitch(1));
+    ImageView<T> resizeSrc21(buffers.template Get<2>(), scaledRoi2, buffers.GetSubBufferPitch(2));
+    ImageView<T> resizeSrc22(buffers.template Get<3>(), scaledRoi2, buffers.GetSubBufferPitch(3));
+
+    Size2D resizedRoiSize = SizeRoi();
+
+    int level = 0;
+    InvokeMSSSIMSrcSrc(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), buffers.template Get<4>(),
+                       buffers.template Get<5>(), aDst.Pointer(), level, aDynamicRange, aK1, aK2, SizeRoi(), roiOffset,
+                       SizeRoi(), roiOffset, SizeRoi(), aStreamCtx);
+
+    resizedRoiSize /= 2;
+    if constexpr (SingleChannel<T>)
+    {
+        twoChannel::Resize(*this, aSrc2, resizeSrc11, resizeSrc12, 0.5, 0, InterpolationMode::Super,
+                           BorderType::Replicate, Roi(), aStreamCtx);
+    }
+    else
+    {
+        this->Resize(resizeSrc11, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi(), aStreamCtx);
+        aSrc2.Resize(resizeSrc12, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi(), aStreamCtx);
+    }
+
+    level = 1;
+    InvokeMSSSIMSrcSrc(resizeSrc11.PointerRoi(), resizeSrc11.Pitch(), resizeSrc12.PointerRoi(), resizeSrc12.Pitch(),
+                       buffers.template Get<4>(), buffers.template Get<5>(), aDst.Pointer(), level, aDynamicRange, aK1,
+                       aK2, resizedRoiSize, roiOffset, resizedRoiSize, roiOffset, resizedRoiSize, aStreamCtx);
+
+    resizedRoiSize /= 2;
+    if constexpr (SingleChannel<T>)
+    {
+        twoChannel::Resize(resizeSrc11, resizeSrc12, resizeSrc21, resizeSrc22, 0.5, 0, InterpolationMode::Super,
+                           BorderType::Replicate, Roi(), aStreamCtx);
+    }
+    else
+    {
+        resizeSrc11.Resize(resizeSrc21, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi(), aStreamCtx);
+        resizeSrc12.Resize(resizeSrc22, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi(), aStreamCtx);
+    }
+
+    level = 2;
+    InvokeMSSSIMSrcSrc(resizeSrc21.PointerRoi(), resizeSrc21.Pitch(), resizeSrc22.PointerRoi(), resizeSrc22.Pitch(),
+                       buffers.template Get<4>(), buffers.template Get<5>(), aDst.Pointer(), level, aDynamicRange, aK1,
+                       aK2, resizedRoiSize, roiOffset, resizedRoiSize, roiOffset, resizedRoiSize, aStreamCtx);
+
+    resizedRoiSize /= 2;
+    resizeSrc11.SetRoi(Roi({0}, resizedRoiSize));
+    resizeSrc12.SetRoi(Roi({0}, resizedRoiSize));
+    if constexpr (SingleChannel<T>)
+    {
+        twoChannel::Resize(resizeSrc21, resizeSrc22, resizeSrc11, resizeSrc12, 0.5, 0, InterpolationMode::Super,
+                           BorderType::Replicate, Roi(), aStreamCtx);
+    }
+    else
+    {
+        resizeSrc21.Resize(resizeSrc11, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi(), aStreamCtx);
+        resizeSrc22.Resize(resizeSrc12, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi(), aStreamCtx);
+    }
+
+    level = 3;
+    InvokeMSSSIMSrcSrc(resizeSrc11.PointerRoi(), resizeSrc11.Pitch(), resizeSrc12.PointerRoi(), resizeSrc12.Pitch(),
+                       buffers.template Get<4>(), buffers.template Get<5>(), aDst.Pointer(), level, aDynamicRange, aK1,
+                       aK2, resizedRoiSize, roiOffset, resizedRoiSize, roiOffset, resizedRoiSize, aStreamCtx);
+
+    resizedRoiSize /= 2;
+    resizeSrc21.SetRoi(Roi({0}, resizedRoiSize));
+    resizeSrc22.SetRoi(Roi({0}, resizedRoiSize));
+    if constexpr (SingleChannel<T>)
+    {
+        twoChannel::Resize(resizeSrc11, resizeSrc12, resizeSrc21, resizeSrc22, 0.5, 0, InterpolationMode::Super,
+                           BorderType::Replicate, Roi(), aStreamCtx);
+    }
+    else
+    {
+        resizeSrc11.Resize(resizeSrc21, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi(), aStreamCtx);
+        resizeSrc12.Resize(resizeSrc22, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi(), aStreamCtx);
+    }
+
+    level = 4;
+    InvokeMSSSIMSrcSrc(resizeSrc21.PointerRoi(), resizeSrc21.Pitch(), resizeSrc22.PointerRoi(), resizeSrc22.Pitch(),
+                       buffers.template Get<4>(), buffers.template Get<5>(), aDst.Pointer(), level, aDynamicRange, aK1,
+                       aK2, resizedRoiSize, roiOffset, resizedRoiSize, roiOffset, resizedRoiSize, aStreamCtx);
 }
 #pragma endregion
 
@@ -1696,8 +1838,7 @@ size_t ImageView<T>::NormInfBufferSize(const opp::cuda::StreamCtx &aStreamCtx) c
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -1724,8 +1865,7 @@ void ImageView<T>::NormInf(opp::cuda::DevVarView<normInf_types_for_rt<T>> &aDst,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1749,8 +1889,7 @@ void ImageView<T>::NormInfMasked(opp::cuda::DevVarView<normInf_types_for_rt<T>> 
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1771,8 +1910,7 @@ void ImageView<T>::NormInf(opp::cuda::DevVarView<normInf_types_for_rt<T>> &aDst,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1794,8 +1932,7 @@ void ImageView<T>::NormInfMasked(opp::cuda::DevVarView<normInf_types_for_rt<T>> 
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1817,8 +1954,7 @@ size_t ImageView<T>::NormL1BufferSize(const opp::cuda::StreamCtx &aStreamCtx) co
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -1845,8 +1981,7 @@ void ImageView<T>::NormL1(opp::cuda::DevVarView<normL1_types_for_rt<T>> &aDst,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1870,8 +2005,7 @@ void ImageView<T>::NormL1Masked(opp::cuda::DevVarView<normL1_types_for_rt<T>> &a
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1892,8 +2026,7 @@ void ImageView<T>::NormL1(opp::cuda::DevVarView<normL1_types_for_rt<T>> &aDst, o
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1914,8 +2047,7 @@ void ImageView<T>::NormL1Masked(opp::cuda::DevVarView<normL1_types_for_rt<T>> &a
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1937,8 +2069,7 @@ size_t ImageView<T>::NormL2BufferSize(const opp::cuda::StreamCtx &aStreamCtx) co
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -1965,8 +2096,7 @@ void ImageView<T>::NormL2(opp::cuda::DevVarView<normL2_types_for_rt<T>> &aDst,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1990,8 +2120,7 @@ void ImageView<T>::NormL2Masked(opp::cuda::DevVarView<normL2_types_for_rt<T>> &a
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2012,8 +2141,7 @@ void ImageView<T>::NormL2(opp::cuda::DevVarView<normL2_types_for_rt<T>> &aDst, o
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2034,8 +2162,7 @@ void ImageView<T>::NormL2Masked(opp::cuda::DevVarView<normL2_types_for_rt<T>> &a
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2057,8 +2184,7 @@ size_t ImageView<T>::SumBufferSize(const opp::cuda::DevVarView<sum_types_for_rt<
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -2083,8 +2209,7 @@ size_t ImageView<T>::SumBufferSize(const opp::cuda::DevVarView<sum_types_for_rt<
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -2111,8 +2236,7 @@ void ImageView<T>::Sum(opp::cuda::DevVarView<sum_types_for_rt<T, 1>> &aDst,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2134,8 +2258,7 @@ void ImageView<T>::Sum(opp::cuda::DevVarView<sum_types_for_rt<T, 2>> &aDst,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2159,8 +2282,7 @@ void ImageView<T>::SumMasked(opp::cuda::DevVarView<sum_types_for_rt<T, 1>> &aDst
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2184,8 +2306,7 @@ void ImageView<T>::SumMasked(opp::cuda::DevVarView<sum_types_for_rt<T, 2>> &aDst
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2206,8 +2327,7 @@ void ImageView<T>::Sum(opp::cuda::DevVarView<sum_types_for_rt<T, 1>> &aDst, opp:
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2227,8 +2347,7 @@ void ImageView<T>::Sum(opp::cuda::DevVarView<sum_types_for_rt<T, 2>> &aDst, opp:
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2249,8 +2368,7 @@ void ImageView<T>::SumMasked(opp::cuda::DevVarView<sum_types_for_rt<T, 1>> &aDst
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2272,8 +2390,7 @@ void ImageView<T>::SumMasked(opp::cuda::DevVarView<sum_types_for_rt<T, 2>> &aDst
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2293,8 +2410,7 @@ template <PixelType T> size_t ImageView<T>::MeanBufferSize(const opp::cuda::Stre
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -2309,8 +2425,7 @@ template <PixelType T> size_t ImageView<T>::MeanMaskedBufferSize(const opp::cuda
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ulong64> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ulong64> buffers(nullptr, BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -2329,8 +2444,7 @@ void ImageView<T>::Mean(opp::cuda::DevVarView<mean_types_for_rt<T>> &aDst,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2354,8 +2468,8 @@ void ImageView<T>::MeanMasked(opp::cuda::DevVarView<mean_types_for_rt<T>> &aDst,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ulong64> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT, ulong64> buffers(aBuffer.Pointer(),
+                                             BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2376,8 +2490,7 @@ void ImageView<T>::Mean(opp::cuda::DevVarView<mean_types_for_rt<T>> &aDst, opp::
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2398,8 +2511,8 @@ void ImageView<T>::MeanMasked(opp::cuda::DevVarView<mean_types_for_rt<T>> &aDst,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ulong64> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT, ulong64> buffers(aBuffer.Pointer(),
+                                             BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2419,8 +2532,7 @@ template <PixelType T> size_t ImageView<T>::MeanStdBufferSize(const opp::cuda::S
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -2435,9 +2547,8 @@ template <PixelType T> size_t ImageView<T>::MeanStdMaskedBufferSize(const opp::c
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 3> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor),
-                                               to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT, ulong64> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT, ulong64> buffers(
+        nullptr, BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -2458,8 +2569,8 @@ void ImageView<T>::MeanStd(opp::cuda::DevVarView<meanStd_types_for_rt1<T>> &aMea
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(),
+                                              BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2485,9 +2596,8 @@ void ImageView<T>::MeanStdMasked(opp::cuda::DevVarView<meanStd_types_for_rt1<T>>
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 3> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor),
-                                               to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT, ulong64> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT, ulong64> buffers(
+        aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2510,8 +2620,8 @@ void ImageView<T>::MeanStd(opp::cuda::DevVarView<meanStd_types_for_rt1<T>> &aMea
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(),
+                                              BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2535,9 +2645,8 @@ void ImageView<T>::MeanStdMasked(opp::cuda::DevVarView<meanStd_types_for_rt1<T>>
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 3> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor),
-                                               to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT, ulong64> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT, ulong64> buffers(
+        aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2560,8 +2669,7 @@ size_t ImageView<T>::CountInRangeBufferSize(const opp::cuda::StreamCtx &aStreamC
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -2588,8 +2696,7 @@ void ImageView<T>::CountInRange(const T &aLowerLimit, const T &aUpperLimit,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2614,8 +2721,7 @@ void ImageView<T>::CountInRangeMasked(const T &aLowerLimit, const T &aUpperLimit
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2637,8 +2743,7 @@ void ImageView<T>::CountInRange(const T &aLowerLimit, const T &aUpperLimit,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2662,8 +2767,7 @@ void ImageView<T>::CountInRangeMasked(const T &aLowerLimit, const T &aUpperLimit
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2685,8 +2789,7 @@ size_t ImageView<T>::MinBufferSize(const opp::cuda::StreamCtx &aStreamCtx) const
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -2711,8 +2814,7 @@ void ImageView<T>::Min(opp::cuda::DevVarView<T> &aDst, opp::cuda::DevVarView<rem
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2735,8 +2837,7 @@ void ImageView<T>::MinMasked(opp::cuda::DevVarView<T> &aDst, opp::cuda::DevVarVi
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2757,8 +2858,7 @@ void ImageView<T>::Min(opp::cuda::DevVarView<T> &aDst, opp::cuda::DevVarView<byt
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2779,8 +2879,7 @@ void ImageView<T>::MinMasked(opp::cuda::DevVarView<T> &aDst, const ImageView<Pix
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2801,8 +2900,7 @@ size_t ImageView<T>::MaxBufferSize(const opp::cuda::StreamCtx &aStreamCtx) const
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -2827,8 +2925,7 @@ void ImageView<T>::Max(opp::cuda::DevVarView<T> &aDst, opp::cuda::DevVarView<rem
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2851,8 +2948,7 @@ void ImageView<T>::MaxMasked(opp::cuda::DevVarView<T> &aDst, opp::cuda::DevVarVi
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2873,8 +2969,7 @@ void ImageView<T>::Max(opp::cuda::DevVarView<T> &aDst, opp::cuda::DevVarView<byt
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2895,8 +2990,7 @@ void ImageView<T>::MaxMasked(opp::cuda::DevVarView<T> &aDst, const ImageView<Pix
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 1> bufferSizes = {to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2917,8 +3011,7 @@ size_t ImageView<T>::MinMaxBufferSize(const opp::cuda::StreamCtx &aStreamCtx) co
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(nullptr, BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -2945,8 +3038,8 @@ void ImageView<T>::MinMax(opp::cuda::DevVarView<T> &aDstMin, opp::cuda::DevVarVi
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(),
+                                              BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2971,8 +3064,8 @@ void ImageView<T>::MinMaxMasked(opp::cuda::DevVarView<T> &aDstMin, opp::cuda::De
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(),
+                                              BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -2994,8 +3087,8 @@ void ImageView<T>::MinMax(opp::cuda::DevVarView<T> &aDstMin, opp::cuda::DevVarVi
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(),
+                                              BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3018,8 +3111,8 @@ void ImageView<T>::MinMaxMasked(opp::cuda::DevVarView<T> &aDstMin, opp::cuda::De
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(), bufferSizes);
+    ScratchBuffer<ComputeT, ComputeT> buffers(aBuffer.Pointer(),
+                                              BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3041,8 +3134,8 @@ size_t ImageView<T>::MinIndexBufferSize(const opp::cuda::StreamCtx &aStreamCtx) 
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(
+        nullptr, BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -3071,8 +3164,8 @@ void ImageView<T>::MinIndex(opp::cuda::DevVarView<T> &aDstMin,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(
+        aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3099,8 +3192,8 @@ void ImageView<T>::MinIndexMasked(opp::cuda::DevVarView<T> &aDstMin,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(
+        aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3124,8 +3217,8 @@ void ImageView<T>::MinIndex(opp::cuda::DevVarView<T> &aDstMin,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(
+        aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3150,8 +3243,8 @@ void ImageView<T>::MinIndexMasked(opp::cuda::DevVarView<T> &aDstMin,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(
+        aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3173,8 +3266,8 @@ size_t ImageView<T>::MaxIndexBufferSize(const opp::cuda::StreamCtx &aStreamCtx) 
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(
+        nullptr, BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -3203,8 +3296,8 @@ void ImageView<T>::MaxIndex(opp::cuda::DevVarView<T> &aDstMax,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(
+        aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3231,8 +3324,8 @@ void ImageView<T>::MaxIndexMasked(opp::cuda::DevVarView<T> &aDstMax,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(
+        aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3256,8 +3349,8 @@ void ImageView<T>::MaxIndex(opp::cuda::DevVarView<T> &aDstMax,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(
+        aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3282,8 +3375,8 @@ void ImageView<T>::MaxIndexMasked(opp::cuda::DevVarView<T> &aDstMax,
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 2> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
-    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(nullptr, bufferSizes);
+    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(
+        aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3305,11 +3398,10 @@ size_t ImageView<T>::MinMaxIndexBufferSize(const opp::cuda::StreamCtx &aStreamCt
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 4> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor),
-                                               to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
     ScratchBuffer<ComputeT, ComputeT, same_vector_size_different_type_t<T, int>,
                   same_vector_size_different_type_t<T, int>>
-        buffers(nullptr, bufferSizes);
+        buffers(nullptr, BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor, SizeRoi().y / divisor,
+                                     SizeRoi().y / divisor});
 
     return buffers.GetTotalBufferSize();
 }
@@ -3338,11 +3430,10 @@ void ImageView<T>::MinMaxIndex(opp::cuda::DevVarView<T> &aDstMin, opp::cuda::Dev
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 4> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor),
-                                               to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
     ScratchBuffer<ComputeT, ComputeT, same_vector_size_different_type_t<T, int>,
                   same_vector_size_different_type_t<T, int>>
-        buffers(nullptr, bufferSizes);
+        buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor, SizeRoi().y / divisor,
+                                               SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3371,11 +3462,10 @@ void ImageView<T>::MinMaxIndexMasked(opp::cuda::DevVarView<T> &aDstMin, opp::cud
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 4> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor),
-                                               to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
     ScratchBuffer<ComputeT, ComputeT, same_vector_size_different_type_t<T, int>,
                   same_vector_size_different_type_t<T, int>>
-        buffers(nullptr, bufferSizes);
+        buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor, SizeRoi().y / divisor,
+                                               SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3399,11 +3489,10 @@ void ImageView<T>::MinMaxIndex(opp::cuda::DevVarView<T> &aDstMin, opp::cuda::Dev
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 4> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor),
-                                               to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
     ScratchBuffer<ComputeT, ComputeT, same_vector_size_different_type_t<T, int>,
                   same_vector_size_different_type_t<T, int>>
-        buffers(nullptr, bufferSizes);
+        buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor, SizeRoi().y / divisor,
+                                               SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3427,11 +3516,10 @@ void ImageView<T>::MinMaxIndexMasked(opp::cuda::DevVarView<T> &aDstMin, opp::cud
         divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
     }
 
-    const std::array<size_t, 4> bufferSizes = {to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor),
-                                               to_size_t(SizeRoi().y / divisor), to_size_t(SizeRoi().y / divisor)};
     ScratchBuffer<ComputeT, ComputeT, same_vector_size_different_type_t<T, int>,
                   same_vector_size_different_type_t<T, int>>
-        buffers(nullptr, bufferSizes);
+        buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor, SizeRoi().y / divisor,
+                                               SizeRoi().y / divisor});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3450,11 +3538,7 @@ size_t ImageView<T>::IntegralBufferSize(ImageView<same_vector_size_different_typ
 {
     using DstT = same_vector_size_different_type_t<T, int>;
 
-    const size_t pitchTmp = PadImageWidthToPitch(sizeof(DstT) * to_size_t(ROI().width + 1));
-    const size_t sizeTmp  = pitchTmp * to_size_t(ROI().height + 1);
-
-    const std::array<size_t, 1> bufferSizes = {sizeTmp};
-    ScratchBuffer<DstT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<DstT> buffers(nullptr, BufferSizes{SizeRoi() + 1});
 
     return buffers.GetTotalBufferSize();
 }
@@ -3465,11 +3549,7 @@ size_t ImageView<T>::IntegralBufferSize(ImageView<same_vector_size_different_typ
 {
     using DstT = same_vector_size_different_type_t<T, float>;
 
-    const size_t pitchTmp = PadImageWidthToPitch(sizeof(DstT) * to_size_t(ROI().width + 1));
-    const size_t sizeTmp  = pitchTmp * to_size_t(ROI().height + 1);
-
-    const std::array<size_t, 1> bufferSizes = {sizeTmp};
-    ScratchBuffer<DstT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<DstT> buffers(nullptr, BufferSizes{SizeRoi() + 1});
 
     return buffers.GetTotalBufferSize();
 }
@@ -3480,11 +3560,7 @@ size_t ImageView<T>::IntegralBufferSize(ImageView<same_vector_size_different_typ
 {
     using DstT = same_vector_size_different_type_t<T, long64>;
 
-    const size_t pitchTmp = PadImageWidthToPitch(sizeof(DstT) * to_size_t(ROI().width + 1));
-    const size_t sizeTmp  = pitchTmp * to_size_t(ROI().height + 1);
-
-    const std::array<size_t, 1> bufferSizes = {sizeTmp};
-    ScratchBuffer<DstT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<DstT> buffers(nullptr, BufferSizes{SizeRoi() + 1});
 
     return buffers.GetTotalBufferSize();
 }
@@ -3495,11 +3571,7 @@ size_t ImageView<T>::IntegralBufferSize(ImageView<same_vector_size_different_typ
 {
     using DstT = same_vector_size_different_type_t<T, double>;
 
-    const size_t pitchTmp = PadImageWidthToPitch(sizeof(DstT) * to_size_t(ROI().width + 1));
-    const size_t sizeTmp  = pitchTmp * to_size_t(ROI().height + 1);
-
-    const std::array<size_t, 1> bufferSizes = {sizeTmp};
-    ScratchBuffer<DstT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<DstT> buffers(nullptr, BufferSizes{SizeRoi() + 1});
 
     return buffers.GetTotalBufferSize();
 }
@@ -3513,14 +3585,7 @@ size_t ImageView<T>::SqrIntegralBufferSize(ImageView<same_vector_size_different_
     using DstT    = same_vector_size_different_type_t<T, int>;
     using DstSqrT = same_vector_size_different_type_t<T, int>;
 
-    const size_t pitchTmp = PadImageWidthToPitch(sizeof(DstT) * to_size_t(ROI().width + 1));
-    const size_t sizeTmp  = pitchTmp * to_size_t(ROI().height + 1);
-
-    const size_t pitchSqrTmp = PadImageWidthToPitch(sizeof(DstSqrT) * to_size_t(ROI().width + 1));
-    const size_t sizeSqrTmp  = pitchSqrTmp * to_size_t(ROI().height + 1);
-
-    const std::array<size_t, 2> bufferSizes = {sizeTmp, sizeSqrTmp};
-    ScratchBuffer<DstT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<DstT, DstSqrT> buffers(nullptr, BufferSizes{SizeRoi() + 1, SizeRoi() + 1});
 
     return buffers.GetTotalBufferSize();
 }
@@ -3534,14 +3599,7 @@ size_t ImageView<T>::SqrIntegralBufferSize(ImageView<same_vector_size_different_
     using DstT    = same_vector_size_different_type_t<T, int>;
     using DstSqrT = same_vector_size_different_type_t<T, long64>;
 
-    const size_t pitchTmp = PadImageWidthToPitch(sizeof(DstT) * to_size_t(ROI().width + 1));
-    const size_t sizeTmp  = pitchTmp * to_size_t(ROI().height + 1);
-
-    const size_t pitchSqrTmp = PadImageWidthToPitch(sizeof(DstSqrT) * to_size_t(ROI().width + 1));
-    const size_t sizeSqrTmp  = pitchSqrTmp * to_size_t(ROI().height + 1);
-
-    const std::array<size_t, 2> bufferSizes = {sizeTmp, sizeSqrTmp};
-    ScratchBuffer<DstT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<DstT, DstSqrT> buffers(nullptr, BufferSizes{SizeRoi() + 1, SizeRoi() + 1});
 
     return buffers.GetTotalBufferSize();
 }
@@ -3555,14 +3613,7 @@ size_t ImageView<T>::SqrIntegralBufferSize(ImageView<same_vector_size_different_
     using DstT    = same_vector_size_different_type_t<T, float>;
     using DstSqrT = same_vector_size_different_type_t<T, double>;
 
-    const size_t pitchTmp = PadImageWidthToPitch(sizeof(DstT) * to_size_t(ROI().width + 1));
-    const size_t sizeTmp  = pitchTmp * to_size_t(ROI().height + 1);
-
-    const size_t pitchSqrTmp = PadImageWidthToPitch(sizeof(DstSqrT) * to_size_t(ROI().width + 1));
-    const size_t sizeSqrTmp  = pitchSqrTmp * to_size_t(ROI().height + 1);
-
-    const std::array<size_t, 2> bufferSizes = {sizeTmp, sizeSqrTmp};
-    ScratchBuffer<DstT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<DstT, DstSqrT> buffers(nullptr, BufferSizes{SizeRoi() + 1, SizeRoi() + 1});
 
     return buffers.GetTotalBufferSize();
 }
@@ -3576,14 +3627,7 @@ size_t ImageView<T>::SqrIntegralBufferSize(ImageView<same_vector_size_different_
     using DstT    = same_vector_size_different_type_t<T, double>;
     using DstSqrT = same_vector_size_different_type_t<T, double>;
 
-    const size_t pitchTmp = PadImageWidthToPitch(sizeof(DstT) * to_size_t(ROI().width + 1));
-    const size_t sizeTmp  = pitchTmp * to_size_t(ROI().height + 1);
-
-    const size_t pitchSqrTmp = PadImageWidthToPitch(sizeof(DstSqrT) * to_size_t(ROI().width + 1));
-    const size_t sizeSqrTmp  = pitchSqrTmp * to_size_t(ROI().height + 1);
-
-    const std::array<size_t, 2> bufferSizes = {sizeTmp, sizeSqrTmp};
-    ScratchBuffer<DstT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<DstT, DstSqrT> buffers(nullptr, BufferSizes{SizeRoi() + 1, SizeRoi() + 1});
 
     return buffers.GetTotalBufferSize();
 }
@@ -3606,13 +3650,12 @@ ImageView<same_vector_size_different_type_t<T, int>> &ImageView<T>::Integral(
     const size_t pitchTmp = PadImageWidthToPitch(sizeof(DstT) * to_size_t(aDst.ROI().width));
     const size_t sizeTmp  = pitchTmp * to_size_t(aDst.ROI().height);
 
-    const std::array<size_t, 1> bufferSizes = {sizeTmp};
-    ScratchBuffer<DstT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<DstT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi() + 1});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
-    InvokeIntegralSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), pitchTmp, aDst.Pointer(), aDst.Pitch(), aVal,
-                      SizeRoi(), aStreamCtx);
+    InvokeIntegralSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), buffers.GetSubBufferPitch(0), aDst.Pointer(),
+                      aDst.Pitch(), aVal, SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -3633,16 +3676,12 @@ ImageView<same_vector_size_different_type_t<T, float>> &ImageView<T>::Integral(
 
     using DstT = same_vector_size_different_type_t<T, float>;
 
-    const size_t pitchTmp = PadImageWidthToPitch(sizeof(DstT) * to_size_t(aDst.ROI().width));
-    const size_t sizeTmp  = pitchTmp * to_size_t(aDst.ROI().height);
-
-    const std::array<size_t, 1> bufferSizes = {sizeTmp};
-    ScratchBuffer<DstT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<DstT> buffers(aBuffer.Pointer(), BufferSizes{aDst.SizeRoi()});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
-    InvokeIntegralSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), pitchTmp, aDst.Pointer(), aDst.Pitch(), aVal,
-                      SizeRoi(), aStreamCtx);
+    InvokeIntegralSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), buffers.GetSubBufferPitch(0), aDst.Pointer(),
+                      aDst.Pitch(), aVal, SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -3666,13 +3705,12 @@ ImageView<same_vector_size_different_type_t<T, long64>> &ImageView<T>::Integral(
     const size_t pitchTmp = PadImageWidthToPitch(sizeof(DstT) * to_size_t(aDst.ROI().width));
     const size_t sizeTmp  = pitchTmp * to_size_t(aDst.ROI().height);
 
-    const std::array<size_t, 1> bufferSizes = {sizeTmp};
-    ScratchBuffer<DstT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<DstT> buffers(aBuffer.Pointer(), BufferSizes{aDst.SizeRoi()});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
-    InvokeIntegralSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), pitchTmp, aDst.Pointer(), aDst.Pitch(), aVal,
-                      SizeRoi(), aStreamCtx);
+    InvokeIntegralSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), buffers.GetSubBufferPitch(0), aDst.Pointer(),
+                      aDst.Pitch(), aVal, SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -3696,13 +3734,12 @@ ImageView<same_vector_size_different_type_t<T, double>> &ImageView<T>::Integral(
     const size_t pitchTmp = PadImageWidthToPitch(sizeof(DstT) * to_size_t(aDst.ROI().width));
     const size_t sizeTmp  = pitchTmp * to_size_t(aDst.ROI().height);
 
-    const std::array<size_t, 1> bufferSizes = {sizeTmp};
-    ScratchBuffer<DstT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<DstT> buffers(aBuffer.Pointer(), BufferSizes{aDst.SizeRoi()});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
-    InvokeIntegralSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), pitchTmp, aDst.Pointer(), aDst.Pitch(), aVal,
-                      SizeRoi(), aStreamCtx);
+    InvokeIntegralSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), buffers.GetSubBufferPitch(0), aDst.Pointer(),
+                      aDst.Pitch(), aVal, SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -3731,20 +3768,13 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, in
     using DstT    = same_vector_size_different_type_t<T, int>;
     using DstSqrT = same_vector_size_different_type_t<T, int>;
 
-    const size_t pitchTmp = PadImageWidthToPitch(sizeof(DstT) * to_size_t(aDst.ROI().width));
-    const size_t sizeTmp  = pitchTmp * to_size_t(aDst.ROI().height);
-
-    const size_t pitchSqrTmp = PadImageWidthToPitch(sizeof(DstSqrT) * to_size_t(aDst.ROI().width));
-    const size_t sizeSqrTmp  = pitchSqrTmp * to_size_t(aDst.ROI().height);
-
-    const std::array<size_t, 2> bufferSizes = {sizeTmp, sizeSqrTmp};
-    ScratchBuffer<DstT, DstSqrT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<DstT, DstSqrT> buffers(aBuffer.Pointer(), BufferSizes{aDst.SizeRoi(), aSqr.SizeRoi()});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
-    InvokeIntegralSqrSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), pitchTmp, buffers.template Get<1>(),
-                         pitchSqrTmp, aDst.Pointer(), aDst.Pitch(), aSqr.Pointer(), aSqr.Pitch(), aVal, aValSqr,
-                         SizeRoi(), aStreamCtx);
+    InvokeIntegralSqrSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), buffers.GetSubBufferPitch(0),
+                         buffers.template Get<1>(), buffers.GetSubBufferPitch(1), aDst.Pointer(), aDst.Pitch(),
+                         aSqr.Pointer(), aSqr.Pitch(), aVal, aValSqr, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
@@ -3771,20 +3801,13 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, in
     using DstT    = same_vector_size_different_type_t<T, int>;
     using DstSqrT = same_vector_size_different_type_t<T, long64>;
 
-    const size_t pitchTmp = PadImageWidthToPitch(sizeof(DstT) * to_size_t(aDst.ROI().width));
-    const size_t sizeTmp  = pitchTmp * to_size_t(aDst.ROI().height);
-
-    const size_t pitchSqrTmp = PadImageWidthToPitch(sizeof(DstSqrT) * to_size_t(aDst.ROI().width));
-    const size_t sizeSqrTmp  = pitchSqrTmp * to_size_t(aDst.ROI().height);
-
-    const std::array<size_t, 2> bufferSizes = {sizeTmp, sizeSqrTmp};
-    ScratchBuffer<DstT, DstSqrT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<DstT, DstSqrT> buffers(aBuffer.Pointer(), BufferSizes{aDst.SizeRoi(), aSqr.SizeRoi()});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
-    InvokeIntegralSqrSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), pitchTmp, buffers.template Get<1>(),
-                         pitchSqrTmp, aDst.Pointer(), aDst.Pitch(), aSqr.Pointer(), aSqr.Pitch(), aVal, aValSqr,
-                         SizeRoi(), aStreamCtx);
+    InvokeIntegralSqrSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), buffers.GetSubBufferPitch(0),
+                         buffers.template Get<1>(), buffers.GetSubBufferPitch(1), aDst.Pointer(), aDst.Pitch(),
+                         aSqr.Pointer(), aSqr.Pitch(), aVal, aValSqr, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
@@ -3811,20 +3834,13 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, fl
     using DstT    = same_vector_size_different_type_t<T, float>;
     using DstSqrT = same_vector_size_different_type_t<T, double>;
 
-    const size_t pitchTmp = PadImageWidthToPitch(sizeof(DstT) * to_size_t(aDst.ROI().width));
-    const size_t sizeTmp  = pitchTmp * to_size_t(aDst.ROI().height);
-
-    const size_t pitchSqrTmp = PadImageWidthToPitch(sizeof(DstSqrT) * to_size_t(aDst.ROI().width));
-    const size_t sizeSqrTmp  = pitchSqrTmp * to_size_t(aDst.ROI().height);
-
-    const std::array<size_t, 2> bufferSizes = {sizeTmp, sizeSqrTmp};
-    ScratchBuffer<DstT, DstSqrT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<DstT, DstSqrT> buffers(aBuffer.Pointer(), BufferSizes{aDst.SizeRoi(), aSqr.SizeRoi()});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
-    InvokeIntegralSqrSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), pitchTmp, buffers.template Get<1>(),
-                         pitchSqrTmp, aDst.Pointer(), aDst.Pitch(), aSqr.Pointer(), aSqr.Pitch(), aVal, aValSqr,
-                         SizeRoi(), aStreamCtx);
+    InvokeIntegralSqrSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), buffers.GetSubBufferPitch(0),
+                         buffers.template Get<1>(), buffers.GetSubBufferPitch(1), aDst.Pointer(), aDst.Pitch(),
+                         aSqr.Pointer(), aSqr.Pitch(), aVal, aValSqr, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
@@ -3851,20 +3867,81 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, do
     using DstT    = same_vector_size_different_type_t<T, double>;
     using DstSqrT = same_vector_size_different_type_t<T, double>;
 
-    const size_t pitchTmp = PadImageWidthToPitch(sizeof(DstT) * to_size_t(aDst.ROI().width));
-    const size_t sizeTmp  = pitchTmp * to_size_t(aDst.ROI().height);
-
-    const size_t pitchSqrTmp = PadImageWidthToPitch(sizeof(DstSqrT) * to_size_t(aDst.ROI().width));
-    const size_t sizeSqrTmp  = pitchSqrTmp * to_size_t(aDst.ROI().height);
-
-    const std::array<size_t, 2> bufferSizes = {sizeTmp, sizeSqrTmp};
-    ScratchBuffer<DstT, DstSqrT> buffers(nullptr, bufferSizes);
+    ScratchBuffer<DstT, DstSqrT> buffers(aBuffer.Pointer(), BufferSizes{aDst.SizeRoi(), aSqr.SizeRoi()});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
-    InvokeIntegralSqrSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), pitchTmp, buffers.template Get<1>(),
-                         pitchSqrTmp, aDst.Pointer(), aDst.Pitch(), aSqr.Pointer(), aSqr.Pitch(), aVal, aValSqr,
-                         SizeRoi(), aStreamCtx);
+    InvokeIntegralSqrSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), buffers.GetSubBufferPitch(0),
+                         buffers.template Get<1>(), buffers.GetSubBufferPitch(1), aDst.Pointer(), aDst.Pitch(),
+                         aSqr.Pointer(), aSqr.Pitch(), aVal, aValSqr, SizeRoi(), aStreamCtx);
+}
+
+template <PixelType T>
+void ImageView<T>::RectStdDev(ImageView<same_vector_size_different_type_t<T, int>> &aSqr,
+                              ImageView<same_vector_size_different_type_t<T, float>> &aDst,
+                              const FilterArea &aFilterArea, const opp::cuda::StreamCtx &aStreamCtx) const
+    requires(std::same_as<remove_vector_t<T>, int>) && NoAlpha<T>
+{
+    using ComputeT = same_vector_size_different_type_t<T, double>;
+    using Src2T    = same_vector_size_different_type_t<T, int>;
+    using DstT     = same_vector_size_different_type_t<T, float>;
+
+    checkSameSize(ROI(), aSqr.ROI());
+    // aDst roi may differ
+
+    InvokeRectStdDev<T, Src2T, ComputeT, DstT>(PointerRoi(), Pitch(), aSqr.PointerRoi(), aSqr.Pitch(),
+                                               aDst.PointerRoi(), aDst.Pitch(), aFilterArea, SizeRoi(), aStreamCtx);
+}
+
+template <PixelType T>
+void ImageView<T>::RectStdDev(ImageView<same_vector_size_different_type_t<T, long64>> &aSqr,
+                              ImageView<same_vector_size_different_type_t<T, float>> &aDst,
+                              const FilterArea &aFilterArea, const opp::cuda::StreamCtx &aStreamCtx) const
+    requires(std::same_as<remove_vector_t<T>, int>) && NoAlpha<T>
+{
+    using ComputeT = same_vector_size_different_type_t<T, double>;
+    using Src2T    = same_vector_size_different_type_t<T, long64>;
+    using DstT     = same_vector_size_different_type_t<T, float>;
+
+    checkSameSize(ROI(), aSqr.ROI());
+    // aDst roi may differ
+
+    InvokeRectStdDev<T, Src2T, ComputeT, DstT>(PointerRoi(), Pitch(), aSqr.PointerRoi(), aSqr.Pitch(),
+                                               aDst.PointerRoi(), aDst.Pitch(), aFilterArea, SizeRoi(), aStreamCtx);
+}
+
+template <PixelType T>
+void ImageView<T>::RectStdDev(ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
+                              ImageView<same_vector_size_different_type_t<T, float>> &aDst,
+                              const FilterArea &aFilterArea, const opp::cuda::StreamCtx &aStreamCtx) const
+    requires(std::same_as<remove_vector_t<T>, float>) && NoAlpha<T>
+{
+    using ComputeT = same_vector_size_different_type_t<T, double>;
+    using Src2T    = same_vector_size_different_type_t<T, double>;
+    using DstT     = same_vector_size_different_type_t<T, float>;
+
+    checkSameSize(ROI(), aSqr.ROI());
+    // aDst roi may differ
+
+    InvokeRectStdDev<T, Src2T, ComputeT, DstT>(PointerRoi(), Pitch(), aSqr.PointerRoi(), aSqr.Pitch(),
+                                               aDst.PointerRoi(), aDst.Pitch(), aFilterArea, SizeRoi(), aStreamCtx);
+}
+
+template <PixelType T>
+void ImageView<T>::RectStdDev(ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
+                              ImageView<same_vector_size_different_type_t<T, double>> &aDst,
+                              const FilterArea &aFilterArea, const opp::cuda::StreamCtx &aStreamCtx) const
+    requires(std::same_as<remove_vector_t<T>, double>) && NoAlpha<T>
+{
+    using ComputeT = same_vector_size_different_type_t<T, double>;
+    using Src2T    = same_vector_size_different_type_t<T, double>;
+    using DstT     = same_vector_size_different_type_t<T, double>;
+
+    checkSameSize(ROI(), aSqr.ROI());
+    // aDst roi may differ
+
+    InvokeRectStdDev<T, Src2T, ComputeT, DstT>(PointerRoi(), Pitch(), aSqr.PointerRoi(), aSqr.Pitch(),
+                                               aDst.PointerRoi(), aDst.Pitch(), aFilterArea, SizeRoi(), aStreamCtx);
 }
 #pragma endregion
 
@@ -4107,16 +4184,24 @@ void ImageView<T>::HistogramRange(opp::cuda::DevVarView<int> &aHist,
 #pragma region Cross Correlation
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelation(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
-                                                      BorderType aBorder, T aConstant, Roi aAllowedReadRoi,
+                                                      BorderType aBorder, const Roi &aAllowedReadRoi,
                                                       const opp::cuda::StreamCtx &aStreamCtx) const
-    requires SingleChannel<T> && (sizeof(T) < 8)
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
 {
-
-    if (aAllowedReadRoi == Roi())
+    if (aBorder == BorderType::Constant)
     {
-        aAllowedReadRoi = ROI();
+        throw INVALIDARGUMENT(aBorder,
+                              "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
+    return this->CrossCorrelation(aTemplate, aDst, {0}, aBorder, aAllowedReadRoi, aStreamCtx);
+}
 
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelation(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                                      T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                                                      const opp::cuda::StreamCtx &aStreamCtx) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -4132,16 +4217,25 @@ ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelation(const ImageView<T> &aTempl
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationNormalized(const ImageView<T> &aTemplate,
                                                                 ImageView<Pixel32fC1> &aDst, BorderType aBorder,
-                                                                T aConstant, Roi aAllowedReadRoi,
+                                                                const Roi &aAllowedReadRoi,
                                                                 const opp::cuda::StreamCtx &aStreamCtx) const
-    requires SingleChannel<T> && (sizeof(T) < 8)
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
 {
-
-    if (aAllowedReadRoi == Roi())
+    if (aBorder == BorderType::Constant)
     {
-        aAllowedReadRoi = ROI();
+        throw INVALIDARGUMENT(aBorder,
+                              "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
+    return this->CrossCorrelationNormalized(aTemplate, aDst, {0}, aBorder, aAllowedReadRoi, aStreamCtx);
+}
 
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationNormalized(const ImageView<T> &aTemplate,
+                                                                ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                                BorderType aBorder, const Roi &aAllowedReadRoi,
+                                                                const opp::cuda::StreamCtx &aStreamCtx) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -4157,16 +4251,25 @@ ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationNormalized(const ImageView<
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::SquareDistanceNormalized(const ImageView<T> &aTemplate,
                                                               ImageView<Pixel32fC1> &aDst, BorderType aBorder,
-                                                              T aConstant, Roi aAllowedReadRoi,
+                                                              const Roi &aAllowedReadRoi,
                                                               const opp::cuda::StreamCtx &aStreamCtx) const
-    requires SingleChannel<T> && (sizeof(T) < 8)
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
 {
-
-    if (aAllowedReadRoi == Roi())
+    if (aBorder == BorderType::Constant)
     {
-        aAllowedReadRoi = ROI();
+        throw INVALIDARGUMENT(aBorder,
+                              "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
+    return this->SquareDistanceNormalized(aTemplate, aDst, {0}, aBorder, aAllowedReadRoi, aStreamCtx);
+}
 
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::SquareDistanceNormalized(const ImageView<T> &aTemplate,
+                                                              ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                              BorderType aBorder, const Roi &aAllowedReadRoi,
+                                                              const opp::cuda::StreamCtx &aStreamCtx) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -4182,18 +4285,30 @@ ImageView<Pixel32fC1> &ImageView<T>::SquareDistanceNormalized(const ImageView<T>
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationCoefficient(const ImageView<Pixel32fC2> &aSrcBoxFiltered,
                                                                  const ImageView<T> &aTemplate,
-                                                                 const opp::cuda::DevVarView<double> &aMeanTemplate,
+                                                                 const opp::cuda::DevVarView<Pixel64fC1> &aMeanTemplate,
                                                                  ImageView<Pixel32fC1> &aDst, BorderType aBorder,
-                                                                 T aConstant, Roi aAllowedReadRoi,
+                                                                 const Roi &aAllowedReadRoi,
                                                                  const opp::cuda::StreamCtx &aStreamCtx) const
-    requires SingleChannel<T> && (sizeof(T) < 8)
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
 {
-
-    if (aAllowedReadRoi == Roi())
+    if (aBorder == BorderType::Constant)
     {
-        aAllowedReadRoi = ROI();
+        throw INVALIDARGUMENT(aBorder,
+                              "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
+    return this->CrossCorrelationCoefficient(aSrcBoxFiltered, aTemplate, aMeanTemplate, aDst, {0}, aBorder,
+                                             aAllowedReadRoi, aStreamCtx);
+}
 
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationCoefficient(const ImageView<Pixel32fC2> &aSrcBoxFiltered,
+                                                                 const ImageView<T> &aTemplate,
+                                                                 const opp::cuda::DevVarView<Pixel64fC1> &aMeanTemplate,
+                                                                 ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                                 BorderType aBorder, const Roi &aAllowedReadRoi,
+                                                                 const opp::cuda::StreamCtx &aStreamCtx) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -4207,6 +4322,89 @@ ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationCoefficient(const ImageView
     return aDst;
 }
 
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelation(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                                      BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    return this->CrossCorrelation(aTemplate, aDst, aBorder, ROI(), aStreamCtx);
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelation(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
+                                                      T aConstant, BorderType aBorder,
+                                                      const opp::cuda::StreamCtx &aStreamCtx) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    return this->CrossCorrelation(aTemplate, aDst, aConstant, aBorder, ROI(), aStreamCtx);
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationNormalized(const ImageView<T> &aTemplate,
+                                                                ImageView<Pixel32fC1> &aDst, BorderType aBorder,
+
+                                                                const opp::cuda::StreamCtx &aStreamCtx) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    return this->CrossCorrelationNormalized(aTemplate, aDst, aBorder, ROI(), aStreamCtx);
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationNormalized(const ImageView<T> &aTemplate,
+                                                                ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                                BorderType aBorder,
+
+                                                                const opp::cuda::StreamCtx &aStreamCtx) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    return this->CrossCorrelationNormalized(aTemplate, aDst, aConstant, aBorder, ROI(), aStreamCtx);
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::SquareDistanceNormalized(const ImageView<T> &aTemplate,
+                                                              ImageView<Pixel32fC1> &aDst, BorderType aBorder,
+
+                                                              const opp::cuda::StreamCtx &aStreamCtx) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    return this->SquareDistanceNormalized(aTemplate, aDst, aBorder, ROI(), aStreamCtx);
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::SquareDistanceNormalized(const ImageView<T> &aTemplate,
+                                                              ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                              BorderType aBorder,
+                                                              const opp::cuda::StreamCtx &aStreamCtx) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    return this->SquareDistanceNormalized(aTemplate, aDst, aConstant, aBorder, ROI(), aStreamCtx);
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationCoefficient(const ImageView<Pixel32fC2> &aSrcBoxFiltered,
+                                                                 const ImageView<T> &aTemplate,
+                                                                 const opp::cuda::DevVarView<Pixel64fC1> &aMeanTemplate,
+                                                                 ImageView<Pixel32fC1> &aDst, BorderType aBorder,
+
+                                                                 const opp::cuda::StreamCtx &aStreamCtx) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    return this->CrossCorrelationCoefficient(aSrcBoxFiltered, aTemplate, aMeanTemplate, aDst, aBorder, ROI(),
+                                             aStreamCtx);
+}
+
+template <PixelType T>
+ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationCoefficient(const ImageView<Pixel32fC2> &aSrcBoxFiltered,
+                                                                 const ImageView<T> &aTemplate,
+                                                                 const opp::cuda::DevVarView<Pixel64fC1> &aMeanTemplate,
+                                                                 ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                                 BorderType aBorder,
+                                                                 const opp::cuda::StreamCtx &aStreamCtx) const
+    requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
+{
+    return this->CrossCorrelationCoefficient(aSrcBoxFiltered, aTemplate, aMeanTemplate, aDst, aConstant, aBorder, ROI(),
+                                             aStreamCtx);
+}
 #pragma endregion
 } // namespace opp::image::cuda
 #endif // OPP_ENABLE_CUDA_BACKEND

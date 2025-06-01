@@ -75,11 +75,12 @@ template <PixelType T> ImageView<T> &ImageView<T>::Resize(ImageView<T> &aDst, In
     const Vec2d scaleFactor = Vec2d(aDst.SizeRoi()) / Vec2d(SizeRoi());
     const Vec2d shift       = Vec2d(0);
 
-    return this->Resize(aDst, scaleFactor, shift, aInterpolation, BorderType::None, {0}, ROI());
+    return this->Resize(aDst, scaleFactor, shift, aInterpolation, {0}, BorderType::None, ROI());
 }
 
 template <PixelType T>
-void ImageView<T>::Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           InterpolationMode aInterpolation)
     requires TwoChannel<T>
@@ -87,27 +88,30 @@ void ImageView<T>::Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageVi
     const Vec2d scaleFactor = Vec2d(aDst1.SizeRoi()) / Vec2d(aSrc1.SizeRoi());
     const Vec2d shift       = Vec2d(0);
 
-    ImageView<T>::Resize(aSrc1, aSrc2, aDst1, aDst2, scaleFactor, shift, aInterpolation, BorderType::None, {0},
+    ImageView<T>::Resize(aSrc1, aSrc2, aDst1, aDst2, scaleFactor, shift, aInterpolation, {0}, BorderType::None,
                          aSrc1.ROI());
 }
 
 template <PixelType T>
-void ImageView<T>::Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                          ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                          ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                          InterpolationMode aInterpolation)
+void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                          ImageView<Vector1<remove_vector_t<T>>> &aDst3, InterpolationMode aInterpolation)
     requires ThreeChannel<T>
 {
     const Vec2d scaleFactor = Vec2d(aDst1.SizeRoi()) / Vec2d(aSrc1.SizeRoi());
     const Vec2d shift       = Vec2d(0);
 
-    ImageView<T>::Resize(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, scaleFactor, shift, aInterpolation, BorderType::None,
-                         {0}, aSrc1.ROI());
+    ImageView<T>::Resize(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, scaleFactor, shift, aInterpolation, {0},
+                         BorderType::None, aSrc1.ROI());
 }
 
 template <PixelType T>
-void ImageView<T>::Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                          ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                           InterpolationMode aInterpolation)
@@ -117,7 +121,7 @@ void ImageView<T>::Resize(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageVi
     const Vec2d shift       = Vec2d(0);
 
     ImageView<T>::Resize(aSrc1, aSrc2, aSrc3, aSrc4, aDst1, aDst2, aDst3, aDst4, scaleFactor, shift, aInterpolation,
-                         BorderType::None, {0}, aSrc1.ROI());
+                         {0}, BorderType::None, aSrc1.ROI());
 }
 
 template <PixelType T> Vec2d ImageView<T>::ResizeGetNPPShift(ImageView<T> &aDst) const
@@ -271,11 +275,12 @@ ImageView<T> &ImageView<T>::Remap(ImageView<T> &aDst, const ImageView<Pixel32fC2
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    return this->Remap(aDst, aCoordinateMap, aInterpolation, aBorder, {0}, aAllowedReadRoi);
+    return this->Remap(aDst, aCoordinateMap, aInterpolation, {0}, aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                          const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation,
                          BorderType aBorder, Roi aAllowedReadRoi)
@@ -286,15 +291,16 @@ void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageVie
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    ImageView<T>::Remap(aSrc1, aSrc2, aDst1, aDst2, aCoordinateMap, aInterpolation, aBorder, {0}, aAllowedReadRoi);
+    ImageView<T>::Remap(aSrc1, aSrc2, aDst1, aDst2, aCoordinateMap, aInterpolation, {0}, aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                         const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation,
-                         BorderType aBorder, Roi aAllowedReadRoi)
+void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst3, const ImageView<Pixel32fC2> &aCoordinateMap,
+                         InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi)
     requires ThreeChannel<T>
 {
     if (aBorder == BorderType::Constant)
@@ -302,13 +308,15 @@ void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageVie
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    ImageView<T>::Remap(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, aCoordinateMap, aInterpolation, aBorder, {0},
+    ImageView<T>::Remap(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, aCoordinateMap, aInterpolation, {0}, aBorder,
                         aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                          const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation,
@@ -320,13 +328,13 @@ void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageVie
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    ImageView<T>::Remap(aSrc1, aSrc2, aSrc3, aSrc4, aDst1, aDst2, aDst3, aDst4, aCoordinateMap, aInterpolation, aBorder,
-                        {0}, aAllowedReadRoi);
+    ImageView<T>::Remap(aSrc1, aSrc2, aSrc3, aSrc4, aDst1, aDst2, aDst3, aDst4, aCoordinateMap, aInterpolation, {0},
+                        aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Remap(ImageView<T> &aDst, const ImageView<Pixel32fC2> &aCoordinateMap,
-                                  InterpolationMode aInterpolation, BorderType aBorder, T aConstant,
+                                  InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
                                   Roi aAllowedReadRoi) const
 {
     checkSameSize(aDst.SizeRoi(), aCoordinateMap.SizeRoi());
@@ -523,10 +531,11 @@ ImageView<T> &ImageView<T>::Remap(ImageView<T> &aDst, const ImageView<Pixel32fC2
 }
 
 template <PixelType T>
-void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                         const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation,
-                         BorderType aBorder, T aConstant, Roi aAllowedReadRoi)
+                         const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, T aConstant,
+                         BorderType aBorder, Roi aAllowedReadRoi)
     requires TwoChannel<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI())
@@ -736,11 +745,12 @@ void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageVie
 }
 
 template <PixelType T>
-void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                         const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation,
-                         BorderType aBorder, T aConstant, Roi aAllowedReadRoi)
+void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst3, const ImageView<Pixel32fC2> &aCoordinateMap,
+                         InterpolationMode aInterpolation, T aConstant, BorderType aBorder, Roi aAllowedReadRoi)
     requires ThreeChannel<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI())
@@ -958,12 +968,14 @@ void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageVie
 }
 
 template <PixelType T>
-void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-                         const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation,
-                         BorderType aBorder, T aConstant, Roi aAllowedReadRoi)
+                         const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, T aConstant,
+                         BorderType aBorder, Roi aAllowedReadRoi)
     requires FourChannelNoAlpha<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI() || aSrc1.ROI() != aSrc4.ROI())
@@ -1195,11 +1207,12 @@ ImageView<T> &ImageView<T>::Remap(ImageView<T> &aDst, const ImageView<Pixel32fC1
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    return this->Remap(aDst, aCoordinateMapX, aCoordinateMapY, aInterpolation, aBorder, {0}, aAllowedReadRoi);
+    return this->Remap(aDst, aCoordinateMapX, aCoordinateMapY, aInterpolation, {0}, aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                          const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
                          InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi)
@@ -1210,16 +1223,18 @@ void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageVie
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    ImageView<T>::Remap(aSrc1, aSrc2, aDst1, aDst2, aCoordinateMapX, aCoordinateMapY, aInterpolation, aBorder, {0},
+    ImageView<T>::Remap(aSrc1, aSrc2, aDst1, aDst2, aCoordinateMapX, aCoordinateMapY, aInterpolation, {0}, aBorder,
                         aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                         const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
-                         InterpolationMode aInterpolation, BorderType aBorder, Roi aAllowedReadRoi)
+void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst3, const ImageView<Pixel32fC1> &aCoordinateMapX,
+                         const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation,
+                         BorderType aBorder, Roi aAllowedReadRoi)
     requires ThreeChannel<T>
 {
     if (aBorder == BorderType::Constant)
@@ -1227,13 +1242,15 @@ void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageVie
         throw INVALIDARGUMENT(aBorder,
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
-    ImageView<T>::Remap(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, aCoordinateMapX, aCoordinateMapY, aInterpolation,
-                        aBorder, {0}, aAllowedReadRoi);
+    ImageView<T>::Remap(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, aCoordinateMapX, aCoordinateMapY, aInterpolation, {0},
+                        aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
-void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                          const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
@@ -1246,13 +1263,13 @@ void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageVie
                               "When using BorderType::Constant, the constant value aConstant must be provided.");
     }
     ImageView<T>::Remap(aSrc1, aSrc2, aSrc3, aSrc4, aDst1, aDst2, aDst3, aDst4, aCoordinateMapX, aCoordinateMapY,
-                        aInterpolation, aBorder, {0}, aAllowedReadRoi);
+                        aInterpolation, {0}, aBorder, aAllowedReadRoi);
 }
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Remap(ImageView<T> &aDst, const ImageView<Pixel32fC1> &aCoordinateMapX,
                                   const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation,
-                                  BorderType aBorder, T aConstant, Roi aAllowedReadRoi) const
+                                  T aConstant, BorderType aBorder, Roi aAllowedReadRoi) const
 {
     checkSameSize(aDst.SizeRoi(), aCoordinateMapX.SizeRoi());
     checkSameSize(aDst.SizeRoi(), aCoordinateMapY.SizeRoi());
@@ -1450,10 +1467,11 @@ ImageView<T> &ImageView<T>::Remap(ImageView<T> &aDst, const ImageView<Pixel32fC1
 }
 
 template <PixelType T>
-void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                          const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
-                         InterpolationMode aInterpolation, BorderType aBorder, T aConstant, Roi aAllowedReadRoi)
+                         InterpolationMode aInterpolation, T aConstant, BorderType aBorder, Roi aAllowedReadRoi)
     requires TwoChannel<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI())
@@ -1665,11 +1683,13 @@ void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageVie
 }
 
 template <PixelType T>
-void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-                         const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
-                         InterpolationMode aInterpolation, BorderType aBorder, T aConstant, Roi aAllowedReadRoi)
+void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst3, const ImageView<Pixel32fC1> &aCoordinateMapX,
+                         const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation, T aConstant,
+                         BorderType aBorder, Roi aAllowedReadRoi)
     requires ThreeChannel<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI())
@@ -1889,12 +1909,14 @@ void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageVie
 }
 
 template <PixelType T>
-void ImageView<T>::Remap(ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                          const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
-                         InterpolationMode aInterpolation, BorderType aBorder, T aConstant, Roi aAllowedReadRoi)
+                         InterpolationMode aInterpolation, T aConstant, BorderType aBorder, Roi aAllowedReadRoi)
     requires FourChannelNoAlpha<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI() || aSrc1.ROI() != aSrc4.ROI())

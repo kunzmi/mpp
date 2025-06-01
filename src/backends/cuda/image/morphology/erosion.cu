@@ -67,7 +67,7 @@ void InvokeErosion(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPit
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
         using FilterT              = Pixel8uC1;
         using MorphOp              = opp::Erode<DstT, FilterT>;
-        using PostOp               = opp::Nothing<DstT>;
+        using PostOp               = opp::NothingMorph<DstT>;
 
         constexpr int pixelBlockSizeX = pixel_block_size_x<DstT>::value;
         constexpr int pixelBlockSizeY = pixel_block_size_y<DstT>::value;
