@@ -1624,7 +1624,6 @@ size_t ImageView<T>::SSIMBufferSize(const opp::cuda::StreamCtx & /*aStreamCtx*/)
 {
     using DstT = ssim_types_for_rt<T>;
 
-    const int minSize       = SizeRoi().Min();
     const float scaleFactor = std::max(1.0f, std::round(to_float(SizeRoi().Min()) / 256.0f));
 
     if (scaleFactor > 1)
@@ -1651,7 +1650,6 @@ void ImageView<T>::SSIM(const ImageView<T> &aSrc2, opp::cuda::DevVarView<ssim_ty
 
     using DstT = ssim_types_for_rt<T>;
 
-    const int minSize       = SizeRoi().Min();
     const float scaleFactor = std::max(1.0f, std::round(to_float(SizeRoi().Min()) / 256.0f));
 
     const Vector2<int> roiOffset(0, 0);

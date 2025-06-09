@@ -594,7 +594,7 @@ void bilateralFilterEachPixel(BorderControlT aSrcWithBC, ImageView<DstT> &aDst, 
             const ComputeT srcPixel = ComputeT(aSrcWithBC(i, j));
 
             const float wColor = getWeightBilateral(pixel00, srcPixel, aValSquareSigma, aNorm);
-            const float wDist  = aPreComputedFilter[j * aFilterArea.Size.x + i];
+            const float wDist  = aPreComputedFilter[f.Pixel.y * aFilterArea.Size.x + f.Pixel.x];
             const float weight = wDist * wColor;
             sumWeights += weight;
             temp += srcPixel * weight;
@@ -886,8 +886,8 @@ void gradientVectorEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDstX
 }
 
 template <typename BorderControlT, typename ComputeT, typename DstT, typename FilterT>
-void unsharpFilterEachPixel(BorderControlT aSrcWithBC, ImageView<DstT> &aDst, const FilterT *aFilter, FilterT aWeight,
-                            FilterT aThreshold, const FilterArea &aFilterArea)
+void unsharpFilterEachPixel(BorderControlT aSrcWithBC, const ImageView<DstT> &aSrcOrig, ImageView<DstT> &aDst,
+                            const FilterT *aFilter, FilterT aWeight, FilterT aThreshold, const FilterArea &aFilterArea)
 {
     for (auto &pixelIterator : aDst)
     {
@@ -905,7 +905,7 @@ void unsharpFilterEachPixel(BorderControlT aSrcWithBC, ImageView<DstT> &aDst, co
             temp += ComputeT(aSrcWithBC(i, j)) * aFilter[f.Pixel.y * aFilterArea.Size.x + f.Pixel.x];
         }
 
-        ComputeT origPixel = ComputeT(aSrcWithBC(pixelX, pixelY));
+        ComputeT origPixel = ComputeT(aSrcOrig(pixelX, pixelY));
         ComputeT highPass  = origPixel - temp;
         ComputeT activator;
         activator.x = std::abs(highPass.x) >= aThreshold ? 1.0f : 0.0f;
@@ -941,9 +941,9 @@ void unsharpFilterEachPixel(BorderControlT aSrcWithBC, ImageView<DstT> &aDst, co
 }
 
 template <typename SrcT, typename ComputeT, typename DstT, typename FilterT>
-void unsharpFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst, const FilterT *aFilter, FilterT aWeight,
-                            FilterT aThreshold, const FilterArea &aFilterArea, BorderType aBorderType, SrcT aConstant,
-                            const Roi &aAllowedReadRoi)
+void unsharpFilterEachPixel(const ImageView<SrcT> &aSrc, const ImageView<DstT> &aSrcOrig, ImageView<DstT> &aDst,
+                            const FilterT *aFilter, FilterT aWeight, FilterT aThreshold, const FilterArea &aFilterArea,
+                            BorderType aBorderType, SrcT aConstant, const Roi &aAllowedReadRoi)
 {
 
     const Vector2<int> roiOffset = aSrc.ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -956,7 +956,7 @@ void unsharpFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst, 
             using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
 
-            unsharpFilterEachPixel<BCType, ComputeT, DstT, FilterT>(bc, aDst, aFilter, aWeight, aThreshold,
+            unsharpFilterEachPixel<BCType, ComputeT, DstT, FilterT>(bc, aSrcOrig, aDst, aFilter, aWeight, aThreshold,
                                                                     aFilterArea);
         }
         break;
@@ -965,7 +965,7 @@ void unsharpFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst, 
             using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset, aConstant);
 
-            unsharpFilterEachPixel<BCType, ComputeT, DstT, FilterT>(bc, aDst, aFilter, aWeight, aThreshold,
+            unsharpFilterEachPixel<BCType, ComputeT, DstT, FilterT>(bc, aSrcOrig, aDst, aFilter, aWeight, aThreshold,
                                                                     aFilterArea);
         }
         break;
@@ -974,7 +974,7 @@ void unsharpFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst, 
             using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
 
-            unsharpFilterEachPixel<BCType, ComputeT, DstT, FilterT>(bc, aDst, aFilter, aWeight, aThreshold,
+            unsharpFilterEachPixel<BCType, ComputeT, DstT, FilterT>(bc, aSrcOrig, aDst, aFilter, aWeight, aThreshold,
                                                                     aFilterArea);
         }
         break;
@@ -983,7 +983,7 @@ void unsharpFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst, 
             using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
 
-            unsharpFilterEachPixel<BCType, ComputeT, DstT, FilterT>(bc, aDst, aFilter, aWeight, aThreshold,
+            unsharpFilterEachPixel<BCType, ComputeT, DstT, FilterT>(bc, aSrcOrig, aDst, aFilter, aWeight, aThreshold,
                                                                     aFilterArea);
         }
         break;
@@ -992,7 +992,7 @@ void unsharpFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst, 
             using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
 
-            unsharpFilterEachPixel<BCType, ComputeT, DstT, FilterT>(bc, aDst, aFilter, aWeight, aThreshold,
+            unsharpFilterEachPixel<BCType, ComputeT, DstT, FilterT>(bc, aSrcOrig, aDst, aFilter, aWeight, aThreshold,
                                                                     aFilterArea);
         }
         break;
@@ -1001,7 +1001,7 @@ void unsharpFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst, 
             using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
 
-            unsharpFilterEachPixel<BCType, ComputeT, DstT, FilterT>(bc, aDst, aFilter, aWeight, aThreshold,
+            unsharpFilterEachPixel<BCType, ComputeT, DstT, FilterT>(bc, aSrcOrig, aDst, aFilter, aWeight, aThreshold,
                                                                     aFilterArea);
         }
         break;
@@ -1815,6 +1815,74 @@ void moprhologyGradientEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &a
         break;
         default:
             throw INVALIDARGUMENT(aBorderType, aBorderType << " is not a supported border type mode for filter.");
+            break;
+    }
+}
+
+template <typename BorderControlT, typename ComputeT, typename DstT, typename FilterT, typename postOP>
+void ssimEachPixel(BorderControlT aSrc1WithBC, BorderControlT aSrc2WithBC, ImageView<DstT> &aDst,
+                   const FilterT *aFilter, const FilterArea &aFilterArea, postOP aPostOp)
+{
+    for (auto &pixelIterator : aDst)
+    {
+        int pixelX = pixelIterator.Pixel().x - aDst.ROI().x;
+        int pixelY = pixelIterator.Pixel().y - aDst.ROI().y;
+
+        ComputeT mean1(0);
+        ComputeT mean2(0);
+        ComputeT var1Sqr(0);
+        ComputeT var2Sqr(0);
+        ComputeT crossVarSqr(0);
+        DstT &pixelOut = pixelIterator.Value();
+
+        for (const auto &f : aFilterArea.Size)
+        {
+            const int i = pixelX + f.Pixel.x - aFilterArea.Center.x;
+            const int j = pixelY + f.Pixel.y - aFilterArea.Center.y;
+
+            ComputeT pixelSrc1 = ComputeT(aSrc1WithBC(i, j));
+            ComputeT pixelSrc2 = ComputeT(aSrc2WithBC(i, j));
+
+            mean1 += pixelSrc1 * aFilter[f.Pixel.y * aFilterArea.Size.x + f.Pixel.x];
+            mean2 += pixelSrc2 * aFilter[f.Pixel.y * aFilterArea.Size.x + f.Pixel.x];
+            var1Sqr += pixelSrc1 * pixelSrc1 * aFilter[f.Pixel.y * aFilterArea.Size.x + f.Pixel.x];
+            var2Sqr += pixelSrc2 * pixelSrc2 * aFilter[f.Pixel.y * aFilterArea.Size.x + f.Pixel.x];
+            crossVarSqr += pixelSrc1 * pixelSrc2 * aFilter[f.Pixel.y * aFilterArea.Size.x + f.Pixel.x];
+        }
+
+        DstT res;
+        aPostOp(mean1, var1Sqr, mean2, var2Sqr, crossVarSqr, res);
+
+        pixelOut = res;
+    }
+}
+
+template <typename SrcT, typename ComputeT, typename DstT, typename FilterT, typename postOP>
+void ssimEachPixel(const ImageView<SrcT> &aSrc1, const ImageView<SrcT> &aSrc2, ImageView<DstT> &aDst,
+                   const FilterT *aFilter, const FilterArea &aFilterArea, BorderType aBorderType,
+                   const Roi &aAllowedReadRoi1, const Roi &aAllowedReadRoi2, postOP aPostOp)
+{
+
+    const Vector2<int> roiOffset1 = aSrc1.ROI().FirstPixel() - aAllowedReadRoi1.FirstPixel();
+    const Vector2<int> roiOffset2 = aSrc2.ROI().FirstPixel() - aAllowedReadRoi2.FirstPixel();
+    const SrcT *allowedPtr1 =
+        gotoPtr(aSrc1.Pointer(), aSrc1.Pitch(), aAllowedReadRoi1.FirstX(), aAllowedReadRoi1.FirstY());
+    const SrcT *allowedPtr2 =
+        gotoPtr(aSrc2.Pointer(), aSrc2.Pitch(), aAllowedReadRoi2.FirstX(), aAllowedReadRoi2.FirstY());
+
+    switch (aBorderType)
+    {
+        case opp::BorderType::Replicate:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
+            const BCType bc1(allowedPtr1, aSrc1.Pitch(), aAllowedReadRoi1.Size(), roiOffset1);
+            const BCType bc2(allowedPtr2, aSrc2.Pitch(), aAllowedReadRoi2.Size(), roiOffset2);
+
+            ssimEachPixel<BCType, ComputeT, DstT, FilterT>(bc1, bc2, aDst, aFilter, aFilterArea, aPostOp);
+        }
+        break;
+        default:
+            throw INVALIDARGUMENT(aBorderType, aBorderType << " is not a supported border type mode for ssim.");
             break;
     }
 }

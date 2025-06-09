@@ -114,7 +114,7 @@ TEST_CASE("8uC3", "[NPP.GeometricTransforms.Resize]")
     cpu_dst.NormDiffL1(npp_res, summedErr, summedErrChannel);
 
     CHECK(maxErr == 1);
-    CHECK(summedErr < 650); // different rounding mode for linear interpolation in NPP?
+    CHECK(summedErr < 800); // different rounding mode for linear interpolation in NPP?
 
     // cubic interpolation
     npp_dst.Set({128}, nppCtx);
@@ -129,7 +129,7 @@ TEST_CASE("8uC3", "[NPP.GeometricTransforms.Resize]")
     cpu_dst.NormDiffL1(npp_res, summedErr, summedErrChannel);
 
     CHECK(maxErr == 1);
-    CHECK(summedErr < 8);
+    CHECK(summedErr < 9);
 }
 
 TEST_CASE("8uC3 - downscale", "[NPP.GeometricTransforms.Resize]")

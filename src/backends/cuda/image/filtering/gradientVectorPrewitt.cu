@@ -78,7 +78,8 @@ void InvokeGradientVectorPrewitt(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDs
                 constexpr int filterSize  = 3;
                 constexpr int centerPixel = 1;
 
-                using FixedFilterKernelXT = FixedFilterKernel<opp::FixedFilter::PrewittVert, filterSize, FilterT>;
+                using FixedFilterKernelXT = // NPP also uses an inverted kernel!
+                    FixedInvertedFilterKernel<opp::FixedFilter::PrewittVert, filterSize, FilterT>;
                 using FixedFilterKernelYT = FixedFilterKernel<opp::FixedFilter::PrewittHoriz, filterSize, FilterT>;
 
                 switch (aBorderType)

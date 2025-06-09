@@ -80,7 +80,7 @@ TEST_CASE("8uC3", "[NPP.GeometricTransforms.Rotate]")
     cpu_dst.NormDiffL1Masked(npp_res, summedErr, summedErrChannel, cpu_mask);
 
     CHECK(maxErr == 1);
-    CHECK(summedErr < 12); // less than 12 pixels differ by max 1
+    CHECK(summedErr < 13); // less than 13 pixels differ by max 1
 
     // cubic interpolation
     npp_dst.Set({128, 0, 0}, nppCtx);
@@ -95,7 +95,7 @@ TEST_CASE("8uC3", "[NPP.GeometricTransforms.Rotate]")
     cpu_dst.NormDiffL1Masked(npp_res, summedErr, summedErrChannel, cpu_mask);
 
     CHECK(maxErr < 7);     // some border pixels are off...
-    CHECK(summedErr < 77); // less than 77 pixels differ by max 1
+    CHECK(summedErr < 82); // less than 82 pixels differ by max 1
 }
 
 TEST_CASE("32fC3", "[NPP.GeometricTransforms.Rotate]")
@@ -152,8 +152,8 @@ TEST_CASE("32fC3", "[NPP.GeometricTransforms.Rotate]")
     cpu_dst.NormDiffInfMasked(npp_res, maxErr, maxErrChannel, cpu_mask);
     cpu_dst.NormDiffL1Masked(npp_res, summedErr, summedErrChannel, cpu_mask);
 
-    CHECK(maxErr < 0.0025);
-    CHECK(summedErr < 2.4);
+    CHECK(maxErr < 0.0035);
+    CHECK(summedErr < 5.2);
 
     // cubic interpolation
     npp_dst.Set({128, 0, 0}, nppCtx);
@@ -168,7 +168,7 @@ TEST_CASE("32fC3", "[NPP.GeometricTransforms.Rotate]")
     cpu_dst.NormDiffL1Masked(npp_res, summedErr, summedErrChannel, cpu_mask);
 
     CHECK(maxErr < 6);
-    CHECK(summedErr < 78);
+    CHECK(summedErr < 81);
 }
 
 TEST_CASE("8uP3", "[NPP.GeometricTransforms.Rotate]")

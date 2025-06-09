@@ -69,7 +69,52 @@ void gradientVectorEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDstX
                              const Roi &aAllowedReadRoi);
 
 template <typename SrcT, typename ComputeT, typename DstT, typename FilterT>
-void unsharpFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst, const FilterT *aFilter, FilterT aWeight,
-                            FilterT aThreshold, const FilterArea &aFilterArea, BorderType aBorderType, SrcT aConstant,
-                            const Roi &aAllowedReadRoi);
+void unsharpFilterEachPixel(const ImageView<SrcT> &aSrc, const ImageView<DstT> &aSrcOrig, ImageView<DstT> &aDst,
+                            const FilterT *aFilter, FilterT aWeight, FilterT aThreshold, const FilterArea &aFilterArea,
+                            BorderType aBorderType, SrcT aConstant, const Roi &aAllowedReadRoi);
+
+template <typename SrcT, typename DstT>
+void cannyEdgeMaxSupressionEachPixel(const ImageView<SrcT> &aSrc, const Pixel32fC1 *aSrcAngle, size_t aPitchSrcAngle,
+                                     ImageView<DstT> &aDst, const Roi &aAllowedReadRoi, SrcT aLowThreshold,
+                                     SrcT aHighThreshold);
+
+template <typename SrcT, typename DstT>
+void cannyEdgeHysteresisEachPixel(const ImageView<SrcT> &aSrc, const Pixel32fC1 *aSrcAngle, size_t aPitchSrcAngle,
+                                  ImageView<DstT> &aDst, const Roi &aAllowedReadRoi);
+
+template <typename SrcT, typename DstT>
+void crossCorrelationEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst, const ImageView<SrcT> &aTemplate,
+                               const FilterArea &aFilterArea, BorderType aBorderType, SrcT aConstant,
+                               const Roi &aAllowedReadRoi);
+
+template <typename SrcT, typename DstT>
+void crossCorrelationNormalizedEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst,
+                                         const ImageView<SrcT> &aTemplate, const FilterArea &aFilterArea,
+                                         BorderType aBorderType, SrcT aConstant, const Roi &aAllowedReadRoi);
+
+template <typename SrcT, typename DstT>
+void crossCorrelationCoefficientEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst,
+                                          const ImageView<SrcT> &aTemplate, const FilterArea &aFilterArea,
+                                          BorderType aBorderType, SrcT aConstant, const Roi &aAllowedReadRoi);
+
+template <typename SrcT, typename DstT>
+void squareDistanceNormalizedEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst,
+                                       const ImageView<SrcT> &aTemplate, const FilterArea &aFilterArea,
+                                       BorderType aBorderType, SrcT aConstant, const Roi &aAllowedReadRoi);
+
+template <typename SrcT, typename FilterT, typename morphOperation, typename postOp>
+void moprhologyEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, const FilterT *aMask,
+                         const FilterArea &aFilterArea, BorderType aBorderType, SrcT aConstant,
+                         const Roi &aAllowedReadRoi, morphOperation aMorph, postOp aPostOp);
+
+template <typename SrcT>
+void moprhologyGradientEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, const Pixel8uC1 *aMask,
+                                 const FilterArea &aFilterArea, BorderType aBorderType, SrcT aConstant,
+                                 const Roi &aAllowedReadRoi);
+
+template <typename SrcT, typename ComputeT, typename DstT, typename FilterT, typename postOP>
+void ssimEachPixel(const ImageView<SrcT> &aSrc1, const ImageView<SrcT> &aSrc2, ImageView<DstT> &aDst,
+                   const FilterT *aFilter, const FilterArea &aFilterArea, BorderType aBorderType,
+                   const Roi &aAllowedReadRoi1, const Roi &aAllowedReadRoi2, postOP aPostOp);
+
 } // namespace opp::image::cpuSimple

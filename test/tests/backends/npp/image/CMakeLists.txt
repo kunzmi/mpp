@@ -1,6 +1,8 @@
 add_subdirectory(arithmetic)
 add_subdirectory(dataExchangeAndInit)
+add_subdirectory(filtering)
 add_subdirectory(geometricTransforms)
 add_subdirectory(linearTransforms)
+add_subdirectory(morphology)
 add_subdirectory(statistics)
 add_subdirectory(thresholdAndCompare)

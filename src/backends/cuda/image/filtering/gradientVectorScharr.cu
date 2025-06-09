@@ -78,6 +78,8 @@ void InvokeGradientVectorScharr(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst
                 constexpr int filterSize  = 3;
                 constexpr int centerPixel = 1;
 
+                // Note: In contrast to the other two gradient vector kernels, ScharrVert kernel is not inverted, just
+                // as in NPP!
                 using FixedFilterKernelXT = FixedFilterKernel<opp::FixedFilter::ScharrVert, filterSize, FilterT>;
                 using FixedFilterKernelYT = FixedFilterKernel<opp::FixedFilter::ScharrHoriz, filterSize, FilterT>;
 

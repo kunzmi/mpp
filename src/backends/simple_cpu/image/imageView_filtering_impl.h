@@ -160,6 +160,37 @@ inline const float *GetFilter(FixedFilter aFilter, int aSize)
     throw INVALIDARGUMENT(aSize aFilter, "Filter is not implemented for this size.");
 }
 
+inline const float *GetFilterInv(FixedFilter aFilter, int aSize)
+{
+    if (aSize == 3)
+    {
+        switch (aFilter)
+        {
+            case opp::FixedFilter::PrewittVert:
+                return reinterpret_cast<const float *>(
+                    FixedInvertedFilterKernel<opp::FixedFilter::PrewittVert, 3, float>::Values);
+            case opp::FixedFilter::SobelVert:
+                return reinterpret_cast<const float *>(
+                    FixedInvertedFilterKernel<opp::FixedFilter::SobelVert, 3, float>::Values);
+            default:
+                break;
+        }
+    }
+
+    if (aSize == 5)
+    {
+        switch (aFilter)
+        {
+            case opp::FixedFilter::SobelVert:
+                return reinterpret_cast<const float *>(
+                    FixedInvertedFilterKernel<opp::FixedFilter::SobelVert, 5, float>::Values);
+            default:
+                break;
+        }
+    }
+    throw INVALIDARGUMENT(aSize aFilter, "Filter is not implemented for this size.");
+}
+
 #pragma region FixedFilter
 
 template <PixelType T>
@@ -300,8 +331,8 @@ ImageView<T> &ImageView<T>::SeparableFilter(ImageView<T> &aDst,
 
     Image<ComputeT> temp(SizeRoi());
 
-    FilterArea filterRow({aFilterSize, 1}, {aFilterCenter, 0});
-    FilterArea filterCol({1, aFilterSize}, {0, aFilterCenter});
+    const FilterArea filterRow({aFilterSize, 1}, {aFilterCenter, 0});
+    const FilterArea filterCol({1, aFilterSize}, {0, aFilterCenter});
 
     filterEachPixel<T, ComputeT, ComputeT, FilterT>(*this, temp, aFilter, filterRow, aBorder, aConstant,
                                                     aAllowedReadRoi, ComputeT(1));
@@ -561,7 +592,7 @@ ImageView<T> &ImageView<T>::BoxFilter(ImageView<T> &aDst, const FilterArea &aFil
     using ComputeT = filter_compute_type_for_t<T>;
 
     const std::vector<FilterT> filter(aFilterArea.Size.TotalSize(), 1.0f);
-    const ComputeT scale = 1.0f / to_float(aFilterArea.Size.TotalSize());
+    const ComputeT scale = ComputeT(1) / ComputeT(to_int(aFilterArea.Size.TotalSize()));
 
     filterEachPixel<T, ComputeT, T, FilterT>(*this, aDst, filter.data(), aFilterArea, aBorder, aConstant,
                                              aAllowedReadRoi, scale);
@@ -1111,7 +1142,7 @@ void ImageView<T>::GradientVectorSobel(ImageView<Pixel16sC1> &aDstX, ImageView<P
     using ComputeT = filter_compute_type_for_t<T>;
 
     const FilterArea filterArea(GetFilterSize(aMaskSize));
-    const float *filterX = GetFilter(opp::FixedFilter::SobelVert, filterArea.Size.x);
+    const float *filterX = GetFilterInv(opp::FixedFilter::SobelVert, filterArea.Size.x);
     const float *filterY = GetFilter(opp::FixedFilter::SobelHoriz, filterArea.Size.x);
 
     gradientVectorEachPixel<T, ComputeT, Pixel16sC1, float>(*this, aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance,
@@ -1196,7 +1227,7 @@ void ImageView<T>::GradientVectorSobel(ImageView<Pixel32fC1> &aDstX, ImageView<P
     using ComputeT = filter_compute_type_for_t<T>;
 
     const FilterArea filterArea(GetFilterSize(aMaskSize));
-    const float *filterX = GetFilter(opp::FixedFilter::SobelVert, filterArea.Size.x);
+    const float *filterX = GetFilterInv(opp::FixedFilter::SobelVert, filterArea.Size.x);
     const float *filterY = GetFilter(opp::FixedFilter::SobelHoriz, filterArea.Size.x);
 
     gradientVectorEachPixel<T, ComputeT, Pixel32fC1, float>(*this, aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance,
@@ -1279,7 +1310,7 @@ void ImageView<T>::GradientVectorScharr(ImageView<Pixel16sC1> &aDstX, ImageView<
     using ComputeT = filter_compute_type_for_t<T>;
 
     const FilterArea filterArea(GetFilterSize(aMaskSize));
-    const float *filterX = GetFilter(opp::FixedFilter::ScharrVert, filterArea.Size.x);
+    const float *filterX = GetFilter(opp::FixedFilter::ScharrVert, filterArea.Size.x); // not inverted!
     const float *filterY = GetFilter(opp::FixedFilter::ScharrHoriz, filterArea.Size.x);
 
     gradientVectorEachPixel<T, ComputeT, Pixel16sC1, float>(*this, aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance,
@@ -1364,7 +1395,7 @@ void ImageView<T>::GradientVectorScharr(ImageView<Pixel32fC1> &aDstX, ImageView<
     using ComputeT = filter_compute_type_for_t<T>;
 
     const FilterArea filterArea(GetFilterSize(aMaskSize));
-    const float *filterX = GetFilter(opp::FixedFilter::ScharrVert, filterArea.Size.x);
+    const float *filterX = GetFilter(opp::FixedFilter::ScharrVert, filterArea.Size.x); // not inverted!
     const float *filterY = GetFilter(opp::FixedFilter::ScharrHoriz, filterArea.Size.x);
 
     gradientVectorEachPixel<T, ComputeT, Pixel32fC1, float>(*this, aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance,
@@ -1447,7 +1478,7 @@ void ImageView<T>::GradientVectorPrewitt(ImageView<Pixel16sC1> &aDstX, ImageView
     using ComputeT = filter_compute_type_for_t<T>;
 
     const FilterArea filterArea(GetFilterSize(aMaskSize));
-    const float *filterX = GetFilter(opp::FixedFilter::PrewittVert, filterArea.Size.x);
+    const float *filterX = GetFilterInv(opp::FixedFilter::PrewittVert, filterArea.Size.x);
     const float *filterY = GetFilter(opp::FixedFilter::PrewittHoriz, filterArea.Size.x);
 
     gradientVectorEachPixel<T, ComputeT, Pixel16sC1, float>(*this, aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance,
@@ -1532,7 +1563,7 @@ void ImageView<T>::GradientVectorPrewitt(ImageView<Pixel32fC1> &aDstX, ImageView
     using ComputeT = filter_compute_type_for_t<T>;
 
     const FilterArea filterArea(GetFilterSize(aMaskSize));
-    const float *filterX = GetFilter(opp::FixedFilter::PrewittVert, filterArea.Size.x);
+    const float *filterX = GetFilterInv(opp::FixedFilter::PrewittVert, filterArea.Size.x);
     const float *filterY = GetFilter(opp::FixedFilter::PrewittHoriz, filterArea.Size.x);
 
     gradientVectorEachPixel<T, ComputeT, Pixel32fC1, float>(*this, aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance,
@@ -1740,13 +1771,13 @@ ImageView<T> &ImageView<T>::UnsharpFilter(ImageView<T> &aDst,
 
     Image<ComputeT> temp(SizeRoi());
 
-    FilterArea filterRow({aFilterSize, 1}, {aFilterCenter, 0});
-    FilterArea filterCol({1, aFilterSize}, {0, aFilterCenter});
+    const FilterArea filterRow({aFilterSize, 1}, {aFilterCenter, 0});
+    const FilterArea filterCol({1, aFilterSize}, {0, aFilterCenter});
 
     filterEachPixel<T, ComputeT, ComputeT, FilterT>(*this, temp, aFilter, filterRow, aBorder, aConstant,
                                                     aAllowedReadRoi, ComputeT(1));
-    unsharpFilterEachPixel<ComputeT, ComputeT, T, FilterT>(temp, aDst, aFilter, aWeight, aThreshold, filterCol, aBorder,
-                                                           ComputeT(aConstant), aAllowedReadRoi);
+    unsharpFilterEachPixel<ComputeT, ComputeT, T, FilterT>(temp, *this, aDst, aFilter, aWeight, aThreshold, filterCol,
+                                                           aBorder, ComputeT(aConstant), aAllowedReadRoi);
 
     return aDst;
 }
@@ -1794,15 +1825,15 @@ ImageView<Pixel32fC1> &ImageView<T>::HarrisCornerResponse(ImageView<Pixel32fC1> 
 
     Image<Pixel32fC4> boxfiltered(SizeRoi());
 
-    this->BoxFilter(boxfiltered, aAvgWindowSize, aBorder);
+    this->BoxFilter(boxfiltered, aAvgWindowSize, aConstant, aBorder, aAllowedReadRoi);
 
     using PostOpT = opp::HarrisCorner;
-    PostOpT postOp(aK, aScale);
+    const PostOpT postOp(aK, aScale);
 
     for (const auto &elem : SizeRoi())
     {
-        int x = elem.Pixel.x;
-        int y = elem.Pixel.y;
+        const int x = elem.Pixel.x;
+        const int y = elem.Pixel.y;
 
         postOp(boxfiltered(x, y), aDst(x, y));
     }

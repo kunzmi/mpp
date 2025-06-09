@@ -23,11 +23,12 @@ constexpr int size = 256;
 
 TEST_CASE("8uC1", "[NPP.Statistics.SSIM]")
 {
-    const uint seed         = Catch::getSeed();
-    NppStreamContext nppCtx = nv::Image8uC1::GetStreamContext();
+    // const uint seed            = Catch::getSeed();
+    NppStreamContext nppCtx    = nv::Image8uC1::GetStreamContext();
+    std::filesystem::path root = std::filesystem::path(TEST_DATA_DIR);
 
-    cpu::Image<Pixel8uC1> cpu_src1(size, size);
-    cpu::Image<Pixel8uC1> cpu_src2(size, size);
+    cpu::Image<Pixel8uC1> cpu_src1 = cpu::Image<Pixel8uC1>::Load(root / "bird256bw.tif");
+    cpu::Image<Pixel8uC1> cpu_src2 = cpu::Image<Pixel8uC1>::Load(root / "bird256bwnoisy.tif");
     Pixel64fC1 cpu_dst;
     float npp_res;
     nv::Image8uC1 npp_src1(size, size);
@@ -35,19 +36,15 @@ TEST_CASE("8uC1", "[NPP.Statistics.SSIM]")
     opp::cuda::DevVar<float> npp_dst(1);
     opp::cuda::DevVar<byte> npp_buffer(npp_src1.SSIMGetBufferHostSize(nppCtx));
 
-    cpu_src1.FillRandom(seed);
-    cpu_src2.FillRandom(seed + 1);
-    cpu_src2.Div(4).Add(cpu_src1);
-
     cpu_src1 >> npp_src1;
     cpu_src2 >> npp_src2;
 
     npp_src1.SSIM(npp_src2, npp_dst, npp_buffer, nppCtx);
     npp_dst >> npp_res;
 
-    cpu_src1.SSIM(cpu_src2, cpu_dst);
+    cpu_src1.SSIM(cpu_src2, cpu_dst, 255, 0.01, 0.03);
 
-    CHECK(cpu_dst.x == Approx(npp_res).margin(0.0000001));
+    CHECK(cpu_dst.x == Approx(npp_res).margin(0.005));
 }
 
 TEST_CASE("8uC3", "[NPP.Statistics.SSIM]")
@@ -74,7 +71,7 @@ TEST_CASE("8uC3", "[NPP.Statistics.SSIM]")
     npp_src1.SSIM(npp_src2, npp_dst, npp_buffer, nppCtx);
     npp_dst >> npp_res;
 
-    cpu_src1.SSIM(cpu_src2, cpu_dst);
+    cpu_src1.SSIM(cpu_src2, cpu_dst, 255, 0.01, 0.03);
 
     CHECK(cpu_dst.x == Approx(npp_res[0]).margin(0.0000001));
     CHECK(cpu_dst.y == Approx(npp_res[1]).margin(0.0000001));

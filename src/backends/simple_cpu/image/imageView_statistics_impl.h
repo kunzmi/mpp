@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include <backends/simple_cpu/image/filterEachPixel_impl.h>
 #include <backends/simple_cpu/image/forEachPixel.h>
 #include <backends/simple_cpu/image/forEachPixelMasked.h>
@@ -19,6 +20,7 @@
 #include <common/image/border.h>
 #include <common/image/channel.h>
 #include <common/image/channelList.h>
+#include <common/image/fixedSizeFilters.h>
 #include <common/image/functors/constantFunctor.h>
 #include <common/image/functors/convertFunctor.h>
 #include <common/image/functors/convertScaleFunctor.h>
@@ -30,6 +32,7 @@
 #include <common/image/functors/inplaceFunctor.h>
 #include <common/image/functors/inplaceSrcFunctor.h>
 #include <common/image/functors/inplaceSrcScaleFunctor.h>
+#include <common/image/functors/rectStdDevFunctor.h>
 #include <common/image/functors/reductionInitValues.h>
 #include <common/image/functors/scaleConversionFunctor.h>
 #include <common/image/functors/srcConstantFunctor.h>
@@ -66,10 +69,10 @@
 #include <common/statistics/operators.h>
 #include <common/statistics/postOperators.h>
 #include <common/utilities.h>
+#include <common/vector_typetraits.h>
 #include <common/vector1.h>
 #include <common/vector3.h>
 #include <common/vectorTypes.h>
-#include <common/vector_typetraits.h>
 #include <concepts>
 #include <cstddef>
 #include <type_traits>
@@ -2874,35 +2877,220 @@ void ImageView<T>::SSIM(const ImageView<T> &aSrc2, same_vector_size_different_ty
 {
     checkSameSize(ROI(), aSrc2.ROI());
 
-    using SrcT                 = T;
-    using ComputeT             = same_vector_size_different_type_t<T, double>;
-    using DstT                 = same_vector_size_different_type_t<T, double>;
-    constexpr size_t TupelSize = 1;
+    using SrcT                  = T;
+    using ComputeT              = same_vector_size_different_type_t<T, double>;
+    using DstT                  = same_vector_size_different_type_t<T, double>;
+    constexpr size_t FilterSize = 11;
 
-    using qualityIndexSrcSrc =
-        SrcSrcReduction5Functor<TupelSize, SrcT, ComputeT, ComputeT, ComputeT, ComputeT, ComputeT,
-                                opp::Sum1Or2<SrcT, ComputeT, 1>, opp::SumSqr1Or2<SrcT, ComputeT, 1>,
-                                opp::Sum1Or2<SrcT, ComputeT, 2>, opp::SumSqr1Or2<SrcT, ComputeT, 2>,
-                                opp::DotProduct<SrcT, ComputeT>>;
-
-    const opp::Sum1Or2<SrcT, ComputeT, 1> opSum1;
-    const opp::SumSqr1Or2<SrcT, ComputeT, 1> opSumSqr1;
-    const opp::Sum1Or2<SrcT, ComputeT, 2> opSum2;
-    const opp::SumSqr1Or2<SrcT, ComputeT, 2> opSumSqr2;
-    const opp::DotProduct<SrcT, ComputeT> opDotProduct;
-
-    const qualityIndexSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), opSum1, opSumSqr1,
-                                     opSum2, opSumSqr2, opDotProduct);
-    DstT dst1(0);
-    DstT dst2(0);
-    DstT dst3(0);
-    DstT dst4(0);
-    DstT dst5(0);
-    reduction(SizeRoi(), dst1, dst2, dst3, dst4, dst5, functor);
+    const float scaleFactor = std::max(1.0f, std::round(to_float(SizeRoi().Min()) / 256.0f));
 
     const opp::SSIM<DstT> postOp(aDynamicRange, aK1, aK2);
+    std::vector<double> ssimFilter(FilterSize * FilterSize, 0);
 
-    postOp(dst1, dst2, dst3, dst4, dst5, aDst);
+    for (size_t y = 0; y < FilterSize; y++)
+    {
+        for (size_t x = 0; x < FilterSize; x++)
+        {
+            const size_t idx = y * FilterSize + x;
+            ssimFilter[idx]  = to_double(FixedFilterKernelSSIM::ValuesSeparable[x]) * // NOLINT
+                              to_double(FixedFilterKernelSSIM::ValuesSeparable[y]);   // NOLINT
+        }
+    }
+
+    if (scaleFactor > 1)
+    {
+        const Size2D scaledRoi = SizeRoi() / to_int(scaleFactor);
+
+        Image<SrcT> resizeSrc1(scaledRoi);
+        Image<SrcT> resizeSrc2(scaledRoi);
+        Image<DstT> localSSIM(scaledRoi);
+
+        this->Resize(resizeSrc1, 1.0 / to_double(scaleFactor), 0, InterpolationMode::Super, BorderType::Replicate,
+                     Roi());
+        aSrc2.Resize(resizeSrc2, 1.0 / to_double(scaleFactor), 0, InterpolationMode::Super, BorderType::Replicate,
+                     Roi());
+
+        ssimEachPixel<T, ComputeT, DstT, double, opp::SSIM<DstT>>(resizeSrc1, resizeSrc2, localSSIM, ssimFilter.data(),
+                                                                  FilterSize, BorderType::Replicate, resizeSrc1.ROI(),
+                                                                  resizeSrc2.ROI(), postOp);
+        if constexpr (vector_active_size_v<T> > 1)
+        {
+            double unused = 0;
+            localSSIM.Mean(aDst, unused);
+        }
+        else
+        {
+            localSSIM.Mean(aDst);
+        }
+    }
+    else
+    {
+        Image<DstT> localSSIM(SizeRoi());
+        ssimEachPixel<T, ComputeT, DstT, double, opp::SSIM<DstT>>(
+            *this, aSrc2, localSSIM, ssimFilter.data(), FilterSize, BorderType::Replicate, ROI(), aSrc2.ROI(), postOp);
+
+        if constexpr (vector_active_size_v<T> > 1)
+        {
+            double unused = 0;
+            localSSIM.Mean(aDst, unused);
+        }
+        else
+        {
+            localSSIM.Mean(aDst);
+        }
+    }
+}
+#pragma endregion
+
+#pragma region MSSSIM
+
+template <PixelType T>
+void ImageView<T>::MSSSIM(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                          double aDynamicRange, double aK1, double aK2) const
+    requires RealVector<T>
+{
+    checkSameSize(ROI(), aSrc2.ROI());
+
+    using ComputeT = same_vector_size_different_type_t<T, double>;
+    using DstT     = same_vector_size_different_type_t<T, double>;
+
+    constexpr size_t FilterSize = 11;
+
+    const Size2D scaledRoi1 = SizeRoi() / 2;
+    const Size2D scaledRoi2 = scaledRoi1 / 2;
+
+    Image<DstT> localSSIM(SizeRoi());
+    Image<T> resizeSrc11(scaledRoi1);
+    Image<T> resizeSrc12(scaledRoi1);
+    Image<T> resizeSrc21(scaledRoi2);
+    Image<T> resizeSrc22(scaledRoi2);
+
+    Size2D resizedRoiSize = SizeRoi();
+
+    const opp::SSIM<DstT> postOpSSIM(aDynamicRange, aK1, aK2);
+    const opp::MSSSIM<DstT> postOpMSSSIM(aDynamicRange, aK2);
+    std::vector<double> ssimFilter(FilterSize * FilterSize, 0);
+
+    for (size_t y = 0; y < FilterSize; y++)
+    {
+        for (size_t x = 0; x < FilterSize; x++)
+        {
+            const size_t idx = y * FilterSize + x;
+            ssimFilter[idx]  = to_double(FixedFilterKernelSSIM::ValuesSeparable[x]) * // NOLINT
+                              to_double(FixedFilterKernelSSIM::ValuesSeparable[y]);   // NOLINT
+        }
+    }
+
+    static constexpr std::array<double, 5> weights = {0.0448, 0.2856, 0.3000, 0.2363, 0.1333}; // sums up to 1
+    std::array<DstT, 5> results{};
+
+    // level 0
+    ssimEachPixel<T, ComputeT, DstT, double, opp::MSSSIM<DstT>>(*this, aSrc2, localSSIM, ssimFilter.data(), FilterSize,
+                                                                BorderType::Replicate, ROI(), aSrc2.ROI(),
+                                                                postOpMSSSIM);
+
+    if constexpr (vector_active_size_v<T> > 1)
+    {
+        double unused = 0;
+        localSSIM.Mean(results[0], unused);
+    }
+    else
+    {
+        localSSIM.Mean(results[0]);
+    }
+
+    // level 1
+    resizedRoiSize /= 2;
+
+    this->Resize(resizeSrc11, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi());
+    aSrc2.Resize(resizeSrc12, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi());
+
+    localSSIM.SetRoi(Roi({0}, resizedRoiSize));
+    ssimEachPixel<T, ComputeT, DstT, double, opp::MSSSIM<DstT>>(resizeSrc11, resizeSrc12, localSSIM, ssimFilter.data(),
+                                                                FilterSize, BorderType::Replicate, resizeSrc11.ROI(),
+                                                                resizeSrc12.ROI(), postOpMSSSIM);
+
+    if constexpr (vector_active_size_v<T> > 1)
+    {
+        double unused = 0;
+        localSSIM.Mean(results[1], unused);
+    }
+    else
+    {
+        localSSIM.Mean(results[1]);
+    }
+
+    // level 2
+    resizedRoiSize /= 2;
+    resizeSrc11.Resize(resizeSrc21, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi());
+    resizeSrc12.Resize(resizeSrc22, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi());
+
+    localSSIM.SetRoi(Roi({0}, resizedRoiSize));
+    ssimEachPixel<T, ComputeT, DstT, double, opp::MSSSIM<DstT>>(resizeSrc21, resizeSrc22, localSSIM, ssimFilter.data(),
+                                                                FilterSize, BorderType::Replicate, resizeSrc21.ROI(),
+                                                                resizeSrc22.ROI(), postOpMSSSIM);
+
+    if constexpr (vector_active_size_v<T> > 1)
+    {
+        double unused = 0;
+        localSSIM.Mean(results[2], unused);
+    }
+    else
+    {
+        localSSIM.Mean(results[2]);
+    }
+
+    // level 3
+    resizedRoiSize /= 2;
+    resizeSrc11.SetRoi(Roi({0}, resizedRoiSize));
+    resizeSrc12.SetRoi(Roi({0}, resizedRoiSize));
+    localSSIM.SetRoi(Roi({0}, resizedRoiSize));
+
+    resizeSrc21.Resize(resizeSrc11, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi());
+    resizeSrc22.Resize(resizeSrc12, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi());
+
+    ssimEachPixel<T, ComputeT, DstT, double, opp::MSSSIM<DstT>>(resizeSrc11, resizeSrc12, localSSIM, ssimFilter.data(),
+                                                                FilterSize, BorderType::Replicate, resizeSrc11.ROI(),
+                                                                resizeSrc12.ROI(), postOpMSSSIM);
+
+    if constexpr (vector_active_size_v<T> > 1)
+    {
+        double unused = 0;
+        localSSIM.Mean(results[3], unused);
+    }
+    else
+    {
+        localSSIM.Mean(results[3]);
+    }
+
+    // level 4
+    resizedRoiSize /= 2;
+    resizeSrc21.SetRoi(Roi({0}, resizedRoiSize));
+    resizeSrc22.SetRoi(Roi({0}, resizedRoiSize));
+    localSSIM.SetRoi(Roi({0}, resizedRoiSize));
+
+    resizeSrc11.Resize(resizeSrc21, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi());
+    resizeSrc12.Resize(resizeSrc22, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi());
+
+    ssimEachPixel<T, ComputeT, DstT, double, opp::SSIM<DstT>>(resizeSrc21, resizeSrc22, localSSIM, ssimFilter.data(),
+                                                              FilterSize, BorderType::Replicate, resizeSrc21.ROI(),
+                                                              resizeSrc22.ROI(), postOpSSIM);
+
+    if constexpr (vector_active_size_v<T> > 1)
+    {
+        double unused = 0;
+        localSSIM.Mean(results[4], unused);
+    }
+    else
+    {
+        localSSIM.Mean(results[4]);
+    }
+
+    aDst = DstT(0);
+    for (size_t i = 0; i < results.size(); i++)
+    {
+        aDst += results[i] * weights[i]; // NOLINT
+    }
 }
 #pragma endregion
 
@@ -4345,6 +4533,86 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, do
                          DstTSqr((*this)(x - 1, y - 1)) * DstTSqr((*this)(x - 1, y - 1));
         }
     }
+}
+
+template <PixelType T>
+void ImageView<T>::RectStdDev(ImageView<same_vector_size_different_type_t<T, int>> &aSqr,
+                              ImageView<same_vector_size_different_type_t<T, float>> &aDst,
+                              const FilterArea &aFilterArea) const
+    requires(std::same_as<remove_vector_t<T>, int>) && NoAlpha<T>
+{
+    using ComputeT = same_vector_size_different_type_t<T, double>;
+    using Src2T    = same_vector_size_different_type_t<T, int>;
+    using DstT     = same_vector_size_different_type_t<T, float>;
+
+    checkSameSize(ROI(), aSqr.ROI());
+    // aDst roi may differ
+
+    constexpr size_t TupelSize = 1;
+    using rectStdDev           = RectStdDevFunctor<TupelSize, T, Src2T, ComputeT, DstT>;
+    const rectStdDev functor(PointerRoi(), Pitch(), aSqr.PointerRoi(), aSqr.Pitch(), SizeRoi(), aFilterArea);
+
+    forEachPixel(aDst, functor);
+}
+
+template <PixelType T>
+void ImageView<T>::RectStdDev(ImageView<same_vector_size_different_type_t<T, long64>> &aSqr,
+                              ImageView<same_vector_size_different_type_t<T, float>> &aDst,
+                              const FilterArea &aFilterArea) const
+    requires(std::same_as<remove_vector_t<T>, int>) && NoAlpha<T>
+{
+    using ComputeT = same_vector_size_different_type_t<T, double>;
+    using Src2T    = same_vector_size_different_type_t<T, long64>;
+    using DstT     = same_vector_size_different_type_t<T, float>;
+
+    checkSameSize(ROI(), aSqr.ROI());
+    // aDst roi may differ
+
+    constexpr size_t TupelSize = 1;
+    using rectStdDev           = RectStdDevFunctor<TupelSize, T, Src2T, ComputeT, DstT>;
+    const rectStdDev functor(PointerRoi(), Pitch(), aSqr.PointerRoi(), aSqr.Pitch(), SizeRoi(), aFilterArea);
+
+    forEachPixel(aDst, functor);
+}
+
+template <PixelType T>
+void ImageView<T>::RectStdDev(ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
+                              ImageView<same_vector_size_different_type_t<T, float>> &aDst,
+                              const FilterArea &aFilterArea) const
+    requires(std::same_as<remove_vector_t<T>, float>) && NoAlpha<T>
+{
+    using ComputeT = same_vector_size_different_type_t<T, double>;
+    using Src2T    = same_vector_size_different_type_t<T, double>;
+    using DstT     = same_vector_size_different_type_t<T, float>;
+
+    checkSameSize(ROI(), aSqr.ROI());
+    // aDst roi may differ
+
+    constexpr size_t TupelSize = 1;
+    using rectStdDev           = RectStdDevFunctor<TupelSize, T, Src2T, ComputeT, DstT>;
+    const rectStdDev functor(PointerRoi(), Pitch(), aSqr.PointerRoi(), aSqr.Pitch(), SizeRoi(), aFilterArea);
+
+    forEachPixel(aDst, functor);
+}
+
+template <PixelType T>
+void ImageView<T>::RectStdDev(ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
+                              ImageView<same_vector_size_different_type_t<T, double>> &aDst,
+                              const FilterArea &aFilterArea) const
+    requires(std::same_as<remove_vector_t<T>, double>) && NoAlpha<T>
+{
+    using ComputeT = same_vector_size_different_type_t<T, double>;
+    using Src2T    = same_vector_size_different_type_t<T, double>;
+    using DstT     = same_vector_size_different_type_t<T, double>;
+
+    checkSameSize(ROI(), aSqr.ROI());
+    // aDst roi may differ
+
+    constexpr size_t TupelSize = 1;
+    using rectStdDev           = RectStdDevFunctor<TupelSize, T, Src2T, ComputeT, DstT>;
+    const rectStdDev functor(PointerRoi(), Pitch(), aSqr.PointerRoi(), aSqr.Pitch(), SizeRoi(), aFilterArea);
+
+    forEachPixel(aDst, functor);
 }
 #pragma endregion
 #pragma endregion

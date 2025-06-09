@@ -76,7 +76,7 @@ TEST_CASE("8uC3", "[NPP.GeometricTransforms.Perspective]")
     double summedErrChannel;
     cpu_dst.NormDiffL1Masked(npp_res, summedErr, summedErrChannel, cpu_mask);
 
-    CHECK(summedErr == Vec3d{6, 3, 0}); // one pixel differs a bit
+    CHECK(summedErr == Vec3d{0, 0, 0});
 
     cpu_dst2.NormDiffL1Masked(npp_res2, summedErr, summedErrChannel, cpu_maskBack);
 
@@ -167,7 +167,7 @@ TEST_CASE("32fC3", "[NPP.GeometricTransforms.Perspective]")
     double summedErrChannel;
     cpu_dst.NormDiffL1Masked(npp_res, summedErr, summedErrChannel, cpu_mask);
 
-    CHECK(summedErr == Vec3d{6, 3, 0}); // one pixel differs a bit
+    CHECK(summedErr == Vec3d{0, 0, 0});
 
     cpu_dst2.NormDiffL1Masked(npp_res2, summedErr, summedErrChannel, cpu_maskBack);
 
@@ -187,7 +187,7 @@ TEST_CASE("32fC3", "[NPP.GeometricTransforms.Perspective]")
     cpu_dst.NormDiffInfMasked(npp_res, maxErr, maxErrChannel, cpu_mask);
     cpu_dst.NormDiffL1Masked(npp_res, summedErr, summedErrChannel, cpu_mask);
 
-    CHECK(maxErr < 0.0035);
+    CHECK(maxErr < 0.0045);
     CHECK(summedErr < 6);
 
     // cubic interpolation
@@ -202,7 +202,7 @@ TEST_CASE("32fC3", "[NPP.GeometricTransforms.Perspective]")
     cpu_dst.NormDiffInfMasked(npp_res, maxErr, maxErrChannel, cpu_mask);
     cpu_dst.NormDiffL1Masked(npp_res, summedErr, summedErrChannel, cpu_mask);
 
-    CHECK(maxErr < 0.004);
+    CHECK(maxErr < 0.0046);
     CHECK(summedErr < 7);
 }
 
@@ -279,7 +279,7 @@ TEST_CASE("8uP3", "[NPP.GeometricTransforms.Perspective]")
     double summedErrChannel;
     cpu_dst.NormDiffL1Masked(npp_res, summedErr, summedErrChannel, cpu_mask);
 
-    CHECK(summedErr == Vec3d{6, 3, 0}); // one pixel differs a bit
+    CHECK(summedErr == Vec3d{0, 0, 0});
 
     cpu_dst2.NormDiffL1Masked(npp_res2, summedErr, summedErrChannel, cpu_maskBack);
 

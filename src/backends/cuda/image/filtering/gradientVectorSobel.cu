@@ -78,7 +78,7 @@ void InvokeGradientVectorSobel(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDstX
                 constexpr int filterSize  = 3;
                 constexpr int centerPixel = 1;
 
-                using FixedFilterKernelXT = FixedFilterKernel<opp::FixedFilter::SobelVert, filterSize, FilterT>;
+                using FixedFilterKernelXT = FixedInvertedFilterKernel<opp::FixedFilter::SobelVert, filterSize, FilterT>;
                 using FixedFilterKernelYT = FixedFilterKernel<opp::FixedFilter::SobelHoriz, filterSize, FilterT>;
 
                 switch (aBorderType)
@@ -174,7 +174,7 @@ void InvokeGradientVectorSobel(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDstX
                 constexpr int filterSize  = 5;
                 constexpr int centerPixel = 2;
 
-                using FixedFilterKernelXT = FixedFilterKernel<opp::FixedFilter::SobelVert, filterSize, FilterT>;
+                using FixedFilterKernelXT = FixedInvertedFilterKernel<opp::FixedFilter::SobelVert, filterSize, FilterT>;
                 using FixedFilterKernelYT = FixedFilterKernel<opp::FixedFilter::SobelHoriz, filterSize, FilterT>;
 
                 switch (aBorderType)

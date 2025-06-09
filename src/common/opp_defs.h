@@ -1382,12 +1382,13 @@ enum class FixedFilter // NOLINT(performance-enum-size)
     /// <summary>
     /// Vertical Prewitt filter. Possible mask size: 3x3.<para/>
     /// Used filter is:<para/>
-    /// 1 0 -1<para/>
-    /// 1 0 -1<para/>
-    /// 1 0 -1<para/>
-    /// Note: the filter is mirrored compared to NPP due to different filtering logic (convolution vs correlation). OPP
-    /// uses correlation through out all filtering alike algorithms and in order to obtain the same output as in NPP,
-    /// the filter coefficients had to be mirrored.
+    /// -1 0 1<para/>
+    /// -1 0 1<para/>
+    /// -1 0 1<para/>
+    /// Note: The documentation in NPP differs to the actually implemented filter. Nevertheless, this is the filter used
+    /// with correlation filtering logic and gives the same results as NPP. OPP uses correlation through out all
+    /// filtering alike algorithms and in order to obtain the same output as in NPP, the filter coefficients had to be
+    /// mirrored.
     /// </summary>
     PrewittVert,
     /// <summary>
@@ -1426,12 +1427,13 @@ enum class FixedFilter // NOLINT(performance-enum-size)
     /// <summary>
     /// Vertical Prewitt filter. Possible mask size: 3x3.<para/>
     /// Used filter is:<para/>
-    ///  3 0 -3<para/>
-    /// 10 0 -10<para/>
-    ///  3 0 -3<para/>
-    /// Note: the filter is mirrored compared to NPP due to different filtering logic (convolution vs correlation). OPP
-    /// uses correlation through out all filtering alike algorithms and in order to obtain the same output as in NPP,
-    /// the filter coefficients had to be mirrored.
+    ///  -3 0 3<para/>
+    /// -10 0 10<para/>
+    ///  -3 0 3<para/>
+    /// Note: The documentation in NPP differs to the actually implemented filter. Nevertheless, this is the filter used
+    /// with correlation filtering logic and gives the same results as NPP. OPP uses correlation through out all
+    /// filtering alike algorithms and in order to obtain the same output as in NPP, the filter coefficients had to be
+    /// mirrored.
     /// </summary>
     ScharrVert,
     /// <summary>
@@ -1452,8 +1454,8 @@ enum class FixedFilter // NOLINT(performance-enum-size)
     /// -1 -2  0  2  1<para/>
     /// -2 -4  0  4  2<para/>
     ///  0  0  0  0  0<para/>
-    /// -2 -4  0  4  2<para/>
-    /// -1 -2  0  2  1<para/>
+    ///  2  4  0 -4 -2<para/>
+    ///  1  2  0 -2 -1<para/>
     /// </summary>
     SobelCross,
     /// <summary>
@@ -1480,14 +1482,15 @@ enum class FixedFilter // NOLINT(performance-enum-size)
     /// 2 0 -2<para/>
     /// 1 0 -1<para/>
     /// and<para/>
-    /// 1  2 0  -2  -1<para/>
-    /// 4  8 0  -8  -4<para/>
-    /// 6 12 0 -12  -6<para/>
-    /// 4  8 0  -8  -4<para/>
-    /// 1  2 0  -2  -1<para/>
-    /// Note: the filter is mirrored compared to NPP due to different filtering logic (convolution vs correlation). OPP
-    /// uses correlation through out all filtering alike algorithms and in order to obtain the same output as in NPP,
-    /// the filter coefficients had to be mirrored.
+    /// -1  -2 0  2 1<para/>
+    /// -4  -8 0  8 4<para/>
+    /// -6 -12 0 12 6<para/>
+    /// -4  -8 0  8 4<para/>
+    /// -1  -2 0  2 1<para/>
+    /// Note: The documentation in NPP differs to the actually implemented filter. Nevertheless, this is the filter used
+    /// with correlation filtering logic and gives the same results as NPP. OPP uses correlation through out all
+    /// filtering alike algorithms and in order to obtain the same output as in NPP, the filter coefficients had to be
+    /// mirrored.
     /// </summary>
     SobelVert,
     /// <summary>

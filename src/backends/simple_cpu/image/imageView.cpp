@@ -103,6 +103,10 @@ template class ImageView<Pixel64fC3>;
 template class ImageView<Pixel64fC4>;
 template class ImageView<Pixel64fC4A>;
 
+template ImageView<Pixel16uC1> &ImageView<Pixel8uC1>::Convert<Pixel16uC1>(ImageView<Pixel16uC1> &aDst) const;
+template ImageView<Pixel32sC1> &ImageView<Pixel8uC1>::Convert<Pixel32sC1>(ImageView<Pixel32sC1> &aDst) const;
+template ImageView<Pixel32fC1> &ImageView<Pixel8uC1>::Convert<Pixel32fC1>(ImageView<Pixel32fC1> &aDst) const;
+template ImageView<Pixel64fC1> &ImageView<Pixel8uC1>::Convert<Pixel64fC1>(ImageView<Pixel64fC1> &aDst) const;
 template ImageView<Pixel32fC3> &ImageView<Pixel8uC3>::Convert<Pixel32fC3>(ImageView<Pixel32fC3> &aDst) const;
 template ImageView<Pixel8uC3> &ImageView<Pixel32fC3>::Convert<Pixel8uC3>(ImageView<Pixel8uC3> &aDst,
                                                                          RoundingMode aRoundingMode) const;

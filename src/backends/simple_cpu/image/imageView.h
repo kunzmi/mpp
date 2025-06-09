@@ -2340,7 +2340,9 @@ template <PixelType T> class ImageView
 #pragma region Gradient Vector
     /// <summary>
     /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
-    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: The definition for the X (vertical) gradient filter kernel is mirrored compared to the definition in
+    /// FixedFilter::SobelVert in order to obtain identical results as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2356,7 +2358,9 @@ template <PixelType T> class ImageView
         requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
     /// <summary>
     /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
-    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: The definition for the X (vertical) gradient filter kernel is mirrored compared to the definition in
+    /// FixedFilter::SobelVert in order to obtain identical results as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2372,7 +2376,9 @@ template <PixelType T> class ImageView
         requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
     /// <summary>
     /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
-    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: The definition for the X (vertical) gradient filter kernel is mirrored compared to the definition in
+    /// FixedFilter::SobelVert in order to obtain identical results as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2389,7 +2395,9 @@ template <PixelType T> class ImageView
                  std::same_as<remove_vector_t<T>, float>);
     /// <summary>
     /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
-    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: The definition for the X (vertical) gradient filter kernel is mirrored compared to the definition in
+    /// FixedFilter::SobelVert in order to obtain identical results as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2407,7 +2415,10 @@ template <PixelType T> class ImageView
 
     /// <summary>
     /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
-    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: In contrast to Sobel and Prewitt variants, the Scharr-definition for the X (vertical) gradient filter
+    /// kernel is identical compared to the definition in FixedFilter::ScharrVert in order to obtain identical results
+    /// as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2425,7 +2436,10 @@ template <PixelType T> class ImageView
 
     /// <summary>
     /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
-    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: In contrast to Sobel and Prewitt variants, the Scharr-definition for the X (vertical) gradient filter
+    /// kernel is identical compared to the definition in FixedFilter::ScharrVert in order to obtain identical results
+    /// as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2442,7 +2456,10 @@ template <PixelType T> class ImageView
         requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
     /// <summary>
     /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
-    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: In contrast to Sobel and Prewitt variants, the Scharr-definition for the X (vertical) gradient filter
+    /// kernel is identical compared to the definition in FixedFilter::ScharrVert in order to obtain identical results
+    /// as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2460,7 +2477,10 @@ template <PixelType T> class ImageView
                  std::same_as<remove_vector_t<T>, float>);
     /// <summary>
     /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
-    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: In contrast to Sobel and Prewitt variants, the Scharr-definition for the X (vertical) gradient filter
+    /// kernel is identical compared to the definition in FixedFilter::ScharrVert in order to obtain identical results
+    /// as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2479,7 +2499,9 @@ template <PixelType T> class ImageView
 
     /// <summary>
     /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
-    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: The definition for the X (vertical) gradient filter kernel is mirrored compared to the definition in
+    /// FixedFilter::PrewittVert in order to obtain identical results as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2497,7 +2519,9 @@ template <PixelType T> class ImageView
 
     /// <summary>
     /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
-    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: The definition for the X (vertical) gradient filter kernel is mirrored compared to the definition in
+    /// FixedFilter::PrewittVert in order to obtain identical results as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2515,7 +2539,9 @@ template <PixelType T> class ImageView
 
     /// <summary>
     /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
-    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: The definition for the X (vertical) gradient filter kernel is mirrored compared to the definition in
+    /// FixedFilter::PrewittVert in order to obtain identical results as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2534,7 +2560,9 @@ template <PixelType T> class ImageView
 
     /// <summary>
     /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
-    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: The definition for the X (vertical) gradient filter kernel is mirrored compared to the definition in
+    /// FixedFilter::PrewittVert in order to obtain identical results as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2553,7 +2581,9 @@ template <PixelType T> class ImageView
 
     /// <summary>
     /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
-    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: The definition for the X (vertical) gradient filter kernel is mirrored compared to the definition in
+    /// FixedFilter::SobelVert in order to obtain identical results as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2569,7 +2599,9 @@ template <PixelType T> class ImageView
         requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
     /// <summary>
     /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
-    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: The definition for the X (vertical) gradient filter kernel is mirrored compared to the definition in
+    /// FixedFilter::SobelVert in order to obtain identical results as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2585,7 +2617,9 @@ template <PixelType T> class ImageView
         requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
     /// <summary>
     /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
-    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: The definition for the X (vertical) gradient filter kernel is mirrored compared to the definition in
+    /// FixedFilter::SobelVert in order to obtain identical results as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2602,7 +2636,9 @@ template <PixelType T> class ImageView
                  std::same_as<remove_vector_t<T>, float>);
     /// <summary>
     /// Computes the gradients for each pixel using fixed Sobel filters. Output images are only computed if the provided
-    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: The definition for the X (vertical) gradient filter kernel is mirrored compared to the definition in
+    /// FixedFilter::SobelVert in order to obtain identical results as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2620,7 +2656,10 @@ template <PixelType T> class ImageView
 
     /// <summary>
     /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
-    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: In contrast to Sobel and Prewitt variants, the Scharr-definition for the X (vertical) gradient filter
+    /// kernel is identical compared to the definition in FixedFilter::ScharrVert in order to obtain identical results
+    /// as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2638,7 +2677,10 @@ template <PixelType T> class ImageView
 
     /// <summary>
     /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
-    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: In contrast to Sobel and Prewitt variants, the Scharr-definition for the X (vertical) gradient filter
+    /// kernel is identical compared to the definition in FixedFilter::ScharrVert in order to obtain identical results
+    /// as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2655,7 +2697,10 @@ template <PixelType T> class ImageView
         requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>);
     /// <summary>
     /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
-    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: In contrast to Sobel and Prewitt variants, the Scharr-definition for the X (vertical) gradient filter
+    /// kernel is identical compared to the definition in FixedFilter::ScharrVert in order to obtain identical results
+    /// as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2673,7 +2718,10 @@ template <PixelType T> class ImageView
                  std::same_as<remove_vector_t<T>, float>);
     /// <summary>
     /// Computes the gradients for each pixel using fixed Scharr filters. Output images are only computed if the
-    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: In contrast to Sobel and Prewitt variants, the Scharr-definition for the X (vertical) gradient filter
+    /// kernel is identical compared to the definition in FixedFilter::ScharrVert in order to obtain identical results
+    /// as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2692,7 +2740,9 @@ template <PixelType T> class ImageView
 
     /// <summary>
     /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
-    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: The definition for the X (vertical) gradient filter kernel is mirrored compared to the definition in
+    /// FixedFilter::PrewittVert in order to obtain identical results as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2710,7 +2760,9 @@ template <PixelType T> class ImageView
 
     /// <summary>
     /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
-    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: The definition for the X (vertical) gradient filter kernel is mirrored compared to the definition in
+    /// FixedFilter::PrewittVert in order to obtain identical results as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2728,7 +2780,9 @@ template <PixelType T> class ImageView
 
     /// <summary>
     /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
-    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: The definition for the X (vertical) gradient filter kernel is mirrored compared to the definition in
+    /// FixedFilter::PrewittVert in order to obtain identical results as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -2747,7 +2801,9 @@ template <PixelType T> class ImageView
 
     /// <summary>
     /// Computes the gradients for each pixel using fixed Prewitt filters. Output images are only computed if the
-    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.
+    /// provided pointer is not nullptr. If an output is set to nullptr, the result is skipped.<para/>
+    /// Note: The definition for the X (vertical) gradient filter kernel is mirrored compared to the definition in
+    /// FixedFilter::PrewittVert in order to obtain identical results as in NPP!
     /// </summary>
     /// <param name="aDstX">the X (vertical) gradient</param>
     /// <param name="aDstY">the Y (horizontal) gradient</param>
@@ -5001,6 +5057,26 @@ template <PixelType T> class ImageView
         requires RealVector<T>;
 #pragma endregion
 
+#pragma region MSSSIM
+
+    /// <summary>
+    /// Computes the Multi-Scale-SSIM of two images.
+    /// Note: This implementation differs slightly from NPP as the exact parameters used are unknown. Here we follow the
+    /// reference matlab implementation provided here: https://ece.uwaterloo.ca/~z70wang/research/ssim/. The only
+    /// difference is in the filtering steps for image borders where OPP applies replication.
+    /// </summary>
+    /// <param name="aSrc2">Second source image</param>
+    /// <param name="aDst">Per channel result</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aDynamicRange">The value range of the image. Typically this is 2^BitsPerPixel - 1.</param>
+    /// <param name="aK1">Stabilisation constant 1, Default=0.01</param>
+    /// <param name="aK2">Stabilisation constant 2, Default=0.03</param>
+    /// <param name="aStreamCtx"></param>
+    void MSSSIM(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst,
+                double aDynamicRange = 1.0, double aK1 = 0.01, double aK2 = 0.03) const
+        requires RealVector<T>;
+#pragma endregion
+
 #pragma region Min
     void Min(T &aDst, remove_vector_t<T> &aDstScalar) const
         requires RealVector<T> && (vector_active_size_v<T> > 1);
@@ -5147,6 +5223,34 @@ template <PixelType T> class ImageView
                      const same_vector_size_different_type_t<T, double> &aVal,
                      const same_vector_size_different_type_t<T, double> &aValSqr) const
         requires RealVector<T>;
+
+    /// <summary>
+    /// Computes the standard deviation from integral square images.
+    /// </summary>
+    void RectStdDev(ImageView<same_vector_size_different_type_t<T, int>> &aSqr,
+                    ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea) const
+        requires(std::same_as<remove_vector_t<T>, int>) && NoAlpha<T>;
+
+    /// <summary>
+    /// Computes the standard deviation from integral square images.
+    /// </summary>
+    void RectStdDev(ImageView<same_vector_size_different_type_t<T, long64>> &aSqr,
+                    ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea) const
+        requires(std::same_as<remove_vector_t<T>, int>) && NoAlpha<T>;
+
+    /// <summary>
+    /// Computes the standard deviation from integral square images.
+    /// </summary>
+    void RectStdDev(ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
+                    ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea) const
+        requires(std::same_as<remove_vector_t<T>, float>) && NoAlpha<T>;
+
+    /// <summary>
+    /// Computes the standard deviation from integral square images.
+    /// </summary>
+    void RectStdDev(ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
+                    ImageView<same_vector_size_different_type_t<T, double>> &aDst, const FilterArea &aFilterArea) const
+        requires(std::same_as<remove_vector_t<T>, double>) && NoAlpha<T>;
 #pragma endregion
 
 #pragma region Histogram

@@ -16,8 +16,8 @@
 #include <backends/npp/image/image16u.h>       // NOLINT(misc-include-cleaner)
 #include <backends/npp/image/image16uC1View.h> // NOLINT(misc-include-cleaner)
 #include <backends/npp/image/image32f.h>       // NOLINT(misc-include-cleaner)
-#include <backends/npp/image/image32fc.h>
 #include <backends/npp/image/image32fC1View.h> // NOLINT(misc-include-cleaner)
+#include <backends/npp/image/image32fc.h>
 #include <backends/npp/image/image32s.h> // NOLINT(misc-include-cleaner)
 #include <backends/npp/image/image64f.h>
 #include <backends/npp/image/image8u.h>       // NOLINT(misc-include-cleaner)
@@ -51,6 +51,23 @@ using namespace opp::image::cuda;
 namespace nv  = opp::image::npp;
 namespace cpu = opp::image::cpuSimple;
 
+void print(cpu::Image<Pixel32fC1> &img)
+{
+    const int startX = 6;
+    const int endX   = 8;
+    const int startY = startX;
+    const int endY   = endX;
+
+    for (int y = startY; y <= endY; y++)
+    {
+        for (int x = startX; x <= endX; x++)
+        {
+            std::cout << img(x, y).x << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
 int main()
 {
     try
@@ -59,36 +76,32 @@ int main()
 
         constexpr size_t iterations = 100;
         constexpr size_t repeats    = 10; /**/
-        constexpr int imgWidth      = 256 * 1;
-        constexpr int imgHeight     = 256 * 1;
+        constexpr int imgWidth      = 16 * 1;
+        constexpr int imgHeight     = 16 * 1;
         // constexpr int sizeTpl       = 16;
         //  INT_MAX / 1024 / 256 + 1;
 
         std::cout << "Hello world! This is " << OPP_PROJECT_NAME << " version " << OPP_VERSION << "!" << std::endl;
 
-        // cpu::Image<Pixel8uC1> cpu_src1(imgWidth, imgHeight);
+        cpu::Image<Pixel32fC1> cpu_src1(imgWidth, imgHeight);
         //                       cpu::ImageView<Pixel8u3> cpu_src1A(cpu_src1);
         /*cpu::Image<Pixel8uC1> cpu_src1 =
             cpu::Image<Pixel8uC1>::Load("C:\\Users\\kunz_\\source\\repos\\oppV1\\opp\\test\\testData\\bird256bw.tif");
         cpu::Image<Pixel8uC1> cpu_src2 = cpu::Image<Pixel8uC1>::Load(
-            "C:\\Users\\kunz_\\source\\repos\\oppV1\\opp\\test\\testData\\bird256bwnoisy.tif");*/
-        cpu::Image<Pixel8uC1> cpu_src1 = cpu::Image<Pixel8uC1>::Load("F:\\ogpp\\muster.tif");
-        cpu::Image<Pixel8uC1> cpu_tpl  = cpu::Image<Pixel8uC1>::Load("F:\\ogpp\\template.tif");
-        cpu::Image<Pixel8uC1> cpu_dst(imgWidth, imgHeight);
-        cpu::Image<Pixel8uC1> cpu_temp(imgWidth, imgHeight);
+            "C:\\Users\\kunz_\\source\\repos\\oppV1\\opp\\test\\testData\\bird256bwnoisy.tif");
+        cpu::Image<Pixel8uC1> cpu_src1 = cpu::Image<Pixel8uC1>::Load("F:\\ogpp\\muster.tif");*/
+        cpu::Image<Pixel32fC1> cpu_dst(imgWidth, imgHeight);
+        cpu::Image<Pixel32fC1> res_npp(imgWidth, imgHeight);
+        cpu::Image<Pixel32fC1> res_opp(imgWidth, imgHeight);
 
-        Image<Pixel8uC1> opp_src1(imgWidth, imgHeight);
-        Image<Pixel8uC1> opp_tpl(16, 16);
-        Image<Pixel8uC1> opp_temp(imgWidth, imgHeight);
-        Image<Pixel8uC1> opp_dst(imgWidth, imgHeight);
-        Image<Pixel32fC2> opp_sqr(imgWidth, imgHeight);
-        DevVar<Pixel64fC1> meanTpl(1);
-        DevVar<Pixel8uC1> opp_tpl2(16 * 16);
+        Image<Pixel32fC1> opp_src1(imgWidth, imgHeight);
+        Image<Pixel32fC1> opp_dst(imgWidth, imgHeight);
 
-        nv::Image8uC1 npp_src1(imgWidth, imgHeight);
-        nv::Image8uC1 npp_tpl(16, 16);
-        nv::Image8uC1 npp_dst(imgWidth, imgHeight);
-        DevVar<byte> npp_tpl2(16 * 16);
+        nv::Image32fC1 npp_src1(imgWidth, imgHeight);
+        nv::Image32fC1 npp_dst(imgWidth, imgHeight);
+
+        cpu_src1.Set(0);
+        cpu_src1(7, 7) = 1;
 
         /*cpu_src1.SetRoi(Roi(116, 65, sizeTpl, sizeTpl));
         cpu_src1.Copy(cpu_tpl);
@@ -158,18 +171,12 @@ int main()
         StreamCtx oppCtx = StreamCtxSingleton::Get();
 
         cpu_src1 >> npp_src1;
-        cpu_tpl >> npp_tpl;
 
         cpu_src1 >> opp_src1;
-        cpu_tpl >> opp_tpl;
 
-        opp_tpl2 << cpu_tpl.Pointer();
-        npp_tpl2 << cpu_tpl.Pointer();
         //  cpu_mask >> opp_mask;
         //  cpu_mask >> npp_mask;
 
-        DevVar<byte> buffer1(opp_tpl.MeanBufferSize(oppCtx));
-        DevVar<byte> buffer2(npp_src1.MorphGetBufferSize());
         /*DevVar<byte> bufferMean(opp_tpl.MeanBufferSize(oppCtx));*/
         // DevVar<byte> bufferSSIM(opp_src1.SqrIntegralBufferSize(opp_dstSum, opp_dstSqr, oppCtx));
 
@@ -243,9 +250,9 @@ int main()
         // opp_tpl2.Div(Pixel32fC1(255), oppCtx);
         // opp_src2.Div(Pixel32fC1(255), oppCtx);
 
-        opp_src1.BlackHat(opp_temp, opp_dst, opp_tpl2, 16, BorderType::Replicate, oppCtx);
-        npp_src1.MorphBlackHatBorder(npp_dst, npp_tpl2, {16, 16}, {8, 8}, buffer2, NPP_BORDER_REPLICATE, nppCtx);
-        cpu_src1.BlackHat(cpu_temp, cpu_dst, cpu_tpl.Pointer(), 16, BorderType::Replicate);
+        opp_src1.FixedFilter(opp_dst, FixedFilter::PrewittVert, MaskSize::Mask_3x3, BorderType::Replicate, oppCtx);
+        cpu_src1.FixedFilter(cpu_dst, FixedFilter::PrewittVert, MaskSize::Mask_3x3, BorderType::Replicate);
+        npp_src1.FilterPrewittVertBorder(npp_dst, NPP_BORDER_REPLICATE, nppCtx);
 
         // npp_src1.MSSSIM(npp_src2, mssim, bufferSSIM, nppCtx);
         // npp_src1.WMSSSIM(npp_src2, wmssim, bufferSSIM, nppCtx);
@@ -297,11 +304,17 @@ int main()
         cpu_dstAngle.Save("f:\\crossCorrOpp.tif");*/
 
         // cpu_src1.Save("f:\\lowpassOrig.tif");
-        cpu_dst.Save("f:\\filterbhCpu.tif");
+        std::cout << std::endl << "Res CPU: " << std::endl;
+        print(cpu_dst);
+        cpu_dst.Save("f:\\filterCpu.tif");
         cpu_dst << opp_dst;
-        cpu_dst.Save("f:\\filterbhOpp.tif");
+        std::cout << std::endl << "Res OPP: " << std::endl;
+        print(cpu_dst);
+        cpu_dst.Save("f:\\filterOpp.tif");
         cpu_dst << npp_dst;
-        cpu_dst.Save("f:\\filterbhNpp.tif"); /**/
+        std::cout << std::endl << "Res NPP: " << std::endl;
+        print(cpu_dst);
+        cpu_dst.Save("f:\\filterNpp.tif"); /**/
 
         std::vector<float> runtimeOPP(iterations);
         std::vector<float> runtimeNPP(iterations);
@@ -322,10 +335,10 @@ int main()
             startIterOPP.Record();
             for (size_t r = 0; r < repeats; r++)
             {
-                /*opp_tpl.Mean(tempvar, bufferMean, oppCtx);
-                opp_src1.BoxAndSumSquareFilter(opp_boxFiltered, sizeTpl, BorderType::Constant, {0}, Roi(), oppCtx);
-                opp_src1.CrossCorrelationCoefficient(opp_boxFiltered, opp_tpl, meanTpl, opp_dstAngle,
-                                                     BorderType::Constant, {0}, Roi(), oppCtx); */
+                // opp_src1.BoxAndSumSquareFilter(opp_sqr, 16, BorderType::Replicate, oppCtx);
+                // opp_tpl.Mean(meanTpl, buffer1, oppCtx);
+                // opp_src1.CrossCorrelationCoefficient(opp_sqr, opp_tpl, meanTpl, opp_dst, 16, BorderType::Replicate,
+                //                                     oppCtx); /**/
                 // opp_src1.SqrIntegral(opp_dstSum, opp_dstSqr, 0, 0, bufferSSIM, oppCtx);
                 // opp_dstStd.SetRoi(Roi(0, 0, imgWidth - filterSize, imgHeight - filterSize));
                 //  opp_dstSum.RectStdDev(opp_dstSqr, opp_dstStd, FilterArea(filterSize, 0), oppCtx);
@@ -368,6 +381,8 @@ int main()
                 // npp_dstSum.ResetRoi();
                 // npp_dstSqr.ResetRoi();
                 // npp_dstStd.ResetRoi();
+
+                // npp_src1.CrossCorrSame_NormLevelAdvanced(npp_tpl, npp_dst, buffer2, buffer3, nppCtx);
             }
             endIterNPP.Record();
             endIterNPP.Synchronize();
