@@ -1,22 +1,171 @@
 add_library(backends.cuda.image.dataExchangeAndInit 
-	convert.cu
+	8s/convert.cu	
+	8s/copy.cu
+	8s/copyBorder.cu
+	8s/copyMasked.cu
+	8s/copySubpix.cu	
+	8s/dup.cu
+	8s/scale.cu
+	8s/set.cu
+	8s/setChannel.cu
+	8s/setMasked.cu
+	8s/swapChannel.cu
+	8s/transpose.cu
 	
-	copy.cu
-	copyBorder.cu
-	copyMasked.cu
-	copySubpix.cu
+	8u/convert.cu	
+	8u/copy.cu
+	8u/copyBorder.cu
+	8u/copyMasked.cu
+	8u/copySubpix.cu	
+	8u/dup.cu
+	8u/scale.cu
+	8u/set.cu
+	8u/setChannel.cu
+	8u/setMasked.cu
+	8u/swapChannel.cu
+	8u/transpose.cu
 	
-	dup.cu
-
-	scale.cu
-
-	set.cu
-	setChannel.cu
-	setMasked.cu
-
-	swapChannel.cu
-
-	transpose.cu
+	16s/convert.cu	
+	16s/copy.cu
+	16s/copyBorder.cu
+	16s/copyMasked.cu
+	16s/copySubpix.cu	
+	16s/dup.cu
+	16s/scale.cu
+	16s/set.cu
+	16s/setChannel.cu
+	16s/setMasked.cu
+	16s/swapChannel.cu
+	16s/transpose.cu
+	
+	16u/convert.cu	
+	16u/copy.cu
+	16u/copyBorder.cu
+	16u/copyMasked.cu
+	16u/copySubpix.cu	
+	16u/dup.cu
+	16u/scale.cu
+	16u/set.cu
+	16u/setChannel.cu
+	16u/setMasked.cu
+	16u/swapChannel.cu
+	16u/transpose.cu
+	
+	32s/convert.cu	
+	32s/copy.cu
+	32s/copyBorder.cu
+	32s/copyMasked.cu
+	32s/copySubpix.cu	
+	32s/dup.cu
+	32s/scale.cu
+	32s/set.cu
+	32s/setChannel.cu
+	32s/setMasked.cu
+	32s/swapChannel.cu
+	32s/transpose.cu
+	
+	32u/convert.cu	
+	32u/copy.cu
+	32u/copyBorder.cu
+	32u/copyMasked.cu
+	32u/copySubpix.cu	
+	32u/dup.cu
+	32u/scale.cu
+	32u/set.cu
+	32u/setChannel.cu
+	32u/setMasked.cu
+	32u/swapChannel.cu
+	32u/transpose.cu
+	
+	16f/convert.cu	
+	16f/copy.cu
+	16f/copyBorder.cu
+	16f/copyMasked.cu
+	16f/copySubpix.cu	
+	16f/dup.cu
+	16f/scale.cu
+	16f/set.cu
+	16f/setChannel.cu
+	16f/setMasked.cu
+	16f/swapChannel.cu
+	16f/transpose.cu
+	
+	16bf/convert.cu	
+	16bf/copy.cu
+	16bf/copyBorder.cu
+	16bf/copyMasked.cu
+	16bf/copySubpix.cu	
+	16bf/dup.cu
+	16bf/scale.cu
+	16bf/set.cu
+	16bf/setChannel.cu
+	16bf/setMasked.cu
+	16bf/swapChannel.cu
+	16bf/transpose.cu
+	
+	32f/convert.cu	
+	32f/copy.cu
+	32f/copyBorder.cu
+	32f/copyMasked.cu
+	32f/copySubpix.cu	
+	32f/dup.cu
+	32f/scale.cu
+	32f/set.cu
+	32f/setChannel.cu
+	32f/setMasked.cu
+	32f/swapChannel.cu
+	32f/transpose.cu
+	
+	64f/convert.cu	
+	64f/copy.cu
+	64f/copyBorder.cu
+	64f/copyMasked.cu
+	64f/copySubpix.cu	
+	64f/dup.cu
+	64f/scale.cu
+	64f/set.cu
+	64f/setChannel.cu
+	64f/setMasked.cu
+	64f/swapChannel.cu
+	64f/transpose.cu
+	
+	16sc/convert.cu	
+	16sc/copy.cu
+	16sc/copyBorder.cu
+	16sc/copyMasked.cu
+	16sc/copySubpix.cu	
+	16sc/dup.cu
+	16sc/set.cu
+	16sc/setChannel.cu
+	16sc/setMasked.cu
+	16sc/swapChannel.cu
+	16sc/transpose.cu
+	
+	32sc/convert.cu	
+	32sc/copy.cu
+	32sc/copyBorder.cu
+	32sc/copyMasked.cu
+	32sc/copySubpix.cu	
+	32sc/dup.cu
+	32sc/set.cu
+	32sc/setChannel.cu
+	32sc/setMasked.cu
+	32sc/swapChannel.cu
+	32sc/transpose.cu
+	
+	32fc/convert.cu	
+	32fc/copy.cu
+	32fc/copyBorder.cu
+	32fc/copyMasked.cu
+	32fc/copySubpix.cu	
+	32fc/dup.cu
+	32fc/set.cu
+	32fc/setChannel.cu
+	32fc/setMasked.cu
+	32fc/swapChannel.cu
+	32fc/transpose.cu
+	
+	64s/transpose.cu
 	)
 	
 target_include_directories(backends.cuda.image.dataExchangeAndInit  PUBLIC 

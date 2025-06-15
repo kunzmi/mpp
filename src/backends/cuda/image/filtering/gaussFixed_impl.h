@@ -640,5 +640,27 @@ void InvokeGaussFixed(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t a
     }
 }
 
+#pragma region Instantiate
+
+#define Instantiate_For(typeSrcIsTypeDst)                                                                              \
+    template void InvokeGaussFixed<typeSrcIsTypeDst, typeSrcIsTypeDst>(                                                \
+        const typeSrcIsTypeDst *aSrc1, size_t aPitchSrc1, typeSrcIsTypeDst *aDst, size_t aPitchDst,                    \
+        MaskSize aMaskSize, BorderType aBorderType, const typeSrcIsTypeDst &aConstant,                                 \
+        const Size2D &aAllowedReadRoiSize, const Vector2<int> &aOffsetToActualRoi, const Size2D &aSize,                \
+        const StreamCtx &aStreamCtx);
+
+#define ForAllChannelsNoAlpha(type)                                                                                    \
+    Instantiate_For(Pixel##type##C1);                                                                                  \
+    Instantiate_For(Pixel##type##C2);                                                                                  \
+    Instantiate_For(Pixel##type##C3);                                                                                  \
+    Instantiate_For(Pixel##type##C4);
+
+#define ForAllChannelsWithAlpha(type)                                                                                  \
+    Instantiate_For(Pixel##type##C1);                                                                                  \
+    Instantiate_For(Pixel##type##C2);                                                                                  \
+    Instantiate_For(Pixel##type##C3);                                                                                  \
+    Instantiate_For(Pixel##type##C4);                                                                                  \
+    Instantiate_For(Pixel##type##C4A);
+#pragma endregion
 } // namespace opp::image::cuda
 #endif // OPP_ENABLE_CUDA_BACKEND

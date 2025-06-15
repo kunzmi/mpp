@@ -2824,6 +2824,55 @@ template <PixelType T> class ImageView
                          const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi,
                          const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const;
 
+    /// <summary>
+    /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
+    /// Note that the filter is applied in "cross-correlation orientation" and not in "convolution orientation", i.e.
+    /// the filter has the same orientation as the image (same behavior as in Matlab, mirrored filter as compared to
+    /// NPP).
+    /// </summary>
+    ImageView<alternative_filter_output_type_for_t<T>> &Filter(
+        ImageView<alternative_filter_output_type_for_t<T>> &aDst,
+        const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+        const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(has_alternative_filter_output_type_for_v<T>);
+    /// <summary>
+    /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
+    /// Note that the filter is applied in "cross-correlation orientation" and not in "convolution orientation", i.e.
+    /// the filter has the same orientation as the image (same behavior as in Matlab, mirrored filter as compared to
+    /// NPP).
+    /// </summary>
+    ImageView<alternative_filter_output_type_for_t<T>> &Filter(
+        ImageView<alternative_filter_output_type_for_t<T>> &aDst,
+        const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+        const FilterArea &aFilterArea, BorderType aBorder,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(has_alternative_filter_output_type_for_v<T>);
+
+    /// <summary>
+    /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
+    /// Note that the filter is applied in "cross-correlation orientation" and not in "convolution orientation", i.e.
+    /// the filter has the same orientation as the image (same behavior as in Matlab, mirrored filter as compared to
+    /// NPP).
+    /// </summary>
+    ImageView<alternative_filter_output_type_for_t<T>> &Filter(
+        ImageView<alternative_filter_output_type_for_t<T>> &aDst,
+        const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+        const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(has_alternative_filter_output_type_for_v<T>);
+    /// <summary>
+    /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
+    /// Note that the filter is applied in "cross-correlation orientation" and not in "convolution orientation", i.e.
+    /// the filter has the same orientation as the image (same behavior as in Matlab, mirrored filter as compared to
+    /// NPP).
+    /// </summary>
+    ImageView<alternative_filter_output_type_for_t<T>> &Filter(
+        ImageView<alternative_filter_output_type_for_t<T>> &aDst,
+        const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
+        const FilterArea &aFilterArea, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+        const opp::cuda::StreamCtx &aStreamCtx = opp::cuda::StreamCtxSingleton::Get()) const
+        requires(has_alternative_filter_output_type_for_v<T>);
 #pragma endregion
 #pragma region Bilateral Gauss Filter
     /// <summary>

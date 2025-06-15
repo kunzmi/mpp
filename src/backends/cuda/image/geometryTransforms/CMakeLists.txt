@@ -1,37 +1,73 @@
 add_library(backends.cuda.image.geometryTransforms 
-	affineBack_part1.cu
-	affineBack_part2.cu
-	affineBack_part3.cu
-	affineBack_part4.cu
-	affineBack_P2.cu
-	affineBack_P3.cu
-	affineBack_P4.cu
+	8s/affineBack.cu
+	8u/affineBack.cu
+	16s/affineBack.cu
+	16u/affineBack.cu
+	32s/affineBack.cu
+	32u/affineBack.cu
+	16f/affineBack.cu
+	16bf/affineBack.cu
+	32f/affineBack.cu
+	64f/affineBack.cu
+	16sc/affineBack.cu
+	32sc/affineBack.cu
+	32fc/affineBack.cu
+	
+	8s/mirror.cu
+	8u/mirror.cu
+	16s/mirror.cu
+	16u/mirror.cu
+	32s/mirror.cu
+	32u/mirror.cu
+	16f/mirror.cu
+	16bf/mirror.cu
+	32f/mirror.cu
+	64f/mirror.cu
+	16sc/mirror.cu
+	32sc/mirror.cu
+	32fc/mirror.cu
+	
+	8s/perspectiveBack.cu
+	8u/perspectiveBack.cu
+	16s/perspectiveBack.cu
+	16u/perspectiveBack.cu
+	32s/perspectiveBack.cu
+	32u/perspectiveBack.cu
+	16f/perspectiveBack.cu
+	16bf/perspectiveBack.cu
+	32f/perspectiveBack.cu
+	64f/perspectiveBack.cu
+	16sc/perspectiveBack.cu
+	32sc/perspectiveBack.cu
+	32fc/perspectiveBack.cu
+	
+	8s/remap.cu
+	8u/remap.cu
+	16s/remap.cu
+	16u/remap.cu
+	32s/remap.cu
+	32u/remap.cu
+	16f/remap.cu
+	16bf/remap.cu
+	32f/remap.cu
+	64f/remap.cu
+	16sc/remap.cu
+	32sc/remap.cu
+	32fc/remap.cu
 
-	mirror.cu
-	
-	perspectiveBack_part1.cu
-	perspectiveBack_part2.cu
-	perspectiveBack_part3.cu
-	perspectiveBack_part4.cu
-	perspectiveBack_P2.cu
-	perspectiveBack_P3.cu
-	perspectiveBack_P4.cu
-	
-	remap_part1.cu
-	remap_part2.cu
-	remap_part3.cu
-	remap_part4.cu
-	remap_P2.cu
-	remap_P3.cu
-	remap_P4.cu
-	
-	resize_part1.cu
-	resize_part2.cu
-	resize_part3.cu
-	resize_part4.cu
-	resize_P2.cu
-	resize_P3.cu
-	resize_P4.cu
+	8s/resize.cu
+	8u/resize.cu
+	16s/resize.cu
+	16u/resize.cu
+	32s/resize.cu
+	32u/resize.cu
+	16f/resize.cu
+	16bf/resize.cu
+	32f/resize.cu
+	64f/resize.cu
+	16sc/resize.cu
+	32sc/resize.cu
+	32fc/resize.cu
 	)
 	
 target_include_directories(backends.cuda.image.geometryTransforms  PUBLIC 

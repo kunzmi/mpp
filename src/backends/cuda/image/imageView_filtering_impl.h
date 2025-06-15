@@ -982,6 +982,85 @@ ImageView<T> &ImageView<T>::Filter(ImageView<T> &aDst,
     return aDst;
 }
 
+template <PixelType T>
+ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::Filter(
+    ImageView<alternative_filter_output_type_for_t<T>> &aDst,
+    const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter, const FilterArea &aFilterArea,
+    BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx) const
+    requires(has_alternative_filter_output_type_for_v<T>)
+{
+    return this->Filter(aDst, aFilter, aFilterArea, {0}, aBorder, ROI(), aStreamCtx);
+}
+
+template <PixelType T>
+ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::Filter(
+    ImageView<alternative_filter_output_type_for_t<T>> &aDst,
+    const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter, const FilterArea &aFilterArea,
+    T aConstant, BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx) const
+    requires(has_alternative_filter_output_type_for_v<T>)
+{
+    return this->Filter(aDst, aFilter, aFilterArea, aConstant, aBorder, ROI(), aStreamCtx);
+}
+
+template <PixelType T>
+ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::Filter(
+    ImageView<alternative_filter_output_type_for_t<T>> &aDst,
+    const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter, const FilterArea &aFilterArea,
+    BorderType aBorder, const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx) const
+    requires(has_alternative_filter_output_type_for_v<T>)
+{
+    if (aBorder == BorderType::Constant)
+    {
+        throw INVALIDARGUMENT(aBorder,
+                              "When using BorderType::Constant, the constant value aConstant must be provided.");
+    }
+    return this->Filter(aDst, aFilter, aFilterArea, {0}, aBorder, aAllowedReadRoi, aStreamCtx);
+}
+
+template <PixelType T>
+ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::Filter(
+    ImageView<alternative_filter_output_type_for_t<T>> &aDst,
+    const opp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter, const FilterArea &aFilterArea,
+    T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx) const
+    requires(has_alternative_filter_output_type_for_v<T>)
+{
+    checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
+
+    const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
+    const T *allowedPtr          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
+
+    if (aFilterArea.Size == Vec2i{3, 3})
+    {
+        InvokeFixedSizeFilter(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aFilter.Pointer(),
+                              MaskSize::Mask_3x3, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
+                              roiOffset, SizeRoi(), aStreamCtx);
+    }
+    else if (aFilterArea.Size == Vec2i{5, 5})
+    {
+        InvokeFixedSizeFilter(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aFilter.Pointer(),
+                              MaskSize::Mask_5x5, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
+                              roiOffset, SizeRoi(), aStreamCtx);
+    }
+    else if (aFilterArea.Size == Vec2i{7, 7})
+    {
+        InvokeFixedSizeFilter(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aFilter.Pointer(),
+                              MaskSize::Mask_7x7, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
+                              roiOffset, SizeRoi(), aStreamCtx);
+    }
+    else if (aFilterArea.Size == Vec2i{9, 9})
+    {
+        InvokeFixedSizeFilter(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aFilter.Pointer(),
+                              MaskSize::Mask_9x9, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
+                              roiOffset, SizeRoi(), aStreamCtx);
+    }
+    else
+    {
+        InvokeFilter(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aFilter.Pointer(), aFilterArea, aBorder,
+                     aConstant, aAllowedReadRoi.Size(), roiOffset, SizeRoi(), aStreamCtx);
+    }
+
+    return aDst;
+}
 #pragma endregion
 
 #pragma region Bilateral Gauss Filter

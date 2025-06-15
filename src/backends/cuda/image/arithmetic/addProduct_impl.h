@@ -1,0 +1,74 @@
+#if OPP_ENABLE_CUDA_BACKEND
+
+#include "addProduct.h"
+#include "addSquareProductWeightedOutputType.h"
+#include <backends/cuda/image/configurations.h>
+#include <backends/cuda/image/forEachPixelKernel.h>
+#include <backends/cuda/streamCtx.h>
+#include <backends/cuda/templateRegistry.h>
+#include <common/arithmetic/ternary_operators.h>
+#include <common/defines.h>
+#include <common/image/functors/inplaceSrcSrcFunctor.h>
+#include <common/image/pixelTypeEnabler.h>
+#include <common/image/pixelTypes.h>
+#include <common/image/size2D.h>
+#include <common/image/threadSplit.h>
+#include <common/opp_defs.h>
+#include <common/safeCast.h>
+#include <common/tupel.h>
+#include <common/vectorTypes.h>
+#include <cuda_runtime.h>
+
+using namespace opp::cuda;
+
+namespace opp::image::cuda
+{
+template <typename SrcT, typename ComputeT, typename DstT>
+void InvokeAddProductInplaceSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2,
+                                   DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize,
+                                   const opp::cuda::StreamCtx &aStreamCtx)
+{
+    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    {
+        OPP_CUDA_REGISTER_TEMPALTE;
+
+        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+        using addProductInplaceSrcSrc =
+            InplaceSrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AddProduct<ComputeT>, RoundingMode::None>;
+
+        const opp::AddProduct<ComputeT> op;
+
+        const addProductInplaceSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, addProductInplaceSrcSrc>(aSrcDst, aPitchSrcDst, aSize,
+                                                                                  aStreamCtx, functor);
+    }
+}
+
+#pragma region Instantiate
+// using add_spw_output_for_t for computeT and DstT
+#define Instantiate_For(typeSrc)                                                                                       \
+    template void                                                                                                      \
+    InvokeAddProductInplaceSrcSrc<typeSrc, add_spw_output_for_t<typeSrc>, add_spw_output_for_t<typeSrc>>(              \
+        const typeSrc *aSrc1, size_t aPitchSrc1, const typeSrc *aSrc2, size_t aPitchSrc2,                              \
+        add_spw_output_for_t<typeSrc> *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize,                              \
+        const StreamCtx &aStreamCtx);
+
+#define ForAllChannelsNoAlpha(type)                                                                                    \
+    Instantiate_For(Pixel##type##C1);                                                                                  \
+    Instantiate_For(Pixel##type##C2);                                                                                  \
+    Instantiate_For(Pixel##type##C3);                                                                                  \
+    Instantiate_For(Pixel##type##C4);
+
+#define ForAllChannelsWithAlpha(type)                                                                                  \
+    Instantiate_For(Pixel##type##C1);                                                                                  \
+    Instantiate_For(Pixel##type##C2);                                                                                  \
+    Instantiate_For(Pixel##type##C3);                                                                                  \
+    Instantiate_For(Pixel##type##C4);                                                                                  \
+    Instantiate_For(Pixel##type##C4A);
+
+#pragma endregion
+
+} // namespace opp::image::cuda
+#endif // OPP_ENABLE_CUDA_BACKEND

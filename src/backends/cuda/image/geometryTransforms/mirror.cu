@@ -84,45 +84,45 @@ void InvokeMirrorSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aP
 
 #pragma region Instantiate
 
-#define Instantiate_For(typeSrc)                                                                                       \
+#define InstantiateInvokeMirrorSrc_For(typeSrc)                                                                        \
     template void InvokeMirrorSrc<typeSrc>(const typeSrc *aSrc1, size_t aPitchSrc1, typeSrc *aDst, size_t aPitchDst,   \
                                            MirrorAxis aAxis, const Size2D &aSize,                                      \
                                            const opp::cuda::StreamCtx &aStreamCtx);
 
-#define ForAllChannelsNoAlpha(type)                                                                                    \
-    Instantiate_For(Pixel##type##C1);                                                                                  \
-    Instantiate_For(Pixel##type##C2);                                                                                  \
-    Instantiate_For(Pixel##type##C3);                                                                                  \
-    Instantiate_For(Pixel##type##C4);
+#define ForAllChannelsNoAlphaInvokeMirrorSrc(type)                                                                     \
+    InstantiateInvokeMirrorSrc_For(Pixel##type##C1);                                                                   \
+    InstantiateInvokeMirrorSrc_For(Pixel##type##C2);                                                                   \
+    InstantiateInvokeMirrorSrc_For(Pixel##type##C3);                                                                   \
+    InstantiateInvokeMirrorSrc_For(Pixel##type##C4);
 
-#define ForAllChannelsWithAlpha(type)                                                                                  \
-    Instantiate_For(Pixel##type##C1);                                                                                  \
-    Instantiate_For(Pixel##type##C2);                                                                                  \
-    Instantiate_For(Pixel##type##C3);                                                                                  \
-    Instantiate_For(Pixel##type##C4);                                                                                  \
-    Instantiate_For(Pixel##type##C4A);
+#define ForAllChannelsWithAlphaInvokeMirrorSrc(type)                                                                   \
+    InstantiateInvokeMirrorSrc_For(Pixel##type##C1);                                                                   \
+    InstantiateInvokeMirrorSrc_For(Pixel##type##C2);                                                                   \
+    InstantiateInvokeMirrorSrc_For(Pixel##type##C3);                                                                   \
+    InstantiateInvokeMirrorSrc_For(Pixel##type##C4);                                                                   \
+    InstantiateInvokeMirrorSrc_For(Pixel##type##C4A);
 
-ForAllChannelsWithAlpha(8u);
-ForAllChannelsWithAlpha(8s);
+ForAllChannelsWithAlphaInvokeMirrorSrc(8u);
+ForAllChannelsWithAlphaInvokeMirrorSrc(8s);
 
-ForAllChannelsWithAlpha(16u);
-ForAllChannelsWithAlpha(16s);
+ForAllChannelsWithAlphaInvokeMirrorSrc(16u);
+ForAllChannelsWithAlphaInvokeMirrorSrc(16s);
 
-ForAllChannelsWithAlpha(32u);
-ForAllChannelsWithAlpha(32s);
+ForAllChannelsWithAlphaInvokeMirrorSrc(32u);
+ForAllChannelsWithAlphaInvokeMirrorSrc(32s);
 
-ForAllChannelsWithAlpha(16f);
-ForAllChannelsWithAlpha(16bf);
-ForAllChannelsWithAlpha(32f);
-ForAllChannelsWithAlpha(64f);
+ForAllChannelsWithAlphaInvokeMirrorSrc(16f);
+ForAllChannelsWithAlphaInvokeMirrorSrc(16bf);
+ForAllChannelsWithAlphaInvokeMirrorSrc(32f);
+ForAllChannelsWithAlphaInvokeMirrorSrc(64f);
 
-ForAllChannelsNoAlpha(16sc);
-ForAllChannelsNoAlpha(32sc);
-ForAllChannelsNoAlpha(32fc);
+ForAllChannelsNoAlphaInvokeMirrorSrc(16sc);
+ForAllChannelsNoAlphaInvokeMirrorSrc(32sc);
+ForAllChannelsNoAlphaInvokeMirrorSrc(32fc);
 
-#undef Instantiate_For
-#undef ForAllChannelsWithAlpha
-#undef ForAllChannelsNoAlpha
+#undef InstantiateInvokeMirrorSrc_For
+#undef ForAllChannelsWithAlphaInvokeMirrorSrc
+#undef ForAllChannelsNoAlphaInvokeMirrorSrc
 #pragma endregion
 
 template <typename SrcT>
@@ -195,44 +195,44 @@ void InvokeMirrorInplace(SrcT *aSrcDst, size_t aPitchSrcDst, MirrorAxis aAxis, c
 
 #pragma region Instantiate
 
-#define Instantiate_For(typeSrc)                                                                                       \
+#define InstantiateInvokeMirrorInplace_For(typeSrc)                                                                    \
     template void InvokeMirrorInplace<typeSrc>(typeSrc * aSrcDst, size_t aPitchSrcDst, MirrorAxis aAxis,               \
                                                const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx);
 
-#define ForAllChannelsNoAlpha(type)                                                                                    \
-    Instantiate_For(Pixel##type##C1);                                                                                  \
-    Instantiate_For(Pixel##type##C2);                                                                                  \
-    Instantiate_For(Pixel##type##C3);                                                                                  \
-    Instantiate_For(Pixel##type##C4);
+#define ForAllChannelsNoAlphaInvokeMirrorInplace(type)                                                                 \
+    InstantiateInvokeMirrorInplace_For(Pixel##type##C1);                                                               \
+    InstantiateInvokeMirrorInplace_For(Pixel##type##C2);                                                               \
+    InstantiateInvokeMirrorInplace_For(Pixel##type##C3);                                                               \
+    InstantiateInvokeMirrorInplace_For(Pixel##type##C4);
 
-#define ForAllChannelsWithAlpha(type)                                                                                  \
-    Instantiate_For(Pixel##type##C1);                                                                                  \
-    Instantiate_For(Pixel##type##C2);                                                                                  \
-    Instantiate_For(Pixel##type##C3);                                                                                  \
-    Instantiate_For(Pixel##type##C4);                                                                                  \
-    Instantiate_For(Pixel##type##C4A);
+#define ForAllChannelsWithAlphaInvokeMirrorInplace(type)                                                               \
+    InstantiateInvokeMirrorInplace_For(Pixel##type##C1);                                                               \
+    InstantiateInvokeMirrorInplace_For(Pixel##type##C2);                                                               \
+    InstantiateInvokeMirrorInplace_For(Pixel##type##C3);                                                               \
+    InstantiateInvokeMirrorInplace_For(Pixel##type##C4);                                                               \
+    InstantiateInvokeMirrorInplace_For(Pixel##type##C4A);
 
-ForAllChannelsWithAlpha(8u);
-ForAllChannelsWithAlpha(8s);
+ForAllChannelsWithAlphaInvokeMirrorInplace(8u);
+ForAllChannelsWithAlphaInvokeMirrorInplace(8s);
 
-ForAllChannelsWithAlpha(16u);
-ForAllChannelsWithAlpha(16s);
+ForAllChannelsWithAlphaInvokeMirrorInplace(16u);
+ForAllChannelsWithAlphaInvokeMirrorInplace(16s);
 
-ForAllChannelsWithAlpha(32u);
-ForAllChannelsWithAlpha(32s);
+ForAllChannelsWithAlphaInvokeMirrorInplace(32u);
+ForAllChannelsWithAlphaInvokeMirrorInplace(32s);
 
-ForAllChannelsWithAlpha(16f);
-ForAllChannelsWithAlpha(16bf);
-ForAllChannelsWithAlpha(32f);
-ForAllChannelsWithAlpha(64f);
+ForAllChannelsWithAlphaInvokeMirrorInplace(16f);
+ForAllChannelsWithAlphaInvokeMirrorInplace(16bf);
+ForAllChannelsWithAlphaInvokeMirrorInplace(32f);
+ForAllChannelsWithAlphaInvokeMirrorInplace(64f);
 
-ForAllChannelsNoAlpha(16sc);
-ForAllChannelsNoAlpha(32sc);
-ForAllChannelsNoAlpha(32fc);
+ForAllChannelsNoAlphaInvokeMirrorInplace(16sc);
+ForAllChannelsNoAlphaInvokeMirrorInplace(32sc);
+ForAllChannelsNoAlphaInvokeMirrorInplace(32fc);
 
-#undef Instantiate_For
-#undef ForAllChannelsWithAlpha
-#undef ForAllChannelsNoAlpha
+#undef InstantiateInvokeMirrorInplace_For
+#undef ForAllChannelsWithAlphaInvokeMirrorInplace
+#undef ForAllChannelsNoAlphaInvokeMirrorInplace
 #pragma endregion
 } // namespace opp::image::cuda
 #endif // OPP_ENABLE_CUDA_BACKEND
