@@ -224,8 +224,6 @@ void InvokeHarrisCornerResponse(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst
 
 #define ForAllChannelsWithAlpha(type) Instantiate_For(Pixel##type##C4, Pixel##type##C1);
 
-ForAllChannelsWithAlpha(32f);
-
 #pragma endregion
 } // namespace opp::image::cuda
 #endif // OPP_ENABLE_CUDA_BACKEND

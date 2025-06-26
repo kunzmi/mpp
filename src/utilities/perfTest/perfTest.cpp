@@ -42,7 +42,23 @@
 #include <common/image/functors/interpolator.h>
 #include <common/image/functors/transformer.h>
 #include <common/image/functors/transformerFunctor.h>
+#include <fstream>
+#include <iostream>
 #include <numbers>
+
+#include "pixel8uC1.h"
+#include "pixel8uC3.h"
+#include "pixel8uC4.h"
+
+#include "pixel16uC1.h"
+#include "pixel16uC3.h"
+#include "pixel16uC4.h"
+
+#include "pixel32fC1.h"
+#include "pixel32fC3.h"
+#include "pixel32fC4.h"
+
+#include "pixel32sC1.h"
 
 using namespace opp;
 using namespace opp::cuda;
@@ -50,7 +66,7 @@ using namespace opp::image;
 using namespace opp::image::cuda;
 namespace nv  = opp::image::npp;
 namespace cpu = opp::image::cpuSimple;
-
+/*
 struct Runtime
 {
     float Min{0};
@@ -995,58 +1011,315 @@ void print(cpu::Image<Pixel32fC1> &img)
     }
 }
 
+template <PixelType T> class OppQualityIndex : public TestOppSrcSrcReductionBase<T, Pixel64fC1>
+{
+  public:
+    OppQualityIndex(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+        : TestOppSrcSrcReductionBase<T, Pixel64fC1>(aIterations, aRepeats, aWidth, aHeight)
+    {
+    }
+
+    void Init() override
+    {
+    }
+
+  private:
+    void RunOnce() override
+    {
+        this->src1.QualityIndex(this->src2, this->res, this->buffer, this->ctx);
+    }
+};*/
+
+Border GetBorder()
+{
+    return Border(-1);
+}
+
 int main()
 {
     try
     {
+        const Border &ab = GetBorder();
+        const Border &ac = {-1};
+        if (ab == ac)
+        {
+            std::cout << "yep";
+        }
+
+        std::cout << "Hello world! This is " << OPP_PROJECT_NAME << " version " << OPP_VERSION << "!" << std::endl;
+
         constexpr size_t iterations = 100;
         constexpr size_t repeats    = 10; /**/
         constexpr int imgWidth      = 4096;
         constexpr int imgHeight     = 4096;
+        Border b                    = Border(-1, 0, -1, 0);
 
+        std::ofstream csv("results.csv", std::ofstream::out);
+
+        runPixel8uC1(iterations, repeats, imgWidth, imgHeight, b, csv);
+        std::cout << std::endl << std::endl << "----------------------" << std::endl << std::endl << std::endl;
+        runPixel8uC3(iterations, repeats, imgWidth, imgHeight, b, csv);
+        std::cout << std::endl << std::endl << "----------------------" << std::endl << std::endl << std::endl;
+        runPixel8uC4(iterations, repeats, imgWidth, imgHeight, b, csv);
+        std::cout << std::endl << std::endl << "----------------------" << std::endl << std::endl << std::endl;
+
+        runPixel16uC1(iterations, repeats, imgWidth, imgHeight, b, csv);
+        std::cout << std::endl << std::endl << "----------------------" << std::endl << std::endl << std::endl;
+        runPixel16uC3(iterations, repeats, imgWidth, imgHeight, b, csv);
+        std::cout << std::endl << std::endl << "----------------------" << std::endl << std::endl << std::endl;
+        runPixel16uC4(iterations, repeats, imgWidth, imgHeight, b, csv);
+        std::cout << std::endl << std::endl << "----------------------" << std::endl << std::endl << std::endl;
+
+        runPixel32fC1(iterations, repeats, imgWidth, imgHeight, b, csv);
+        std::cout << std::endl << std::endl << "----------------------" << std::endl << std::endl << std::endl;
+        runPixel32fC3(iterations, repeats, imgWidth, imgHeight, b, csv);
+        std::cout << std::endl << std::endl << "----------------------" << std::endl << std::endl << std::endl;
+        runPixel32fC4(iterations, repeats, imgWidth, imgHeight, b, csv);
+        std::cout << std::endl << std::endl << "----------------------" << std::endl << std::endl << std::endl;
+        // runPixel8uC1(iterations, repeats, imgWidth, imgHeight, -1);
+
+        runPixel32sC1(iterations, repeats, imgWidth, imgHeight, b, csv);
+        std::cout << std::endl << std::endl << "----------------------" << std::endl << std::endl << std::endl;
+
+        Image<Pixel16uC1> ttt(imgWidth, imgHeight);
+        nv::Image16uC3 ttt2(imgWidth, imgHeight);
+        // ttt2.Max()
+        //     ttt.M()
+
+        /* Roi roi(0, 0, imgWidth, imgHeight);
+        FilterArea filterArea(11);
+        FilterArea filterAreaCol({1, 11}, {0, 5});
+        FilterArea filterAreaRow({11, 1}, {5, 0});
+        AffineTransformation<double> shift1 = AffineTransformation<double>::GetTranslation(Vec2d(-imgWidth / 2));
+        AffineTransformation<double> rot    = AffineTransformation<double>::GetRotation(30);
+        AffineTransformation<double> shift2 = AffineTransformation<double>::GetTranslation(Vec2d(imgWidth / 2));
+        AffineTransformation<double> affine = shift2 * rot * shift1;
+        PerspectiveTransformation<double> perspective(affine);
+        perspective(2, 0) = 0.0002;
+        perspective(2, 1) = -0.0003;
+
+        AddTest<Pixel8uC1, nv::Image8uC1> testAdd(iterations, repeats, imgWidth, imgHeight);
+        SubTest<Pixel8uC1, nv::Image8uC1> testSub(iterations, repeats, imgWidth, imgHeight);
+        MulTest<Pixel8uC1, nv::Image8uC1> testMul(iterations, repeats, imgWidth, imgHeight);
+        DivTest<Pixel8uC1, nv::Image8uC1> testDiv(iterations, repeats, imgWidth, imgHeight);
+
+        BoxFilterTest<Pixel8uC1, nv::Image8uC1> testBoxFilter(iterations, repeats, imgWidth, imgHeight);
+        RowWindowSumTest<Pixel8uC1, Pixel32fC1, nv::Image8uC1, nv::Image32fC1> testRowWindowSum(iterations, repeats,
+                                                                                                imgWidth, imgHeight);
+        ColumnWindowSumTest<Pixel8uC1, Pixel32fC1, nv::Image8uC1, nv::Image32fC1> testColumnWindowSum(
+            iterations, repeats, imgWidth, imgHeight);
+        LowPassFilterTest<Pixel8uC1, nv::Image8uC1> testLowPassFilter(iterations, repeats, imgWidth, imgHeight);
+        GaussFilterTest<Pixel8uC1, nv::Image8uC1> testGaussFilter(iterations, repeats, imgWidth, imgHeight);
+        GaussAdvancedFilterTest<Pixel8uC1, nv::Image8uC1> testGaussAdvancedilter(iterations, repeats, imgWidth,
+                                                                                 imgHeight);
+
+        AffineTransformTest<Pixel8uC1, nv::Image8uC1> testAffineTransformation(iterations, repeats, imgWidth,
+                                                                               imgHeight);
+
+        PerspectiveTransformTest<Pixel8uC1, nv::Image8uC1> testPerspectiveTransformation(iterations, repeats, imgWidth,
+                                                                                         imgHeight);
+
+        QualityIndexTest<Pixel8uC1, Pixel64fC1, nv::Image8uC1, float, vector_active_size_v<Pixel8uC1>> testQualityIndex(
+            iterations, repeats, imgWidth, imgHeight);
+
+        MaxTest<Pixel8uC1, Pixel8uC1, nv::Image8uC1, byte, vector_active_size_v<Pixel8uC1>> testMax(
+            iterations, repeats, imgWidth, imgHeight);
+
+        MeanTest<Pixel8uC1, Pixel64fC1, nv::Image8uC1, double, vector_active_size_v<Pixel8uC1>> testMean(
+            iterations, repeats, imgWidth, imgHeight);
+
+        MeanStdTest<Pixel8uC1, Pixel64fC1, nv::Image8uC1, double, vector_active_size_v<Pixel8uC1>> testMeanStd(
+            iterations, repeats, imgWidth, imgHeight);
+
+        MSETest<Pixel8uC1, Pixel64fC1, nv::Image8uC1, float, vector_active_size_v<Pixel8uC1>> testMSE(
+            iterations, repeats, imgWidth, imgHeight);
+
+        Image<Pixel8uC3> ttt(imgWidth, imgHeight);
+
+        // ttt.MSE()
+        nv::Image8uC1 ttt2(imgWidth, imgHeight);
+        // ttt2.MSE(, )
+        //     ttt2.SumWindowColumnBorder(,)
         cpu::Image<Pixel8uC1> cpu_src1(imgWidth, imgHeight);
         cpu::Image<Pixel8uC1> cpu_src2(imgWidth, imgHeight);
         cpu_src1.FillRandom(0);
         cpu_src2.FillRandom(1);
+        cpu_src2.Add({1});
+
+        testAdd.Init(cpu_src1, cpu_src2);
+        testAdd.Run(roi);
+        testAdd.GetResult<cpu::Image<Pixel8uC1>, Pixel64fC1>();
+
+        testSub.Init(cpu_src1, cpu_src2);
+        testSub.Run(roi);
+        testSub.GetResult<cpu::Image<Pixel8uC1>, Pixel64fC1>();
+
+        testMul.Init(cpu_src1, cpu_src2);
+        testMul.Run(roi);
+        testMul.GetResult<cpu::Image<Pixel8uC1>, Pixel64fC1>();
+
+        testDiv.Init(cpu_src1, cpu_src2);
+        testDiv.Run(roi);
+        testDiv.GetResult<cpu::Image<Pixel8uC1>, Pixel64fC1>();
+
+        testBoxFilter.Init(cpu_src1);
+        testBoxFilter.Run(roi, filterArea);
+        testBoxFilter.GetResult<cpu::Image<Pixel8uC1>, Pixel64fC1>();
+
+        testRowWindowSum.Init(cpu_src1);
+        testRowWindowSum.Run(roi, filterAreaRow);
+        testRowWindowSum.GetResult<cpu::Image<Pixel32fC1>, Pixel64fC1>();
+
+        testColumnWindowSum.Init(cpu_src1);
+        testColumnWindowSum.Run(roi, filterAreaCol);
+        testColumnWindowSum.GetResult<cpu::Image<Pixel32fC1>, Pixel64fC1>();
+
+        testLowPassFilter.Init(cpu_src1);
+        testLowPassFilter.Run(roi, 3);
+        testLowPassFilter.GetResult<cpu::Image<Pixel8uC1>, Pixel64fC1>();
+
+        testLowPassFilter.Init(cpu_src1);
+        testLowPassFilter.Run(roi, 5);
+        testLowPassFilter.GetResult<cpu::Image<Pixel8uC1>, Pixel64fC1>();
+
+        testGaussFilter.Init(cpu_src1);
+        testGaussFilter.Run(roi, 3);
+        testGaussFilter.GetResult<cpu::Image<Pixel8uC1>, Pixel64fC1>();
+
+        testGaussFilter.Init(cpu_src1);
+        testGaussFilter.Run(roi, 5);
+        testGaussFilter.GetResult<cpu::Image<Pixel8uC1>, Pixel64fC1>();
+
+        testGaussFilter.Init(cpu_src1);
+        testGaussFilter.Run(roi, 15);
+        testGaussFilter.GetResult<cpu::Image<Pixel8uC1>, Pixel64fC1>();
+
+        testGaussAdvancedilter.Init(cpu_src1, 9);
+        testGaussAdvancedilter.Run(roi, 9);
+        testGaussAdvancedilter.GetResult<cpu::Image<Pixel8uC1>, Pixel64fC1>();
+
+        testGaussAdvancedilter.Init(cpu_src1, 11);
+        testGaussAdvancedilter.Run(roi, 11);
+        testGaussAdvancedilter.GetResult<cpu::Image<Pixel8uC1>, Pixel64fC1>();
+
+        testGaussAdvancedilter.Init(cpu_src1, 21);
+        testGaussAdvancedilter.Run(roi, 21);
+        testGaussAdvancedilter.GetResult<cpu::Image<Pixel8uC1>, Pixel64fC1>();
+
+        testAffineTransformation.Init(cpu_src1, affine, InterpolationMode::NearestNeighbor);
+        testAffineTransformation.Run(roi);
+        testAffineTransformation.GetResult<cpu::Image<Pixel8uC1>, Pixel64fC1>();
+
+        testAffineTransformation.Init(cpu_src1, affine, InterpolationMode::Linear);
+        testAffineTransformation.Run(roi);
+        testAffineTransformation.GetResult<cpu::Image<Pixel8uC1>, Pixel64fC1>();
+
+        testAffineTransformation.Init(cpu_src1, affine, InterpolationMode::CubicLagrange);
+        testAffineTransformation.Run(roi);
+        testAffineTransformation.GetResult<cpu::Image<Pixel8uC1>, Pixel64fC1>();
+
+        testPerspectiveTransformation.Init(cpu_src1, perspective, InterpolationMode::NearestNeighbor);
+        testPerspectiveTransformation.Run(roi);
+        testPerspectiveTransformation.GetResult<cpu::Image<Pixel8uC1>, Pixel64fC1>();
+
+        testPerspectiveTransformation.Init(cpu_src1, perspective, InterpolationMode::Linear);
+        testPerspectiveTransformation.Run(roi);
+        testPerspectiveTransformation.GetResult<cpu::Image<Pixel8uC1>, Pixel64fC1>();
+
+        testPerspectiveTransformation.Init(cpu_src1, perspective, InterpolationMode::CubicLagrange);
+        testPerspectiveTransformation.Run(roi);
+        testPerspectiveTransformation.GetResult<cpu::Image<Pixel8uC1>, Pixel64fC1>();
+
+        testQualityIndex.Init(cpu_src1, cpu_src2);
+        testQualityIndex.Run(roi);
+        testQualityIndex.GetResult<Pixel64fC1, Pixel32fC1>();
+
+        testMax.Init(cpu_src1);
+        testMax.Run(roi);
+        testMax.GetResult<Pixel8uC1, Pixel8uC1>();
+
+        testMean.Init(cpu_src1);
+        testMean.Run(roi);
+        testMean.GetResult<Pixel64fC1, Pixel64fC1>();
+
+        testMeanStd.Init(cpu_src1);
+        testMeanStd.Run(roi);
+        testMeanStd.GetResult<Pixel64fC1, Pixel64fC1>();
+
+        testMSE.Init(cpu_src1, cpu_src2);
+        testMSE.Run(roi);
+        testMSE.GetResult<Pixel64fC1, Pixel32fC1>();
+
+        AddTest<Pixel32fC1, nv::Image32fC1> testAdd2(iterations, repeats, imgWidth, imgHeight);
+        SubTest<Pixel32fC1, nv::Image32fC1> testSub2(iterations, repeats, imgWidth, imgHeight);
+        MulTest<Pixel32fC1, nv::Image32fC1> testMul2(iterations, repeats, imgWidth, imgHeight);
+        DivTest<Pixel32fC1, nv::Image32fC1> testDiv2(iterations, repeats, imgWidth, imgHeight);
+
+        BoxFilterTest<Pixel32fC1, nv::Image32fC1> testBoxFilter2(iterations, repeats, imgWidth, imgHeight);
+
+        cpu::Image<Pixel32fC1> cpu_src12(imgWidth, imgHeight);
+        cpu::Image<Pixel32fC1> cpu_src22(imgWidth, imgHeight);
+        cpu_src12.FillRandom(0);
+        cpu_src22.FillRandom(1);
+        cpu_src22.Add({1});
+
+        testAdd2.Init(cpu_src12, cpu_src22);
+        testAdd2.Run(roi);
+        testAdd2.GetResult<cpu::Image<Pixel32fC1>, Pixel64fC1>();
+
+        testSub2.Init(cpu_src12, cpu_src22);
+        testSub2.Run(roi);
+        testSub2.GetResult<cpu::Image<Pixel32fC1>, Pixel64fC1>();
+
+        testMul2.Init(cpu_src12, cpu_src22);
+        testMul2.Run(roi);
+        testMul2.GetResult<cpu::Image<Pixel32fC1>, Pixel64fC1>();
+
+        testDiv2.Init(cpu_src12, cpu_src22);
+        testDiv2.Run(roi);
+        testDiv2.GetResult<cpu::Image<Pixel32fC1>, Pixel64fC1>();
+
+        testBoxFilter2.Init(cpu_src12);
+        testBoxFilter2.Run(roi, filterArea);
+        testBoxFilter2.GetResult<cpu::Image<Pixel32fC1>, Pixel64fC1>();*/
 
         // constexpr int sizeTpl       = 16;
         //  INT_MAX / 1024 / 256 + 1;
 
-        std::cout << "Hello world! This is " << OPP_PROJECT_NAME << " version " << OPP_VERSION << "!" << std::endl;
+        // OppQualityIndex<Pixel8uC1> opp(iterations, repeats, imgWidth, imgHeight);
+        //  TestOPPQualityIndex<Pixel8uC1> opp(iterations, repeats, imgWidth, imgHeight);
+        //  TestNPPQualityIndex<nv::Image8uC1> npp(iterations, repeats, imgWidth, imgHeight);
 
-        TestOPPQualityIndex<Pixel8uC1> opp(iterations, repeats, imgWidth, imgHeight);
-        TestNPPQualityIndex<nv::Image8uC1> npp(iterations, repeats, imgWidth, imgHeight);
-
-        opp.SetSrc(cpu_src1, cpu_src2);
-        npp.SetSrc(cpu_src1, cpu_src2);
+        // opp.SetSrc(cpu_src1, cpu_src2);
+        // npp.SetSrc(cpu_src1, cpu_src2);
 
         // opp.SetBorder(-1);
         // npp.SetBorder(-1);
 
-        std::cout << "Warmup opp" << std::endl;
-        opp.WarmUp();
-        std::cout << "Running opp" << std::endl;
-        Runtime rt_opp = opp.Run();
-        std::cout << "Warmup npp" << std::endl;
-        npp.WarmUp();
-        std::cout << "Running npp" << std::endl;
-        Runtime rt_npp = npp.Run();
+        /* std::cout << "Warmup opp" << std::endl;
+         opp.WarmUp();
+         std::cout << "Running opp" << std::endl;
+         Runtime rt_opp = opp.Run();
+         std::cout << "Warmup npp" << std::endl;
+         npp.WarmUp();
+         std::cout << "Running npp" << std::endl;
+         Runtime rt_npp = npp.Run();
 
-        std::cout << "Done!" << std::endl << std::endl;
-        std::cout << "OPP:" << std::endl;
-        std::cout << rt_opp << std::endl;
-        std::cout << "NPP:" << std::endl;
-        std::cout << rt_npp << std::endl;
+         std::cout << "Done!" << std::endl << std::endl;
+         std::cout << "OPP:" << std::endl;
+         std::cout << rt_opp << std::endl;
+         std::cout << "NPP:" << std::endl;
+         std::cout << rt_npp << std::endl;
 
-        const float ratio = rt_npp.Mean / rt_opp.Mean;
-        if (ratio >= 1.0f)
-        {
-            std::cout << "OPP is " << ratio * 100.0f - 100.0f << "% faster!" << std::endl;
-        }
-        else
-        {
-            std::cout << "OPP is " << 1.0f / ratio * 100.0f - 100.0f << "% slower..." << std::endl;
-        }
+         const float ratio = rt_npp.Mean / rt_opp.Mean;
+         if (ratio >= 1.0f)
+         {
+             std::cout << "OPP is " << ratio * 100.0f - 100.0f << "% faster!" << std::endl;
+         }
+         else
+         {
+             std::cout << "OPP is " << 1.0f / ratio * 100.0f - 100.0f << "% slower..." << std::endl;
+         }*/
 
         // cpu::Image<Pixel32fC1> cpu_src1(imgWidth, imgHeight);
         //                        cpu::ImageView<Pixel8u3> cpu_src1A(cpu_src1);
@@ -1055,18 +1328,21 @@ int main()
         cpu::Image<Pixel8uC1> cpu_src2 = cpu::Image<Pixel8uC1>::Load(
             "C:\\Users\\kunz_\\source\\repos\\oppV1\\opp\\test\\testData\\bird256bwnoisy.tif");
         cpu::Image<Pixel8uC1> cpu_src1 = cpu::Image<Pixel8uC1>::Load("F:\\ogpp\\muster.tif");*/
-        // cpu::Image<Pixel32fC1> cpu_dst(imgWidth, imgHeight);
-        // cpu::Image<Pixel32fC1> res_npp(imgWidth, imgHeight);
-        // cpu::Image<Pixel32fC1> res_opp(imgWidth, imgHeight);
+        // cpu::Image<Pixel32fC4> cpu_dst(imgWidth, imgHeight);
+        // cpu::Image<Pixel32fC4> res_npp(imgWidth, imgHeight);
+        // cpu::Image<Pixel32fC4> res_opp(imgWidth, imgHeight);
 
         // Image<Pixel32fC1> opp_src1(imgWidth, imgHeight);
         // Image<Pixel32fC1> opp_dst(imgWidth, imgHeight);
 
-        // nv::Image8uC1 npp_src1(imgWidth, imgHeight);
-        //  nv::Image8uC1 npp_dst(imgWidth, imgHeight);
+        // nv::Image8uC4 npp_src1(imgWidth, imgHeight);
+        //   nv::Image8uC1 npp_dst(imgWidth, imgHeight);
 
-        // cpu_src1.Set(0);
-        // cpu_src1(7, 7) = 1;
+        // cpu_dst.AverageError(cpu_src1, maxError, scalar);
+
+        // npp_src1.SizeRoi();
+        //  cpu_src1.Set(0);
+        //  cpu_src1(7, 7) = 1;
 
         /*cpu_src1.SetRoi(Roi(116, 65, sizeTpl, sizeTpl));
         cpu_src1.Copy(cpu_tpl);

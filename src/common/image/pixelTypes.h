@@ -1317,67 +1317,67 @@ template <> struct default_ext_compute_type_for<Pixel32scC4>
     using type = Pixel64fcC4;
 };
 
-// 16s -> 64f
-template <> struct default_ext_compute_type_for<Pixel16sC1>
-{
-    using type = Pixel64fC1;
-};
-template <> struct default_ext_compute_type_for<Pixel16sC2>
-{
-    using type = Pixel64fC2;
-};
-template <> struct default_ext_compute_type_for<Pixel16sC3>
-{
-    using type = Pixel64fC3;
-};
-template <> struct default_ext_compute_type_for<Pixel16sC4>
-{
-    using type = Pixel64fC4;
-};
-template <> struct default_ext_compute_type_for<Pixel16sC4A>
-{
-    using type = Pixel64fC4A;
-};
-
-// 16sc -> 64fc
-template <> struct default_ext_compute_type_for<Pixel16scC1>
-{
-    using type = Pixel64fcC1;
-};
-template <> struct default_ext_compute_type_for<Pixel16scC2>
-{
-    using type = Pixel64fcC2;
-};
-template <> struct default_ext_compute_type_for<Pixel16scC3>
-{
-    using type = Pixel64fcC3;
-};
-template <> struct default_ext_compute_type_for<Pixel16scC4>
-{
-    using type = Pixel64fcC4;
-};
-
-// 16u -> 64f
-template <> struct default_ext_compute_type_for<Pixel16uC1>
-{
-    using type = Pixel64fC1;
-};
-template <> struct default_ext_compute_type_for<Pixel16uC2>
-{
-    using type = Pixel64fC2;
-};
-template <> struct default_ext_compute_type_for<Pixel16uC3>
-{
-    using type = Pixel64fC3;
-};
-template <> struct default_ext_compute_type_for<Pixel16uC4>
-{
-    using type = Pixel64fC4;
-};
-template <> struct default_ext_compute_type_for<Pixel16uC4A>
-{
-    using type = Pixel64fC4A;
-};
+//// 16s -> 64f
+// template <> struct default_ext_compute_type_for<Pixel16sC1>
+//{
+//     using type = Pixel64fC1;
+// };
+// template <> struct default_ext_compute_type_for<Pixel16sC2>
+//{
+//     using type = Pixel64fC2;
+// };
+// template <> struct default_ext_compute_type_for<Pixel16sC3>
+//{
+//     using type = Pixel64fC3;
+// };
+// template <> struct default_ext_compute_type_for<Pixel16sC4>
+//{
+//     using type = Pixel64fC4;
+// };
+// template <> struct default_ext_compute_type_for<Pixel16sC4A>
+//{
+//     using type = Pixel64fC4A;
+// };
+//
+//// 16sc -> 64fc
+// template <> struct default_ext_compute_type_for<Pixel16scC1>
+//{
+//     using type = Pixel64fcC1;
+// };
+// template <> struct default_ext_compute_type_for<Pixel16scC2>
+//{
+//     using type = Pixel64fcC2;
+// };
+// template <> struct default_ext_compute_type_for<Pixel16scC3>
+//{
+//     using type = Pixel64fcC3;
+// };
+// template <> struct default_ext_compute_type_for<Pixel16scC4>
+//{
+//     using type = Pixel64fcC4;
+// };
+//
+//// 16u -> 64f
+// template <> struct default_ext_compute_type_for<Pixel16uC1>
+//{
+//     using type = Pixel64fC1;
+// };
+// template <> struct default_ext_compute_type_for<Pixel16uC2>
+//{
+//     using type = Pixel64fC2;
+// };
+// template <> struct default_ext_compute_type_for<Pixel16uC3>
+//{
+//     using type = Pixel64fC3;
+// };
+// template <> struct default_ext_compute_type_for<Pixel16uC4>
+//{
+//     using type = Pixel64fC4;
+// };
+// template <> struct default_ext_compute_type_for<Pixel16uC4A>
+//{
+//     using type = Pixel64fC4A;
+// };
 
 template <typename T> using default_ext_compute_type_for_t = typename default_ext_compute_type_for<T>::type;
 #pragma endregion

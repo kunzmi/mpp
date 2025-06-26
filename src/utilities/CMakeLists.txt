@@ -2,3 +2,4 @@
 add_subdirectory(nppCodeGenerator)
 add_subdirectory(nppFunctionLister)
 add_subdirectory(nppParser)
+add_subdirectory(perfTest)

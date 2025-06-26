@@ -238,6 +238,11 @@ template class ImageView<Pixel32fcC1>;
 using Image32fcC1View                             = ImageView<Pixel32fcC1>;
 template <> ImageView<Pixel32fcC1> ImageView<Pixel32fcC1>::Null = ImageView<Pixel32fcC1>(nullptr, Size2D(0, 0), 0);
 
+
+template class ImageView<Pixel32sC1>;
+using Image32sC1View                                           = ImageView<Pixel32sC1>;
+template <> ImageView<Pixel32sC1> ImageView<Pixel32sC1>::Null = ImageView<Pixel32sC1>(nullptr, Size2D(0, 0), 0);
+
 //#pragma region Instantiate Affine
 //
 //// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)

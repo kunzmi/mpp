@@ -60,6 +60,7 @@ template <typename T> class DevVar : public DevVarView<T>
 
         aOther.PointerRef() = nullptr;
         aOther.SizeRef()    = 0;
+        return *this;
     }
 };
 

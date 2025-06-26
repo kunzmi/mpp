@@ -46,22 +46,23 @@ void InvokeAddSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, si
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using simdOP_t = simd::Add<Tupel<DstT, TupelSize>>;
-        if constexpr (simdOP_t::has_simd)
-        {
-            using ComputeT_SIMD = add_simd_tupel_compute_type_for_t<SrcT>;
-            // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
-            using addSrcSrcSIMD = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoundingMode::None,
-                                                ComputeT_SIMD, simdOP_t>;
+        // if constexpr (simdOP_t::has_simd)
+        //{
+        //     using ComputeT_SIMD = add_simd_tupel_compute_type_for_t<SrcT>;
+        //     // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
+        //     using addSrcSrcSIMD = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>,
+        //     RoundingMode::None,
+        //                                         ComputeT_SIMD, simdOP_t>;
 
-            const opp::Add<ComputeT> op;
-            const simdOP_t opSIMD;
+        //    const opp::Add<ComputeT> op;
+        //    const simdOP_t opSIMD;
 
-            const addSrcSrcSIMD functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, opSIMD);
+        //    const addSrcSrcSIMD functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, opSIMD);
 
-            InvokeForEachPixelKernelDefault<DstT, TupelSize, addSrcSrcSIMD>(aDst, aPitchDst, aSize, aStreamCtx,
-                                                                            functor);
-        }
-        else
+        //    InvokeForEachPixelKernelDefault<DstT, TupelSize, addSrcSrcSIMD>(aDst, aPitchDst, aSize, aStreamCtx,
+        //                                                                    functor);
+        //}
+        // else
         {
             // set to roundingmode NONE, because Add cannot produce non-integers in computations with ints:
             using addSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Add<ComputeT>, RoundingMode::None>;

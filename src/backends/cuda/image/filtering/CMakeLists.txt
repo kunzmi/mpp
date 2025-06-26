@@ -479,7 +479,16 @@ add_library(backends.cuda.image.filtering
 	
 	)
 	
-	set_source_files_properties(bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
+	set_source_files_properties(8s/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
+	set_source_files_properties(8u/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
+	set_source_files_properties(16s/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
+	set_source_files_properties(16u/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
+	set_source_files_properties(32s/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
+	set_source_files_properties(32u/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
+	set_source_files_properties(16f/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
+	set_source_files_properties(16bf/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
+	set_source_files_properties(32f/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
+	set_source_files_properties(64f/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
 	set_source_files_properties(precomputeBilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
 
 target_include_directories(backends.cuda.image.filtering  PUBLIC 

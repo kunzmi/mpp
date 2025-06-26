@@ -102,24 +102,6 @@ void InvokeMirrorSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aP
     InstantiateInvokeMirrorSrc_For(Pixel##type##C4);                                                                   \
     InstantiateInvokeMirrorSrc_For(Pixel##type##C4A);
 
-ForAllChannelsWithAlphaInvokeMirrorSrc(8u);
-ForAllChannelsWithAlphaInvokeMirrorSrc(8s);
-
-ForAllChannelsWithAlphaInvokeMirrorSrc(16u);
-ForAllChannelsWithAlphaInvokeMirrorSrc(16s);
-
-ForAllChannelsWithAlphaInvokeMirrorSrc(32u);
-ForAllChannelsWithAlphaInvokeMirrorSrc(32s);
-
-ForAllChannelsWithAlphaInvokeMirrorSrc(16f);
-ForAllChannelsWithAlphaInvokeMirrorSrc(16bf);
-ForAllChannelsWithAlphaInvokeMirrorSrc(32f);
-ForAllChannelsWithAlphaInvokeMirrorSrc(64f);
-
-ForAllChannelsNoAlphaInvokeMirrorSrc(16sc);
-ForAllChannelsNoAlphaInvokeMirrorSrc(32sc);
-ForAllChannelsNoAlphaInvokeMirrorSrc(32fc);
-
 #pragma endregion
 
 template <typename SrcT>
@@ -208,24 +190,6 @@ void InvokeMirrorInplace(SrcT *aSrcDst, size_t aPitchSrcDst, MirrorAxis aAxis, c
     InstantiateInvokeMirrorInplace_For(Pixel##type##C3);                                                               \
     InstantiateInvokeMirrorInplace_For(Pixel##type##C4);                                                               \
     InstantiateInvokeMirrorInplace_For(Pixel##type##C4A);
-
-ForAllChannelsWithAlphaInvokeMirrorInplace(8u);
-ForAllChannelsWithAlphaInvokeMirrorInplace(8s);
-
-ForAllChannelsWithAlphaInvokeMirrorInplace(16u);
-ForAllChannelsWithAlphaInvokeMirrorInplace(16s);
-
-ForAllChannelsWithAlphaInvokeMirrorInplace(32u);
-ForAllChannelsWithAlphaInvokeMirrorInplace(32s);
-
-ForAllChannelsWithAlphaInvokeMirrorInplace(16f);
-ForAllChannelsWithAlphaInvokeMirrorInplace(16bf);
-ForAllChannelsWithAlphaInvokeMirrorInplace(32f);
-ForAllChannelsWithAlphaInvokeMirrorInplace(64f);
-
-ForAllChannelsNoAlphaInvokeMirrorInplace(16sc);
-ForAllChannelsNoAlphaInvokeMirrorInplace(32sc);
-ForAllChannelsNoAlphaInvokeMirrorInplace(32fc);
 
 #pragma endregion
 } // namespace opp::image::cuda

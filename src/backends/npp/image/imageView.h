@@ -48,6 +48,8 @@ template <PixelType T> class ImageView
     /// </summary>
     static constexpr size_t ChannelCount = to_size_t(channel_count_v<T>);
 
+    using pixel_type_t = T;
+
   private:
     /// <summary>
     /// Base pointer to image data.
