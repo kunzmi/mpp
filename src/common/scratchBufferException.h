@@ -7,12 +7,12 @@
 #include <sstream>
 #include <string>
 
-namespace opp
+namespace mpp
 {
 /// <summary>
 /// ScratchBufferException is thrown when a provided scratch buffer is smaller than the required buffer size.
 /// </summary>
-class ScratchBufferException : public OPPException
+class ScratchBufferException : public MPPException
 {
   public:
     ScratchBufferException(size_t aRequiredSize, size_t aProvidedSize, const std::string &aMessage,
@@ -25,15 +25,15 @@ class ScratchBufferException : public OPPException
     ScratchBufferException &operator=(const ScratchBufferException &) = delete;
     ScratchBufferException &operator=(ScratchBufferException &&)      = delete;
 };
-} // namespace opp
+} // namespace mpp
 
 // NOLINTBEGIN --> function like macro, parantheses for "msg"...
 #define SCRATCHBUFFEREXCEPTION_EXT(requiredSize, providedSize, msg)                                                    \
-    (opp::ScratchBufferException(requiredSize, providedSize, (std::ostringstream() << msg).str(), __FILE__, __LINE__,  \
+    (mpp::ScratchBufferException(requiredSize, providedSize, (std::ostringstream() << msg).str(), __FILE__, __LINE__,  \
                                  __PRETTY_FUNCTION__))
 
 #define SCRATCHBUFFEREXCEPTION(requiredSize, providedSize)                                                             \
-    (opp::ScratchBufferException(requiredSize, providedSize, "", __FILE__, __LINE__, __PRETTY_FUNCTION__))
+    (mpp::ScratchBufferException(requiredSize, providedSize, "", __FILE__, __LINE__, __PRETTY_FUNCTION__))
 
 #define CHECK_BUFFER_SIZE(buffer, providedSize)                                                                        \
     {                                                                                                                  \

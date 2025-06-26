@@ -13,11 +13,11 @@
 #include <common/defines.h>
 #include <common/safeCast.h>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size = 256;
 

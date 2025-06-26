@@ -11,7 +11,7 @@
 
 #include <iostream>
 
-namespace opp::image::cpuSimple
+namespace mpp::image::cpuSimple
 {
 // forward declaration
 template <PixelType T> class ImageView;
@@ -34,4 +34,4 @@ void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, ImageVie
 template <typename DstT, typename functor>
 void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, ImageView<DstT> &aDst3, ImageView<DstT> &aDst4,
                         const functor &aOp);
-} // namespace opp::image::cpuSimple
+} // namespace mpp::image::cpuSimple

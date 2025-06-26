@@ -27,7 +27,7 @@
 #include <common/image/sizePitched.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/utilities.h>
 #include <common/vector1.h>
@@ -39,33 +39,33 @@
 #include <type_traits>
 #include <vector>
 
-namespace opp::image::cpuSimple
+namespace mpp::image::cpuSimple
 {
 inline Size2D GetFilterSize(MaskSize aMaskSize)
 {
     switch (aMaskSize)
     {
-        case opp::MaskSize::Mask_1x3:
+        case mpp::MaskSize::Mask_1x3:
             return {1, 3};
-        case opp::MaskSize::Mask_1x5:
+        case mpp::MaskSize::Mask_1x5:
             return {1, 5};
-        case opp::MaskSize::Mask_3x1:
+        case mpp::MaskSize::Mask_3x1:
             return {3, 1};
-        case opp::MaskSize::Mask_5x1:
+        case mpp::MaskSize::Mask_5x1:
             return {5, 1};
-        case opp::MaskSize::Mask_3x3:
+        case mpp::MaskSize::Mask_3x3:
             return {3, 3};
-        case opp::MaskSize::Mask_5x5:
+        case mpp::MaskSize::Mask_5x5:
             return {5, 5};
-        case opp::MaskSize::Mask_7x7:
+        case mpp::MaskSize::Mask_7x7:
             return {7, 7};
-        case opp::MaskSize::Mask_9x9:
+        case mpp::MaskSize::Mask_9x9:
             return {9, 9};
-        case opp::MaskSize::Mask_11x11:
+        case mpp::MaskSize::Mask_11x11:
             return {11, 11};
-        case opp::MaskSize::Mask_13x13:
+        case mpp::MaskSize::Mask_13x13:
             return {13, 13};
-        case opp::MaskSize::Mask_15x15:
+        case mpp::MaskSize::Mask_15x15:
             return {15, 15};
         default:
             return {-1, -1};
@@ -78,49 +78,49 @@ inline const float *GetFilter(FixedFilter aFilter, int aSize)
     {
         switch (aFilter)
         {
-            case opp::FixedFilter::Gauss:
-                return reinterpret_cast<const float *>(FixedFilterKernel<opp::FixedFilter::Gauss, 3, float>::Values);
-            case opp::FixedFilter::HighPass:
-                return reinterpret_cast<const float *>(FixedFilterKernel<opp::FixedFilter::HighPass, 3, float>::Values);
-            case opp::FixedFilter::LowPass:
-                return reinterpret_cast<const float *>(FixedFilterKernel<opp::FixedFilter::LowPass, 3, float>::Values);
-            case opp::FixedFilter::Laplace:
-                return reinterpret_cast<const float *>(FixedFilterKernel<opp::FixedFilter::Laplace, 3, float>::Values);
-            case opp::FixedFilter::PrewittHoriz:
+            case mpp::FixedFilter::Gauss:
+                return reinterpret_cast<const float *>(FixedFilterKernel<mpp::FixedFilter::Gauss, 3, float>::Values);
+            case mpp::FixedFilter::HighPass:
+                return reinterpret_cast<const float *>(FixedFilterKernel<mpp::FixedFilter::HighPass, 3, float>::Values);
+            case mpp::FixedFilter::LowPass:
+                return reinterpret_cast<const float *>(FixedFilterKernel<mpp::FixedFilter::LowPass, 3, float>::Values);
+            case mpp::FixedFilter::Laplace:
+                return reinterpret_cast<const float *>(FixedFilterKernel<mpp::FixedFilter::Laplace, 3, float>::Values);
+            case mpp::FixedFilter::PrewittHoriz:
                 return reinterpret_cast<const float *>(
-                    FixedFilterKernel<opp::FixedFilter::PrewittHoriz, 3, float>::Values);
-            case opp::FixedFilter::PrewittVert:
+                    FixedFilterKernel<mpp::FixedFilter::PrewittHoriz, 3, float>::Values);
+            case mpp::FixedFilter::PrewittVert:
                 return reinterpret_cast<const float *>(
-                    FixedFilterKernel<opp::FixedFilter::PrewittVert, 3, float>::Values);
-            case opp::FixedFilter::RobertsDown:
+                    FixedFilterKernel<mpp::FixedFilter::PrewittVert, 3, float>::Values);
+            case mpp::FixedFilter::RobertsDown:
                 return reinterpret_cast<const float *>(
-                    FixedFilterKernel<opp::FixedFilter::RobertsDown, 3, float>::Values);
-            case opp::FixedFilter::RobertsUp:
+                    FixedFilterKernel<mpp::FixedFilter::RobertsDown, 3, float>::Values);
+            case mpp::FixedFilter::RobertsUp:
                 return reinterpret_cast<const float *>(
-                    FixedFilterKernel<opp::FixedFilter::RobertsUp, 3, float>::Values);
-            case opp::FixedFilter::ScharrHoriz:
+                    FixedFilterKernel<mpp::FixedFilter::RobertsUp, 3, float>::Values);
+            case mpp::FixedFilter::ScharrHoriz:
                 return reinterpret_cast<const float *>(
-                    FixedFilterKernel<opp::FixedFilter::ScharrHoriz, 3, float>::Values);
-            case opp::FixedFilter::ScharrVert:
+                    FixedFilterKernel<mpp::FixedFilter::ScharrHoriz, 3, float>::Values);
+            case mpp::FixedFilter::ScharrVert:
                 return reinterpret_cast<const float *>(
-                    FixedFilterKernel<opp::FixedFilter::ScharrVert, 3, float>::Values);
-            case opp::FixedFilter::Sharpen:
-                return reinterpret_cast<const float *>(FixedFilterKernel<opp::FixedFilter::Sharpen, 3, float>::Values);
-            case opp::FixedFilter::SobelCross:
+                    FixedFilterKernel<mpp::FixedFilter::ScharrVert, 3, float>::Values);
+            case mpp::FixedFilter::Sharpen:
+                return reinterpret_cast<const float *>(FixedFilterKernel<mpp::FixedFilter::Sharpen, 3, float>::Values);
+            case mpp::FixedFilter::SobelCross:
                 return reinterpret_cast<const float *>(
-                    FixedFilterKernel<opp::FixedFilter::SobelCross, 3, float>::Values);
-            case opp::FixedFilter::SobelHoriz:
+                    FixedFilterKernel<mpp::FixedFilter::SobelCross, 3, float>::Values);
+            case mpp::FixedFilter::SobelHoriz:
                 return reinterpret_cast<const float *>(
-                    FixedFilterKernel<opp::FixedFilter::SobelHoriz, 3, float>::Values);
-            case opp::FixedFilter::SobelVert:
+                    FixedFilterKernel<mpp::FixedFilter::SobelHoriz, 3, float>::Values);
+            case mpp::FixedFilter::SobelVert:
                 return reinterpret_cast<const float *>(
-                    FixedFilterKernel<opp::FixedFilter::SobelVert, 3, float>::Values);
-            case opp::FixedFilter::SobelHorizSecond:
+                    FixedFilterKernel<mpp::FixedFilter::SobelVert, 3, float>::Values);
+            case mpp::FixedFilter::SobelHorizSecond:
                 return reinterpret_cast<const float *>(
-                    FixedFilterKernel<opp::FixedFilter::SobelHorizSecond, 3, float>::Values);
-            case opp::FixedFilter::SobelVertSecond:
+                    FixedFilterKernel<mpp::FixedFilter::SobelHorizSecond, 3, float>::Values);
+            case mpp::FixedFilter::SobelVertSecond:
                 return reinterpret_cast<const float *>(
-                    FixedFilterKernel<opp::FixedFilter::SobelVertSecond, 3, float>::Values);
+                    FixedFilterKernel<mpp::FixedFilter::SobelVertSecond, 3, float>::Values);
             default:
                 break;
         }
@@ -130,29 +130,29 @@ inline const float *GetFilter(FixedFilter aFilter, int aSize)
     {
         switch (aFilter)
         {
-            case opp::FixedFilter::Gauss:
-                return reinterpret_cast<const float *>(FixedFilterKernel<opp::FixedFilter::Gauss, 5, float>::Values);
-            case opp::FixedFilter::HighPass:
-                return reinterpret_cast<const float *>(FixedFilterKernel<opp::FixedFilter::HighPass, 5, float>::Values);
-            case opp::FixedFilter::LowPass:
-                return reinterpret_cast<const float *>(FixedFilterKernel<opp::FixedFilter::LowPass, 5, float>::Values);
-            case opp::FixedFilter::Laplace:
-                return reinterpret_cast<const float *>(FixedFilterKernel<opp::FixedFilter::Laplace, 5, float>::Values);
-            case opp::FixedFilter::SobelCross:
+            case mpp::FixedFilter::Gauss:
+                return reinterpret_cast<const float *>(FixedFilterKernel<mpp::FixedFilter::Gauss, 5, float>::Values);
+            case mpp::FixedFilter::HighPass:
+                return reinterpret_cast<const float *>(FixedFilterKernel<mpp::FixedFilter::HighPass, 5, float>::Values);
+            case mpp::FixedFilter::LowPass:
+                return reinterpret_cast<const float *>(FixedFilterKernel<mpp::FixedFilter::LowPass, 5, float>::Values);
+            case mpp::FixedFilter::Laplace:
+                return reinterpret_cast<const float *>(FixedFilterKernel<mpp::FixedFilter::Laplace, 5, float>::Values);
+            case mpp::FixedFilter::SobelCross:
                 return reinterpret_cast<const float *>(
-                    FixedFilterKernel<opp::FixedFilter::SobelCross, 5, float>::Values);
-            case opp::FixedFilter::SobelHoriz:
+                    FixedFilterKernel<mpp::FixedFilter::SobelCross, 5, float>::Values);
+            case mpp::FixedFilter::SobelHoriz:
                 return reinterpret_cast<const float *>(
-                    FixedFilterKernel<opp::FixedFilter::SobelHoriz, 5, float>::Values);
-            case opp::FixedFilter::SobelVert:
+                    FixedFilterKernel<mpp::FixedFilter::SobelHoriz, 5, float>::Values);
+            case mpp::FixedFilter::SobelVert:
                 return reinterpret_cast<const float *>(
-                    FixedFilterKernel<opp::FixedFilter::SobelVert, 5, float>::Values);
-            case opp::FixedFilter::SobelHorizSecond:
+                    FixedFilterKernel<mpp::FixedFilter::SobelVert, 5, float>::Values);
+            case mpp::FixedFilter::SobelHorizSecond:
                 return reinterpret_cast<const float *>(
-                    FixedFilterKernel<opp::FixedFilter::SobelHorizSecond, 5, float>::Values);
-            case opp::FixedFilter::SobelVertSecond:
+                    FixedFilterKernel<mpp::FixedFilter::SobelHorizSecond, 5, float>::Values);
+            case mpp::FixedFilter::SobelVertSecond:
                 return reinterpret_cast<const float *>(
-                    FixedFilterKernel<opp::FixedFilter::SobelVertSecond, 5, float>::Values);
+                    FixedFilterKernel<mpp::FixedFilter::SobelVertSecond, 5, float>::Values);
             default:
                 break;
         }
@@ -166,12 +166,12 @@ inline const float *GetFilterInv(FixedFilter aFilter, int aSize)
     {
         switch (aFilter)
         {
-            case opp::FixedFilter::PrewittVert:
+            case mpp::FixedFilter::PrewittVert:
                 return reinterpret_cast<const float *>(
-                    FixedInvertedFilterKernel<opp::FixedFilter::PrewittVert, 3, float>::Values);
-            case opp::FixedFilter::SobelVert:
+                    FixedInvertedFilterKernel<mpp::FixedFilter::PrewittVert, 3, float>::Values);
+            case mpp::FixedFilter::SobelVert:
                 return reinterpret_cast<const float *>(
-                    FixedInvertedFilterKernel<opp::FixedFilter::SobelVert, 3, float>::Values);
+                    FixedInvertedFilterKernel<mpp::FixedFilter::SobelVert, 3, float>::Values);
             default:
                 break;
         }
@@ -181,9 +181,9 @@ inline const float *GetFilterInv(FixedFilter aFilter, int aSize)
     {
         switch (aFilter)
         {
-            case opp::FixedFilter::SobelVert:
+            case mpp::FixedFilter::SobelVert:
                 return reinterpret_cast<const float *>(
-                    FixedInvertedFilterKernel<opp::FixedFilter::SobelVert, 5, float>::Values);
+                    FixedInvertedFilterKernel<mpp::FixedFilter::SobelVert, 5, float>::Values);
             default:
                 break;
         }
@@ -194,20 +194,20 @@ inline const float *GetFilterInv(FixedFilter aFilter, int aSize)
 #pragma region FixedFilter
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize,
+ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
                                         BorderType aBorder) const
 {
     return this->FixedFilter(aDst, aFilter, aMaskSize, aBorder, ROI());
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
+ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
                                         BorderType aBorder) const
 {
     return this->FixedFilter(aDst, aFilter, aMaskSize, aConstant, aBorder, ROI());
 }
 template <PixelType T>
-ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize,
+ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
                                         BorderType aBorder, const Roi &aAllowedReadRoi) const
 {
     if (aBorder == BorderType::Constant)
@@ -219,7 +219,7 @@ ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, opp::FixedFilter aFi
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
+ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
                                         BorderType aBorder, const Roi &aAllowedReadRoi) const
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -237,7 +237,7 @@ ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, opp::FixedFilter aFi
 
 template <PixelType T>
 ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::FixedFilter(
-    ImageView<alternative_filter_output_type_for_t<T>> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize,
+    ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
     BorderType aBorder) const
     requires(has_alternative_filter_output_type_for_v<T>)
 {
@@ -246,7 +246,7 @@ ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::FixedFilter(
 
 template <PixelType T>
 ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::FixedFilter(
-    ImageView<alternative_filter_output_type_for_t<T>> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
+    ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
     BorderType aBorder) const
     requires(has_alternative_filter_output_type_for_v<T>)
 {
@@ -254,7 +254,7 @@ ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::FixedFilter(
 }
 template <PixelType T>
 ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::FixedFilter(
-    ImageView<alternative_filter_output_type_for_t<T>> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize,
+    ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
     BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires(has_alternative_filter_output_type_for_v<T>)
 {
@@ -268,7 +268,7 @@ ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::FixedFilter(
 
 template <PixelType T>
 ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::FixedFilter(
-    ImageView<alternative_filter_output_type_for_t<T>> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
+    ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
     BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires(has_alternative_filter_output_type_for_v<T>)
 {
@@ -1013,7 +1013,7 @@ ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const Filte
 template <PixelType T>
 ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
                                                  const float *aPreCompGeomDistCoeff, float aValSquareSigma,
-                                                 opp::Norm aNorm, BorderType aBorder) const
+                                                 mpp::Norm aNorm, BorderType aBorder) const
     requires(!SingleChannel<T>) && RealVector<T> &&
             (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>)
 {
@@ -1023,7 +1023,7 @@ ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const Filte
 template <PixelType T>
 ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
                                                  const float *aPreCompGeomDistCoeff, float aValSquareSigma,
-                                                 opp::Norm aNorm, T aConstant, BorderType aBorder) const
+                                                 mpp::Norm aNorm, T aConstant, BorderType aBorder) const
     requires(!SingleChannel<T>) && RealVector<T> &&
             (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>)
 {
@@ -1034,7 +1034,7 @@ ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const Filte
 template <PixelType T>
 ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
                                                  const float *aPreCompGeomDistCoeff, float aValSquareSigma,
-                                                 opp::Norm aNorm, BorderType aBorder, const Roi &aAllowedReadRoi) const
+                                                 mpp::Norm aNorm, BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires(!SingleChannel<T>) && RealVector<T> &&
             (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>)
 {
@@ -1050,7 +1050,7 @@ ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const Filte
 template <PixelType T>
 ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
                                                  const float *aPreCompGeomDistCoeff, float aValSquareSigma,
-                                                 opp::Norm aNorm, T aConstant, BorderType aBorder,
+                                                 mpp::Norm aNorm, T aConstant, BorderType aBorder,
                                                  const Roi &aAllowedReadRoi) const
     requires(!SingleChannel<T>) && RealVector<T> &&
             (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>)
@@ -1142,8 +1142,8 @@ void ImageView<T>::GradientVectorSobel(ImageView<Pixel16sC1> &aDstX, ImageView<P
     using ComputeT = filter_compute_type_for_t<T>;
 
     const FilterArea filterArea(GetFilterSize(aMaskSize));
-    const float *filterX = GetFilterInv(opp::FixedFilter::SobelVert, filterArea.Size.x);
-    const float *filterY = GetFilter(opp::FixedFilter::SobelHoriz, filterArea.Size.x);
+    const float *filterX = GetFilterInv(mpp::FixedFilter::SobelVert, filterArea.Size.x);
+    const float *filterY = GetFilter(mpp::FixedFilter::SobelHoriz, filterArea.Size.x);
 
     gradientVectorEachPixel<T, ComputeT, Pixel16sC1, float>(*this, aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance,
                                                             filterX, filterY, filterArea, aNorm, aBorder, aConstant,
@@ -1227,8 +1227,8 @@ void ImageView<T>::GradientVectorSobel(ImageView<Pixel32fC1> &aDstX, ImageView<P
     using ComputeT = filter_compute_type_for_t<T>;
 
     const FilterArea filterArea(GetFilterSize(aMaskSize));
-    const float *filterX = GetFilterInv(opp::FixedFilter::SobelVert, filterArea.Size.x);
-    const float *filterY = GetFilter(opp::FixedFilter::SobelHoriz, filterArea.Size.x);
+    const float *filterX = GetFilterInv(mpp::FixedFilter::SobelVert, filterArea.Size.x);
+    const float *filterY = GetFilter(mpp::FixedFilter::SobelHoriz, filterArea.Size.x);
 
     gradientVectorEachPixel<T, ComputeT, Pixel32fC1, float>(*this, aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance,
                                                             filterX, filterY, filterArea, aNorm, aBorder, aConstant,
@@ -1310,8 +1310,8 @@ void ImageView<T>::GradientVectorScharr(ImageView<Pixel16sC1> &aDstX, ImageView<
     using ComputeT = filter_compute_type_for_t<T>;
 
     const FilterArea filterArea(GetFilterSize(aMaskSize));
-    const float *filterX = GetFilter(opp::FixedFilter::ScharrVert, filterArea.Size.x); // not inverted!
-    const float *filterY = GetFilter(opp::FixedFilter::ScharrHoriz, filterArea.Size.x);
+    const float *filterX = GetFilter(mpp::FixedFilter::ScharrVert, filterArea.Size.x); // not inverted!
+    const float *filterY = GetFilter(mpp::FixedFilter::ScharrHoriz, filterArea.Size.x);
 
     gradientVectorEachPixel<T, ComputeT, Pixel16sC1, float>(*this, aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance,
                                                             filterX, filterY, filterArea, aNorm, aBorder, aConstant,
@@ -1395,8 +1395,8 @@ void ImageView<T>::GradientVectorScharr(ImageView<Pixel32fC1> &aDstX, ImageView<
     using ComputeT = filter_compute_type_for_t<T>;
 
     const FilterArea filterArea(GetFilterSize(aMaskSize));
-    const float *filterX = GetFilter(opp::FixedFilter::ScharrVert, filterArea.Size.x); // not inverted!
-    const float *filterY = GetFilter(opp::FixedFilter::ScharrHoriz, filterArea.Size.x);
+    const float *filterX = GetFilter(mpp::FixedFilter::ScharrVert, filterArea.Size.x); // not inverted!
+    const float *filterY = GetFilter(mpp::FixedFilter::ScharrHoriz, filterArea.Size.x);
 
     gradientVectorEachPixel<T, ComputeT, Pixel32fC1, float>(*this, aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance,
                                                             filterX, filterY, filterArea, aNorm, aBorder, aConstant,
@@ -1478,8 +1478,8 @@ void ImageView<T>::GradientVectorPrewitt(ImageView<Pixel16sC1> &aDstX, ImageView
     using ComputeT = filter_compute_type_for_t<T>;
 
     const FilterArea filterArea(GetFilterSize(aMaskSize));
-    const float *filterX = GetFilterInv(opp::FixedFilter::PrewittVert, filterArea.Size.x);
-    const float *filterY = GetFilter(opp::FixedFilter::PrewittHoriz, filterArea.Size.x);
+    const float *filterX = GetFilterInv(mpp::FixedFilter::PrewittVert, filterArea.Size.x);
+    const float *filterY = GetFilter(mpp::FixedFilter::PrewittHoriz, filterArea.Size.x);
 
     gradientVectorEachPixel<T, ComputeT, Pixel16sC1, float>(*this, aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance,
                                                             filterX, filterY, filterArea, aNorm, aBorder, aConstant,
@@ -1563,8 +1563,8 @@ void ImageView<T>::GradientVectorPrewitt(ImageView<Pixel32fC1> &aDstX, ImageView
     using ComputeT = filter_compute_type_for_t<T>;
 
     const FilterArea filterArea(GetFilterSize(aMaskSize));
-    const float *filterX = GetFilterInv(opp::FixedFilter::PrewittVert, filterArea.Size.x);
-    const float *filterY = GetFilter(opp::FixedFilter::PrewittHoriz, filterArea.Size.x);
+    const float *filterX = GetFilterInv(mpp::FixedFilter::PrewittVert, filterArea.Size.x);
+    const float *filterY = GetFilter(mpp::FixedFilter::PrewittHoriz, filterArea.Size.x);
 
     gradientVectorEachPixel<T, ComputeT, Pixel32fC1, float>(*this, aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance,
                                                             filterX, filterY, filterArea, aNorm, aBorder, aConstant,
@@ -1827,7 +1827,7 @@ ImageView<Pixel32fC1> &ImageView<T>::HarrisCornerResponse(ImageView<Pixel32fC1> 
 
     this->BoxFilter(boxfiltered, aAvgWindowSize, aConstant, aBorder, aAllowedReadRoi);
 
-    using PostOpT = opp::HarrisCorner;
+    using PostOpT = mpp::HarrisCorner;
     const PostOpT postOp(aK, aScale);
 
     for (const auto &elem : SizeRoi())
@@ -1868,4 +1868,4 @@ ImageView<Pixel8uC1> &ImageView<T>::CannyEdge(const ImageView<Pixel32fC1> &aSrcA
     return aDst;
 }
 #pragma endregion
-} // namespace opp::image::cpuSimple
+} // namespace mpp::image::cpuSimple

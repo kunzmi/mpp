@@ -5,7 +5,7 @@
 #include "half_fp16.h"     //NOLINT(misc-include-cleaner)
 #include "vector4A_impl.h" //NOLINT(misc-include-cleaner)
 
-namespace opp
+namespace mpp
 {
 template struct Vector4A<sbyte>;
 template struct Vector4A<byte>;
@@ -776,4 +776,4 @@ template std::ostream &operator<<(std::ostream &aOs, const Vector4A<Complex<doub
 template std::wostream &operator<<(std::wostream &aOs, const Vector4A<Complex<double>> &aVec);
 template std::istream &operator>>(std::istream &aIs, Vector4A<Complex<double>> &aVec);
 template std::wistream &operator>>(std::wistream &aIs, Vector4A<Complex<double>> &aVec);
-} // namespace opp
+} // namespace mpp

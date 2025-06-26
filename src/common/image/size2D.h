@@ -4,7 +4,7 @@
 #include <istream>
 #include <ostream>
 
-namespace opp::image
+namespace mpp::image
 {
 /// <summary>
 /// A specialized type to describe image size in 2D (number of pixels in X and Y)
@@ -221,4 +221,4 @@ std::ostream &operator<<(std::ostream &aOs, const Size2D &aSize);
 std::wostream &operator<<(std::wostream &aOs, const Size2D &aSize);
 std::istream &operator>>(std::istream &aIs, Size2D &aSize);
 std::wistream &operator>>(std::wistream &aIs, Size2D &aSize);
-} // namespace opp::image
+} // namespace mpp::image

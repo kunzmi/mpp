@@ -4,7 +4,7 @@
 #include <common/vector_typetraits.h>
 #include <concepts>
 
-namespace opp::image::cpuSimple
+namespace mpp::image::cpuSimple
 {
 // level types for histogram even:
 template <typename SrcT> struct hist_even_level_types_scalar_for
@@ -89,4 +89,4 @@ template <typename SrcT> struct hist_range_types_for
 template <typename T>
 using hist_range_types_for_t = same_vector_size_different_type_t<T, typename hist_range_types_for<T>::levelType>;
 
-} // namespace opp::image::cpuSimple
+} // namespace mpp::image::cpuSimple

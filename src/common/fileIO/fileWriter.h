@@ -11,12 +11,12 @@
 #include <memory>
 #include <ostream>
 
-namespace opp::fileIO
+namespace mpp::fileIO
 {
 const std::string FILE_CREATED_BY = std::string("File created by ") + // NOLINT(cert-err58-cpp)
-                                    OPP_PROJECT_NAME +                // NOLINT(cert-err58-cpp)
+                                    MPP_PROJECT_NAME +                // NOLINT(cert-err58-cpp)
                                     " version " +                     // NOLINT(cert-err58-cpp)
-                                    OPP_VERSION;                      // NOLINT(cert-err58-cpp)
+                                    MPP_VERSION;                      // NOLINT(cert-err58-cpp)
 
 constexpr size_t FILEWRITER_CHUNK_SIZE = 10ull * 1024ull * 1024ull; // 10MB
 
@@ -75,7 +75,7 @@ class FileWriter : public virtual File
     /// <summary>
     /// Converts from internal data type to Em data type enum<para/>
     /// </summary>
-    virtual void SetDataType(opp::image::PixelTypeEnum) = 0;
+    virtual void SetDataType(mpp::image::PixelTypeEnum) = 0;
     /// <summary>
     /// Sets the pixel size given in nm and converts them if needed to the internal unit.
     /// </summary>
@@ -156,4 +156,4 @@ class FileWriter : public virtual File
     void SeekWrite(size_t aPos, std::ios_base::seekdir aDir = std::ios_base::beg);
     size_t TellWrite();
 };
-} // namespace opp::fileIO
+} // namespace mpp::fileIO

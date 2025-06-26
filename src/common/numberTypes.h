@@ -6,7 +6,7 @@
 
 // definition of some concepts that classify the different number types used:
 
-namespace opp
+namespace mpp
 {
 // forward declaration for HalfFp16, BFloat16
 class HalfFp16;
@@ -143,4 +143,4 @@ concept IsFloat = std::same_as<T, float>;
 template <typename T>
 concept IsDouble = std::same_as<T, double>;
 
-} // namespace opp
+} // namespace mpp

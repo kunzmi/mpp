@@ -62,11 +62,11 @@
 #include <catch2/catch_test_macros.hpp>
 #include <common/defines.h>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size = 256;
 
@@ -81,8 +81,8 @@ TEST_CASE("8uC1", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image8uC1 npp_src1(size, size);
     nv::Image8uC1 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -110,8 +110,8 @@ TEST_CASE("8uC2", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image8uC2 npp_src1(size, size);
     nv::Image8uC2 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -139,8 +139,8 @@ TEST_CASE("8uC3", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image8uC3 npp_src1(size, size);
     nv::Image8uC3 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -168,8 +168,8 @@ TEST_CASE("8uC4", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image8uC4 npp_src1(size, size);
     nv::Image8uC4 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -196,8 +196,8 @@ TEST_CASE("8sC1", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image8sC1 npp_src1(size, size);
     nv::Image8sC1 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -225,8 +225,8 @@ TEST_CASE("8sC2", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image8sC2 npp_src1(size, size);
     nv::Image8sC2 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -254,8 +254,8 @@ TEST_CASE("8sC3", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image8sC3 npp_src1(size, size);
     nv::Image8sC3 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -283,8 +283,8 @@ TEST_CASE("8sC4", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image8sC4 npp_src1(size, size);
     nv::Image8sC4 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -311,8 +311,8 @@ TEST_CASE("16uC1", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image16uC1 npp_src1(size, size);
     nv::Image16uC1 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -340,8 +340,8 @@ TEST_CASE("16uC2", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image16uC2 npp_src1(size, size);
     nv::Image16uC2 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -369,8 +369,8 @@ TEST_CASE("16uC3", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image16uC3 npp_src1(size, size);
     nv::Image16uC3 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -398,8 +398,8 @@ TEST_CASE("16uC4", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image16uC4 npp_src1(size, size);
     nv::Image16uC4 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -426,8 +426,8 @@ TEST_CASE("16sC1", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image16sC1 npp_src1(size, size);
     nv::Image16sC1 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -455,8 +455,8 @@ TEST_CASE("16sC2", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image16sC2 npp_src1(size, size);
     nv::Image16sC2 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -484,8 +484,8 @@ TEST_CASE("16sC3", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image16sC3 npp_src1(size, size);
     nv::Image16sC3 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -513,8 +513,8 @@ TEST_CASE("16sC4", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image16sC4 npp_src1(size, size);
     nv::Image16sC4 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -541,8 +541,8 @@ TEST_CASE("16scC1", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image16scC1 npp_src1(size, size);
     nv::Image16scC1 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -570,8 +570,8 @@ TEST_CASE("16scC2", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image16scC2 npp_src1(size, size);
     nv::Image16scC2 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -599,8 +599,8 @@ TEST_CASE("16scC3", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image16scC3 npp_src1(size, size);
     nv::Image16scC3 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -628,8 +628,8 @@ TEST_CASE("16scC4", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image16scC4 npp_src1(size, size);
     nv::Image16scC4 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -656,8 +656,8 @@ TEST_CASE("32uC1", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image32uC1 npp_src1(size, size);
     nv::Image32uC1 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -685,8 +685,8 @@ TEST_CASE("32uC2", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image32uC2 npp_src1(size, size);
     nv::Image32uC2 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -714,8 +714,8 @@ TEST_CASE("32uC3", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image32uC3 npp_src1(size, size);
     nv::Image32uC3 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -743,8 +743,8 @@ TEST_CASE("32uC4", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image32uC4 npp_src1(size, size);
     nv::Image32uC4 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -771,8 +771,8 @@ TEST_CASE("32sC1", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image32sC1 npp_src1(size, size);
     nv::Image32sC1 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -800,8 +800,8 @@ TEST_CASE("32sC2", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image32sC2 npp_src1(size, size);
     nv::Image32sC2 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -829,8 +829,8 @@ TEST_CASE("32sC3", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image32sC3 npp_src1(size, size);
     nv::Image32sC3 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -858,8 +858,8 @@ TEST_CASE("32sC4", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image32sC4 npp_src1(size, size);
     nv::Image32sC4 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -886,8 +886,8 @@ TEST_CASE("32scC1", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image32scC1 npp_src1(size, size);
     nv::Image32scC1 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -915,8 +915,8 @@ TEST_CASE("32scC2", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image32scC2 npp_src1(size, size);
     nv::Image32scC2 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -944,8 +944,8 @@ TEST_CASE("32scC3", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image32scC3 npp_src1(size, size);
     nv::Image32scC3 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -973,8 +973,8 @@ TEST_CASE("32scC4", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image32scC4 npp_src1(size, size);
     nv::Image32scC4 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -1001,8 +1001,8 @@ TEST_CASE("32fC1", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image32fC1 npp_src1(size, size);
     nv::Image32fC1 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -1030,8 +1030,8 @@ TEST_CASE("32fC2", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image32fC2 npp_src1(size, size);
     nv::Image32fC2 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -1059,8 +1059,8 @@ TEST_CASE("32fC3", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image32fC3 npp_src1(size, size);
     nv::Image32fC3 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -1088,8 +1088,8 @@ TEST_CASE("32fC4", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image32fC4 npp_src1(size, size);
     nv::Image32fC4 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -1116,8 +1116,8 @@ TEST_CASE("32fcC1", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image32fcC1 npp_src1(size, size);
     nv::Image32fcC1 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -1145,8 +1145,8 @@ TEST_CASE("32fcC2", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image32fcC2 npp_src1(size, size);
     nv::Image32fcC2 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -1174,8 +1174,8 @@ TEST_CASE("32fcC3", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image32fcC3 npp_src1(size, size);
     nv::Image32fcC3 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -1203,8 +1203,8 @@ TEST_CASE("32fcC4", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image32fcC4 npp_src1(size, size);
     nv::Image32fcC4 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -1231,8 +1231,8 @@ TEST_CASE("64fC1", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image64fC1 npp_src1(size, size);
     nv::Image64fC1 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -1260,8 +1260,8 @@ TEST_CASE("64fC2", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image64fC2 npp_src1(size, size);
     nv::Image64fC2 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -1289,8 +1289,8 @@ TEST_CASE("64fC3", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image64fC3 npp_src1(size, size);
     nv::Image64fC3 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -1318,8 +1318,8 @@ TEST_CASE("64fC4", "[NPP.Statistics.MaximumError]")
     double npp_res;
     nv::Image64fC4 npp_src1(size, size);
     nv::Image64fC4 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaximumErrorGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);

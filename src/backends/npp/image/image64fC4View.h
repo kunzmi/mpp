@@ -2,7 +2,7 @@
 
 #pragma once
 #include <common/moduleEnabler.h>
-#if OPP_ENABLE_NPP_BACKEND
+#if MPP_ENABLE_NPP_BACKEND
 #include <common/image/pixelTypeEnabler.h>
 
 #include "imageView.h"
@@ -14,7 +14,7 @@
 #include <common/image/size2D.h>
 #include <common/image/sizePitched.h>
 
-namespace opp::image::npp
+namespace mpp::image::npp
 {
 // forward declaration:
 class Image64fC1View;
@@ -47,7 +47,7 @@ class Image64fC4View : public ImageView<Pixel64fC4>
     [[nodiscard]] Image64fC4View GetView(const Border &aBorder = Border());
 
     //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
-#if OPPi_ENABLE_DOUBLE_TYPE && OPPi_ENABLE_FOUR_CHANNEL
+#if MPPi_ENABLE_DOUBLE_TYPE && MPPi_ENABLE_FOUR_CHANNEL
 
     // NppStatus nppiCrossCorrFull_Norm_64f_C4R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, NppStreamContext nppStreamCtx)
     Image64fC4View &CrossCorrFull_Norm(const Image64fC4View &pTpl, Image64fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
@@ -68,10 +68,10 @@ class Image64fC4View : public ImageView<Pixel64fC4>
     Image64fC4View &CrossCorrValid_NormA(const Image64fC4View &pTpl, Image64fC4View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrFull_NormLevel_64f_C4R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    Image64fC4View &CrossCorrFull_NormLevel(const Image64fC4View &pTpl, Image64fC4View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image64fC4View &CrossCorrFull_NormLevel(const Image64fC4View &pTpl, Image64fC4View &pDst, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrFull_NormLevel_64f_AC4R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    Image64fC4View &CrossCorrFull_NormLevelA(const Image64fC4View &pTpl, Image64fC4View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image64fC4View &CrossCorrFull_NormLevelA(const Image64fC4View &pTpl, Image64fC4View &pDst, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFullNormLevelGetBufferHostSize_64f_C4R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t FullNormLevelGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -80,10 +80,10 @@ class Image64fC4View : public ImageView<Pixel64fC4>
     [[nodiscard]] size_t FullNormLevelGetBufferHostSizeA(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrSame_NormLevel_64f_C4R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    Image64fC4View &CrossCorrSame_NormLevel(const Image64fC4View &pTpl, Image64fC4View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image64fC4View &CrossCorrSame_NormLevel(const Image64fC4View &pTpl, Image64fC4View &pDst, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrSame_NormLevel_64f_AC4R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    Image64fC4View &CrossCorrSame_NormLevelA(const Image64fC4View &pTpl, Image64fC4View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image64fC4View &CrossCorrSame_NormLevelA(const Image64fC4View &pTpl, Image64fC4View &pDst, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSameNormLevelGetBufferHostSize_64f_C4R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t SameNormLevelGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -92,10 +92,10 @@ class Image64fC4View : public ImageView<Pixel64fC4>
     [[nodiscard]] size_t SameNormLevelGetBufferHostSizeA(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrValid_NormLevel_64f_C4R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    Image64fC4View &CrossCorrValid_NormLevel(const Image64fC4View &pTpl, Image64fC4View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image64fC4View &CrossCorrValid_NormLevel(const Image64fC4View &pTpl, Image64fC4View &pDst, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrValid_NormLevel_64f_AC4R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    Image64fC4View &CrossCorrValid_NormLevelA(const Image64fC4View &pTpl, Image64fC4View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image64fC4View &CrossCorrValid_NormLevelA(const Image64fC4View &pTpl, Image64fC4View &pDst, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiValidNormLevelGetBufferHostSize_64f_C4R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t ValidNormLevelGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -104,34 +104,34 @@ class Image64fC4View : public ImageView<Pixel64fC4>
     [[nodiscard]] size_t ValidNormLevelGetBufferHostSizeA(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrFull_NormLevelAdvanced_64f_C4R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, Npp8u * pDeviceBuffer, Npp8u * pAdvancedScratchBuffer, NppStreamContext nppStreamCtx)
-    Image64fC4View &CrossCorrFull_NormLevelAdvanced(const Image64fC4View &pTpl, Image64fC4View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image64fC4View &CrossCorrFull_NormLevelAdvanced(const Image64fC4View &pTpl, Image64fC4View &pDst, mpp::cuda::DevVarView<byte> &pDeviceBuffer, mpp::cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrSame_NormLevelAdvanced_64f_C4R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, Npp8u * pDeviceBuffer, Npp8u * pAdvancedScratchBuffer, NppStreamContext nppStreamCtx)
-    Image64fC4View &CrossCorrSame_NormLevelAdvanced(const Image64fC4View &pTpl, Image64fC4View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image64fC4View &CrossCorrSame_NormLevelAdvanced(const Image64fC4View &pTpl, Image64fC4View &pDst, mpp::cuda::DevVarView<byte> &pDeviceBuffer, mpp::cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrValid_NormLevelAdvanced_64f_C4R_Ctx(const Npp64f * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp64f * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp64f * pDst, int nDstStep, Npp8u * pDeviceBuffer, Npp8u * pAdvancedScratchBuffer, NppStreamContext nppStreamCtx)
-    Image64fC4View &CrossCorrValid_NormLevelAdvanced(const Image64fC4View &pTpl, Image64fC4View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image64fC4View &CrossCorrValid_NormLevelAdvanced(const Image64fC4View &pTpl, Image64fC4View &pDst, mpp::cuda::DevVarView<byte> &pDeviceBuffer, mpp::cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumError_64f_C4R_Ctx(const Npp64f * pSrc1, int nSrc1Step, const Npp64f * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void MaximumError(const Image64fC4View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void MaximumError(const Image64fC4View &pSrc2, mpp::cuda::DevVarView<double> &pError, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumErrorGetBufferHostSize_64f_C4R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t MaximumErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAverageError_64f_C4R_Ctx(const Npp64f * pSrc1, int nSrc1Step, const Npp64f * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void AverageError(const Image64fC4View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void AverageError(const Image64fC4View &pSrc2, mpp::cuda::DevVarView<double> &pError, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAverageErrorGetBufferHostSize_64f_C4R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t AverageErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumRelativeError_64f_C4R_Ctx(const Npp64f * pSrc1, int nSrc1Step, const Npp64f * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void MaximumRelativeError(const Image64fC4View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void MaximumRelativeError(const Image64fC4View &pSrc2, mpp::cuda::DevVarView<double> &pError, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumRelativeErrorGetBufferHostSize_64f_C4R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t MaximumRelativeErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAverageRelativeError_64f_C4R_Ctx(const Npp64f * pSrc1, int nSrc1Step, const Npp64f * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void AverageRelativeError(const Image64fC4View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void AverageRelativeError(const Image64fC4View &pSrc2, mpp::cuda::DevVarView<double> &pError, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAverageRelativeErrorGetBufferHostSize_64f_C4R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t AverageRelativeErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -163,8 +163,8 @@ class Image64fC4View : public ImageView<Pixel64fC4>
     // NppStatus nppiWarpAffine_64f_P4R_Ctx(const Npp64f *[4] aSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, Npp64f *[4] aDst, int nDstStep, NppiRect oDstROI, const double[2][3] aCoeffs, int eInterpolation, NppStreamContext nppStreamCtx)
     static void WarpAffine(const Image64fC1View &aSrcChannel0, const Image64fC1View &aSrcChannel1, const Image64fC1View &aSrcChannel2, const Image64fC1View &aSrcChannel3, Image64fC1View &aDstChannel0, Image64fC1View &aDstChannel1, Image64fC1View &aDstChannel2, Image64fC1View &aDstChannel3, const AffineTransformation<double> &aCoeffs, int eInterpolation, const NppStreamContext &nppStreamCtx);
 
-#endif // OPPi_ENABLE_DOUBLE_TYPE && OPPi_ENABLE_FOUR_CHANNEL
+#endif // MPPi_ENABLE_DOUBLE_TYPE && MPPi_ENABLE_FOUR_CHANNEL
     //NOLINTEND(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 };
-} // namespace opp::image::npp
-#endif // OPP_ENABLE_NPP_BACKEND
+} // namespace mpp::image::npp
+#endif // MPP_ENABLE_NPP_BACKEND

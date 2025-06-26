@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "maxMasked.h"
 #include <backends/cuda/image/configurations.h>
@@ -13,7 +13,7 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/statistics/operators.h>
 #include <common/statistics/postOperators.h>
@@ -21,36 +21,36 @@
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT>
 void InvokeMaxMaskedSrc(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aSrc, size_t aPitchSrc,
                         SrcT *aTempBuffer, SrcT *aDst, remove_vector_t<SrcT> *aDstScalar, const Size2D &aSize,
-                        const opp::cuda::StreamCtx &aStreamCtx)
+                        const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
+    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
+        MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
-        using maxSrc = SrcReductionFunctor<TupelSize, SrcT, SrcT, opp::MaxRed<SrcT>>;
+        using maxSrc = SrcReductionFunctor<TupelSize, SrcT, SrcT, mpp::MaxRed<SrcT>>;
 
-        const opp::MaxRed<SrcT> op;
+        const mpp::MaxRed<SrcT> op;
 
         const maxSrc functor(aSrc, aPitchSrc, op);
 
-        InvokeReductionMaskedAlongXKernelDefault<SrcT, SrcT, TupelSize, maxSrc, opp::MaxRed<SrcT>,
+        InvokeReductionMaskedAlongXKernelDefault<SrcT, SrcT, TupelSize, maxSrc, mpp::MaxRed<SrcT>,
                                                  ReductionInitValue::Min>(aMask, aPitchMask, aSrc, aTempBuffer, aSize,
                                                                           aStreamCtx, functor);
 
-        const opp::Nothing<SrcT> postOp;
-        const opp::MaxScalar<SrcT> postOpScalar;
+        const mpp::Nothing<SrcT> postOp;
+        const mpp::MaxScalar<SrcT> postOpScalar;
 
-        InvokeReductionAlongYKernelDefault<SrcT, SrcT, opp::MaxRed<SrcT>, ReductionInitValue::Min, opp::Nothing<SrcT>,
-                                           opp::MaxScalar<SrcT>>(aTempBuffer, aDst, aDstScalar, aSize.y, postOp,
+        InvokeReductionAlongYKernelDefault<SrcT, SrcT, mpp::MaxRed<SrcT>, ReductionInitValue::Min, mpp::Nothing<SrcT>,
+                                           mpp::MaxScalar<SrcT>>(aTempBuffer, aDst, aDstScalar, aSize.y, postOp,
                                                                  postOpScalar, aStreamCtx);
     }
 }
@@ -70,5 +70,5 @@ void InvokeMaxMaskedSrc(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *a
     Instantiate_For(Pixel##type##C4A);
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

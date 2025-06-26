@@ -15,7 +15,7 @@
 #include <sstream>
 #include <string>
 
-using namespace opp;
+using namespace mpp;
 using namespace Catch;
 
 TEST_CASE("Complex<float>", "[Common]")

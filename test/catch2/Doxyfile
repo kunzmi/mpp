@@ -372,7 +372,7 @@ CPP_CLI_SUPPORT        = NO
 
 SIP_SUPPORT            = NO
 
-# For Microsoft's IDL there are propget and propput attributes to indicate
+# For Microsoft's IDL there are propget and prmpput attributes to indicate
 # getter and setter methods for a property. Setting this option to YES will make
 # doxygen to replace the get and set methods by a property in the documentation.
 # This will only work if the methods are indeed getting or setting a simple

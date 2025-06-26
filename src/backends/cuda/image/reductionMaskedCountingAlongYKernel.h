@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/image/configurations.h>
@@ -16,7 +16,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 
 /// <summary>
@@ -242,7 +242,7 @@ template <typename SrcT, typename DstT, typename reductionOp, ReductionInitValue
           typename postOpScalar>
 void InvokeReductionMaskedCountingAlongYKernelDefault(const ulong64 *aMaskCounters, const SrcT *aSrc, DstT *aDst,
                                                       remove_vector_t<DstT> *aDstScalar, int aSize,
-                                                      const opp::cuda::StreamCtx &aStreamCtx)
+                                                      const mpp::cuda::StreamCtx &aStreamCtx)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {
@@ -272,5 +272,5 @@ void InvokeReductionMaskedCountingAlongYKernelDefault(const ulong64 *aMaskCounte
     }
 }
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

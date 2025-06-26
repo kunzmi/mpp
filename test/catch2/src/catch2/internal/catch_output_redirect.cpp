@@ -44,7 +44,7 @@ namespace Catch {
         /**
          * Redirects specific stream's rdbuf with another's.
          *
-         * Redirection can be stopped and started on-demand, assumes
+         * Redirection can be stmpped and started on-demand, assumes
          * that the underlying stream's rdbuf aren't changed by other
          * users.
          */

@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace opp::utilities::nppParser
+namespace mpp::utilities::nppParser
 {
 struct Argument
 {
@@ -67,4 +67,4 @@ inline void from_json(const nlohmann::json &aj, Function &aFunction)
     aj.at("arguments").get_to(aFunction.arguments);
     aj.at("category").get_to(aFunction.category);
 }
-} // namespace opp::utilities::nppParser
+} // namespace mpp::utilities::nppParser

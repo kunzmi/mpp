@@ -8,12 +8,12 @@
 #define __PRETTY_FUNCTION__ __FUNCSIG__ // NOLINT(bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp)
 #endif
 
-namespace opp
+namespace mpp
 {
 /// <summary>
-/// Exception base class for all exceptions thrown in OPP.
+/// Exception base class for all exceptions thrown in MPP.
 /// </summary>
-class OPPException : public std::exception
+class MPPException : public std::exception
 {
   private:
     std::string mWhat;
@@ -24,14 +24,14 @@ class OPPException : public std::exception
     std::string &Message();
 
   public:
-    OPPException() noexcept = default;
-    explicit OPPException(std::string aMessage);
-    ~OPPException() noexcept override = default;
+    MPPException() noexcept = default;
+    explicit MPPException(std::string aMessage);
+    ~MPPException() noexcept override = default;
 
-    OPPException(OPPException &&)                 = default;
-    OPPException(const OPPException &)            = default;
-    OPPException &operator=(const OPPException &) = delete;
-    OPPException &operator=(OPPException &&)      = delete;
+    MPPException(MPPException &&)                 = default;
+    MPPException(const MPPException &)            = default;
+    MPPException &operator=(const MPPException &) = delete;
+    MPPException &operator=(MPPException &&)      = delete;
 
     /// <summary>
     /// A detailed string containing the error message and the location where the error happend. More verbose in debug
@@ -47,7 +47,7 @@ class OPPException : public std::exception
 /// <summary>
 /// Exception is a general exception.
 /// </summary>
-class Exception : public OPPException
+class Exception : public MPPException
 {
   public:
     Exception(const std::string &aMessage, const std::filesystem::path &aCodeFileName, int aLineNumber,
@@ -63,7 +63,7 @@ class Exception : public OPPException
 /// <summary>
 /// InvalidArgumentException is thrown if an argument is not in an acceptable value range.
 /// </summary>
-class InvalidArgumentException : public OPPException
+class InvalidArgumentException : public MPPException
 {
   public:
     InvalidArgumentException(const std::string &aArgumentName, const std::string &aMessage,
@@ -76,12 +76,12 @@ class InvalidArgumentException : public OPPException
     InvalidArgumentException &operator=(const InvalidArgumentException &) = delete;
     InvalidArgumentException &operator=(InvalidArgumentException &&)      = delete;
 };
-} // namespace opp
+} // namespace mpp
 
 // NOLINTBEGIN --> function like macro, parantheses for "msg"...
-#define EXCEPTION(msg) (opp::Exception((std::ostringstream() << msg).str(), __FILE__, __LINE__, __PRETTY_FUNCTION__))
+#define EXCEPTION(msg) (mpp::Exception((std::ostringstream() << msg).str(), __FILE__, __LINE__, __PRETTY_FUNCTION__))
 
 #define INVALIDARGUMENT(argument, msg)                                                                                 \
-    (opp::InvalidArgumentException(#argument, (std::ostringstream() << msg).str(), __FILE__, __LINE__,                 \
+    (mpp::InvalidArgumentException(#argument, (std::ostringstream() << msg).str(), __FILE__, __LINE__,                 \
                                    __PRETTY_FUNCTION__))
 // NOLINTEND

@@ -32,11 +32,11 @@
 #include <numbers>
 #include <vector>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size = 256;
 
@@ -70,7 +70,7 @@ TEST_CASE("8uC1", "[NPP.Filtering.GaussAdvancedFilter]")
     nv::Image8uC1 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
     std::vector<float> filter = GetFilter(7, 2.5f);
-    opp::cuda::DevVar<float> filterd(7);
+    mpp::cuda::DevVar<float> filterd(7);
     filterd << filter;
 
     cpu_src1.FillRandom(seed);
@@ -96,7 +96,7 @@ TEST_CASE("8uC3", "[NPP.Filtering.GaussAdvancedFilter]")
     nv::Image8uC3 npp_src1(size, size);
     nv::Image8uC3 npp_dst(size, size);
     std::vector<float> filter = GetFilter(7, 2.5f);
-    opp::cuda::DevVar<float> filterd(7);
+    mpp::cuda::DevVar<float> filterd(7);
     filterd << filter;
 
     cpu_src1.FillRandom(seed);
@@ -122,7 +122,7 @@ TEST_CASE("8uC4", "[NPP.Filtering.GaussAdvancedFilter]")
     nv::Image8uC4 npp_src1(size, size);
     nv::Image8uC4 npp_dst(size, size);
     std::vector<float> filter = GetFilter(7, 2.5f);
-    opp::cuda::DevVar<float> filterd(7);
+    mpp::cuda::DevVar<float> filterd(7);
     filterd << filter;
 
     cpu_src1.FillRandom(seed);
@@ -148,7 +148,7 @@ TEST_CASE("16uC1", "[NPP.Filtering.GaussAdvancedFilter]")
     nv::Image16uC1 npp_src1(size, size);
     nv::Image16uC1 npp_dst(size, size);
     std::vector<float> filter = GetFilter(7, 2.5f);
-    opp::cuda::DevVar<float> filterd(7);
+    mpp::cuda::DevVar<float> filterd(7);
     filterd << filter;
 
     cpu_src1.FillRandom(seed);
@@ -174,7 +174,7 @@ TEST_CASE("16uC3", "[NPP.Filtering.GaussAdvancedFilter]")
     nv::Image16uC3 npp_src1(size, size);
     nv::Image16uC3 npp_dst(size, size);
     std::vector<float> filter = GetFilter(7, 2.5f);
-    opp::cuda::DevVar<float> filterd(7);
+    mpp::cuda::DevVar<float> filterd(7);
     filterd << filter;
 
     cpu_src1.FillRandom(seed);
@@ -200,7 +200,7 @@ TEST_CASE("16uC4", "[NPP.Filtering.GaussAdvancedFilter]")
     nv::Image16uC4 npp_src1(size, size);
     nv::Image16uC4 npp_dst(size, size);
     std::vector<float> filter = GetFilter(7, 2.5f);
-    opp::cuda::DevVar<float> filterd(7);
+    mpp::cuda::DevVar<float> filterd(7);
     filterd << filter;
 
     cpu_src1.FillRandom(seed);
@@ -226,7 +226,7 @@ TEST_CASE("16sC1", "[NPP.Filtering.GaussAdvancedFilter]")
     nv::Image16sC1 npp_src1(size, size);
     nv::Image16sC1 npp_dst(size, size);
     std::vector<float> filter = GetFilter(7, 2.5f);
-    opp::cuda::DevVar<float> filterd(7);
+    mpp::cuda::DevVar<float> filterd(7);
     filterd << filter;
 
     cpu_src1.FillRandom(seed);
@@ -252,7 +252,7 @@ TEST_CASE("16sC3", "[NPP.Filtering.GaussAdvancedFilter]")
     nv::Image16sC3 npp_src1(size, size);
     nv::Image16sC3 npp_dst(size, size);
     std::vector<float> filter = GetFilter(7, 2.5f);
-    opp::cuda::DevVar<float> filterd(7);
+    mpp::cuda::DevVar<float> filterd(7);
     filterd << filter;
 
     cpu_src1.FillRandom(seed);
@@ -278,7 +278,7 @@ TEST_CASE("16sC4", "[NPP.Filtering.GaussAdvancedFilter]")
     nv::Image16sC4 npp_src1(size, size);
     nv::Image16sC4 npp_dst(size, size);
     std::vector<float> filter = GetFilter(7, 2.5f);
-    opp::cuda::DevVar<float> filterd(7);
+    mpp::cuda::DevVar<float> filterd(7);
     filterd << filter;
 
     cpu_src1.FillRandom(seed);
@@ -304,7 +304,7 @@ TEST_CASE("32fC1", "[NPP.Filtering.GaussAdvancedFilter]")
     nv::Image32fC1 npp_src1(size, size);
     nv::Image32fC1 npp_dst(size, size);
     std::vector<float> filter = GetFilter(7, 2.5f);
-    opp::cuda::DevVar<float> filterd(7);
+    mpp::cuda::DevVar<float> filterd(7);
     filterd << filter;
 
     cpu_src1.FillRandom(seed);
@@ -330,7 +330,7 @@ TEST_CASE("32fC3", "[NPP.Filtering.GaussAdvancedFilter]")
     nv::Image32fC3 npp_src1(size, size);
     nv::Image32fC3 npp_dst(size, size);
     std::vector<float> filter = GetFilter(7, 2.5f);
-    opp::cuda::DevVar<float> filterd(7);
+    mpp::cuda::DevVar<float> filterd(7);
     filterd << filter;
 
     cpu_src1.FillRandom(seed);
@@ -356,7 +356,7 @@ TEST_CASE("32fC4", "[NPP.Filtering.GaussAdvancedFilter]")
     nv::Image32fC4 npp_src1(size, size);
     nv::Image32fC4 npp_dst(size, size);
     std::vector<float> filter = GetFilter(7, 2.5f);
-    opp::cuda::DevVar<float> filterd(7);
+    mpp::cuda::DevVar<float> filterd(7);
     filterd << filter;
 
     cpu_src1.FillRandom(seed);
@@ -384,7 +384,7 @@ TEST_CASE("32fC4A", "[NPP.Filtering.GaussAdvancedFilter]")
     cpu::Image<Pixel32fC4> npp_res(size, size);
     nv::Image32fC4 npp_dst(size, size);
     std::vector<float> filter = GetFilter(7, 2.5f);
-    opp::cuda::DevVar<float> filterd(7);
+    mpp::cuda::DevVar<float> filterd(7);
     filterd << filter;
 
     cpu_src1.FillRandom(seed);

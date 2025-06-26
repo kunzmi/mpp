@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "setChannel.h"
 #include <backends/cuda/image/configurations.h>
@@ -12,23 +12,23 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename DstT>
 void InvokeSetChannelC(remove_vector_t<DstT> aConst, Channel aChannel, DstT *aDst, size_t aPitchDst,
                        const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE;
+        MPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE;
 
         InvokeSetChannelKernelDefault<DstT>(aDst, aPitchDst, aConst, aChannel, aSize, aStreamCtx);
     }
@@ -57,9 +57,9 @@ template <typename DstT>
 void InvokeSetChannelDevC(const remove_vector_t<DstT> *aConst, Channel aChannel, DstT *aDst, size_t aPitchDst,
                           const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE;
+        MPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE;
 
         InvokeSetChannelKernelDefault<DstT>(aDst, aPitchDst, aConst, aChannel, aSize, aStreamCtx);
     }
@@ -87,5 +87,5 @@ void InvokeSetChannelDevC(const remove_vector_t<DstT> *aConst, Channel aChannel,
 
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

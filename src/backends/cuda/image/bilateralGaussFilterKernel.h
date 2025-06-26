@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/image/configurations.h>
@@ -11,7 +11,7 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
 #include <common/utilities.h>
@@ -20,7 +20,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 
 template <typename ComputeT, Norm norm>
@@ -295,7 +295,7 @@ template <typename ComputeT, typename DstT, size_t TupelSize, int blockWidth, in
 void InvokeBilateralGaussFilterKernelDefault(const BorderControlT &aSrcWithBC, DstT *aDst, size_t aPitchDst,
                                              const FilterArea &aFilterArea, const Pixel32fC1 *aPreCompGeomDistCoeff,
                                              float aValSquareSigma, const Size2D &aSize,
-                                             const opp::cuda::StreamCtx &aStreamCtx)
+                                             const mpp::cuda::StreamCtx &aStreamCtx)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {
@@ -322,5 +322,5 @@ void InvokeBilateralGaussFilterKernelDefault(const BorderControlT &aSrcWithBC, D
     }
 }
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

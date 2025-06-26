@@ -6,7 +6,7 @@
 #include "vector2_impl.h" //NOLINT(misc-include-cleaner)
 #include <iostream>
 
-namespace opp
+namespace mpp
 {
 
 std::ostream &operator<<(std::ostream &aOs, const Axis2D &aAxis)
@@ -808,4 +808,4 @@ template std::ostream &operator<<(std::ostream &aOs, const Vector2<Complex<doubl
 template std::wostream &operator<<(std::wostream &aOs, const Vector2<Complex<double>> &aVec);
 template std::istream &operator>>(std::istream &aIs, Vector2<Complex<double>> &aVec);
 template std::wistream &operator>>(std::wistream &aIs, Vector2<Complex<double>> &aVec);
-} // namespace opp
+} // namespace mpp

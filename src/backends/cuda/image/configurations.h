@@ -1,12 +1,12 @@
 #pragma once
 #include <common/moduleEnabler.h>
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include <common/defines.h>
 #include <common/image/pixelTypes.h>
 #include <cuda_runtime_api.h>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 // allow named config names in template
 template <size_t sizeConfigName> struct ConfigNameWrapper
@@ -80,5 +80,5 @@ template <size_t typeSize> struct ConfigTupelSize<"Default", typeSize>
     // assuming 64 byte warp alignment
     static constexpr size_t value{typeSize == 1 ? 8 : typeSize == 2 ? 4 : typeSize == 4 ? 2 : 1};
 };
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

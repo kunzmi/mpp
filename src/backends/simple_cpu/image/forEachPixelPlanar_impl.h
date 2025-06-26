@@ -13,7 +13,7 @@
 #include <common/vector_typetraits.h>
 #include <iostream>
 
-namespace opp::image::cpuSimple
+namespace mpp::image::cpuSimple
 {
 /// <summary>
 /// runs aFunctor on every pixel of an image. Inplace and outplace operation, no mask. Planar 2 channel destination.
@@ -141,4 +141,4 @@ void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, ImageVie
         ++pixelIterator4;
     }
 }
-} // namespace opp::image::cpuSimple
+} // namespace mpp::image::cpuSimple

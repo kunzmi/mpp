@@ -11,7 +11,7 @@
 #include <string>
 #include <utility>
 
-namespace opp::image
+namespace mpp::image
 {
 /// <summary>
 /// A 3x2 AffineTransformation that represents a 2D affine transformation.<para/>
@@ -333,4 +333,4 @@ DEVICE_CODE inline Vec2f operator*(const AffineTransformation<float> &aLeft, con
     return Vec2f{aLeft[0] * aRight.x + aLeft[1] * aRight.y + aLeft[2],
                  aLeft[3] * aRight.x + aLeft[4] * aRight.y + aLeft[5]};
 }
-} // namespace opp::image
+} // namespace mpp::image

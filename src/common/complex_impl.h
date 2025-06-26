@@ -18,20 +18,20 @@
 #include <type_traits>
 
 #ifdef IS_CUDA_COMPILER
-#include "opp_defs.h"
+#include "mpp_defs.h"
 #include <cuda_bf16.h>
 #include <cuda_fp16.h>
 #include <vector_types.h>
 #else
 // no arguments to these intrinsics directly depend on a template parameter,
 // so a declaration must be available:
-opp::float2 __half22float2(opp::half2);               // NOLINT
-opp::half2 __float22half2_rn(opp::float2);            // NOLINT
-opp::float2 __bfloat1622float2(opp::nv_bfloat162);    // NOLINT
-opp::nv_bfloat162 __float22bfloat162_rn(opp::float2); // NOLINT
+mpp::float2 __half22float2(mpp::half2);               // NOLINT
+mpp::half2 __float22half2_rn(mpp::float2);            // NOLINT
+mpp::float2 __bfloat1622float2(mpp::nv_bfloat162);    // NOLINT
+mpp::nv_bfloat162 __float22bfloat162_rn(mpp::float2); // NOLINT
 #endif
 
-namespace opp
+namespace mpp
 {
 
 #pragma region Constructors
@@ -1399,9 +1399,9 @@ DEVICE_ONLY_CODE Complex<T> &Complex<T>::RoundZero()
     return *this;
 }
 
-template <opp::HostCode T2> std::ostream &operator<<(std::ostream &aOs, const opp::Complex<T2> &aVec)
+template <mpp::HostCode T2> std::ostream &operator<<(std::ostream &aOs, const mpp::Complex<T2> &aVec)
 {
-    if constexpr (opp::ByteSizeType<T2>)
+    if constexpr (mpp::ByteSizeType<T2>)
     {
         const int real = static_cast<int>(aVec.real); // NOLINT
         const int imag = static_cast<int>(aVec.imag); // NOLINT
@@ -1435,9 +1435,9 @@ template <opp::HostCode T2> std::ostream &operator<<(std::ostream &aOs, const op
     return aOs;
 }
 
-template <opp::HostCode T2> std::wostream &operator<<(std::wostream &aOs, const opp::Complex<T2> &aVec)
+template <mpp::HostCode T2> std::wostream &operator<<(std::wostream &aOs, const mpp::Complex<T2> &aVec)
 {
-    if constexpr (opp::ByteSizeType<T2>)
+    if constexpr (mpp::ByteSizeType<T2>)
     {
         const int real = static_cast<int>(aVec.real); // NOLINT
         const int imag = static_cast<int>(aVec.imag); // NOLINT
@@ -1471,9 +1471,9 @@ template <opp::HostCode T2> std::wostream &operator<<(std::wostream &aOs, const 
     return aOs;
 }
 
-template <opp::HostCode T2> std::istream &operator>>(std::istream &aIs, opp::Complex<T2> &aVec)
+template <mpp::HostCode T2> std::istream &operator>>(std::istream &aIs, mpp::Complex<T2> &aVec)
 {
-    if constexpr (opp::ByteSizeType<T2>)
+    if constexpr (mpp::ByteSizeType<T2>)
     {
         int real{};
         int imag{};
@@ -1488,9 +1488,9 @@ template <opp::HostCode T2> std::istream &operator>>(std::istream &aIs, opp::Com
     return aIs;
 }
 
-template <opp::HostCode T2> std::wistream &operator>>(std::wistream &aIs, opp::Complex<T2> &aVec)
+template <mpp::HostCode T2> std::wistream &operator>>(std::wistream &aIs, mpp::Complex<T2> &aVec)
 {
-    if constexpr (opp::ByteSizeType<T2>)
+    if constexpr (mpp::ByteSizeType<T2>)
     {
         int real{};
         int imag{};
@@ -1505,4 +1505,4 @@ template <opp::HostCode T2> std::wistream &operator>>(std::wistream &aIs, opp::C
     return aIs;
 }
 
-} // namespace opp
+} // namespace mpp

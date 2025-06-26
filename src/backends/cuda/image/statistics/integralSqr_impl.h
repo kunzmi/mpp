@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "integralSqr.h"
 #include <backends/cuda/image/configurations.h>
@@ -12,25 +12,25 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT, typename ComputeT, typename DstT, typename DstSqrT>
 void InvokeIntegralSqrSrc(const SrcT *aSrc, size_t aPitchSrc, DstT *aTemp, size_t aPitchTemp, DstSqrT *aTemp2,
                           size_t aPitchTemp2, DstT *aDst, size_t aPitchDst, DstSqrT *aDstSqr, size_t aPitchDstSqr,
                           const DstT &aStartValue, const DstSqrT &aStartValueSqr, const Size2D &aSizeDst,
-                          const opp::cuda::StreamCtx &aStreamCtx)
+                          const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
         // DstSqrT is always 64 wide, so TupelSize is always 1 for DstSqrT
@@ -58,7 +58,7 @@ void InvokeIntegralSqrSrc(const SrcT *aSrc, size_t aPitchSrc, DstT *aTemp, size_
                                        typeDstSqr *aTemp2, size_t aPitchTemp2, typeDst *aDst, size_t aPitchDst,        \
                                        typeDstSqr *aDstSqr, size_t aPitchDstSqr, const typeDst &aStartValue,           \
                                        const typeDstSqr &aStartValueSqr, const Size2D &aSizeDst,                       \
-                                       const opp::cuda::StreamCtx &aStreamCtx);
+                                       const mpp::cuda::StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlpha(typeSrc, typeDst, typeDstSqr)                                                            \
     Instantiate_For(Pixel##typeSrc##C1, Pixel##typeDst##C1, Pixel##typeDstSqr##C1);                                    \
@@ -68,5 +68,5 @@ void InvokeIntegralSqrSrc(const SrcT *aSrc, size_t aPitchSrc, DstT *aTemp, size_
 
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

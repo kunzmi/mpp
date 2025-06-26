@@ -33,7 +33,7 @@
 #include <common/image/size2D.h>
 #include <common/image/sizePitched.h>
 #include <common/numberTypes.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/statistics/indexMinMax.h>
 #include <common/utilities.h>
@@ -46,7 +46,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace opp::image::cpuSimple
+namespace mpp::image::cpuSimple
 {
 
 template <PixelType T> class ImageView
@@ -690,7 +690,7 @@ template <PixelType T> class ImageView
         return const_iterator({mRoi.FirstX(), mRoi.LastY() + 1}, *this);
     }
 
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
     /// <summary>
     /// Copy from host to device memory
     /// </summary>
@@ -756,9 +756,9 @@ template <PixelType T> class ImageView
         // the callee will move the ptr to the first roi pixel
         aDeviceSrc.CopyToHostRoi(mPtr, mPitch, mRoi);
     }
-#endif // OPP_ENABLE_CUDA_BACKEND
+#endif // MPP_ENABLE_CUDA_BACKEND
 
-#if OPP_ENABLE_NPP_BACKEND
+#if MPP_ENABLE_NPP_BACKEND
     /// <summary>
     /// Copy from host to device memory
     /// </summary>
@@ -824,7 +824,7 @@ template <PixelType T> class ImageView
         // the callee will move the ptr to the first roi pixel
         aDeviceSrc.CopyToHostRoi(mPtr, mPitch, mRoi);
     }
-#endif // OPP_ENABLE_NPP_BACKEND
+#endif // MPP_ENABLE_NPP_BACKEND
 
     /// <summary>
     /// Returns true, if size and pixel content is identical (inside the ROI). Returns false if ROI size differs.
@@ -1813,54 +1813,54 @@ template <PixelType T> class ImageView
 #pragma region Filtering
 #pragma region Fixed Filter
     /// <summary>
-    /// Applies an opp::FixedFilter to the source image.
+    /// Applies an mpp::FixedFilter to the source image.
     /// </summary>
-    ImageView<T> &FixedFilter(ImageView<T> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
+    ImageView<T> &FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
                               BorderType aBorder, const Roi &aAllowedReadRoi) const;
     /// <summary>
-    /// Applies an opp::FixedFilter to the source image.
+    /// Applies an mpp::FixedFilter to the source image.
     /// </summary>
-    ImageView<T> &FixedFilter(ImageView<T> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize, BorderType aBorder,
+    ImageView<T> &FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, BorderType aBorder,
                               const Roi &aAllowedReadRoi) const;
 
     /// <summary>
-    /// Applies an opp::FixedFilter to the source image.
+    /// Applies an mpp::FixedFilter to the source image.
     /// </summary>
-    ImageView<T> &FixedFilter(ImageView<T> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
+    ImageView<T> &FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
                               BorderType aBorder) const;
     /// <summary>
-    /// Applies an opp::FixedFilter to the source image.
+    /// Applies an mpp::FixedFilter to the source image.
     /// </summary>
-    ImageView<T> &FixedFilter(ImageView<T> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize,
+    ImageView<T> &FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
                               BorderType aBorder) const;
 
     /// <summary>
-    /// Applies an opp::FixedFilter to the source image.
+    /// Applies an mpp::FixedFilter to the source image.
     /// </summary>
     ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
-        ImageView<alternative_filter_output_type_for_t<T>> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize,
+        ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
         T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
         requires(has_alternative_filter_output_type_for_v<T>);
     /// <summary>
-    /// Applies an opp::FixedFilter to the source image.
+    /// Applies an mpp::FixedFilter to the source image.
     /// </summary>
     ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
-        ImageView<alternative_filter_output_type_for_t<T>> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize,
+        ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
         BorderType aBorder, const Roi &aAllowedReadRoi) const
         requires(has_alternative_filter_output_type_for_v<T>);
 
     /// <summary>
-    /// Applies an opp::FixedFilter to the source image.
+    /// Applies an mpp::FixedFilter to the source image.
     /// </summary>
     ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
-        ImageView<alternative_filter_output_type_for_t<T>> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize,
+        ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
         T aConstant, BorderType aBorder) const
         requires(has_alternative_filter_output_type_for_v<T>);
     /// <summary>
-    /// Applies an opp::FixedFilter to the source image.
+    /// Applies an mpp::FixedFilter to the source image.
     /// </summary>
     ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
-        ImageView<alternative_filter_output_type_for_t<T>> &aDst, opp::FixedFilter aFilter, MaskSize aMaskSize,
+        ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
         BorderType aBorder) const
         requires(has_alternative_filter_output_type_for_v<T>);
 #pragma endregion
@@ -2305,7 +2305,7 @@ template <PixelType T> class ImageView
     /// from PrecomputeBilateralGaussFilter().
     /// </summary>
     ImageView<T> &BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
-                                       const float *aPreCompGeomDistCoeff, float aValSquareSigma, opp::Norm aNorm,
+                                       const float *aPreCompGeomDistCoeff, float aValSquareSigma, mpp::Norm aNorm,
                                        T aConstant, BorderType aBorder) const
         requires(!SingleChannel<T>) && RealVector<T> &&
                 (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
@@ -2314,7 +2314,7 @@ template <PixelType T> class ImageView
     /// from PrecomputeBilateralGaussFilter().
     /// </summary>
     ImageView<T> &BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
-                                       const float *aPreCompGeomDistCoeff, float aValSquareSigma, opp::Norm aNorm,
+                                       const float *aPreCompGeomDistCoeff, float aValSquareSigma, mpp::Norm aNorm,
                                        BorderType aBorder) const
         requires(!SingleChannel<T>) && RealVector<T> &&
                 (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
@@ -2323,7 +2323,7 @@ template <PixelType T> class ImageView
     /// from PrecomputeBilateralGaussFilter().
     /// </summary>
     ImageView<T> &BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
-                                       const float *aPreCompGeomDistCoeff, float aValSquareSigma, opp::Norm aNorm,
+                                       const float *aPreCompGeomDistCoeff, float aValSquareSigma, mpp::Norm aNorm,
                                        T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
         requires(!SingleChannel<T>) && RealVector<T> &&
                 (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
@@ -2332,7 +2332,7 @@ template <PixelType T> class ImageView
     /// from PrecomputeBilateralGaussFilter().
     /// </summary>
     ImageView<T> &BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
-                                       const float *aPreCompGeomDistCoeff, float aValSquareSigma, opp::Norm aNorm,
+                                       const float *aPreCompGeomDistCoeff, float aValSquareSigma, mpp::Norm aNorm,
                                        BorderType aBorder, const Roi &aAllowedReadRoi) const
         requires(!SingleChannel<T>) && RealVector<T> &&
                 (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
@@ -3750,7 +3750,7 @@ template <PixelType T> class ImageView
     /// Resize<para/>
     /// Simplified API to rescale from source image ROI to destination image ROI.<para/>
     /// NOTE: the result is NOT the same as in NPP using the same function. The shift applied in NPP for the same
-    /// function don't make much sense to me, in OPP Resize matches the input extent [-0.5 .. srcWidth-0.5[ to the
+    /// function don't make much sense to me, in MPP Resize matches the input extent [-0.5 .. srcWidth-0.5[ to the
     /// output [-0.5 .. dstWidth-0.5[. Whereas NPP applies different strategies for up-and downscaling. In order to get
     /// the same results as in NPP, use an user defined scaling factor of <para/> Vec2d scaleFactor =
     /// Vec2d(dstImg.SizeRoi()) / Vec2d(srcImg.SizeRoi());<para/> and a shift given by ResizeGetNPPShift().
@@ -3761,7 +3761,7 @@ template <PixelType T> class ImageView
     /// Resize<para/>
     /// Simplified API to rescale from source image ROI to destination image ROI.<para/>
     /// NOTE: the result is NOT the same as in NPP using the same function. The shift applied in NPP for the same
-    /// function don't make much sense to me, in OPP Resize matches the input extent [-0.5 .. srcWidth-0.5[ to the
+    /// function don't make much sense to me, in MPP Resize matches the input extent [-0.5 .. srcWidth-0.5[ to the
     /// output [-0.5 .. dstWidth-0.5[. Whereas NPP applies different strategies for up-and downscaling. In order to get
     /// the same results as in NPP, use an user defined scaling factor of <para/> Vec2d scaleFactor =
     /// Vec2d(dstImg.SizeRoi()) / Vec2d(srcImg.SizeRoi());<para/> and a shift given by ResizeGetNPPShift().
@@ -3776,7 +3776,7 @@ template <PixelType T> class ImageView
     /// Resize<para/>
     /// Simplified API to rescale from source image ROI to destination image ROI.<para/>
     /// NOTE: the result is NOT the same as in NPP using the same function. The shift applied in NPP for the same
-    /// function don't make much sense to me, in OPP Resize matches the input extent [-0.5 .. srcWidth-0.5[ to the
+    /// function don't make much sense to me, in MPP Resize matches the input extent [-0.5 .. srcWidth-0.5[ to the
     /// output [-0.5 .. dstWidth-0.5[. Whereas NPP applies different strategies for up-and downscaling. In order to get
     /// the same results as in NPP, use an user defined scaling factor of <para/> Vec2d scaleFactor =
     /// Vec2d(dstImg.SizeRoi()) / Vec2d(srcImg.SizeRoi());<para/> and a shift given by ResizeGetNPPShift().
@@ -3792,7 +3792,7 @@ template <PixelType T> class ImageView
     /// Resize<para/>
     /// Simplified API to rescale from source image ROI to destination image ROI.<para/>
     /// NOTE: the result is NOT the same as in NPP using the same function. The shift applied in NPP for the same
-    /// function don't make much sense to me, in OPP Resize matches the input extent [-0.5 .. srcWidth-0.5[ to the
+    /// function don't make much sense to me, in MPP Resize matches the input extent [-0.5 .. srcWidth-0.5[ to the
     /// output [-0.5 .. dstWidth-0.5[. Whereas NPP applies different strategies for up-and downscaling. In order to get
     /// the same results as in NPP, use an user defined scaling factor of <para/> Vec2d scaleFactor =
     /// Vec2d(dstImg.SizeRoi()) / Vec2d(srcImg.SizeRoi());<para/> and a shift given by ResizeGetNPPShift().
@@ -3807,13 +3807,13 @@ template <PixelType T> class ImageView
         requires FourChannelNoAlpha<T>;
 
     /// <summary>
-    /// Returns a shift to be used in OPP resize method that matches to the result given by the NPP Resize-function.
+    /// Returns a shift to be used in MPP resize method that matches to the result given by the NPP Resize-function.
     /// </summary>
     Vec2d ResizeGetNPPShift(ImageView<T> &aDst) const;
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
-    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// point, in MPP the definition is as following: The integer pixel coordinate corresponds to the center of the
     /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
     /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
     /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
@@ -3839,7 +3839,7 @@ template <PixelType T> class ImageView
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
-    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// point, in MPP the definition is as following: The integer pixel coordinate corresponds to the center of the
     /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
     /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
     /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
@@ -3864,7 +3864,7 @@ template <PixelType T> class ImageView
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
-    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// point, in MPP the definition is as following: The integer pixel coordinate corresponds to the center of the
     /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
     /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
     /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
@@ -3893,7 +3893,7 @@ template <PixelType T> class ImageView
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
-    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// point, in MPP the definition is as following: The integer pixel coordinate corresponds to the center of the
     /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
     /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
     /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
@@ -3922,7 +3922,7 @@ template <PixelType T> class ImageView
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
-    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// point, in MPP the definition is as following: The integer pixel coordinate corresponds to the center of the
     /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
     /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
     /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
@@ -3953,7 +3953,7 @@ template <PixelType T> class ImageView
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
-    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// point, in MPP the definition is as following: The integer pixel coordinate corresponds to the center of the
     /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
     /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
     /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
@@ -3984,7 +3984,7 @@ template <PixelType T> class ImageView
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
-    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// point, in MPP the definition is as following: The integer pixel coordinate corresponds to the center of the
     /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
     /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
     /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
@@ -4016,7 +4016,7 @@ template <PixelType T> class ImageView
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
-    /// point, in OPP the definition is as following: The integer pixel coordinate corresponds to the center of the
+    /// point, in MPP the definition is as following: The integer pixel coordinate corresponds to the center of the
     /// pixel surface that thus has an extent for a pixel i from [i-0.5 .. i+0.5[ (excluding the right border). The
     /// entire valid image area then ranges from [-0.5 to width-0.5[ <para/>
     /// When rescaling, an additional shift is applied, so that the area from source image [-0.5 .. srcWidth-0.5[
@@ -5063,7 +5063,7 @@ template <PixelType T> class ImageView
     /// Computes the Multi-Scale-SSIM of two images.
     /// Note: This implementation differs slightly from NPP as the exact parameters used are unknown. Here we follow the
     /// reference matlab implementation provided here: https://ece.uwaterloo.ca/~z70wang/research/ssim/. The only
-    /// difference is in the filtering steps for image borders where OPP applies replication.
+    /// difference is in the filtering steps for image borders where MPP applies replication.
     /// </summary>
     /// <param name="aSrc2">Second source image</param>
     /// <param name="aDst">Per channel result</param>
@@ -5477,4 +5477,4 @@ template <PixelType T> class ImageView
 #pragma endregion
 #pragma endregion
 };
-} // namespace opp::image::cpuSimple
+} // namespace mpp::image::cpuSimple

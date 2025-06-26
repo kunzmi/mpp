@@ -14,7 +14,7 @@
 #include <filesystem>
 #include <vector>
 
-namespace opp::image::cpuSimple
+namespace mpp::image::cpuSimple
 {
 
 template <PixelType T> class Image : public ImageView<T>
@@ -83,25 +83,25 @@ template <PixelType T> class Image : public ImageView<T>
 
     static bool CanLoad(const std::filesystem::path &aFilename)
     {
-        opp::fileIO::TIFFFile tiff(aFilename);
+        mpp::fileIO::TIFFFile tiff(aFilename);
         const bool ok = tiff.TryToOpenAndReadHeader();
         if (!ok)
         {
             return false;
         }
 
-        return tiff.GetDataType() == opp::image::pixel_type_enum<T>::pixelType;
+        return tiff.GetDataType() == mpp::image::pixel_type_enum<T>::pixelType;
     }
 
     static Image Load(const std::filesystem::path &aFilename)
     {
-        opp::fileIO::TIFFFile tiff(aFilename);
+        mpp::fileIO::TIFFFile tiff(aFilename);
         tiff.OpenAndRead();
 
-        if (tiff.GetDataType() != opp::image::pixel_type_enum<T>::pixelType)
+        if (tiff.GetDataType() != mpp::image::pixel_type_enum<T>::pixelType)
         {
             throw FILEIOEXCEPTION(aFilename, "Failed to read TIFF-image. Expected pixel type: "
-                                                 << opp::image::pixel_type_enum<T>::pixelType
+                                                 << mpp::image::pixel_type_enum<T>::pixelType
                                                  << " but TIFF file is of type " << tiff.GetDataType());
         }
 
@@ -113,13 +113,13 @@ template <PixelType T> class Image : public ImageView<T>
 
     static std::vector<Image> LoadPlanar(const std::filesystem::path &aFilename)
     {
-        opp::fileIO::TIFFFile tiff(aFilename);
+        mpp::fileIO::TIFFFile tiff(aFilename);
         tiff.OpenAndRead();
 
-        if (tiff.GetDataType() != opp::image::pixel_type_enum<T>::pixelType)
+        if (tiff.GetDataType() != mpp::image::pixel_type_enum<T>::pixelType)
         {
             throw FILEIOEXCEPTION(aFilename, "Failed to read TIFF-image. Expected pixel type: "
-                                                 << opp::image::pixel_type_enum<T>::pixelType
+                                                 << mpp::image::pixel_type_enum<T>::pixelType
                                                  << " but TIFF file is of type " << tiff.GetDataType());
         }
 
@@ -145,8 +145,8 @@ template <PixelType T> class Image : public ImageView<T>
 
     void Save(const std::filesystem::path &aFilename)
     {
-        opp::fileIO::TIFFFile::WriteTIFF(aFilename, ImageView<T>::SizeAllocRef().x, ImageView<T>::SizeAllocRef().y, 0.0,
-                                         opp::image::pixel_type_enum<T>::pixelType, mData.data(), 9);
+        mpp::fileIO::TIFFFile::WriteTIFF(aFilename, ImageView<T>::SizeAllocRef().x, ImageView<T>::SizeAllocRef().y, 0.0,
+                                         mpp::image::pixel_type_enum<T>::pixelType, mData.data(), 9);
     }
 };
-} // namespace opp::image::cpuSimple
+} // namespace mpp::image::cpuSimple

@@ -8,7 +8,7 @@
 #include <numbers>
 #include <vector>
 
-namespace opp
+namespace mpp
 {
 /// <summary>
 /// returns as result a value res so that res * aDiv is always >= aValue. Basically a floating point division with
@@ -211,7 +211,7 @@ template <RealFloatingPoint T> DEVICE_CODE void MakeNANandINFValid(T &aLeft, T &
             // if only left is nan/inf, set them to max valid value difference and result will be false for any
             // (reasonable) aEpsilon
             aLeft  = T(0.0f); // aEpsilon should be < numeric_limits<T>::max() / 2
-            aRight = opp::numeric_limits<T>::max();
+            aRight = mpp::numeric_limits<T>::max();
         }
     }
     else
@@ -221,7 +221,7 @@ template <RealFloatingPoint T> DEVICE_CODE void MakeNANandINFValid(T &aLeft, T &
             // if only right is nan/inf, set them to max valid value difference and result will be false for any
             // (reasonable) aEpsilon
             aLeft  = T(0.0f); // aEpsilon should be < numeric_limits<T>::max() / 2
-            aRight = opp::numeric_limits<T>::max();
+            aRight = mpp::numeric_limits<T>::max();
         }
     }
 }
@@ -239,13 +239,13 @@ DEVICE_CODE float GetAlphaAsFloat(T aValue)
     // Note: The results from NPP are not coherent. The result from AlphaComp with AlphaComposition::Over and an empty
     // second image is not the same as AlphaPremul - but they should give same results. So instead of trying getting the
     // exact same result as NPP we'll just do simple math as described in the IPP functions.
-    return (static_cast<float>(aValue)) / static_cast<float>(opp::numeric_limits<T>::max());
+    return (static_cast<float>(aValue)) / static_cast<float>(mpp::numeric_limits<T>::max());
 }
 template <Number T>
     requires RealIntegral<T> && FourBytesSizeType<T> // int32 and uint32
 DEVICE_CODE double GetAlphaAsFloat(T aValue)
 {
-    return (static_cast<double>(aValue)) / static_cast<double>(opp::numeric_limits<T>::max());
+    return (static_cast<double>(aValue)) / static_cast<double>(mpp::numeric_limits<T>::max());
 }
 
-} // namespace opp
+} // namespace mpp

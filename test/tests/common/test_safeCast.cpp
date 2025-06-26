@@ -20,7 +20,7 @@
 #endif // !_MSC_VER
 #endif // defined(__clang__)
 
-using namespace opp;
+using namespace mpp;
 
 TEST_CASE("SafeCast", "[Common]")
 {

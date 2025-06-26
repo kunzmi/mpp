@@ -9,7 +9,7 @@
 #include <numeric>
 #include <vector>
 
-using namespace opp;
+using namespace mpp;
 using namespace Catch;
 
 TEST_CASE("Tupel size 2", "[Common]")

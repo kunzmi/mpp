@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "gradientVectorSobel.h"
 #include <backends/cuda/image/configurations.h>
@@ -11,15 +11,15 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 
 template <typename T> struct pixel_block_size_x
@@ -58,11 +58,11 @@ void InvokeGradientVectorSobel(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDstX
                                size_t aPitchDstAngle, Pixel32fC4 *aDstCovariance, size_t aPitchDstCovariance,
                                Norm aNorm, MaskSize aMaskSize, BorderType aBorderType, const SrcT &aConstant,
                                const Size2D &aAllowedReadRoiSize, const Vector2<int> &aOffsetToActualRoi,
-                               const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+                               const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
+    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
         using ComputeT             = filter_compute_type_for_t<SrcT>;
@@ -78,12 +78,12 @@ void InvokeGradientVectorSobel(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDstX
                 constexpr int filterSize  = 3;
                 constexpr int centerPixel = 1;
 
-                using FixedFilterKernelXT = FixedInvertedFilterKernel<opp::FixedFilter::SobelVert, filterSize, FilterT>;
-                using FixedFilterKernelYT = FixedFilterKernel<opp::FixedFilter::SobelHoriz, filterSize, FilterT>;
+                using FixedFilterKernelXT = FixedInvertedFilterKernel<mpp::FixedFilter::SobelVert, filterSize, FilterT>;
+                using FixedFilterKernelYT = FixedFilterKernel<mpp::FixedFilter::SobelHoriz, filterSize, FilterT>;
 
                 switch (aBorderType)
                 {
-                    case opp::BorderType::None:
+                    case mpp::BorderType::None:
                     {
                         using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
                         const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -96,7 +96,7 @@ void InvokeGradientVectorSobel(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDstX
                             aDstCovariance, aPitchDstCovariance, aNorm, aSize, aStreamCtx);
                     }
                     break;
-                    case opp::BorderType::Constant:
+                    case mpp::BorderType::Constant:
                     {
                         using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
                         const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
@@ -109,7 +109,7 @@ void InvokeGradientVectorSobel(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDstX
                             aDstCovariance, aPitchDstCovariance, aNorm, aSize, aStreamCtx);
                     }
                     break;
-                    case opp::BorderType::Replicate:
+                    case mpp::BorderType::Replicate:
                     {
                         using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
                         const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -122,7 +122,7 @@ void InvokeGradientVectorSobel(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDstX
                             aDstCovariance, aPitchDstCovariance, aNorm, aSize, aStreamCtx);
                     }
                     break;
-                    case opp::BorderType::Mirror:
+                    case mpp::BorderType::Mirror:
                     {
                         using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
                         const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -135,7 +135,7 @@ void InvokeGradientVectorSobel(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDstX
                             aDstCovariance, aPitchDstCovariance, aNorm, aSize, aStreamCtx);
                     }
                     break;
-                    case opp::BorderType::MirrorReplicate:
+                    case mpp::BorderType::MirrorReplicate:
                     {
                         using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
                         const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -148,7 +148,7 @@ void InvokeGradientVectorSobel(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDstX
                             aDstCovariance, aPitchDstCovariance, aNorm, aSize, aStreamCtx);
                     }
                     break;
-                    case opp::BorderType::Wrap:
+                    case mpp::BorderType::Wrap:
                     {
                         using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
                         const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -174,12 +174,12 @@ void InvokeGradientVectorSobel(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDstX
                 constexpr int filterSize  = 5;
                 constexpr int centerPixel = 2;
 
-                using FixedFilterKernelXT = FixedInvertedFilterKernel<opp::FixedFilter::SobelVert, filterSize, FilterT>;
-                using FixedFilterKernelYT = FixedFilterKernel<opp::FixedFilter::SobelHoriz, filterSize, FilterT>;
+                using FixedFilterKernelXT = FixedInvertedFilterKernel<mpp::FixedFilter::SobelVert, filterSize, FilterT>;
+                using FixedFilterKernelYT = FixedFilterKernel<mpp::FixedFilter::SobelHoriz, filterSize, FilterT>;
 
                 switch (aBorderType)
                 {
-                    case opp::BorderType::None:
+                    case mpp::BorderType::None:
                     {
                         using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
                         const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -192,7 +192,7 @@ void InvokeGradientVectorSobel(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDstX
                             aDstCovariance, aPitchDstCovariance, aNorm, aSize, aStreamCtx);
                     }
                     break;
-                    case opp::BorderType::Constant:
+                    case mpp::BorderType::Constant:
                     {
                         using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
                         const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
@@ -205,7 +205,7 @@ void InvokeGradientVectorSobel(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDstX
                             aDstCovariance, aPitchDstCovariance, aNorm, aSize, aStreamCtx);
                     }
                     break;
-                    case opp::BorderType::Replicate:
+                    case mpp::BorderType::Replicate:
                     {
                         using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
                         const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -218,7 +218,7 @@ void InvokeGradientVectorSobel(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDstX
                             aDstCovariance, aPitchDstCovariance, aNorm, aSize, aStreamCtx);
                     }
                     break;
-                    case opp::BorderType::Mirror:
+                    case mpp::BorderType::Mirror:
                     {
                         using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
                         const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -231,7 +231,7 @@ void InvokeGradientVectorSobel(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDstX
                             aDstCovariance, aPitchDstCovariance, aNorm, aSize, aStreamCtx);
                     }
                     break;
-                    case opp::BorderType::MirrorReplicate:
+                    case mpp::BorderType::MirrorReplicate:
                     {
                         using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
                         const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -244,7 +244,7 @@ void InvokeGradientVectorSobel(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDstX
                             aDstCovariance, aPitchDstCovariance, aNorm, aSize, aStreamCtx);
                     }
                     break;
-                    case opp::BorderType::Wrap:
+                    case mpp::BorderType::Wrap:
                     {
                         using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
                         const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -297,5 +297,5 @@ void InvokeGradientVectorSobel(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDstX
 
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

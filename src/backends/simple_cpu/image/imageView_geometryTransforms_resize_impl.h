@@ -22,7 +22,7 @@
 #include <common/image/sizePitched.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/utilities.h>
 #include <common/vector1.h>
@@ -34,7 +34,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace opp::image::cpuSimple
+namespace mpp::image::cpuSimple
 {
 #pragma region Resize
 template <PixelType T>
@@ -126,7 +126,7 @@ ImageView<T> &ImageView<T>::Resize(ImageView<T> &aDst, const Vector2<double> &aS
     auto runOverInterpolation = [&]<typename bcT>(const bcT &aBC) {
         switch (aInterpolation)
         {
-            case opp::InterpolationMode::NearestNeighbor:
+            case mpp::InterpolationMode::NearestNeighbor:
             {
                 using InterpolatorT = Interpolator<T, bcT, CoordTInterpol, InterpolationMode::NearestNeighbor>;
                 const InterpolatorT interpol(aBC);
@@ -137,7 +137,7 @@ ImageView<T> &ImageView<T>::Resize(ImageView<T> &aDst, const Vector2<double> &aS
                 forEachPixel(aDst, functor);
             }
             break;
-            case opp::InterpolationMode::Linear:
+            case mpp::InterpolationMode::Linear:
             {
                 using InterpolatorT =
                     Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol, InterpolationMode::Linear>;
@@ -149,7 +149,7 @@ ImageView<T> &ImageView<T>::Resize(ImageView<T> &aDst, const Vector2<double> &aS
                 forEachPixel(aDst, functor);
             }
             break;
-            case opp::InterpolationMode::CubicHermiteSpline:
+            case mpp::InterpolationMode::CubicHermiteSpline:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol,
                                                    InterpolationMode::CubicHermiteSpline>;
@@ -161,7 +161,7 @@ ImageView<T> &ImageView<T>::Resize(ImageView<T> &aDst, const Vector2<double> &aS
                 forEachPixel(aDst, functor);
             }
             break;
-            case opp::InterpolationMode::CubicLagrange:
+            case mpp::InterpolationMode::CubicLagrange:
             {
                 using InterpolatorT =
                     Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol, InterpolationMode::CubicLagrange>;
@@ -173,7 +173,7 @@ ImageView<T> &ImageView<T>::Resize(ImageView<T> &aDst, const Vector2<double> &aS
                 forEachPixel(aDst, functor);
             }
             break;
-            case opp::InterpolationMode::Cubic2ParamBSpline:
+            case mpp::InterpolationMode::Cubic2ParamBSpline:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol,
                                                    InterpolationMode::Cubic2ParamBSpline>;
@@ -185,7 +185,7 @@ ImageView<T> &ImageView<T>::Resize(ImageView<T> &aDst, const Vector2<double> &aS
                 forEachPixel(aDst, functor);
             }
             break;
-            case opp::InterpolationMode::Cubic2ParamCatmullRom:
+            case mpp::InterpolationMode::Cubic2ParamCatmullRom:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol,
                                                    InterpolationMode::Cubic2ParamCatmullRom>;
@@ -197,7 +197,7 @@ ImageView<T> &ImageView<T>::Resize(ImageView<T> &aDst, const Vector2<double> &aS
                 forEachPixel(aDst, functor);
             }
             break;
-            case opp::InterpolationMode::Cubic2ParamB05C03:
+            case mpp::InterpolationMode::Cubic2ParamB05C03:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol,
                                                    InterpolationMode::Cubic2ParamB05C03>;
@@ -209,7 +209,7 @@ ImageView<T> &ImageView<T>::Resize(ImageView<T> &aDst, const Vector2<double> &aS
                 forEachPixel(aDst, functor);
             }
             break;
-            case opp::InterpolationMode::Lanczos2Lobed:
+            case mpp::InterpolationMode::Lanczos2Lobed:
             {
                 using InterpolatorT =
                     Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol, InterpolationMode::Lanczos2Lobed>;
@@ -221,7 +221,7 @@ ImageView<T> &ImageView<T>::Resize(ImageView<T> &aDst, const Vector2<double> &aS
                 forEachPixel(aDst, functor);
             }
             break;
-            case opp::InterpolationMode::Lanczos3Lobed:
+            case mpp::InterpolationMode::Lanczos3Lobed:
             {
                 using InterpolatorT =
                     Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol, InterpolationMode::Lanczos3Lobed>;
@@ -233,7 +233,7 @@ ImageView<T> &ImageView<T>::Resize(ImageView<T> &aDst, const Vector2<double> &aS
                 forEachPixel(aDst, functor);
             }
             break;
-            case opp::InterpolationMode::Super:
+            case mpp::InterpolationMode::Super:
             {
                 using InterpolatorT =
                     Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol, InterpolationMode::Super>;
@@ -255,7 +255,7 @@ ImageView<T> &ImageView<T>::Resize(ImageView<T> &aDst, const Vector2<double> &aS
 
     switch (aBorder)
     {
-        case opp::BorderType::None:
+        case mpp::BorderType::None:
         {
             // for interpolation at the border we will still use replicate:
             using BCType = BorderControl<T, BorderType::Replicate, true, false, false, false>;
@@ -264,7 +264,7 @@ ImageView<T> &ImageView<T>::Resize(ImageView<T> &aDst, const Vector2<double> &aS
             runOverInterpolation(bc);
         }
         break;
-        case opp::BorderType::Constant:
+        case mpp::BorderType::Constant:
         {
             using BCType = BorderControl<T, BorderType::Constant, false, false, false, false>;
             const BCType bc(allowedPtr, Pitch(), aAllowedReadRoi.Size(), roiOffset, aConstant);
@@ -272,7 +272,7 @@ ImageView<T> &ImageView<T>::Resize(ImageView<T> &aDst, const Vector2<double> &aS
             runOverInterpolation(bc);
         }
         break;
-        case opp::BorderType::Replicate:
+        case mpp::BorderType::Replicate:
         {
             using BCType = BorderControl<T, BorderType::Replicate, false, false, false, false>;
             const BCType bc(allowedPtr, Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -280,7 +280,7 @@ ImageView<T> &ImageView<T>::Resize(ImageView<T> &aDst, const Vector2<double> &aS
             runOverInterpolation(bc);
         }
         break;
-        case opp::BorderType::Mirror:
+        case mpp::BorderType::Mirror:
         {
             using BCType = BorderControl<T, BorderType::Mirror, false, false, false, false>;
             const BCType bc(allowedPtr, Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -288,7 +288,7 @@ ImageView<T> &ImageView<T>::Resize(ImageView<T> &aDst, const Vector2<double> &aS
             runOverInterpolation(bc);
         }
         break;
-        case opp::BorderType::MirrorReplicate:
+        case mpp::BorderType::MirrorReplicate:
         {
             using BCType = BorderControl<T, BorderType::MirrorReplicate, false, false, false, false>;
             const BCType bc(allowedPtr, Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -296,7 +296,7 @@ ImageView<T> &ImageView<T>::Resize(ImageView<T> &aDst, const Vector2<double> &aS
             runOverInterpolation(bc);
         }
         break;
-        case opp::BorderType::Wrap:
+        case mpp::BorderType::Wrap:
         {
             using BCType = BorderControl<T, BorderType::Wrap, false, false, false, false>;
             const BCType bc(allowedPtr, Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -371,7 +371,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
     auto runOverInterpolation = [&]<typename bcT>(const bcT &aBC) {
         switch (aInterpolation)
         {
-            case opp::InterpolationMode::NearestNeighbor:
+            case mpp::InterpolationMode::NearestNeighbor:
             {
                 using InterpolatorT = Interpolator<T, bcT, CoordTInterpol, InterpolationMode::NearestNeighbor>;
                 const InterpolatorT interpol(aBC);
@@ -382,7 +382,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, functor);
             }
             break;
-            case opp::InterpolationMode::Linear:
+            case mpp::InterpolationMode::Linear:
             {
                 using InterpolatorT =
                     Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol, InterpolationMode::Linear>;
@@ -394,7 +394,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, functor);
             }
             break;
-            case opp::InterpolationMode::CubicHermiteSpline:
+            case mpp::InterpolationMode::CubicHermiteSpline:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol,
                                                    InterpolationMode::CubicHermiteSpline>;
@@ -406,7 +406,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, functor);
             }
             break;
-            case opp::InterpolationMode::CubicLagrange:
+            case mpp::InterpolationMode::CubicLagrange:
             {
                 using InterpolatorT =
                     Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol, InterpolationMode::CubicLagrange>;
@@ -418,7 +418,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, functor);
             }
             break;
-            case opp::InterpolationMode::Cubic2ParamBSpline:
+            case mpp::InterpolationMode::Cubic2ParamBSpline:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol,
                                                    InterpolationMode::Cubic2ParamBSpline>;
@@ -430,7 +430,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, functor);
             }
             break;
-            case opp::InterpolationMode::Cubic2ParamCatmullRom:
+            case mpp::InterpolationMode::Cubic2ParamCatmullRom:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol,
                                                    InterpolationMode::Cubic2ParamCatmullRom>;
@@ -442,7 +442,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, functor);
             }
             break;
-            case opp::InterpolationMode::Cubic2ParamB05C03:
+            case mpp::InterpolationMode::Cubic2ParamB05C03:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol,
                                                    InterpolationMode::Cubic2ParamB05C03>;
@@ -454,7 +454,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, functor);
             }
             break;
-            case opp::InterpolationMode::Lanczos2Lobed:
+            case mpp::InterpolationMode::Lanczos2Lobed:
             {
                 using InterpolatorT =
                     Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol, InterpolationMode::Lanczos2Lobed>;
@@ -466,7 +466,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, functor);
             }
             break;
-            case opp::InterpolationMode::Lanczos3Lobed:
+            case mpp::InterpolationMode::Lanczos3Lobed:
             {
                 using InterpolatorT =
                     Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol, InterpolationMode::Lanczos3Lobed>;
@@ -478,7 +478,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, functor);
             }
             break;
-            case opp::InterpolationMode::Super:
+            case mpp::InterpolationMode::Super:
             {
                 using InterpolatorT =
                     Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol, InterpolationMode::Super>;
@@ -500,7 +500,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
 
     switch (aBorder)
     {
-        case opp::BorderType::None:
+        case mpp::BorderType::None:
         {
             // for interpolation at the border we will still use replicate:
             using BCType = BorderControl<T, BorderType::Replicate, true, false, false, true>;
@@ -509,7 +509,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
             runOverInterpolation(bc);
         }
         break;
-        case opp::BorderType::Constant:
+        case mpp::BorderType::Constant:
         {
             using BCType = BorderControl<T, BorderType::Constant, false, false, false, true>;
             const BCType bc(allowedPtr1, aSrc1.Pitch(), allowedPtr2, aSrc2.Pitch(), aAllowedReadRoi.Size(), roiOffset,
@@ -518,7 +518,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
             runOverInterpolation(bc);
         }
         break;
-        case opp::BorderType::Replicate:
+        case mpp::BorderType::Replicate:
         {
             using BCType = BorderControl<T, BorderType::Replicate, false, false, false, true>;
             const BCType bc(allowedPtr1, aSrc1.Pitch(), allowedPtr2, aSrc2.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -526,7 +526,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
             runOverInterpolation(bc);
         }
         break;
-        case opp::BorderType::Mirror:
+        case mpp::BorderType::Mirror:
         {
             using BCType = BorderControl<T, BorderType::Mirror, false, false, false, true>;
             const BCType bc(allowedPtr1, aSrc1.Pitch(), allowedPtr2, aSrc2.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -534,7 +534,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
             runOverInterpolation(bc);
         }
         break;
-        case opp::BorderType::MirrorReplicate:
+        case mpp::BorderType::MirrorReplicate:
         {
             using BCType = BorderControl<T, BorderType::MirrorReplicate, false, false, false, true>;
             const BCType bc(allowedPtr1, aSrc1.Pitch(), allowedPtr2, aSrc2.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -542,7 +542,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
             runOverInterpolation(bc);
         }
         break;
-        case opp::BorderType::Wrap:
+        case mpp::BorderType::Wrap:
         {
             using BCType = BorderControl<T, BorderType::Wrap, false, false, false, true>;
             const BCType bc(allowedPtr1, aSrc1.Pitch(), allowedPtr2, aSrc2.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -620,7 +620,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
     auto runOverInterpolation = [&]<typename bcT>(const bcT &aBC) {
         switch (aInterpolation)
         {
-            case opp::InterpolationMode::NearestNeighbor:
+            case mpp::InterpolationMode::NearestNeighbor:
             {
                 using InterpolatorT = Interpolator<T, bcT, CoordTInterpol, InterpolationMode::NearestNeighbor>;
                 const InterpolatorT interpol(aBC);
@@ -631,7 +631,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, aDst3, functor);
             }
             break;
-            case opp::InterpolationMode::Linear:
+            case mpp::InterpolationMode::Linear:
             {
                 using InterpolatorT =
                     Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol, InterpolationMode::Linear>;
@@ -643,7 +643,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, aDst3, functor);
             }
             break;
-            case opp::InterpolationMode::CubicHermiteSpline:
+            case mpp::InterpolationMode::CubicHermiteSpline:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol,
                                                    InterpolationMode::CubicHermiteSpline>;
@@ -655,7 +655,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, aDst3, functor);
             }
             break;
-            case opp::InterpolationMode::CubicLagrange:
+            case mpp::InterpolationMode::CubicLagrange:
             {
                 using InterpolatorT =
                     Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol, InterpolationMode::CubicLagrange>;
@@ -667,7 +667,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, aDst3, functor);
             }
             break;
-            case opp::InterpolationMode::Cubic2ParamBSpline:
+            case mpp::InterpolationMode::Cubic2ParamBSpline:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol,
                                                    InterpolationMode::Cubic2ParamBSpline>;
@@ -679,7 +679,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, aDst3, functor);
             }
             break;
-            case opp::InterpolationMode::Cubic2ParamCatmullRom:
+            case mpp::InterpolationMode::Cubic2ParamCatmullRom:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol,
                                                    InterpolationMode::Cubic2ParamCatmullRom>;
@@ -691,7 +691,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, aDst3, functor);
             }
             break;
-            case opp::InterpolationMode::Cubic2ParamB05C03:
+            case mpp::InterpolationMode::Cubic2ParamB05C03:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol,
                                                    InterpolationMode::Cubic2ParamB05C03>;
@@ -703,7 +703,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, aDst3, functor);
             }
             break;
-            case opp::InterpolationMode::Lanczos2Lobed:
+            case mpp::InterpolationMode::Lanczos2Lobed:
             {
                 using InterpolatorT =
                     Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol, InterpolationMode::Lanczos2Lobed>;
@@ -715,7 +715,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, aDst3, functor);
             }
             break;
-            case opp::InterpolationMode::Lanczos3Lobed:
+            case mpp::InterpolationMode::Lanczos3Lobed:
             {
                 using InterpolatorT =
                     Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol, InterpolationMode::Lanczos3Lobed>;
@@ -727,7 +727,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, aDst3, functor);
             }
             break;
-            case opp::InterpolationMode::Super:
+            case mpp::InterpolationMode::Super:
             {
                 using InterpolatorT =
                     Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol, InterpolationMode::Super>;
@@ -749,7 +749,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
 
     switch (aBorder)
     {
-        case opp::BorderType::None:
+        case mpp::BorderType::None:
         {
             // for interpolation at the border we will still use replicate:
             using BCType = BorderControl<T, BorderType::Replicate, true, false, false, true>;
@@ -759,7 +759,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
             runOverInterpolation(bc);
         }
         break;
-        case opp::BorderType::Constant:
+        case mpp::BorderType::Constant:
         {
             using BCType = BorderControl<T, BorderType::Constant, false, false, false, true>;
             const BCType bc(allowedPtr1, aSrc1.Pitch(), allowedPtr2, aSrc2.Pitch(), allowedPtr3, aSrc3.Pitch(),
@@ -768,7 +768,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
             runOverInterpolation(bc);
         }
         break;
-        case opp::BorderType::Replicate:
+        case mpp::BorderType::Replicate:
         {
             using BCType = BorderControl<T, BorderType::Replicate, false, false, false, true>;
             const BCType bc(allowedPtr1, aSrc1.Pitch(), allowedPtr2, aSrc2.Pitch(), allowedPtr3, aSrc3.Pitch(),
@@ -777,7 +777,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
             runOverInterpolation(bc);
         }
         break;
-        case opp::BorderType::Mirror:
+        case mpp::BorderType::Mirror:
         {
             using BCType = BorderControl<T, BorderType::Mirror, false, false, false, true>;
             const BCType bc(allowedPtr1, aSrc1.Pitch(), allowedPtr2, aSrc2.Pitch(), allowedPtr3, aSrc3.Pitch(),
@@ -786,7 +786,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
             runOverInterpolation(bc);
         }
         break;
-        case opp::BorderType::MirrorReplicate:
+        case mpp::BorderType::MirrorReplicate:
         {
             using BCType = BorderControl<T, BorderType::MirrorReplicate, false, false, false, true>;
             const BCType bc(allowedPtr1, aSrc1.Pitch(), allowedPtr2, aSrc2.Pitch(), allowedPtr3, aSrc3.Pitch(),
@@ -795,7 +795,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
             runOverInterpolation(bc);
         }
         break;
-        case opp::BorderType::Wrap:
+        case mpp::BorderType::Wrap:
         {
             using BCType = BorderControl<T, BorderType::Wrap, false, false, false, true>;
             const BCType bc(allowedPtr1, aSrc1.Pitch(), allowedPtr2, aSrc2.Pitch(), allowedPtr3, aSrc3.Pitch(),
@@ -880,7 +880,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
     auto runOverInterpolation = [&]<typename bcT>(const bcT &aBC) {
         switch (aInterpolation)
         {
-            case opp::InterpolationMode::NearestNeighbor:
+            case mpp::InterpolationMode::NearestNeighbor:
             {
                 using InterpolatorT = Interpolator<T, bcT, CoordTInterpol, InterpolationMode::NearestNeighbor>;
                 const InterpolatorT interpol(aBC);
@@ -891,7 +891,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, aDst3, aDst4, functor);
             }
             break;
-            case opp::InterpolationMode::Linear:
+            case mpp::InterpolationMode::Linear:
             {
                 using InterpolatorT =
                     Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol, InterpolationMode::Linear>;
@@ -903,7 +903,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, aDst3, aDst4, functor);
             }
             break;
-            case opp::InterpolationMode::CubicHermiteSpline:
+            case mpp::InterpolationMode::CubicHermiteSpline:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol,
                                                    InterpolationMode::CubicHermiteSpline>;
@@ -915,7 +915,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, aDst3, aDst4, functor);
             }
             break;
-            case opp::InterpolationMode::CubicLagrange:
+            case mpp::InterpolationMode::CubicLagrange:
             {
                 using InterpolatorT =
                     Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol, InterpolationMode::CubicLagrange>;
@@ -927,7 +927,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, aDst3, aDst4, functor);
             }
             break;
-            case opp::InterpolationMode::Cubic2ParamBSpline:
+            case mpp::InterpolationMode::Cubic2ParamBSpline:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol,
                                                    InterpolationMode::Cubic2ParamBSpline>;
@@ -939,7 +939,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, aDst3, aDst4, functor);
             }
             break;
-            case opp::InterpolationMode::Cubic2ParamCatmullRom:
+            case mpp::InterpolationMode::Cubic2ParamCatmullRom:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol,
                                                    InterpolationMode::Cubic2ParamCatmullRom>;
@@ -951,7 +951,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, aDst3, aDst4, functor);
             }
             break;
-            case opp::InterpolationMode::Cubic2ParamB05C03:
+            case mpp::InterpolationMode::Cubic2ParamB05C03:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol,
                                                    InterpolationMode::Cubic2ParamB05C03>;
@@ -963,7 +963,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, aDst3, aDst4, functor);
             }
             break;
-            case opp::InterpolationMode::Lanczos2Lobed:
+            case mpp::InterpolationMode::Lanczos2Lobed:
             {
                 using InterpolatorT =
                     Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol, InterpolationMode::Lanczos2Lobed>;
@@ -975,7 +975,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, aDst3, aDst4, functor);
             }
             break;
-            case opp::InterpolationMode::Lanczos3Lobed:
+            case mpp::InterpolationMode::Lanczos3Lobed:
             {
                 using InterpolatorT =
                     Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol, InterpolationMode::Lanczos3Lobed>;
@@ -987,7 +987,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                 forEachPixelPlanar(aDst1, aDst2, aDst3, aDst4, functor);
             }
             break;
-            case opp::InterpolationMode::Super:
+            case mpp::InterpolationMode::Super:
             {
                 using InterpolatorT =
                     Interpolator<geometry_compute_type_for_t<T>, bcT, CoordTInterpol, InterpolationMode::Super>;
@@ -1009,7 +1009,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
 
     switch (aBorder)
     {
-        case opp::BorderType::None:
+        case mpp::BorderType::None:
         {
             // for interpolation at the border we will still use replicate:
             using BCType = BorderControl<T, BorderType::Replicate, true, false, false, true>;
@@ -1019,7 +1019,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
             runOverInterpolation(bc);
         }
         break;
-        case opp::BorderType::Constant:
+        case mpp::BorderType::Constant:
         {
             using BCType = BorderControl<T, BorderType::Constant, false, false, false, true>;
             const BCType bc(allowedPtr1, aSrc1.Pitch(), allowedPtr2, aSrc2.Pitch(), allowedPtr3, aSrc3.Pitch(),
@@ -1028,7 +1028,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
             runOverInterpolation(bc);
         }
         break;
-        case opp::BorderType::Replicate:
+        case mpp::BorderType::Replicate:
         {
             using BCType = BorderControl<T, BorderType::Replicate, false, false, false, true>;
             const BCType bc(allowedPtr1, aSrc1.Pitch(), allowedPtr2, aSrc2.Pitch(), allowedPtr3, aSrc3.Pitch(),
@@ -1037,7 +1037,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
             runOverInterpolation(bc);
         }
         break;
-        case opp::BorderType::Mirror:
+        case mpp::BorderType::Mirror:
         {
             using BCType = BorderControl<T, BorderType::Mirror, false, false, false, true>;
             const BCType bc(allowedPtr1, aSrc1.Pitch(), allowedPtr2, aSrc2.Pitch(), allowedPtr3, aSrc3.Pitch(),
@@ -1046,7 +1046,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
             runOverInterpolation(bc);
         }
         break;
-        case opp::BorderType::MirrorReplicate:
+        case mpp::BorderType::MirrorReplicate:
         {
             using BCType = BorderControl<T, BorderType::MirrorReplicate, false, false, false, true>;
             const BCType bc(allowedPtr1, aSrc1.Pitch(), allowedPtr2, aSrc2.Pitch(), allowedPtr3, aSrc3.Pitch(),
@@ -1055,7 +1055,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
             runOverInterpolation(bc);
         }
         break;
-        case opp::BorderType::Wrap:
+        case mpp::BorderType::Wrap:
         {
             using BCType = BorderControl<T, BorderType::Wrap, false, false, false, true>;
             const BCType bc(allowedPtr1, aSrc1.Pitch(), allowedPtr2, aSrc2.Pitch(), allowedPtr3, aSrc3.Pitch(),
@@ -1070,4 +1070,4 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
     }
 }
 #pragma endregion
-} // namespace opp::image::cpuSimple
+} // namespace mpp::image::cpuSimple

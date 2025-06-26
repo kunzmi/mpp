@@ -1,5 +1,5 @@
 #pragma once
-#include "opp_defs.h"
+#include "mpp_defs.h"
 #include <common/defines.h>
 #include <common/numeric_limits.h>
 #include <concepts>
@@ -8,13 +8,13 @@
 #include <cuda_bf16.h>
 #endif
 
-namespace opp
+namespace mpp
 {
 /// <summary>
 /// We implement our own BFloat16 type, as different devices use different implementations. This is meant to wrap them
 /// all together to one type: On CPU we use our own implementation (which is based on amd_hip_bfloat16.h), on Cuda
 /// devices the bf16 header from Nvidia and on AMD devices the implementation coming with ROCm. But from an external
-/// view, it is always the same opp::BFloat16 datatype.
+/// view, it is always the same mpp::BFloat16 datatype.
 /// </summary>
 class alignas(2) BFloat16
 {
@@ -499,7 +499,7 @@ class alignas(2) BFloat16
 #endif
 };
 
-// bfloat literal: 2.4_bf is read as BFloat16 when opp namespace is used
+// bfloat literal: 2.4_bf is read as BFloat16 when mpp namespace is used
 inline BFloat16 operator"" _bf(long double aValue)
 {
     return BFloat16(float(aValue));
@@ -567,4 +567,4 @@ std::wostream &operator<<(std::wostream &aOs, const BFloat16 &aHalf);
 std::istream &operator>>(std::istream &aIs, BFloat16 &aHalf);
 std::wistream &operator>>(std::wistream &aIs, BFloat16 &aHalf);
 
-} // namespace opp
+} // namespace mpp

@@ -8,7 +8,7 @@
 #include <cuda_bf16.h>
 #include <cuda_fp16.h>
 
-namespace opp::cuda::simd
+namespace mpp::cuda::simd
 {
 
 template <typename T> struct AbsDiff
@@ -781,4 +781,4 @@ template <typename T> struct Max
         srcdst[1] = __hmax2(srcdst[1], src1[1]);
     }
 };
-} // namespace opp::cuda::simd
+} // namespace mpp::cuda::simd

@@ -13,7 +13,7 @@
 #include <numeric>
 #include <vector>
 
-using namespace opp;
+using namespace mpp;
 using namespace Catch;
 
 TEST_CASE("Typecast with StaticCast<float> Large", "[Common]")
@@ -110,23 +110,23 @@ TEST_CASE("Typecast with StaticCast<float> Large", "[Common]")
     // to bfloat
     CHECK(bf1.x == 2147483648.0f);
     CHECK(bf1.y == 4294967295.0f);
-    CHECK(opp::isnan(bf1.z));
+    CHECK(mpp::isnan(bf1.z));
     CHECK(bf1.w == INFINITY);
 
     CHECK(bf2.x == -2147483648.0f);
     CHECK(bf2.y == -2147483648.0f);
-    CHECK(opp::isnan(bf2.z));
+    CHECK(mpp::isnan(bf2.z));
     CHECK(bf2.w == -INFINITY);
 
     // to half-float
     CHECK(hf1.x == INFINITY);
     CHECK(hf1.y == INFINITY);
-    CHECK(opp::isnan(hf1.z));
+    CHECK(mpp::isnan(hf1.z));
     CHECK(hf1.w == INFINITY);
 
     CHECK(hf2.x == -INFINITY);
     CHECK(hf2.y == -INFINITY);
-    CHECK(opp::isnan(hf2.z));
+    CHECK(mpp::isnan(hf2.z));
     CHECK(hf2.w == -INFINITY);
 }
 
@@ -343,34 +343,34 @@ TEST_CASE("Typecast with StaticCast<BFloat16>", "[Common]")
     // to bfloat
     CHECK(bf1_.x == 2147483648.0f);
     CHECK(bf1_.y == 4294967295.0f);
-    CHECK(opp::isnan(bf1_.z));
+    CHECK(mpp::isnan(bf1_.z));
     CHECK(bf1_.w == INFINITY);
 
     CHECK(bf2_.x == -2147483648.0f);
     CHECK(bf2_.y == -2147483648.0f);
-    CHECK(opp::isnan(bf2_.z));
+    CHECK(mpp::isnan(bf2_.z));
     CHECK(bf2_.w == -INFINITY);
 
     // to half-float
     CHECK(hf1.x == INFINITY);
     CHECK(hf1.y == INFINITY);
-    CHECK(opp::isnan(hf1.z));
+    CHECK(mpp::isnan(hf1.z));
     CHECK(hf1.w == INFINITY);
 
     CHECK(hf2.x == -INFINITY);
     CHECK(hf2.y == -INFINITY);
-    CHECK(opp::isnan(hf2.z));
+    CHECK(mpp::isnan(hf2.z));
     CHECK(hf2.w == -INFINITY);
 
     // to float
     CHECK(f1.x == 2147483648.0f);
     CHECK(f1.y == 4294967295.0f);
-    CHECK(opp::isnan(f1.z));
+    CHECK(mpp::isnan(f1.z));
     CHECK(f1.w == INFINITY);
 
     CHECK(f2.x == -2147483648.0f);
     CHECK(f2.y == -2147483648.0f);
-    CHECK(opp::isnan(f2.z));
+    CHECK(mpp::isnan(f2.z));
     CHECK(f2.w == -INFINITY);
 }
 
@@ -471,33 +471,33 @@ TEST_CASE("Typecast with StaticCast<HalfFp16>", "[Common]")
     // to bfloat
     CHECK(bf1.x == 65536.0f);
     CHECK(bf1.y == 65024.0f);
-    CHECK(opp::isnan(bf1.z));
+    CHECK(mpp::isnan(bf1.z));
     CHECK(bf1.w == INFINITY);
 
     CHECK(bf2.x == -65536.0f);
     CHECK(bf2.y == -65024.0f);
-    CHECK(opp::isnan(bf2.z));
+    CHECK(mpp::isnan(bf2.z));
     CHECK(bf2.w == -INFINITY);
 
     // to half-float
     CHECK(hf1_.x == 65504.0f);
     CHECK(hf1_.y == 64992.0f);
-    CHECK(opp::isnan(hf1_.z));
+    CHECK(mpp::isnan(hf1_.z));
     CHECK(hf1_.w == INFINITY);
 
     CHECK(hf2.x == -65504.0f);
     CHECK(hf2.y == -64992.0f);
-    CHECK(opp::isnan(hf2.z));
+    CHECK(mpp::isnan(hf2.z));
     CHECK(hf2.w == -INFINITY);
 
     // to float
     CHECK(f1.x == 65504.0f);
     CHECK(f1.y == 64992.0f);
-    CHECK(opp::isnan(f1.z));
+    CHECK(mpp::isnan(f1.z));
     CHECK(f1.w == INFINITY);
 
     CHECK(f2.x == -65504.0f);
     CHECK(f2.y == -64992.0f);
-    CHECK(opp::isnan(f2.z));
+    CHECK(mpp::isnan(f2.z));
     CHECK(f2.w == -INFINITY);
 }

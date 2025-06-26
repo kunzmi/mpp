@@ -1,13 +1,13 @@
 #pragma once
 #include <common/defines.h>
 #include <common/image/pixelTypes.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
 #include <concepts>
 #include <random>
 
-namespace opp
+namespace mpp
 {
 template <AnyVector T> struct FillRandom
 {
@@ -290,4 +290,4 @@ template <AnyVector T> struct FillRandomNormal
         }
     }
 };
-} // namespace opp
+} // namespace mpp

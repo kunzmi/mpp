@@ -1,17 +1,17 @@
 #pragma once
+#include "testMppBase.h"
 #include "testNppBase.h"
-#include "testOppBase.h"
 #include <backends/simple_cpu/image/imageView.h>
 #include <common/image/filterArea.h>
 #include <common/vector_typetraits.h>
 
-namespace opp
+namespace mpp
 {
-template <typename oppT, typename nppT> class FilteringBase
+template <typename mppT, typename nppT> class FilteringBase
 {
   public:
     FilteringBase(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : opp(aIterations, aRepeats, aWidth, aHeight), npp(aIterations, aRepeats, aWidth, aHeight), repeats(aRepeats)
+        : mpp(aIterations, aRepeats, aWidth, aHeight), npp(aIterations, aRepeats, aWidth, aHeight), repeats(aRepeats)
     {
     }
     virtual ~FilteringBase() = default;
@@ -27,23 +27,23 @@ template <typename oppT, typename nppT> class FilteringBase
 
     template <typename ImgT> void Init(const ImgT &aCpuSrc1)
     {
-        opp.Init();
+        mpp.Init();
         npp.Init();
 
-        aCpuSrc1 >> opp.GetSrc1();
+        aCpuSrc1 >> mpp.GetSrc1();
 
         aCpuSrc1 >> npp.GetSrc1();
     }
 
     void Run(const Roi &aRoi, const FilterArea &aFilterArea)
     {
-        opp.fa = aFilterArea;
+        mpp.fa = aFilterArea;
         npp.fa = aFilterArea;
-        opp.SetRoi(aRoi);
+        mpp.SetRoi(aRoi);
         npp.SetRoi(aRoi);
 
-        opp.WarmUp();
-        rt_opp = opp.Run();
+        mpp.WarmUp();
+        rt_mpp = mpp.Run();
 
         npp.WarmUp();
         rt_npp = npp.Run();
@@ -52,58 +52,58 @@ template <typename oppT, typename nppT> class FilteringBase
     template <typename ImgT, PixelType resT> TestResult GetResult()
     {
         std::stringstream ss;
-        ss << GetName() << " for " << GetType() << " and filter size " << opp.fa.Size;
+        ss << GetName() << " for " << GetType() << " and filter size " << mpp.fa.Size;
 
         std::cout << ss.str() << std::endl;
 
         ImgT resNpp(npp.GetDst().SizeAlloc());
-        ImgT resOpp(opp.GetDst().SizeAlloc());
+        ImgT resMpp(mpp.GetDst().SizeAlloc());
 
         resNpp << npp.GetDst();
-        resOpp << opp.GetDst();
+        resMpp << mpp.GetDst();
 
         resNpp.SetRoi(npp.GetDst().ROI());
-        resOpp.SetRoi(opp.GetDst().ROI());
+        resMpp.SetRoi(mpp.GetDst().ROI());
 
         double maxErrorScalar = 0;
         resT maxError{0};
 
         if constexpr (vector_size_v<resT> == 1)
         {
-            resOpp.MaximumError(resNpp, maxError);
+            resMpp.MaximumError(resNpp, maxError);
             maxErrorScalar = maxError.x;
         }
         else
         {
-            resOpp.MaximumError(resNpp, maxError, maxErrorScalar);
+            resMpp.MaximumError(resNpp, maxError, maxErrorScalar);
         }
         double avgErrorScalar = 0;
         resT avgError{0};
 
         if constexpr (vector_size_v<resT> == 1)
         {
-            resOpp.AverageError(resNpp, avgError);
+            resMpp.AverageError(resNpp, avgError);
             avgErrorScalar = avgError.x;
         }
         else
         {
-            resOpp.AverageError(resNpp, avgError, avgErrorScalar);
+            resMpp.AverageError(resNpp, avgError, avgErrorScalar);
         }
 
-        std::cout << "OPP:" << std::endl;
-        std::cout << rt_opp << std::endl;
+        std::cout << "MPP:" << std::endl;
+        std::cout << rt_mpp << std::endl;
         std::cout << "NPP:" << std::endl;
         std::cout << rt_npp << std::endl;
 
-        const float ratio = rt_npp.Mean / rt_opp.Mean;
+        const float ratio = rt_npp.Mean / rt_mpp.Mean;
         if (ratio >= 1.0f)
         {
-            std::cout << "OPP is " << (rt_npp.Mean - rt_opp.Mean) / static_cast<float>(repeats) << " msec or "
+            std::cout << "MPP is " << (rt_npp.Mean - rt_mpp.Mean) / static_cast<float>(repeats) << " msec or "
                       << ratio * 100.0f - 100.0f << "% faster!" << std::endl;
         }
         else
         {
-            std::cout << "OPP is " << (rt_opp.Mean - rt_npp.Mean) / static_cast<float>(repeats) << " msec or "
+            std::cout << "MPP is " << (rt_mpp.Mean - rt_npp.Mean) / static_cast<float>(repeats) << " msec or "
                       << 1.0f / ratio * 100.0f - 100.0f << "% slower..." << std::endl;
         }
 
@@ -114,17 +114,17 @@ template <typename oppT, typename nppT> class FilteringBase
         TestResult res;
 
         res.Name                   = ss.str();
-        res.TotalOPP               = rt_opp.Total;
+        res.TotalMPP               = rt_mpp.Total;
         res.TotalNPP               = rt_npp.Total;
-        res.MeanOPP                = rt_opp.Mean;
+        res.MeanMPP                = rt_mpp.Mean;
         res.MeanNPP                = rt_npp.Mean;
-        res.StdOPP                 = rt_opp.Std;
+        res.StdMPP                 = rt_mpp.Std;
         res.StdNPP                 = rt_npp.Std;
-        res.MinOPP                 = rt_opp.Min;
+        res.MinMPP                 = rt_mpp.Min;
         res.MinNPP                 = rt_npp.Min;
-        res.MaxOPP                 = rt_opp.Max;
+        res.MaxMPP                 = rt_mpp.Max;
         res.MaxNPP                 = rt_npp.Max;
-        res.AbsoluteDifferenceMSec = (rt_npp.Mean - rt_opp.Mean) / static_cast<float>(repeats);
+        res.AbsoluteDifferenceMSec = (rt_npp.Mean - rt_mpp.Mean) / static_cast<float>(repeats);
         if (ratio >= 1.0f)
         {
             res.RelativeDifference = ratio * 100.0f - 100.0f;
@@ -137,20 +137,20 @@ template <typename oppT, typename nppT> class FilteringBase
     }
 
   protected:
-    oppT opp;
+    mppT mpp;
     nppT npp;
 
-    Runtime rt_opp;
+    Runtime rt_mpp;
     Runtime rt_npp;
 
     size_t repeats;
 };
 
-template <PixelType T> class BoxFilterOpp : public TestOppSrcDstBase<T>
+template <PixelType T> class BoxFilterMpp : public TestMppSrcDstBase<T>
 {
   public:
-    BoxFilterOpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : TestOppSrcDstBase<T>(aIterations, aRepeats, aWidth, aHeight)
+    BoxFilterMpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+        : TestMppSrcDstBase<T>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -183,11 +183,11 @@ template <typename T> class BoxFilterNpp : public TestNppSrcDstBase<T>
   private:
 };
 
-template <PixelType T, typename T2> class BoxFilterTest : public FilteringBase<BoxFilterOpp<T>, BoxFilterNpp<T2>>
+template <PixelType T, typename T2> class BoxFilterTest : public FilteringBase<BoxFilterMpp<T>, BoxFilterNpp<T2>>
 {
   public:
     BoxFilterTest(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : FilteringBase<BoxFilterOpp<T>, BoxFilterNpp<T2>>(aIterations, aRepeats, aWidth, aHeight)
+        : FilteringBase<BoxFilterMpp<T>, BoxFilterNpp<T2>>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -202,11 +202,11 @@ template <PixelType T, typename T2> class BoxFilterTest : public FilteringBase<B
     }
 };
 
-template <PixelType SrcT, PixelType DstT> class ColumnWindowSumOpp : public TestOppSrcDstBase<SrcT, DstT>
+template <PixelType SrcT, PixelType DstT> class ColumnWindowSumMpp : public TestMppSrcDstBase<SrcT, DstT>
 {
   public:
-    ColumnWindowSumOpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : TestOppSrcDstBase<SrcT, DstT>(aIterations, aRepeats, aWidth, aHeight)
+    ColumnWindowSumMpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+        : TestMppSrcDstBase<SrcT, DstT>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -239,11 +239,11 @@ template <typename SrcT, typename DstT> class ColumnWindowSumNpp : public TestNp
 };
 
 template <PixelType SrcT, PixelType DstT, typename T2, typename DstT2>
-class ColumnWindowSumTest : public FilteringBase<ColumnWindowSumOpp<SrcT, DstT>, ColumnWindowSumNpp<T2, DstT2>>
+class ColumnWindowSumTest : public FilteringBase<ColumnWindowSumMpp<SrcT, DstT>, ColumnWindowSumNpp<T2, DstT2>>
 {
   public:
     ColumnWindowSumTest(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : FilteringBase<ColumnWindowSumOpp<SrcT, DstT>, ColumnWindowSumNpp<T2, DstT2>>(aIterations, aRepeats, aWidth,
+        : FilteringBase<ColumnWindowSumMpp<SrcT, DstT>, ColumnWindowSumNpp<T2, DstT2>>(aIterations, aRepeats, aWidth,
                                                                                        aHeight)
     {
     }
@@ -259,11 +259,11 @@ class ColumnWindowSumTest : public FilteringBase<ColumnWindowSumOpp<SrcT, DstT>,
     }
 };
 
-template <PixelType SrcT, PixelType DstT> class RowWindowSumOpp : public TestOppSrcDstBase<SrcT, DstT>
+template <PixelType SrcT, PixelType DstT> class RowWindowSumMpp : public TestMppSrcDstBase<SrcT, DstT>
 {
   public:
-    RowWindowSumOpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : TestOppSrcDstBase<SrcT, DstT>(aIterations, aRepeats, aWidth, aHeight)
+    RowWindowSumMpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+        : TestMppSrcDstBase<SrcT, DstT>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -296,11 +296,11 @@ template <typename SrcT, typename DstT> class RowWindowSumNpp : public TestNppSr
 };
 
 template <PixelType SrcT, PixelType DstT, typename T2, typename DstT2>
-class RowWindowSumTest : public FilteringBase<RowWindowSumOpp<SrcT, DstT>, RowWindowSumNpp<T2, DstT2>>
+class RowWindowSumTest : public FilteringBase<RowWindowSumMpp<SrcT, DstT>, RowWindowSumNpp<T2, DstT2>>
 {
   public:
     RowWindowSumTest(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : FilteringBase<RowWindowSumOpp<SrcT, DstT>, RowWindowSumNpp<T2, DstT2>>(aIterations, aRepeats, aWidth, aHeight)
+        : FilteringBase<RowWindowSumMpp<SrcT, DstT>, RowWindowSumNpp<T2, DstT2>>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -315,11 +315,11 @@ class RowWindowSumTest : public FilteringBase<RowWindowSumOpp<SrcT, DstT>, RowWi
     }
 };
 
-template <PixelType T> class LowPassFilterOpp : public TestOppSrcDstBase<T>
+template <PixelType T> class LowPassFilterMpp : public TestMppSrcDstBase<T>
 {
   public:
-    LowPassFilterOpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : TestOppSrcDstBase<T>(aIterations, aRepeats, aWidth, aHeight)
+    LowPassFilterMpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+        : TestMppSrcDstBase<T>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -362,11 +362,11 @@ template <typename T> class LowPassFilterNpp : public TestNppSrcDstBase<T>
 };
 
 template <PixelType T, typename T2>
-class LowPassFilterTest : public FilteringBase<LowPassFilterOpp<T>, LowPassFilterNpp<T2>>
+class LowPassFilterTest : public FilteringBase<LowPassFilterMpp<T>, LowPassFilterNpp<T2>>
 {
   public:
     LowPassFilterTest(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : FilteringBase<LowPassFilterOpp<T>, LowPassFilterNpp<T2>>(aIterations, aRepeats, aWidth, aHeight)
+        : FilteringBase<LowPassFilterMpp<T>, LowPassFilterNpp<T2>>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -381,11 +381,11 @@ class LowPassFilterTest : public FilteringBase<LowPassFilterOpp<T>, LowPassFilte
     }
 };
 
-template <PixelType T> class GaussFilterOpp : public TestOppSrcDstBase<T>
+template <PixelType T> class GaussFilterMpp : public TestMppSrcDstBase<T>
 {
   public:
-    GaussFilterOpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : TestOppSrcDstBase<T>(aIterations, aRepeats, aWidth, aHeight)
+    GaussFilterMpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+        : TestMppSrcDstBase<T>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -467,11 +467,11 @@ template <typename T> class GaussFilterNpp : public TestNppSrcDstBase<T>
   private:
 };
 
-template <PixelType T, typename T2> class GaussFilterTest : public FilteringBase<GaussFilterOpp<T>, GaussFilterNpp<T2>>
+template <PixelType T, typename T2> class GaussFilterTest : public FilteringBase<GaussFilterMpp<T>, GaussFilterNpp<T2>>
 {
   public:
     GaussFilterTest(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : FilteringBase<GaussFilterOpp<T>, GaussFilterNpp<T2>>(aIterations, aRepeats, aWidth, aHeight)
+        : FilteringBase<GaussFilterMpp<T>, GaussFilterNpp<T2>>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -486,11 +486,11 @@ template <PixelType T, typename T2> class GaussFilterTest : public FilteringBase
     }
 };
 
-template <PixelType T> class GaussAdvancedFilterOpp : public TestOppSrcDstBase<T>
+template <PixelType T> class GaussAdvancedFilterMpp : public TestMppSrcDstBase<T>
 {
   public:
-    GaussAdvancedFilterOpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : TestOppSrcDstBase<T>(aIterations, aRepeats, aWidth, aHeight)
+    GaussAdvancedFilterMpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+        : TestMppSrcDstBase<T>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -525,20 +525,20 @@ template <typename T> class GaussAdvancedFilterNpp : public TestNppSrcDstBase<T>
 };
 
 template <PixelType T, typename T2>
-class GaussAdvancedFilterTest : public FilteringBase<GaussAdvancedFilterOpp<T>, GaussAdvancedFilterNpp<T2>>
+class GaussAdvancedFilterTest : public FilteringBase<GaussAdvancedFilterMpp<T>, GaussAdvancedFilterNpp<T2>>
 {
   public:
     GaussAdvancedFilterTest(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : FilteringBase<GaussAdvancedFilterOpp<T>, GaussAdvancedFilterNpp<T2>>(aIterations, aRepeats, aWidth, aHeight)
+        : FilteringBase<GaussAdvancedFilterMpp<T>, GaussAdvancedFilterNpp<T2>>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
     template <typename ImgT> void Init(const ImgT &aCpuSrc1, const FilterArea &aFilterArea)
     {
-        FilteringBase<GaussAdvancedFilterOpp<T>, GaussAdvancedFilterNpp<T2>>::Init(aCpuSrc1);
+        FilteringBase<GaussAdvancedFilterMpp<T>, GaussAdvancedFilterNpp<T2>>::Init(aCpuSrc1);
 
         std::vector<float> filter_h(to_size_t(aFilterArea.Size.x));
-        this->opp.filter   = DevVar<float>(to_size_t(aFilterArea.Size.x));
+        this->mpp.filter   = DevVar<float>(to_size_t(aFilterArea.Size.x));
         this->npp.filter   = DevVar<float>(to_size_t(aFilterArea.Size.x));
         const double sigma = 0.4 + (to_double(aFilterArea.Size.x) / 3.0) * 0.6;
 
@@ -555,7 +555,7 @@ class GaussAdvancedFilterTest : public FilteringBase<GaussAdvancedFilterOpp<T>, 
             filter_h[i] /= sum_filter;
         }
 
-        this->opp.filter << filter_h;
+        this->mpp.filter << filter_h;
         this->npp.filter << filter_h;
     }
 
@@ -569,4 +569,4 @@ class GaussAdvancedFilterTest : public FilteringBase<GaussAdvancedFilterOpp<T>, 
         return pixel_type_name<T>::value;
     }
 };
-} // namespace opp
+} // namespace mpp

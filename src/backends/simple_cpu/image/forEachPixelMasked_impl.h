@@ -10,7 +10,7 @@
 
 #include <iostream>
 
-namespace opp::image::cpuSimple
+namespace mpp::image::cpuSimple
 {
 /// <summary>
 /// runs aOp on every pixel of an image. Inplace and outplace operation, with mask.
@@ -64,4 +64,4 @@ void forEachPixel(const ImageView<Pixel8uC1> &aMask, ImageView<DstT> &aDst, cons
         pixelOut = res;
     }
 }
-} // namespace opp::image::cpuSimple
+} // namespace mpp::image::cpuSimple

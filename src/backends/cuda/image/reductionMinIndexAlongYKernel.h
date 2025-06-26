@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/image/configurations.h>
@@ -17,7 +17,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 /// <summary>
 /// runs Min with index reduction on one image column, single output value.
@@ -35,7 +35,7 @@ __global__ void reductionMinIdxAlongYKernel(
     int warpLaneId = threadIdx.x;
     int batchId    = threadIdx.y;
 
-    opp::MinIdx<SrcT> redOpMin;
+    mpp::MinIdx<SrcT> redOpMin;
 
     SrcT resultMin(reduction_init_value_v<ReductionInitValue::Max, SrcT>);
     idxT resultMinIdx(-1);
@@ -233,7 +233,7 @@ void InvokeReductionMinIdxAlongYKernelDefault(const SrcT *aSrcMin,
                                               SrcT *aDstMin, same_vector_size_different_type_t<SrcT, int> *aDstMinIdxX,
                                               same_vector_size_different_type_t<SrcT, int> *aDstMinIdxY,
                                               remove_vector_t<SrcT> *aDstScalarMin, Vector3<int> *aDstScalarIdxMin,
-                                              int aSize, const opp::cuda::StreamCtx &aStreamCtx)
+                                              int aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {
@@ -253,5 +253,5 @@ void InvokeReductionMinIdxAlongYKernelDefault(const SrcT *aSrcMin,
     }
 }
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

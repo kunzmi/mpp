@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "swapChannel.h"
 #include <backends/cuda/image/configurations.h>
@@ -16,24 +16,24 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT, typename DstT>
 void InvokeSwapChannelSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst,
                           const ChannelList<vector_active_size_v<DstT>> &aDstChannels, const Size2D &aSize,
-                          const opp::cuda::StreamCtx &aStreamCtx)
+                          const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
         // in case that either input or ourput type is three-channel, we can't use tupels:
         if constexpr (vector_size_v<SrcT> == 3 || vector_size_v<DstT> == 3)
@@ -41,9 +41,9 @@ void InvokeSwapChannelSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size
             constexpr size_t TupelSize = 1;
 
             using swapChannelSrc =
-                SrcFunctor<TupelSize, SrcT, SrcT, DstT, opp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
+                SrcFunctor<TupelSize, SrcT, SrcT, DstT, mpp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
 
-            const opp::SwapChannel<SrcT, DstT> op(aDstChannels);
+            const mpp::SwapChannel<SrcT, DstT> op(aDstChannels);
 
             const swapChannelSrc functor(aSrc1, aPitchSrc1, op);
 
@@ -55,9 +55,9 @@ void InvokeSwapChannelSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size
             constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
             using swapChannelSrc =
-                SrcFunctor<TupelSize, SrcT, SrcT, DstT, opp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
+                SrcFunctor<TupelSize, SrcT, SrcT, DstT, mpp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
 
-            const opp::SwapChannel<SrcT, DstT> op(aDstChannels);
+            const mpp::SwapChannel<SrcT, DstT> op(aDstChannels);
 
             const swapChannelSrc functor(aSrc1, aPitchSrc1, op);
 
@@ -85,11 +85,11 @@ void InvokeSwapChannelSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size
 template <ThreeChannel SrcT, FourChannelNoAlpha DstT>
 void InvokeSwapChannelSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst,
                           const ChannelList<vector_active_size_v<DstT>> &aDstChannels, remove_vector_t<DstT> aValue,
-                          const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+                          const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
         constexpr size_t TupelSize = 1; // ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
@@ -102,9 +102,9 @@ void InvokeSwapChannelSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size
         if (allChannelsSet)
         {
             using swapChannelSrc =
-                SrcFunctor<TupelSize, SrcT, SrcT, DstT, opp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
+                SrcFunctor<TupelSize, SrcT, SrcT, DstT, mpp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
 
-            const opp::SwapChannel<SrcT, DstT> op(aDstChannels, aValue);
+            const mpp::SwapChannel<SrcT, DstT> op(aDstChannels, aValue);
 
             const swapChannelSrc functor(aSrc1, aPitchSrc1, op);
 
@@ -113,9 +113,9 @@ void InvokeSwapChannelSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size
         }
         else
         {
-            using swapChannelSrcDstAsSrc = SrcDstAsSrcFunctor<TupelSize, SrcT, DstT, opp::SwapChannel<SrcT, DstT>>;
+            using swapChannelSrcDstAsSrc = SrcDstAsSrcFunctor<TupelSize, SrcT, DstT, mpp::SwapChannel<SrcT, DstT>>;
 
-            const opp::SwapChannel<SrcT, DstT> op(aDstChannels, aValue);
+            const mpp::SwapChannel<SrcT, DstT> op(aDstChannels, aValue);
 
             const swapChannelSrcDstAsSrc functor(aSrc1, aPitchSrc1, aDst, aPitchDst, op);
 
@@ -140,19 +140,19 @@ void InvokeSwapChannelSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size
 template <typename SrcT>
 void InvokeSwapChannelInplace(SrcT *aSrcDst, size_t aPitchSrcDst,
                               const ChannelList<vector_active_size_v<SrcT>> &aDstChannels, const Size2D &aSize,
-                              const opp::cuda::StreamCtx &aStreamCtx)
+                              const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
+    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
     {
         using DstT = SrcT;
-        OPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using swapChannelInplace =
-            InplaceFunctor<TupelSize, SrcT, DstT, opp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
+            InplaceFunctor<TupelSize, SrcT, DstT, mpp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
 
-        const opp::SwapChannel<SrcT, DstT> op(aDstChannels);
+        const mpp::SwapChannel<SrcT, DstT> op(aDstChannels);
 
         const swapChannelInplace functor(op);
 
@@ -173,5 +173,5 @@ void InvokeSwapChannelInplace(SrcT *aSrcDst, size_t aPitchSrcDst,
     InstantiateInvokeSwapChannelInplace_For(Pixel##type##C4);
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

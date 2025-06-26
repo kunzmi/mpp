@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "histogramRange.h"
 #include <backends/cuda/image/configurations.h>
@@ -10,7 +10,7 @@
 #include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
@@ -18,17 +18,17 @@
 #include <cub/device/device_histogram.cuh>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 
 template <typename SrcT>
 size_t InvokeHistogramRangeGetBufferSize(const SrcT *aSrc1, size_t aPitchSrc1,
                                          const int aNumLevels[vector_active_size<SrcT>::value], const Size2D &aSize,
-                                         const opp::cuda::StreamCtx &aStreamCtx)
+                                         const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
+    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
     {
         size_t bufferSize = 0;
         int *hist[vector_active_size<SrcT>::value]{nullptr};
@@ -65,11 +65,11 @@ void InvokeHistogramRange(const SrcT *aSrc1, size_t aPitchSrc1, void *aTempBuffe
                           int *aHist[vector_active_size<SrcT>::value],
                           const int aNumLevels[vector_active_size<SrcT>::value],
                           const hist_range_types_for_t<SrcT> *aLevels[vector_active_size<SrcT>::value],
-                          const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+                          const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
+    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
+        MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
 
         if constexpr (std::same_as<HalfFp16, remove_vector_t<SrcT>>)
         {
@@ -100,12 +100,12 @@ void InvokeHistogramRange(const SrcT *aSrc1, size_t aPitchSrc1, void *aTempBuffe
 #define Instantiate_For(type)                                                                                          \
     template size_t InvokeHistogramRangeGetBufferSize<type>(                                                           \
         const type *aSrc1, size_t aPitchSrc1, const int aNumLevels[vector_active_size<type>::value],                   \
-        const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx);                                                  \
+        const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);                                                  \
     template void InvokeHistogramRange<type>(                                                                          \
         const type *aSrc1, size_t aPitchSrc1, void *aTempBuffer, size_t aTempBufferSize,                               \
         int *aHist[vector_active_size<type>::value], const int aNumLevels[vector_active_size<type>::value],            \
         const hist_range_types_for_t<type> *aLevels[vector_active_size<type>::value], const Size2D &aSize,             \
-        const opp::cuda::StreamCtx &aStreamCtx);
+        const mpp::cuda::StreamCtx &aStreamCtx);
 
 #define ForAllChannelsWithAlpha(type)                                                                                  \
     Instantiate_For(Pixel##type##C1);                                                                                  \
@@ -116,5 +116,5 @@ void InvokeHistogramRange(const SrcT *aSrc1, size_t aPitchSrc1, void *aTempBuffe
 
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

@@ -1,5 +1,5 @@
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "cudaException.h"
 #include "streamCtx.h"
@@ -7,7 +7,7 @@
 #include <cuda_runtime_api.h>
 #include <driver_types.h>
 
-namespace opp::cuda
+namespace mpp::cuda
 {
 void StreamCtxSingleton::UpdateContext()
 {
@@ -50,5 +50,5 @@ void StreamCtxSingleton::SetStream(const Stream &aStream)
 
 thread_local StreamCtx StreamCtxSingleton::tlSingletonCtx = StreamCtx();
 
-} // namespace opp::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

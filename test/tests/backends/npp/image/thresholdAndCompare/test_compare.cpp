@@ -47,11 +47,11 @@
 #include <catch2/catch_test_macros.hpp>
 #include <common/defines.h>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size = 256;
 
@@ -122,7 +122,7 @@ TEST_CASE("8uC1", "[NPP.Statistics.CompareC]")
     nv::Image8uC1 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
 
-    opp::FillRandom<Pixel8uC1> opRand(seed + 1);
+    mpp::FillRandom<Pixel8uC1> opRand(seed + 1);
     cpu_src1.FillRandom(seed);
     opRand(cpu_src2);
 
@@ -231,7 +231,7 @@ TEST_CASE("8uC3", "[NPP.Statistics.CompareC]")
     nv::Image8uC3 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
 
-    opp::FillRandom<Pixel8uC3> opRand(seed + 1);
+    mpp::FillRandom<Pixel8uC3> opRand(seed + 1);
     cpu_src1.FillRandom(seed);
     opRand(cpu_src2);
 
@@ -340,7 +340,7 @@ TEST_CASE("8uC4", "[NPP.Statistics.CompareC]")
     nv::Image8uC4 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
 
-    opp::FillRandom<Pixel8uC4> opRand(seed + 1);
+    mpp::FillRandom<Pixel8uC4> opRand(seed + 1);
     cpu_src1.FillRandom(seed);
     opRand(cpu_src2);
 
@@ -452,7 +452,7 @@ TEST_CASE("8uC4A", "[NPP.Statistics.CompareC]")
     nv::Image8uC4 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
 
-    opp::FillRandom<Pixel8uC4A> opRand(seed + 1);
+    mpp::FillRandom<Pixel8uC4A> opRand(seed + 1);
     cpu_src1.FillRandom(seed);
     opRand(cpu_src2);
 
@@ -561,7 +561,7 @@ TEST_CASE("16sC1", "[NPP.Statistics.CompareC]")
     nv::Image16sC1 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
 
-    opp::FillRandom<Pixel16sC1> opRand(seed + 1);
+    mpp::FillRandom<Pixel16sC1> opRand(seed + 1);
     cpu_src1.FillRandom(seed);
     opRand(cpu_src2);
 
@@ -670,7 +670,7 @@ TEST_CASE("16sC3", "[NPP.Statistics.CompareC]")
     nv::Image16sC3 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
 
-    opp::FillRandom<Pixel16sC3> opRand(seed + 1);
+    mpp::FillRandom<Pixel16sC3> opRand(seed + 1);
     cpu_src1.FillRandom(seed);
     opRand(cpu_src2);
 
@@ -779,7 +779,7 @@ TEST_CASE("16sC4", "[NPP.Statistics.CompareC]")
     nv::Image16sC4 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
 
-    opp::FillRandom<Pixel16sC4> opRand(seed + 1);
+    mpp::FillRandom<Pixel16sC4> opRand(seed + 1);
     cpu_src1.FillRandom(seed);
     opRand(cpu_src2);
 
@@ -891,7 +891,7 @@ TEST_CASE("16sC4A", "[NPP.Statistics.CompareC]")
     nv::Image16sC4 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
 
-    opp::FillRandom<Pixel16sC4A> opRand(seed + 1);
+    mpp::FillRandom<Pixel16sC4A> opRand(seed + 1);
     cpu_src1.FillRandom(seed);
     opRand(cpu_src2);
 
@@ -1000,7 +1000,7 @@ TEST_CASE("16uC1", "[NPP.Statistics.CompareC]")
     nv::Image16uC1 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
 
-    opp::FillRandom<Pixel16uC1> opRand(seed + 1);
+    mpp::FillRandom<Pixel16uC1> opRand(seed + 1);
     cpu_src1.FillRandom(seed);
     opRand(cpu_src2);
 
@@ -1109,7 +1109,7 @@ TEST_CASE("16uC3", "[NPP.Statistics.CompareC]")
     nv::Image16uC3 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
 
-    opp::FillRandom<Pixel16uC3> opRand(seed + 1);
+    mpp::FillRandom<Pixel16uC3> opRand(seed + 1);
     cpu_src1.FillRandom(seed);
     opRand(cpu_src2);
 
@@ -1218,7 +1218,7 @@ TEST_CASE("16uC4", "[NPP.Statistics.CompareC]")
     nv::Image16uC4 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
 
-    opp::FillRandom<Pixel16uC4> opRand(seed + 1);
+    mpp::FillRandom<Pixel16uC4> opRand(seed + 1);
     cpu_src1.FillRandom(seed);
     opRand(cpu_src2);
 
@@ -1330,7 +1330,7 @@ TEST_CASE("16uC4A", "[NPP.Statistics.CompareC]")
     nv::Image16uC4 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
 
-    opp::FillRandom<Pixel16uC4A> opRand(seed + 1);
+    mpp::FillRandom<Pixel16uC4A> opRand(seed + 1);
     cpu_src1.FillRandom(seed);
     opRand(cpu_src2);
 
@@ -1439,7 +1439,7 @@ TEST_CASE("32fC1", "[NPP.Statistics.CompareC]")
     nv::Image32fC1 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
 
-    opp::FillRandom<Pixel32fC1> opRand(seed + 1);
+    mpp::FillRandom<Pixel32fC1> opRand(seed + 1);
     cpu_src1.FillRandom(seed);
     opRand(cpu_src2);
 
@@ -1548,7 +1548,7 @@ TEST_CASE("32fC3", "[NPP.Statistics.CompareC]")
     nv::Image32fC3 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
 
-    opp::FillRandom<Pixel32fC3> opRand(seed + 1);
+    mpp::FillRandom<Pixel32fC3> opRand(seed + 1);
     cpu_src1.FillRandom(seed);
     opRand(cpu_src2);
 
@@ -1657,7 +1657,7 @@ TEST_CASE("32fC4", "[NPP.Statistics.CompareC]")
     nv::Image32fC4 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
 
-    opp::FillRandom<Pixel32fC4> opRand(seed + 1);
+    mpp::FillRandom<Pixel32fC4> opRand(seed + 1);
     cpu_src1.FillRandom(seed);
     opRand(cpu_src2);
 
@@ -1769,7 +1769,7 @@ TEST_CASE("32fC4A", "[NPP.Statistics.CompareC]")
     nv::Image32fC4 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
 
-    opp::FillRandom<Pixel32fC4A> opRand(seed + 1);
+    mpp::FillRandom<Pixel32fC4A> opRand(seed + 1);
     cpu_src1.FillRandom(seed);
     opRand(cpu_src2);
 

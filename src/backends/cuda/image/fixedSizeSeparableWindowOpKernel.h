@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/image/configurations.h>
@@ -20,7 +20,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename T> struct pixel_block_size_for_small_fixed_kernel_x
 {
@@ -539,7 +539,7 @@ template <typename ComputeT, typename DstT, size_t TupelSize, int blockHeight, R
 void InvokeFixedSizeSeparableWindowOpKernelDefault(const BorderControlT &aSrcWithBC, DstT *aDst, size_t aPitchDst,
                                                    int aFilterSize, const Vector2<int> &aFilterCenter,
                                                    windowOp aWindowOp, postOp aPostOp, const Size2D &aSize,
-                                                   const opp::cuda::StreamCtx &aStreamCtx)
+                                                   const mpp::cuda::StreamCtx &aStreamCtx)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {
@@ -596,5 +596,5 @@ void InvokeFixedSizeSeparableWindowOpKernelDefault(const BorderControlT &aSrcWit
     }
 }
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

@@ -2,7 +2,7 @@
 #include "bigTiffImageFileDirectory.h"
 #include "tiffFile.h"
 
-namespace opp::fileIO::bigTiffTag
+namespace mpp::fileIO::bigTiffTag
 {
 template <class T>
 BigIFDEntry<T>::BigIFDEntry(TIFFFile &aFile, ushort aTagID)
@@ -80,4 +80,4 @@ const std::string &BigIFDEntry<std::string>::Value() const // NOLINT(misc-defini
 {
     return mValue;
 }
-} // namespace opp::fileIO::bigTiffTag
+} // namespace mpp::fileIO::bigTiffTag

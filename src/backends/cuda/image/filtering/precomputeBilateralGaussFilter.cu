@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "bilateralGaussFilter.h"
 #include <backends/cuda/image/configurations.h>
@@ -11,22 +11,22 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 
 void InvokePrecomputeBilateralGaussFilter(Pixel32fC1 *aPreCompGeomDistCoeff, const FilterArea &aFilterArea,
-                                          float aPosSquareSigma, const opp::cuda::StreamCtx &aStreamCtx)
+                                          float aPosSquareSigma, const mpp::cuda::StreamCtx &aStreamCtx)
 {
     InvokePrecomputeGeometryDistanceCoeffKernelDefault(aPreCompGeomDistCoeff, aFilterArea, aPosSquareSigma, aStreamCtx);
 }
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

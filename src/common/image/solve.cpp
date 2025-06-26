@@ -3,7 +3,7 @@
 #include <common/safeCast.h>
 #include <vector>
 
-bool opp::image::solve(double *aMatrix, double *aVec, int aN)
+bool mpp::image::solve(double *aMatrix, double *aVec, int aN)
 {
     constexpr double ZERO = 10e-30;
     double rowMax         = 0;
@@ -104,7 +104,7 @@ bool opp::image::solve(double *aMatrix, double *aVec, int aN)
     return OK;
 }
 
-bool opp::image::solve(float *aMatrix, float *aVec, int aN)
+bool mpp::image::solve(float *aMatrix, float *aVec, int aN)
 {
     constexpr float ZERO = 10e-15f;
     float rowMax         = 0;

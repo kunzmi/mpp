@@ -7,7 +7,7 @@
 #include <common/tupel.h>
 #include <concepts>
 
-namespace opp::cuda::simd
+namespace mpp::cuda::simd
 {
 using byte1_8   = Tupel<Vector1<byte>, 8>;
 using sbyte1_8  = Tupel<Vector1<sbyte>, 8>;
@@ -39,4 +39,4 @@ concept IsSignedSimdType = IsNativeSignedSimdType<T> || IsNonNativeSimdType<T>;
 template <typename T>
 concept IsSimdType = IsNativeSimdType<T> || IsNonNativeSimdType<T>;
 
-} // namespace opp::cuda::simd
+} // namespace mpp::cuda::simd

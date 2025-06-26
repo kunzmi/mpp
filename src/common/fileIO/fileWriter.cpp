@@ -10,7 +10,7 @@
 #include <memory>
 #include <utility>
 
-namespace opp::fileIO
+namespace mpp::fileIO
 {
 FileWriter::FileWriter() : mOStream(nullptr)
 {
@@ -128,4 +128,4 @@ void FileWriter::WriteWithStatus(const char *aSrc, size_t aCount)
         }
     }
 }
-} // namespace opp::fileIO
+} // namespace mpp::fileIO

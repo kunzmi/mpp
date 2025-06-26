@@ -6,7 +6,7 @@
 #include <common/image/roi.h>
 #include <common/image/size2D.h>
 #include <common/numberTypes.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/utilities.h>
 #include <common/vector2.h>
 #include <common/vector_typetraits.h>
@@ -20,7 +20,7 @@
 #endif
 #include <numbers>
 
-namespace opp::image
+namespace mpp::image
 {
 
 template <typename PixelT> struct interpolator_coordinate_type
@@ -718,6 +718,6 @@ template <typename PixelT, typename BorderControlT, typename CoordT, Interpolati
         return sinc_never0(aX) * sinc_never0(aX / static_cast<CoordT>(3));
     }
 };
-} // namespace opp::image
+} // namespace mpp::image
 
 #undef STD

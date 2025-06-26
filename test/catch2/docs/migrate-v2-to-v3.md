@@ -36,7 +36,7 @@ To migrate to v3, there are two basic approaches to do so.
 
 Doing 1 means downloading the [amalgamated header](/extras/catch_amalgamated.hpp)
 and the [amalgamated sources](/extras/catch_amalgamated.cpp) from `extras`,
-dropping them into your test project, and rewriting your includes from
+drmpping them into your test project, and rewriting your includes from
 `<catch2/catch.hpp>` to `"catch_amalgamated.hpp"` (or something similar,
 based on how you set up your paths).
 

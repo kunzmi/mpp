@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h>
-#if OPP_ENABLE_NPP_BACKEND
+#if MPP_ENABLE_NPP_BACKEND
 #include <common/image/pixelTypeEnabler.h>
 
 #include "image64fC1View.h"
@@ -19,7 +19,7 @@
 #include <common/safeCast.h>
 #include <nppdefs.h>
 
-namespace opp::image::npp
+namespace mpp::image::npp
 {
 
 class Image64fC1 : public Image64fC1View
@@ -85,5 +85,5 @@ class Image64fC4 : public Image64fC4View
     Image64fC4 &operator=(const Image64fC4 &) = delete;
     Image64fC4 &operator=(Image64fC4 &&aOther) noexcept;
 };
-} // namespace opp::image::npp
-#endif // OPP_ENABLE_NPP_BACKEND
+} // namespace mpp::image::npp
+#endif // MPP_ENABLE_NPP_BACKEND

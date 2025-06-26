@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "arithmetic/addSquareProductWeightedOutputType.h"
 #include "imageView.h"
@@ -15,17 +15,17 @@
 #include <common/image/roiException.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/utilities.h>
 #include <common/vector_typetraits.h>
 #include <concepts>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 #pragma region Add
 template <PixelType T>
 ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -39,7 +39,7 @@ ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, ImageView<T> &aDst,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -54,7 +54,7 @@ ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Add(const T &aConst, ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Add(const T &aConst, ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -66,7 +66,7 @@ ImageView<T> &ImageView<T>::Add(const T &aConst, ImageView<T> &aDst, const opp::
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Add(const T &aConst, ImageView<T> &aDst, int aScaleFactor,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -80,8 +80,8 @@ ImageView<T> &ImageView<T>::Add(const T &aConst, ImageView<T> &aDst, int aScaleF
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Add(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Add(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -92,8 +92,8 @@ ImageView<T> &ImageView<T>::Add(const opp::cuda::DevVarView<T> &aConst, ImageVie
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Add(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, int aScaleFactor,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Add(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, int aScaleFactor,
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -107,7 +107,7 @@ ImageView<T> &ImageView<T>::Add(const opp::cuda::DevVarView<T> &aConst, ImageVie
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -118,7 +118,7 @@ ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, const opp::cuda::Stre
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, int aScaleFactor, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -132,7 +132,7 @@ ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, int aScaleFactor, con
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Add(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Add(const T &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     InvokeAddInplaceC(PointerRoi(), Pitch(), aConst, SizeRoi(), aStreamCtx);
@@ -141,7 +141,7 @@ ImageView<T> &ImageView<T>::Add(const T &aConst, const opp::cuda::StreamCtx &aSt
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Add(const T &aConst, int aScaleFactor, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Add(const T &aConst, int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
@@ -152,7 +152,7 @@ ImageView<T> &ImageView<T>::Add(const T &aConst, int aScaleFactor, const opp::cu
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Add(const opp::cuda::DevVarView<T> &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Add(const mpp::cuda::DevVarView<T> &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     InvokeAddInplaceDevC(PointerRoi(), Pitch(), aConst.Pointer(), SizeRoi(), aStreamCtx);
@@ -161,8 +161,8 @@ ImageView<T> &ImageView<T>::Add(const opp::cuda::DevVarView<T> &aConst, const op
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Add(const opp::cuda::DevVarView<T> &aConst, int aScaleFactor,
-                                const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Add(const mpp::cuda::DevVarView<T> &aConst, int aScaleFactor,
+                                const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
@@ -174,7 +174,7 @@ ImageView<T> &ImageView<T>::Add(const opp::cuda::DevVarView<T> &aConst, int aSca
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::AddMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                      const opp::cuda::StreamCtx &aStreamCtx) const
+                                      const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -189,7 +189,7 @@ ImageView<T> &ImageView<T>::AddMasked(const ImageView<T> &aSrc2, ImageView<T> &a
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::AddMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                      int aScaleFactor, const opp::cuda::StreamCtx &aStreamCtx) const
+                                      int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -206,7 +206,7 @@ ImageView<T> &ImageView<T>::AddMasked(const ImageView<T> &aSrc2, ImageView<T> &a
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::AddMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                      const opp::cuda::StreamCtx &aStreamCtx) const
+                                      const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -220,7 +220,7 @@ ImageView<T> &ImageView<T>::AddMasked(const T &aConst, ImageView<T> &aDst, const
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::AddMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                      int aScaleFactor, const opp::cuda::StreamCtx &aStreamCtx) const
+                                      int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -235,8 +235,8 @@ ImageView<T> &ImageView<T>::AddMasked(const T &aConst, ImageView<T> &aDst, const
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::AddMasked(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                                      const ImageView<Pixel8uC1> &aMask, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::AddMasked(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                                      const ImageView<Pixel8uC1> &aMask, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -249,9 +249,9 @@ ImageView<T> &ImageView<T>::AddMasked(const opp::cuda::DevVarView<T> &aConst, Im
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::AddMasked(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::AddMasked(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
                                       const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
-                                      const opp::cuda::StreamCtx &aStreamCtx) const
+                                      const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -267,7 +267,7 @@ ImageView<T> &ImageView<T>::AddMasked(const opp::cuda::DevVarView<T> &aConst, Im
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::AddMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
-                                      const opp::cuda::StreamCtx &aStreamCtx)
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -281,7 +281,7 @@ ImageView<T> &ImageView<T>::AddMasked(const ImageView<T> &aSrc2, const ImageView
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::AddMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
-                                      const opp::cuda::StreamCtx &aStreamCtx)
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -297,7 +297,7 @@ ImageView<T> &ImageView<T>::AddMasked(const ImageView<T> &aSrc2, const ImageView
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::AddMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask,
-                                      const opp::cuda::StreamCtx &aStreamCtx)
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -309,7 +309,7 @@ ImageView<T> &ImageView<T>::AddMasked(const T &aConst, const ImageView<Pixel8uC1
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::AddMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
-                                      const opp::cuda::StreamCtx &aStreamCtx)
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -323,8 +323,8 @@ ImageView<T> &ImageView<T>::AddMasked(const T &aConst, const ImageView<Pixel8uC1
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::AddMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                                      const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::AddMasked(const mpp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -336,8 +336,8 @@ ImageView<T> &ImageView<T>::AddMasked(const opp::cuda::DevVarView<T> &aConst, co
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::AddMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                                      int aScaleFactor, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::AddMasked(const mpp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                                      int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -354,7 +354,7 @@ ImageView<T> &ImageView<T>::AddMasked(const opp::cuda::DevVarView<T> &aConst, co
 #pragma region Sub
 template <PixelType T>
 ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -368,7 +368,7 @@ ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -383,7 +383,7 @@ ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sub(const T &aConst, ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Sub(const T &aConst, ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -395,7 +395,7 @@ ImageView<T> &ImageView<T>::Sub(const T &aConst, ImageView<T> &aDst, const opp::
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Sub(const T &aConst, ImageView<T> &aDst, int aScaleFactor,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -409,8 +409,8 @@ ImageView<T> &ImageView<T>::Sub(const T &aConst, ImageView<T> &aDst, int aScaleF
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sub(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Sub(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -421,8 +421,8 @@ ImageView<T> &ImageView<T>::Sub(const opp::cuda::DevVarView<T> &aConst, ImageVie
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sub(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, int aScaleFactor,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Sub(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, int aScaleFactor,
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -436,7 +436,7 @@ ImageView<T> &ImageView<T>::Sub(const opp::cuda::DevVarView<T> &aConst, ImageVie
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -447,7 +447,7 @@ ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, const opp::cuda::Stre
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, int aScaleFactor, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -461,7 +461,7 @@ ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, int aScaleFactor, con
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sub(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Sub(const T &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     InvokeSubInplaceC(PointerRoi(), Pitch(), aConst, SizeRoi(), aStreamCtx);
@@ -470,7 +470,7 @@ ImageView<T> &ImageView<T>::Sub(const T &aConst, const opp::cuda::StreamCtx &aSt
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sub(const T &aConst, int aScaleFactor, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Sub(const T &aConst, int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
@@ -481,7 +481,7 @@ ImageView<T> &ImageView<T>::Sub(const T &aConst, int aScaleFactor, const opp::cu
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sub(const opp::cuda::DevVarView<T> &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Sub(const mpp::cuda::DevVarView<T> &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     InvokeSubInplaceDevC(PointerRoi(), Pitch(), aConst.Pointer(), SizeRoi(), aStreamCtx);
@@ -490,8 +490,8 @@ ImageView<T> &ImageView<T>::Sub(const opp::cuda::DevVarView<T> &aConst, const op
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sub(const opp::cuda::DevVarView<T> &aConst, int aScaleFactor,
-                                const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Sub(const mpp::cuda::DevVarView<T> &aConst, int aScaleFactor,
+                                const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
@@ -502,7 +502,7 @@ ImageView<T> &ImageView<T>::Sub(const opp::cuda::DevVarView<T> &aConst, int aSca
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::SubInv(const ImageView<T> &aSrc2, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::SubInv(const ImageView<T> &aSrc2, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -513,7 +513,7 @@ ImageView<T> &ImageView<T>::SubInv(const ImageView<T> &aSrc2, const opp::cuda::S
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::SubInv(const ImageView<T> &aSrc2, int aScaleFactor, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::SubInv(const ImageView<T> &aSrc2, int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -527,7 +527,7 @@ ImageView<T> &ImageView<T>::SubInv(const ImageView<T> &aSrc2, int aScaleFactor, 
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::SubInv(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::SubInv(const T &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     InvokeSubInvInplaceC(PointerRoi(), Pitch(), aConst, SizeRoi(), aStreamCtx);
@@ -536,7 +536,7 @@ ImageView<T> &ImageView<T>::SubInv(const T &aConst, const opp::cuda::StreamCtx &
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::SubInv(const T &aConst, int aScaleFactor, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::SubInv(const T &aConst, int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
@@ -547,7 +547,7 @@ ImageView<T> &ImageView<T>::SubInv(const T &aConst, int aScaleFactor, const opp:
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::SubInv(const opp::cuda::DevVarView<T> &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::SubInv(const mpp::cuda::DevVarView<T> &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     InvokeSubInvInplaceDevC(PointerRoi(), Pitch(), aConst.Pointer(), SizeRoi(), aStreamCtx);
@@ -556,8 +556,8 @@ ImageView<T> &ImageView<T>::SubInv(const opp::cuda::DevVarView<T> &aConst, const
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::SubInv(const opp::cuda::DevVarView<T> &aConst, int aScaleFactor,
-                                   const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::SubInv(const mpp::cuda::DevVarView<T> &aConst, int aScaleFactor,
+                                   const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
@@ -569,7 +569,7 @@ ImageView<T> &ImageView<T>::SubInv(const opp::cuda::DevVarView<T> &aConst, int a
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::SubMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                      const opp::cuda::StreamCtx &aStreamCtx) const
+                                      const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -584,7 +584,7 @@ ImageView<T> &ImageView<T>::SubMasked(const ImageView<T> &aSrc2, ImageView<T> &a
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::SubMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                      int aScaleFactor, const opp::cuda::StreamCtx &aStreamCtx) const
+                                      int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -601,7 +601,7 @@ ImageView<T> &ImageView<T>::SubMasked(const ImageView<T> &aSrc2, ImageView<T> &a
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::SubMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                      const opp::cuda::StreamCtx &aStreamCtx) const
+                                      const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -615,7 +615,7 @@ ImageView<T> &ImageView<T>::SubMasked(const T &aConst, ImageView<T> &aDst, const
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::SubMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                      int aScaleFactor, const opp::cuda::StreamCtx &aStreamCtx) const
+                                      int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -630,8 +630,8 @@ ImageView<T> &ImageView<T>::SubMasked(const T &aConst, ImageView<T> &aDst, const
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::SubMasked(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                                      const ImageView<Pixel8uC1> &aMask, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::SubMasked(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                                      const ImageView<Pixel8uC1> &aMask, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -644,9 +644,9 @@ ImageView<T> &ImageView<T>::SubMasked(const opp::cuda::DevVarView<T> &aConst, Im
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::SubMasked(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::SubMasked(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
                                       const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
-                                      const opp::cuda::StreamCtx &aStreamCtx) const
+                                      const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -662,7 +662,7 @@ ImageView<T> &ImageView<T>::SubMasked(const opp::cuda::DevVarView<T> &aConst, Im
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::SubMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
-                                      const opp::cuda::StreamCtx &aStreamCtx)
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -676,7 +676,7 @@ ImageView<T> &ImageView<T>::SubMasked(const ImageView<T> &aSrc2, const ImageView
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::SubMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
-                                      const opp::cuda::StreamCtx &aStreamCtx)
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -692,7 +692,7 @@ ImageView<T> &ImageView<T>::SubMasked(const ImageView<T> &aSrc2, const ImageView
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::SubMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask,
-                                      const opp::cuda::StreamCtx &aStreamCtx)
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -704,7 +704,7 @@ ImageView<T> &ImageView<T>::SubMasked(const T &aConst, const ImageView<Pixel8uC1
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::SubMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
-                                      const opp::cuda::StreamCtx &aStreamCtx)
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -718,8 +718,8 @@ ImageView<T> &ImageView<T>::SubMasked(const T &aConst, const ImageView<Pixel8uC1
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::SubMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                                      const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::SubMasked(const mpp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -731,8 +731,8 @@ ImageView<T> &ImageView<T>::SubMasked(const opp::cuda::DevVarView<T> &aConst, co
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::SubMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                                      int aScaleFactor, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::SubMasked(const mpp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                                      int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -747,7 +747,7 @@ ImageView<T> &ImageView<T>::SubMasked(const opp::cuda::DevVarView<T> &aConst, co
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::SubInvMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
-                                         const opp::cuda::StreamCtx &aStreamCtx)
+                                         const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -761,7 +761,7 @@ ImageView<T> &ImageView<T>::SubInvMasked(const ImageView<T> &aSrc2, const ImageV
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::SubInvMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
-                                         const opp::cuda::StreamCtx &aStreamCtx)
+                                         const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -777,7 +777,7 @@ ImageView<T> &ImageView<T>::SubInvMasked(const ImageView<T> &aSrc2, const ImageV
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::SubInvMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask,
-                                         const opp::cuda::StreamCtx &aStreamCtx)
+                                         const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -789,7 +789,7 @@ ImageView<T> &ImageView<T>::SubInvMasked(const T &aConst, const ImageView<Pixel8
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::SubInvMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
-                                         const opp::cuda::StreamCtx &aStreamCtx)
+                                         const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -803,8 +803,8 @@ ImageView<T> &ImageView<T>::SubInvMasked(const T &aConst, const ImageView<Pixel8
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::SubInvMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                                         const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::SubInvMasked(const mpp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                                         const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -816,8 +816,8 @@ ImageView<T> &ImageView<T>::SubInvMasked(const opp::cuda::DevVarView<T> &aConst,
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::SubInvMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                                         int aScaleFactor, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::SubInvMasked(const mpp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                                         int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -835,7 +835,7 @@ ImageView<T> &ImageView<T>::SubInvMasked(const opp::cuda::DevVarView<T> &aConst,
 #pragma region Mul
 template <PixelType T>
 ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -849,7 +849,7 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -864,7 +864,7 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Mul(const T &aConst, ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Mul(const T &aConst, ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -876,7 +876,7 @@ ImageView<T> &ImageView<T>::Mul(const T &aConst, ImageView<T> &aDst, const opp::
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Mul(const T &aConst, ImageView<T> &aDst, int aScaleFactor,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -890,8 +890,8 @@ ImageView<T> &ImageView<T>::Mul(const T &aConst, ImageView<T> &aDst, int aScaleF
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Mul(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Mul(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -902,8 +902,8 @@ ImageView<T> &ImageView<T>::Mul(const opp::cuda::DevVarView<T> &aConst, ImageVie
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Mul(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, int aScaleFactor,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Mul(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, int aScaleFactor,
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -917,7 +917,7 @@ ImageView<T> &ImageView<T>::Mul(const opp::cuda::DevVarView<T> &aConst, ImageVie
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -928,7 +928,7 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, const opp::cuda::Stre
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, int aScaleFactor, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -942,7 +942,7 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, int aScaleFactor, con
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Mul(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Mul(const T &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     InvokeMulInplaceC(PointerRoi(), Pitch(), aConst, SizeRoi(), aStreamCtx);
@@ -951,7 +951,7 @@ ImageView<T> &ImageView<T>::Mul(const T &aConst, const opp::cuda::StreamCtx &aSt
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Mul(const T &aConst, int aScaleFactor, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Mul(const T &aConst, int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
@@ -962,7 +962,7 @@ ImageView<T> &ImageView<T>::Mul(const T &aConst, int aScaleFactor, const opp::cu
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Mul(const opp::cuda::DevVarView<T> &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Mul(const mpp::cuda::DevVarView<T> &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     InvokeMulInplaceDevC(PointerRoi(), Pitch(), aConst.Pointer(), SizeRoi(), aStreamCtx);
@@ -971,8 +971,8 @@ ImageView<T> &ImageView<T>::Mul(const opp::cuda::DevVarView<T> &aConst, const op
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Mul(const opp::cuda::DevVarView<T> &aConst, int aScaleFactor,
-                                const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Mul(const mpp::cuda::DevVarView<T> &aConst, int aScaleFactor,
+                                const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
@@ -984,7 +984,7 @@ ImageView<T> &ImageView<T>::Mul(const opp::cuda::DevVarView<T> &aConst, int aSca
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::MulMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                      const opp::cuda::StreamCtx &aStreamCtx) const
+                                      const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -999,7 +999,7 @@ ImageView<T> &ImageView<T>::MulMasked(const ImageView<T> &aSrc2, ImageView<T> &a
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::MulMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                      int aScaleFactor, const opp::cuda::StreamCtx &aStreamCtx) const
+                                      int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1016,7 +1016,7 @@ ImageView<T> &ImageView<T>::MulMasked(const ImageView<T> &aSrc2, ImageView<T> &a
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::MulMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                      const opp::cuda::StreamCtx &aStreamCtx) const
+                                      const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1030,7 +1030,7 @@ ImageView<T> &ImageView<T>::MulMasked(const T &aConst, ImageView<T> &aDst, const
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::MulMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                      int aScaleFactor, const opp::cuda::StreamCtx &aStreamCtx) const
+                                      int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1045,8 +1045,8 @@ ImageView<T> &ImageView<T>::MulMasked(const T &aConst, ImageView<T> &aDst, const
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MulMasked(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                                      const ImageView<Pixel8uC1> &aMask, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::MulMasked(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                                      const ImageView<Pixel8uC1> &aMask, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1059,9 +1059,9 @@ ImageView<T> &ImageView<T>::MulMasked(const opp::cuda::DevVarView<T> &aConst, Im
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MulMasked(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::MulMasked(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
                                       const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
-                                      const opp::cuda::StreamCtx &aStreamCtx) const
+                                      const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1077,7 +1077,7 @@ ImageView<T> &ImageView<T>::MulMasked(const opp::cuda::DevVarView<T> &aConst, Im
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::MulMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
-                                      const opp::cuda::StreamCtx &aStreamCtx)
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1091,7 +1091,7 @@ ImageView<T> &ImageView<T>::MulMasked(const ImageView<T> &aSrc2, const ImageView
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::MulMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
-                                      const opp::cuda::StreamCtx &aStreamCtx)
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1107,7 +1107,7 @@ ImageView<T> &ImageView<T>::MulMasked(const ImageView<T> &aSrc2, const ImageView
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::MulMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask,
-                                      const opp::cuda::StreamCtx &aStreamCtx)
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -1119,7 +1119,7 @@ ImageView<T> &ImageView<T>::MulMasked(const T &aConst, const ImageView<Pixel8uC1
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::MulMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
-                                      const opp::cuda::StreamCtx &aStreamCtx)
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -1133,8 +1133,8 @@ ImageView<T> &ImageView<T>::MulMasked(const T &aConst, const ImageView<Pixel8uC1
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MulMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                                      const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::MulMasked(const mpp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -1146,8 +1146,8 @@ ImageView<T> &ImageView<T>::MulMasked(const opp::cuda::DevVarView<T> &aConst, co
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MulMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                                      int aScaleFactor, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::MulMasked(const mpp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                                      int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -1165,7 +1165,7 @@ ImageView<T> &ImageView<T>::MulMasked(const opp::cuda::DevVarView<T> &aConst, co
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::MulScale(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                                     const opp::cuda::StreamCtx &aStreamCtx) const
+                                     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1180,7 +1180,7 @@ ImageView<T> &ImageView<T>::MulScale(const ImageView<T> &aSrc2, ImageView<T> &aD
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MulScale(const T &aConst, ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::MulScale(const T &aConst, ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1194,8 +1194,8 @@ ImageView<T> &ImageView<T>::MulScale(const T &aConst, ImageView<T> &aDst, const 
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MulScale(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                                     const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::MulScale(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                                     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1209,7 +1209,7 @@ ImageView<T> &ImageView<T>::MulScale(const opp::cuda::DevVarView<T> &aConst, Ima
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MulScale(const ImageView<T> &aSrc2, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::MulScale(const ImageView<T> &aSrc2, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1223,7 +1223,7 @@ ImageView<T> &ImageView<T>::MulScale(const ImageView<T> &aSrc2, const opp::cuda:
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MulScale(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::MulScale(const T &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>
 {
     const float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
@@ -1234,7 +1234,7 @@ ImageView<T> &ImageView<T>::MulScale(const T &aConst, const opp::cuda::StreamCtx
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MulScale(const opp::cuda::DevVarView<T> &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::MulScale(const mpp::cuda::DevVarView<T> &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>
 {
     const float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
@@ -1247,7 +1247,7 @@ ImageView<T> &ImageView<T>::MulScale(const opp::cuda::DevVarView<T> &aConst, con
 template <PixelType T>
 ImageView<T> &ImageView<T>::MulScaleMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst,
                                            const ImageView<Pixel8uC1> &aMask,
-                                           const opp::cuda::StreamCtx &aStreamCtx) const
+                                           const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1264,7 +1264,7 @@ ImageView<T> &ImageView<T>::MulScaleMasked(const ImageView<T> &aSrc2, ImageView<
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::MulScaleMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                           const opp::cuda::StreamCtx &aStreamCtx) const
+                                           const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1279,9 +1279,9 @@ ImageView<T> &ImageView<T>::MulScaleMasked(const T &aConst, ImageView<T> &aDst, 
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MulScaleMasked(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::MulScaleMasked(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
                                            const ImageView<Pixel8uC1> &aMask,
-                                           const opp::cuda::StreamCtx &aStreamCtx) const
+                                           const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1297,7 +1297,7 @@ ImageView<T> &ImageView<T>::MulScaleMasked(const opp::cuda::DevVarView<T> &aCons
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::MulScaleMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
-                                           const opp::cuda::StreamCtx &aStreamCtx)
+                                           const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1313,7 +1313,7 @@ ImageView<T> &ImageView<T>::MulScaleMasked(const ImageView<T> &aSrc2, const Imag
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::MulScaleMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask,
-                                           const opp::cuda::StreamCtx &aStreamCtx)
+                                           const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -1327,8 +1327,8 @@ ImageView<T> &ImageView<T>::MulScaleMasked(const T &aConst, const ImageView<Pixe
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MulScaleMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                                           const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::MulScaleMasked(const mpp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                                           const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -1345,7 +1345,7 @@ ImageView<T> &ImageView<T>::MulScaleMasked(const opp::cuda::DevVarView<T> &aCons
 #pragma region Div
 template <PixelType T>
 ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1359,7 +1359,7 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, int aScaleFactor,
-                                RoundingMode aRoundingMode, const opp::cuda::StreamCtx &aStreamCtx) const
+                                RoundingMode aRoundingMode, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1374,7 +1374,7 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1386,7 +1386,7 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, const opp::
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, int aScaleFactor, RoundingMode aRoundingMode,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1400,8 +1400,8 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, int aScaleF
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Div(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Div(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1412,8 +1412,8 @@ ImageView<T> &ImageView<T>::Div(const opp::cuda::DevVarView<T> &aConst, ImageVie
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Div(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, int aScaleFactor,
-                                RoundingMode aRoundingMode, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Div(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst, int aScaleFactor,
+                                RoundingMode aRoundingMode, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1427,7 +1427,7 @@ ImageView<T> &ImageView<T>::Div(const opp::cuda::DevVarView<T> &aConst, ImageVie
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1439,7 +1439,7 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, const opp::cuda::Stre
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, int aScaleFactor, RoundingMode aRoundingMode,
-                                const opp::cuda::StreamCtx &aStreamCtx)
+                                const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1453,7 +1453,7 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, int aScaleFactor, Rou
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Div(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Div(const T &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     InvokeDivInplaceC(PointerRoi(), Pitch(), aConst, SizeRoi(), aStreamCtx);
@@ -1463,7 +1463,7 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, const opp::cuda::StreamCtx &aSt
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Div(const T &aConst, int aScaleFactor, RoundingMode aRoundingMode,
-                                const opp::cuda::StreamCtx &aStreamCtx)
+                                const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
@@ -1474,7 +1474,7 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, int aScaleFactor, RoundingMode 
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Div(const opp::cuda::DevVarView<T> &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Div(const mpp::cuda::DevVarView<T> &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     InvokeDivInplaceDevC(PointerRoi(), Pitch(), aConst.Pointer(), SizeRoi(), aStreamCtx);
@@ -1483,8 +1483,8 @@ ImageView<T> &ImageView<T>::Div(const opp::cuda::DevVarView<T> &aConst, const op
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Div(const opp::cuda::DevVarView<T> &aConst, int aScaleFactor, RoundingMode aRoundingMode,
-                                const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Div(const mpp::cuda::DevVarView<T> &aConst, int aScaleFactor, RoundingMode aRoundingMode,
+                                const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
@@ -1496,7 +1496,7 @@ ImageView<T> &ImageView<T>::Div(const opp::cuda::DevVarView<T> &aConst, int aSca
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::DivInv(const ImageView<T> &aSrc2, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::DivInv(const ImageView<T> &aSrc2, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1508,7 +1508,7 @@ ImageView<T> &ImageView<T>::DivInv(const ImageView<T> &aSrc2, const opp::cuda::S
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::DivInv(const ImageView<T> &aSrc2, int aScaleFactor, RoundingMode aRoundingMode,
-                                   const opp::cuda::StreamCtx &aStreamCtx)
+                                   const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1522,7 +1522,7 @@ ImageView<T> &ImageView<T>::DivInv(const ImageView<T> &aSrc2, int aScaleFactor, 
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::DivInv(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::DivInv(const T &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     InvokeDivInvInplaceC(PointerRoi(), Pitch(), aConst, SizeRoi(), aStreamCtx);
@@ -1532,7 +1532,7 @@ ImageView<T> &ImageView<T>::DivInv(const T &aConst, const opp::cuda::StreamCtx &
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::DivInv(const T &aConst, int aScaleFactor, RoundingMode aRoundingMode,
-                                   const opp::cuda::StreamCtx &aStreamCtx)
+                                   const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
@@ -1543,7 +1543,7 @@ ImageView<T> &ImageView<T>::DivInv(const T &aConst, int aScaleFactor, RoundingMo
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::DivInv(const opp::cuda::DevVarView<T> &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::DivInv(const mpp::cuda::DevVarView<T> &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     InvokeDivInvInplaceDevC(PointerRoi(), Pitch(), aConst.Pointer(), SizeRoi(), aStreamCtx);
@@ -1552,8 +1552,8 @@ ImageView<T> &ImageView<T>::DivInv(const opp::cuda::DevVarView<T> &aConst, const
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::DivInv(const opp::cuda::DevVarView<T> &aConst, int aScaleFactor, RoundingMode aRoundingMode,
-                                   const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::DivInv(const mpp::cuda::DevVarView<T> &aConst, int aScaleFactor, RoundingMode aRoundingMode,
+                                   const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
@@ -1566,7 +1566,7 @@ ImageView<T> &ImageView<T>::DivInv(const opp::cuda::DevVarView<T> &aConst, int a
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                      const opp::cuda::StreamCtx &aStreamCtx) const
+                                      const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1582,7 +1582,7 @@ ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, ImageView<T> &a
 template <PixelType T>
 ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                                       int aScaleFactor, RoundingMode aRoundingMode,
-                                      const opp::cuda::StreamCtx &aStreamCtx) const
+                                      const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1600,7 +1600,7 @@ ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, ImageView<T> &a
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::DivMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
-                                      const opp::cuda::StreamCtx &aStreamCtx) const
+                                      const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1615,7 +1615,7 @@ ImageView<T> &ImageView<T>::DivMasked(const T &aConst, ImageView<T> &aDst, const
 template <PixelType T>
 ImageView<T> &ImageView<T>::DivMasked(const T &aConst, ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                                       int aScaleFactor, RoundingMode aRoundingMode,
-                                      const opp::cuda::StreamCtx &aStreamCtx) const
+                                      const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1630,8 +1630,8 @@ ImageView<T> &ImageView<T>::DivMasked(const T &aConst, ImageView<T> &aDst, const
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::DivMasked(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                                      const ImageView<Pixel8uC1> &aMask, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::DivMasked(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                                      const ImageView<Pixel8uC1> &aMask, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1644,9 +1644,9 @@ ImageView<T> &ImageView<T>::DivMasked(const opp::cuda::DevVarView<T> &aConst, Im
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::DivMasked(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::DivMasked(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
                                       const ImageView<Pixel8uC1> &aMask, int aScaleFactor, RoundingMode aRoundingMode,
-                                      const opp::cuda::StreamCtx &aStreamCtx) const
+                                      const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1662,7 +1662,7 @@ ImageView<T> &ImageView<T>::DivMasked(const opp::cuda::DevVarView<T> &aConst, Im
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
-                                      const opp::cuda::StreamCtx &aStreamCtx)
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1676,7 +1676,7 @@ ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, const ImageView
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
-                                      RoundingMode aRoundingMode, const opp::cuda::StreamCtx &aStreamCtx)
+                                      RoundingMode aRoundingMode, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1692,7 +1692,7 @@ ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, const ImageView
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::DivMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask,
-                                      const opp::cuda::StreamCtx &aStreamCtx)
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -1704,7 +1704,7 @@ ImageView<T> &ImageView<T>::DivMasked(const T &aConst, const ImageView<Pixel8uC1
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::DivMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
-                                      RoundingMode aRoundingMode, const opp::cuda::StreamCtx &aStreamCtx)
+                                      RoundingMode aRoundingMode, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -1718,8 +1718,8 @@ ImageView<T> &ImageView<T>::DivMasked(const T &aConst, const ImageView<Pixel8uC1
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::DivMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                                      const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::DivMasked(const mpp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -1731,9 +1731,9 @@ ImageView<T> &ImageView<T>::DivMasked(const opp::cuda::DevVarView<T> &aConst, co
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::DivMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+ImageView<T> &ImageView<T>::DivMasked(const mpp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
                                       int aScaleFactor, RoundingMode aRoundingMode,
-                                      const opp::cuda::StreamCtx &aStreamCtx)
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -1748,7 +1748,7 @@ ImageView<T> &ImageView<T>::DivMasked(const opp::cuda::DevVarView<T> &aConst, co
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::DivInvMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask,
-                                         const opp::cuda::StreamCtx &aStreamCtx)
+                                         const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1762,7 +1762,7 @@ ImageView<T> &ImageView<T>::DivInvMasked(const ImageView<T> &aSrc2, const ImageV
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::DivInvMasked(const ImageView<T> &aSrc2, const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
-                                         RoundingMode aRoundingMode, const opp::cuda::StreamCtx &aStreamCtx)
+                                         RoundingMode aRoundingMode, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1778,7 +1778,7 @@ ImageView<T> &ImageView<T>::DivInvMasked(const ImageView<T> &aSrc2, const ImageV
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::DivInvMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask,
-                                         const opp::cuda::StreamCtx &aStreamCtx)
+                                         const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -1790,7 +1790,7 @@ ImageView<T> &ImageView<T>::DivInvMasked(const T &aConst, const ImageView<Pixel8
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::DivInvMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask, int aScaleFactor,
-                                         RoundingMode aRoundingMode, const opp::cuda::StreamCtx &aStreamCtx)
+                                         RoundingMode aRoundingMode, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -1804,8 +1804,8 @@ ImageView<T> &ImageView<T>::DivInvMasked(const T &aConst, const ImageView<Pixel8
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::DivInvMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
-                                         const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::DivInvMasked(const mpp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+                                         const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -1817,9 +1817,9 @@ ImageView<T> &ImageView<T>::DivInvMasked(const opp::cuda::DevVarView<T> &aConst,
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::DivInvMasked(const opp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
+ImageView<T> &ImageView<T>::DivInvMasked(const mpp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
                                          int aScaleFactor, RoundingMode aRoundingMode,
-                                         const opp::cuda::StreamCtx &aStreamCtx)
+                                         const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
     checkSameSize(ROI(), aMask.ROI());
@@ -1837,7 +1837,7 @@ ImageView<T> &ImageView<T>::DivInvMasked(const opp::cuda::DevVarView<T> &aConst,
 #pragma region AddSquare
 template <PixelType T>
 ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddSquare(ImageView<add_spw_output_for_t<T>> &aSrcDst,
-                                                            const opp::cuda::StreamCtx &aStreamCtx)
+                                                            const mpp::cuda::StreamCtx &aStreamCtx)
 {
     checkSameSize(ROI(), aSrcDst.ROI());
 
@@ -1849,7 +1849,7 @@ ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddSquare(ImageView<add_spw_ou
 template <PixelType T>
 ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddSquareMasked(ImageView<add_spw_output_for_t<T>> &aSrcDst,
                                                                   const ImageView<Pixel8uC1> &aMask,
-                                                                  const opp::cuda::StreamCtx &aStreamCtx)
+                                                                  const mpp::cuda::StreamCtx &aStreamCtx)
 {
     checkSameSize(ROI(), aSrcDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
@@ -1865,7 +1865,7 @@ ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddSquareMasked(ImageView<add_
 template <PixelType T>
 ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddProduct(const ImageView<T> &aSrc2,
                                                              ImageView<add_spw_output_for_t<T>> &aSrcDst,
-                                                             const opp::cuda::StreamCtx &aStreamCtx)
+                                                             const mpp::cuda::StreamCtx &aStreamCtx)
 {
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aSrcDst.ROI());
@@ -1880,7 +1880,7 @@ template <PixelType T>
 ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddProductMasked(const ImageView<T> &aSrc2,
                                                                    ImageView<add_spw_output_for_t<T>> &aSrcDst,
                                                                    const ImageView<Pixel8uC1> &aMask,
-                                                                   const opp::cuda::StreamCtx &aStreamCtx)
+                                                                   const mpp::cuda::StreamCtx &aStreamCtx)
 {
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aSrcDst.ROI());
@@ -1898,7 +1898,7 @@ template <PixelType T>
 ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddWeighted(const ImageView<T> &aSrc2,
                                                               ImageView<add_spw_output_for_t<T>> &aDst,
                                                               remove_vector_t<add_spw_output_for_t<T>> aAlpha,
-                                                              const opp::cuda::StreamCtx &aStreamCtx) const
+                                                              const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aDst.ROI());
@@ -1914,7 +1914,7 @@ ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddWeightedMasked(const ImageV
                                                                     ImageView<add_spw_output_for_t<T>> &aDst,
                                                                     remove_vector_t<add_spw_output_for_t<T>> aAlpha,
                                                                     const ImageView<Pixel8uC1> &aMask,
-                                                                    const opp::cuda::StreamCtx &aStreamCtx) const
+                                                                    const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aDst.ROI());
@@ -1928,7 +1928,7 @@ ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddWeightedMasked(const ImageV
 template <PixelType T>
 ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddWeighted(ImageView<add_spw_output_for_t<T>> &aSrcDst,
                                                               remove_vector_t<add_spw_output_for_t<T>> aAlpha,
-                                                              const opp::cuda::StreamCtx &aStreamCtx)
+                                                              const mpp::cuda::StreamCtx &aStreamCtx)
 {
     checkSameSize(ROI(), aSrcDst.ROI());
 
@@ -1942,7 +1942,7 @@ template <PixelType T>
 ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddWeightedMasked(ImageView<add_spw_output_for_t<T>> &aSrcDst,
                                                                     remove_vector_t<add_spw_output_for_t<T>> aAlpha,
                                                                     const ImageView<Pixel8uC1> &aMask,
-                                                                    const opp::cuda::StreamCtx &aStreamCtx)
+                                                                    const mpp::cuda::StreamCtx &aStreamCtx)
 {
     checkSameSize(ROI(), aSrcDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
@@ -1956,7 +1956,7 @@ ImageView<add_spw_output_for_t<T>> &ImageView<T>::AddWeightedMasked(ImageView<ad
 
 #pragma region Abs
 template <PixelType T>
-ImageView<T> &ImageView<T>::Abs(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Abs(ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealSignedVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -1967,7 +1967,7 @@ ImageView<T> &ImageView<T>::Abs(ImageView<T> &aDst, const opp::cuda::StreamCtx &
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Abs(const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Abs(const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealSignedVector<T>
 {
     InvokeAbsInplace(PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
@@ -1979,7 +1979,7 @@ ImageView<T> &ImageView<T>::Abs(const opp::cuda::StreamCtx &aStreamCtx)
 #pragma region AbsDiff
 template <PixelType T>
 ImageView<T> &ImageView<T>::AbsDiff(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                                    const opp::cuda::StreamCtx &aStreamCtx) const
+                                    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealUnsignedVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -1992,7 +1992,7 @@ ImageView<T> &ImageView<T>::AbsDiff(const ImageView<T> &aSrc2, ImageView<T> &aDs
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::AbsDiff(const T &aConst, ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::AbsDiff(const T &aConst, ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealUnsignedVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2003,8 +2003,8 @@ ImageView<T> &ImageView<T>::AbsDiff(const T &aConst, ImageView<T> &aDst, const o
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::AbsDiff(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                                    const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::AbsDiff(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                                    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealUnsignedVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2016,7 +2016,7 @@ ImageView<T> &ImageView<T>::AbsDiff(const opp::cuda::DevVarView<T> &aConst, Imag
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::AbsDiff(const ImageView<T> &aSrc2, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::AbsDiff(const ImageView<T> &aSrc2, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealUnsignedVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -2027,7 +2027,7 @@ ImageView<T> &ImageView<T>::AbsDiff(const ImageView<T> &aSrc2, const opp::cuda::
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::AbsDiff(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::AbsDiff(const T &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealUnsignedVector<T>
 {
     InvokeAbsDiffInplaceC(PointerRoi(), Pitch(), aConst, SizeRoi(), aStreamCtx);
@@ -2036,7 +2036,7 @@ ImageView<T> &ImageView<T>::AbsDiff(const T &aConst, const opp::cuda::StreamCtx 
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::AbsDiff(const opp::cuda::DevVarView<T> &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::AbsDiff(const mpp::cuda::DevVarView<T> &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealUnsignedVector<T>
 {
     InvokeAbsDiffInplaceDevC(PointerRoi(), Pitch(), aConst.Pointer(), SizeRoi(), aStreamCtx);
@@ -2048,7 +2048,7 @@ ImageView<T> &ImageView<T>::AbsDiff(const opp::cuda::DevVarView<T> &aConst, cons
 #pragma region And
 template <PixelType T>
 ImageView<T> &ImageView<T>::And(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -2061,7 +2061,7 @@ ImageView<T> &ImageView<T>::And(const ImageView<T> &aSrc2, ImageView<T> &aDst,
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::And(const T &aConst, ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::And(const T &aConst, ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2072,8 +2072,8 @@ ImageView<T> &ImageView<T>::And(const T &aConst, ImageView<T> &aDst, const opp::
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::And(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::And(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2084,7 +2084,7 @@ ImageView<T> &ImageView<T>::And(const opp::cuda::DevVarView<T> &aConst, ImageVie
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::And(const ImageView<T> &aSrc2, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::And(const ImageView<T> &aSrc2, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -2095,7 +2095,7 @@ ImageView<T> &ImageView<T>::And(const ImageView<T> &aSrc2, const opp::cuda::Stre
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::And(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::And(const T &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealIntVector<T>
 {
     InvokeAndInplaceC(PointerRoi(), Pitch(), aConst, SizeRoi(), aStreamCtx);
@@ -2104,7 +2104,7 @@ ImageView<T> &ImageView<T>::And(const T &aConst, const opp::cuda::StreamCtx &aSt
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::And(const opp::cuda::DevVarView<T> &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::And(const mpp::cuda::DevVarView<T> &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealIntVector<T>
 {
     InvokeAndInplaceDevC(PointerRoi(), Pitch(), aConst.Pointer(), SizeRoi(), aStreamCtx);
@@ -2115,7 +2115,7 @@ ImageView<T> &ImageView<T>::And(const opp::cuda::DevVarView<T> &aConst, const op
 
 #pragma region Not
 template <PixelType T>
-ImageView<T> &ImageView<T>::Not(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Not(ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2126,7 +2126,7 @@ ImageView<T> &ImageView<T>::Not(ImageView<T> &aDst, const opp::cuda::StreamCtx &
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Not(const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Not(const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealIntVector<T>
 {
     InvokeNotInplace(PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
@@ -2137,7 +2137,7 @@ ImageView<T> &ImageView<T>::Not(const opp::cuda::StreamCtx &aStreamCtx)
 
 #pragma region Exp
 template <PixelType T>
-ImageView<T> &ImageView<T>::Exp(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Exp(ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2148,7 +2148,7 @@ ImageView<T> &ImageView<T>::Exp(ImageView<T> &aDst, const opp::cuda::StreamCtx &
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Exp(const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Exp(const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexVector<T>
 {
     InvokeExpInplace(PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
@@ -2159,7 +2159,7 @@ ImageView<T> &ImageView<T>::Exp(const opp::cuda::StreamCtx &aStreamCtx)
 
 #pragma region Ln
 template <PixelType T>
-ImageView<T> &ImageView<T>::Ln(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Ln(ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2170,7 +2170,7 @@ ImageView<T> &ImageView<T>::Ln(ImageView<T> &aDst, const opp::cuda::StreamCtx &a
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Ln(const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Ln(const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexVector<T>
 {
     InvokeLnInplace(PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
@@ -2182,7 +2182,7 @@ ImageView<T> &ImageView<T>::Ln(const opp::cuda::StreamCtx &aStreamCtx)
 #pragma region LShift
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::LShift(uint aConst, ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::LShift(uint aConst, ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2193,7 +2193,7 @@ ImageView<T> &ImageView<T>::LShift(uint aConst, ImageView<T> &aDst, const opp::c
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::LShift(uint aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::LShift(uint aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealIntVector<T>
 {
     InvokeLShiftInplaceC(PointerRoi(), Pitch(), aConst, SizeRoi(), aStreamCtx);
@@ -2205,7 +2205,7 @@ ImageView<T> &ImageView<T>::LShift(uint aConst, const opp::cuda::StreamCtx &aStr
 #pragma region Or
 template <PixelType T>
 ImageView<T> &ImageView<T>::Or(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                               const opp::cuda::StreamCtx &aStreamCtx) const
+                               const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -2218,7 +2218,7 @@ ImageView<T> &ImageView<T>::Or(const ImageView<T> &aSrc2, ImageView<T> &aDst,
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Or(const T &aConst, ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Or(const T &aConst, ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2229,8 +2229,8 @@ ImageView<T> &ImageView<T>::Or(const T &aConst, ImageView<T> &aDst, const opp::c
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Or(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                               const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Or(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                               const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2241,7 +2241,7 @@ ImageView<T> &ImageView<T>::Or(const opp::cuda::DevVarView<T> &aConst, ImageView
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Or(const ImageView<T> &aSrc2, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Or(const ImageView<T> &aSrc2, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -2252,7 +2252,7 @@ ImageView<T> &ImageView<T>::Or(const ImageView<T> &aSrc2, const opp::cuda::Strea
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Or(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Or(const T &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealIntVector<T>
 {
     InvokeOrInplaceC(PointerRoi(), Pitch(), aConst, SizeRoi(), aStreamCtx);
@@ -2261,7 +2261,7 @@ ImageView<T> &ImageView<T>::Or(const T &aConst, const opp::cuda::StreamCtx &aStr
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Or(const opp::cuda::DevVarView<T> &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Or(const mpp::cuda::DevVarView<T> &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealIntVector<T>
 {
     InvokeOrInplaceDevC(PointerRoi(), Pitch(), aConst.Pointer(), SizeRoi(), aStreamCtx);
@@ -2273,7 +2273,7 @@ ImageView<T> &ImageView<T>::Or(const opp::cuda::DevVarView<T> &aConst, const opp
 #pragma region RShift
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::RShift(uint aConst, ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::RShift(uint aConst, ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2284,7 +2284,7 @@ ImageView<T> &ImageView<T>::RShift(uint aConst, ImageView<T> &aDst, const opp::c
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::RShift(uint aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::RShift(uint aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealIntVector<T>
 {
     InvokeRShiftInplaceC(PointerRoi(), Pitch(), aConst, SizeRoi(), aStreamCtx);
@@ -2295,7 +2295,7 @@ ImageView<T> &ImageView<T>::RShift(uint aConst, const opp::cuda::StreamCtx &aStr
 
 #pragma region Sqr
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sqr(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Sqr(ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2306,7 +2306,7 @@ ImageView<T> &ImageView<T>::Sqr(ImageView<T> &aDst, const opp::cuda::StreamCtx &
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sqr(const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Sqr(const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexVector<T>
 {
     InvokeSqrInplace(PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
@@ -2317,7 +2317,7 @@ ImageView<T> &ImageView<T>::Sqr(const opp::cuda::StreamCtx &aStreamCtx)
 
 #pragma region Sqrt
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sqrt(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Sqrt(ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2328,7 +2328,7 @@ ImageView<T> &ImageView<T>::Sqrt(ImageView<T> &aDst, const opp::cuda::StreamCtx 
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Sqrt(const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Sqrt(const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexVector<T>
 {
     InvokeSqrtInplace(PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
@@ -2340,7 +2340,7 @@ ImageView<T> &ImageView<T>::Sqrt(const opp::cuda::StreamCtx &aStreamCtx)
 #pragma region Xor
 template <PixelType T>
 ImageView<T> &ImageView<T>::Xor(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -2353,7 +2353,7 @@ ImageView<T> &ImageView<T>::Xor(const ImageView<T> &aSrc2, ImageView<T> &aDst,
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Xor(const T &aConst, ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Xor(const T &aConst, ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2364,8 +2364,8 @@ ImageView<T> &ImageView<T>::Xor(const T &aConst, ImageView<T> &aDst, const opp::
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Xor(const opp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
-                                const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Xor(const mpp::cuda::DevVarView<T> &aConst, ImageView<T> &aDst,
+                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2376,7 +2376,7 @@ ImageView<T> &ImageView<T>::Xor(const opp::cuda::DevVarView<T> &aConst, ImageVie
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Xor(const ImageView<T> &aSrc2, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Xor(const ImageView<T> &aSrc2, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealIntVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -2387,7 +2387,7 @@ ImageView<T> &ImageView<T>::Xor(const ImageView<T> &aSrc2, const opp::cuda::Stre
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Xor(const T &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Xor(const T &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealIntVector<T>
 {
     InvokeXorInplaceC(PointerRoi(), Pitch(), aConst, SizeRoi(), aStreamCtx);
@@ -2396,7 +2396,7 @@ ImageView<T> &ImageView<T>::Xor(const T &aConst, const opp::cuda::StreamCtx &aSt
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Xor(const opp::cuda::DevVarView<T> &aConst, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Xor(const mpp::cuda::DevVarView<T> &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealIntVector<T>
 {
     InvokeXorInplaceDevC(PointerRoi(), Pitch(), aConst.Pointer(), SizeRoi(), aStreamCtx);
@@ -2407,7 +2407,7 @@ ImageView<T> &ImageView<T>::Xor(const opp::cuda::DevVarView<T> &aConst, const op
 
 #pragma region AlphaPremul
 template <PixelType T>
-ImageView<T> &ImageView<T>::AlphaPremul(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::AlphaPremul(ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires FourChannelNoAlpha<T> && RealVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2418,7 +2418,7 @@ ImageView<T> &ImageView<T>::AlphaPremul(ImageView<T> &aDst, const opp::cuda::Str
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::AlphaPremul(const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::AlphaPremul(const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T> && RealVector<T>
 {
     InvokeAlphaPremulInplace(PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
@@ -2428,7 +2428,7 @@ ImageView<T> &ImageView<T>::AlphaPremul(const opp::cuda::StreamCtx &aStreamCtx)
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst,
-                                        const opp::cuda::StreamCtx &aStreamCtx) const
+                                        const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealFloatingVector<T> && (!FourChannelAlpha<T>)
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2442,7 +2442,7 @@ ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> 
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst,
-                                        const opp::cuda::StreamCtx &aStreamCtx) const
+                                        const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T> && (!FourChannelAlpha<T>)
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2458,7 +2458,7 @@ ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> 
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealFloatingVector<T> && (!FourChannelAlpha<T>)
 {
     const T alphaVec(aAlpha);
@@ -2469,7 +2469,7 @@ ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, const opp::cu
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealIntVector<T> && (!FourChannelAlpha<T>)
 {
     const float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
@@ -2483,7 +2483,7 @@ ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, const opp::cu
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> &aDst,
-                                        const opp::cuda::StreamCtx &aStreamCtx) const
+                                        const mpp::cuda::StreamCtx &aStreamCtx) const
     requires FourChannelAlpha<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2496,7 +2496,7 @@ ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> 
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelAlpha<T>
 {
     using SrcTA = Vector4<remove_vector_t<T>>;
@@ -2509,7 +2509,7 @@ ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, const opp::cu
 #pragma region AlphaComp
 template <PixelType T>
 ImageView<T> &ImageView<T>::AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &aDst, AlphaCompositionOp aAlphaOp,
-                                      const opp::cuda::StreamCtx &aStreamCtx) const
+                                      const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(!FourChannelAlpha<T>) && RealVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -2524,7 +2524,7 @@ ImageView<T> &ImageView<T>::AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &a
 template <PixelType T>
 ImageView<T> &ImageView<T>::AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &aDst, remove_vector_t<T> aAlpha1,
                                       remove_vector_t<T> aAlpha2, AlphaCompositionOp aAlphaOp,
-                                      const opp::cuda::StreamCtx &aStreamCtx) const
+                                      const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -2540,7 +2540,7 @@ ImageView<T> &ImageView<T>::AlphaComp(const ImageView<T> &aSrc2, ImageView<T> &a
 #pragma region Complex
 template <PixelType T>
 ImageView<T> &ImageView<T>::ConjMul(const ImageView<T> &aSrc2, ImageView<T> &aDst,
-                                    const opp::cuda::StreamCtx &aStreamCtx) const
+                                    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires ComplexVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -2553,7 +2553,7 @@ ImageView<T> &ImageView<T>::ConjMul(const ImageView<T> &aSrc2, ImageView<T> &aDs
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::ConjMul(const ImageView<T> &aSrc2, const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::ConjMul(const ImageView<T> &aSrc2, const mpp::cuda::StreamCtx &aStreamCtx)
     requires ComplexVector<T>
 {
     checkSameSize(ROI(), aSrc2.ROI());
@@ -2564,7 +2564,7 @@ ImageView<T> &ImageView<T>::ConjMul(const ImageView<T> &aSrc2, const opp::cuda::
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Conj(ImageView<T> &aDst, const opp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Conj(ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires ComplexVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2575,7 +2575,7 @@ ImageView<T> &ImageView<T>::Conj(ImageView<T> &aDst, const opp::cuda::StreamCtx 
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Conj(const opp::cuda::StreamCtx &aStreamCtx)
+ImageView<T> &ImageView<T>::Conj(const mpp::cuda::StreamCtx &aStreamCtx)
     requires ComplexVector<T>
 {
     InvokeConjInplace(PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
@@ -2586,7 +2586,7 @@ ImageView<T> &ImageView<T>::Conj(const opp::cuda::StreamCtx &aStreamCtx)
 template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &ImageView<T>::Magnitude(
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst,
-    const opp::cuda::StreamCtx &aStreamCtx) const
+    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2599,7 +2599,7 @@ ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_
 template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &ImageView<T>::MagnitudeSqr(
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst,
-    const opp::cuda::StreamCtx &aStreamCtx) const
+    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2612,7 +2612,7 @@ ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_
 template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &ImageView<T>::Angle(
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst,
-    const opp::cuda::StreamCtx &aStreamCtx) const
+    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2625,7 +2625,7 @@ ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_
 template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &ImageView<T>::Real(
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst,
-    const opp::cuda::StreamCtx &aStreamCtx) const
+    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires ComplexVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2638,7 +2638,7 @@ ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_
 template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &ImageView<T>::Imag(
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst,
-    const opp::cuda::StreamCtx &aStreamCtx) const
+    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires ComplexVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2651,7 +2651,7 @@ ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_
 template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &ImageView<T>::MakeComplex(
     ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst,
-    const opp::cuda::StreamCtx &aStreamCtx) const
+    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealSignedVector<T> && (!FourChannelAlpha<T>)
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -2665,7 +2665,7 @@ template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &ImageView<T>::MakeComplex(
     const ImageView<T> &aSrcImag,
     ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst,
-    const opp::cuda::StreamCtx &aStreamCtx) const
+    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealSignedVector<T> && (!FourChannelAlpha<T>)
 {
     checkSameSize(ROI(), aSrcImag.ROI());
@@ -2677,5 +2677,5 @@ ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>
     return aDst;
 }
 #pragma endregion
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

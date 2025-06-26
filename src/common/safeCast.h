@@ -7,7 +7,7 @@
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 
-namespace opp
+namespace mpp
 {
 // template <typename T_toTest, typename T_required>
 // concept isSameType = std::is_same<T_toTest, T_required>::value;
@@ -835,6 +835,6 @@ template <typename T_From> DEVICE_CODE constexpr sbyte to_sbyte(T_From aValue)
     return static_cast<sbyte>(aValue);
 }
 
-} // namespace opp
+} // namespace mpp
 
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)

@@ -16,8 +16,8 @@
 #include <backends/npp/image/image16u.h>       // NOLINT(misc-include-cleaner)
 #include <backends/npp/image/image16uC1View.h> // NOLINT(misc-include-cleaner)
 #include <backends/npp/image/image32f.h>       // NOLINT(misc-include-cleaner)
-#include <backends/npp/image/image32fc.h>
 #include <backends/npp/image/image32fC1View.h> // NOLINT(misc-include-cleaner)
+#include <backends/npp/image/image32fc.h>
 #include <backends/npp/image/image32s.h> // NOLINT(misc-include-cleaner)
 #include <backends/npp/image/image64f.h>
 #include <backends/npp/image/image8u.h>       // NOLINT(misc-include-cleaner)
@@ -60,12 +60,12 @@
 
 #include "pixel32sC1.h"
 
-using namespace opp;
-using namespace opp::cuda;
-using namespace opp::image;
-using namespace opp::image::cuda;
-namespace nv  = opp::image::npp;
-namespace cpu = opp::image::cpuSimple;
+using namespace mpp;
+using namespace mpp::cuda;
+using namespace mpp::image;
+using namespace mpp::image::cuda;
+namespace nv  = mpp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
 /*
 struct Runtime
 {
@@ -160,10 +160,10 @@ class TestBase
     Event endGlobal;
 };
 
-template <typename T> class TestOPPAdd : public TestBase
+template <typename T> class TestMPPAdd : public TestBase
 {
   public:
-    TestOPPAdd(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+    TestMPPAdd(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
         : TestBase(aIterations, aRepeats), src1(aWidth, aHeight), src2(aWidth, aHeight), dst(aWidth, aHeight)
     {
         ctx = StreamCtxSingleton::Get();
@@ -236,10 +236,10 @@ template <typename T> class TestNPPAdd : public TestBase
     }
 };
 
-template <typename T> class TestOPPQualityIndex : public TestBase
+template <typename T> class TestMPPQualityIndex : public TestBase
 {
   public:
-    TestOPPQualityIndex(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+    TestMPPQualityIndex(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
         : TestBase(aIterations, aRepeats), src1(aWidth, aHeight), src2(aWidth, aHeight)
     {
         ctx    = StreamCtxSingleton::Get();
@@ -324,10 +324,10 @@ template <typename T> class TestNPPQualityIndex : public TestBase
     }
 };
 
-template <typename T> class TestOPPMean : public TestBase
+template <typename T> class TestMPPMean : public TestBase
 {
   public:
-    TestOPPMean(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+    TestMPPMean(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
         : TestBase(aIterations, aRepeats), src1(aWidth, aHeight)
     {
         ctx    = StreamCtxSingleton::Get();
@@ -394,10 +394,10 @@ template <typename T> class TestNPPMean : public TestBase
     }
 };
 
-template <typename T> class TestOPPMinMaxIdx : public TestBase
+template <typename T> class TestMPPMinMaxIdx : public TestBase
 {
   public:
-    TestOPPMinMaxIdx(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+    TestMPPMinMaxIdx(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
         : TestBase(aIterations, aRepeats), src1(aWidth, aHeight)
     {
         ctx    = StreamCtxSingleton::Get();
@@ -479,10 +479,10 @@ template <typename T> class TestNPPMinMaxIdx : public TestBase
     }
 };
 
-template <typename T> class TestOPPMeanStd : public TestBase
+template <typename T> class TestMPPMeanStd : public TestBase
 {
   public:
-    TestOPPMeanStd(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+    TestMPPMeanStd(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
         : TestBase(aIterations, aRepeats), src1(aWidth, aHeight)
     {
         ctx    = StreamCtxSingleton::Get();
@@ -551,10 +551,10 @@ template <typename T> class TestNPPMeanStd : public TestBase
     }
 };
 
-template <typename T> class TestOPPFilterGauss : public TestBase
+template <typename T> class TestMPPFilterGauss : public TestBase
 {
   public:
-    TestOPPFilterGauss(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+    TestMPPFilterGauss(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
         : TestBase(aIterations, aRepeats), src1(aWidth, aHeight), dst(aWidth, aHeight)
     {
         ctx = StreamCtxSingleton::Get();
@@ -621,10 +621,10 @@ template <typename T> class TestNPPFilterGauss : public TestBase
     }
 };
 
-template <typename T> class TestOPPFilterGaussAdvanced : public TestBase
+template <typename T> class TestMPPFilterGaussAdvanced : public TestBase
 {
   public:
-    TestOPPFilterGaussAdvanced(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+    TestMPPFilterGaussAdvanced(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
         : TestBase(aIterations, aRepeats), src1(aWidth, aHeight), dst(aWidth, aHeight)
     {
         ctx = StreamCtxSingleton::Get();
@@ -697,10 +697,10 @@ template <typename T> class TestNPPFilterGaussAdvanced : public TestBase
     }
 };
 
-template <typename T> class TestOPPFilter : public TestBase
+template <typename T> class TestMPPFilter : public TestBase
 {
   public:
-    TestOPPFilter(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+    TestMPPFilter(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
         : TestBase(aIterations, aRepeats), src1(aWidth, aHeight), dst(aWidth, aHeight)
     {
         ctx = StreamCtxSingleton::Get();
@@ -774,10 +774,10 @@ template <typename T> class TestNPPFilter : public TestBase
     }
 };
 
-template <typename T> class TestOPPFilterLaplace : public TestBase
+template <typename T> class TestMPPFilterLaplace : public TestBase
 {
   public:
-    TestOPPFilterLaplace(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+    TestMPPFilterLaplace(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
         : TestBase(aIterations, aRepeats), src1(aWidth, aHeight), dst(aWidth, aHeight)
     {
         ctx = StreamCtxSingleton::Get();
@@ -844,10 +844,10 @@ template <typename T> class TestNPPFilterLaplace : public TestBase
     }
 };
 
-template <typename T> class TestOPPFilterBox : public TestBase
+template <typename T> class TestMPPFilterBox : public TestBase
 {
   public:
-    TestOPPFilterBox(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+    TestMPPFilterBox(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
         : TestBase(aIterations, aRepeats), src1(aWidth, aHeight), dst(aWidth, aHeight)
     {
         ctx = StreamCtxSingleton::Get();
@@ -914,10 +914,10 @@ template <typename T> class TestNPPFilterBox : public TestBase
     }
 };
 
-template <typename T> class TestOPPAffineTransform : public TestBase
+template <typename T> class TestMPPAffineTransform : public TestBase
 {
   public:
-    TestOPPAffineTransform(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+    TestMPPAffineTransform(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
         : TestBase(aIterations, aRepeats), src1(aWidth, aHeight), dst(aWidth, aHeight)
     {
         ctx                                 = StreamCtxSingleton::Get();
@@ -1011,11 +1011,11 @@ void print(cpu::Image<Pixel32fC1> &img)
     }
 }
 
-template <PixelType T> class OppQualityIndex : public TestOppSrcSrcReductionBase<T, Pixel64fC1>
+template <PixelType T> class MppQualityIndex : public TestMppSrcSrcReductionBase<T, Pixel64fC1>
 {
   public:
-    OppQualityIndex(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : TestOppSrcSrcReductionBase<T, Pixel64fC1>(aIterations, aRepeats, aWidth, aHeight)
+    MppQualityIndex(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+        : TestMppSrcSrcReductionBase<T, Pixel64fC1>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -1046,7 +1046,7 @@ int main()
             std::cout << "yep";
         }
 
-        std::cout << "Hello world! This is " << OPP_PROJECT_NAME << " version " << OPP_VERSION << "!" << std::endl;
+        std::cout << "Hello world! This is " << MPP_PROJECT_NAME << " version " << MPP_VERSION << "!" << std::endl;
 
         constexpr size_t iterations = 100;
         constexpr size_t repeats    = 10; /**/
@@ -1286,54 +1286,54 @@ int main()
         // constexpr int sizeTpl       = 16;
         //  INT_MAX / 1024 / 256 + 1;
 
-        // OppQualityIndex<Pixel8uC1> opp(iterations, repeats, imgWidth, imgHeight);
-        //  TestOPPQualityIndex<Pixel8uC1> opp(iterations, repeats, imgWidth, imgHeight);
+        // MppQualityIndex<Pixel8uC1> mpp(iterations, repeats, imgWidth, imgHeight);
+        //  TestMPPQualityIndex<Pixel8uC1> mpp(iterations, repeats, imgWidth, imgHeight);
         //  TestNPPQualityIndex<nv::Image8uC1> npp(iterations, repeats, imgWidth, imgHeight);
 
-        // opp.SetSrc(cpu_src1, cpu_src2);
+        // mpp.SetSrc(cpu_src1, cpu_src2);
         // npp.SetSrc(cpu_src1, cpu_src2);
 
-        // opp.SetBorder(-1);
+        // mpp.SetBorder(-1);
         // npp.SetBorder(-1);
 
-        /* std::cout << "Warmup opp" << std::endl;
-         opp.WarmUp();
-         std::cout << "Running opp" << std::endl;
-         Runtime rt_opp = opp.Run();
+        /* std::cout << "Warmup mpp" << std::endl;
+         mpp.WarmUp();
+         std::cout << "Running mpp" << std::endl;
+         Runtime rt_mpp = mpp.Run();
          std::cout << "Warmup npp" << std::endl;
          npp.WarmUp();
          std::cout << "Running npp" << std::endl;
          Runtime rt_npp = npp.Run();
 
          std::cout << "Done!" << std::endl << std::endl;
-         std::cout << "OPP:" << std::endl;
-         std::cout << rt_opp << std::endl;
+         std::cout << "MPP:" << std::endl;
+         std::cout << rt_mpp << std::endl;
          std::cout << "NPP:" << std::endl;
          std::cout << rt_npp << std::endl;
 
-         const float ratio = rt_npp.Mean / rt_opp.Mean;
+         const float ratio = rt_npp.Mean / rt_mpp.Mean;
          if (ratio >= 1.0f)
          {
-             std::cout << "OPP is " << ratio * 100.0f - 100.0f << "% faster!" << std::endl;
+             std::cout << "MPP is " << ratio * 100.0f - 100.0f << "% faster!" << std::endl;
          }
          else
          {
-             std::cout << "OPP is " << 1.0f / ratio * 100.0f - 100.0f << "% slower..." << std::endl;
+             std::cout << "MPP is " << 1.0f / ratio * 100.0f - 100.0f << "% slower..." << std::endl;
          }*/
 
         // cpu::Image<Pixel32fC1> cpu_src1(imgWidth, imgHeight);
         //                        cpu::ImageView<Pixel8u3> cpu_src1A(cpu_src1);
         /*cpu::Image<Pixel8uC1> cpu_src1 =
-            cpu::Image<Pixel8uC1>::Load("C:\\Users\\kunz_\\source\\repos\\oppV1\\opp\\test\\testData\\bird256bw.tif");
+            cpu::Image<Pixel8uC1>::Load("C:\\Users\\kunz_\\source\\repos\\mppV1\\mpp\\test\\testData\\bird256bw.tif");
         cpu::Image<Pixel8uC1> cpu_src2 = cpu::Image<Pixel8uC1>::Load(
-            "C:\\Users\\kunz_\\source\\repos\\oppV1\\opp\\test\\testData\\bird256bwnoisy.tif");
+            "C:\\Users\\kunz_\\source\\repos\\mppV1\\mpp\\test\\testData\\bird256bwnoisy.tif");
         cpu::Image<Pixel8uC1> cpu_src1 = cpu::Image<Pixel8uC1>::Load("F:\\ogpp\\muster.tif");*/
         // cpu::Image<Pixel32fC4> cpu_dst(imgWidth, imgHeight);
         // cpu::Image<Pixel32fC4> res_npp(imgWidth, imgHeight);
-        // cpu::Image<Pixel32fC4> res_opp(imgWidth, imgHeight);
+        // cpu::Image<Pixel32fC4> res_mpp(imgWidth, imgHeight);
 
-        // Image<Pixel32fC1> opp_src1(imgWidth, imgHeight);
-        // Image<Pixel32fC1> opp_dst(imgWidth, imgHeight);
+        // Image<Pixel32fC1> mpp_src1(imgWidth, imgHeight);
+        // Image<Pixel32fC1> mpp_dst(imgWidth, imgHeight);
 
         // nv::Image8uC4 npp_src1(imgWidth, imgHeight);
         //   nv::Image8uC1 npp_dst(imgWidth, imgHeight);
@@ -1409,34 +1409,34 @@ int main()
         //     return -1;
         // }
 
-        // StreamCtx oppCtx = StreamCtxSingleton::Get();
+        // StreamCtx mppCtx = StreamCtxSingleton::Get();
 
         // cpu_src1 >> npp_src1;
 
-        // cpu_src1 >> opp_src1;
+        // cpu_src1 >> mpp_src1;
 
-        //  cpu_mask >> opp_mask;
+        //  cpu_mask >> mpp_mask;
         //  cpu_mask >> npp_mask;
 
-        /*DevVar<byte> bufferMean(opp_tpl.MeanBufferSize(oppCtx));*/
-        // DevVar<byte> bufferSSIM(opp_src1.SqrIntegralBufferSize(opp_dstSum, opp_dstSqr, oppCtx));
+        /*DevVar<byte> bufferMean(mpp_tpl.MeanBufferSize(mppCtx));*/
+        // DevVar<byte> bufferSSIM(mpp_src1.SqrIntegralBufferSize(mpp_dstSum, mpp_dstSqr, mppCtx));
 
-        // opp_src1.SetRoi(Border(-1, 0));
-        // opp_dstAngle.Set(Pixel32fC1(0.0f), oppCtx);
+        // mpp_src1.SetRoi(Border(-1, 0));
+        // mpp_dstAngle.Set(Pixel32fC1(0.0f), mppCtx);
         // npp_dstAngle.Set(Pixel32fC1(0.0f), nppCtx);
-        /*opp_src1.SetRoi(-8);
-        opp_dstAngle.SetRoi(-8);
+        /*mpp_src1.SetRoi(-8);
+        mpp_dstAngle.SetRoi(-8);
 
         // npp_src1.SetRoi(-8);
         npp_dstAngle.SetRoi(-8); */
-        // const BorderType opp_boder = BorderType::Replicate;
+        // const BorderType mpp_boder = BorderType::Replicate;
         /*const NppiMaskSize nppMask  = NppiMaskSize::NPP_MASK_SIZE_3_X_3;
-        const MaskSize oppMask      = MaskSize::Mask_3x3;
-        const FixedFilter oppFilter = FixedFilter::Laplace;*/
+        const MaskSize mppMask      = MaskSize::Mask_3x3;
+        const FixedFilter mppFilter = FixedFilter::Laplace;*/
         // NppiSize nppMaskSize    = {filterSize, filterSize};
         // NppiPoint nppMaskCenter = {filterSize / 2, filterSize / 2};
-        // Vec2i oppMaskSize   = {filterSize, filterSize};
-        // Vec2i oppMaskCenter = {filterSize / 2, filterSize / 2};
+        // Vec2i mppMaskSize   = {filterSize, filterSize};
+        // Vec2i mppMaskCenter = {filterSize / 2, filterSize / 2};
         // DevVar<float> preComputedDist(64 * 64);
         // DevVar<float> preComputedDist2(64 * 64);
         // DevVar<Pixel32fC3> ssimo(1);
@@ -1477,21 +1477,21 @@ int main()
 
         // npp_src1.FilterBorder32f(npp_dst, filter, {15, 15}, {6, 6}, NppiBorderType::NPP_BORDER_REPLICATE, nppCtx);
 
-        // opp_src1.ThresholdAdaptiveBoxFilter(opp_dst, oppMaskSize, oppMaskCenter, 0.5f, 255, 0, opp_boder, {0}, Roi(),
-        //                                     oppCtx);
-        // opp_src1.SeparableFilter(opp_dst, filter, oppMaskSize.x, oppMaskCenter.x, opp_boder, {0}, Roi(), oppCtx);
-        // opp_src1.MaxFilter(opp_dst, oppMaskSize, opp_boder, {0}, Roi(), oppCtx);
+        // mpp_src1.ThresholdAdaptiveBoxFilter(mpp_dst, mppMaskSize, mppMaskCenter, 0.5f, 255, 0, mpp_boder, {0}, Roi(),
+        //                                     mppCtx);
+        // mpp_src1.SeparableFilter(mpp_dst, filter, mppMaskSize.x, mppMaskCenter.x, mpp_boder, {0}, Roi(), mppCtx);
+        // mpp_src1.MaxFilter(mpp_dst, mppMaskSize, mpp_boder, {0}, Roi(), mppCtx);
 
-        // opp_src1.GradientVectorSobel(opp_null16s, opp_null16s, opp_dstMag, opp_dstAngle, opp_null32fC4, Norm::L2,
-        //                              MaskSize::Mask_5x5, opp_boder, {0}, Roi(), oppCtx);
-        // opp_dstMag.CannyEdge(opp_dstAngle, opp_temp, opp_dst, 400, 3000, Roi(), oppCtx);
+        // mpp_src1.GradientVectorSobel(mpp_null16s, mpp_null16s, mpp_dstMag, mpp_dstAngle, mpp_null32fC4, Norm::L2,
+        //                              MaskSize::Mask_5x5, mpp_boder, {0}, Roi(), mppCtx);
+        // mpp_dstMag.CannyEdge(mpp_dstAngle, mpp_temp, mpp_dst, 400, 3000, Roi(), mppCtx);
         // Pixel64fC1 ssimcpu;
         // cpu_src1.SSIM(cpu_src2, ssimcpu, 1);
 
-        // opp_tpl2.Div(Pixel32fC1(255), oppCtx);
-        // opp_src2.Div(Pixel32fC1(255), oppCtx);
+        // mpp_tpl2.Div(Pixel32fC1(255), mppCtx);
+        // mpp_src2.Div(Pixel32fC1(255), mppCtx);
 
-        /// opp_src1.FixedFilter(opp_dst, FixedFilter::PrewittVert, MaskSize::Mask_3x3, BorderType::Replicate, oppCtx);
+        /// mpp_src1.FixedFilter(mpp_dst, FixedFilter::PrewittVert, MaskSize::Mask_3x3, BorderType::Replicate, mppCtx);
         /// cpu_src1.FixedFilter(cpu_dst, FixedFilter::PrewittVert, MaskSize::Mask_3x3, BorderType::Replicate);
         /// npp_src1.FilterPrewittVertBorder(npp_dst, NPP_BORDER_REPLICATE, nppCtx);
 
@@ -1500,12 +1500,12 @@ int main()
         // npp_src1.QualityIndex(npp_src2, {imgWidth, imgHeight}, qin, bufferSSIM, nppCtx);
 
         /*DevVarView<Pixel64fC1> tempvar(reinterpret_cast<Pixel64fC1 *>(meanTpl.Pointer()), 8);
-        opp_tpl.Mean(tempvar, bufferMean, oppCtx);
-        opp_src1.BoxAndSumSquareFilter(opp_boxFiltered, sizeTpl, BorderType::Constant, {0}, Roi(), oppCtx);
-        opp_src1.CrossCorrelationCoefficient(opp_boxFiltered, opp_tpl, meanTpl, opp_dstAngle, BorderType::Constant, {0},
-                                             Roi(), oppCtx);*/
+        mpp_tpl.Mean(tempvar, bufferMean, mppCtx);
+        mpp_src1.BoxAndSumSquareFilter(mpp_boxFiltered, sizeTpl, BorderType::Constant, {0}, Roi(), mppCtx);
+        mpp_src1.CrossCorrelationCoefficient(mpp_boxFiltered, mpp_tpl, meanTpl, mpp_dstAngle, BorderType::Constant, {0},
+                                             Roi(), mppCtx);*/
 
-        //  opp_src1.FixedFilter(opp_dst, oppFilter, oppMask, opp_boder, {0}, Roi(), oppCtx);
+        //  mpp_src1.FixedFilter(mpp_dst, mppFilter, mppMask, mpp_boder, {0}, Roi(), mppCtx);
         //  npp_src1.FilterLaplaceBorder(npp_dst, nppMask, NppiBorderType::NPP_BORDER_REPLICATE, nppCtx);
         /*npp_src1.FilterColumnBorder32f(npp_dst, filter, filterSize, filterSize / 2,
                                        NppiBorderType::NPP_BORDER_REPLICATE, nppCtx);
@@ -1517,12 +1517,12 @@ int main()
 
         // npp_src1.CrossCorrSame_NormLevelAdvanced(npp_tpl, npp_dstAngle, buffer1, buffer2, nppCtx);
 
-        /*cpu_dst << opp_temp;
-        cpu_dst.Save("f:\\cannyTempOpp.tif");
-        cpu_dstMag << opp_dstMag;
-        cpu_dstMag.Save("f:\\gradientVectorMagOpp.tif");
-        cpu_dstAngle << opp_dstAngle;
-        cpu_dstAngle.Save("f:\\gradientVectorAngleOpp.tif");
+        /*cpu_dst << mpp_temp;
+        cpu_dst.Save("f:\\cannyTempMpp.tif");
+        cpu_dstMag << mpp_dstMag;
+        cpu_dstMag.Save("f:\\gradientVectorMagMpp.tif");
+        cpu_dstAngle << mpp_dstAngle;
+        cpu_dstAngle.Save("f:\\gradientVectorAngleMpp.tif");
 
         nv::ImageView<Pixel8uC1> npp_temp0(reinterpret_cast<Pixel8uC1 *>(buffer.Pointer()),
                                            SizePitched({256, 256}, 256), npp_dst.ROI());
@@ -1541,23 +1541,23 @@ int main()
         cpu_dstY.Save("f:\\cannyTemp3Npp.tif");
         cpu_dstAngle << npp_dstAngle;
         cpu_dstAngle.Save("f:\\crossCorrNpp.tif");
-        cpu_dstAngle << opp_dstAngle;
-        cpu_dstAngle.Save("f:\\crossCorrOpp.tif");*/
+        cpu_dstAngle << mpp_dstAngle;
+        cpu_dstAngle.Save("f:\\crossCorrMpp.tif");*/
 
         // cpu_src1.Save("f:\\lowpassOrig.tif");
         /*std::cout << std::endl << "Res CPU: " << std::endl;
         print(cpu_dst);
         cpu_dst.Save("f:\\filterCpu.tif");
-        cpu_dst << opp_dst;
-        std::cout << std::endl << "Res OPP: " << std::endl;
+        cpu_dst << mpp_dst;
+        std::cout << std::endl << "Res MPP: " << std::endl;
         print(cpu_dst);
-        cpu_dst.Save("f:\\filterOpp.tif");
+        cpu_dst.Save("f:\\filterMpp.tif");
         cpu_dst << npp_dst;
         std::cout << std::endl << "Res NPP: " << std::endl;
         print(cpu_dst);
         cpu_dst.Save("f:\\filterNpp.tif"); */
     }
-    catch (opp::OPPException &ex)
+    catch (mpp::MPPException &ex)
     {
         std::cout << ex.what();
     }

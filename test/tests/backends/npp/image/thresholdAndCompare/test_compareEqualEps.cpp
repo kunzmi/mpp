@@ -16,11 +16,11 @@
 #include <catch2/catch_test_macros.hpp>
 #include <common/defines.h>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size = 256;
 
@@ -77,7 +77,7 @@ TEST_CASE("32fC1", "[NPP.Statistics.CompareEqualEpsC]")
     nv::Image32fC1 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
 
-    opp::FillRandom<Pixel32fC1> opRand(seed + 1);
+    mpp::FillRandom<Pixel32fC1> opRand(seed + 1);
     cpu_src1.FillRandom(seed);
     opRand(cpu_src2);
 
@@ -130,7 +130,7 @@ TEST_CASE("32fC3", "[NPP.Statistics.CompareEqualEpsC]")
     nv::Image32fC3 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
 
-    opp::FillRandom<Pixel32fC3> opRand(seed + 1);
+    mpp::FillRandom<Pixel32fC3> opRand(seed + 1);
     cpu_src1.FillRandom(seed);
     opRand(cpu_src2);
 
@@ -183,7 +183,7 @@ TEST_CASE("32fC4", "[NPP.Statistics.CompareEqualEpsC]")
     nv::Image32fC4 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
 
-    opp::FillRandom<Pixel32fC4> opRand(seed + 1);
+    mpp::FillRandom<Pixel32fC4> opRand(seed + 1);
     cpu_src1.FillRandom(seed);
     opRand(cpu_src2);
 
@@ -239,7 +239,7 @@ TEST_CASE("32fC4A", "[NPP.Statistics.CompareEqualEpsC]")
     nv::Image32fC4 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
 
-    opp::FillRandom<Pixel32fC4A> opRand(seed + 1);
+    mpp::FillRandom<Pixel32fC4A> opRand(seed + 1);
     cpu_src1.FillRandom(seed);
     opRand(cpu_src2);
 

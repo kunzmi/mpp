@@ -2,7 +2,7 @@
 #include <common/defines.h>
 #include <cstddef>
 
-namespace opp::image
+namespace mpp::image
 {
 // integer indices
 template <typename T> DEVICE_CODE T *gotoPtr(T *aPixel0, size_t aPitch, int x, int y)
@@ -43,4 +43,4 @@ template <ByteSizeType T> DEVICE_CODE const T *gotoPtr(const T *aPixel0, size_t 
 {
     return ((aPixel0 + aPitch * y) + x);
 }
-} // namespace opp::image
+} // namespace mpp::image

@@ -6,7 +6,7 @@
 #include <zlib/zconf.h>
 #include <zlib/zlib.h>
 
-namespace opp::fileIO
+namespace mpp::fileIO
 {
 ZLIBDecoder::ZLIBDecoder()
 {
@@ -97,4 +97,4 @@ size_t ZLIBEncoder::Deflate(byte *aUncompressedStream, size_t aSizeIn, byte *aCo
 
     return mStrm.total_out;
 }
-} // namespace opp::fileIO
+} // namespace mpp::fileIO

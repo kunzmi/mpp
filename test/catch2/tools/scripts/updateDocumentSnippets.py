@@ -7,7 +7,7 @@ import subprocess
 # ---------------------------------------------------
 # Update code examples
 # ---------------------------------------------------
-# For info on mdsnippets, see https://github.com/SimonCropp/MarkdownSnippets
+# For info on mdsnippets, see https://github.com/SimonCrmpp/MarkdownSnippets
 
 # install dotnet SDK from http://go.microsoft.com/fwlink/?LinkID=798306&clcid=0x409
 # Then install MarkdownSnippets.Tool with

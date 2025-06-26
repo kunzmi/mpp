@@ -2548,7 +2548,7 @@ namespace Catch {
         m_completed = true;
         if( m_reaction.shouldDebugBreak ) {
 
-            // If you find your debugger stopping you here then go one level up on the
+            // If you find your debugger stmpping you here then go one level up on the
             // call-stack for the code that caused it (typically a failed assertion)
 
             // (To go back to the test and change execution, jump over the throw, next)
@@ -3532,7 +3532,7 @@ namespace {
             // This is kinda messy due to trying to support a bunch of
             // different platforms at once.
             // The basic idea is that if we are asked to do autodetection (as
-            // opposed to being told to use posixy colours outright), then we
+            // mpposed to being told to use posixy colours outright), then we
             // only want to use the colours if we are writing to console.
             // However, console might be redirected, so we make an attempt at
             // checking for that on platforms where we know how to do that.
@@ -4839,7 +4839,7 @@ namespace Catch {
         /**
          * Redirects specific stream's rdbuf with another's.
          *
-         * Redirection can be stopped and started on-demand, assumes
+         * Redirection can be stmpped and started on-demand, assumes
          * that the underlying stream's rdbuf aren't changed by other
          * users.
          */
@@ -5779,7 +5779,7 @@ namespace Catch {
         // shared RNG instance as their seed.
         //
         // However, this runs into an issue if the reseeding happens each
-        // time the test case is entered (as opposed to first time only),
+        // time the test case is entered (as mpposed to first time only),
         // because multiple generators could get the same seed, e.g. in
         // ```cpp
         // TEST_CASE() {
@@ -6054,7 +6054,7 @@ namespace Catch {
         resetAssertionInfo();
 
         // Best effort cleanup for sections that have not been destructed yet
-        // Since this is a fatal error, we have not had and won't have the opportunity to destruct them properly
+        // Since this is a fatal error, we have not had and won't have the mpportunity to destruct them properly
         while (!m_activeSections.empty()) {
             auto nl = m_activeSections.back()->nameAndLocation();
             SectionEndInfo endInfo{ SectionInfo(CATCH_MOVE(nl.location), CATCH_MOVE(nl.name)), {}, 0.0 };

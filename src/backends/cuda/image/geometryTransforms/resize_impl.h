@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "resize.h"
 #include <backends/cuda/image/configurations.h>
@@ -19,25 +19,25 @@
 #include <common/image/roi.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT>
 void InvokeResizeSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aPitchDst, const Vector2<double> &aScale,
                      const Vector2<double> &aShift, InterpolationMode aInterpolation, BorderType aBorder,
                      const SrcT &aConstant, const Vector2<int> aAllowedReadRoiOffset, const Size2D &aAllowedReadRoiSize,
-                     const Size2D &aSizeSrc, const Size2D &aSizeDst, const opp::cuda::StreamCtx &aStreamCtx)
+                     const Size2D &aSizeSrc, const Size2D &aSizeDst, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
+    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
+        MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
@@ -56,7 +56,7 @@ void InvokeResizeSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aP
         auto runOverInterpolation = [&]<typename bcT>(const bcT &aBC) {
             switch (aInterpolation)
             {
-                case opp::InterpolationMode::NearestNeighbor:
+                case mpp::InterpolationMode::NearestNeighbor:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT = Interpolator<SrcT, bcT, CoordTInterpol, InterpolationMode::NearestNeighbor>;
@@ -69,7 +69,7 @@ void InvokeResizeSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aP
                                                                                functor);
                 }
                 break;
-                case opp::InterpolationMode::Linear:
+                case mpp::InterpolationMode::Linear:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT =
@@ -83,7 +83,7 @@ void InvokeResizeSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aP
                                                                                functor);
                 }
                 break;
-                case opp::InterpolationMode::CubicHermiteSpline:
+                case mpp::InterpolationMode::CubicHermiteSpline:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -97,7 +97,7 @@ void InvokeResizeSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aP
                                                                                functor);
                 }
                 break;
-                case opp::InterpolationMode::CubicLagrange:
+                case mpp::InterpolationMode::CubicLagrange:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -111,7 +111,7 @@ void InvokeResizeSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aP
                                                                                functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamBSpline:
+                case mpp::InterpolationMode::Cubic2ParamBSpline:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -125,7 +125,7 @@ void InvokeResizeSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aP
                                                                                functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamCatmullRom:
+                case mpp::InterpolationMode::Cubic2ParamCatmullRom:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -139,7 +139,7 @@ void InvokeResizeSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aP
                                                                                functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamB05C03:
+                case mpp::InterpolationMode::Cubic2ParamB05C03:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -153,7 +153,7 @@ void InvokeResizeSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aP
                                                                                functor);
                 }
                 break;
-                case opp::InterpolationMode::Lanczos2Lobed:
+                case mpp::InterpolationMode::Lanczos2Lobed:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -167,7 +167,7 @@ void InvokeResizeSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aP
                                                                                functor);
                 }
                 break;
-                case opp::InterpolationMode::Lanczos3Lobed:
+                case mpp::InterpolationMode::Lanczos3Lobed:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -181,7 +181,7 @@ void InvokeResizeSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aP
                                                                                functor);
                 }
                 break;
-                case opp::InterpolationMode::Super:
+                case mpp::InterpolationMode::Super:
                 {
                     // assuming that we already checked that scaleFactors are < 1
                     Vector2<CoordT> scaleFactor = Vector2<CoordT>(aScale);
@@ -207,7 +207,7 @@ void InvokeResizeSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aP
 
         switch (aBorder)
         {
-            case opp::BorderType::None:
+            case mpp::BorderType::None:
             {
                 // for interpolation at the border we will still use replicate:
                 using BCType = BorderControl<SrcT, BorderType::Replicate, true, false, false, false>;
@@ -216,7 +216,7 @@ void InvokeResizeSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aP
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Constant:
+            case mpp::BorderType::Constant:
             {
                 using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
                 const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset, aConstant);
@@ -224,7 +224,7 @@ void InvokeResizeSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aP
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Replicate:
+            case mpp::BorderType::Replicate:
             {
                 using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
                 const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
@@ -232,7 +232,7 @@ void InvokeResizeSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aP
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Mirror:
+            case mpp::BorderType::Mirror:
             {
                 using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
                 const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
@@ -240,7 +240,7 @@ void InvokeResizeSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aP
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::MirrorReplicate:
+            case mpp::BorderType::MirrorReplicate:
             {
                 using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
                 const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
@@ -248,7 +248,7 @@ void InvokeResizeSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aP
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Wrap:
+            case mpp::BorderType::Wrap:
             {
                 using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
                 const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
@@ -270,7 +270,7 @@ void InvokeResizeSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aP
         const typeSrc *aSrc1, size_t aPitchSrc1, typeSrc *aDst, size_t aPitchDst, const Vector2<double> &aScale,       \
         const Vector2<double> &aShift, InterpolationMode aInterpolation, BorderType aBorder, const typeSrc &aConstant, \
         const Vector2<int> aAllowedReadRoiOffset, const Size2D &aAllowedReadRoiSize, const Size2D &aSizeSrc,           \
-        const Size2D &aSizeDst, const opp::cuda::StreamCtx &aStreamCtx);
+        const Size2D &aSizeDst, const mpp::cuda::StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlpha(type)                                                                                    \
     Instantiate_For(Pixel##type##C1);                                                                                  \
@@ -294,11 +294,11 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                      size_t aPitchDst2, const Vector2<double> &aScale, const Vector2<double> &aShift,
                      InterpolationMode aInterpolation, BorderType aBorder, const SrcT &aConstant,
                      const Vector2<int> aAllowedReadRoiOffset, const Size2D &aAllowedReadRoiSize,
-                     const Size2D &aSizeSrc, const Size2D &aSizeDst, const opp::cuda::StreamCtx &aStreamCtx)
+                     const Size2D &aSizeSrc, const Size2D &aSizeDst, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
+    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
+        MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
@@ -317,7 +317,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
         auto runOverInterpolation = [&]<typename bcT>(const bcT &aBC) {
             switch (aInterpolation)
             {
-                case opp::InterpolationMode::NearestNeighbor:
+                case mpp::InterpolationMode::NearestNeighbor:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT = Interpolator<SrcT, bcT, CoordTInterpol, InterpolationMode::NearestNeighbor>;
@@ -330,7 +330,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Linear:
+                case mpp::InterpolationMode::Linear:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT =
@@ -344,7 +344,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::CubicHermiteSpline:
+                case mpp::InterpolationMode::CubicHermiteSpline:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -358,7 +358,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::CubicLagrange:
+                case mpp::InterpolationMode::CubicLagrange:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -372,7 +372,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamBSpline:
+                case mpp::InterpolationMode::Cubic2ParamBSpline:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -386,7 +386,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamCatmullRom:
+                case mpp::InterpolationMode::Cubic2ParamCatmullRom:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -400,7 +400,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamB05C03:
+                case mpp::InterpolationMode::Cubic2ParamB05C03:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -414,7 +414,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Lanczos2Lobed:
+                case mpp::InterpolationMode::Lanczos2Lobed:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -428,7 +428,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Lanczos3Lobed:
+                case mpp::InterpolationMode::Lanczos3Lobed:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -442,7 +442,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Super:
+                case mpp::InterpolationMode::Super:
                 {
                     // assuming that we already checked that scaleFactors are < 1
                     Vector2<CoordT> scaleFactor = Vector2<CoordT>(aScale);
@@ -468,7 +468,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
 
         switch (aBorder)
         {
-            case opp::BorderType::None:
+            case mpp::BorderType::None:
             {
                 // for interpolation at the border we will still use replicate:
                 using BCType = BorderControl<SrcT, BorderType::Replicate, true, false, false, true>;
@@ -477,7 +477,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Constant:
+            case mpp::BorderType::Constant:
             {
                 using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset,
@@ -486,7 +486,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Replicate:
+            case mpp::BorderType::Replicate:
             {
                 using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
@@ -494,7 +494,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Mirror:
+            case mpp::BorderType::Mirror:
             {
                 using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
@@ -502,7 +502,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::MirrorReplicate:
+            case mpp::BorderType::MirrorReplicate:
             {
                 using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
@@ -510,7 +510,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Wrap:
+            case mpp::BorderType::Wrap:
             {
                 using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
@@ -534,7 +534,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
         size_t aPitchDst1, Vector1<remove_vector_t<typeSrc>> *aDst2, size_t aPitchDst2, const Vector2<double> &aScale, \
         const Vector2<double> &aShift, InterpolationMode aInterpolation, BorderType aBorder, const typeSrc &aConstant, \
         const Vector2<int> aAllowedReadRoiOffset, const Size2D &aAllowedReadRoiSize, const Size2D &aSizeSrc,           \
-        const Size2D &aSizeDst, const opp::cuda::StreamCtx &aStreamCtx);
+        const Size2D &aSizeDst, const mpp::cuda::StreamCtx &aStreamCtx);
 
 #define InstantiateP2_ForGeomType(type) InstantiateP2_For(Pixel##type##C2);
 
@@ -549,11 +549,11 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                      const Vector2<double> &aScale, const Vector2<double> &aShift, InterpolationMode aInterpolation,
                      BorderType aBorder, const SrcT &aConstant, const Vector2<int> aAllowedReadRoiOffset,
                      const Size2D &aAllowedReadRoiSize, const Size2D &aSizeSrc, const Size2D &aSizeDst,
-                     const opp::cuda::StreamCtx &aStreamCtx)
+                     const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
+    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
+        MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
@@ -572,7 +572,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
         auto runOverInterpolation = [&]<typename bcT>(const bcT &aBC) {
             switch (aInterpolation)
             {
-                case opp::InterpolationMode::NearestNeighbor:
+                case mpp::InterpolationMode::NearestNeighbor:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT = Interpolator<SrcT, bcT, CoordTInterpol, InterpolationMode::NearestNeighbor>;
@@ -585,7 +585,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Linear:
+                case mpp::InterpolationMode::Linear:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT =
@@ -599,7 +599,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::CubicHermiteSpline:
+                case mpp::InterpolationMode::CubicHermiteSpline:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -613,7 +613,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::CubicLagrange:
+                case mpp::InterpolationMode::CubicLagrange:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -627,7 +627,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamBSpline:
+                case mpp::InterpolationMode::Cubic2ParamBSpline:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -641,7 +641,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamCatmullRom:
+                case mpp::InterpolationMode::Cubic2ParamCatmullRom:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -655,7 +655,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamB05C03:
+                case mpp::InterpolationMode::Cubic2ParamB05C03:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -669,7 +669,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Lanczos2Lobed:
+                case mpp::InterpolationMode::Lanczos2Lobed:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -683,7 +683,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Lanczos3Lobed:
+                case mpp::InterpolationMode::Lanczos3Lobed:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -697,7 +697,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Super:
+                case mpp::InterpolationMode::Super:
                 {
                     // assuming that we already checked that scaleFactors are < 1
                     Vector2<CoordT> scaleFactor = Vector2<CoordT>(aScale);
@@ -723,7 +723,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
 
         switch (aBorder)
         {
-            case opp::BorderType::None:
+            case mpp::BorderType::None:
             {
                 // for interpolation at the border we will still use replicate:
                 using BCType = BorderControl<SrcT, BorderType::Replicate, true, false, false, true>;
@@ -733,7 +733,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Constant:
+            case mpp::BorderType::Constant:
             {
                 using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
@@ -742,7 +742,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Replicate:
+            case mpp::BorderType::Replicate:
             {
                 using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
@@ -751,7 +751,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Mirror:
+            case mpp::BorderType::Mirror:
             {
                 using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
@@ -760,7 +760,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::MirrorReplicate:
+            case mpp::BorderType::MirrorReplicate:
             {
                 using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
@@ -769,7 +769,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Wrap:
+            case mpp::BorderType::Wrap:
             {
                 using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
@@ -796,7 +796,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
         Vector1<remove_vector_t<typeSrc>> *aDst3, size_t aPitchDst3, const Vector2<double> &aScale,                    \
         const Vector2<double> &aShift, InterpolationMode aInterpolation, BorderType aBorder, const typeSrc &aConstant, \
         const Vector2<int> aAllowedReadRoiOffset, const Size2D &aAllowedReadRoiSize, const Size2D &aSizeSrc,           \
-        const Size2D &aSizeDst, const opp::cuda::StreamCtx &aStreamCtx);
+        const Size2D &aSizeDst, const mpp::cuda::StreamCtx &aStreamCtx);
 
 #define InstantiateP3_ForGeomType(type) InstantiateP3_For(Pixel##type##C3);
 
@@ -812,11 +812,11 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                      Vector1<remove_vector_t<SrcT>> *aDst4, size_t aPitchDst4, const Vector2<double> &aScale,
                      const Vector2<double> &aShift, InterpolationMode aInterpolation, BorderType aBorder,
                      const SrcT &aConstant, const Vector2<int> aAllowedReadRoiOffset, const Size2D &aAllowedReadRoiSize,
-                     const Size2D &aSizeSrc, const Size2D &aSizeDst, const opp::cuda::StreamCtx &aStreamCtx)
+                     const Size2D &aSizeSrc, const Size2D &aSizeDst, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
+    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
+        MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
@@ -835,7 +835,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
         auto runOverInterpolation = [&]<typename bcT>(const bcT &aBC) {
             switch (aInterpolation)
             {
-                case opp::InterpolationMode::NearestNeighbor:
+                case mpp::InterpolationMode::NearestNeighbor:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT = Interpolator<SrcT, bcT, CoordTInterpol, InterpolationMode::NearestNeighbor>;
@@ -849,7 +849,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Linear:
+                case mpp::InterpolationMode::Linear:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT =
@@ -864,7 +864,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::CubicHermiteSpline:
+                case mpp::InterpolationMode::CubicHermiteSpline:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -879,7 +879,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::CubicLagrange:
+                case mpp::InterpolationMode::CubicLagrange:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -894,7 +894,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamBSpline:
+                case mpp::InterpolationMode::Cubic2ParamBSpline:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -909,7 +909,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamCatmullRom:
+                case mpp::InterpolationMode::Cubic2ParamCatmullRom:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -924,7 +924,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamB05C03:
+                case mpp::InterpolationMode::Cubic2ParamB05C03:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -939,7 +939,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Lanczos2Lobed:
+                case mpp::InterpolationMode::Lanczos2Lobed:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -954,7 +954,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Lanczos3Lobed:
+                case mpp::InterpolationMode::Lanczos3Lobed:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -969,7 +969,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                         aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Super:
+                case mpp::InterpolationMode::Super:
                 {
                     // assuming that we already checked that scaleFactors are < 1
                     Vector2<CoordT> scaleFactor = Vector2<CoordT>(aScale);
@@ -996,7 +996,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
 
         switch (aBorder)
         {
-            case opp::BorderType::None:
+            case mpp::BorderType::None:
             {
                 // for interpolation at the border we will still use replicate:
                 using BCType = BorderControl<SrcT, BorderType::Replicate, true, false, false, true>;
@@ -1006,7 +1006,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Constant:
+            case mpp::BorderType::Constant:
             {
                 using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
@@ -1015,7 +1015,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Replicate:
+            case mpp::BorderType::Replicate:
             {
                 using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
@@ -1024,7 +1024,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Mirror:
+            case mpp::BorderType::Mirror:
             {
                 using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
@@ -1033,7 +1033,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::MirrorReplicate:
+            case mpp::BorderType::MirrorReplicate:
             {
                 using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
@@ -1042,7 +1042,7 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Wrap:
+            case mpp::BorderType::Wrap:
             {
                 using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
@@ -1071,10 +1071,10 @@ void InvokeResizeSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchS
         size_t aPitchDst4, const Vector2<double> &aScale, const Vector2<double> &aShift,                               \
         InterpolationMode aInterpolation, BorderType aBorder, const typeSrc &aConstant,                                \
         const Vector2<int> aAllowedReadRoiOffset, const Size2D &aAllowedReadRoiSize, const Size2D &aSizeSrc,           \
-        const Size2D &aSizeDst, const opp::cuda::StreamCtx &aStreamCtx);
+        const Size2D &aSizeDst, const mpp::cuda::StreamCtx &aStreamCtx);
 
 #define InstantiateP4_ForGeomType(type) InstantiateP4_For(Pixel##type##C4);
 
 #pragma endregion
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

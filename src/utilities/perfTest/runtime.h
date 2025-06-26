@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 
-namespace opp
+namespace mpp
 {
 struct Runtime
 {
@@ -17,4 +17,4 @@ struct Runtime
 };
 
 std::ostream &operator<<(std::ostream &aOs, const Runtime &aRuntime);
-} // namespace opp
+} // namespace mpp

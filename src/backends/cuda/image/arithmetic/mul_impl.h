@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "mul.h"
 #include <backends/cuda/image/configurations.h>
@@ -25,23 +25,23 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMulSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst,
                      size_t aPitchDst, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
@@ -49,10 +49,10 @@ void InvokeMulSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, si
         if constexpr (simdOP_t::has_simd)
         {
             // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
-            using mulSrcSrcSIMD = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>, RoundingMode::None,
+            using mulSrcSrcSIMD = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None,
                                                 ComputeT, simdOP_t>;
 
-            const opp::Mul<ComputeT> op;
+            const mpp::Mul<ComputeT> op;
             const simdOP_t opSIMD;
 
             const mulSrcSrcSIMD functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, opSIMD);
@@ -63,9 +63,9 @@ void InvokeMulSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, si
         else
         {
             // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
-            using mulSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>, RoundingMode::None>;
+            using mulSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None>;
 
-            const opp::Mul<ComputeT> op;
+            const mpp::Mul<ComputeT> op;
 
             const mulSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
@@ -102,9 +102,9 @@ void InvokeMulSrcSrcScale(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc
                           size_t aPitchDst, scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize,
                           const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
         if (aScaleFactor == 1.0f)
@@ -116,9 +116,9 @@ void InvokeMulSrcSrcScale(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using mulSrcSrcScale =
-            SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
+            SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
-        const opp::Mul<ComputeT> op;
+        const mpp::Mul<ComputeT> op;
 
         const mulSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
 
@@ -155,9 +155,9 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMulSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT *aDst, size_t aPitchDst,
                    const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
@@ -165,10 +165,10 @@ void InvokeMulSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT 
         if constexpr (simdOP_t::has_simd)
         {
             // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
-            using mulSrcCSIMD = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>,
+            using mulSrcCSIMD = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>,
                                                    RoundingMode::None, Tupel<ComputeT, TupelSize>, simdOP_t>;
 
-            const opp::Mul<ComputeT> op;
+            const mpp::Mul<ComputeT> op;
             const simdOP_t opSIMD;
             const Tupel<ComputeT, TupelSize> tupelConstant =
                 Tupel<ComputeT, TupelSize>::GetConstant(static_cast<ComputeT>(aConst));
@@ -180,9 +180,9 @@ void InvokeMulSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT 
         else
         {
             // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
-            using mulSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>, RoundingMode::None>;
+            using mulSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None>;
 
-            const opp::Mul<ComputeT> op;
+            const mpp::Mul<ComputeT> op;
 
             const mulSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
 
@@ -217,9 +217,9 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMulSrcCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT *aDst, size_t aPitchDst,
                         scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
         if (aScaleFactor == 1.0f)
@@ -230,10 +230,10 @@ void InvokeMulSrcCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, 
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using mulSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>,
+        using mulSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>,
                                                      RoundingMode::NearestTiesToEven>;
 
-        const opp::Mul<ComputeT> op;
+        const mpp::Mul<ComputeT> op;
 
         const mulSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
 
@@ -269,17 +269,17 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMulSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst, DstT *aDst, size_t aPitchDst,
                       const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
         using mulSrcDevC =
-            SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>, RoundingMode::None>;
+            SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None>;
 
-        const opp::Mul<ComputeT> op;
+        const mpp::Mul<ComputeT> op;
 
         const mulSrcDevC functor(aSrc, aPitchSrc, aConst, op);
 
@@ -314,9 +314,9 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMulSrcDevCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst, DstT *aDst, size_t aPitchDst,
                            scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
         if (aScaleFactor == 1.0f)
@@ -327,10 +327,10 @@ void InvokeMulSrcDevCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aCons
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using mulSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>,
+        using mulSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>,
                                                            RoundingMode::NearestTiesToEven>;
 
-        const opp::Mul<ComputeT> op;
+        const mpp::Mul<ComputeT> op;
 
         const mulSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
 
@@ -366,9 +366,9 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMulInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, size_t aPitchSrc2, const Size2D &aSize,
                          const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
@@ -376,10 +376,10 @@ void InvokeMulInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, 
         if constexpr (simdOP_t::has_simd)
         {
             // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
-            using mulInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>,
+            using mulInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>,
                                                         RoundingMode::None, ComputeT, simdOP_t>;
 
-            const opp::Mul<ComputeT> op;
+            const mpp::Mul<ComputeT> op;
             const simdOP_t opSIMD;
 
             const mulInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
@@ -391,9 +391,9 @@ void InvokeMulInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, 
         {
             // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
             using mulInplaceSrc =
-                InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>, RoundingMode::None>;
+                InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None>;
 
-            const opp::Mul<ComputeT> op;
+            const mpp::Mul<ComputeT> op;
 
             const mulInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
@@ -430,9 +430,9 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMulInplaceSrcScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, size_t aPitchSrc2,
                               scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
         if (aScaleFactor == 1.0f)
@@ -443,10 +443,10 @@ void InvokeMulInplaceSrcScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aS
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using mulInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Mul<ComputeT>,
+        using mulInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>,
                                                           RoundingMode::NearestTiesToEven>;
 
-        const opp::Mul<ComputeT> op;
+        const mpp::Mul<ComputeT> op;
 
         const mulInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
 
@@ -483,9 +483,9 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMulInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, const Size2D &aSize,
                        const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
@@ -493,10 +493,10 @@ void InvokeMulInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, c
         if constexpr (simdOP_t::has_simd)
         {
             // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
-            using mulInplaceCSIMD = InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Mul<ComputeT>,
+            using mulInplaceCSIMD = InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>,
                                                            RoundingMode::None, Tupel<ComputeT, TupelSize>, simdOP_t>;
 
-            const opp::Mul<ComputeT> op;
+            const mpp::Mul<ComputeT> op;
             const simdOP_t opSIMD;
             const Tupel<ComputeT, TupelSize> tupelConstant =
                 Tupel<ComputeT, TupelSize>::GetConstant(static_cast<ComputeT>(aConst));
@@ -510,9 +510,9 @@ void InvokeMulInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, c
         {
             // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
             using mulInplaceC =
-                InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Mul<ComputeT>, RoundingMode::None>;
+                InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None>;
 
-            const opp::Mul<ComputeT> op;
+            const mpp::Mul<ComputeT> op;
 
             const mulInplaceC functor(static_cast<ComputeT>(aConst), op);
 
@@ -549,9 +549,9 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMulInplaceCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst,
                             scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
         if (aScaleFactor == 1.0f)
@@ -563,9 +563,9 @@ void InvokeMulInplaceCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aCon
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using mulInplaceCScale =
-            InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
+            InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
 
-        const opp::Mul<ComputeT> op;
+        const mpp::Mul<ComputeT> op;
 
         const mulInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
 
@@ -602,17 +602,17 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMulInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aConst, const Size2D &aSize,
                           const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
         using mulInplaceDevC =
-            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, opp::Mul<ComputeT>, RoundingMode::None>;
+            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None>;
 
-        const opp::Mul<ComputeT> op;
+        const mpp::Mul<ComputeT> op;
 
         const mulInplaceDevC functor(aConst, op);
 
@@ -648,9 +648,9 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMulInplaceDevCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aConst,
                                scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
         if (aScaleFactor == 1.0f)
@@ -661,10 +661,10 @@ void InvokeMulInplaceDevCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *a
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using mulInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Mul<ComputeT>,
+        using mulInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>,
                                                                    RoundingMode::NearestTiesToEven>;
 
-        const opp::Mul<ComputeT> op;
+        const mpp::Mul<ComputeT> op;
 
         const mulInplaceDevCScale functor(aConst, op, aScaleFactor);
 
@@ -697,5 +697,5 @@ void InvokeMulInplaceDevCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *a
 
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

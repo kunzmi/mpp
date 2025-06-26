@@ -9,7 +9,7 @@
 #include <istream>
 #include <memory>
 
-namespace opp::fileIO
+namespace mpp::fileIO
 {
 PseudoFileReader::PseudoFileReader() : File("", true)
 {
@@ -33,9 +33,9 @@ bool PseudoFileReader::TryToOpenAndReadHeader() noexcept
     return true;
 }
 
-opp::image::PixelTypeEnum PseudoFileReader::GetDataType() const
+mpp::image::PixelTypeEnum PseudoFileReader::GetDataType() const
 {
-    return opp::image::PixelTypeEnum::Unknown;
+    return mpp::image::PixelTypeEnum::Unknown;
 }
 
 Vector3<int> PseudoFileReader::Size() const
@@ -43,7 +43,7 @@ Vector3<int> PseudoFileReader::Size() const
     return {};
 }
 
-opp::image::Size2D PseudoFileReader::SizePlane() const
+mpp::image::Size2D PseudoFileReader::SizePlane() const
 {
     return {};
 }
@@ -92,4 +92,4 @@ FileType PseudoFileReader::GetFileType() const
 {
     return FileType::UNKNOWN;
 }
-} // namespace opp::fileIO
+} // namespace mpp::fileIO

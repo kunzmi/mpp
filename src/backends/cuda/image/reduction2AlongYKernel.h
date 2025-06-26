@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/image/configurations.h>
@@ -16,7 +16,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 /// <summary>
 /// runs aFunctor reduction on one image column, single output value.
@@ -349,7 +349,7 @@ template <typename SrcT1, typename SrcT2, typename DstT1, typename DstT2, typena
 void InvokeReduction2AlongYKernelDefault(const SrcT1 *aSrc1, const SrcT2 *aSrc2, DstT1 *aDst1, DstT2 *aDst2,
                                          remove_vector_t<DstT1> *aDstScalar1, remove_vector_t<DstT2> *aDstScalar2,
                                          int aSize, postOp1 aPostOp1, postOp2 aPostOp2, postOpScalar1 aPostOpScalar1,
-                                         postOpScalar2 aPostOpScalar2, const opp::cuda::StreamCtx &aStreamCtx)
+                                         postOpScalar2 aPostOpScalar2, const mpp::cuda::StreamCtx &aStreamCtx)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {
@@ -376,5 +376,5 @@ void InvokeReduction2AlongYKernelDefault(const SrcT1 *aSrc1, const SrcT2 *aSrc2,
     }
 }
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

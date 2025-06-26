@@ -2,14 +2,14 @@
 #include "defines.h"
 #include "needSaturationClamp.h"
 #include "numberTypes.h"
-#include "opp_defs.h"
+#include "mpp_defs.h"
 #include "vector4.h"
 #include "vector_typetraits.h"
 #include <common/utilities.h>
 #include <concepts>
 #include <iostream>
 
-namespace opp
+namespace mpp
 {
 
 // forward declaration:
@@ -2243,4 +2243,4 @@ template <HostCode T2>
 std::wistream &operator>>(std::wistream &aIs, Vector4A<T2> &aVec)
     requires ByteSizeType<T2>;
 
-} // namespace opp
+} // namespace mpp

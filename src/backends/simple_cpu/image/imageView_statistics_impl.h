@@ -63,7 +63,7 @@
 #include <common/image/sizePitched.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/statistics/indexMinMax.h>
 #include <common/statistics/operators.h>
@@ -78,7 +78,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace opp::image::cpuSimple
+namespace mpp::image::cpuSimple
 {
 #pragma region AverageError
 template <PixelType T>
@@ -93,9 +93,9 @@ void ImageView<T>::AverageError(const ImageView<T> &aSrc2, same_vector_size_diff
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL1SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL1<SrcT, ComputeT>>;
+    using normL1SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL1<SrcT, ComputeT>>;
 
-    const opp::NormDiffL1<SrcT, ComputeT> op;
+    const mpp::NormDiffL1<SrcT, ComputeT> op;
 
     const normL1SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -103,8 +103,8 @@ void ImageView<T>::AverageError(const ImageView<T> &aSrc2, same_vector_size_diff
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()));
-    const opp::DivScalar<DstT> postOpScalar(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()));
+    const mpp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()));
+    const mpp::DivScalar<DstT> postOpScalar(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()));
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -122,9 +122,9 @@ void ImageView<T>::AverageErrorMasked(const ImageView<T> &aSrc2, same_vector_siz
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL1SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL1<SrcT, ComputeT>>;
+    using normL1SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL1<SrcT, ComputeT>>;
 
-    const opp::NormDiffL1<SrcT, ComputeT> op;
+    const mpp::NormDiffL1<SrcT, ComputeT> op;
 
     const normL1SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -132,8 +132,8 @@ void ImageView<T>::AverageErrorMasked(const ImageView<T> &aSrc2, same_vector_siz
 
     const size_t maskpixels = reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(maskpixels));
-    const opp::DivScalar<DstT> postOpScalar(static_cast<remove_vector_t<DstT>>(maskpixels));
+    const mpp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(maskpixels));
+    const mpp::DivScalar<DstT> postOpScalar(static_cast<remove_vector_t<DstT>>(maskpixels));
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -150,9 +150,9 @@ void ImageView<T>::AverageError(const ImageView<T> &aSrc2, same_vector_size_diff
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL1SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL1<SrcT, ComputeT>>;
+    using normL1SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL1<SrcT, ComputeT>>;
 
-    const opp::NormDiffL1<SrcT, ComputeT> op;
+    const mpp::NormDiffL1<SrcT, ComputeT> op;
 
     const normL1SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -160,7 +160,7 @@ void ImageView<T>::AverageError(const ImageView<T> &aSrc2, same_vector_size_diff
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()));
+    const mpp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()));
 
     postOp(aDst);
 }
@@ -177,9 +177,9 @@ void ImageView<T>::AverageErrorMasked(const ImageView<T> &aSrc2, same_vector_siz
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL1SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL1<SrcT, ComputeT>>;
+    using normL1SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL1<SrcT, ComputeT>>;
 
-    const opp::NormDiffL1<SrcT, ComputeT> op;
+    const mpp::NormDiffL1<SrcT, ComputeT> op;
 
     const normL1SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -187,7 +187,7 @@ void ImageView<T>::AverageErrorMasked(const ImageView<T> &aSrc2, same_vector_siz
 
     const size_t maskpixels = reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(maskpixels));
+    const mpp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(maskpixels));
 
     postOp(aDst);
 }
@@ -206,9 +206,9 @@ void ImageView<T>::AverageRelativeError(const ImageView<T> &aSrc2, same_vector_s
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using avgErrorSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::AverageRelativeError<SrcT, ComputeT>>;
+    using avgErrorSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::AverageRelativeError<SrcT, ComputeT>>;
 
-    const opp::AverageRelativeError<SrcT, ComputeT> op;
+    const mpp::AverageRelativeError<SrcT, ComputeT> op;
 
     const avgErrorSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -216,8 +216,8 @@ void ImageView<T>::AverageRelativeError(const ImageView<T> &aSrc2, same_vector_s
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()));
-    const opp::DivScalar<DstT> postOpScalar(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()));
+    const mpp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()));
+    const mpp::DivScalar<DstT> postOpScalar(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()));
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -236,9 +236,9 @@ void ImageView<T>::AverageRelativeErrorMasked(const ImageView<T> &aSrc2,
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using avgErrorSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::AverageRelativeError<SrcT, ComputeT>>;
+    using avgErrorSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::AverageRelativeError<SrcT, ComputeT>>;
 
-    const opp::AverageRelativeError<SrcT, ComputeT> op;
+    const mpp::AverageRelativeError<SrcT, ComputeT> op;
 
     const avgErrorSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -246,8 +246,8 @@ void ImageView<T>::AverageRelativeErrorMasked(const ImageView<T> &aSrc2,
 
     const size_t maskpixels = reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(maskpixels));
-    const opp::DivScalar<DstT> postOpScalar(static_cast<remove_vector_t<DstT>>(maskpixels));
+    const mpp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(maskpixels));
+    const mpp::DivScalar<DstT> postOpScalar(static_cast<remove_vector_t<DstT>>(maskpixels));
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -265,9 +265,9 @@ void ImageView<T>::AverageRelativeError(const ImageView<T> &aSrc2,
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using avgErrorSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::AverageRelativeError<SrcT, ComputeT>>;
+    using avgErrorSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::AverageRelativeError<SrcT, ComputeT>>;
 
-    const opp::AverageRelativeError<SrcT, ComputeT> op;
+    const mpp::AverageRelativeError<SrcT, ComputeT> op;
 
     const avgErrorSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -275,7 +275,7 @@ void ImageView<T>::AverageRelativeError(const ImageView<T> &aSrc2,
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()));
+    const mpp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()));
 
     postOp(aDst);
 }
@@ -293,9 +293,9 @@ void ImageView<T>::AverageRelativeErrorMasked(const ImageView<T> &aSrc2,
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using avgErrorSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::AverageRelativeError<SrcT, ComputeT>>;
+    using avgErrorSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::AverageRelativeError<SrcT, ComputeT>>;
 
-    const opp::AverageRelativeError<SrcT, ComputeT> op;
+    const mpp::AverageRelativeError<SrcT, ComputeT> op;
 
     const avgErrorSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -303,7 +303,7 @@ void ImageView<T>::AverageRelativeErrorMasked(const ImageView<T> &aSrc2,
 
     const size_t maskpixels = reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(maskpixels));
+    const mpp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(maskpixels));
 
     postOp(aDst);
 }
@@ -322,9 +322,9 @@ void ImageView<T>::DotProduct(const ImageView<T> &aSrc2, same_vector_size_differ
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using dotProdSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::DotProduct<SrcT, ComputeT>>;
+    using dotProdSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::DotProduct<SrcT, ComputeT>>;
 
-    const opp::DotProduct<SrcT, ComputeT> op;
+    const mpp::DotProduct<SrcT, ComputeT> op;
 
     const dotProdSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -332,8 +332,8 @@ void ImageView<T>::DotProduct(const ImageView<T> &aSrc2, same_vector_size_differ
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
-    const opp::SumScalar<DstT> postOpScalar;
+    const mpp::Nothing<DstT> postOp;
+    const mpp::SumScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -350,9 +350,9 @@ void ImageView<T>::DotProduct(const ImageView<T> &aSrc2, same_vector_size_differ
     using DstT                 = same_vector_size_different_type_t<T, c_double>;
     constexpr size_t TupelSize = 1;
 
-    using dotProdSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::DotProduct<SrcT, ComputeT>>;
+    using dotProdSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::DotProduct<SrcT, ComputeT>>;
 
-    const opp::DotProduct<SrcT, ComputeT> op;
+    const mpp::DotProduct<SrcT, ComputeT> op;
 
     const dotProdSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -360,8 +360,8 @@ void ImageView<T>::DotProduct(const ImageView<T> &aSrc2, same_vector_size_differ
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
-    const opp::SumScalar<DstT> postOpScalar;
+    const mpp::Nothing<DstT> postOp;
+    const mpp::SumScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -380,9 +380,9 @@ void ImageView<T>::DotProductMasked(const ImageView<T> &aSrc2, same_vector_size_
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using dotProdSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::DotProduct<SrcT, ComputeT>>;
+    using dotProdSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::DotProduct<SrcT, ComputeT>>;
 
-    const opp::DotProduct<SrcT, ComputeT> op;
+    const mpp::DotProduct<SrcT, ComputeT> op;
 
     const dotProdSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -390,8 +390,8 @@ void ImageView<T>::DotProductMasked(const ImageView<T> &aSrc2, same_vector_size_
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
-    const opp::SumScalar<DstT> postOpScalar;
+    const mpp::Nothing<DstT> postOp;
+    const mpp::SumScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -409,9 +409,9 @@ void ImageView<T>::DotProductMasked(const ImageView<T> &aSrc2, same_vector_size_
     using DstT                 = same_vector_size_different_type_t<T, c_double>;
     constexpr size_t TupelSize = 1;
 
-    using dotProdSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::DotProduct<SrcT, ComputeT>>;
+    using dotProdSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::DotProduct<SrcT, ComputeT>>;
 
-    const opp::DotProduct<SrcT, ComputeT> op;
+    const mpp::DotProduct<SrcT, ComputeT> op;
 
     const dotProdSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -419,8 +419,8 @@ void ImageView<T>::DotProductMasked(const ImageView<T> &aSrc2, same_vector_size_
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
-    const opp::SumScalar<DstT> postOpScalar;
+    const mpp::Nothing<DstT> postOp;
+    const mpp::SumScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -437,9 +437,9 @@ void ImageView<T>::DotProduct(const ImageView<T> &aSrc2, same_vector_size_differ
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using dotProdSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::DotProduct<SrcT, ComputeT>>;
+    using dotProdSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::DotProduct<SrcT, ComputeT>>;
 
-    const opp::DotProduct<SrcT, ComputeT> op;
+    const mpp::DotProduct<SrcT, ComputeT> op;
 
     const dotProdSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -447,7 +447,7 @@ void ImageView<T>::DotProduct(const ImageView<T> &aSrc2, same_vector_size_differ
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
 
     postOp(aDst);
 }
@@ -462,9 +462,9 @@ void ImageView<T>::DotProduct(const ImageView<T> &aSrc2, same_vector_size_differ
     using DstT                 = same_vector_size_different_type_t<T, c_double>;
     constexpr size_t TupelSize = 1;
 
-    using dotProdSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::DotProduct<SrcT, ComputeT>>;
+    using dotProdSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::DotProduct<SrcT, ComputeT>>;
 
-    const opp::DotProduct<SrcT, ComputeT> op;
+    const mpp::DotProduct<SrcT, ComputeT> op;
 
     const dotProdSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -472,7 +472,7 @@ void ImageView<T>::DotProduct(const ImageView<T> &aSrc2, same_vector_size_differ
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
 
     postOp(aDst);
 }
@@ -490,9 +490,9 @@ void ImageView<T>::DotProductMasked(const ImageView<T> &aSrc2, same_vector_size_
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using dotProdSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::DotProduct<SrcT, ComputeT>>;
+    using dotProdSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::DotProduct<SrcT, ComputeT>>;
 
-    const opp::DotProduct<SrcT, ComputeT> op;
+    const mpp::DotProduct<SrcT, ComputeT> op;
 
     const dotProdSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -500,7 +500,7 @@ void ImageView<T>::DotProductMasked(const ImageView<T> &aSrc2, same_vector_size_
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
 
     postOp(aDst);
 }
@@ -517,9 +517,9 @@ void ImageView<T>::DotProductMasked(const ImageView<T> &aSrc2, same_vector_size_
     using DstT                 = same_vector_size_different_type_t<T, c_double>;
     constexpr size_t TupelSize = 1;
 
-    using dotProdSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::DotProduct<SrcT, ComputeT>>;
+    using dotProdSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::DotProduct<SrcT, ComputeT>>;
 
-    const opp::DotProduct<SrcT, ComputeT> op;
+    const mpp::DotProduct<SrcT, ComputeT> op;
 
     const dotProdSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -527,7 +527,7 @@ void ImageView<T>::DotProductMasked(const ImageView<T> &aSrc2, same_vector_size_
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
 
     postOp(aDst);
 }
@@ -545,9 +545,9 @@ void ImageView<T>::MSE(const ImageView<T> &aSrc2, same_vector_size_different_typ
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL2<SrcT, ComputeT>>;
+    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL2<SrcT, ComputeT>>;
 
-    const opp::NormDiffL2<SrcT, ComputeT> op;
+    const mpp::NormDiffL2<SrcT, ComputeT> op;
 
     const normL2SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -555,8 +555,8 @@ void ImageView<T>::MSE(const ImageView<T> &aSrc2, same_vector_size_different_typ
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()));
-    const opp::DivScalar<DstT> postOpScalar(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()));
+    const mpp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()));
+    const mpp::DivScalar<DstT> postOpScalar(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()));
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -573,9 +573,9 @@ void ImageView<T>::MSE(const ImageView<T> &aSrc2, same_vector_size_different_typ
     using DstT                 = same_vector_size_different_type_t<T, c_double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL2<SrcT, ComputeT>>;
+    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL2<SrcT, ComputeT>>;
 
-    const opp::NormDiffL2<SrcT, ComputeT> op;
+    const mpp::NormDiffL2<SrcT, ComputeT> op;
 
     const normL2SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -583,8 +583,8 @@ void ImageView<T>::MSE(const ImageView<T> &aSrc2, same_vector_size_different_typ
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(SizeRoi().TotalSize()));
-    const opp::DivScalar<DstT> postOpScalar(
+    const mpp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(SizeRoi().TotalSize()));
+    const mpp::DivScalar<DstT> postOpScalar(
         static_cast<complex_basetype_t<remove_vector_t<DstT>>>(SizeRoi().TotalSize()));
 
     aDstScalar = postOpScalar(aDst);
@@ -604,9 +604,9 @@ void ImageView<T>::MSEMasked(const ImageView<T> &aSrc2, same_vector_size_differe
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL2<SrcT, ComputeT>>;
+    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL2<SrcT, ComputeT>>;
 
-    const opp::NormDiffL2<SrcT, ComputeT> op;
+    const mpp::NormDiffL2<SrcT, ComputeT> op;
 
     const normL2SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -616,8 +616,8 @@ void ImageView<T>::MSEMasked(const ImageView<T> &aSrc2, same_vector_size_differe
 
     const size_t maskpixels = reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(maskpixels));
-    const opp::DivScalar<DstT> postOpScalar(static_cast<remove_vector_t<DstT>>(maskpixels));
+    const mpp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(maskpixels));
+    const mpp::DivScalar<DstT> postOpScalar(static_cast<remove_vector_t<DstT>>(maskpixels));
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -635,9 +635,9 @@ void ImageView<T>::MSEMasked(const ImageView<T> &aSrc2, same_vector_size_differe
     using DstT                 = same_vector_size_different_type_t<T, c_double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL2<SrcT, ComputeT>>;
+    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL2<SrcT, ComputeT>>;
 
-    const opp::NormDiffL2<SrcT, ComputeT> op;
+    const mpp::NormDiffL2<SrcT, ComputeT> op;
 
     const normL2SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -645,8 +645,8 @@ void ImageView<T>::MSEMasked(const ImageView<T> &aSrc2, same_vector_size_differe
 
     const size_t maskpixels = reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(maskpixels));
-    const opp::DivScalar<DstT> postOpScalar(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(maskpixels));
+    const mpp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(maskpixels));
+    const mpp::DivScalar<DstT> postOpScalar(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(maskpixels));
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -663,9 +663,9 @@ void ImageView<T>::MSE(const ImageView<T> &aSrc2, same_vector_size_different_typ
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL2<SrcT, ComputeT>>;
+    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL2<SrcT, ComputeT>>;
 
-    const opp::NormDiffL2<SrcT, ComputeT> op;
+    const mpp::NormDiffL2<SrcT, ComputeT> op;
 
     const normL2SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -673,7 +673,7 @@ void ImageView<T>::MSE(const ImageView<T> &aSrc2, same_vector_size_different_typ
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()));
+    const mpp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()));
 
     postOp(aDst);
 }
@@ -688,9 +688,9 @@ void ImageView<T>::MSE(const ImageView<T> &aSrc2, same_vector_size_different_typ
     using DstT                 = same_vector_size_different_type_t<T, c_double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL2<SrcT, ComputeT>>;
+    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL2<SrcT, ComputeT>>;
 
-    const opp::NormDiffL2<SrcT, ComputeT> op;
+    const mpp::NormDiffL2<SrcT, ComputeT> op;
 
     const normL2SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -698,7 +698,7 @@ void ImageView<T>::MSE(const ImageView<T> &aSrc2, same_vector_size_different_typ
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(SizeRoi().TotalSize()));
+    const mpp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(SizeRoi().TotalSize()));
 
     postOp(aDst);
 }
@@ -716,9 +716,9 @@ void ImageView<T>::MSEMasked(const ImageView<T> &aSrc2, same_vector_size_differe
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL2<SrcT, ComputeT>>;
+    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL2<SrcT, ComputeT>>;
 
-    const opp::NormDiffL2<SrcT, ComputeT> op;
+    const mpp::NormDiffL2<SrcT, ComputeT> op;
 
     const normL2SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -728,7 +728,7 @@ void ImageView<T>::MSEMasked(const ImageView<T> &aSrc2, same_vector_size_differe
 
     const size_t maskpixels = reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(maskpixels));
+    const mpp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(maskpixels));
 
     postOp(aDst);
 }
@@ -745,9 +745,9 @@ void ImageView<T>::MSEMasked(const ImageView<T> &aSrc2, same_vector_size_differe
     using DstT                 = same_vector_size_different_type_t<T, c_double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL2<SrcT, ComputeT>>;
+    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL2<SrcT, ComputeT>>;
 
-    const opp::NormDiffL2<SrcT, ComputeT> op;
+    const mpp::NormDiffL2<SrcT, ComputeT> op;
 
     const normL2SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -755,7 +755,7 @@ void ImageView<T>::MSEMasked(const ImageView<T> &aSrc2, same_vector_size_differe
 
     const size_t maskpixels = reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(maskpixels));
+    const mpp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(maskpixels));
 
     postOp(aDst);
 }
@@ -773,9 +773,9 @@ void ImageView<T>::MaximumError(const ImageView<T> &aSrc2, same_vector_size_diff
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normInfSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffInf<SrcT, ComputeT>>;
+    using normInfSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffInf<SrcT, ComputeT>>;
 
-    const opp::NormDiffInf<SrcT, ComputeT> op;
+    const mpp::NormDiffInf<SrcT, ComputeT> op;
 
     const normInfSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -783,8 +783,8 @@ void ImageView<T>::MaximumError(const ImageView<T> &aSrc2, same_vector_size_diff
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
-    const opp::MaxScalar<DstT> postOpScalar;
+    const mpp::Nothing<DstT> postOp;
+    const mpp::MaxScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -803,9 +803,9 @@ void ImageView<T>::MaximumErrorMasked(const ImageView<T> &aSrc2, same_vector_siz
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normInfSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffInf<SrcT, ComputeT>>;
+    using normInfSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffInf<SrcT, ComputeT>>;
 
-    const opp::NormDiffInf<SrcT, ComputeT> op;
+    const mpp::NormDiffInf<SrcT, ComputeT> op;
 
     const normInfSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -813,8 +813,8 @@ void ImageView<T>::MaximumErrorMasked(const ImageView<T> &aSrc2, same_vector_siz
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
-    const opp::MaxScalar<DstT> postOpScalar;
+    const mpp::Nothing<DstT> postOp;
+    const mpp::MaxScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -831,9 +831,9 @@ void ImageView<T>::MaximumError(const ImageView<T> &aSrc2, same_vector_size_diff
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normInfSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffInf<SrcT, ComputeT>>;
+    using normInfSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffInf<SrcT, ComputeT>>;
 
-    const opp::NormDiffInf<SrcT, ComputeT> op;
+    const mpp::NormDiffInf<SrcT, ComputeT> op;
 
     const normInfSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -841,7 +841,7 @@ void ImageView<T>::MaximumError(const ImageView<T> &aSrc2, same_vector_size_diff
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
 
     postOp(aDst);
 }
@@ -859,9 +859,9 @@ void ImageView<T>::MaximumErrorMasked(const ImageView<T> &aSrc2, same_vector_siz
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normInfSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffInf<SrcT, ComputeT>>;
+    using normInfSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffInf<SrcT, ComputeT>>;
 
-    const opp::NormDiffInf<SrcT, ComputeT> op;
+    const mpp::NormDiffInf<SrcT, ComputeT> op;
 
     const normInfSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -869,7 +869,7 @@ void ImageView<T>::MaximumErrorMasked(const ImageView<T> &aSrc2, same_vector_siz
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
 
     postOp(aDst);
 }
@@ -887,9 +887,9 @@ void ImageView<T>::MaximumRelativeError(const ImageView<T> &aSrc2, same_vector_s
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using avgErrorSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::MaximumRelativeError<SrcT, ComputeT>>;
+    using avgErrorSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::MaximumRelativeError<SrcT, ComputeT>>;
 
-    const opp::MaximumRelativeError<SrcT, ComputeT> op;
+    const mpp::MaximumRelativeError<SrcT, ComputeT> op;
 
     const avgErrorSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -897,8 +897,8 @@ void ImageView<T>::MaximumRelativeError(const ImageView<T> &aSrc2, same_vector_s
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
-    const opp::MaxScalar<DstT> postOpScalar;
+    const mpp::Nothing<DstT> postOp;
+    const mpp::MaxScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -918,9 +918,9 @@ void ImageView<T>::MaximumRelativeErrorMasked(const ImageView<T> &aSrc2,
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using avgErrorSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::MaximumRelativeError<SrcT, ComputeT>>;
+    using avgErrorSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::MaximumRelativeError<SrcT, ComputeT>>;
 
-    const opp::MaximumRelativeError<SrcT, ComputeT> op;
+    const mpp::MaximumRelativeError<SrcT, ComputeT> op;
 
     const avgErrorSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -928,8 +928,8 @@ void ImageView<T>::MaximumRelativeErrorMasked(const ImageView<T> &aSrc2,
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
-    const opp::MaxScalar<DstT> postOpScalar;
+    const mpp::Nothing<DstT> postOp;
+    const mpp::MaxScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -947,9 +947,9 @@ void ImageView<T>::MaximumRelativeError(const ImageView<T> &aSrc2,
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using avgErrorSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::MaximumRelativeError<SrcT, ComputeT>>;
+    using avgErrorSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::MaximumRelativeError<SrcT, ComputeT>>;
 
-    const opp::MaximumRelativeError<SrcT, ComputeT> op;
+    const mpp::MaximumRelativeError<SrcT, ComputeT> op;
 
     const avgErrorSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -957,7 +957,7 @@ void ImageView<T>::MaximumRelativeError(const ImageView<T> &aSrc2,
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
     postOp(aDst);
 }
 
@@ -975,9 +975,9 @@ void ImageView<T>::MaximumRelativeErrorMasked(const ImageView<T> &aSrc2,
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using avgErrorSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::MaximumRelativeError<SrcT, ComputeT>>;
+    using avgErrorSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::MaximumRelativeError<SrcT, ComputeT>>;
 
-    const opp::MaximumRelativeError<SrcT, ComputeT> op;
+    const mpp::MaximumRelativeError<SrcT, ComputeT> op;
 
     const avgErrorSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -985,7 +985,7 @@ void ImageView<T>::MaximumRelativeErrorMasked(const ImageView<T> &aSrc2,
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
 
     postOp(aDst);
 }
@@ -1035,9 +1035,9 @@ void ImageView<T>::NormDiffL1(const ImageView<T> &aSrc2, same_vector_size_differ
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL1SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL1<SrcT, ComputeT>>;
+    using normL1SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL1<SrcT, ComputeT>>;
 
-    const opp::NormDiffL1<SrcT, ComputeT> op;
+    const mpp::NormDiffL1<SrcT, ComputeT> op;
 
     const normL1SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -1045,8 +1045,8 @@ void ImageView<T>::NormDiffL1(const ImageView<T> &aSrc2, same_vector_size_differ
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
-    const opp::SumScalar<DstT> postOpScalar;
+    const mpp::Nothing<DstT> postOp;
+    const mpp::SumScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -1065,9 +1065,9 @@ void ImageView<T>::NormDiffL1Masked(const ImageView<T> &aSrc2, same_vector_size_
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL1SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL1<SrcT, ComputeT>>;
+    using normL1SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL1<SrcT, ComputeT>>;
 
-    const opp::NormDiffL1<SrcT, ComputeT> op;
+    const mpp::NormDiffL1<SrcT, ComputeT> op;
 
     const normL1SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -1075,8 +1075,8 @@ void ImageView<T>::NormDiffL1Masked(const ImageView<T> &aSrc2, same_vector_size_
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
-    const opp::SumScalar<DstT> postOpScalar;
+    const mpp::Nothing<DstT> postOp;
+    const mpp::SumScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -1093,9 +1093,9 @@ void ImageView<T>::NormDiffL1(const ImageView<T> &aSrc2, same_vector_size_differ
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL1SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL1<SrcT, ComputeT>>;
+    using normL1SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL1<SrcT, ComputeT>>;
 
-    const opp::NormDiffL1<SrcT, ComputeT> op;
+    const mpp::NormDiffL1<SrcT, ComputeT> op;
 
     const normL1SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -1103,7 +1103,7 @@ void ImageView<T>::NormDiffL1(const ImageView<T> &aSrc2, same_vector_size_differ
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
 
     postOp(aDst);
 }
@@ -1121,9 +1121,9 @@ void ImageView<T>::NormDiffL1Masked(const ImageView<T> &aSrc2, same_vector_size_
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL1SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL1<SrcT, ComputeT>>;
+    using normL1SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL1<SrcT, ComputeT>>;
 
-    const opp::NormDiffL1<SrcT, ComputeT> op;
+    const mpp::NormDiffL1<SrcT, ComputeT> op;
 
     const normL1SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -1131,7 +1131,7 @@ void ImageView<T>::NormDiffL1Masked(const ImageView<T> &aSrc2, same_vector_size_
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
 
     postOp(aDst);
 }
@@ -1149,9 +1149,9 @@ void ImageView<T>::NormDiffL2(const ImageView<T> &aSrc2, same_vector_size_differ
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL2<SrcT, ComputeT>>;
+    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL2<SrcT, ComputeT>>;
 
-    const opp::NormDiffL2<SrcT, ComputeT> op;
+    const mpp::NormDiffL2<SrcT, ComputeT> op;
 
     const normL2SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -1159,8 +1159,8 @@ void ImageView<T>::NormDiffL2(const ImageView<T> &aSrc2, same_vector_size_differ
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::SqrtPostOp<DstT> postOp;
-    const opp::SumThenSqrtScalar<DstT> postOpScalar;
+    const mpp::SqrtPostOp<DstT> postOp;
+    const mpp::SumThenSqrtScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -1179,9 +1179,9 @@ void ImageView<T>::NormDiffL2Masked(const ImageView<T> &aSrc2, same_vector_size_
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL2<SrcT, ComputeT>>;
+    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL2<SrcT, ComputeT>>;
 
-    const opp::NormDiffL2<SrcT, ComputeT> op;
+    const mpp::NormDiffL2<SrcT, ComputeT> op;
 
     const normL2SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -1189,8 +1189,8 @@ void ImageView<T>::NormDiffL2Masked(const ImageView<T> &aSrc2, same_vector_size_
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::SqrtPostOp<DstT> postOp;
-    const opp::SumThenSqrtScalar<DstT> postOpScalar;
+    const mpp::SqrtPostOp<DstT> postOp;
+    const mpp::SumThenSqrtScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -1206,9 +1206,9 @@ void ImageView<T>::NormDiffL2(const ImageView<T> &aSrc2, same_vector_size_differ
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL2<SrcT, ComputeT>>;
+    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL2<SrcT, ComputeT>>;
 
-    const opp::NormDiffL2<SrcT, ComputeT> op;
+    const mpp::NormDiffL2<SrcT, ComputeT> op;
 
     const normL2SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -1216,7 +1216,7 @@ void ImageView<T>::NormDiffL2(const ImageView<T> &aSrc2, same_vector_size_differ
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::SqrtPostOp<DstT> postOp;
+    const mpp::SqrtPostOp<DstT> postOp;
     postOp(aDst);
 }
 
@@ -1233,9 +1233,9 @@ void ImageView<T>::NormDiffL2Masked(const ImageView<T> &aSrc2, same_vector_size_
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL2<SrcT, ComputeT>>;
+    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL2<SrcT, ComputeT>>;
 
-    const opp::NormDiffL2<SrcT, ComputeT> op;
+    const mpp::NormDiffL2<SrcT, ComputeT> op;
 
     const normL2SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -1243,7 +1243,7 @@ void ImageView<T>::NormDiffL2Masked(const ImageView<T> &aSrc2, same_vector_size_
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::SqrtPostOp<DstT> postOp;
+    const mpp::SqrtPostOp<DstT> postOp;
 
     postOp(aDst);
 }
@@ -1261,11 +1261,11 @@ void ImageView<T>::NormRelInf(const ImageView<T> &aSrc2, same_vector_size_differ
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normInfSrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, opp::NormRelInf<SrcT, ComputeT>,
-                                                  opp::NormInf<SrcT, ComputeT>>;
+    using normInfSrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, mpp::NormRelInf<SrcT, ComputeT>,
+                                                  mpp::NormInf<SrcT, ComputeT>>;
 
-    const opp::NormRelInf<SrcT, ComputeT> op1;
-    const opp::NormInf<SrcT, ComputeT> op2;
+    const mpp::NormRelInf<SrcT, ComputeT> op1;
+    const mpp::NormInf<SrcT, ComputeT> op2;
 
     const normInfSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op1, op2);
 
@@ -1275,8 +1275,8 @@ void ImageView<T>::NormRelInf(const ImageView<T> &aSrc2, same_vector_size_differ
     reduction(SizeRoi(), dst1, dst2, functor);
 
     // ignore result1 as only the second is a meaningful output for NormRel
-    const opp::NormRelInfPost<DstT> postOp2;
-    const opp::NormRelInfPost<DstT> postOpScalar2;
+    const mpp::NormRelInfPost<DstT> postOp2;
+    const mpp::NormRelInfPost<DstT> postOpScalar2;
 
     postOpScalar2(dst1, dst2, aDstScalar);
 
@@ -1296,11 +1296,11 @@ void ImageView<T>::NormRelInfMasked(const ImageView<T> &aSrc2, same_vector_size_
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normInfSrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, opp::NormRelInf<SrcT, ComputeT>,
-                                                  opp::NormInf<SrcT, ComputeT>>;
+    using normInfSrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, mpp::NormRelInf<SrcT, ComputeT>,
+                                                  mpp::NormInf<SrcT, ComputeT>>;
 
-    const opp::NormRelInf<SrcT, ComputeT> op1;
-    const opp::NormInf<SrcT, ComputeT> op2;
+    const mpp::NormRelInf<SrcT, ComputeT> op1;
+    const mpp::NormInf<SrcT, ComputeT> op2;
 
     const normInfSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op1, op2);
 
@@ -1310,8 +1310,8 @@ void ImageView<T>::NormRelInfMasked(const ImageView<T> &aSrc2, same_vector_size_
     reduction(aMask, SizeRoi(), dst1, dst2, functor);
 
     // ignore result1 as only the second is a meaningful output for NormRel
-    const opp::NormRelInfPost<DstT> postOp2;
-    const opp::NormRelInfPost<DstT> postOpScalar2;
+    const mpp::NormRelInfPost<DstT> postOp2;
+    const mpp::NormRelInfPost<DstT> postOpScalar2;
 
     postOpScalar2(dst1, dst2, aDstScalar);
     postOp2(dst1, dst2, aDst);
@@ -1328,11 +1328,11 @@ void ImageView<T>::NormRelInf(const ImageView<T> &aSrc2, same_vector_size_differ
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normInfSrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, opp::NormRelInf<SrcT, ComputeT>,
-                                                  opp::NormInf<SrcT, ComputeT>>;
+    using normInfSrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, mpp::NormRelInf<SrcT, ComputeT>,
+                                                  mpp::NormInf<SrcT, ComputeT>>;
 
-    const opp::NormRelInf<SrcT, ComputeT> op1;
-    const opp::NormInf<SrcT, ComputeT> op2;
+    const mpp::NormRelInf<SrcT, ComputeT> op1;
+    const mpp::NormInf<SrcT, ComputeT> op2;
 
     const normInfSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op1, op2);
 
@@ -1342,7 +1342,7 @@ void ImageView<T>::NormRelInf(const ImageView<T> &aSrc2, same_vector_size_differ
     reduction(SizeRoi(), dst1, dst2, functor);
 
     // ignore result1 as only the second is a meaningful output for NormRel
-    const opp::NormRelInfPost<DstT> postOp2;
+    const mpp::NormRelInfPost<DstT> postOp2;
 
     postOp2(dst1, dst2, aDst);
 }
@@ -1360,11 +1360,11 @@ void ImageView<T>::NormRelInfMasked(const ImageView<T> &aSrc2, same_vector_size_
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normInfSrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, opp::NormRelInf<SrcT, ComputeT>,
-                                                  opp::NormInf<SrcT, ComputeT>>;
+    using normInfSrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, mpp::NormRelInf<SrcT, ComputeT>,
+                                                  mpp::NormInf<SrcT, ComputeT>>;
 
-    const opp::NormRelInf<SrcT, ComputeT> op1;
-    const opp::NormInf<SrcT, ComputeT> op2;
+    const mpp::NormRelInf<SrcT, ComputeT> op1;
+    const mpp::NormInf<SrcT, ComputeT> op2;
 
     const normInfSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op1, op2);
 
@@ -1374,7 +1374,7 @@ void ImageView<T>::NormRelInfMasked(const ImageView<T> &aSrc2, same_vector_size_
     reduction(aMask, SizeRoi(), dst1, dst2, functor);
 
     // ignore result1 as only the second is a meaningful output for NormRel
-    const opp::NormRelInfPost<DstT> postOp2;
+    const mpp::NormRelInfPost<DstT> postOp2;
 
     postOp2(dst1, dst2, aDst);
 }
@@ -1392,11 +1392,11 @@ void ImageView<T>::NormRelL1(const ImageView<T> &aSrc2, same_vector_size_differe
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL1SrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, opp::NormRelL1<SrcT, ComputeT>,
-                                                 opp::NormL1<SrcT, ComputeT>>;
+    using normL1SrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, mpp::NormRelL1<SrcT, ComputeT>,
+                                                 mpp::NormL1<SrcT, ComputeT>>;
 
-    const opp::NormRelL1<SrcT, ComputeT> op1;
-    const opp::NormL1<SrcT, ComputeT> op2;
+    const mpp::NormRelL1<SrcT, ComputeT> op1;
+    const mpp::NormL1<SrcT, ComputeT> op2;
 
     const normL1SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op1, op2);
 
@@ -1406,8 +1406,8 @@ void ImageView<T>::NormRelL1(const ImageView<T> &aSrc2, same_vector_size_differe
     reduction(SizeRoi(), dst1, dst2, functor);
 
     // ignore result1 as only the second is a meaningful output for NormRel
-    const opp::NormRelL1Post<DstT> postOp2;
-    const opp::NormRelL1Post<DstT> postOpScalar2;
+    const mpp::NormRelL1Post<DstT> postOp2;
+    const mpp::NormRelL1Post<DstT> postOpScalar2;
 
     postOpScalar2(dst1, dst2, aDstScalar);
     postOp2(dst1, dst2, aDst);
@@ -1426,11 +1426,11 @@ void ImageView<T>::NormRelL1Masked(const ImageView<T> &aSrc2, same_vector_size_d
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL1SrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, opp::NormRelL1<SrcT, ComputeT>,
-                                                 opp::NormL1<SrcT, ComputeT>>;
+    using normL1SrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, mpp::NormRelL1<SrcT, ComputeT>,
+                                                 mpp::NormL1<SrcT, ComputeT>>;
 
-    const opp::NormRelL1<SrcT, ComputeT> op1;
-    const opp::NormL1<SrcT, ComputeT> op2;
+    const mpp::NormRelL1<SrcT, ComputeT> op1;
+    const mpp::NormL1<SrcT, ComputeT> op2;
 
     const normL1SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op1, op2);
 
@@ -1440,8 +1440,8 @@ void ImageView<T>::NormRelL1Masked(const ImageView<T> &aSrc2, same_vector_size_d
     reduction(aMask, SizeRoi(), dst1, dst2, functor);
 
     // ignore result1 as only the second is a meaningful output for NormRel
-    const opp::NormRelL1Post<DstT> postOp2;
-    const opp::NormRelL1Post<DstT> postOpScalar2;
+    const mpp::NormRelL1Post<DstT> postOp2;
+    const mpp::NormRelL1Post<DstT> postOpScalar2;
 
     postOpScalar2(dst1, dst2, aDstScalar);
     postOp2(dst1, dst2, aDst);
@@ -1458,11 +1458,11 @@ void ImageView<T>::NormRelL1(const ImageView<T> &aSrc2, same_vector_size_differe
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL1SrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, opp::NormRelL1<SrcT, ComputeT>,
-                                                 opp::NormL1<SrcT, ComputeT>>;
+    using normL1SrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, mpp::NormRelL1<SrcT, ComputeT>,
+                                                 mpp::NormL1<SrcT, ComputeT>>;
 
-    const opp::NormRelL1<SrcT, ComputeT> op1;
-    const opp::NormL1<SrcT, ComputeT> op2;
+    const mpp::NormRelL1<SrcT, ComputeT> op1;
+    const mpp::NormL1<SrcT, ComputeT> op2;
 
     const normL1SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op1, op2);
 
@@ -1472,7 +1472,7 @@ void ImageView<T>::NormRelL1(const ImageView<T> &aSrc2, same_vector_size_differe
     reduction(SizeRoi(), dst1, dst2, functor);
 
     // ignore result1 as only the second is a meaningful output for NormRel
-    const opp::NormRelL1Post<DstT> postOp2;
+    const mpp::NormRelL1Post<DstT> postOp2;
 
     postOp2(dst1, dst2, aDst);
 }
@@ -1490,11 +1490,11 @@ void ImageView<T>::NormRelL1Masked(const ImageView<T> &aSrc2, same_vector_size_d
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL1SrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, opp::NormRelL1<SrcT, ComputeT>,
-                                                 opp::NormL1<SrcT, ComputeT>>;
+    using normL1SrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, mpp::NormRelL1<SrcT, ComputeT>,
+                                                 mpp::NormL1<SrcT, ComputeT>>;
 
-    const opp::NormRelL1<SrcT, ComputeT> op1;
-    const opp::NormL1<SrcT, ComputeT> op2;
+    const mpp::NormRelL1<SrcT, ComputeT> op1;
+    const mpp::NormL1<SrcT, ComputeT> op2;
 
     const normL1SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op1, op2);
 
@@ -1504,7 +1504,7 @@ void ImageView<T>::NormRelL1Masked(const ImageView<T> &aSrc2, same_vector_size_d
     reduction(aMask, SizeRoi(), dst1, dst2, functor);
 
     // ignore result1 as only the second is a meaningful output for NormRel
-    const opp::NormRelL1Post<DstT> postOp2;
+    const mpp::NormRelL1Post<DstT> postOp2;
 
     postOp2(dst1, dst2, aDst);
 }
@@ -1522,11 +1522,11 @@ void ImageView<T>::NormRelL2(const ImageView<T> &aSrc2, same_vector_size_differe
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2SrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, opp::NormRelL2<SrcT, ComputeT>,
-                                                 opp::NormL2<SrcT, ComputeT>>;
+    using normL2SrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, mpp::NormRelL2<SrcT, ComputeT>,
+                                                 mpp::NormL2<SrcT, ComputeT>>;
 
-    const opp::NormRelL2<SrcT, ComputeT> op1;
-    const opp::NormL2<SrcT, ComputeT> op2;
+    const mpp::NormRelL2<SrcT, ComputeT> op1;
+    const mpp::NormL2<SrcT, ComputeT> op2;
 
     const normL2SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op1, op2);
 
@@ -1536,8 +1536,8 @@ void ImageView<T>::NormRelL2(const ImageView<T> &aSrc2, same_vector_size_differe
     reduction(SizeRoi(), dst1, dst2, functor);
 
     // ignore result1 as only the second is a meaningful output for NormRel
-    const opp::NormRelL2Post<DstT> postOp2;
-    const opp::NormRelL2Post<DstT> postOpScalar2;
+    const mpp::NormRelL2Post<DstT> postOp2;
+    const mpp::NormRelL2Post<DstT> postOpScalar2;
 
     postOpScalar2(dst1, dst2, aDstScalar);
     postOp2(dst1, dst2, aDst);
@@ -1556,11 +1556,11 @@ void ImageView<T>::NormRelL2Masked(const ImageView<T> &aSrc2, same_vector_size_d
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2SrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, opp::NormRelL2<SrcT, ComputeT>,
-                                                 opp::NormL2<SrcT, ComputeT>>;
+    using normL2SrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, mpp::NormRelL2<SrcT, ComputeT>,
+                                                 mpp::NormL2<SrcT, ComputeT>>;
 
-    const opp::NormRelL2<SrcT, ComputeT> op1;
-    const opp::NormL2<SrcT, ComputeT> op2;
+    const mpp::NormRelL2<SrcT, ComputeT> op1;
+    const mpp::NormL2<SrcT, ComputeT> op2;
 
     const normL2SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op1, op2);
 
@@ -1570,8 +1570,8 @@ void ImageView<T>::NormRelL2Masked(const ImageView<T> &aSrc2, same_vector_size_d
     reduction(aMask, SizeRoi(), dst1, dst2, functor);
 
     // ignore result1 as only the second is a meaningful output for NormRel
-    const opp::NormRelL2Post<DstT> postOp2;
-    const opp::NormRelL2Post<DstT> postOpScalar2;
+    const mpp::NormRelL2Post<DstT> postOp2;
+    const mpp::NormRelL2Post<DstT> postOpScalar2;
 
     postOpScalar2(dst1, dst2, aDstScalar);
     postOp2(dst1, dst2, aDst);
@@ -1588,11 +1588,11 @@ void ImageView<T>::NormRelL2(const ImageView<T> &aSrc2, same_vector_size_differe
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2SrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, opp::NormRelL2<SrcT, ComputeT>,
-                                                 opp::NormL2<SrcT, ComputeT>>;
+    using normL2SrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, mpp::NormRelL2<SrcT, ComputeT>,
+                                                 mpp::NormL2<SrcT, ComputeT>>;
 
-    const opp::NormRelL2<SrcT, ComputeT> op1;
-    const opp::NormL2<SrcT, ComputeT> op2;
+    const mpp::NormRelL2<SrcT, ComputeT> op1;
+    const mpp::NormL2<SrcT, ComputeT> op2;
 
     const normL2SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op1, op2);
 
@@ -1602,7 +1602,7 @@ void ImageView<T>::NormRelL2(const ImageView<T> &aSrc2, same_vector_size_differe
     reduction(SizeRoi(), dst1, dst2, functor);
 
     // ignore result1 as only the second is a meaningful output for NormRel
-    const opp::NormRelL2Post<DstT> postOp2;
+    const mpp::NormRelL2Post<DstT> postOp2;
 
     postOp2(dst1, dst2, aDst);
 }
@@ -1620,11 +1620,11 @@ void ImageView<T>::NormRelL2Masked(const ImageView<T> &aSrc2, same_vector_size_d
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2SrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, opp::NormRelL2<SrcT, ComputeT>,
-                                                 opp::NormL2<SrcT, ComputeT>>;
+    using normL2SrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, mpp::NormRelL2<SrcT, ComputeT>,
+                                                 mpp::NormL2<SrcT, ComputeT>>;
 
-    const opp::NormRelL2<SrcT, ComputeT> op1;
-    const opp::NormL2<SrcT, ComputeT> op2;
+    const mpp::NormRelL2<SrcT, ComputeT> op1;
+    const mpp::NormL2<SrcT, ComputeT> op2;
 
     const normL2SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op1, op2);
 
@@ -1634,7 +1634,7 @@ void ImageView<T>::NormRelL2Masked(const ImageView<T> &aSrc2, same_vector_size_d
     reduction(aMask, SizeRoi(), dst1, dst2, functor);
 
     // ignore result1 as only the second is a meaningful output for NormRel
-    const opp::NormRelL2Post<DstT> postOp2;
+    const mpp::NormRelL2Post<DstT> postOp2;
     postOp2(dst1, dst2, aDst);
 }
 #pragma endregion
@@ -1651,9 +1651,9 @@ void ImageView<T>::PSNR(const ImageView<T> &aSrc2, same_vector_size_different_ty
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL2<SrcT, ComputeT>>;
+    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL2<SrcT, ComputeT>>;
 
-    const opp::NormDiffL2<SrcT, ComputeT> op;
+    const mpp::NormDiffL2<SrcT, ComputeT> op;
 
     const normL2SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -1661,8 +1661,8 @@ void ImageView<T>::PSNR(const ImageView<T> &aSrc2, same_vector_size_different_ty
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::PSNR<DstT> postOp(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()), aValueRange);
-    const opp::PSNRScalar<DstT> postOpScalar(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()), aValueRange);
+    const mpp::PSNR<DstT> postOp(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()), aValueRange);
+    const mpp::PSNRScalar<DstT> postOpScalar(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()), aValueRange);
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -1680,9 +1680,9 @@ void ImageView<T>::PSNR(const ImageView<T> &aSrc2, same_vector_size_different_ty
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL2<SrcT, ComputeT>>;
+    using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL2<SrcT, ComputeT>>;
 
-    const opp::NormDiffL2<SrcT, ComputeT> op;
+    const mpp::NormDiffL2<SrcT, ComputeT> op;
 
     const normL2SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
@@ -1690,7 +1690,7 @@ void ImageView<T>::PSNR(const ImageView<T> &aSrc2, same_vector_size_different_ty
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::PSNR<DstT> postOp(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()), aValueRange);
+    const mpp::PSNR<DstT> postOp(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()), aValueRange);
 
     postOp(aDst);
 }
@@ -1706,9 +1706,9 @@ void ImageView<T>::NormInf(same_vector_size_different_type_t<T, double> &aDst, d
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normInfSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormInf<SrcT, ComputeT>>;
+    using normInfSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormInf<SrcT, ComputeT>>;
 
-    const opp::NormInf<SrcT, ComputeT> op;
+    const mpp::NormInf<SrcT, ComputeT> op;
 
     const normInfSrc functor(PointerRoi(), Pitch(), op);
 
@@ -1716,8 +1716,8 @@ void ImageView<T>::NormInf(same_vector_size_different_type_t<T, double> &aDst, d
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
-    const opp::MaxScalar<DstT> postOpScalar;
+    const mpp::Nothing<DstT> postOp;
+    const mpp::MaxScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -1735,9 +1735,9 @@ void ImageView<T>::NormInfMasked(same_vector_size_different_type_t<T, double> &a
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normInfSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormInf<SrcT, ComputeT>>;
+    using normInfSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormInf<SrcT, ComputeT>>;
 
-    const opp::NormInf<SrcT, ComputeT> op;
+    const mpp::NormInf<SrcT, ComputeT> op;
 
     const normInfSrc functor(PointerRoi(), Pitch(), op);
 
@@ -1745,8 +1745,8 @@ void ImageView<T>::NormInfMasked(same_vector_size_different_type_t<T, double> &a
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
-    const opp::MaxScalar<DstT> postOpScalar;
+    const mpp::Nothing<DstT> postOp;
+    const mpp::MaxScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -1761,9 +1761,9 @@ void ImageView<T>::NormInf(same_vector_size_different_type_t<T, double> &aDst) c
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normInfSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormInf<SrcT, ComputeT>>;
+    using normInfSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormInf<SrcT, ComputeT>>;
 
-    const opp::NormInf<SrcT, ComputeT> op;
+    const mpp::NormInf<SrcT, ComputeT> op;
 
     const normInfSrc functor(PointerRoi(), Pitch(), op);
 
@@ -1771,7 +1771,7 @@ void ImageView<T>::NormInf(same_vector_size_different_type_t<T, double> &aDst) c
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
 
     postOp(aDst);
 }
@@ -1788,9 +1788,9 @@ void ImageView<T>::NormInfMasked(same_vector_size_different_type_t<T, double> &a
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normInfSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormInf<SrcT, ComputeT>>;
+    using normInfSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormInf<SrcT, ComputeT>>;
 
-    const opp::NormInf<SrcT, ComputeT> op;
+    const mpp::NormInf<SrcT, ComputeT> op;
 
     const normInfSrc functor(PointerRoi(), Pitch(), op);
 
@@ -1798,7 +1798,7 @@ void ImageView<T>::NormInfMasked(same_vector_size_different_type_t<T, double> &a
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
 
     postOp(aDst);
 }
@@ -1814,9 +1814,9 @@ void ImageView<T>::NormL1(same_vector_size_different_type_t<T, double> &aDst, do
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL1Src = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormL1<SrcT, ComputeT>>;
+    using normL1Src = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormL1<SrcT, ComputeT>>;
 
-    const opp::NormL1<SrcT, ComputeT> op;
+    const mpp::NormL1<SrcT, ComputeT> op;
 
     const normL1Src functor(PointerRoi(), Pitch(), op);
 
@@ -1824,8 +1824,8 @@ void ImageView<T>::NormL1(same_vector_size_different_type_t<T, double> &aDst, do
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
-    const opp::SumScalar<DstT> postOpScalar;
+    const mpp::Nothing<DstT> postOp;
+    const mpp::SumScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -1843,9 +1843,9 @@ void ImageView<T>::NormL1Masked(same_vector_size_different_type_t<T, double> &aD
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL1Src = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormL1<SrcT, ComputeT>>;
+    using normL1Src = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormL1<SrcT, ComputeT>>;
 
-    const opp::NormL1<SrcT, ComputeT> op;
+    const mpp::NormL1<SrcT, ComputeT> op;
 
     const normL1Src functor(PointerRoi(), Pitch(), op);
 
@@ -1853,8 +1853,8 @@ void ImageView<T>::NormL1Masked(same_vector_size_different_type_t<T, double> &aD
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
-    const opp::SumScalar<DstT> postOpScalar;
+    const mpp::Nothing<DstT> postOp;
+    const mpp::SumScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -1869,9 +1869,9 @@ void ImageView<T>::NormL1(same_vector_size_different_type_t<T, double> &aDst) co
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL1Src = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormL1<SrcT, ComputeT>>;
+    using normL1Src = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormL1<SrcT, ComputeT>>;
 
-    const opp::NormL1<SrcT, ComputeT> op;
+    const mpp::NormL1<SrcT, ComputeT> op;
 
     const normL1Src functor(PointerRoi(), Pitch(), op);
 
@@ -1879,7 +1879,7 @@ void ImageView<T>::NormL1(same_vector_size_different_type_t<T, double> &aDst) co
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
 
     postOp(aDst);
 }
@@ -1896,9 +1896,9 @@ void ImageView<T>::NormL1Masked(same_vector_size_different_type_t<T, double> &aD
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL1Src = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormL1<SrcT, ComputeT>>;
+    using normL1Src = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormL1<SrcT, ComputeT>>;
 
-    const opp::NormL1<SrcT, ComputeT> op;
+    const mpp::NormL1<SrcT, ComputeT> op;
 
     const normL1Src functor(PointerRoi(), Pitch(), op);
 
@@ -1906,7 +1906,7 @@ void ImageView<T>::NormL1Masked(same_vector_size_different_type_t<T, double> &aD
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
 
     postOp(aDst);
 }
@@ -1921,9 +1921,9 @@ void ImageView<T>::NormL2(same_vector_size_different_type_t<T, double> &aDst, do
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2Src = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormL2<SrcT, ComputeT>>;
+    using normL2Src = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormL2<SrcT, ComputeT>>;
 
-    const opp::NormL2<SrcT, ComputeT> op;
+    const mpp::NormL2<SrcT, ComputeT> op;
 
     const normL2Src functor(PointerRoi(), Pitch(), op);
 
@@ -1931,8 +1931,8 @@ void ImageView<T>::NormL2(same_vector_size_different_type_t<T, double> &aDst, do
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::SqrtPostOp<DstT> postOp;
-    const opp::SumThenSqrtScalar<DstT> postOpScalar;
+    const mpp::SqrtPostOp<DstT> postOp;
+    const mpp::SumThenSqrtScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -1950,9 +1950,9 @@ void ImageView<T>::NormL2Masked(same_vector_size_different_type_t<T, double> &aD
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2Src = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormL2<SrcT, ComputeT>>;
+    using normL2Src = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormL2<SrcT, ComputeT>>;
 
-    const opp::NormL2<SrcT, ComputeT> op;
+    const mpp::NormL2<SrcT, ComputeT> op;
 
     const normL2Src functor(PointerRoi(), Pitch(), op);
 
@@ -1960,8 +1960,8 @@ void ImageView<T>::NormL2Masked(same_vector_size_different_type_t<T, double> &aD
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::SqrtPostOp<DstT> postOp;
-    const opp::SumThenSqrtScalar<DstT> postOpScalar;
+    const mpp::SqrtPostOp<DstT> postOp;
+    const mpp::SumThenSqrtScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -1976,9 +1976,9 @@ void ImageView<T>::NormL2(same_vector_size_different_type_t<T, double> &aDst) co
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2Src = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormL2<SrcT, ComputeT>>;
+    using normL2Src = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormL2<SrcT, ComputeT>>;
 
-    const opp::NormL2<SrcT, ComputeT> op;
+    const mpp::NormL2<SrcT, ComputeT> op;
 
     const normL2Src functor(PointerRoi(), Pitch(), op);
 
@@ -1986,7 +1986,7 @@ void ImageView<T>::NormL2(same_vector_size_different_type_t<T, double> &aDst) co
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::SqrtPostOp<DstT> postOp;
+    const mpp::SqrtPostOp<DstT> postOp;
 
     postOp(aDst);
 }
@@ -2003,9 +2003,9 @@ void ImageView<T>::NormL2Masked(same_vector_size_different_type_t<T, double> &aD
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using normL2Src = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormL2<SrcT, ComputeT>>;
+    using normL2Src = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormL2<SrcT, ComputeT>>;
 
-    const opp::NormL2<SrcT, ComputeT> op;
+    const mpp::NormL2<SrcT, ComputeT> op;
 
     const normL2Src functor(PointerRoi(), Pitch(), op);
 
@@ -2013,7 +2013,7 @@ void ImageView<T>::NormL2Masked(same_vector_size_different_type_t<T, double> &aD
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::SqrtPostOp<DstT> postOp;
+    const mpp::SqrtPostOp<DstT> postOp;
 
     postOp(aDst);
 }
@@ -2029,9 +2029,9 @@ void ImageView<T>::Sum(same_vector_size_different_type_t<T, double> &aDst, doubl
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::Sum<SrcT, ComputeT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::Sum<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op;
+    const mpp::Sum<SrcT, ComputeT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -2039,8 +2039,8 @@ void ImageView<T>::Sum(same_vector_size_different_type_t<T, double> &aDst, doubl
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
-    const opp::SumScalar<DstT> postOpScalar;
+    const mpp::Nothing<DstT> postOp;
+    const mpp::SumScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -2054,9 +2054,9 @@ void ImageView<T>::Sum(same_vector_size_different_type_t<T, c_double> &aDst, c_d
     using DstT                 = same_vector_size_different_type_t<T, c_double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::Sum<SrcT, ComputeT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::Sum<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op;
+    const mpp::Sum<SrcT, ComputeT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -2064,8 +2064,8 @@ void ImageView<T>::Sum(same_vector_size_different_type_t<T, c_double> &aDst, c_d
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
-    const opp::SumScalar<DstT> postOpScalar;
+    const mpp::Nothing<DstT> postOp;
+    const mpp::SumScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -2083,9 +2083,9 @@ void ImageView<T>::SumMasked(same_vector_size_different_type_t<T, double> &aDst,
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::Sum<SrcT, ComputeT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::Sum<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op;
+    const mpp::Sum<SrcT, ComputeT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -2093,8 +2093,8 @@ void ImageView<T>::SumMasked(same_vector_size_different_type_t<T, double> &aDst,
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
-    const opp::SumScalar<DstT> postOpScalar;
+    const mpp::Nothing<DstT> postOp;
+    const mpp::SumScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -2111,9 +2111,9 @@ void ImageView<T>::SumMasked(same_vector_size_different_type_t<T, c_double> &aDs
     using DstT                 = same_vector_size_different_type_t<T, c_double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::Sum<SrcT, ComputeT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::Sum<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op;
+    const mpp::Sum<SrcT, ComputeT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -2121,8 +2121,8 @@ void ImageView<T>::SumMasked(same_vector_size_different_type_t<T, c_double> &aDs
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
-    const opp::SumScalar<DstT> postOpScalar;
+    const mpp::Nothing<DstT> postOp;
+    const mpp::SumScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -2137,9 +2137,9 @@ void ImageView<T>::Sum(same_vector_size_different_type_t<T, double> &aDst) const
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::Sum<SrcT, ComputeT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::Sum<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op;
+    const mpp::Sum<SrcT, ComputeT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -2147,7 +2147,7 @@ void ImageView<T>::Sum(same_vector_size_different_type_t<T, double> &aDst) const
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
 
     postOp(aDst);
 }
@@ -2160,9 +2160,9 @@ void ImageView<T>::Sum(same_vector_size_different_type_t<T, c_double> &aDst) con
     using DstT                 = same_vector_size_different_type_t<T, c_double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::Sum<SrcT, ComputeT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::Sum<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op;
+    const mpp::Sum<SrcT, ComputeT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -2170,7 +2170,7 @@ void ImageView<T>::Sum(same_vector_size_different_type_t<T, c_double> &aDst) con
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
 
     postOp(aDst);
 }
@@ -2187,9 +2187,9 @@ void ImageView<T>::SumMasked(same_vector_size_different_type_t<T, double> &aDst,
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::Sum<SrcT, ComputeT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::Sum<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op;
+    const mpp::Sum<SrcT, ComputeT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -2197,7 +2197,7 @@ void ImageView<T>::SumMasked(same_vector_size_different_type_t<T, double> &aDst,
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
 
     postOp(aDst);
 }
@@ -2213,9 +2213,9 @@ void ImageView<T>::SumMasked(same_vector_size_different_type_t<T, c_double> &aDs
     using DstT                 = same_vector_size_different_type_t<T, c_double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::Sum<SrcT, ComputeT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::Sum<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op;
+    const mpp::Sum<SrcT, ComputeT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -2223,7 +2223,7 @@ void ImageView<T>::SumMasked(same_vector_size_different_type_t<T, c_double> &aDs
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
 
     postOp(aDst);
 }
@@ -2239,9 +2239,9 @@ void ImageView<T>::Mean(same_vector_size_different_type_t<T, double> &aDst, doub
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::Sum<SrcT, ComputeT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::Sum<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op;
+    const mpp::Sum<SrcT, ComputeT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -2249,8 +2249,8 @@ void ImageView<T>::Mean(same_vector_size_different_type_t<T, double> &aDst, doub
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(SizeRoi().TotalSize()));
-    const opp::DivScalar<DstT> postOpScalar(
+    const mpp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(SizeRoi().TotalSize()));
+    const mpp::DivScalar<DstT> postOpScalar(
         static_cast<complex_basetype_t<remove_vector_t<DstT>>>(SizeRoi().TotalSize()));
 
     aDstScalar = postOpScalar(aDst);
@@ -2265,9 +2265,9 @@ void ImageView<T>::Mean(same_vector_size_different_type_t<T, c_double> &aDst, c_
     using DstT                 = same_vector_size_different_type_t<T, c_double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::Sum<SrcT, ComputeT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::Sum<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op;
+    const mpp::Sum<SrcT, ComputeT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -2275,8 +2275,8 @@ void ImageView<T>::Mean(same_vector_size_different_type_t<T, c_double> &aDst, c_
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(SizeRoi().TotalSize()));
-    const opp::DivScalar<DstT> postOpScalar(
+    const mpp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(SizeRoi().TotalSize()));
+    const mpp::DivScalar<DstT> postOpScalar(
         static_cast<complex_basetype_t<remove_vector_t<DstT>>>(SizeRoi().TotalSize()));
 
     aDstScalar = postOpScalar(aDst);
@@ -2295,9 +2295,9 @@ void ImageView<T>::MeanMasked(same_vector_size_different_type_t<T, double> &aDst
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::Sum<SrcT, ComputeT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::Sum<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op;
+    const mpp::Sum<SrcT, ComputeT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -2305,8 +2305,8 @@ void ImageView<T>::MeanMasked(same_vector_size_different_type_t<T, double> &aDst
 
     const size_t maskpixels = reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(maskpixels));
-    const opp::DivScalar<DstT> postOpScalar(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(maskpixels));
+    const mpp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(maskpixels));
+    const mpp::DivScalar<DstT> postOpScalar(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(maskpixels));
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -2324,9 +2324,9 @@ void ImageView<T>::MeanMasked(same_vector_size_different_type_t<T, c_double> &aD
     using DstT                 = same_vector_size_different_type_t<T, c_double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::Sum<SrcT, ComputeT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::Sum<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op;
+    const mpp::Sum<SrcT, ComputeT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -2334,8 +2334,8 @@ void ImageView<T>::MeanMasked(same_vector_size_different_type_t<T, c_double> &aD
 
     const size_t maskpixels = reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(maskpixels));
-    const opp::DivScalar<DstT> postOpScalar(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(maskpixels));
+    const mpp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(maskpixels));
+    const mpp::DivScalar<DstT> postOpScalar(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(maskpixels));
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -2350,9 +2350,9 @@ void ImageView<T>::Mean(same_vector_size_different_type_t<T, double> &aDst) cons
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::Sum<SrcT, ComputeT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::Sum<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op;
+    const mpp::Sum<SrcT, ComputeT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -2360,7 +2360,7 @@ void ImageView<T>::Mean(same_vector_size_different_type_t<T, double> &aDst) cons
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(SizeRoi().TotalSize()));
+    const mpp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(SizeRoi().TotalSize()));
 
     postOp(aDst);
 }
@@ -2373,9 +2373,9 @@ void ImageView<T>::Mean(same_vector_size_different_type_t<T, c_double> &aDst) co
     using DstT                 = same_vector_size_different_type_t<T, c_double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::Sum<SrcT, ComputeT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::Sum<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op;
+    const mpp::Sum<SrcT, ComputeT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -2383,7 +2383,7 @@ void ImageView<T>::Mean(same_vector_size_different_type_t<T, c_double> &aDst) co
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(SizeRoi().TotalSize()));
+    const mpp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(SizeRoi().TotalSize()));
 
     postOp(aDst);
 }
@@ -2400,9 +2400,9 @@ void ImageView<T>::MeanMasked(same_vector_size_different_type_t<T, double> &aDst
     using DstT                 = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::Sum<SrcT, ComputeT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::Sum<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op;
+    const mpp::Sum<SrcT, ComputeT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -2410,7 +2410,7 @@ void ImageView<T>::MeanMasked(same_vector_size_different_type_t<T, double> &aDst
 
     const size_t maskpixels = reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(maskpixels));
+    const mpp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(maskpixels));
 
     postOp(aDst);
 }
@@ -2427,9 +2427,9 @@ void ImageView<T>::MeanMasked(same_vector_size_different_type_t<T, c_double> &aD
     using DstT                 = same_vector_size_different_type_t<T, c_double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::Sum<SrcT, ComputeT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::Sum<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op;
+    const mpp::Sum<SrcT, ComputeT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -2437,7 +2437,7 @@ void ImageView<T>::MeanMasked(same_vector_size_different_type_t<T, c_double> &aD
 
     const size_t maskpixels = reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(maskpixels));
+    const mpp::DivPostOp<DstT> postOp(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(maskpixels));
 
     postOp(aDst);
 }
@@ -2457,11 +2457,11 @@ void ImageView<T>::MeanStd(same_vector_size_different_type_t<T, double> &aMean,
     using DstT2                = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSumSqrSrc = SrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, opp::Sum<SrcT, ComputeT>,
-                                              opp::SumSqr<SrcT, ComputeT>>;
+    using sumSumSqrSrc = SrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, mpp::Sum<SrcT, ComputeT>,
+                                              mpp::SumSqr<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op1;
-    const opp::SumSqr<SrcT, ComputeT> op2;
+    const mpp::Sum<SrcT, ComputeT> op1;
+    const mpp::SumSqr<SrcT, ComputeT> op2;
 
     const sumSumSqrSrc functor(PointerRoi(), Pitch(), op1, op2);
 
@@ -2470,11 +2470,11 @@ void ImageView<T>::MeanStd(same_vector_size_different_type_t<T, double> &aMean,
 
     reduction(SizeRoi(), aMean, sumSqr, functor);
 
-    const opp::DivPostOp<DstT1> postOp1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(SizeRoi().TotalSize()));
-    const opp::StdDeviation<DstT2> postOp2(static_cast<remove_vector_t<DstT2>>(SizeRoi().TotalSize()));
-    const opp::DivScalar<DstT1> postOpScalar1(
+    const mpp::DivPostOp<DstT1> postOp1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(SizeRoi().TotalSize()));
+    const mpp::StdDeviation<DstT2> postOp2(static_cast<remove_vector_t<DstT2>>(SizeRoi().TotalSize()));
+    const mpp::DivScalar<DstT1> postOpScalar1(
         static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(SizeRoi().TotalSize()));
-    const opp::StdDeviation<DstT2> postOpScalar2((static_cast<remove_vector_t<DstT2>>(SizeRoi().TotalSize())));
+    const mpp::StdDeviation<DstT2> postOpScalar2((static_cast<remove_vector_t<DstT2>>(SizeRoi().TotalSize())));
 
     postOpScalar2(aMean, sumSqr, aStdScalar);
     aMeanScalar = postOpScalar1(aMean);
@@ -2493,11 +2493,11 @@ void ImageView<T>::MeanStd(same_vector_size_different_type_t<T, c_double> &aMean
     using DstT2                = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSumSqrSrc = SrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, opp::Sum<SrcT, ComputeT>,
-                                              opp::SumSqr<SrcT, ComputeT>>;
+    using sumSumSqrSrc = SrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, mpp::Sum<SrcT, ComputeT>,
+                                              mpp::SumSqr<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op1;
-    const opp::SumSqr<SrcT, ComputeT> op2;
+    const mpp::Sum<SrcT, ComputeT> op1;
+    const mpp::SumSqr<SrcT, ComputeT> op2;
 
     const sumSumSqrSrc functor(PointerRoi(), Pitch(), op1, op2);
 
@@ -2506,11 +2506,11 @@ void ImageView<T>::MeanStd(same_vector_size_different_type_t<T, c_double> &aMean
 
     reduction(SizeRoi(), aMean, sumSqr, functor);
 
-    const opp::DivPostOp<DstT1> postOp1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(SizeRoi().TotalSize()));
-    const opp::StdDeviation<DstT2> postOp2(static_cast<remove_vector_t<DstT2>>(SizeRoi().TotalSize()));
-    const opp::DivScalar<DstT1> postOpScalar1(
+    const mpp::DivPostOp<DstT1> postOp1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(SizeRoi().TotalSize()));
+    const mpp::StdDeviation<DstT2> postOp2(static_cast<remove_vector_t<DstT2>>(SizeRoi().TotalSize()));
+    const mpp::DivScalar<DstT1> postOpScalar1(
         static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(SizeRoi().TotalSize()));
-    const opp::StdDeviation<DstT2> postOpScalar2((static_cast<remove_vector_t<DstT2>>(SizeRoi().TotalSize())));
+    const mpp::StdDeviation<DstT2> postOpScalar2((static_cast<remove_vector_t<DstT2>>(SizeRoi().TotalSize())));
 
     postOpScalar2(aMean, sumSqr, aStdScalar);
     aMeanScalar = postOpScalar1(aMean);
@@ -2533,11 +2533,11 @@ void ImageView<T>::MeanStdMasked(same_vector_size_different_type_t<T, double> &a
     using DstT2                = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSumSqrSrc = SrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, opp::Sum<SrcT, ComputeT>,
-                                              opp::SumSqr<SrcT, ComputeT>>;
+    using sumSumSqrSrc = SrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, mpp::Sum<SrcT, ComputeT>,
+                                              mpp::SumSqr<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op1;
-    const opp::SumSqr<SrcT, ComputeT> op2;
+    const mpp::Sum<SrcT, ComputeT> op1;
+    const mpp::SumSqr<SrcT, ComputeT> op2;
 
     const sumSumSqrSrc functor(PointerRoi(), Pitch(), op1, op2);
 
@@ -2546,10 +2546,10 @@ void ImageView<T>::MeanStdMasked(same_vector_size_different_type_t<T, double> &a
 
     const size_t maskpixels = reduction(aMask, SizeRoi(), aMean, sumSqr, functor);
 
-    const opp::DivPostOp<DstT1> postOp1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(maskpixels));
-    const opp::StdDeviation<DstT2> postOp2(static_cast<remove_vector_t<DstT2>>(maskpixels));
-    const opp::DivScalar<DstT1> postOpScalar1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(maskpixels));
-    const opp::StdDeviation<DstT2> postOpScalar2((static_cast<remove_vector_t<DstT2>>(maskpixels)));
+    const mpp::DivPostOp<DstT1> postOp1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(maskpixels));
+    const mpp::StdDeviation<DstT2> postOp2(static_cast<remove_vector_t<DstT2>>(maskpixels));
+    const mpp::DivScalar<DstT1> postOpScalar1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(maskpixels));
+    const mpp::StdDeviation<DstT2> postOpScalar2((static_cast<remove_vector_t<DstT2>>(maskpixels)));
 
     postOpScalar2(aMean, sumSqr, aStdScalar);
     aMeanScalar = postOpScalar1(aMean);
@@ -2570,11 +2570,11 @@ void ImageView<T>::MeanStdMasked(same_vector_size_different_type_t<T, c_double> 
     using DstT2                = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSumSqrSrc = SrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, opp::Sum<SrcT, ComputeT>,
-                                              opp::SumSqr<SrcT, ComputeT>>;
+    using sumSumSqrSrc = SrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, mpp::Sum<SrcT, ComputeT>,
+                                              mpp::SumSqr<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op1;
-    const opp::SumSqr<SrcT, ComputeT> op2;
+    const mpp::Sum<SrcT, ComputeT> op1;
+    const mpp::SumSqr<SrcT, ComputeT> op2;
 
     const sumSumSqrSrc functor(PointerRoi(), Pitch(), op1, op2);
 
@@ -2583,10 +2583,10 @@ void ImageView<T>::MeanStdMasked(same_vector_size_different_type_t<T, c_double> 
 
     const size_t maskpixels = reduction(aMask, SizeRoi(), aMean, sumSqr, functor);
 
-    const opp::DivPostOp<DstT1> postOp1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(maskpixels));
-    const opp::StdDeviation<DstT2> postOp2(static_cast<remove_vector_t<DstT2>>(maskpixels));
-    const opp::DivScalar<DstT1> postOpScalar1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(maskpixels));
-    const opp::StdDeviation<DstT2> postOpScalar2((static_cast<remove_vector_t<DstT2>>(maskpixels)));
+    const mpp::DivPostOp<DstT1> postOp1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(maskpixels));
+    const mpp::StdDeviation<DstT2> postOp2(static_cast<remove_vector_t<DstT2>>(maskpixels));
+    const mpp::DivScalar<DstT1> postOpScalar1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(maskpixels));
+    const mpp::StdDeviation<DstT2> postOpScalar2((static_cast<remove_vector_t<DstT2>>(maskpixels)));
 
     postOpScalar2(aMean, sumSqr, aStdScalar);
     aMeanScalar = postOpScalar1(aMean);
@@ -2605,11 +2605,11 @@ void ImageView<T>::MeanStd(same_vector_size_different_type_t<T, double> &aMean,
     using DstT2                = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSumSqrSrc = SrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, opp::Sum<SrcT, ComputeT>,
-                                              opp::SumSqr<SrcT, ComputeT>>;
+    using sumSumSqrSrc = SrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, mpp::Sum<SrcT, ComputeT>,
+                                              mpp::SumSqr<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op1;
-    const opp::SumSqr<SrcT, ComputeT> op2;
+    const mpp::Sum<SrcT, ComputeT> op1;
+    const mpp::SumSqr<SrcT, ComputeT> op2;
 
     const sumSumSqrSrc functor(PointerRoi(), Pitch(), op1, op2);
 
@@ -2618,8 +2618,8 @@ void ImageView<T>::MeanStd(same_vector_size_different_type_t<T, double> &aMean,
 
     reduction(SizeRoi(), aMean, sumSqr, functor);
 
-    const opp::DivPostOp<DstT1> postOp1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(SizeRoi().TotalSize()));
-    const opp::StdDeviation<DstT2> postOp2(static_cast<remove_vector_t<DstT2>>(SizeRoi().TotalSize()));
+    const mpp::DivPostOp<DstT1> postOp1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(SizeRoi().TotalSize()));
+    const mpp::StdDeviation<DstT2> postOp2(static_cast<remove_vector_t<DstT2>>(SizeRoi().TotalSize()));
 
     postOp2(aMean, sumSqr, aStd);
     postOp1(aMean);
@@ -2635,11 +2635,11 @@ void ImageView<T>::MeanStd(same_vector_size_different_type_t<T, c_double> &aMean
     using DstT2                = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSumSqrSrc = SrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, opp::Sum<SrcT, ComputeT>,
-                                              opp::SumSqr<SrcT, ComputeT>>;
+    using sumSumSqrSrc = SrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, mpp::Sum<SrcT, ComputeT>,
+                                              mpp::SumSqr<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op1;
-    const opp::SumSqr<SrcT, ComputeT> op2;
+    const mpp::Sum<SrcT, ComputeT> op1;
+    const mpp::SumSqr<SrcT, ComputeT> op2;
 
     const sumSumSqrSrc functor(PointerRoi(), Pitch(), op1, op2);
 
@@ -2648,8 +2648,8 @@ void ImageView<T>::MeanStd(same_vector_size_different_type_t<T, c_double> &aMean
 
     reduction(SizeRoi(), aMean, sumSqr, functor);
 
-    const opp::DivPostOp<DstT1> postOp1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(SizeRoi().TotalSize()));
-    const opp::StdDeviation<DstT2> postOp2(static_cast<remove_vector_t<DstT2>>(SizeRoi().TotalSize()));
+    const mpp::DivPostOp<DstT1> postOp1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(SizeRoi().TotalSize()));
+    const mpp::StdDeviation<DstT2> postOp2(static_cast<remove_vector_t<DstT2>>(SizeRoi().TotalSize()));
 
     postOp2(aMean, sumSqr, aStd);
     postOp1(aMean);
@@ -2669,11 +2669,11 @@ void ImageView<T>::MeanStdMasked(same_vector_size_different_type_t<T, double> &a
     using DstT2                = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSumSqrSrc = SrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, opp::Sum<SrcT, ComputeT>,
-                                              opp::SumSqr<SrcT, ComputeT>>;
+    using sumSumSqrSrc = SrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, mpp::Sum<SrcT, ComputeT>,
+                                              mpp::SumSqr<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op1;
-    const opp::SumSqr<SrcT, ComputeT> op2;
+    const mpp::Sum<SrcT, ComputeT> op1;
+    const mpp::SumSqr<SrcT, ComputeT> op2;
 
     const sumSumSqrSrc functor(PointerRoi(), Pitch(), op1, op2);
 
@@ -2682,8 +2682,8 @@ void ImageView<T>::MeanStdMasked(same_vector_size_different_type_t<T, double> &a
 
     const size_t maskpixels = reduction(aMask, SizeRoi(), aMean, sumSqr, functor);
 
-    const opp::DivPostOp<DstT1> postOp1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(maskpixels));
-    const opp::StdDeviation<DstT2> postOp2(static_cast<remove_vector_t<DstT2>>(maskpixels));
+    const mpp::DivPostOp<DstT1> postOp1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(maskpixels));
+    const mpp::StdDeviation<DstT2> postOp2(static_cast<remove_vector_t<DstT2>>(maskpixels));
 
     postOp2(aMean, sumSqr, aStd);
     postOp1(aMean);
@@ -2702,11 +2702,11 @@ void ImageView<T>::MeanStdMasked(same_vector_size_different_type_t<T, c_double> 
     using DstT2                = same_vector_size_different_type_t<T, double>;
     constexpr size_t TupelSize = 1;
 
-    using sumSumSqrSrc = SrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, opp::Sum<SrcT, ComputeT>,
-                                              opp::SumSqr<SrcT, ComputeT>>;
+    using sumSumSqrSrc = SrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, mpp::Sum<SrcT, ComputeT>,
+                                              mpp::SumSqr<SrcT, ComputeT>>;
 
-    const opp::Sum<SrcT, ComputeT> op1;
-    const opp::SumSqr<SrcT, ComputeT> op2;
+    const mpp::Sum<SrcT, ComputeT> op1;
+    const mpp::SumSqr<SrcT, ComputeT> op2;
 
     const sumSumSqrSrc functor(PointerRoi(), Pitch(), op1, op2);
 
@@ -2715,8 +2715,8 @@ void ImageView<T>::MeanStdMasked(same_vector_size_different_type_t<T, c_double> 
 
     const size_t maskpixels = reduction(aMask, SizeRoi(), aMean, sumSqr, functor);
 
-    const opp::DivPostOp<DstT1> postOp1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(maskpixels));
-    const opp::StdDeviation<DstT2> postOp2(static_cast<remove_vector_t<DstT2>>(maskpixels));
+    const mpp::DivPostOp<DstT1> postOp1(static_cast<complex_basetype_t<remove_vector_t<DstT1>>>(maskpixels));
+    const mpp::StdDeviation<DstT2> postOp2(static_cast<remove_vector_t<DstT2>>(maskpixels));
 
     postOp2(aMean, sumSqr, aStd);
     postOp1(aMean);
@@ -2734,9 +2734,9 @@ void ImageView<T>::CountInRange(const T &aLowerLimit, const T &aUpperLimit,
     using DstT                 = same_vector_size_different_type_t<T, size_t>;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::CountInRange<SrcT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::CountInRange<SrcT>>;
 
-    const opp::CountInRange<SrcT> op(aLowerLimit, aUpperLimit);
+    const mpp::CountInRange<SrcT> op(aLowerLimit, aUpperLimit);
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -2744,8 +2744,8 @@ void ImageView<T>::CountInRange(const T &aLowerLimit, const T &aUpperLimit,
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
-    const opp::SumScalar<DstT> postOpScalar;
+    const mpp::Nothing<DstT> postOp;
+    const mpp::SumScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -2762,9 +2762,9 @@ void ImageView<T>::CountInRangeMasked(const T &aLowerLimit, const T &aUpperLimit
     using DstT                 = same_vector_size_different_type_t<T, size_t>;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::CountInRange<SrcT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::CountInRange<SrcT>>;
 
-    const opp::CountInRange<SrcT> op(aLowerLimit, aUpperLimit);
+    const mpp::CountInRange<SrcT> op(aLowerLimit, aUpperLimit);
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -2772,8 +2772,8 @@ void ImageView<T>::CountInRangeMasked(const T &aLowerLimit, const T &aUpperLimit
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
-    const opp::SumScalar<DstT> postOpScalar;
+    const mpp::Nothing<DstT> postOp;
+    const mpp::SumScalar<DstT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -2788,9 +2788,9 @@ void ImageView<T>::CountInRange(const T &aLowerLimit, const T &aUpperLimit,
     using DstT                 = same_vector_size_different_type_t<T, size_t>;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::CountInRange<SrcT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::CountInRange<SrcT>>;
 
-    const opp::CountInRange<SrcT> op(aLowerLimit, aUpperLimit);
+    const mpp::CountInRange<SrcT> op(aLowerLimit, aUpperLimit);
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -2798,7 +2798,7 @@ void ImageView<T>::CountInRange(const T &aLowerLimit, const T &aUpperLimit,
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
 
     postOp(aDst);
 }
@@ -2814,9 +2814,9 @@ void ImageView<T>::CountInRangeMasked(const T &aLowerLimit, const T &aUpperLimit
     using DstT                 = same_vector_size_different_type_t<T, size_t>;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::CountInRange<SrcT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::CountInRange<SrcT>>;
 
-    const opp::CountInRange<SrcT> op(aLowerLimit, aUpperLimit);
+    const mpp::CountInRange<SrcT> op(aLowerLimit, aUpperLimit);
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -2824,7 +2824,7 @@ void ImageView<T>::CountInRangeMasked(const T &aLowerLimit, const T &aUpperLimit
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
 
     postOp(aDst);
 }
@@ -2844,15 +2844,15 @@ void ImageView<T>::QualityIndex(const ImageView<T> &aSrc2, same_vector_size_diff
 
     using qualityIndexSrcSrc =
         SrcSrcReduction5Functor<TupelSize, SrcT, ComputeT, ComputeT, ComputeT, ComputeT, ComputeT,
-                                opp::Sum1Or2<SrcT, ComputeT, 1>, opp::SumSqr1Or2<SrcT, ComputeT, 1>,
-                                opp::Sum1Or2<SrcT, ComputeT, 2>, opp::SumSqr1Or2<SrcT, ComputeT, 2>,
-                                opp::DotProduct<SrcT, ComputeT>>;
+                                mpp::Sum1Or2<SrcT, ComputeT, 1>, mpp::SumSqr1Or2<SrcT, ComputeT, 1>,
+                                mpp::Sum1Or2<SrcT, ComputeT, 2>, mpp::SumSqr1Or2<SrcT, ComputeT, 2>,
+                                mpp::DotProduct<SrcT, ComputeT>>;
 
-    const opp::Sum1Or2<SrcT, ComputeT, 1> opSum1;
-    const opp::SumSqr1Or2<SrcT, ComputeT, 1> opSumSqr1;
-    const opp::Sum1Or2<SrcT, ComputeT, 2> opSum2;
-    const opp::SumSqr1Or2<SrcT, ComputeT, 2> opSumSqr2;
-    const opp::DotProduct<SrcT, ComputeT> opDotProduct;
+    const mpp::Sum1Or2<SrcT, ComputeT, 1> opSum1;
+    const mpp::SumSqr1Or2<SrcT, ComputeT, 1> opSumSqr1;
+    const mpp::Sum1Or2<SrcT, ComputeT, 2> opSum2;
+    const mpp::SumSqr1Or2<SrcT, ComputeT, 2> opSumSqr2;
+    const mpp::DotProduct<SrcT, ComputeT> opDotProduct;
 
     const qualityIndexSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), opSum1, opSumSqr1,
                                      opSum2, opSumSqr2, opDotProduct);
@@ -2863,7 +2863,7 @@ void ImageView<T>::QualityIndex(const ImageView<T> &aSrc2, same_vector_size_diff
     DstT dst5(0);
     reduction(SizeRoi(), dst1, dst2, dst3, dst4, dst5, functor);
 
-    const opp::QualityIndex<DstT> postOp(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()));
+    const mpp::QualityIndex<DstT> postOp(static_cast<remove_vector_t<DstT>>(SizeRoi().TotalSize()));
 
     postOp(dst1, dst2, dst3, dst4, dst5, aDst);
 }
@@ -2884,7 +2884,7 @@ void ImageView<T>::SSIM(const ImageView<T> &aSrc2, same_vector_size_different_ty
 
     const float scaleFactor = std::max(1.0f, std::round(to_float(SizeRoi().Min()) / 256.0f));
 
-    const opp::SSIM<DstT> postOp(aDynamicRange, aK1, aK2);
+    const mpp::SSIM<DstT> postOp(aDynamicRange, aK1, aK2);
     std::vector<double> ssimFilter(FilterSize * FilterSize, 0);
 
     for (size_t y = 0; y < FilterSize; y++)
@@ -2910,7 +2910,7 @@ void ImageView<T>::SSIM(const ImageView<T> &aSrc2, same_vector_size_different_ty
         aSrc2.Resize(resizeSrc2, 1.0 / to_double(scaleFactor), 0, InterpolationMode::Super, BorderType::Replicate,
                      Roi());
 
-        ssimEachPixel<T, ComputeT, DstT, double, opp::SSIM<DstT>>(resizeSrc1, resizeSrc2, localSSIM, ssimFilter.data(),
+        ssimEachPixel<T, ComputeT, DstT, double, mpp::SSIM<DstT>>(resizeSrc1, resizeSrc2, localSSIM, ssimFilter.data(),
                                                                   FilterSize, BorderType::Replicate, resizeSrc1.ROI(),
                                                                   resizeSrc2.ROI(), postOp);
         if constexpr (vector_active_size_v<T> > 1)
@@ -2926,7 +2926,7 @@ void ImageView<T>::SSIM(const ImageView<T> &aSrc2, same_vector_size_different_ty
     else
     {
         Image<DstT> localSSIM(SizeRoi());
-        ssimEachPixel<T, ComputeT, DstT, double, opp::SSIM<DstT>>(
+        ssimEachPixel<T, ComputeT, DstT, double, mpp::SSIM<DstT>>(
             *this, aSrc2, localSSIM, ssimFilter.data(), FilterSize, BorderType::Replicate, ROI(), aSrc2.ROI(), postOp);
 
         if constexpr (vector_active_size_v<T> > 1)
@@ -2967,8 +2967,8 @@ void ImageView<T>::MSSSIM(const ImageView<T> &aSrc2, same_vector_size_different_
 
     Size2D resizedRoiSize = SizeRoi();
 
-    const opp::SSIM<DstT> postOpSSIM(aDynamicRange, aK1, aK2);
-    const opp::MSSSIM<DstT> postOpMSSSIM(aDynamicRange, aK2);
+    const mpp::SSIM<DstT> postOpSSIM(aDynamicRange, aK1, aK2);
+    const mpp::MSSSIM<DstT> postOpMSSSIM(aDynamicRange, aK2);
     std::vector<double> ssimFilter(FilterSize * FilterSize, 0);
 
     for (size_t y = 0; y < FilterSize; y++)
@@ -2985,7 +2985,7 @@ void ImageView<T>::MSSSIM(const ImageView<T> &aSrc2, same_vector_size_different_
     std::array<DstT, 5> results{};
 
     // level 0
-    ssimEachPixel<T, ComputeT, DstT, double, opp::MSSSIM<DstT>>(*this, aSrc2, localSSIM, ssimFilter.data(), FilterSize,
+    ssimEachPixel<T, ComputeT, DstT, double, mpp::MSSSIM<DstT>>(*this, aSrc2, localSSIM, ssimFilter.data(), FilterSize,
                                                                 BorderType::Replicate, ROI(), aSrc2.ROI(),
                                                                 postOpMSSSIM);
 
@@ -3006,7 +3006,7 @@ void ImageView<T>::MSSSIM(const ImageView<T> &aSrc2, same_vector_size_different_
     aSrc2.Resize(resizeSrc12, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi());
 
     localSSIM.SetRoi(Roi({0}, resizedRoiSize));
-    ssimEachPixel<T, ComputeT, DstT, double, opp::MSSSIM<DstT>>(resizeSrc11, resizeSrc12, localSSIM, ssimFilter.data(),
+    ssimEachPixel<T, ComputeT, DstT, double, mpp::MSSSIM<DstT>>(resizeSrc11, resizeSrc12, localSSIM, ssimFilter.data(),
                                                                 FilterSize, BorderType::Replicate, resizeSrc11.ROI(),
                                                                 resizeSrc12.ROI(), postOpMSSSIM);
 
@@ -3026,7 +3026,7 @@ void ImageView<T>::MSSSIM(const ImageView<T> &aSrc2, same_vector_size_different_
     resizeSrc12.Resize(resizeSrc22, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi());
 
     localSSIM.SetRoi(Roi({0}, resizedRoiSize));
-    ssimEachPixel<T, ComputeT, DstT, double, opp::MSSSIM<DstT>>(resizeSrc21, resizeSrc22, localSSIM, ssimFilter.data(),
+    ssimEachPixel<T, ComputeT, DstT, double, mpp::MSSSIM<DstT>>(resizeSrc21, resizeSrc22, localSSIM, ssimFilter.data(),
                                                                 FilterSize, BorderType::Replicate, resizeSrc21.ROI(),
                                                                 resizeSrc22.ROI(), postOpMSSSIM);
 
@@ -3049,7 +3049,7 @@ void ImageView<T>::MSSSIM(const ImageView<T> &aSrc2, same_vector_size_different_
     resizeSrc21.Resize(resizeSrc11, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi());
     resizeSrc22.Resize(resizeSrc12, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi());
 
-    ssimEachPixel<T, ComputeT, DstT, double, opp::MSSSIM<DstT>>(resizeSrc11, resizeSrc12, localSSIM, ssimFilter.data(),
+    ssimEachPixel<T, ComputeT, DstT, double, mpp::MSSSIM<DstT>>(resizeSrc11, resizeSrc12, localSSIM, ssimFilter.data(),
                                                                 FilterSize, BorderType::Replicate, resizeSrc11.ROI(),
                                                                 resizeSrc12.ROI(), postOpMSSSIM);
 
@@ -3072,7 +3072,7 @@ void ImageView<T>::MSSSIM(const ImageView<T> &aSrc2, same_vector_size_different_
     resizeSrc11.Resize(resizeSrc21, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi());
     resizeSrc12.Resize(resizeSrc22, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi());
 
-    ssimEachPixel<T, ComputeT, DstT, double, opp::SSIM<DstT>>(resizeSrc21, resizeSrc22, localSSIM, ssimFilter.data(),
+    ssimEachPixel<T, ComputeT, DstT, double, mpp::SSIM<DstT>>(resizeSrc21, resizeSrc22, localSSIM, ssimFilter.data(),
                                                               FilterSize, BorderType::Replicate, resizeSrc21.ROI(),
                                                               resizeSrc22.ROI(), postOpSSIM);
 
@@ -3104,9 +3104,9 @@ void ImageView<T>::Min(T &aDst, remove_vector_t<T> &aDstScalar) const
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::MinRed<SrcT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::MinRed<SrcT>>;
 
-    const opp::MinRed<SrcT> op;
+    const mpp::MinRed<SrcT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -3114,8 +3114,8 @@ void ImageView<T>::Min(T &aDst, remove_vector_t<T> &aDstScalar) const
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<SrcT> postOp;
-    const opp::MinScalar<SrcT> postOpScalar;
+    const mpp::Nothing<SrcT> postOp;
+    const mpp::MinScalar<SrcT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -3130,9 +3130,9 @@ void ImageView<T>::MinMasked(T &aDst, remove_vector_t<T> &aDstScalar, const Imag
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::MinRed<SrcT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::MinRed<SrcT>>;
 
-    const opp::MinRed<SrcT> op;
+    const mpp::MinRed<SrcT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -3140,8 +3140,8 @@ void ImageView<T>::MinMasked(T &aDst, remove_vector_t<T> &aDstScalar, const Imag
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<SrcT> postOp;
-    const opp::MinScalar<SrcT> postOpScalar;
+    const mpp::Nothing<SrcT> postOp;
+    const mpp::MinScalar<SrcT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -3156,9 +3156,9 @@ void ImageView<T>::Min(T &aDst) const
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::MinRed<SrcT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::MinRed<SrcT>>;
 
-    const opp::MinRed<SrcT> op;
+    const mpp::MinRed<SrcT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -3166,7 +3166,7 @@ void ImageView<T>::Min(T &aDst) const
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<SrcT> postOp;
+    const mpp::Nothing<SrcT> postOp;
 
     postOp(aDst);
 }
@@ -3180,9 +3180,9 @@ void ImageView<T>::MinMasked(T &aDst, const ImageView<Pixel8uC1> &aMask) const
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::MinRed<SrcT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::MinRed<SrcT>>;
 
-    const opp::MinRed<SrcT> op;
+    const mpp::MinRed<SrcT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -3190,7 +3190,7 @@ void ImageView<T>::MinMasked(T &aDst, const ImageView<Pixel8uC1> &aMask) const
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<SrcT> postOp;
+    const mpp::Nothing<SrcT> postOp;
 
     postOp(aDst);
 }
@@ -3205,9 +3205,9 @@ void ImageView<T>::Max(T &aDst, remove_vector_t<T> &aDstScalar) const
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::MaxRed<SrcT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::MaxRed<SrcT>>;
 
-    const opp::MaxRed<SrcT> op;
+    const mpp::MaxRed<SrcT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -3215,8 +3215,8 @@ void ImageView<T>::Max(T &aDst, remove_vector_t<T> &aDstScalar) const
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<SrcT> postOp;
-    const opp::MaxScalar<SrcT> postOpScalar;
+    const mpp::Nothing<SrcT> postOp;
+    const mpp::MaxScalar<SrcT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -3231,9 +3231,9 @@ void ImageView<T>::MaxMasked(T &aDst, remove_vector_t<T> &aDstScalar, const Imag
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::MaxRed<SrcT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::MaxRed<SrcT>>;
 
-    const opp::MaxRed<SrcT> op;
+    const mpp::MaxRed<SrcT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -3241,8 +3241,8 @@ void ImageView<T>::MaxMasked(T &aDst, remove_vector_t<T> &aDstScalar, const Imag
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<SrcT> postOp;
-    const opp::MaxScalar<SrcT> postOpScalar;
+    const mpp::Nothing<SrcT> postOp;
+    const mpp::MaxScalar<SrcT> postOpScalar;
 
     aDstScalar = postOpScalar(aDst);
     postOp(aDst);
@@ -3257,9 +3257,9 @@ void ImageView<T>::Max(T &aDst) const
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::MaxRed<SrcT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::MaxRed<SrcT>>;
 
-    const opp::MaxRed<SrcT> op;
+    const mpp::MaxRed<SrcT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -3267,7 +3267,7 @@ void ImageView<T>::Max(T &aDst) const
 
     reduction(SizeRoi(), aDst, functor);
 
-    const opp::Nothing<SrcT> postOp;
+    const mpp::Nothing<SrcT> postOp;
 
     postOp(aDst);
 }
@@ -3281,9 +3281,9 @@ void ImageView<T>::MaxMasked(T &aDst, const ImageView<Pixel8uC1> &aMask) const
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::MaxRed<SrcT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::MaxRed<SrcT>>;
 
-    const opp::MaxRed<SrcT> op;
+    const mpp::MaxRed<SrcT> op;
 
     const sumSrc functor(PointerRoi(), Pitch(), op);
 
@@ -3291,7 +3291,7 @@ void ImageView<T>::MaxMasked(T &aDst, const ImageView<Pixel8uC1> &aMask) const
 
     reduction(aMask, SizeRoi(), aDst, functor);
 
-    const opp::Nothing<SrcT> postOp;
+    const mpp::Nothing<SrcT> postOp;
 
     postOp(aDst);
 }
@@ -3306,10 +3306,10 @@ void ImageView<T>::MinMax(T &aDstMin, T &aDstMax, remove_vector_t<T> &aDstMinSca
     using SrcT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using minMaxSrc = SrcReduction2Functor<TupelSize, SrcT, SrcT, SrcT, opp::MinRed<SrcT>, opp::MaxRed<SrcT>>;
+    using minMaxSrc = SrcReduction2Functor<TupelSize, SrcT, SrcT, SrcT, mpp::MinRed<SrcT>, mpp::MaxRed<SrcT>>;
 
-    const opp::MinRed<SrcT> op1;
-    const opp::MaxRed<SrcT> op2;
+    const mpp::MinRed<SrcT> op1;
+    const mpp::MaxRed<SrcT> op2;
 
     const minMaxSrc functor(PointerRoi(), Pitch(), op1, op2);
 
@@ -3318,10 +3318,10 @@ void ImageView<T>::MinMax(T &aDstMin, T &aDstMax, remove_vector_t<T> &aDstMinSca
 
     reduction(SizeRoi(), aDstMin, aDstMax, functor);
 
-    const opp::Nothing<SrcT> postOp1;
-    const opp::Nothing<SrcT> postOp2;
-    const opp::MinScalar<SrcT> postOpScalar1;
-    const opp::MaxScalar<SrcT> postOpScalar2;
+    const mpp::Nothing<SrcT> postOp1;
+    const mpp::Nothing<SrcT> postOp2;
+    const mpp::MinScalar<SrcT> postOpScalar1;
+    const mpp::MaxScalar<SrcT> postOpScalar2;
 
     postOpScalar2(aDstMax, aDstMax, aDstMaxScalar);
     aDstMinScalar = postOpScalar1(aDstMin);
@@ -3337,10 +3337,10 @@ void ImageView<T>::MinMaxMasked(T &aDstMin, T &aDstMax, remove_vector_t<T> &aDst
     using SrcT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using minMaxSrc = SrcReduction2Functor<TupelSize, SrcT, SrcT, SrcT, opp::MinRed<SrcT>, opp::MaxRed<SrcT>>;
+    using minMaxSrc = SrcReduction2Functor<TupelSize, SrcT, SrcT, SrcT, mpp::MinRed<SrcT>, mpp::MaxRed<SrcT>>;
 
-    const opp::MinRed<SrcT> op1;
-    const opp::MaxRed<SrcT> op2;
+    const mpp::MinRed<SrcT> op1;
+    const mpp::MaxRed<SrcT> op2;
 
     const minMaxSrc functor(PointerRoi(), Pitch(), op1, op2);
 
@@ -3349,10 +3349,10 @@ void ImageView<T>::MinMaxMasked(T &aDstMin, T &aDstMax, remove_vector_t<T> &aDst
 
     reduction(aMask, SizeRoi(), aDstMin, aDstMax, functor);
 
-    const opp::Nothing<SrcT> postOp1;
-    const opp::Nothing<SrcT> postOp2;
-    const opp::MinScalar<SrcT> postOpScalar1;
-    const opp::MaxScalar<SrcT> postOpScalar2;
+    const mpp::Nothing<SrcT> postOp1;
+    const mpp::Nothing<SrcT> postOp2;
+    const mpp::MinScalar<SrcT> postOpScalar1;
+    const mpp::MaxScalar<SrcT> postOpScalar2;
 
     postOpScalar2(aDstMax, aDstMax, aDstMaxScalar);
     aDstMinScalar = postOpScalar1(aDstMin);
@@ -3367,10 +3367,10 @@ void ImageView<T>::MinMax(T &aDstMin, T &aDstMax) const
     using SrcT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using minMaxSrc = SrcReduction2Functor<TupelSize, SrcT, SrcT, SrcT, opp::MinRed<SrcT>, opp::MaxRed<SrcT>>;
+    using minMaxSrc = SrcReduction2Functor<TupelSize, SrcT, SrcT, SrcT, mpp::MinRed<SrcT>, mpp::MaxRed<SrcT>>;
 
-    const opp::MinRed<SrcT> op1;
-    const opp::MaxRed<SrcT> op2;
+    const mpp::MinRed<SrcT> op1;
+    const mpp::MaxRed<SrcT> op2;
 
     const minMaxSrc functor(PointerRoi(), Pitch(), op1, op2);
 
@@ -3379,8 +3379,8 @@ void ImageView<T>::MinMax(T &aDstMin, T &aDstMax) const
 
     reduction(SizeRoi(), aDstMin, aDstMax, functor);
 
-    const opp::Nothing<SrcT> postOp1;
-    const opp::Nothing<SrcT> postOp2;
+    const mpp::Nothing<SrcT> postOp1;
+    const mpp::Nothing<SrcT> postOp2;
 
     postOp2(aDstMax);
     postOp1(aDstMin);
@@ -3392,10 +3392,10 @@ void ImageView<T>::MinMaxMasked(T &aDstMin, T &aDstMax, const ImageView<Pixel8uC
     using SrcT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using minMaxSrc = SrcReduction2Functor<TupelSize, SrcT, SrcT, SrcT, opp::MinRed<SrcT>, opp::MaxRed<SrcT>>;
+    using minMaxSrc = SrcReduction2Functor<TupelSize, SrcT, SrcT, SrcT, mpp::MinRed<SrcT>, mpp::MaxRed<SrcT>>;
 
-    const opp::MinRed<SrcT> op1;
-    const opp::MaxRed<SrcT> op2;
+    const mpp::MinRed<SrcT> op1;
+    const mpp::MaxRed<SrcT> op2;
 
     const minMaxSrc functor(PointerRoi(), Pitch(), op1, op2);
 
@@ -3404,8 +3404,8 @@ void ImageView<T>::MinMaxMasked(T &aDstMin, T &aDstMax, const ImageView<Pixel8uC
 
     reduction(aMask, SizeRoi(), aDstMin, aDstMax, functor);
 
-    const opp::Nothing<SrcT> postOp1;
-    const opp::Nothing<SrcT> postOp2;
+    const mpp::Nothing<SrcT> postOp1;
+    const mpp::Nothing<SrcT> postOp2;
 
     postOp2(aDstMax);
     postOp1(aDstMin);
@@ -3422,7 +3422,7 @@ void ImageView<T>::MinIndex(T &aDstMin, same_vector_size_different_type_t<T, int
     using idxT                 = same_vector_size_different_type_t<SrcT, int>;
     constexpr size_t TupelSize = 1;
 
-    const opp::MinIdx<SrcT> redOpMin;
+    const mpp::MinIdx<SrcT> redOpMin;
     const SrcReductionMinIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
 
     std::vector<T> tempVal(to_size_t(SizeRoi().y));
@@ -3512,7 +3512,7 @@ void ImageView<T>::MinIndexMasked(T &aDstMin, same_vector_size_different_type_t<
     using idxT                 = same_vector_size_different_type_t<SrcT, int>;
     constexpr size_t TupelSize = 1;
 
-    const opp::MinIdx<SrcT> redOpMin;
+    const mpp::MinIdx<SrcT> redOpMin;
     const SrcReductionMinIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
 
     std::vector<T> tempVal(to_size_t(SizeRoi().y));
@@ -3604,7 +3604,7 @@ void ImageView<T>::MinIndex(T &aDstMin, same_vector_size_different_type_t<T, int
     using idxT                 = same_vector_size_different_type_t<SrcT, int>;
     constexpr size_t TupelSize = 1;
 
-    const opp::MinIdx<SrcT> redOpMin;
+    const mpp::MinIdx<SrcT> redOpMin;
     const SrcReductionMinIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
 
     std::vector<T> tempVal(to_size_t(SizeRoi().y));
@@ -3650,7 +3650,7 @@ void ImageView<T>::MinIndexMasked(T &aDstMin, same_vector_size_different_type_t<
     using idxT                 = same_vector_size_different_type_t<SrcT, int>;
     constexpr size_t TupelSize = 1;
 
-    const opp::MinIdx<SrcT> redOpMin;
+    const mpp::MinIdx<SrcT> redOpMin;
     const SrcReductionMinIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
 
     std::vector<T> tempVal(to_size_t(SizeRoi().y));
@@ -3701,7 +3701,7 @@ void ImageView<T>::MaxIndex(T &aDstMax, same_vector_size_different_type_t<T, int
     using idxT                 = same_vector_size_different_type_t<SrcT, int>;
     constexpr size_t TupelSize = 1;
 
-    const opp::MaxIdx<SrcT> redOpMax;
+    const mpp::MaxIdx<SrcT> redOpMax;
     const SrcReductionMaxIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
 
     std::vector<T> tempVal(to_size_t(SizeRoi().y));
@@ -3791,7 +3791,7 @@ void ImageView<T>::MaxIndexMasked(T &aDstMax, same_vector_size_different_type_t<
     using idxT                 = same_vector_size_different_type_t<SrcT, int>;
     constexpr size_t TupelSize = 1;
 
-    const opp::MaxIdx<SrcT> redOpMax;
+    const mpp::MaxIdx<SrcT> redOpMax;
     const SrcReductionMaxIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
 
     std::vector<T> tempVal(to_size_t(SizeRoi().y));
@@ -3883,7 +3883,7 @@ void ImageView<T>::MaxIndex(T &aDstMax, same_vector_size_different_type_t<T, int
     using idxT                 = same_vector_size_different_type_t<SrcT, int>;
     constexpr size_t TupelSize = 1;
 
-    const opp::MaxIdx<SrcT> redOpMax;
+    const mpp::MaxIdx<SrcT> redOpMax;
     const SrcReductionMaxIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
 
     std::vector<T> tempVal(to_size_t(SizeRoi().y));
@@ -3929,7 +3929,7 @@ void ImageView<T>::MaxIndexMasked(T &aDstMax, same_vector_size_different_type_t<
     using idxT                 = same_vector_size_different_type_t<SrcT, int>;
     constexpr size_t TupelSize = 1;
 
-    const opp::MaxIdx<SrcT> redOpMax;
+    const mpp::MaxIdx<SrcT> redOpMax;
     const SrcReductionMaxIdxFunctor<TupelSize, SrcT> functor(PointerRoi(), Pitch());
 
     std::vector<T> tempVal(to_size_t(SizeRoi().y));
@@ -4136,8 +4136,8 @@ ImageView<T> &ImageView<T>::MinEvery(const ImageView<T> &aSrc2, ImageView<T> &aD
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using minEverySrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Min<ComputeT>, RoundingMode::None>;
-    const opp::Min<ComputeT> op;
+    using minEverySrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Min<ComputeT>, RoundingMode::None>;
+    const mpp::Min<ComputeT> op;
     const minEverySrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
     forEachPixel(aDst, functor);
 
@@ -4156,8 +4156,8 @@ ImageView<T> &ImageView<T>::MinEvery(const ImageView<T> &aSrc2)
     constexpr size_t TupelSize = 1;
 
     using minEveryInplaceSrc =
-        InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Min<ComputeT>, RoundingMode::None>;
-    const opp::Min<ComputeT> op;
+        InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Min<ComputeT>, RoundingMode::None>;
+    const mpp::Min<ComputeT> op;
     const minEveryInplaceSrc functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op);
     forEachPixel(*this, functor);
 
@@ -4178,8 +4178,8 @@ ImageView<T> &ImageView<T>::MaxEvery(const ImageView<T> &aSrc2, ImageView<T> &aD
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using maxEverySrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Max<ComputeT>, RoundingMode::None>;
-    const opp::Max<ComputeT> op;
+    using maxEverySrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Max<ComputeT>, RoundingMode::None>;
+    const mpp::Max<ComputeT> op;
     const maxEverySrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
     forEachPixel(aDst, functor);
 
@@ -4198,8 +4198,8 @@ ImageView<T> &ImageView<T>::MaxEvery(const ImageView<T> &aSrc2)
     constexpr size_t TupelSize = 1;
 
     using maxEveryInplaceSrc =
-        InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Max<ComputeT>, RoundingMode::None>;
-    const opp::Max<ComputeT> op;
+        InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Max<ComputeT>, RoundingMode::None>;
+    const mpp::Max<ComputeT> op;
     const maxEveryInplaceSrc functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op);
     forEachPixel(*this, functor);
 
@@ -4889,4 +4889,4 @@ ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationCoefficient(const ImageView
     return this->CrossCorrelationCoefficient(aTemplate, aDst, aConstant, aBorder, ROI());
 }
 #pragma endregion
-} // namespace opp::image::cpuSimple
+} // namespace mpp::image::cpuSimple

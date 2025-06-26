@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/image/configurations.h>
@@ -15,7 +15,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 /// <summary>
 /// runs aFunctor on every pixel of a (half-)sub-image and swaps the value with another pixel. Inplace.
@@ -93,7 +93,7 @@ void InvokeForEachPixelInHalfRoiSwapKernel(const dim3 &aBlockSize, uint aSharedM
 
 template <typename DstT, typename funcType, bool xUneven>
 void InvokeForEachPixelInHalfRoiSwapKernelDefault(DstT *aDst, size_t aPitchDst, const Size2D &aSizeSub,
-                                                  const opp::cuda::StreamCtx &aStreamCtx, const funcType &aFunc)
+                                                  const mpp::cuda::StreamCtx &aStreamCtx, const funcType &aFunc)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {
@@ -111,5 +111,5 @@ void InvokeForEachPixelInHalfRoiSwapKernelDefault(DstT *aDst, size_t aPitchDst, 
     }
 }
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

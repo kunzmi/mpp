@@ -10,8 +10,8 @@
 #include <sstream>
 #include <vector>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
 
 TEST_CASE("Bound<float>", "[Common.Image]")

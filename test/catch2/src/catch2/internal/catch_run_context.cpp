@@ -205,7 +205,7 @@ namespace Catch {
         // shared RNG instance as their seed.
         //
         // However, this runs into an issue if the reseeding happens each
-        // time the test case is entered (as opposed to first time only),
+        // time the test case is entered (as mpposed to first time only),
         // because multiple generators could get the same seed, e.g. in
         // ```cpp
         // TEST_CASE() {
@@ -480,7 +480,7 @@ namespace Catch {
         resetAssertionInfo();
 
         // Best effort cleanup for sections that have not been destructed yet
-        // Since this is a fatal error, we have not had and won't have the opportunity to destruct them properly
+        // Since this is a fatal error, we have not had and won't have the mpportunity to destruct them properly
         while (!m_activeSections.empty()) {
             auto nl = m_activeSections.back()->nameAndLocation();
             SectionEndInfo endInfo{ SectionInfo(CATCH_MOVE(nl.location), CATCH_MOVE(nl.name)), {}, 0.0 };

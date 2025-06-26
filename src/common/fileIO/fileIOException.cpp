@@ -4,7 +4,7 @@
 #include <sstream>
 #include <string>
 
-namespace opp::fileIO
+namespace mpp::fileIO
 {
 FileIOException::FileIOException(const std::filesystem::path &aFileName, const std::string &aMessage,
                                  [[maybe_unused]] const std::filesystem::path &aCodeFileName,
@@ -31,4 +31,4 @@ FileIOException::FileIOException(const std::filesystem::path &aFileName, const s
 
     What() = ss.str();
 }
-} // namespace opp::fileIO
+} // namespace mpp::fileIO

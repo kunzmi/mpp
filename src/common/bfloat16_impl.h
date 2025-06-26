@@ -1,7 +1,7 @@
 #pragma once
 #include "bfloat16.h"
 #include "exception.h"
-#include "opp_defs.h"
+#include "mpp_defs.h"
 #include <cmath>
 #include <common/defines.h>
 #include <common/numeric_limits.h>
@@ -18,7 +18,7 @@
 #endif
 // NOLINTBEGIN(misc-definitions-in-headers)
 
-namespace opp
+namespace mpp
 {
 
 #ifdef IS_HOST_COMPILER
@@ -26,10 +26,10 @@ DEVICE_CODE INLINE BFloat16::BFloat16(float aFloat, RoundingMode aRoundingMode)
 {
     switch (aRoundingMode)
     {
-        case opp::RoundingMode::NearestTiesToEven:
+        case mpp::RoundingMode::NearestTiesToEven:
             value = FromFloat(aFloat).value;
             break;
-        case opp::RoundingMode::TowardZero:
+        case mpp::RoundingMode::TowardZero:
             value = FromFloatTruncate(aFloat).value;
             break;
         default:
@@ -53,16 +53,16 @@ DEVICE_CODE INLINE BFloat16::BFloat16(float aFloat, RoundingMode aRoundingMode)
 {
     switch (aRoundingMode)
     {
-        case opp::RoundingMode::NearestTiesToEven:
+        case mpp::RoundingMode::NearestTiesToEven:
             value = __float2bfloat16_rn(aFloat);
             break;
-        case opp::RoundingMode::TowardZero:
+        case mpp::RoundingMode::TowardZero:
             value = __float2bfloat16_rz(aFloat);
             break;
-        case opp::RoundingMode::TowardNegativeInfinity:
+        case mpp::RoundingMode::TowardNegativeInfinity:
             value = __float2bfloat16_rd(aFloat);
             break;
-        case opp::RoundingMode::TowardPositiveInfinity:
+        case mpp::RoundingMode::TowardPositiveInfinity:
             value = __float2bfloat16_ru(aFloat);
             break;
         default:
@@ -847,7 +847,7 @@ INLINE std::wistream &operator>>(std::wistream &aIs, BFloat16 &aHalf)
     return aIs;
 }
 
-} // namespace opp
+} // namespace mpp
 // NOLINTEND(misc-definitions-in-headers)
 
 #undef INLINE

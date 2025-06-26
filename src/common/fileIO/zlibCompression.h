@@ -3,7 +3,7 @@
 #include <common/defines.h>
 #include <zlib/zlib.h>
 
-namespace opp::fileIO
+namespace mpp::fileIO
 {
 
 /// <summary>
@@ -55,4 +55,4 @@ class ZLIBEncoder
     bool mInitDone{false};
 };
 
-} // namespace opp::fileIO
+} // namespace mpp::fileIO

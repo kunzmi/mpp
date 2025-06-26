@@ -6,7 +6,7 @@
 #include <istream>
 #include <ostream>
 
-namespace opp::image
+namespace mpp::image
 {
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 Roi::Roi(int aX, int aY, int aWidth, int aHeight) noexcept : x(aX), y(aY), width(aWidth), height(aHeight)
@@ -405,4 +405,4 @@ Roi operator/(const Roi &aLeft, int aRight)
 //{
 //     return Roi{aLeft / aRight.x, aLeft / aRight.y, aLeft / aRight.width, aLeft / aRight.height};
 // }
-} // namespace opp::image
+} // namespace mpp::image

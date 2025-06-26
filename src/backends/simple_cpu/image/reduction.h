@@ -10,7 +10,7 @@
 
 #include <iostream>
 
-namespace opp::image::cpuSimple
+namespace mpp::image::cpuSimple
 {
 // forward declaration
 template <PixelType T> class ImageView;
@@ -30,4 +30,4 @@ void reduction(const Size2D &aSize, DstT &aDst1, DstT &aDst2, const functor &aOp
 template <typename DstT, typename functor>
 void reduction(const Size2D &aSize, DstT &aDst1, DstT &aDst2, DstT &aDst3, DstT &aDst4, DstT &aDst5,
                const functor &aOp);
-} // namespace opp::image::cpuSimple
+} // namespace mpp::image::cpuSimple

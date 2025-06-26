@@ -6,7 +6,7 @@
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
 #include <common/numberTypes.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
@@ -16,7 +16,7 @@
 // disable warning for pragma unroll when compiling with host compiler:
 #include <common/disableWarningsBegin.h>
 
-namespace opp::image
+namespace mpp::image
 {
 /// <summary>
 /// Computes an output pixel from one constant value -&gt; srcDst pixel (set function)
@@ -59,5 +59,5 @@ template <size_t tupelSize, typename DstT> struct ConstantFunctor : public Image
     }
 #pragma endregion
 };
-} // namespace opp::image
+} // namespace mpp::image
 #include <common/disableWarningsEnd.h>

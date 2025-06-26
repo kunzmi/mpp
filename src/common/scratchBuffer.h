@@ -9,7 +9,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace opp
+namespace mpp
 {
 struct BufferSize
 {
@@ -26,7 +26,7 @@ struct BufferSize
         : WidthInElements(to_size_t(aWidthInElements)), HeightInElements(to_size_t(aHeightInElements))
     {
     }
-    BufferSize(const opp::image::Size2D &aSizeInElements)
+    BufferSize(const mpp::image::Size2D &aSizeInElements)
         : WidthInElements(to_size_t(aSizeInElements.x)), HeightInElements(to_size_t(aSizeInElements.y))
     {
     }
@@ -165,4 +165,4 @@ template <typename... BufferTypes> class ScratchBuffer
         return mBufferSizesInBytes[sizeof...(BufferTypes) - 1] + BUFFER_ALIGNMNENT;
     }
 };
-} // namespace opp
+} // namespace mpp

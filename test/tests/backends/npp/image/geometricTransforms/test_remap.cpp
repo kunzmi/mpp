@@ -18,13 +18,13 @@
 #include <common/image/affineTransformation.h>
 #include <common/image/bound.h>
 #include <common/image/quad.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size = 256;
 

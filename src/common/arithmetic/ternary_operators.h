@@ -4,7 +4,7 @@
 #include <common/vectorTypes.h>
 #include <concepts>
 
-namespace opp
+namespace mpp
 {
 template <AnyVector T> struct AddProduct
 {
@@ -31,4 +31,4 @@ template <AnyVector T> struct AddWeighted
         aSrcDst = aSrcDst * (static_cast<remove_vector_t<T>>(1) - Alpha) + aSrc1 * Alpha;
     }
 };
-} // namespace opp
+} // namespace mpp

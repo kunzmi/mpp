@@ -1,17 +1,17 @@
 #pragma once
 #include "testNppBase.h"
-#include "testOppBase.h"
+#include "testMppBase.h"
 #include <backends/simple_cpu/image/imageView.h>
 #include <common/image/filterArea.h>
 #include <common/vector_typetraits.h>
 
-namespace opp
+namespace mpp
 {
-template <typename oppT, typename nppT> class StatisticsSrcBase
+template <typename mppT, typename nppT> class StatisticsSrcBase
 {
   public:
     StatisticsSrcBase(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : opp(aIterations, aRepeats, aWidth, aHeight), npp(aIterations, aRepeats, aWidth, aHeight), repeats(aRepeats)
+        : mpp(aIterations, aRepeats, aWidth, aHeight), npp(aIterations, aRepeats, aWidth, aHeight), repeats(aRepeats)
     {
     }
     virtual ~StatisticsSrcBase() = default;
@@ -27,72 +27,72 @@ template <typename oppT, typename nppT> class StatisticsSrcBase
 
     template <typename ImgT> void Init(const ImgT &aCpuSrc1)
     {
-        opp.Init();
+        mpp.Init();
         npp.Init();
 
-        aCpuSrc1 >> opp.GetSrc1();
+        aCpuSrc1 >> mpp.GetSrc1();
         aCpuSrc1 >> npp.GetSrc1();
     }
 
     void Run(const Roi &aRoi)
     {
-        opp.SetRoi(aRoi);
+        mpp.SetRoi(aRoi);
         npp.SetRoi(aRoi);
-        opp.AllocBuffer(); // might change with roi...
+        mpp.AllocBuffer(); // might change with roi...
         npp.AllocBuffer(); // might change with roi...
 
-        opp.WarmUp();
-        rt_opp = opp.Run();
+        mpp.WarmUp();
+        rt_mpp = mpp.Run();
 
         npp.WarmUp();
         rt_npp = npp.Run();
     }
 
-    template <PixelType oppT2, PixelType nppT2> TestResult GetResult()
+    template <PixelType mppT2, PixelType nppT2> TestResult GetResult()
     {
         std::cout << GetName() << " for " << GetType() << std::endl;
 
         nppT2 resNpp;
-        oppT2 resOpp;
+        mppT2 resMpp;
 
         npp.GetDst() >> resNpp.data();
-        opp.GetDst() >> resOpp.data();
+        mpp.GetDst() >> resMpp.data();
 
-        std::cout << "OPP:" << std::endl;
-        std::cout << rt_opp << std::endl;
+        std::cout << "MPP:" << std::endl;
+        std::cout << rt_mpp << std::endl;
         std::cout << "NPP:" << std::endl;
         std::cout << rt_npp << std::endl;
 
-        const float ratio = rt_npp.Mean / rt_opp.Mean;
+        const float ratio = rt_npp.Mean / rt_mpp.Mean;
         if (ratio >= 1.0f)
         {
-            std::cout << "OPP is " << (rt_npp.Mean - rt_opp.Mean) / static_cast<float>(repeats) << " msec or "
+            std::cout << "MPP is " << (rt_npp.Mean - rt_mpp.Mean) / static_cast<float>(repeats) << " msec or "
                       << ratio * 100.0f - 100.0f << "% faster!" << std::endl;
         }
         else
         {
-            std::cout << "OPP is " << (rt_opp.Mean - rt_npp.Mean) / static_cast<float>(repeats) << " msec or "
+            std::cout << "MPP is " << (rt_mpp.Mean - rt_npp.Mean) / static_cast<float>(repeats) << " msec or "
                       << 1.0f / ratio * 100.0f - 100.0f << "% slower..." << std::endl;
         }
 
-        std::cout << "Result NPP: " << resNpp << " OPP: " << resOpp << std::endl;
+        std::cout << "Result NPP: " << resNpp << " MPP: " << resMpp << std::endl;
         std::cout << std::endl
                   << "--------------------------------------------------------------------------------" << std::endl;
 
         TestResult res;
 
         res.Name                   = GetName() + " for " + GetType();
-        res.TotalOPP               = rt_opp.Total;
+        res.TotalMPP               = rt_mpp.Total;
         res.TotalNPP               = rt_npp.Total;
-        res.MeanOPP                = rt_opp.Mean;
+        res.MeanMPP                = rt_mpp.Mean;
         res.MeanNPP                = rt_npp.Mean;
-        res.StdOPP                 = rt_opp.Std;
+        res.StdMPP                 = rt_mpp.Std;
         res.StdNPP                 = rt_npp.Std;
-        res.MinOPP                 = rt_opp.Min;
+        res.MinMPP                 = rt_mpp.Min;
         res.MinNPP                 = rt_npp.Min;
-        res.MaxOPP                 = rt_opp.Max;
+        res.MaxMPP                 = rt_mpp.Max;
         res.MaxNPP                 = rt_npp.Max;
-        res.AbsoluteDifferenceMSec = (rt_npp.Mean - rt_opp.Mean) / static_cast<float>(repeats);
+        res.AbsoluteDifferenceMSec = (rt_npp.Mean - rt_mpp.Mean) / static_cast<float>(repeats);
         if (ratio >= 1.0f)
         {
             res.RelativeDifference = ratio * 100.0f - 100.0f;
@@ -105,20 +105,20 @@ template <typename oppT, typename nppT> class StatisticsSrcBase
     }
 
   protected:
-    oppT opp;
+    mppT mpp;
     nppT npp;
 
-    Runtime rt_opp;
+    Runtime rt_mpp;
     Runtime rt_npp;
 
     size_t repeats;
 };
 
-template <typename oppT, typename nppT> class StatisticsSrcSrcBase
+template <typename mppT, typename nppT> class StatisticsSrcSrcBase
 {
   public:
     StatisticsSrcSrcBase(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : opp(aIterations, aRepeats, aWidth, aHeight), npp(aIterations, aRepeats, aWidth, aHeight), repeats(aRepeats)
+        : mpp(aIterations, aRepeats, aWidth, aHeight), npp(aIterations, aRepeats, aWidth, aHeight), repeats(aRepeats)
     {
     }
     virtual ~StatisticsSrcSrcBase() = default;
@@ -134,75 +134,75 @@ template <typename oppT, typename nppT> class StatisticsSrcSrcBase
 
     template <typename ImgT> void Init(const ImgT &aCpuSrc1, const ImgT &aCpuSrc2)
     {
-        opp.Init();
+        mpp.Init();
         npp.Init();
 
-        aCpuSrc1 >> opp.GetSrc1();
+        aCpuSrc1 >> mpp.GetSrc1();
         aCpuSrc1 >> npp.GetSrc1();
 
-        aCpuSrc2 >> opp.GetSrc2();
+        aCpuSrc2 >> mpp.GetSrc2();
         aCpuSrc2 >> npp.GetSrc2();
     }
 
     void Run(const Roi &aRoi)
     {
-        opp.SetRoi(aRoi);
+        mpp.SetRoi(aRoi);
         npp.SetRoi(aRoi);
-        opp.AllocBuffer(); // might change with roi...
+        mpp.AllocBuffer(); // might change with roi...
         npp.AllocBuffer(); // might change with roi...
 
-        opp.WarmUp();
-        rt_opp = opp.Run();
+        mpp.WarmUp();
+        rt_mpp = mpp.Run();
 
         npp.WarmUp();
         rt_npp = npp.Run();
     }
 
-    template <PixelType oppT2, PixelType nppT2> TestResult GetResult()
+    template <PixelType mppT2, PixelType nppT2> TestResult GetResult()
     {
         std::cout << GetName() << " for " << GetType() << std::endl;
 
         nppT2 resNpp;
-        oppT2 resOpp;
+        mppT2 resMpp;
 
         npp.GetDst() >> resNpp.data();
-        opp.GetDst() >> resOpp.data();
+        mpp.GetDst() >> resMpp.data();
 
-        std::cout << "OPP:" << std::endl;
-        std::cout << rt_opp << std::endl;
+        std::cout << "MPP:" << std::endl;
+        std::cout << rt_mpp << std::endl;
         std::cout << "NPP:" << std::endl;
         std::cout << rt_npp << std::endl;
 
-        const float ratio = rt_npp.Mean / rt_opp.Mean;
+        const float ratio = rt_npp.Mean / rt_mpp.Mean;
         if (ratio >= 1.0f)
         {
-            std::cout << "OPP is " << (rt_npp.Mean - rt_opp.Mean) / static_cast<float>(repeats) << " msec or "
+            std::cout << "MPP is " << (rt_npp.Mean - rt_mpp.Mean) / static_cast<float>(repeats) << " msec or "
                       << ratio * 100.0f - 100.0f << "% faster!" << std::endl;
         }
         else
         {
-            std::cout << "OPP is " << (rt_opp.Mean - rt_npp.Mean) / static_cast<float>(repeats) << " msec or "
+            std::cout << "MPP is " << (rt_mpp.Mean - rt_npp.Mean) / static_cast<float>(repeats) << " msec or "
                       << 1.0f / ratio * 100.0f - 100.0f << "% slower..." << std::endl;
         }
 
-        std::cout << "Result NPP: " << resNpp << " OPP: " << resOpp << std::endl;
+        std::cout << "Result NPP: " << resNpp << " MPP: " << resMpp << std::endl;
         std::cout << std::endl
                   << "--------------------------------------------------------------------------------" << std::endl;
 
         TestResult res;
 
         res.Name                   = GetName() + " for " + GetType();
-        res.TotalOPP               = rt_opp.Total;
+        res.TotalMPP               = rt_mpp.Total;
         res.TotalNPP               = rt_npp.Total;
-        res.MeanOPP                = rt_opp.Mean;
+        res.MeanMPP                = rt_mpp.Mean;
         res.MeanNPP                = rt_npp.Mean;
-        res.StdOPP                 = rt_opp.Std;
+        res.StdMPP                 = rt_mpp.Std;
         res.StdNPP                 = rt_npp.Std;
-        res.MinOPP                 = rt_opp.Min;
+        res.MinMPP                 = rt_mpp.Min;
         res.MinNPP                 = rt_npp.Min;
-        res.MaxOPP                 = rt_opp.Max;
+        res.MaxMPP                 = rt_mpp.Max;
         res.MaxNPP                 = rt_npp.Max;
-        res.AbsoluteDifferenceMSec = (rt_npp.Mean - rt_opp.Mean) / static_cast<float>(repeats);
+        res.AbsoluteDifferenceMSec = (rt_npp.Mean - rt_mpp.Mean) / static_cast<float>(repeats);
         if (ratio >= 1.0f)
         {
             res.RelativeDifference = ratio * 100.0f - 100.0f;
@@ -215,20 +215,20 @@ template <typename oppT, typename nppT> class StatisticsSrcSrcBase
     }
 
   protected:
-    oppT opp;
+    mppT mpp;
     nppT npp;
 
-    Runtime rt_opp;
+    Runtime rt_mpp;
     Runtime rt_npp;
 
     size_t repeats;
 };
 
-template <PixelType SrcT, typename DstT> class QualityIndexOpp : public TestOppSrcSrcReductionBase<SrcT, DstT>
+template <PixelType SrcT, typename DstT> class QualityIndexMpp : public TestMppSrcSrcReductionBase<SrcT, DstT>
 {
   public:
-    QualityIndexOpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : TestOppSrcSrcReductionBase<SrcT, DstT>(aIterations, aRepeats, aWidth, aHeight)
+    QualityIndexMpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+        : TestMppSrcSrcReductionBase<SrcT, DstT>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -269,11 +269,11 @@ class QualityIndexNpp : public TestNppSrcSrcReductionBase<SrcT, DstT, resSize>
 
 template <PixelType SrcT, typename DstT, typename SrcT2, typename DstT2, size_t resSize>
 class QualityIndexTest
-    : public StatisticsSrcSrcBase<QualityIndexOpp<SrcT, DstT>, QualityIndexNpp<SrcT2, DstT2, resSize>>
+    : public StatisticsSrcSrcBase<QualityIndexMpp<SrcT, DstT>, QualityIndexNpp<SrcT2, DstT2, resSize>>
 {
   public:
     QualityIndexTest(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : StatisticsSrcSrcBase<QualityIndexOpp<SrcT, DstT>, QualityIndexNpp<SrcT2, DstT2, resSize>>(
+        : StatisticsSrcSrcBase<QualityIndexMpp<SrcT, DstT>, QualityIndexNpp<SrcT2, DstT2, resSize>>(
               aIterations, aRepeats, aWidth, aHeight)
     {
     }
@@ -289,11 +289,11 @@ class QualityIndexTest
     }
 };
 
-template <PixelType SrcT, typename DstT> class MaxOpp : public TestOppSrcReductionBase<SrcT, DstT>
+template <PixelType SrcT, typename DstT> class MaxMpp : public TestMppSrcReductionBase<SrcT, DstT>
 {
   public:
-    MaxOpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : TestOppSrcReductionBase<SrcT, DstT>(aIterations, aRepeats, aWidth, aHeight)
+    MaxMpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+        : TestMppSrcReductionBase<SrcT, DstT>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -341,11 +341,11 @@ class MaxNpp : public TestNppSrcReductionBase<SrcT, DstT, resSize>
 };
 
 template <PixelType SrcT, typename DstT, typename SrcT2, typename DstT2, size_t resSize>
-class MaxTest : public StatisticsSrcBase<MaxOpp<SrcT, DstT>, MaxNpp<SrcT2, DstT2, resSize>>
+class MaxTest : public StatisticsSrcBase<MaxMpp<SrcT, DstT>, MaxNpp<SrcT2, DstT2, resSize>>
 {
   public:
     MaxTest(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : StatisticsSrcBase<MaxOpp<SrcT, DstT>, MaxNpp<SrcT2, DstT2, resSize>>(aIterations, aRepeats, aWidth, aHeight)
+        : StatisticsSrcBase<MaxMpp<SrcT, DstT>, MaxNpp<SrcT2, DstT2, resSize>>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -360,11 +360,11 @@ class MaxTest : public StatisticsSrcBase<MaxOpp<SrcT, DstT>, MaxNpp<SrcT2, DstT2
     }
 };
 
-template <PixelType SrcT, typename DstT> class MeanOpp : public TestOppSrcReductionBase<SrcT, DstT>
+template <PixelType SrcT, typename DstT> class MeanMpp : public TestMppSrcReductionBase<SrcT, DstT>
 {
   public:
-    MeanOpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : TestOppSrcReductionBase<SrcT, DstT>(aIterations, aRepeats, aWidth, aHeight)
+    MeanMpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+        : TestMppSrcReductionBase<SrcT, DstT>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -412,11 +412,11 @@ class MeanNpp : public TestNppSrcReductionBase<SrcT, DstT, resSize>
 };
 
 template <PixelType SrcT, typename DstT, typename SrcT2, typename DstT2, size_t resSize>
-class MeanTest : public StatisticsSrcBase<MeanOpp<SrcT, DstT>, MeanNpp<SrcT2, DstT2, resSize>>
+class MeanTest : public StatisticsSrcBase<MeanMpp<SrcT, DstT>, MeanNpp<SrcT2, DstT2, resSize>>
 {
   public:
     MeanTest(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : StatisticsSrcBase<MeanOpp<SrcT, DstT>, MeanNpp<SrcT2, DstT2, resSize>>(aIterations, aRepeats, aWidth, aHeight)
+        : StatisticsSrcBase<MeanMpp<SrcT, DstT>, MeanNpp<SrcT2, DstT2, resSize>>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -431,11 +431,11 @@ class MeanTest : public StatisticsSrcBase<MeanOpp<SrcT, DstT>, MeanNpp<SrcT2, Ds
     }
 };
 
-template <PixelType SrcT, typename DstT> class MeanStdOpp : public TestOppSrcReductionBase<SrcT, DstT>
+template <PixelType SrcT, typename DstT> class MeanStdMpp : public TestMppSrcReductionBase<SrcT, DstT>
 {
   public:
-    MeanStdOpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : TestOppSrcReductionBase<SrcT, DstT>(aIterations, aRepeats, aWidth, aHeight)
+    MeanStdMpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+        : TestMppSrcReductionBase<SrcT, DstT>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -499,11 +499,11 @@ class MeanStdNpp : public TestNppSrcReductionBase<SrcT, DstT, resSize>
 };
 
 template <PixelType SrcT, typename DstT, typename SrcT2, typename DstT2, size_t resSize>
-class MeanStdTest : public StatisticsSrcBase<MeanStdOpp<SrcT, DstT>, MeanStdNpp<SrcT2, DstT2, resSize>>
+class MeanStdTest : public StatisticsSrcBase<MeanStdMpp<SrcT, DstT>, MeanStdNpp<SrcT2, DstT2, resSize>>
 {
   public:
     MeanStdTest(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : StatisticsSrcBase<MeanStdOpp<SrcT, DstT>, MeanStdNpp<SrcT2, DstT2, resSize>>(aIterations, aRepeats, aWidth,
+        : StatisticsSrcBase<MeanStdMpp<SrcT, DstT>, MeanStdNpp<SrcT2, DstT2, resSize>>(aIterations, aRepeats, aWidth,
                                                                                        aHeight)
     {
     }
@@ -519,11 +519,11 @@ class MeanStdTest : public StatisticsSrcBase<MeanStdOpp<SrcT, DstT>, MeanStdNpp<
     }
 };
 
-template <PixelType SrcT, typename DstT> class MSEOpp : public TestOppSrcSrcReductionBase<SrcT, DstT>
+template <PixelType SrcT, typename DstT> class MSEMpp : public TestMppSrcSrcReductionBase<SrcT, DstT>
 {
   public:
-    MSEOpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : TestOppSrcSrcReductionBase<SrcT, DstT>(aIterations, aRepeats, aWidth, aHeight)
+    MSEMpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+        : TestMppSrcSrcReductionBase<SrcT, DstT>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -571,11 +571,11 @@ class MSENpp : public TestNppSrcSrcReductionBase<SrcT, DstT, resSize>
 };
 
 template <PixelType SrcT, typename DstT, typename SrcT2, typename DstT2, size_t resSize>
-class MSETest : public StatisticsSrcSrcBase<MSEOpp<SrcT, DstT>, MSENpp<SrcT2, DstT2, resSize>>
+class MSETest : public StatisticsSrcSrcBase<MSEMpp<SrcT, DstT>, MSENpp<SrcT2, DstT2, resSize>>
 {
   public:
     MSETest(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : StatisticsSrcSrcBase<MSEOpp<SrcT, DstT>, MSENpp<SrcT2, DstT2, resSize>>(aIterations, aRepeats, aWidth,
+        : StatisticsSrcSrcBase<MSEMpp<SrcT, DstT>, MSENpp<SrcT2, DstT2, resSize>>(aIterations, aRepeats, aWidth,
                                                                                   aHeight)
     {
     }
@@ -590,4 +590,4 @@ class MSETest : public StatisticsSrcSrcBase<MSEOpp<SrcT, DstT>, MSENpp<SrcT2, Ds
         return pixel_type_name<SrcT>::value;
     }
 };
-} // namespace opp
+} // namespace mpp

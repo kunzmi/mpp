@@ -6,7 +6,7 @@
 #include <numeric>
 #include <vector>
 
-namespace opp
+namespace mpp
 {
 Runtime::Runtime(const std::vector<float> &aTimings, float aTotal) : Total(aTotal)
 {
@@ -37,4 +37,4 @@ std::ostream &operator<<(std::ostream &aOs, const Runtime &aRuntime)
 
     return aOs;
 }
-} // namespace opp
+} // namespace mpp

@@ -2,5 +2,5 @@
 #include <common/image/border.h>
 #include <ostream>
 
-void runPixel8uC3(size_t aIterations, size_t aRepeats, int aWidth, int aHeight, const opp::image::Border &aBorder,
+void runPixel8uC3(size_t aIterations, size_t aRepeats, int aWidth, int aHeight, const mpp::image::Border &aBorder,
                   std::ofstream &aCsv);

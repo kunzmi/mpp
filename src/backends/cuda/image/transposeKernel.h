@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/image/configurations.h>
@@ -15,7 +15,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 
 /// <summary>
@@ -64,7 +64,7 @@ void InvokeTransposeKernel(const dim3 &aBlockSize, uint aSharedMemory, cudaStrea
 
 template <typename SrcDstT>
 void InvokeTransposeKernelDefault(const SrcDstT *aSrc, size_t aPitchSrc, SrcDstT *aDst, size_t aPitchDst,
-                                  const Size2D &aSizeDst, const opp::cuda::StreamCtx &aStreamCtx)
+                                  const Size2D &aSizeDst, const mpp::cuda::StreamCtx &aStreamCtx)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {
@@ -94,5 +94,5 @@ void InvokeTransposeKernelDefault(const SrcDstT *aSrc, size_t aPitchSrc, SrcDstT
     }
 }
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

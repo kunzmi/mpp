@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-namespace opp::fileIO
+namespace mpp::fileIO
 {
 FileReader::FileReader() : mIStream(nullptr)
 {
@@ -176,4 +176,4 @@ size_t FileReader::TellRead()
     const size_t ret = to_size_t(mIStream->tellg());
     return ret;
 }
-} // namespace opp::fileIO
+} // namespace mpp::fileIO

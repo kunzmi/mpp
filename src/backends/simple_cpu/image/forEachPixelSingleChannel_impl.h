@@ -13,7 +13,7 @@
 #include <common/vector_typetraits.h>
 #include <iostream>
 
-namespace opp::image::cpuSimple
+namespace mpp::image::cpuSimple
 {
 /// <summary>
 /// runs aFunctor on every pixel (only one channel of a multi-channel pixel) of an image. no inplace operation, no mask.
@@ -34,4 +34,4 @@ void forEachPixelSingleChannel(ImageView<DstT> &aDst, Channel aDstChannel, const
         pixelOut[aDstChannel] = res.x;
     }
 }
-} // namespace opp::image::cpuSimple
+} // namespace mpp::image::cpuSimple

@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-namespace opp::image
+namespace mpp::image
 {
 template <RealFloatingPoint T> constexpr size_t Matrix<T>::GetIndex(int aRow, int aCol)
 {
@@ -520,4 +520,4 @@ const Matrix<float> RGBtoXYZ =
     Matrix<float>(0.412453f, 0.35758f, 0.180423f, 0.212671f, 0.71516f, 0.072169f, 0.019334f, 0.119193f, 0.950227f);
 const Matrix<float> XYZtoRGB =
     Matrix<float>(3.240479f, -1.53715f, -0.498535f, -0.969256f, 1.875991f, 0.041556f, 0.055648f, -0.204043f, 1.057311f);
-} // namespace opp::image
+} // namespace mpp::image

@@ -16,7 +16,7 @@
 #include <utilities/nppParser/nppParser.h>
 #include <vector>
 
-using namespace opp::utilities::nppParser;
+using namespace mpp::utilities::nppParser;
 
 std::string ReplaceAll(std::string aSrc, const std::string &aToReplace, const std::string &aReplaceBy)
 {
@@ -30,7 +30,7 @@ std::string ReplaceAll(std::string aSrc, const std::string &aToReplace, const st
 }
 
 size_t processForPixelType(const std::vector<Function> &aFunctions, std::vector<Function> &aBatchFunction,
-                           const std::string &aTypeString, opp::image::PixelTypeEnum aType,
+                           const std::string &aTypeString, mpp::image::PixelTypeEnum aType,
                            const std::string &aCondition, nlohmann::json &aJson,
                            std::vector<Function> &aConversionCheck)
 {
@@ -52,42 +52,42 @@ size_t processForPixelType(const std::vector<Function> &aFunctions, std::vector<
             }
             if (GetChannelCount(aType) == 4)
             {
-                opp::image::PixelTypeEnum alphaType = opp::image::PixelTypeEnum::Unknown;
+                mpp::image::PixelTypeEnum alphaType = mpp::image::PixelTypeEnum::Unknown;
                 switch (aType)
                 {
-                    case opp::image::PixelTypeEnum::PTE64fC4:
-                        alphaType = opp::image::PixelTypeEnum::PTE64fC4A;
+                    case mpp::image::PixelTypeEnum::PTE64fC4:
+                        alphaType = mpp::image::PixelTypeEnum::PTE64fC4A;
                         break;
-                    case opp::image::PixelTypeEnum::PTE32fC4:
-                        alphaType = opp::image::PixelTypeEnum::PTE32fC4A;
+                    case mpp::image::PixelTypeEnum::PTE32fC4:
+                        alphaType = mpp::image::PixelTypeEnum::PTE32fC4A;
                         break;
-                    case opp::image::PixelTypeEnum::PTE16fC4:
-                        alphaType = opp::image::PixelTypeEnum::PTE16fC4A;
+                    case mpp::image::PixelTypeEnum::PTE16fC4:
+                        alphaType = mpp::image::PixelTypeEnum::PTE16fC4A;
                         break;
-                    case opp::image::PixelTypeEnum::PTE16bfC4:
-                        alphaType = opp::image::PixelTypeEnum::PTE16bfC4A;
+                    case mpp::image::PixelTypeEnum::PTE16bfC4:
+                        alphaType = mpp::image::PixelTypeEnum::PTE16bfC4A;
                         break;
-                    case opp::image::PixelTypeEnum::PTE32sC4:
-                        alphaType = opp::image::PixelTypeEnum::PTE32sC4A;
+                    case mpp::image::PixelTypeEnum::PTE32sC4:
+                        alphaType = mpp::image::PixelTypeEnum::PTE32sC4A;
                         break;
-                    case opp::image::PixelTypeEnum::PTE32uC4:
-                        alphaType = opp::image::PixelTypeEnum::PTE32uC4A;
+                    case mpp::image::PixelTypeEnum::PTE32uC4:
+                        alphaType = mpp::image::PixelTypeEnum::PTE32uC4A;
                         break;
-                    case opp::image::PixelTypeEnum::PTE16sC4:
-                        alphaType = opp::image::PixelTypeEnum::PTE16sC4A;
+                    case mpp::image::PixelTypeEnum::PTE16sC4:
+                        alphaType = mpp::image::PixelTypeEnum::PTE16sC4A;
                         break;
-                    case opp::image::PixelTypeEnum::PTE16uC4:
-                        alphaType = opp::image::PixelTypeEnum::PTE16uC4A;
+                    case mpp::image::PixelTypeEnum::PTE16uC4:
+                        alphaType = mpp::image::PixelTypeEnum::PTE16uC4A;
                         break;
-                    case opp::image::PixelTypeEnum::PTE8sC4:
-                        alphaType = opp::image::PixelTypeEnum::PTE8sC4A;
+                    case mpp::image::PixelTypeEnum::PTE8sC4:
+                        alphaType = mpp::image::PixelTypeEnum::PTE8sC4A;
                         break;
-                    case opp::image::PixelTypeEnum::PTE8uC4:
-                        alphaType = opp::image::PixelTypeEnum::PTE8uC4A;
+                    case mpp::image::PixelTypeEnum::PTE8uC4:
+                        alphaType = mpp::image::PixelTypeEnum::PTE8uC4A;
                         break;
-                    case opp::image::PixelTypeEnum::PTE16scC4:
-                    case opp::image::PixelTypeEnum::PTE32scC4:
-                    case opp::image::PixelTypeEnum::PTE32fcC4:
+                    case mpp::image::PixelTypeEnum::PTE16scC4:
+                    case mpp::image::PixelTypeEnum::PTE32scC4:
+                    case mpp::image::PixelTypeEnum::PTE32fcC4:
                         continue;
                     default:
                         break;
@@ -109,7 +109,7 @@ size_t processForPixelType(const std::vector<Function> &aFunctions, std::vector<
             aBatchFunction.push_back(func);
             continue;
         }
-        if (aType == opp::image::PixelTypeEnum::PTE8uC2)
+        if (aType == mpp::image::PixelTypeEnum::PTE8uC2)
         {
             for (auto &arg : func.arguments)
             {
@@ -145,7 +145,7 @@ size_t processForPixelType(const std::vector<Function> &aFunctions, std::vector<
 
     cpp << "// Code automatically generated by nppCodeGenerator - do not modify manually" << std::endl;
     cpp << "#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)" << std::endl;
-    cpp << "#if OPP_ENABLE_NPP_BACKEND" << std::endl;
+    cpp << "#if MPP_ENABLE_NPP_BACKEND" << std::endl;
     cpp << "#include <common/image/pixelTypeEnabler.h> //NOLINT(misc-include-cleaner)" << std::endl;
     cpp << std::endl;
     cpp << imageHeaders;
@@ -215,8 +215,8 @@ int main()
         {
             // 8uC1
             {
-                const std::string condition          = "OPPi_ENABLE_UINT8_TYPE && OPPi_ENABLE_ONE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE8uC1;
+                const std::string condition          = "MPPi_ENABLE_UINT8_TYPE && MPPi_ENABLE_ONE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE8uC1;
                 const std::string typeString         = "8uC1";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -225,8 +225,8 @@ int main()
 
             // 8uC2
             {
-                const std::string condition          = "OPPi_ENABLE_UINT8_TYPE && OPPi_ENABLE_TWO_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE8uC2;
+                const std::string condition          = "MPPi_ENABLE_UINT8_TYPE && MPPi_ENABLE_TWO_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE8uC2;
                 const std::string typeString         = "8uC2";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -235,8 +235,8 @@ int main()
 
             // 8uC3
             {
-                const std::string condition          = "OPPi_ENABLE_UINT8_TYPE && OPPi_ENABLE_THREE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE8uC3;
+                const std::string condition          = "MPPi_ENABLE_UINT8_TYPE && MPPi_ENABLE_THREE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE8uC3;
                 const std::string typeString         = "8uC3";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -245,8 +245,8 @@ int main()
 
             // 8uC4
             {
-                const std::string condition          = "OPPi_ENABLE_UINT8_TYPE && OPPi_ENABLE_FOUR_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE8uC4;
+                const std::string condition          = "MPPi_ENABLE_UINT8_TYPE && MPPi_ENABLE_FOUR_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE8uC4;
                 const std::string typeString         = "8uC4";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -258,8 +258,8 @@ int main()
         {
             // 8sC1
             {
-                const std::string condition          = "OPPi_ENABLE_INT8_TYPE && OPPi_ENABLE_ONE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE8sC1;
+                const std::string condition          = "MPPi_ENABLE_INT8_TYPE && MPPi_ENABLE_ONE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE8sC1;
                 const std::string typeString         = "8sC1";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -268,8 +268,8 @@ int main()
 
             // 8sC2
             {
-                const std::string condition          = "OPPi_ENABLE_INT8_TYPE && OPPi_ENABLE_TWO_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE8sC2;
+                const std::string condition          = "MPPi_ENABLE_INT8_TYPE && MPPi_ENABLE_TWO_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE8sC2;
                 const std::string typeString         = "8sC2";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -278,8 +278,8 @@ int main()
 
             // 8sC3
             {
-                const std::string condition          = "OPPi_ENABLE_INT8_TYPE && OPPi_ENABLE_THREE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE8sC3;
+                const std::string condition          = "MPPi_ENABLE_INT8_TYPE && MPPi_ENABLE_THREE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE8sC3;
                 const std::string typeString         = "8sC3";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -288,8 +288,8 @@ int main()
 
             // 8sC4
             {
-                const std::string condition          = "OPPi_ENABLE_INT8_TYPE && OPPi_ENABLE_FOUR_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE8sC4;
+                const std::string condition          = "MPPi_ENABLE_INT8_TYPE && MPPi_ENABLE_FOUR_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE8sC4;
                 const std::string typeString         = "8sC4";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -301,8 +301,8 @@ int main()
         {
             // 16uC1
             {
-                const std::string condition          = "OPPi_ENABLE_UINT16_TYPE && OPPi_ENABLE_ONE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16uC1;
+                const std::string condition          = "MPPi_ENABLE_UINT16_TYPE && MPPi_ENABLE_ONE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE16uC1;
                 const std::string typeString         = "16uC1";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -311,8 +311,8 @@ int main()
 
             // 16uC2
             {
-                const std::string condition          = "OPPi_ENABLE_UINT16_TYPE && OPPi_ENABLE_TWO_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16uC2;
+                const std::string condition          = "MPPi_ENABLE_UINT16_TYPE && MPPi_ENABLE_TWO_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE16uC2;
                 const std::string typeString         = "16uC2";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -321,8 +321,8 @@ int main()
 
             // 16uC3
             {
-                const std::string condition          = "OPPi_ENABLE_UINT16_TYPE && OPPi_ENABLE_THREE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16uC3;
+                const std::string condition          = "MPPi_ENABLE_UINT16_TYPE && MPPi_ENABLE_THREE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE16uC3;
                 const std::string typeString         = "16uC3";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -331,8 +331,8 @@ int main()
 
             // 16uC4
             {
-                const std::string condition          = "OPPi_ENABLE_UINT16_TYPE && OPPi_ENABLE_FOUR_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16uC4;
+                const std::string condition          = "MPPi_ENABLE_UINT16_TYPE && MPPi_ENABLE_FOUR_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE16uC4;
                 const std::string typeString         = "16uC4";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -344,8 +344,8 @@ int main()
         {
             // 16sC1
             {
-                const std::string condition          = "OPPi_ENABLE_INT16_TYPE && OPPi_ENABLE_ONE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16sC1;
+                const std::string condition          = "MPPi_ENABLE_INT16_TYPE && MPPi_ENABLE_ONE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE16sC1;
                 const std::string typeString         = "16sC1";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -354,8 +354,8 @@ int main()
 
             // 16sC2
             {
-                const std::string condition          = "OPPi_ENABLE_INT16_TYPE && OPPi_ENABLE_TWO_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16sC2;
+                const std::string condition          = "MPPi_ENABLE_INT16_TYPE && MPPi_ENABLE_TWO_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE16sC2;
                 const std::string typeString         = "16sC2";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -364,8 +364,8 @@ int main()
 
             // 16sC3
             {
-                const std::string condition          = "OPPi_ENABLE_INT16_TYPE && OPPi_ENABLE_THREE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16sC3;
+                const std::string condition          = "MPPi_ENABLE_INT16_TYPE && MPPi_ENABLE_THREE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE16sC3;
                 const std::string typeString         = "16sC3";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -374,8 +374,8 @@ int main()
 
             // 16sC4
             {
-                const std::string condition          = "OPPi_ENABLE_INT16_TYPE && OPPi_ENABLE_FOUR_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16sC4;
+                const std::string condition          = "MPPi_ENABLE_INT16_TYPE && MPPi_ENABLE_FOUR_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE16sC4;
                 const std::string typeString         = "16sC4";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -387,8 +387,8 @@ int main()
         {
             // 16scC1
             {
-                const std::string condition          = "OPPi_ENABLE_COMPLEX_INT16_TYPE && OPPi_ENABLE_ONE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16scC1;
+                const std::string condition          = "MPPi_ENABLE_COMPLEX_INT16_TYPE && MPPi_ENABLE_ONE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE16scC1;
                 const std::string typeString         = "16scC1";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -397,8 +397,8 @@ int main()
 
             // 16scC2
             {
-                const std::string condition          = "OPPi_ENABLE_COMPLEX_INT16_TYPE && OPPi_ENABLE_TWO_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16scC2;
+                const std::string condition          = "MPPi_ENABLE_COMPLEX_INT16_TYPE && MPPi_ENABLE_TWO_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE16scC2;
                 const std::string typeString         = "16scC2";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -407,8 +407,8 @@ int main()
 
             // 16scC3
             {
-                const std::string condition          = "OPPi_ENABLE_COMPLEX_INT16_TYPE && OPPi_ENABLE_THREE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16scC3;
+                const std::string condition          = "MPPi_ENABLE_COMPLEX_INT16_TYPE && MPPi_ENABLE_THREE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE16scC3;
                 const std::string typeString         = "16scC3";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -417,8 +417,8 @@ int main()
 
             // 16scC4
             {
-                const std::string condition          = "OPPi_ENABLE_COMPLEX_INT16_TYPE && OPPi_ENABLE_FOUR_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16scC4;
+                const std::string condition          = "MPPi_ENABLE_COMPLEX_INT16_TYPE && MPPi_ENABLE_FOUR_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE16scC4;
                 const std::string typeString         = "16scC4";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -430,8 +430,8 @@ int main()
         {
             // 32uC1
             {
-                const std::string condition          = "OPPi_ENABLE_UINT32_TYPE && OPPi_ENABLE_ONE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32uC1;
+                const std::string condition          = "MPPi_ENABLE_UINT32_TYPE && MPPi_ENABLE_ONE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE32uC1;
                 const std::string typeString         = "32uC1";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -440,8 +440,8 @@ int main()
 
             // 32uC2
             {
-                const std::string condition          = "OPPi_ENABLE_UINT32_TYPE && OPPi_ENABLE_TWO_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32uC2;
+                const std::string condition          = "MPPi_ENABLE_UINT32_TYPE && MPPi_ENABLE_TWO_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE32uC2;
                 const std::string typeString         = "32uC2";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -450,8 +450,8 @@ int main()
 
             // 32uC3
             {
-                const std::string condition          = "OPPi_ENABLE_UINT32_TYPE && OPPi_ENABLE_THREE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32uC3;
+                const std::string condition          = "MPPi_ENABLE_UINT32_TYPE && MPPi_ENABLE_THREE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE32uC3;
                 const std::string typeString         = "32uC3";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -460,8 +460,8 @@ int main()
 
             // 32uC4
             {
-                const std::string condition          = "OPPi_ENABLE_UINT32_TYPE && OPPi_ENABLE_FOUR_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32uC4;
+                const std::string condition          = "MPPi_ENABLE_UINT32_TYPE && MPPi_ENABLE_FOUR_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE32uC4;
                 const std::string typeString         = "32uC4";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -473,8 +473,8 @@ int main()
         {
             // 32sC1
             {
-                const std::string condition          = "OPPi_ENABLE_INT32_TYPE && OPPi_ENABLE_ONE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32sC1;
+                const std::string condition          = "MPPi_ENABLE_INT32_TYPE && MPPi_ENABLE_ONE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE32sC1;
                 const std::string typeString         = "32sC1";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -483,8 +483,8 @@ int main()
 
             // 32sC2
             {
-                const std::string condition          = "OPPi_ENABLE_INT32_TYPE && OPPi_ENABLE_TWO_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32sC2;
+                const std::string condition          = "MPPi_ENABLE_INT32_TYPE && MPPi_ENABLE_TWO_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE32sC2;
                 const std::string typeString         = "32sC2";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -493,8 +493,8 @@ int main()
 
             // 32sC3
             {
-                const std::string condition          = "OPPi_ENABLE_INT32_TYPE && OPPi_ENABLE_THREE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32sC3;
+                const std::string condition          = "MPPi_ENABLE_INT32_TYPE && MPPi_ENABLE_THREE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE32sC3;
                 const std::string typeString         = "32sC3";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -503,8 +503,8 @@ int main()
 
             // 32sC4
             {
-                const std::string condition          = "OPPi_ENABLE_INT32_TYPE && OPPi_ENABLE_FOUR_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32sC4;
+                const std::string condition          = "MPPi_ENABLE_INT32_TYPE && MPPi_ENABLE_FOUR_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE32sC4;
                 const std::string typeString         = "32sC4";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -516,8 +516,8 @@ int main()
         {
             // 32scC1
             {
-                const std::string condition          = "OPPi_ENABLE_COMPLEX_INT32_TYPE && OPPi_ENABLE_ONE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32scC1;
+                const std::string condition          = "MPPi_ENABLE_COMPLEX_INT32_TYPE && MPPi_ENABLE_ONE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE32scC1;
                 const std::string typeString         = "32scC1";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -526,8 +526,8 @@ int main()
 
             // 32scC2
             {
-                const std::string condition          = "OPPi_ENABLE_COMPLEX_INT32_TYPE && OPPi_ENABLE_TWO_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32scC2;
+                const std::string condition          = "MPPi_ENABLE_COMPLEX_INT32_TYPE && MPPi_ENABLE_TWO_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE32scC2;
                 const std::string typeString         = "32scC2";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -536,8 +536,8 @@ int main()
 
             // 32scC3
             {
-                const std::string condition          = "OPPi_ENABLE_COMPLEX_INT32_TYPE && OPPi_ENABLE_THREE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32scC3;
+                const std::string condition          = "MPPi_ENABLE_COMPLEX_INT32_TYPE && MPPi_ENABLE_THREE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE32scC3;
                 const std::string typeString         = "32scC3";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -546,8 +546,8 @@ int main()
 
             // 32scC4
             {
-                const std::string condition          = "OPPi_ENABLE_COMPLEX_INT32_TYPE && OPPi_ENABLE_FOUR_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32scC4;
+                const std::string condition          = "MPPi_ENABLE_COMPLEX_INT32_TYPE && MPPi_ENABLE_FOUR_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE32scC4;
                 const std::string typeString         = "32scC4";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -559,8 +559,8 @@ int main()
         {
             // 32fC1
             {
-                const std::string condition          = "OPPi_ENABLE_FLOAT_TYPE && OPPi_ENABLE_ONE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32fC1;
+                const std::string condition          = "MPPi_ENABLE_FLOAT_TYPE && MPPi_ENABLE_ONE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE32fC1;
                 const std::string typeString         = "32fC1";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -569,8 +569,8 @@ int main()
 
             // 32fC2
             {
-                const std::string condition          = "OPPi_ENABLE_FLOAT_TYPE && OPPi_ENABLE_TWO_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32fC2;
+                const std::string condition          = "MPPi_ENABLE_FLOAT_TYPE && MPPi_ENABLE_TWO_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE32fC2;
                 const std::string typeString         = "32fC2";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -579,8 +579,8 @@ int main()
 
             // 32fC3
             {
-                const std::string condition          = "OPPi_ENABLE_FLOAT_TYPE && OPPi_ENABLE_THREE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32fC3;
+                const std::string condition          = "MPPi_ENABLE_FLOAT_TYPE && MPPi_ENABLE_THREE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE32fC3;
                 const std::string typeString         = "32fC3";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -589,8 +589,8 @@ int main()
 
             // 32fC4
             {
-                const std::string condition          = "OPPi_ENABLE_FLOAT_TYPE && OPPi_ENABLE_FOUR_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32fC4;
+                const std::string condition          = "MPPi_ENABLE_FLOAT_TYPE && MPPi_ENABLE_FOUR_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE32fC4;
                 const std::string typeString         = "32fC4";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -602,8 +602,8 @@ int main()
         {
             // 32fcC1
             {
-                const std::string condition          = "OPPi_ENABLE_COMPLEX_FLOAT_TYPE && OPPi_ENABLE_ONE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32fcC1;
+                const std::string condition          = "MPPi_ENABLE_COMPLEX_FLOAT_TYPE && MPPi_ENABLE_ONE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE32fcC1;
                 const std::string typeString         = "32fcC1";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -612,8 +612,8 @@ int main()
 
             // 32fcC2
             {
-                const std::string condition          = "OPPi_ENABLE_COMPLEX_FLOAT_TYPE && OPPi_ENABLE_TWO_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32fcC2;
+                const std::string condition          = "MPPi_ENABLE_COMPLEX_FLOAT_TYPE && MPPi_ENABLE_TWO_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE32fcC2;
                 const std::string typeString         = "32fcC2";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -622,8 +622,8 @@ int main()
 
             // 32fcC3
             {
-                const std::string condition          = "OPPi_ENABLE_COMPLEX_FLOAT_TYPE && OPPi_ENABLE_THREE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32fcC3;
+                const std::string condition          = "MPPi_ENABLE_COMPLEX_FLOAT_TYPE && MPPi_ENABLE_THREE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE32fcC3;
                 const std::string typeString         = "32fcC3";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -632,8 +632,8 @@ int main()
 
             // 32fcC4
             {
-                const std::string condition          = "OPPi_ENABLE_COMPLEX_FLOAT_TYPE && OPPi_ENABLE_FOUR_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE32fcC4;
+                const std::string condition          = "MPPi_ENABLE_COMPLEX_FLOAT_TYPE && MPPi_ENABLE_FOUR_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE32fcC4;
                 const std::string typeString         = "32fcC4";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -645,8 +645,8 @@ int main()
         {
             // 64fC1
             {
-                const std::string condition          = "OPPi_ENABLE_DOUBLE_TYPE && OPPi_ENABLE_ONE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE64fC1;
+                const std::string condition          = "MPPi_ENABLE_DOUBLE_TYPE && MPPi_ENABLE_ONE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE64fC1;
                 const std::string typeString         = "64fC1";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -655,8 +655,8 @@ int main()
 
             // 64fC2
             {
-                const std::string condition          = "OPPi_ENABLE_DOUBLE_TYPE && OPPi_ENABLE_TWO_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE64fC2;
+                const std::string condition          = "MPPi_ENABLE_DOUBLE_TYPE && MPPi_ENABLE_TWO_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE64fC2;
                 const std::string typeString         = "64fC2";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -665,8 +665,8 @@ int main()
 
             // 64fC3
             {
-                const std::string condition          = "OPPi_ENABLE_DOUBLE_TYPE && OPPi_ENABLE_THREE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE64fC3;
+                const std::string condition          = "MPPi_ENABLE_DOUBLE_TYPE && MPPi_ENABLE_THREE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE64fC3;
                 const std::string typeString         = "64fC3";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -675,8 +675,8 @@ int main()
 
             // 64fC4
             {
-                const std::string condition          = "OPPi_ENABLE_DOUBLE_TYPE && OPPi_ENABLE_FOUR_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE64fC4;
+                const std::string condition          = "MPPi_ENABLE_DOUBLE_TYPE && MPPi_ENABLE_FOUR_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE64fC4;
                 const std::string typeString         = "64fC4";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -688,8 +688,8 @@ int main()
         {
             // 16fC1
             {
-                const std::string condition          = "OPPi_ENABLE_HALFFLOAT16_TYPE && OPPi_ENABLE_ONE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16fC1;
+                const std::string condition          = "MPPi_ENABLE_HALFFLOAT16_TYPE && MPPi_ENABLE_ONE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE16fC1;
                 const std::string typeString         = "16fC1";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -698,8 +698,8 @@ int main()
 
             // 16fC2
             {
-                const std::string condition          = "OPPi_ENABLE_HALFFLOAT16_TYPE && OPPi_ENABLE_TWO_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16fC2;
+                const std::string condition          = "MPPi_ENABLE_HALFFLOAT16_TYPE && MPPi_ENABLE_TWO_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE16fC2;
                 const std::string typeString         = "16fC2";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -708,8 +708,8 @@ int main()
 
             // 16fC3
             {
-                const std::string condition          = "OPPi_ENABLE_HALFFLOAT16_TYPE && OPPi_ENABLE_THREE_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16fC3;
+                const std::string condition          = "MPPi_ENABLE_HALFFLOAT16_TYPE && MPPi_ENABLE_THREE_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE16fC3;
                 const std::string typeString         = "16fC3";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -718,8 +718,8 @@ int main()
 
             // 16fC4
             {
-                const std::string condition          = "OPPi_ENABLE_HALFFLOAT16_TYPE && OPPi_ENABLE_FOUR_CHANNEL";
-                const opp::image::PixelTypeEnum type = opp::image::PixelTypeEnum::PTE16fC4;
+                const std::string condition          = "MPPi_ENABLE_HALFFLOAT16_TYPE && MPPi_ENABLE_FOUR_CHANNEL";
+                const mpp::image::PixelTypeEnum type = mpp::image::PixelTypeEnum::PTE16fC4;
                 const std::string typeString         = "16fC4";
 
                 totalConverted += processForPixelType(functionsNoCtxDoublets, batchFunc, typeString, type, condition,
@@ -758,7 +758,7 @@ int main()
         {
             if (elem.category != "support") // we don't need malloc and free here
             {
-                if (NPPParser::GetPixelType(elem) == opp::image::PixelTypeEnum::Unknown)
+                if (NPPParser::GetPixelType(elem) == mpp::image::PixelTypeEnum::Unknown)
                 {
                     unknown.push_back(elem);
                     std::cout << elem.name << std::endl;

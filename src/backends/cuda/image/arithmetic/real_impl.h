@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "real.h"
 #include <backends/cuda/image/configurations.h>
@@ -13,30 +13,30 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeRealSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                    const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using realSrc =
-            SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Real<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+            SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Real<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
 
-        const opp::Real<ComputeT> op;
+        const mpp::Real<ComputeT> op;
 
         const realSrc functor(aSrc1, aPitchSrc1, op);
 
@@ -59,5 +59,5 @@ void InvokeRealSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPit
 
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

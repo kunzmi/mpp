@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h>
-#if OPP_ENABLE_NPP_BACKEND
+#if MPP_ENABLE_NPP_BACKEND
 #include <common/image/pixelTypeEnabler.h>
 
 #include <common/exception.h>
@@ -10,12 +10,12 @@
 
 constexpr bool NPP_TRHOW_ON_WARNING = true;
 
-namespace opp::npp
+namespace mpp::npp
 {
 /// <summary>
 /// NppException is thrown when a NPP API call via nppSafeCall does not return NPP_SUCCESS.
 /// </summary>
-class NppException : public OPPException
+class NppException : public MPPException
 {
   private:
     static constexpr const char *ConvertErrorCodeToMessage(NppStatus aErrorCode);
@@ -294,7 +294,7 @@ constexpr const char *NppException::ConvertErrorCodeToName(NppStatus aErrorCode)
             return "UNKNOWN";
     }
 }
-} // namespace opp::npp
+} // namespace mpp::npp
 
 /// <summary>
 /// Checks if a NppStatus is NPP_SUCCESS and throws a corresponding NppException if not
@@ -306,14 +306,14 @@ inline void __nppSafeCall(NppStatus aErr, const char *aCodeFile, int aLine, cons
     {
         if (NPP_SUCCESS != aErr)
         {
-            throw opp::npp::NppException(aErr, aCodeFile, aLine, aFunction);
+            throw mpp::npp::NppException(aErr, aCodeFile, aLine, aFunction);
         }
     }
     else
     {
         if (aErr < NPP_SUCCESS) // negative codes indicate error, positive warning
         {
-            throw opp::npp::NppException(aErr, aCodeFile, aLine, aFunction);
+            throw mpp::npp::NppException(aErr, aCodeFile, aLine, aFunction);
         }
     }
 }
@@ -329,14 +329,14 @@ inline void __nppSafeCall(NppStatus aErr, const std::string &aMessage, const cha
     {
         if (NPP_SUCCESS != aErr)
         {
-            throw opp::npp::NppException(aErr, aMessage, aCodeFile, aLine, aFunction);
+            throw mpp::npp::NppException(aErr, aMessage, aCodeFile, aLine, aFunction);
         }
     }
     else
     {
         if (aErr < NPP_SUCCESS) // negative codes indicate error, positive warning
         {
-            throw opp::npp::NppException(aErr, aMessage, aCodeFile, aLine, aFunction);
+            throw mpp::npp::NppException(aErr, aMessage, aCodeFile, aLine, aFunction);
         }
     }
 }
@@ -354,8 +354,8 @@ inline void __nppSafeCall(NppStatus aErr, const std::string &aMessage, const cha
     }
 
 #define NPPEXCEPTION(msg)                                                                                              \
-    (opp::npp::NppException((std::ostringstream() << msg).str(), __FILE__, __LINE__, __PRETTY_FUNCTION__))
+    (mpp::npp::NppException((std::ostringstream() << msg).str(), __FILE__, __LINE__, __PRETTY_FUNCTION__))
 
 // NOLINTEND
 
-#endif // OPP_ENABLE_NPP_BACKEND
+#endif // MPP_ENABLE_NPP_BACKEND

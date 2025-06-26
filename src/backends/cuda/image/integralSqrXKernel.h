@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "integralXKernel.h" // for doShuffleUp functions
 #include <backends/cuda/cudaException.h>
@@ -17,7 +17,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 /// <summary>
 /// performs integral and integralSqr image computation in X direction and pads a row and a column.
@@ -380,7 +380,7 @@ void InvokeIntegralSqrXKernel(const dim3 &aBlockSize, uint aSharedMemory, int aW
 
 template <typename SrcT, typename DstT, class DstSqrT, size_t TupelSize>
 void InvokeIntegralSqrXKernelDefault(const SrcT *aSrc, size_t aPitchSrc, DstT *aDst, size_t aPitchDst, DstSqrT *aDstSqr,
-                                     size_t aPitchDstSqr, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+                                     size_t aPitchDstSqr, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {
@@ -401,5 +401,5 @@ void InvokeIntegralSqrXKernelDefault(const SrcT *aSrc, size_t aPitchSrc, DstT *a
     }
 }
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

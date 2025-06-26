@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-namespace opp::utilities::nppParser
+namespace mpp::utilities::nppParser
 {
 const std::filesystem::path NPPParser::_basePath = NPP_HEADER_DIR; // NOLINT(cert-err58-cpp)
 
@@ -256,7 +256,7 @@ bool NPPParser::GetContext(const std::string &aFName)
 {
     return aFName.substr(aFName.size() - 3) == "Ctx";
 }
-opp::image::PixelTypeEnum nppParser::NPPParser::GetPixelType(const Function &aFunction)
+mpp::image::PixelTypeEnum nppParser::NPPParser::GetPixelType(const Function &aFunction)
 {
     std::string channel    = GetChannelString(aFunction.name);
     const std::string type = GetTypeString(aFunction.name);
@@ -266,20 +266,20 @@ opp::image::PixelTypeEnum nppParser::NPPParser::GetPixelType(const Function &aFu
     if (aFunction.name == "nppiAddProduct_16f_C1IR_Ctx")
     {
         // special case...
-        return opp::image::PixelTypeEnum::PTE16fC1;
+        return mpp::image::PixelTypeEnum::PTE16fC1;
     }
 
     if (shortName == "AddSquare" || shortName == "AddProduct" || shortName == "AddWeighted")
     {
         // special case...
-        return opp::image::PixelTypeEnum::PTE32fC1;
+        return mpp::image::PixelTypeEnum::PTE32fC1;
     }
     if (aFunction.name == "nppiCompressedMarkerLabelsUFInfo_32u_C1R_Ctx" ||
         aFunction.name == "nppiContoursImageMarchingSquaresInterpolation_32f_C1R_Ctx" ||
         aFunction.name == "nppiContoursImageMarchingSquaresInterpolation_64f_C1R_Ctx")
     {
         // better call directly the NPP function for these ones...
-        return opp::image::PixelTypeEnum::Unknown;
+        return mpp::image::PixelTypeEnum::Unknown;
     }
 
     channel.erase(std::remove(channel.begin(), channel.end(), 'I'), channel.end());
@@ -297,31 +297,31 @@ opp::image::PixelTypeEnum nppParser::NPPParser::GetPixelType(const Function &aFu
         if (channel == "C1R" || channel == "AC1R" || channel == "C1" || channel == "C1CR" || channel == "C1C2R" ||
             channel == "C1C3R" || channel == "C1C4R" || channel == "C1AC4R" || channel == "P1R")
         {
-            return opp::image::PixelTypeEnum::PTE8uC1;
+            return mpp::image::PixelTypeEnum::PTE8uC1;
         }
         if (channel == "C2R" || channel == "C2" || channel == "C2CR" || channel == "C2C1R" || channel == "C2C3R" ||
             channel == "C2C4R" || channel == "C2P2R" || channel == "C2P3R" || channel == "P2R" || channel == "P2P3R" ||
             channel == "P2C2R" || channel == "P2C3R" || channel == "P2C4R")
         {
-            return opp::image::PixelTypeEnum::PTE8uC2;
+            return mpp::image::PixelTypeEnum::PTE8uC2;
         }
         if (channel == "C3R" || channel == "C3" || channel == "C3CR" || channel == "C3C1R" || channel == "C3C2R" ||
             channel == "C3C4R" || channel == "C3A0C4R" || channel == "C3P3R" || channel == "C3P2R" ||
             channel == "P3R" || channel == "P3P2R" || channel == "P3C2R" || channel == "P3C3R" || channel == "P3C4R" ||
             channel == "P3AC4R")
         {
-            return opp::image::PixelTypeEnum::PTE8uC3;
+            return mpp::image::PixelTypeEnum::PTE8uC3;
         }
         if (channel == "C4R" || channel == "C4" || channel == "C4CR" || channel == "C4C1R" || channel == "C4C3R" ||
             channel == "C4P4R" || channel == "C4P3R" || channel == "P4R" || channel == "P4P3R" || channel == "P4C3R" ||
             channel == "P4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE8uC4;
+            return mpp::image::PixelTypeEnum::PTE8uC4;
         }
         if (channel == "AC4R" || channel == "AC4CR" || channel == "AC4C1R" || channel == "AC4C2R" ||
             channel == "AC4P3R" || channel == "AC4P4R" || channel == "AP4R" || channel == "AP4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE8uC4A;
+            return mpp::image::PixelTypeEnum::PTE8uC4A;
         }
     }
 
@@ -330,31 +330,31 @@ opp::image::PixelTypeEnum nppParser::NPPParser::GetPixelType(const Function &aFu
         if (channel == "C1R" || channel == "AC1R" || channel == "C1" || channel == "C1CR" || channel == "C1C2R" ||
             channel == "C1C3R" || channel == "C1C4R" || channel == "C1AC4R" || channel == "P1R")
         {
-            return opp::image::PixelTypeEnum::PTE8sC1;
+            return mpp::image::PixelTypeEnum::PTE8sC1;
         }
         if (channel == "C2R" || channel == "C2" || channel == "C2CR" || channel == "C2C1R" || channel == "C2C3R" ||
             channel == "C2C4R" || channel == "C2P2R" || channel == "C2P3R" || channel == "P2R" || channel == "P2P3R" ||
             channel == "P2C2R" || channel == "P2C3R" || channel == "P2C4R")
         {
-            return opp::image::PixelTypeEnum::PTE8sC2;
+            return mpp::image::PixelTypeEnum::PTE8sC2;
         }
         if (channel == "C3R" || channel == "C3" || channel == "C3CR" || channel == "C3C1R" || channel == "C3C2R" ||
             channel == "C3C4R" || channel == "C3A0C4R" || channel == "C3P3R" || channel == "C3P2R" ||
             channel == "P3R" || channel == "P3P2R" || channel == "P3C2R" || channel == "P3C3R" || channel == "P3C4R" ||
             channel == "P3AC4R")
         {
-            return opp::image::PixelTypeEnum::PTE8sC3;
+            return mpp::image::PixelTypeEnum::PTE8sC3;
         }
         if (channel == "C4R" || channel == "C4" || channel == "C4CR" || channel == "C4C1R" || channel == "C4C3R" ||
             channel == "C4P4R" || channel == "C4P3R" || channel == "P4R" || channel == "P4P3R" || channel == "P4C3R" ||
             channel == "P4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE8sC4;
+            return mpp::image::PixelTypeEnum::PTE8sC4;
         }
         if (channel == "AC4R" || channel == "AC4CR" || channel == "AC4C1R" || channel == "AC4C2R" ||
             channel == "AC4P3R" || channel == "AC4P4R" || channel == "AP4R" || channel == "AP4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE8sC4A;
+            return mpp::image::PixelTypeEnum::PTE8sC4A;
         }
     }
 
@@ -363,31 +363,31 @@ opp::image::PixelTypeEnum nppParser::NPPParser::GetPixelType(const Function &aFu
         if (channel == "C1R" || channel == "AC1R" || channel == "C1" || channel == "C1CR" || channel == "C1C2R" ||
             channel == "C1C3R" || channel == "C1C4R" || channel == "C1AC4R" || channel == "P1R")
         {
-            return opp::image::PixelTypeEnum::PTE16fC1;
+            return mpp::image::PixelTypeEnum::PTE16fC1;
         }
         if (channel == "C2R" || channel == "C2" || channel == "C2CR" || channel == "C2C1R" || channel == "C2C3R" ||
             channel == "C2C4R" || channel == "C2P2R" || channel == "C2P3R" || channel == "P2R" || channel == "P2P3R" ||
             channel == "P2C2R" || channel == "P2C3R" || channel == "P2C4R")
         {
-            return opp::image::PixelTypeEnum::PTE16fC2;
+            return mpp::image::PixelTypeEnum::PTE16fC2;
         }
         if (channel == "C3R" || channel == "C3" || channel == "C3CR" || channel == "C3C1R" || channel == "C3C2R" ||
             channel == "C3C4R" || channel == "C3A0C4R" || channel == "C3P3R" || channel == "C3P2R" ||
             channel == "P3R" || channel == "P3P2R" || channel == "P3C2R" || channel == "P3C3R" || channel == "P3C4R" ||
             channel == "P3AC4R")
         {
-            return opp::image::PixelTypeEnum::PTE16fC3;
+            return mpp::image::PixelTypeEnum::PTE16fC3;
         }
         if (channel == "C4R" || channel == "C4" || channel == "C4CR" || channel == "C4C1R" || channel == "C4C3R" ||
             channel == "C4P4R" || channel == "C4P3R" || channel == "P4R" || channel == "P4P3R" || channel == "P4C3R" ||
             channel == "P4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE16fC4;
+            return mpp::image::PixelTypeEnum::PTE16fC4;
         }
         if (channel == "AC4R" || channel == "AC4CR" || channel == "AC4C1R" || channel == "AC4C2R" ||
             channel == "AC4P3R" || channel == "AC4P4R" || channel == "AP4R" || channel == "AP4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE16fC4A;
+            return mpp::image::PixelTypeEnum::PTE16fC4A;
         }
     }
 
@@ -396,31 +396,31 @@ opp::image::PixelTypeEnum nppParser::NPPParser::GetPixelType(const Function &aFu
         if (channel == "C1R" || channel == "AC1R" || channel == "C1" || channel == "C1CR" || channel == "C1C2R" ||
             channel == "C1C3R" || channel == "C1C4R" || channel == "C1AC4R" || channel == "P1R")
         {
-            return opp::image::PixelTypeEnum::PTE16uC1;
+            return mpp::image::PixelTypeEnum::PTE16uC1;
         }
         if (channel == "C2R" || channel == "C2" || channel == "C2CR" || channel == "C2C1R" || channel == "C2C3R" ||
             channel == "C2C4R" || channel == "C2P2R" || channel == "C2P3R" || channel == "P2R" || channel == "P2P3R" ||
             channel == "P2C2R" || channel == "P2C3R" || channel == "P2C4R")
         {
-            return opp::image::PixelTypeEnum::PTE16uC2;
+            return mpp::image::PixelTypeEnum::PTE16uC2;
         }
         if (channel == "C3R" || channel == "C3" || channel == "C3CR" || channel == "C3C1R" || channel == "C3C2R" ||
             channel == "C3C4R" || channel == "C3A0C4R" || channel == "C3P3R" || channel == "C3P2R" ||
             channel == "P3R" || channel == "P3P2R" || channel == "P3C2R" || channel == "P3C3R" || channel == "P3C4R" ||
             channel == "P3AC4R")
         {
-            return opp::image::PixelTypeEnum::PTE16uC3;
+            return mpp::image::PixelTypeEnum::PTE16uC3;
         }
         if (channel == "C4R" || channel == "C4" || channel == "C4CR" || channel == "C4C1R" || channel == "C4C3R" ||
             channel == "C4P4R" || channel == "C4P3R" || channel == "P4R" || channel == "P4P3R" || channel == "P4C3R" ||
             channel == "P4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE16uC4;
+            return mpp::image::PixelTypeEnum::PTE16uC4;
         }
         if (channel == "AC4R" || channel == "AC4CR" || channel == "AC4C1R" || channel == "AC4C2R" ||
             channel == "AC4P3R" || channel == "AC4P4R" || channel == "AP4R" || channel == "AP4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE16uC4A;
+            return mpp::image::PixelTypeEnum::PTE16uC4A;
         }
     }
 
@@ -429,31 +429,31 @@ opp::image::PixelTypeEnum nppParser::NPPParser::GetPixelType(const Function &aFu
         if (channel == "C1R" || channel == "AC1R" || channel == "C1" || channel == "C1CR" || channel == "C1C2R" ||
             channel == "C1C3R" || channel == "C1C4R" || channel == "C1AC4R" || channel == "P1R")
         {
-            return opp::image::PixelTypeEnum::PTE16scC1;
+            return mpp::image::PixelTypeEnum::PTE16scC1;
         }
         if (channel == "C2R" || channel == "C2" || channel == "C2CR" || channel == "C2C1R" || channel == "C2C3R" ||
             channel == "C2C4R" || channel == "C2P2R" || channel == "C2P3R" || channel == "P2R" || channel == "P2P3R" ||
             channel == "P2C2R" || channel == "P2C3R" || channel == "P2C4R")
         {
-            return opp::image::PixelTypeEnum::PTE16scC2;
+            return mpp::image::PixelTypeEnum::PTE16scC2;
         }
         if (channel == "C3R" || channel == "C3" || channel == "C3CR" || channel == "C3C1R" || channel == "C3C2R" ||
             channel == "C3C4R" || channel == "C3A0C4R" || channel == "C3P3R" || channel == "C3P2R" ||
             channel == "P3R" || channel == "P3P2R" || channel == "P3C2R" || channel == "P3C3R" || channel == "P3C4R" ||
             channel == "P3AC4R")
         {
-            return opp::image::PixelTypeEnum::PTE16scC3;
+            return mpp::image::PixelTypeEnum::PTE16scC3;
         }
         if (channel == "C4R" || channel == "C4" || channel == "C4CR" || channel == "C4C1R" || channel == "C4C3R" ||
             channel == "C4P4R" || channel == "C4P3R" || channel == "P4R" || channel == "P4P3R" || channel == "P4C3R" ||
             channel == "P4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE16scC4;
+            return mpp::image::PixelTypeEnum::PTE16scC4;
         }
         if (channel == "AC4R" || channel == "AC4CR" || channel == "AC4C1R" || channel == "AC4C2R" ||
             channel == "AC4P3R" || channel == "AC4P4R" || channel == "AP4R" || channel == "AP4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE16scC4;
+            return mpp::image::PixelTypeEnum::PTE16scC4;
         } /**/
     }
 
@@ -462,31 +462,31 @@ opp::image::PixelTypeEnum nppParser::NPPParser::GetPixelType(const Function &aFu
         if (channel == "C1R" || channel == "AC1R" || channel == "C1" || channel == "C1CR" || channel == "C1C2R" ||
             channel == "C1C3R" || channel == "C1C4R" || channel == "C1AC4R" || channel == "P1R")
         {
-            return opp::image::PixelTypeEnum::PTE16sC1;
+            return mpp::image::PixelTypeEnum::PTE16sC1;
         }
         if (channel == "C2R" || channel == "C2" || channel == "C2CR" || channel == "C2C1R" || channel == "C2C3R" ||
             channel == "C2C4R" || channel == "C2P2R" || channel == "C2P3R" || channel == "P2R" || channel == "P2P3R" ||
             channel == "P2C2R" || channel == "P2C3R" || channel == "P2C4R")
         {
-            return opp::image::PixelTypeEnum::PTE16sC2;
+            return mpp::image::PixelTypeEnum::PTE16sC2;
         }
         if (channel == "C3R" || channel == "C3" || channel == "C3CR" || channel == "C3C1R" || channel == "C3C2R" ||
             channel == "C3C4R" || channel == "C3A0C4R" || channel == "C3P3R" || channel == "C3P2R" ||
             channel == "P3R" || channel == "P3P2R" || channel == "P3C2R" || channel == "P3C3R" || channel == "P3C4R" ||
             channel == "P3AC4R")
         {
-            return opp::image::PixelTypeEnum::PTE16sC3;
+            return mpp::image::PixelTypeEnum::PTE16sC3;
         }
         if (channel == "C4R" || channel == "C4" || channel == "C4CR" || channel == "C4C1R" || channel == "C4C3R" ||
             channel == "C4P4R" || channel == "C4P3R" || channel == "P4R" || channel == "P4P3R" || channel == "P4C3R" ||
             channel == "P4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE16sC4;
+            return mpp::image::PixelTypeEnum::PTE16sC4;
         }
         if (channel == "AC4R" || channel == "AC4CR" || channel == "AC4C1R" || channel == "AC4C2R" ||
             channel == "AC4P3R" || channel == "AC4P4R" || channel == "AP4R" || channel == "AP4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE16sC4A;
+            return mpp::image::PixelTypeEnum::PTE16sC4A;
         }
     }
 
@@ -495,30 +495,30 @@ opp::image::PixelTypeEnum nppParser::NPPParser::GetPixelType(const Function &aFu
         if (channel == "C1R" || channel == "AC1R" || channel == "C1" || channel == "C1CR" || channel == "C1C2R" ||
             channel == "C1C3R" || channel == "C1C4R" || channel == "C1AC4R" || channel == "P1R")
         {
-            return opp::image::PixelTypeEnum::PTE32uC1;
+            return mpp::image::PixelTypeEnum::PTE32uC1;
         }
         if (channel == "C2R" || channel == "C2" || channel == "C2CR" || channel == "C2C1R" || channel == "C2C3R" ||
             channel == "C2C4R" || channel == "C2P2R" || channel == "C2P3R" || channel == "P2R" || channel == "P2P3R" ||
             channel == "P2C2R" || channel == "P2C3R" || channel == "P2C4R")
         {
-            return opp::image::PixelTypeEnum::PTE32uC2;
+            return mpp::image::PixelTypeEnum::PTE32uC2;
         }
         if (channel == "C3R" || channel == "C3" || channel == "C3CR" || channel == "C3C1R" || channel == "C3C2R" ||
             channel == "C3C4R" || channel == "C3A0C4R" || channel == "C3P3R" || channel == "C3P2R" ||
             channel == "P3R" || channel == "P3P2R" || channel == "P3C2R" || channel == "P3C3R" || channel == "P3C4R" ||
             channel == "P3AC4R")
         {
-            return opp::image::PixelTypeEnum::PTE32uC3;
+            return mpp::image::PixelTypeEnum::PTE32uC3;
         }
         if (channel == "C4R" || channel == "C4" || channel == "C4CR" || channel == "C4C1R" || channel == "C4C3R" ||
             channel == "C4P4R" || channel == "C4P3R")
         {
-            return opp::image::PixelTypeEnum::PTE32uC4;
+            return mpp::image::PixelTypeEnum::PTE32uC4;
         }
         if (channel == "AC4R" || channel == "AC4CR" || channel == "AC4C1R" || channel == "AC4C2R" ||
             channel == "AC4P3R" || channel == "AC4P4R" || channel == "AP4R" || channel == "AP4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE32uC4A;
+            return mpp::image::PixelTypeEnum::PTE32uC4A;
         }
     }
 
@@ -527,31 +527,31 @@ opp::image::PixelTypeEnum nppParser::NPPParser::GetPixelType(const Function &aFu
         if (channel == "C1R" || channel == "AC1R" || channel == "C1" || channel == "C1CR" || channel == "C1C2R" ||
             channel == "C1C3R" || channel == "C1C4R" || channel == "C1AC4R" || channel == "P1R")
         {
-            return opp::image::PixelTypeEnum::PTE32scC1;
+            return mpp::image::PixelTypeEnum::PTE32scC1;
         }
         if (channel == "C2R" || channel == "C2" || channel == "C2CR" || channel == "C2C1R" || channel == "C2C3R" ||
             channel == "C2C4R" || channel == "C2P2R" || channel == "C2P3R" || channel == "P2R" || channel == "P2P3R" ||
             channel == "P2C2R" || channel == "P2C3R" || channel == "P2C4R")
         {
-            return opp::image::PixelTypeEnum::PTE32scC2;
+            return mpp::image::PixelTypeEnum::PTE32scC2;
         }
         if (channel == "C3R" || channel == "C3" || channel == "C3CR" || channel == "C3C1R" || channel == "C3C2R" ||
             channel == "C3C4R" || channel == "C3A0C4R" || channel == "C3P3R" || channel == "C3P2R" ||
             channel == "P3R" || channel == "P3P2R" || channel == "P3C2R" || channel == "P3C3R" || channel == "P3C4R" ||
             channel == "P3AC4R")
         {
-            return opp::image::PixelTypeEnum::PTE32scC3;
+            return mpp::image::PixelTypeEnum::PTE32scC3;
         }
         if (channel == "C4R" || channel == "C4" || channel == "C4CR" || channel == "C4C1R" || channel == "C4C3R" ||
             channel == "C4P4R" || channel == "C4P3R" || channel == "P4R" || channel == "P4P3R" || channel == "P4C3R" ||
             channel == "P4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE32scC4;
+            return mpp::image::PixelTypeEnum::PTE32scC4;
         }
         if (channel == "AC4R" || channel == "AC4CR" || channel == "AC4C1R" || channel == "AC4C2R" ||
             channel == "AC4P3R" || channel == "AC4P4R" || channel == "AP4R" || channel == "AP4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE32scC4;
+            return mpp::image::PixelTypeEnum::PTE32scC4;
         } /* */
     }
 
@@ -560,31 +560,31 @@ opp::image::PixelTypeEnum nppParser::NPPParser::GetPixelType(const Function &aFu
         if (channel == "C1R" || channel == "AC1R" || channel == "C1" || channel == "C1CR" || channel == "C1C2R" ||
             channel == "C1C3R" || channel == "C1C4R" || channel == "C1AC4R" || channel == "P1R")
         {
-            return opp::image::PixelTypeEnum::PTE32sC1;
+            return mpp::image::PixelTypeEnum::PTE32sC1;
         }
         if (channel == "C2R" || channel == "C2" || channel == "C2CR" || channel == "C2C1R" || channel == "C2C3R" ||
             channel == "C2C4R" || channel == "C2P2R" || channel == "C2P3R" || channel == "P2R" || channel == "P2P3R" ||
             channel == "P2C2R" || channel == "P2C3R" || channel == "P2C4R")
         {
-            return opp::image::PixelTypeEnum::PTE32sC2;
+            return mpp::image::PixelTypeEnum::PTE32sC2;
         }
         if (channel == "C3R" || channel == "C3" || channel == "C3CR" || channel == "C3C1R" || channel == "C3C2R" ||
             channel == "C3C4R" || channel == "C3A0C4R" || channel == "C3P3R" || channel == "C3P2R" ||
             channel == "P3R" || channel == "P3P2R" || channel == "P3C2R" || channel == "P3C3R" || channel == "P3C4R" ||
             channel == "P3AC4R")
         {
-            return opp::image::PixelTypeEnum::PTE32sC3;
+            return mpp::image::PixelTypeEnum::PTE32sC3;
         }
         if (channel == "C4R" || channel == "C4" || channel == "C4CR" || channel == "C4C1R" || channel == "C4C3R" ||
             channel == "C4P4R" || channel == "C4P3R" || channel == "P4R" || channel == "P4P3R" || channel == "P4C3R" ||
             channel == "P4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE32sC4;
+            return mpp::image::PixelTypeEnum::PTE32sC4;
         }
         if (channel == "AC4R" || channel == "AC4CR" || channel == "AC4C1R" || channel == "AC4C2R" ||
             channel == "AC4P3R" || channel == "AC4P4R" || channel == "AP4R" || channel == "AP4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE32sC4A;
+            return mpp::image::PixelTypeEnum::PTE32sC4A;
         }
     }
 
@@ -593,31 +593,31 @@ opp::image::PixelTypeEnum nppParser::NPPParser::GetPixelType(const Function &aFu
         if (channel == "C1R" || channel == "AC1R" || channel == "C1" || channel == "C1CR" || channel == "C1C2R" ||
             channel == "C1C3R" || channel == "C1C4R" || channel == "C1AC4R" || channel == "P1R")
         {
-            return opp::image::PixelTypeEnum::PTE32fcC1;
+            return mpp::image::PixelTypeEnum::PTE32fcC1;
         }
         if (channel == "C2R" || channel == "C2" || channel == "C2CR" || channel == "C2C1R" || channel == "C2C3R" ||
             channel == "C2C4R" || channel == "C2P2R" || channel == "C2P3R" || channel == "P2R" || channel == "P2P3R" ||
             channel == "P2C2R" || channel == "P2C3R" || channel == "P2C4R")
         {
-            return opp::image::PixelTypeEnum::PTE32fcC2;
+            return mpp::image::PixelTypeEnum::PTE32fcC2;
         }
         if (channel == "C3R" || channel == "C3" || channel == "C3CR" || channel == "C3C1R" || channel == "C3C2R" ||
             channel == "C3C4R" || channel == "C3A0C4R" || channel == "C3P3R" || channel == "C3P2R" ||
             channel == "P3R" || channel == "P3P2R" || channel == "P3C2R" || channel == "P3C3R" || channel == "P3C4R" ||
             channel == "P3AC4R")
         {
-            return opp::image::PixelTypeEnum::PTE32fcC3;
+            return mpp::image::PixelTypeEnum::PTE32fcC3;
         }
         if (channel == "C4R" || channel == "C4" || channel == "C4CR" || channel == "C4C1R" || channel == "C4C3R" ||
             channel == "C4P4R" || channel == "C4P3R" || channel == "P4R" || channel == "P4P3R" || channel == "P4C3R" ||
             channel == "P4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE32fcC4;
+            return mpp::image::PixelTypeEnum::PTE32fcC4;
         }
         if (channel == "AC4R" || channel == "AC4CR" || channel == "AC4C1R" || channel == "AC4C2R" ||
             channel == "AC4P3R" || channel == "AC4P4R" || channel == "AP4R" || channel == "AP4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE32fcC4;
+            return mpp::image::PixelTypeEnum::PTE32fcC4;
         } /* */
     }
 
@@ -626,31 +626,31 @@ opp::image::PixelTypeEnum nppParser::NPPParser::GetPixelType(const Function &aFu
         if (channel == "C1R" || channel == "AC1R" || channel == "C1" || channel == "C1CR" || channel == "C1C2R" ||
             channel == "C1C3R" || channel == "C1C4R" || channel == "C1AC4R" || channel == "P1R")
         {
-            return opp::image::PixelTypeEnum::PTE32fC1;
+            return mpp::image::PixelTypeEnum::PTE32fC1;
         }
         if (channel == "C2R" || channel == "C2" || channel == "C2CR" || channel == "C2C1R" || channel == "C2C3R" ||
             channel == "C2C4R" || channel == "C2P2R" || channel == "C2P3R" || channel == "P2R" || channel == "P2P3R" ||
             channel == "P2C2R" || channel == "P2C3R" || channel == "P2C4R")
         {
-            return opp::image::PixelTypeEnum::PTE32fC2;
+            return mpp::image::PixelTypeEnum::PTE32fC2;
         }
         if (channel == "C3R" || channel == "C3" || channel == "C3CR" || channel == "C3C1R" || channel == "C3C2R" ||
             channel == "C3C4R" || channel == "C3A0C4R" || channel == "C3P3R" || channel == "C3P2R" ||
             channel == "P3R" || channel == "P3P2R" || channel == "P3C2R" || channel == "P3C3R" || channel == "P3C4R" ||
             channel == "P3AC4R")
         {
-            return opp::image::PixelTypeEnum::PTE32fC3;
+            return mpp::image::PixelTypeEnum::PTE32fC3;
         }
         if (channel == "C4R" || channel == "C4" || channel == "C4CR" || channel == "C4C1R" || channel == "C4C3R" ||
             channel == "C4P4R" || channel == "C4P3R" || channel == "P4R" || channel == "P4P3R" || channel == "P4C3R" ||
             channel == "P4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE32fC4;
+            return mpp::image::PixelTypeEnum::PTE32fC4;
         }
         if (channel == "AC4R" || channel == "AC4CR" || channel == "AC4C1R" || channel == "AC4C2R" ||
             channel == "AC4P3R" || channel == "AC4P4R" || channel == "AP4R" || channel == "AP4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE32fC4A;
+            return mpp::image::PixelTypeEnum::PTE32fC4A;
         }
     }
 
@@ -659,34 +659,34 @@ opp::image::PixelTypeEnum nppParser::NPPParser::GetPixelType(const Function &aFu
         if (channel == "C1R" || channel == "AC1R" || channel == "C1" || channel == "C1CR" || channel == "C1C2R" ||
             channel == "C1C3R" || channel == "C1C4R" || channel == "C1AC4R" || channel == "P1R")
         {
-            return opp::image::PixelTypeEnum::PTE64fC1;
+            return mpp::image::PixelTypeEnum::PTE64fC1;
         }
         if (channel == "C2R" || channel == "C2" || channel == "C2CR" || channel == "C2C1R" || channel == "C2C3R" ||
             channel == "C2C4R" || channel == "C2P2R" || channel == "C2P3R" || channel == "P2R" || channel == "P2P3R" ||
             channel == "P2C2R" || channel == "P2C3R" || channel == "P2C4R")
         {
-            return opp::image::PixelTypeEnum::PTE64fC2;
+            return mpp::image::PixelTypeEnum::PTE64fC2;
         }
         if (channel == "C3R" || channel == "C3" || channel == "C3CR" || channel == "C3C1R" || channel == "C3C2R" ||
             channel == "C3C4R" || channel == "C3A0C4R" || channel == "C3P3R" || channel == "C3P2R" ||
             channel == "P3R" || channel == "P3P2R" || channel == "P3C2R" || channel == "P3C3R" || channel == "P3C4R" ||
             channel == "P3AC4R")
         {
-            return opp::image::PixelTypeEnum::PTE64fC3;
+            return mpp::image::PixelTypeEnum::PTE64fC3;
         }
         if (channel == "C4R" || channel == "C4" || channel == "C4CR" || channel == "C4C1R" || channel == "C4C3R" ||
             channel == "C4P4R" || channel == "C4P3R" || channel == "P4R" || channel == "P4P3R" || channel == "P4C3R" ||
             channel == "P4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE64fC4;
+            return mpp::image::PixelTypeEnum::PTE64fC4;
         }
         if (channel == "AC4R" || channel == "AC4CR" || channel == "AC4C1R" || channel == "AC4C2R" ||
             channel == "AC4P3R" || channel == "AC4P4R" || channel == "AP4R" || channel == "AP4C4R")
         {
-            return opp::image::PixelTypeEnum::PTE64fC4A;
+            return mpp::image::PixelTypeEnum::PTE64fC4A;
         }
     }
-    return opp::image::PixelTypeEnum::Unknown;
+    return mpp::image::PixelTypeEnum::Unknown;
 }
 bool nppParser::NPPParser::IsPlanar(const Function &aFunction)
 {
@@ -798,4 +798,4 @@ bool nppParser::NPPParser::IsDeviceConstant(const Function &aFunction)
 
     return baseName.find("DeviceC") != std::string::npos;
 }
-} // namespace opp::utilities::nppParser
+} // namespace mpp::utilities::nppParser

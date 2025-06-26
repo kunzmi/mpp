@@ -5,7 +5,7 @@
 #include <sstream>
 #include <string>
 
-namespace opp
+namespace mpp
 {
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 ScratchBufferException::ScratchBufferException(size_t aRequiredSize, size_t aProvidedSize, const std::string &aMessage,
@@ -43,4 +43,4 @@ ScratchBufferException::ScratchBufferException(size_t aRequiredSize, size_t aPro
     What() = ss.str();
 }
 
-} // namespace opp
+} // namespace mpp

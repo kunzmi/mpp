@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "threshold.h"
 #include <backends/cuda/image/configurations.h>
@@ -19,30 +19,30 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeThresholdLTSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aThreshold, DstT *aDst, size_t aPitchDst,
-                           const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+                           const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using thresholdSrcC =
-            SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Max<ComputeT>, RoundingMode::None>;
+            SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Max<ComputeT>, RoundingMode::None>;
 
-        const opp::Max<ComputeT> op;
+        const mpp::Max<ComputeT> op;
 
         const thresholdSrcC functor(aSrc, aPitchSrc, aThreshold, op);
 
@@ -68,18 +68,18 @@ void InvokeThresholdLTSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aThre
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeThresholdLTSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aThreshold, DstT *aDst, size_t aPitchDst,
-                              const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+                              const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using thresholdSrcC =
-            SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Max<ComputeT>, RoundingMode::None>;
+            SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Max<ComputeT>, RoundingMode::None>;
 
-        const opp::Max<ComputeT> op;
+        const mpp::Max<ComputeT> op;
 
         const thresholdSrcC functor(aSrc, aPitchSrc, aThreshold, op);
 
@@ -105,18 +105,18 @@ void InvokeThresholdLTSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aT
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeThresholdLTInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aThreshold, const Size2D &aSize,
-                               const opp::cuda::StreamCtx &aStreamCtx)
+                               const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using thresholdInplaceC =
-            InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Max<ComputeT>, RoundingMode::None>;
+            InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::Max<ComputeT>, RoundingMode::None>;
 
-        const opp::Max<ComputeT> op;
+        const mpp::Max<ComputeT> op;
 
         const thresholdInplaceC functor(aThreshold, op);
 
@@ -143,18 +143,18 @@ void InvokeThresholdLTInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &a
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeThresholdLTInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aThreshold, const Size2D &aSize,
-                                  const opp::cuda::StreamCtx &aStreamCtx)
+                                  const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using thresholdInplaceC =
-            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, opp::Max<ComputeT>, RoundingMode::None>;
+            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, mpp::Max<ComputeT>, RoundingMode::None>;
 
-        const opp::Max<ComputeT> op;
+        const mpp::Max<ComputeT> op;
 
         const thresholdInplaceC functor(aThreshold, op);
 
@@ -181,18 +181,18 @@ void InvokeThresholdLTInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeThresholdGTSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aThreshold, DstT *aDst, size_t aPitchDst,
-                           const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+                           const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using thresholdSrcC =
-            SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Min<ComputeT>, RoundingMode::None>;
+            SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Min<ComputeT>, RoundingMode::None>;
 
-        const opp::Min<ComputeT> op;
+        const mpp::Min<ComputeT> op;
 
         const thresholdSrcC functor(aSrc, aPitchSrc, aThreshold, op);
 
@@ -218,18 +218,18 @@ void InvokeThresholdGTSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aThre
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeThresholdGTSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aThreshold, DstT *aDst, size_t aPitchDst,
-                              const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+                              const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using thresholdSrcC =
-            SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Min<ComputeT>, RoundingMode::None>;
+            SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Min<ComputeT>, RoundingMode::None>;
 
-        const opp::Min<ComputeT> op;
+        const mpp::Min<ComputeT> op;
 
         const thresholdSrcC functor(aSrc, aPitchSrc, aThreshold, op);
 
@@ -255,18 +255,18 @@ void InvokeThresholdGTSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aT
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeThresholdGTInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aThreshold, const Size2D &aSize,
-                               const opp::cuda::StreamCtx &aStreamCtx)
+                               const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using thresholdInplaceC =
-            InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Min<ComputeT>, RoundingMode::None>;
+            InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::Min<ComputeT>, RoundingMode::None>;
 
-        const opp::Min<ComputeT> op;
+        const mpp::Min<ComputeT> op;
 
         const thresholdInplaceC functor(aThreshold, op);
 
@@ -293,18 +293,18 @@ void InvokeThresholdGTInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &a
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeThresholdGTInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aThreshold, const Size2D &aSize,
-                                  const opp::cuda::StreamCtx &aStreamCtx)
+                                  const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using thresholdInplaceC =
-            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, opp::Min<ComputeT>, RoundingMode::None>;
+            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, mpp::Min<ComputeT>, RoundingMode::None>;
 
-        const opp::Min<ComputeT> op;
+        const mpp::Min<ComputeT> op;
 
         const thresholdInplaceC functor(aThreshold, op);
 
@@ -331,17 +331,17 @@ void InvokeThresholdGTInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeThresholdLTValSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aThreshold, const SrcT &aValue,
-                              DstT *aDst, size_t aPitchDst, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+                              DstT *aDst, size_t aPitchDst, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using thresholdSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::MaxVal<ComputeT>, RoundingMode::None>;
+        using thresholdSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::MaxVal<ComputeT>, RoundingMode::None>;
 
-        const opp::MaxVal<ComputeT> op(aValue, aThreshold);
+        const mpp::MaxVal<ComputeT> op(aValue, aThreshold);
 
         const thresholdSrc functor(aSrc, aPitchSrc, op);
 
@@ -368,17 +368,17 @@ void InvokeThresholdLTValSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aT
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeThresholdLTValInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aThreshold, const SrcT &aValue,
-                                  const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+                                  const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using thresholdInplace = InplaceFunctor<TupelSize, ComputeT, DstT, opp::MaxVal<ComputeT>, RoundingMode::None>;
+        using thresholdInplace = InplaceFunctor<TupelSize, ComputeT, DstT, mpp::MaxVal<ComputeT>, RoundingMode::None>;
 
-        const opp::MaxVal<ComputeT> op(aValue, aThreshold);
+        const mpp::MaxVal<ComputeT> op(aValue, aThreshold);
 
         const thresholdInplace functor(op);
 
@@ -405,17 +405,17 @@ void InvokeThresholdLTValInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeThresholdGTValSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aThreshold, const SrcT &aValue,
-                              DstT *aDst, size_t aPitchDst, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+                              DstT *aDst, size_t aPitchDst, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using thresholdSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::MinVal<ComputeT>, RoundingMode::None>;
+        using thresholdSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::MinVal<ComputeT>, RoundingMode::None>;
 
-        const opp::MinVal<ComputeT> op(aValue, aThreshold);
+        const mpp::MinVal<ComputeT> op(aValue, aThreshold);
 
         const thresholdSrc functor(aSrc, aPitchSrc, op);
 
@@ -442,17 +442,17 @@ void InvokeThresholdGTValSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aT
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeThresholdGTValInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aThreshold, const SrcT &aValue,
-                                  const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+                                  const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using thresholdInplace = InplaceFunctor<TupelSize, ComputeT, DstT, opp::MinVal<ComputeT>, RoundingMode::None>;
+        using thresholdInplace = InplaceFunctor<TupelSize, ComputeT, DstT, mpp::MinVal<ComputeT>, RoundingMode::None>;
 
-        const opp::MinVal<ComputeT> op(aValue, aThreshold);
+        const mpp::MinVal<ComputeT> op(aValue, aThreshold);
 
         const thresholdInplace functor(op);
 
@@ -480,18 +480,18 @@ void InvokeThresholdGTValInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeThresholdLTValGTValSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aThresholdLT, const SrcT &aValueLT,
                                    const SrcT &aThresholdGT, const SrcT &aValueGT, DstT *aDst, size_t aPitchDst,
-                                   const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+                                   const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using thresholdSrc =
-            SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::MinValMaxVal<ComputeT>, RoundingMode::None>;
+            SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::MinValMaxVal<ComputeT>, RoundingMode::None>;
 
-        const opp::MinValMaxVal<ComputeT> op(aValueGT, aThresholdGT, aValueLT, aThresholdLT);
+        const mpp::MinValMaxVal<ComputeT> op(aValueGT, aThresholdGT, aValueLT, aThresholdLT);
 
         const thresholdSrc functor(aSrc, aPitchSrc, op);
 
@@ -519,18 +519,18 @@ void InvokeThresholdLTValGTValSrcC(const SrcT *aSrc, size_t aPitchSrc, const Src
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeThresholdLTValGTValInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aThresholdLT,
                                        const SrcT &aValueLT, const SrcT &aThresholdGT, const SrcT &aValueGT,
-                                       const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+                                       const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using thresholdInplace =
-            InplaceFunctor<TupelSize, ComputeT, DstT, opp::MinValMaxVal<ComputeT>, RoundingMode::None>;
+            InplaceFunctor<TupelSize, ComputeT, DstT, mpp::MinValMaxVal<ComputeT>, RoundingMode::None>;
 
-        const opp::MinValMaxVal<ComputeT> op(aValueGT, aThresholdGT, aValueLT, aThresholdLT);
+        const mpp::MinValMaxVal<ComputeT> op(aValueGT, aThresholdGT, aValueLT, aThresholdLT);
 
         const thresholdInplace functor(op);
 
@@ -556,5 +556,5 @@ void InvokeThresholdLTValGTValInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const
 
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

@@ -2,7 +2,7 @@
 
 #pragma once
 #include <common/moduleEnabler.h>
-#if OPP_ENABLE_NPP_BACKEND
+#if MPP_ENABLE_NPP_BACKEND
 #include <common/image/pixelTypeEnabler.h>
 
 #include "imageView.h"
@@ -14,7 +14,7 @@
 #include <common/image/size2D.h>
 #include <common/image/sizePitched.h>
 
-namespace opp::image::npp
+namespace mpp::image::npp
 {
 // forward declaration:
 class Image16sC1View;
@@ -55,7 +55,7 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     [[nodiscard]] Image8uC3View GetView(const Border &aBorder = Border());
 
     //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
-#if OPPi_ENABLE_UINT8_TYPE && OPPi_ENABLE_THREE_CHANNEL
+#if MPPi_ENABLE_UINT8_TYPE && MPPi_ENABLE_THREE_CHANNEL
 
     // NppStatus nppiSet_8u_C3R_Ctx(const Npp8u[3] aValue, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     Image8uC3View &Set(const Pixel8uC3 &aValue, const NppStreamContext &nppStreamCtx);
@@ -136,61 +136,61 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     Image8uC3View &Add(const Pixel8uC3 &aConstants, Image8uC3View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAddDeviceC_8u_C3RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    Image8uC3View &Add(const opp::cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC3View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &Add(const mpp::cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC3View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAddC_8u_C3IRSfs_Ctx(const Npp8u[3] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
     Image8uC3View &Add(const Pixel8uC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAddDeviceC_8u_C3IRSfs_Ctx(const Npp8u * pConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    Image8uC3View &Add(const opp::cuda::DevVarView<Pixel8uC3> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC3View &Add(const mpp::cuda::DevVarView<Pixel8uC3> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMulC_8u_C3RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u[3] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
     Image8uC3View &Mul(const Pixel8uC3 &aConstants, Image8uC3View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMulDeviceC_8u_C3RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    Image8uC3View &Mul(const opp::cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC3View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &Mul(const mpp::cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC3View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMulC_8u_C3IRSfs_Ctx(const Npp8u[3] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
     Image8uC3View &Mul(const Pixel8uC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMulDeviceC_8u_C3IRSfs_Ctx(const Npp8u * pConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    Image8uC3View &Mul(const opp::cuda::DevVarView<Pixel8uC3> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC3View &Mul(const mpp::cuda::DevVarView<Pixel8uC3> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMulCScale_8u_C3R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u[3] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     Image8uC3View &MulScale(const Pixel8uC3 &aConstants, Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMulDeviceCScale_8u_C3R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    Image8uC3View &MulScale(const opp::cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &MulScale(const mpp::cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMulCScale_8u_C3IR_Ctx(const Npp8u[3] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     Image8uC3View &MulScale(const Pixel8uC3 &aConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiMulDeviceCScale_8u_C3IR_Ctx(const Npp8u * pConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
-    Image8uC3View &MulScale(const opp::cuda::DevVarView<Pixel8uC3> &pConstants, const NppStreamContext &nppStreamCtx);
+    Image8uC3View &MulScale(const mpp::cuda::DevVarView<Pixel8uC3> &pConstants, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSubC_8u_C3RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u[3] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
     Image8uC3View &Sub(const Pixel8uC3 &aConstants, Image8uC3View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSubDeviceC_8u_C3RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    Image8uC3View &Sub(const opp::cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC3View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &Sub(const mpp::cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC3View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSubC_8u_C3IRSfs_Ctx(const Npp8u[3] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
     Image8uC3View &Sub(const Pixel8uC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSubDeviceC_8u_C3IRSfs_Ctx(const Npp8u * pConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    Image8uC3View &Sub(const opp::cuda::DevVarView<Pixel8uC3> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC3View &Sub(const mpp::cuda::DevVarView<Pixel8uC3> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiDivC_8u_C3RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u[3] aConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
     Image8uC3View &Div(const Pixel8uC3 &aConstants, Image8uC3View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDivDeviceC_8u_C3RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pConstants, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    Image8uC3View &Div(const opp::cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC3View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &Div(const mpp::cuda::DevVarView<Pixel8uC3> &pConstants, Image8uC3View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDivC_8u_C3IRSfs_Ctx(const Npp8u[3] aConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
     Image8uC3View &Div(const Pixel8uC3 &aConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiDivDeviceC_8u_C3IRSfs_Ctx(const Npp8u * pConstants, Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
-    Image8uC3View &Div(const opp::cuda::DevVarView<Pixel8uC3> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
+    Image8uC3View &Div(const mpp::cuda::DevVarView<Pixel8uC3> &pConstants, int nScaleFactor, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiAdd_8u_C3RSfs_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, int nScaleFactor, NppStreamContext nppStreamCtx)
     Image8uC3View &Add(const Image8uC3View &pSrc2, Image8uC3View &pDst, int nScaleFactor, const NppStreamContext &nppStreamCtx) const;
@@ -781,28 +781,28 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     static void ColorTwist32f(Image8uC1View &aSrcDstChannel0, Image8uC1View &aSrcDstChannel1, Image8uC1View &aSrcDstChannel2, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiLUT_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32s *[3] pValues, const Npp32s *[3] pLevels, int[3] nLevels, NppStreamContext nppStreamCtx)
-    Image8uC3View &LUT(Image8uC3View &pDst, opp::cuda::DevVarView<int> pValues[3], opp::cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &LUT(Image8uC3View &pDst, mpp::cuda::DevVarView<int> pValues[3], mpp::cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiLUT_8u_C3IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp32s *[3] pValues, const Npp32s *[3] pLevels, int[3] nLevels, NppStreamContext nppStreamCtx)
-    Image8uC3View &LUT(opp::cuda::DevVarView<int> pValues[3], opp::cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx);
+    Image8uC3View &LUT(mpp::cuda::DevVarView<int> pValues[3], mpp::cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiLUT_Linear_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32s *[3] pValues, const Npp32s *[3] pLevels, int[3] nLevels, NppStreamContext nppStreamCtx)
-    Image8uC3View &LUT_Linear(Image8uC3View &pDst, opp::cuda::DevVarView<int> pValues[3], opp::cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &LUT_Linear(Image8uC3View &pDst, mpp::cuda::DevVarView<int> pValues[3], mpp::cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiLUT_Linear_8u_C3IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp32s *[3] pValues, const Npp32s *[3] pLevels, int[3] nLevels, NppStreamContext nppStreamCtx)
-    Image8uC3View &LUT_Linear(opp::cuda::DevVarView<int> pValues[3], opp::cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx);
+    Image8uC3View &LUT_Linear(mpp::cuda::DevVarView<int> pValues[3], mpp::cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiLUT_Cubic_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32s *[3] pValues, const Npp32s *[3] pLevels, int[3] nLevels, NppStreamContext nppStreamCtx)
-    Image8uC3View &LUT_Cubic(Image8uC3View &pDst, opp::cuda::DevVarView<int> pValues[3], opp::cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &LUT_Cubic(Image8uC3View &pDst, mpp::cuda::DevVarView<int> pValues[3], mpp::cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiLUT_Cubic_8u_C3IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp32s *[3] pValues, const Npp32s *[3] pLevels, int[3] nLevels, NppStreamContext nppStreamCtx)
-    Image8uC3View &LUT_Cubic(opp::cuda::DevVarView<int> pValues[3], opp::cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx);
+    Image8uC3View &LUT_Cubic(mpp::cuda::DevVarView<int> pValues[3], mpp::cuda::DevVarView<int> pLevels[3], int nLevels[3], const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiLUTPalette_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u *[3] pTables, int nBitSize, NppStreamContext nppStreamCtx)
-    Image8uC3View &LUTPalette(Image8uC3View &pDst, opp::cuda::DevVarView<byte> pTables[3], int nBitSize, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &LUTPalette(Image8uC3View &pDst, mpp::cuda::DevVarView<byte> pTables[3], int nBitSize, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiLUTPaletteSwap_8u_C3A0C4R_Ctx(const Npp8u * pSrc, int nSrcStep, int nAlphaValue, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u *[3] pTables, int nBitSize, NppStreamContext nppStreamCtx)
-    Image8uC4View &LUTPaletteSwapA(int nAlphaValue, Image8uC4View &pDst, opp::cuda::DevVarView<byte> pTables[3], int nBitSize, const NppStreamContext &nppStreamCtx) const;
+    Image8uC4View &LUTPaletteSwapA(int nAlphaValue, Image8uC4View &pDst, mpp::cuda::DevVarView<byte> pTables[3], int nBitSize, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiRGBToYUV420_8u_ColorTwist32f_P3R_Ctx(const Npp8u *const[3] pSrc, int[3] aSrcStep, Npp8u *[3] pDst, int[3] aDstStep, NppiSize oSizeROI, const Npp32f[3][4] aTwist, NppStreamContext nppStreamCtx)
     static void RGBToYUV420(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
@@ -895,10 +895,10 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     Image8uC1View &Compare(const Pixel8uC3 &pConstants, Image8uC1View &pDst, NppCmpOp eComparisonOperation, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDilate_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    Image8uC3View &Dilate(Image8uC3View &pDst, const opp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &Dilate(Image8uC3View &pDst, const mpp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDilateBorder_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    Image8uC3View &DilateBorder(Image8uC3View &pDst, const opp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC3View &DilateBorder(Image8uC3View &pDst, const mpp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiDilate3x3_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     Image8uC3View &Dilate3x3(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const;
@@ -907,10 +907,10 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     Image8uC3View &Dilate3x3Border(Image8uC3View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiErode_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    Image8uC3View &Erode(Image8uC3View &pDst, const opp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &Erode(Image8uC3View &pDst, const mpp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiErodeBorder_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    Image8uC3View &ErodeBorder(Image8uC3View &pDst, const opp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC3View &ErodeBorder(Image8uC3View &pDst, const mpp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiErode3x3_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     Image8uC3View &Erode3x3(Image8uC3View &pDst, const NppStreamContext &nppStreamCtx) const;
@@ -922,43 +922,43 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     [[nodiscard]] size_t MorphGetBufferSize() const;
 
     // NppStatus nppiMorphCloseBorder_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, Npp8u * pBuffer, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    Image8uC3View &MorphCloseBorder(Image8uC3View &pDst, const opp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, opp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC3View &MorphCloseBorder(Image8uC3View &pDst, const mpp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, mpp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiMorphOpenBorder_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, Npp8u * pBuffer, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    Image8uC3View &MorphOpenBorder(Image8uC3View &pDst, const opp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, opp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC3View &MorphOpenBorder(Image8uC3View &pDst, const mpp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, mpp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiMorphTopHatBorder_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, Npp8u * pBuffer, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    Image8uC3View &MorphTopHatBorder(Image8uC3View &pDst, const opp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, opp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC3View &MorphTopHatBorder(Image8uC3View &pDst, const mpp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, mpp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiMorphBlackHatBorder_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, Npp8u * pBuffer, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    Image8uC3View &MorphBlackHatBorder(Image8uC3View &pDst, const opp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, opp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC3View &MorphBlackHatBorder(Image8uC3View &pDst, const mpp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, mpp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiMorphGradientBorder_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp8u * pMask, NppiSize oMaskSize, NppiPoint oAnchor, Npp8u * pBuffer, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    Image8uC3View &MorphGradientBorder(Image8uC3View &pDst, const opp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, opp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC3View &MorphGradientBorder(Image8uC3View &pDst, const mpp::cuda::DevVarView<byte> &pMask, NppiSize oMaskSize, NppiPoint oAnchor, mpp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterColumn_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oROI, const Npp32s * pKernel, Npp32s nMaskSize, Npp32s nAnchor, Npp32s nDivisor, NppStreamContext nppStreamCtx)
-    Image8uC3View &FilterColumn(Image8uC3View &pDst, const opp::cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &FilterColumn(Image8uC3View &pDst, const mpp::cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterColumnBorder_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const Npp32s * pKernel, Npp32s nMaskSize, Npp32s nAnchor, Npp32s nDivisor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    Image8uC3View &FilterColumnBorder(Image8uC3View &pDst, const opp::cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC3View &FilterColumnBorder(Image8uC3View &pDst, const mpp::cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterColumn32f_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oROI, const Npp32f * pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppStreamContext nppStreamCtx)
-    Image8uC3View &FilterColumn32f(Image8uC3View &pDst, const opp::cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &FilterColumn32f(Image8uC3View &pDst, const mpp::cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterColumnBorder32f_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    Image8uC3View &FilterColumnBorder32f(Image8uC3View &pDst, const opp::cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC3View &FilterColumnBorder32f(Image8uC3View &pDst, const mpp::cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterRow_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oROI, const Npp32s * pKernel, Npp32s nMaskSize, Npp32s nAnchor, Npp32s nDivisor, NppStreamContext nppStreamCtx)
-    Image8uC3View &FilterRow(Image8uC3View &pDst, const opp::cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &FilterRow(Image8uC3View &pDst, const mpp::cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterRowBorder_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const Npp32s * pKernel, Npp32s nMaskSize, Npp32s nAnchor, Npp32s nDivisor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    Image8uC3View &FilterRowBorder(Image8uC3View &pDst, const opp::cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC3View &FilterRowBorder(Image8uC3View &pDst, const mpp::cuda::DevVarView<int> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const Pixel32sC1 &nDivisor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterRow32f_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oROI, const Npp32f * pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppStreamContext nppStreamCtx)
-    Image8uC3View &FilterRow32f(Image8uC3View &pDst, const opp::cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &FilterRow32f(Image8uC3View &pDst, const mpp::cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterRowBorder32f_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    Image8uC3View &FilterRowBorder32f(Image8uC3View &pDst, const opp::cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC3View &FilterRowBorder32f(Image8uC3View &pDst, const mpp::cuda::DevVarView<float> &pKernel, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiSumWindowColumn_8u32f_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp32f * pDst, Npp32s nDstStep, NppiSize oROI, Npp32s nMaskSize, Npp32s nAnchor, NppStreamContext nppStreamCtx)
     Image32fC3View &SumWindowColumn(Image32fC3View &pDst, Npp32s nMaskSize, Npp32s nAnchor, const NppStreamContext &nppStreamCtx) const;
@@ -973,22 +973,22 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     Image32fC3View &SumWindowRowBorder(Image32fC3View &pDst, Npp32s nMaskSize, Npp32s nAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilter_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const Npp32s * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, Npp32s nDivisor, NppStreamContext nppStreamCtx)
-    Image8uC3View &Filter(Image8uC3View &pDst, const opp::cuda::DevVarView<int> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const Pixel32sC1 &nDivisor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &Filter(Image8uC3View &pDst, const mpp::cuda::DevVarView<int> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const Pixel32sC1 &nDivisor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilter32f_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    Image8uC3View &Filter32f(Image8uC3View &pDst, const opp::cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &Filter32f(Image8uC3View &pDst, const mpp::cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilter32f_8u16s_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, Npp16s * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
-    Image16sC3View &Filter32f(Image16sC3View &pDst, const opp::cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
+    Image16sC3View &Filter32f(Image16sC3View &pDst, const mpp::cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterBorder_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const Npp32s * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, Npp32s nDivisor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    Image8uC3View &FilterBorder(Image8uC3View &pDst, const opp::cuda::DevVarView<int> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const Pixel32sC1 &nDivisor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC3View &FilterBorder(Image8uC3View &pDst, const mpp::cuda::DevVarView<int> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, const Pixel32sC1 &nDivisor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterBorder32f_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    Image8uC3View &FilterBorder32f(Image8uC3View &pDst, const opp::cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC3View &FilterBorder32f(Image8uC3View &pDst, const mpp::cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterBorder32f_8u16s_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp16s * pDst, int nDstStep, NppiSize oSizeROI, const Npp32f * pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    Image16sC3View &FilterBorder32f(Image16sC3View &pDst, const opp::cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image16sC3View &FilterBorder32f(Image16sC3View &pDst, const mpp::cuda::DevVarView<float> &pKernel, NppiSize oKernelSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterBox_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
     Image8uC3View &FilterBox(Image8uC3View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
@@ -997,7 +997,7 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     Image8uC3View &FilterBoxBorder(Image8uC3View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterBoxBorderAdvanced_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
-    Image8uC3View &FilterBoxBorderAdvanced(Image8uC3View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC3View &FilterBoxBorderAdvanced(Image8uC3View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, mpp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterMax_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, NppStreamContext nppStreamCtx)
     Image8uC3View &FilterMax(Image8uC3View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, const NppStreamContext &nppStreamCtx) const;
@@ -1012,13 +1012,13 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     Image8uC3View &FilterMinBorder(Image8uC3View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterMedian_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
-    Image8uC3View &FilterMedian(Image8uC3View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &FilterMedian(Image8uC3View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, mpp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterMedianGetBufferSize_8u_C3R_Ctx(NppiSize oSizeROI, NppiSize oMaskSize, Npp32u * nBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t FilterMedianGetBufferSize(NppiSize oMaskSize, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterMedianBorder_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, Npp8u * pBuffer, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    Image8uC3View &FilterMedianBorder(Image8uC3View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, opp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC3View &FilterMedianBorder(Image8uC3View &pDst, NppiSize oMaskSize, NppiPoint oAnchor, mpp::cuda::DevVarView<byte> &pBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterMedianBorderGetBufferSize_8u_C3R_Ctx(NppiSize oSizeROI, NppiSize oMaskSize, Npp32u * nBufferSize, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t FilterMedianBorderGetBufferSize(NppiSize oMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx) const;
@@ -1069,19 +1069,19 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     Image8uC3View &FilterGauss(Image8uC3View &pDst, NppiMaskSize eMaskSize, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterGaussAdvanced_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const int nFilterTaps, const Npp32f * pKernel, NppStreamContext nppStreamCtx)
-    Image8uC3View &FilterGaussAdvanced(Image8uC3View &pDst, const int nFilterTaps, const opp::cuda::DevVarView<float> &pKernel, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &FilterGaussAdvanced(Image8uC3View &pDst, const int nFilterTaps, const mpp::cuda::DevVarView<float> &pKernel, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterGaussBorder_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, NppiMaskSize eMaskSize, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
     Image8uC3View &FilterGaussBorder(Image8uC3View &pDst, NppiMaskSize eMaskSize, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterGaussAdvancedBorder_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const int nFilterTaps, const Npp32f * pKernel, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    Image8uC3View &FilterGaussAdvancedBorder(Image8uC3View &pDst, const int nFilterTaps, const opp::cuda::DevVarView<float> &pKernel, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC3View &FilterGaussAdvancedBorder(Image8uC3View &pDst, const int nFilterTaps, const mpp::cuda::DevVarView<float> &pKernel, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterGaussPyramidLayerDownBorder_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, Npp32f nRate, const int nFilterTaps, const Npp32f * pKernel, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    Image8uC3View &FilterGaussPyramidLayerDownBorder(Image8uC3View &pDst, const Pixel32fC1 &nRate, const int nFilterTaps, const opp::cuda::DevVarView<float> &pKernel, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC3View &FilterGaussPyramidLayerDownBorder(Image8uC3View &pDst, const Pixel32fC1 &nRate, const int nFilterTaps, const mpp::cuda::DevVarView<float> &pKernel, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterGaussPyramidLayerUpBorder_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, Npp32f nRate, const int nFilterTaps, const Npp32f * pKernel, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    Image8uC3View &FilterGaussPyramidLayerUpBorder(Image8uC3View &pDst, const Pixel32fC1 &nRate, const int nFilterTaps, const opp::cuda::DevVarView<float> &pKernel, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    Image8uC3View &FilterGaussPyramidLayerUpBorder(Image8uC3View &pDst, const Pixel32fC1 &nRate, const int nFilterTaps, const mpp::cuda::DevVarView<float> &pKernel, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterBilateralGaussBorder_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, const int nRadius, const int nStepBetweenSrcPixels, const Npp32f nValSquareSigma, const Npp32f nPosSquareSigma, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
     Image8uC3View &FilterBilateralGaussBorder(Image8uC3View &pDst, const int nRadius, const int nStepBetweenSrcPixels, const Pixel32fC1 &nValSquareSigma, const Pixel32fC1 &nPosSquareSigma, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
@@ -1105,7 +1105,7 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     Image8uC3View &FilterSharpenBorder(Image8uC3View &pDst, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFilterUnsharpBorder_8u_C3R_Ctx(const Npp8u * pSrc, Npp32s nSrcStep, NppiPoint oSrcOffset, Npp8u * pDst, Npp32s nDstStep, NppiSize oSizeROI, Npp32f nRadius, Npp32f nSigma, Npp32f nWeight, Npp32f nThreshold, NppiBorderType eBorderType, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    Image8uC3View &FilterUnsharpBorder(Image8uC3View &pDst, const Pixel32fC1 &nRadius, const Pixel32fC1 &nSigma, const Pixel32fC1 &nWeight, const Pixel32fC1 &nThreshold, NppiBorderType eBorderType, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &FilterUnsharpBorder(Image8uC3View &pDst, const Pixel32fC1 &nRadius, const Pixel32fC1 &nSigma, const Pixel32fC1 &nWeight, const Pixel32fC1 &nThreshold, NppiBorderType eBorderType, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFilterUnsharpGetBufferSize_8u_C3R(const Npp32f nRadius, const Npp32f nSigma, int * hpBufferSize)
     [[nodiscard]] size_t FilterUnsharpGetBufferSize(const Pixel32fC1 &nRadius, const Pixel32fC1 &nSigma) const;
@@ -1123,67 +1123,67 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     void GradientVectorSobelBorder(Image16sC1View &pDstX, Image16sC1View &pDstY, Image16sC1View &pDstMag, Image32fC1View &pDstAngle, NppiMaskSize eMaskSize, NppiNorm eNorm, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiHistogramOfGradientsBorder_8u32f_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcSize, NppiPoint oSrcOffset, const NppiPoint * hpLocations, int nLocations, Npp32f * pDstWindowDescriptorBuffer, NppiSize oSizeROI, const NppiHOGConfig oHOGConfig, Npp8u * pScratchBuffer, NppiBorderType eBorderType, NppStreamContext nppStreamCtx)
-    void HistogramOfGradientsBorder(const NppiPoint *hpLocations, int nLocations, Npp32f *pDstWindowDescriptorBuffer, const NppiHOGConfig oHOGConfig, opp::cuda::DevVarView<byte> &pScratchBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
+    void HistogramOfGradientsBorder(const NppiPoint *hpLocations, int nLocations, Npp32f *pDstWindowDescriptorBuffer, const NppiHOGConfig oHOGConfig, mpp::cuda::DevVarView<byte> &pScratchBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea = Roi()) const;
 
     // NppStatus nppiFloodFill_8u_C3IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiPoint oSeed, const Npp8u[3] aNewValues, NppiNorm eNorm, NppiSize oSizeROI, NppiConnectedRegion * pConnectedRegion, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
-    Image8uC3View &FloodFill(NppiPoint oSeed, const Pixel8uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
+    Image8uC3View &FloodFill(NppiPoint oSeed, const Pixel8uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, mpp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiFloodFillBoundary_8u_C3IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiPoint oSeed, const Npp8u[3] aNewValues, const Npp8u[3] aBoundaryValues, NppiNorm eNorm, NppiSize oSizeROI, NppiConnectedRegion * pConnectedRegion, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
-    Image8uC3View &FloodFillBoundary(NppiPoint oSeed, const Pixel8uC3 &aNewValues, const Pixel8uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
+    Image8uC3View &FloodFillBoundary(NppiPoint oSeed, const Pixel8uC3 &aNewValues, const Pixel8uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, mpp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiFloodFillRange_8u_C3IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiPoint oSeed, Npp8u[3] aMin, Npp8u[3] aMax, const Npp8u[3] aNewValues, NppiNorm eNorm, NppiSize oSizeROI, NppiConnectedRegion * pConnectedRegion, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
-    Image8uC3View &FloodFillRange(NppiPoint oSeed, Pixel8uC3 &aMin, Pixel8uC3 &aMax, const Pixel8uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
+    Image8uC3View &FloodFillRange(NppiPoint oSeed, Pixel8uC3 &aMin, Pixel8uC3 &aMax, const Pixel8uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, mpp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiFloodFillRangeBoundary_8u_C3IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiPoint oSeed, Npp8u[3] aMin, Npp8u[3] aMax, const Npp8u[3] aNewValues, const Npp8u[3] aBoundaryValues, NppiNorm eNorm, NppiSize oSizeROI, NppiConnectedRegion * pConnectedRegion, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
-    Image8uC3View &FloodFillRangeBoundary(NppiPoint oSeed, Pixel8uC3 &aMin, Pixel8uC3 &aMax, const Pixel8uC3 &aNewValues, const Pixel8uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
+    Image8uC3View &FloodFillRangeBoundary(NppiPoint oSeed, Pixel8uC3 &aMin, Pixel8uC3 &aMax, const Pixel8uC3 &aNewValues, const Pixel8uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, mpp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiFloodFillGradient_8u_C3IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiPoint oSeed, Npp8u[3] aMin, Npp8u[3] aMax, const Npp8u[3] aNewValues, NppiNorm eNorm, NppiSize oSizeROI, NppiConnectedRegion * pConnectedRegion, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
-    Image8uC3View &FloodFillGradient(NppiPoint oSeed, Pixel8uC3 &aMin, Pixel8uC3 &aMax, const Pixel8uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
+    Image8uC3View &FloodFillGradient(NppiPoint oSeed, Pixel8uC3 &aMin, Pixel8uC3 &aMax, const Pixel8uC3 &aNewValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, mpp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiFloodFillGradientBoundary_8u_C3IR_Ctx(Npp8u * pSrcDst, int nSrcDstStep, NppiPoint oSeed, Npp8u[3] aMin, Npp8u[3] aMax, const Npp8u[3] aNewValues, const Npp8u[3] aBoundaryValues, NppiNorm eNorm, NppiSize oSizeROI, NppiConnectedRegion * pConnectedRegion, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
-    Image8uC3View &FloodFillGradientBoundary(NppiPoint oSeed, Pixel8uC3 &aMin, Pixel8uC3 &aMax, const Pixel8uC3 &aNewValues, const Pixel8uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
+    Image8uC3View &FloodFillGradientBoundary(NppiPoint oSeed, Pixel8uC3 &aMin, Pixel8uC3 &aMax, const Pixel8uC3 &aNewValues, const Pixel8uC3 &aBoundaryValues, NppiNorm eNorm, NppiConnectedRegion *pConnectedRegion, mpp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiSum_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSizeROI, Npp8u * pDeviceBuffer, Npp64f[3] aSum, NppStreamContext nppStreamCtx)
-    void Sum(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<double> &aSum, const NppStreamContext &nppStreamCtx) const;
+    void Sum(mpp::cuda::DevVarView<byte> &pDeviceBuffer, mpp::cuda::DevVarView<double> &aSum, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSumGetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t SumGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMin_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSizeROI, Npp8u * pDeviceBuffer, Npp8u[3] aMin, NppStreamContext nppStreamCtx)
-    void Min(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &aMin, const NppStreamContext &nppStreamCtx) const;
+    void Min(mpp::cuda::DevVarView<byte> &pDeviceBuffer, mpp::cuda::DevVarView<byte> &aMin, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMinGetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t MinGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMinIndx_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSizeROI, Npp8u * pDeviceBuffer, Npp8u[3] aMin, int[3] aIndexX, int[3] aIndexY, NppStreamContext nppStreamCtx)
-    void MinIndx(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &aMin, opp::cuda::DevVarView<int> &aIndexX, opp::cuda::DevVarView<int> &aIndexY, const NppStreamContext &nppStreamCtx) const;
+    void MinIndx(mpp::cuda::DevVarView<byte> &pDeviceBuffer, mpp::cuda::DevVarView<byte> &aMin, mpp::cuda::DevVarView<int> &aIndexX, mpp::cuda::DevVarView<int> &aIndexY, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMinIndxGetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t MinIndxGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMax_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSizeROI, Npp8u * pDeviceBuffer, Npp8u[3] aMax, NppStreamContext nppStreamCtx)
-    void Max(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &aMax, const NppStreamContext &nppStreamCtx) const;
+    void Max(mpp::cuda::DevVarView<byte> &pDeviceBuffer, mpp::cuda::DevVarView<byte> &aMax, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaxGetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t MaxGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaxIndx_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSizeROI, Npp8u * pDeviceBuffer, Npp8u[3] aMax, int[3] aIndexX, int[3] aIndexY, NppStreamContext nppStreamCtx)
-    void MaxIndx(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &aMax, opp::cuda::DevVarView<int> &aIndexX, opp::cuda::DevVarView<int> &aIndexY, const NppStreamContext &nppStreamCtx) const;
+    void MaxIndx(mpp::cuda::DevVarView<byte> &pDeviceBuffer, mpp::cuda::DevVarView<byte> &aMax, mpp::cuda::DevVarView<int> &aIndexX, mpp::cuda::DevVarView<int> &aIndexY, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaxIndxGetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t MaxIndxGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMinMax_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSizeROI, Npp8u[3] aMin, Npp8u[3] aMax, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void MinMax(opp::cuda::DevVarView<byte> &aMin, opp::cuda::DevVarView<byte> &aMax, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void MinMax(mpp::cuda::DevVarView<byte> &aMin, mpp::cuda::DevVarView<byte> &aMax, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMinMaxGetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t MinMaxGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMinMaxIndx_8u_C3CR_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSizeROI, int nCOI, Npp8u * pMinValue, Npp8u * pMaxValue, NppiPoint * pMinIndex, NppiPoint * pMaxIndex, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void MinMaxIndx(int nCOI, opp::cuda::DevVarView<byte> &pMinValue, opp::cuda::DevVarView<byte> &pMaxValue, opp::cuda::DevVarView<NppiPoint> &pMinIndex, opp::cuda::DevVarView<NppiPoint> &pMaxIndex, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void MinMaxIndx(int nCOI, mpp::cuda::DevVarView<byte> &pMinValue, mpp::cuda::DevVarView<byte> &pMaxValue, mpp::cuda::DevVarView<NppiPoint> &pMinIndex, mpp::cuda::DevVarView<NppiPoint> &pMaxIndex, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMinMaxIndx_8u_C3CMR_Ctx(const Npp8u * pSrc, int nSrcStep, const Npp8u * pMask, int nMaskStep, NppiSize oSizeROI, int nCOI, Npp8u * pMinValue, Npp8u * pMaxValue, NppiPoint * pMinIndex, NppiPoint * pMaxIndex, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void MinMaxIndx(const Image8uC1View &pMask, int nCOI, opp::cuda::DevVarView<byte> &pMinValue, opp::cuda::DevVarView<byte> &pMaxValue, opp::cuda::DevVarView<NppiPoint> &pMinIndex, opp::cuda::DevVarView<NppiPoint> &pMaxIndex, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void MinMaxIndx(const Image8uC1View &pMask, int nCOI, mpp::cuda::DevVarView<byte> &pMinValue, mpp::cuda::DevVarView<byte> &pMaxValue, mpp::cuda::DevVarView<NppiPoint> &pMinIndex, mpp::cuda::DevVarView<NppiPoint> &pMaxIndex, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMinMaxIndxGetBufferHostSize_8u_C3CR_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t MinMaxIndxGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -1192,10 +1192,10 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     [[nodiscard]] size_t MinMaxIndxGetBufferHostSizeMasked(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMean_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSizeROI, Npp8u * pDeviceBuffer, Npp64f[3] aMean, NppStreamContext nppStreamCtx)
-    void Mean(opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<double> &aMean, const NppStreamContext &nppStreamCtx) const;
+    void Mean(mpp::cuda::DevVarView<byte> &pDeviceBuffer, mpp::cuda::DevVarView<double> &aMean, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMean_8u_C3CMR_Ctx(const Npp8u * pSrc, int nSrcStep, const Npp8u * pMask, int nMaskStep, NppiSize oSizeROI, int nCOI, Npp8u * pDeviceBuffer, Npp64f * pMean, NppStreamContext nppStreamCtx)
-    void Mean(const Image8uC1View &pMask, int nCOI, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<double> &pMean, const NppStreamContext &nppStreamCtx) const;
+    void Mean(const Image8uC1View &pMask, int nCOI, mpp::cuda::DevVarView<byte> &pDeviceBuffer, mpp::cuda::DevVarView<double> &pMean, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMeanGetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t MeanGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -1204,10 +1204,10 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     [[nodiscard]] size_t MeanGetBufferHostSizeMasked(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMean_StdDev_8u_C3CR_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSizeROI, int nCOI, Npp8u * pDeviceBuffer, Npp64f * pMean, Npp64f * pStdDev, NppStreamContext nppStreamCtx)
-    void Mean_StdDev(int nCOI, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<double> &pMean, opp::cuda::DevVarView<double> &pStdDev, const NppStreamContext &nppStreamCtx) const;
+    void Mean_StdDev(int nCOI, mpp::cuda::DevVarView<byte> &pDeviceBuffer, mpp::cuda::DevVarView<double> &pMean, mpp::cuda::DevVarView<double> &pStdDev, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMean_StdDev_8u_C3CMR_Ctx(const Npp8u * pSrc, int nSrcStep, const Npp8u * pMask, int nMaskStep, NppiSize oSizeROI, int nCOI, Npp8u * pDeviceBuffer, Npp64f * pMean, Npp64f * pStdDev, NppStreamContext nppStreamCtx)
-    void Mean_StdDev(const Image8uC1View &pMask, int nCOI, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<double> &pMean, opp::cuda::DevVarView<double> &pStdDev, const NppStreamContext &nppStreamCtx) const;
+    void Mean_StdDev(const Image8uC1View &pMask, int nCOI, mpp::cuda::DevVarView<byte> &pDeviceBuffer, mpp::cuda::DevVarView<double> &pMean, mpp::cuda::DevVarView<double> &pStdDev, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMeanStdDevGetBufferHostSize_8u_C3CR_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t MeanStdDevGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -1216,10 +1216,10 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     [[nodiscard]] size_t MeanStdDevGetBufferHostSizeMasked(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNorm_Inf_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSizeROI, Npp64f[3] aNorm, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void Norm_Inf(opp::cuda::DevVarView<double> &aNorm, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void Norm_Inf(mpp::cuda::DevVarView<double> &aNorm, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNorm_Inf_8u_C3CMR_Ctx(const Npp8u * pSrc, int nSrcStep, const Npp8u * pMask, int nMaskStep, NppiSize oSizeROI, int nCOI, Npp64f * pNorm, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void Norm_Inf(const Image8uC1View &pMask, int nCOI, opp::cuda::DevVarView<double> &pNorm, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void Norm_Inf(const Image8uC1View &pMask, int nCOI, mpp::cuda::DevVarView<double> &pNorm, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormInfGetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t NormInfGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -1228,10 +1228,10 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     [[nodiscard]] size_t NormInfGetBufferHostSizeMasked(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNorm_L1_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSizeROI, Npp64f[3] aNorm, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void Norm_L1(opp::cuda::DevVarView<double> &aNorm, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void Norm_L1(mpp::cuda::DevVarView<double> &aNorm, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNorm_L1_8u_C3CMR_Ctx(const Npp8u * pSrc, int nSrcStep, const Npp8u * pMask, int nMaskStep, NppiSize oSizeROI, int nCOI, Npp64f * pNorm, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void Norm_L1(const Image8uC1View &pMask, int nCOI, opp::cuda::DevVarView<double> &pNorm, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void Norm_L1(const Image8uC1View &pMask, int nCOI, mpp::cuda::DevVarView<double> &pNorm, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormL1GetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t NormL1GetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -1240,10 +1240,10 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     [[nodiscard]] size_t NormL1GetBufferHostSizeMasked(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNorm_L2_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSizeROI, Npp64f[3] aNorm, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void Norm_L2(opp::cuda::DevVarView<double> &aNorm, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void Norm_L2(mpp::cuda::DevVarView<double> &aNorm, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNorm_L2_8u_C3CMR_Ctx(const Npp8u * pSrc, int nSrcStep, const Npp8u * pMask, int nMaskStep, NppiSize oSizeROI, int nCOI, Npp64f * pNorm, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void Norm_L2(const Image8uC1View &pMask, int nCOI, opp::cuda::DevVarView<double> &pNorm, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void Norm_L2(const Image8uC1View &pMask, int nCOI, mpp::cuda::DevVarView<double> &pNorm, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormL2GetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t NormL2GetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -1252,10 +1252,10 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     [[nodiscard]] size_t NormL2GetBufferHostSizeMasked(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormDiff_Inf_8u_C3R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f[3] aNormDiff, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void NormDiff_Inf(const Image8uC3View &pSrc2, opp::cuda::DevVarView<double> &aNormDiff, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void NormDiff_Inf(const Image8uC3View &pSrc2, mpp::cuda::DevVarView<double> &aNormDiff, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormDiff_Inf_8u_C3CMR_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, const Npp8u * pMask, int nMaskStep, NppiSize oSizeROI, int nCOI, Npp64f * pNormDiff, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void NormDiff_Inf(const Image8uC3View &pSrc2, const Image8uC1View &pMask, int nCOI, opp::cuda::DevVarView<double> &pNormDiff, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void NormDiff_Inf(const Image8uC3View &pSrc2, const Image8uC1View &pMask, int nCOI, mpp::cuda::DevVarView<double> &pNormDiff, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormDiffInfGetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t NormDiffInfGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -1264,10 +1264,10 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     [[nodiscard]] size_t NormDiffInfGetBufferHostSizeMasked(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormDiff_L1_8u_C3R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f[3] aNormDiff, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void NormDiff_L1(const Image8uC3View &pSrc2, opp::cuda::DevVarView<double> &aNormDiff, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void NormDiff_L1(const Image8uC3View &pSrc2, mpp::cuda::DevVarView<double> &aNormDiff, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormDiff_L1_8u_C3CMR_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, const Npp8u * pMask, int nMaskStep, NppiSize oSizeROI, int nCOI, Npp64f * pNormDiff, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void NormDiff_L1(const Image8uC3View &pSrc2, const Image8uC1View &pMask, int nCOI, opp::cuda::DevVarView<double> &pNormDiff, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void NormDiff_L1(const Image8uC3View &pSrc2, const Image8uC1View &pMask, int nCOI, mpp::cuda::DevVarView<double> &pNormDiff, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormDiffL1GetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t NormDiffL1GetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -1276,10 +1276,10 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     [[nodiscard]] size_t NormDiffL1GetBufferHostSizeMasked(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormDiff_L2_8u_C3R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f[3] aNormDiff, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void NormDiff_L2(const Image8uC3View &pSrc2, opp::cuda::DevVarView<double> &aNormDiff, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void NormDiff_L2(const Image8uC3View &pSrc2, mpp::cuda::DevVarView<double> &aNormDiff, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormDiff_L2_8u_C3CMR_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, const Npp8u * pMask, int nMaskStep, NppiSize oSizeROI, int nCOI, Npp64f * pNormDiff, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void NormDiff_L2(const Image8uC3View &pSrc2, const Image8uC1View &pMask, int nCOI, opp::cuda::DevVarView<double> &pNormDiff, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void NormDiff_L2(const Image8uC3View &pSrc2, const Image8uC1View &pMask, int nCOI, mpp::cuda::DevVarView<double> &pNormDiff, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormDiffL2GetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t NormDiffL2GetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -1288,10 +1288,10 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     [[nodiscard]] size_t NormDiffL2GetBufferHostSizeMasked(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormRel_Inf_8u_C3R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f[3] aNormRel, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void NormRel_Inf(const Image8uC3View &pSrc2, opp::cuda::DevVarView<double> &aNormRel, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void NormRel_Inf(const Image8uC3View &pSrc2, mpp::cuda::DevVarView<double> &aNormRel, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormRel_Inf_8u_C3CMR_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, const Npp8u * pMask, int nMaskStep, NppiSize oSizeROI, int nCOI, Npp64f * pNormRel, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void NormRel_Inf(const Image8uC3View &pSrc2, const Image8uC1View &pMask, int nCOI, opp::cuda::DevVarView<double> &pNormRel, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void NormRel_Inf(const Image8uC3View &pSrc2, const Image8uC1View &pMask, int nCOI, mpp::cuda::DevVarView<double> &pNormRel, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormRelInfGetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t NormRelInfGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -1300,10 +1300,10 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     [[nodiscard]] size_t NormRelInfGetBufferHostSizeMasked(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormRel_L1_8u_C3R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f[3] aNormRel, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void NormRel_L1(const Image8uC3View &pSrc2, opp::cuda::DevVarView<double> &aNormRel, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void NormRel_L1(const Image8uC3View &pSrc2, mpp::cuda::DevVarView<double> &aNormRel, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormRel_L1_8u_C3CMR_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, const Npp8u * pMask, int nMaskStep, NppiSize oSizeROI, int nCOI, Npp64f * pNormRel, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void NormRel_L1(const Image8uC3View &pSrc2, const Image8uC1View &pMask, int nCOI, opp::cuda::DevVarView<double> &pNormRel, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void NormRel_L1(const Image8uC3View &pSrc2, const Image8uC1View &pMask, int nCOI, mpp::cuda::DevVarView<double> &pNormRel, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormRelL1GetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t NormRelL1GetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -1312,10 +1312,10 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     [[nodiscard]] size_t NormRelL1GetBufferHostSizeMasked(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormRel_L2_8u_C3R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f[3] aNormRel, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void NormRel_L2(const Image8uC3View &pSrc2, opp::cuda::DevVarView<double> &aNormRel, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void NormRel_L2(const Image8uC3View &pSrc2, mpp::cuda::DevVarView<double> &aNormRel, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormRel_L2_8u_C3CMR_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, const Npp8u * pMask, int nMaskStep, NppiSize oSizeROI, int nCOI, Npp64f * pNormRel, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void NormRel_L2(const Image8uC3View &pSrc2, const Image8uC1View &pMask, int nCOI, opp::cuda::DevVarView<double> &pNormRel, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void NormRel_L2(const Image8uC3View &pSrc2, const Image8uC1View &pMask, int nCOI, mpp::cuda::DevVarView<double> &pNormRel, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiNormRelL2GetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t NormRelL2GetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -1324,13 +1324,13 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     [[nodiscard]] size_t NormRelL2GetBufferHostSizeMasked(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDotProd_8u64f_C3R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f[3] aDp, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void DotProd(const Image8uC3View &pSrc2, opp::cuda::DevVarView<double> &aDp, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void DotProd(const Image8uC3View &pSrc2, mpp::cuda::DevVarView<double> &aDp, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiDotProdGetBufferHostSize_8u64f_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t DotProdGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCountInRange_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSizeROI, int[3] aCounts, Npp8u[3] aLowerBound, Npp8u[3] aUpperBound, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void CountInRange(opp::cuda::DevVarView<int> &aCounts, Pixel8uC3 &aLowerBound, Pixel8uC3 &aUpperBound, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void CountInRange(mpp::cuda::DevVarView<int> &aCounts, Pixel8uC3 &aLowerBound, Pixel8uC3 &aUpperBound, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCountInRangeGetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t CountInRangeGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -1342,13 +1342,13 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     Image8uC3View &MinEvery(const Image8uC3View &pSrc, const NppStreamContext &nppStreamCtx);
 
     // NppStatus nppiHistogramEven_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSizeROI, Npp32s *[3] pHist, int[3] nLevels, Npp32s[3] nLowerLevel, Npp32s[3] nUpperLevel, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
-    void HistogramEven(opp::cuda::DevVarView<int> pHist[3], int nLevels[3], Pixel32sC3 &nLowerLevel, Pixel32sC3 &nUpperLevel, opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx) const;
+    void HistogramEven(mpp::cuda::DevVarView<int> pHist[3], int nLevels[3], Pixel32sC3 &nLowerLevel, Pixel32sC3 &nUpperLevel, mpp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiHistogramEvenGetBufferSize_8u_C3R_Ctx(NppiSize oSizeROI, int[3] nLevels, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t HistogramEvenGetBufferSize(int nLevels[3], const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiHistogramRange_8u_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSizeROI, Npp32s *[3] pHist, const Npp32s *[3] pLevels, int[3] nLevels, Npp8u * pBuffer, NppStreamContext nppStreamCtx)
-    void HistogramRange(opp::cuda::DevVarView<int> pHist[3], opp::cuda::DevVarView<int> pLevels[3], int nLevels[3], opp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx) const;
+    void HistogramRange(mpp::cuda::DevVarView<int> pHist[3], mpp::cuda::DevVarView<int> pLevels[3], int nLevels[3], mpp::cuda::DevVarView<byte> &pBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiHistogramRangeGetBufferSize_8u_C3R_Ctx(NppiSize oSizeROI, int[3] nLevels, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t HistogramRangeGetBufferSize(int nLevels[3], const NppStreamContext &nppStreamCtx) const;
@@ -1390,10 +1390,10 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     Image32fC3View &CrossCorrValid_Norm(const Image8uC3View &pTpl, Image32fC3View &pDst, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrFull_NormLevel_8u_C3RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp8u * pDst, int nDstStep, int nScaleFactor, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    Image8uC3View &CrossCorrFull_NormLevel(const Image8uC3View &pTpl, Image8uC3View &pDst, int nScaleFactor, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &CrossCorrFull_NormLevel(const Image8uC3View &pTpl, Image8uC3View &pDst, int nScaleFactor, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrFull_NormLevel_8u32f_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    Image32fC3View &CrossCorrFull_NormLevel(const Image8uC3View &pTpl, Image32fC3View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image32fC3View &CrossCorrFull_NormLevel(const Image8uC3View &pTpl, Image32fC3View &pDst, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiFullNormLevelGetBufferHostSize_8u_C3RSfs_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t FullNormLevelGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -1402,10 +1402,10 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     [[nodiscard]] size_t FullNormLevelGetBufferHostSizeFloat(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrSame_NormLevel_8u_C3RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp8u * pDst, int nDstStep, int nScaleFactor, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    Image8uC3View &CrossCorrSame_NormLevel(const Image8uC3View &pTpl, Image8uC3View &pDst, int nScaleFactor, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &CrossCorrSame_NormLevel(const Image8uC3View &pTpl, Image8uC3View &pDst, int nScaleFactor, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrSame_NormLevel_8u32f_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    Image32fC3View &CrossCorrSame_NormLevel(const Image8uC3View &pTpl, Image32fC3View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image32fC3View &CrossCorrSame_NormLevel(const Image8uC3View &pTpl, Image32fC3View &pDst, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSameNormLevelGetBufferHostSize_8u_C3RSfs_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t SameNormLevelGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -1414,10 +1414,10 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     [[nodiscard]] size_t SameNormLevelGetBufferHostSizeFloat(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrValid_NormLevel_8u_C3RSfs_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp8u * pDst, int nDstStep, int nScaleFactor, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    Image8uC3View &CrossCorrValid_NormLevel(const Image8uC3View &pTpl, Image8uC3View &pDst, int nScaleFactor, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image8uC3View &CrossCorrValid_NormLevel(const Image8uC3View &pTpl, Image8uC3View &pDst, int nScaleFactor, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrValid_NormLevel_8u32f_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    Image32fC3View &CrossCorrValid_NormLevel(const Image8uC3View &pTpl, Image32fC3View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image32fC3View &CrossCorrValid_NormLevel(const Image8uC3View &pTpl, Image32fC3View &pDst, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiValidNormLevelGetBufferHostSize_8u_C3RSfs_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t ValidNormLevelGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -1426,55 +1426,55 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     [[nodiscard]] size_t ValidNormLevelGetBufferHostSizeFloat(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrFull_NormLevelAdvanced_8u32f_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, Npp8u * pDeviceBuffer, Npp8u * pAdvancedScratchBuffer, NppStreamContext nppStreamCtx)
-    Image32fC3View &CrossCorrFull_NormLevelAdvanced(const Image8uC3View &pTpl, Image32fC3View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image32fC3View &CrossCorrFull_NormLevelAdvanced(const Image8uC3View &pTpl, Image32fC3View &pDst, mpp::cuda::DevVarView<byte> &pDeviceBuffer, mpp::cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrSame_NormLevelAdvanced_8u32f_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, Npp8u * pDeviceBuffer, Npp8u * pAdvancedScratchBuffer, NppStreamContext nppStreamCtx)
-    Image32fC3View &CrossCorrSame_NormLevelAdvanced(const Image8uC3View &pTpl, Image32fC3View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image32fC3View &CrossCorrSame_NormLevelAdvanced(const Image8uC3View &pTpl, Image32fC3View &pDst, mpp::cuda::DevVarView<byte> &pDeviceBuffer, mpp::cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiCrossCorrValid_NormLevelAdvanced_8u32f_C3R_Ctx(const Npp8u * pSrc, int nSrcStep, NppiSize oSrcRoiSize, const Npp8u * pTpl, int nTplStep, NppiSize oTplRoiSize, Npp32f * pDst, int nDstStep, Npp8u * pDeviceBuffer, Npp8u * pAdvancedScratchBuffer, NppStreamContext nppStreamCtx)
-    Image32fC3View &CrossCorrValid_NormLevelAdvanced(const Image8uC3View &pTpl, Image32fC3View &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, opp::cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
+    Image32fC3View &CrossCorrValid_NormLevelAdvanced(const Image8uC3View &pTpl, Image32fC3View &pDst, mpp::cuda::DevVarView<byte> &pDeviceBuffer, mpp::cuda::DevVarView<byte> &pAdvancedScratchBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiQualityIndex_8u32f_C3R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, NppiSize oRoiSize, Npp32f * pDst, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void QualityIndex(const Image8uC3View &pSrc2, NppiSize oRoiSize, opp::cuda::DevVarView<float> &pDst, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void QualityIndex(const Image8uC3View &pSrc2, NppiSize oRoiSize, mpp::cuda::DevVarView<float> &pDst, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiQualityIndexGetBufferHostSize_8u32f_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t QualityIndexGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumError_8u_C3R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void MaximumError(const Image8uC3View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void MaximumError(const Image8uC3View &pSrc2, mpp::cuda::DevVarView<double> &pError, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumErrorGetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t MaximumErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAverageError_8u_C3R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void AverageError(const Image8uC3View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void AverageError(const Image8uC3View &pSrc2, mpp::cuda::DevVarView<double> &pError, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAverageErrorGetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t AverageErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumRelativeError_8u_C3R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void MaximumRelativeError(const Image8uC3View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void MaximumRelativeError(const Image8uC3View &pSrc2, mpp::cuda::DevVarView<double> &pError, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMaximumRelativeErrorGetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t MaximumRelativeErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAverageRelativeError_8u_C3R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp64f * pError, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void AverageRelativeError(const Image8uC3View &pSrc2, opp::cuda::DevVarView<double> &pError, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void AverageRelativeError(const Image8uC3View &pSrc2, mpp::cuda::DevVarView<double> &pError, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiAverageRelativeErrorGetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t AverageRelativeErrorGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMSE_8u_C3R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp32f * pMSE, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void MSE(const Image8uC3View &pSrc2, opp::cuda::DevVarView<float> &pMSE, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void MSE(const Image8uC3View &pSrc2, mpp::cuda::DevVarView<float> &pMSE, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiPSNR_8u_C3R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp32f * pPSNR, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void PSNR(const Image8uC3View &pSrc2, opp::cuda::DevVarView<float> &pPSNR, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void PSNR(const Image8uC3View &pSrc2, mpp::cuda::DevVarView<float> &pPSNR, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiSSIM_8u_C3R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp32f * pSSIM, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void SSIM(const Image8uC3View &pSrc2, opp::cuda::DevVarView<float> &pSSIM, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void SSIM(const Image8uC3View &pSrc2, mpp::cuda::DevVarView<float> &pSSIM, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiWMSSSIM_8u_C3R_Ctx(const Npp8u * pSrc1, int nSrc1Step, const Npp8u * pSrc2, int nSrc2Step, NppiSize oSizeROI, Npp32f * pMSSSIM, Npp8u * pDeviceBuffer, NppStreamContext nppStreamCtx)
-    void WMSSSIM(const Image8uC3View &pSrc2, opp::cuda::DevVarView<float> &pMSSSIM, opp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
+    void WMSSSIM(const Image8uC3View &pSrc2, mpp::cuda::DevVarView<float> &pMSSSIM, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx) const;
 
     // NppStatus nppiMSEGetBufferHostSize_8u_C3R_Ctx(NppiSize oSizeROI, size_t * hpBufferSize, NppStreamContext nppStreamCtx)
     [[nodiscard]] size_t MSEGetBufferHostSize(const NppStreamContext &nppStreamCtx) const;
@@ -1551,8 +1551,8 @@ class Image8uC3View : public ImageView<Pixel8uC3>
     // NppStatus nppiWarpPerspectiveQuad_8u_P3R_Ctx(const Npp8u *[3] pSrc, NppiSize oSrcSize, int nSrcStep, NppiRect oSrcROI, const double[4][2] aSrcQuad, Npp8u *[3] pDst, int nDstStep, NppiRect oDstROI, const double[4][2] aDstQuad, int eInterpolation, NppStreamContext nppStreamCtx)
     static void WarpPerspectiveQuad(const Image8uC1View &aSrcChannel0, const Image8uC1View &aSrcChannel1, const Image8uC1View &aSrcChannel2, Image8uC1View &aDstChannel0, Image8uC1View &aDstChannel1, Image8uC1View &aDstChannel2, const Quad<double> &aSrcQuad, const Quad<double> &aDstQuad, int eInterpolation, const NppStreamContext &nppStreamCtx);
 
-#endif // OPPi_ENABLE_UINT8_TYPE && OPPi_ENABLE_THREE_CHANNEL
+#endif // MPPi_ENABLE_UINT8_TYPE && MPPi_ENABLE_THREE_CHANNEL
     //NOLINTEND(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 };
-} // namespace opp::image::npp
-#endif // OPP_ENABLE_NPP_BACKEND
+} // namespace mpp::image::npp
+#endif // MPP_ENABLE_NPP_BACKEND

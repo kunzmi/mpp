@@ -29,11 +29,11 @@
 #include <common/defines.h>
 #include <utility>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size = 256;
 
@@ -49,10 +49,10 @@ TEST_CASE("8uC1", "[NPP.Statistics.MaxIndex]")
     Pixel32sC1 npp_idxX;
     Pixel32sC1 npp_idxY;
     nv::Image8uC1 npp_src1(size, size);
-    opp::cuda::DevVar<byte> npp_dst(1);
-    opp::cuda::DevVar<int> npp_dstIdxX(1);
-    opp::cuda::DevVar<int> npp_dstIdxY(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<byte> npp_dst(1);
+    mpp::cuda::DevVar<int> npp_dstIdxX(1);
+    mpp::cuda::DevVar<int> npp_dstIdxY(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
 
     cpu_src1.Set(127);
     cpu_src1(10, 10)  = 4;
@@ -95,10 +95,10 @@ TEST_CASE("8uC3", "[NPP.Statistics.MaxIndex]")
     Pixel32sC3 npp_idxX;
     Pixel32sC3 npp_idxY;
     nv::Image8uC3 npp_src1(size, size);
-    opp::cuda::DevVar<byte> npp_dst(3);
-    opp::cuda::DevVar<int> npp_dstIdxX(3);
-    opp::cuda::DevVar<int> npp_dstIdxY(3);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<byte> npp_dst(3);
+    mpp::cuda::DevVar<int> npp_dstIdxX(3);
+    mpp::cuda::DevVar<int> npp_dstIdxY(3);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
 
     cpu_src1.Set(127);
     cpu_src1(10, 10)  = {4, 5, 6};
@@ -150,10 +150,10 @@ TEST_CASE("8uC4", "[NPP.Statistics.MaxIndex]")
     Pixel32sC4 npp_idxX;
     Pixel32sC4 npp_idxY;
     nv::Image8uC4 npp_src1(size, size);
-    opp::cuda::DevVar<byte> npp_dst(4);
-    opp::cuda::DevVar<int> npp_dstIdxX(4);
-    opp::cuda::DevVar<int> npp_dstIdxY(4);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<byte> npp_dst(4);
+    mpp::cuda::DevVar<int> npp_dstIdxX(4);
+    mpp::cuda::DevVar<int> npp_dstIdxY(4);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
 
     cpu_src1.Set(127);
     cpu_src1(10, 10)  = {4, 5, 6, 7};
@@ -210,10 +210,10 @@ TEST_CASE("8uC4A", "[NPP.Statistics.MaxIndex]")
     Pixel32sC4A npp_idxX;
     Pixel32sC4A npp_idxY;
     nv::Image8uC4 npp_src1(size, size);
-    opp::cuda::DevVar<byte> npp_dst(3);
-    opp::cuda::DevVar<int> npp_dstIdxX(3);
-    opp::cuda::DevVar<int> npp_dstIdxY(3);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSizeA(nppCtx));
+    mpp::cuda::DevVar<byte> npp_dst(3);
+    mpp::cuda::DevVar<int> npp_dstIdxX(3);
+    mpp::cuda::DevVar<int> npp_dstIdxY(3);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSizeA(nppCtx));
 
     cpu_src1.Set(127);
     cpu_src1A(10, 10)  = {4, 5, 6};
@@ -263,10 +263,10 @@ TEST_CASE("16sC1", "[NPP.Statistics.MaxIndex]")
     Pixel32sC1 npp_idxX;
     Pixel32sC1 npp_idxY;
     nv::Image16sC1 npp_src1(size, size);
-    opp::cuda::DevVar<short> npp_dst(1);
-    opp::cuda::DevVar<int> npp_dstIdxX(1);
-    opp::cuda::DevVar<int> npp_dstIdxY(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<short> npp_dst(1);
+    mpp::cuda::DevVar<int> npp_dstIdxX(1);
+    mpp::cuda::DevVar<int> npp_dstIdxY(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
 
     cpu_src1.Set(127);
     cpu_src1(10, 10)  = 4;
@@ -309,10 +309,10 @@ TEST_CASE("16sC3", "[NPP.Statistics.MaxIndex]")
     Pixel32sC3 npp_idxX;
     Pixel32sC3 npp_idxY;
     nv::Image16sC3 npp_src1(size, size);
-    opp::cuda::DevVar<short> npp_dst(3);
-    opp::cuda::DevVar<int> npp_dstIdxX(3);
-    opp::cuda::DevVar<int> npp_dstIdxY(3);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<short> npp_dst(3);
+    mpp::cuda::DevVar<int> npp_dstIdxX(3);
+    mpp::cuda::DevVar<int> npp_dstIdxY(3);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
 
     cpu_src1.Set(127);
     cpu_src1(10, 10)  = {4, 5, 6};
@@ -364,10 +364,10 @@ TEST_CASE("16sC4", "[NPP.Statistics.MaxIndex]")
     Pixel32sC4 npp_idxX;
     Pixel32sC4 npp_idxY;
     nv::Image16sC4 npp_src1(size, size);
-    opp::cuda::DevVar<short> npp_dst(4);
-    opp::cuda::DevVar<int> npp_dstIdxX(4);
-    opp::cuda::DevVar<int> npp_dstIdxY(4);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<short> npp_dst(4);
+    mpp::cuda::DevVar<int> npp_dstIdxX(4);
+    mpp::cuda::DevVar<int> npp_dstIdxY(4);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
 
     cpu_src1.Set(127);
     cpu_src1(10, 10)  = {4, 5, 6, 7};
@@ -424,10 +424,10 @@ TEST_CASE("16sC4A", "[NPP.Statistics.MaxIndex]")
     Pixel32sC4A npp_idxX;
     Pixel32sC4A npp_idxY;
     nv::Image16sC4 npp_src1(size, size);
-    opp::cuda::DevVar<short> npp_dst(3);
-    opp::cuda::DevVar<int> npp_dstIdxX(3);
-    opp::cuda::DevVar<int> npp_dstIdxY(3);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSizeA(nppCtx));
+    mpp::cuda::DevVar<short> npp_dst(3);
+    mpp::cuda::DevVar<int> npp_dstIdxX(3);
+    mpp::cuda::DevVar<int> npp_dstIdxY(3);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSizeA(nppCtx));
 
     cpu_src1.Set(127);
     cpu_src1A(10, 10)  = {4, 5, 6};
@@ -477,10 +477,10 @@ TEST_CASE("16uC1", "[NPP.Statistics.MaxIndex]")
     Pixel32sC1 npp_idxX;
     Pixel32sC1 npp_idxY;
     nv::Image16uC1 npp_src1(size, size);
-    opp::cuda::DevVar<ushort> npp_dst(1);
-    opp::cuda::DevVar<int> npp_dstIdxX(1);
-    opp::cuda::DevVar<int> npp_dstIdxY(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<ushort> npp_dst(1);
+    mpp::cuda::DevVar<int> npp_dstIdxX(1);
+    mpp::cuda::DevVar<int> npp_dstIdxY(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
 
     cpu_src1.Set(127);
     cpu_src1(10, 10)  = 4;
@@ -523,10 +523,10 @@ TEST_CASE("16uC3", "[NPP.Statistics.MaxIndex]")
     Pixel32sC3 npp_idxX;
     Pixel32sC3 npp_idxY;
     nv::Image16uC3 npp_src1(size, size);
-    opp::cuda::DevVar<ushort> npp_dst(3);
-    opp::cuda::DevVar<int> npp_dstIdxX(3);
-    opp::cuda::DevVar<int> npp_dstIdxY(3);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<ushort> npp_dst(3);
+    mpp::cuda::DevVar<int> npp_dstIdxX(3);
+    mpp::cuda::DevVar<int> npp_dstIdxY(3);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
 
     cpu_src1.Set(127);
     cpu_src1(10, 10)  = {4, 5, 6};
@@ -578,10 +578,10 @@ TEST_CASE("16uC4", "[NPP.Statistics.MaxIndex]")
     Pixel32sC4 npp_idxX;
     Pixel32sC4 npp_idxY;
     nv::Image16uC4 npp_src1(size, size);
-    opp::cuda::DevVar<ushort> npp_dst(4);
-    opp::cuda::DevVar<int> npp_dstIdxX(4);
-    opp::cuda::DevVar<int> npp_dstIdxY(4);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<ushort> npp_dst(4);
+    mpp::cuda::DevVar<int> npp_dstIdxX(4);
+    mpp::cuda::DevVar<int> npp_dstIdxY(4);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
 
     cpu_src1.Set(127);
     cpu_src1(10, 10)  = {4, 5, 6, 7};
@@ -638,10 +638,10 @@ TEST_CASE("16uC4A", "[NPP.Statistics.MaxIndex]")
     Pixel32sC4A npp_idxX;
     Pixel32sC4A npp_idxY;
     nv::Image16uC4 npp_src1(size, size);
-    opp::cuda::DevVar<ushort> npp_dst(3);
-    opp::cuda::DevVar<int> npp_dstIdxX(3);
-    opp::cuda::DevVar<int> npp_dstIdxY(3);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSizeA(nppCtx));
+    mpp::cuda::DevVar<ushort> npp_dst(3);
+    mpp::cuda::DevVar<int> npp_dstIdxX(3);
+    mpp::cuda::DevVar<int> npp_dstIdxY(3);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSizeA(nppCtx));
 
     cpu_src1.Set(127);
     cpu_src1A(10, 10)  = {4, 5, 6};
@@ -691,10 +691,10 @@ TEST_CASE("32fC1", "[NPP.Statistics.MaxIndex]")
     Pixel32sC1 npp_idxX;
     Pixel32sC1 npp_idxY;
     nv::Image32fC1 npp_src1(size, size);
-    opp::cuda::DevVar<float> npp_dst(1);
-    opp::cuda::DevVar<int> npp_dstIdxX(1);
-    opp::cuda::DevVar<int> npp_dstIdxY(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<float> npp_dst(1);
+    mpp::cuda::DevVar<int> npp_dstIdxX(1);
+    mpp::cuda::DevVar<int> npp_dstIdxY(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
 
     cpu_src1.Set(127);
     cpu_src1(10, 10)  = 4;
@@ -737,10 +737,10 @@ TEST_CASE("32fC3", "[NPP.Statistics.MaxIndex]")
     Pixel32sC3 npp_idxX;
     Pixel32sC3 npp_idxY;
     nv::Image32fC3 npp_src1(size, size);
-    opp::cuda::DevVar<float> npp_dst(3);
-    opp::cuda::DevVar<int> npp_dstIdxX(3);
-    opp::cuda::DevVar<int> npp_dstIdxY(3);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<float> npp_dst(3);
+    mpp::cuda::DevVar<int> npp_dstIdxX(3);
+    mpp::cuda::DevVar<int> npp_dstIdxY(3);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
 
     cpu_src1.Set(127);
     cpu_src1(10, 10)  = {4, 5, 6};
@@ -792,10 +792,10 @@ TEST_CASE("32fC4", "[NPP.Statistics.MaxIndex]")
     Pixel32sC4 npp_idxX;
     Pixel32sC4 npp_idxY;
     nv::Image32fC4 npp_src1(size, size);
-    opp::cuda::DevVar<float> npp_dst(4);
-    opp::cuda::DevVar<int> npp_dstIdxX(4);
-    opp::cuda::DevVar<int> npp_dstIdxY(4);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<float> npp_dst(4);
+    mpp::cuda::DevVar<int> npp_dstIdxX(4);
+    mpp::cuda::DevVar<int> npp_dstIdxY(4);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSize(nppCtx));
 
     cpu_src1.Set(127);
     cpu_src1(10, 10)  = {4, 5, 6, 7};
@@ -852,10 +852,10 @@ TEST_CASE("32fC4A", "[NPP.Statistics.MaxIndex]")
     Pixel32sC4A npp_idxX;
     Pixel32sC4A npp_idxY;
     nv::Image32fC4 npp_src1(size, size);
-    opp::cuda::DevVar<float> npp_dst(3);
-    opp::cuda::DevVar<int> npp_dstIdxX(3);
-    opp::cuda::DevVar<int> npp_dstIdxY(3);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSizeA(nppCtx));
+    mpp::cuda::DevVar<float> npp_dst(3);
+    mpp::cuda::DevVar<int> npp_dstIdxX(3);
+    mpp::cuda::DevVar<int> npp_dstIdxY(3);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.MaxIndxGetBufferHostSizeA(nppCtx));
 
     cpu_src1.Set(127);
     cpu_src1A(10, 10)  = {4, 5, 6};

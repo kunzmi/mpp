@@ -45,11 +45,11 @@
 #include <catch2/catch_test_macros.hpp>
 #include <common/defines.h>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size = 256;
 
@@ -78,7 +78,7 @@ TEST_CASE("8uC1", "[NPP.Arithmetic.MulScale]")
     npp_res << npp_dst;
 
     // Note: NPP version of MulScale uses RoundingMode::TowardZero which differs from Mul with scaling factor -8 (= 256
-    // = byte.max()) which uses RoundingMode::NearestTiesToEven. As in OPP we use the same code for Mul with scaling
+    // = byte.max()) which uses RoundingMode::NearestTiesToEven. As in MPP we use the same code for Mul with scaling
     // factor and for MulScale, we have to use the same rounding mode. And I don't see a reason why it should be
     // different... Long story short, the results may differ by +-1.
 

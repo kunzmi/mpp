@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "reduction5AlongXKernel.h" // for DuShuffle function
 #include <backends/cuda/cudaException.h>
@@ -17,7 +17,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 /// <summary>
 /// runs aFunctor reduction on one image column, single output value.
@@ -222,7 +222,7 @@ template <typename SrcT1, typename SrcT2, typename SrcT3, typename SrcT4, typena
           typename postOp>
 void InvokeReduction5AlongYKernelDefault(const SrcT1 *aSrc1, const SrcT2 *aSrc2, const SrcT3 *aSrc3, const SrcT4 *aSrc4,
                                          const SrcT5 *aSrc5, DstT *aDst, int aSize, postOp aPostOp,
-                                         const opp::cuda::StreamCtx &aStreamCtx)
+                                         const mpp::cuda::StreamCtx &aStreamCtx)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {
@@ -263,5 +263,5 @@ void InvokeReduction5AlongYKernelDefault(const SrcT1 *aSrc1, const SrcT2 *aSrc2,
     }
 }
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

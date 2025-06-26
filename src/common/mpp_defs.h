@@ -2,12 +2,12 @@
 #include <common/defines.h>
 #include <ostream>
 
-namespace opp
+namespace mpp
 {
 #pragma region RoundingMode
 /// <summary>
 /// Rounding Modes<para/>
-/// The enumerated rounding modes are used by a large number of OPP primitives
+/// The enumerated rounding modes are used by a large number of MPP primitives
 /// to allow the user to specify the method by which fractional values are converted
 /// to integer values.
 /// </summary>
@@ -326,40 +326,40 @@ inline std::ostream &operator<<(std::ostream &aOs, const AlphaCompositionOp &aAl
 {
     switch (aAlphaComposition)
     {
-        case opp::AlphaCompositionOp::Over:
+        case mpp::AlphaCompositionOp::Over:
             aOs << alpha_composition_name<AlphaCompositionOp::Over>::value;
             break;
-        case opp::AlphaCompositionOp::In:
+        case mpp::AlphaCompositionOp::In:
             aOs << alpha_composition_name<AlphaCompositionOp::In>::value;
             break;
-        case opp::AlphaCompositionOp::Out:
+        case mpp::AlphaCompositionOp::Out:
             aOs << alpha_composition_name<AlphaCompositionOp::Out>::value;
             break;
-        case opp::AlphaCompositionOp::ATop:
+        case mpp::AlphaCompositionOp::ATop:
             aOs << alpha_composition_name<AlphaCompositionOp::ATop>::value;
             break;
-        case opp::AlphaCompositionOp::XOr:
+        case mpp::AlphaCompositionOp::XOr:
             aOs << alpha_composition_name<AlphaCompositionOp::XOr>::value;
             break;
-        case opp::AlphaCompositionOp::Plus:
+        case mpp::AlphaCompositionOp::Plus:
             aOs << alpha_composition_name<AlphaCompositionOp::Plus>::value;
             break;
-        case opp::AlphaCompositionOp::OverPremul:
+        case mpp::AlphaCompositionOp::OverPremul:
             aOs << alpha_composition_name<AlphaCompositionOp::OverPremul>::value;
             break;
-        case opp::AlphaCompositionOp::InPremul:
+        case mpp::AlphaCompositionOp::InPremul:
             aOs << alpha_composition_name<AlphaCompositionOp::InPremul>::value;
             break;
-        case opp::AlphaCompositionOp::OutPremul:
+        case mpp::AlphaCompositionOp::OutPremul:
             aOs << alpha_composition_name<AlphaCompositionOp::OutPremul>::value;
             break;
-        case opp::AlphaCompositionOp::ATopPremul:
+        case mpp::AlphaCompositionOp::ATopPremul:
             aOs << alpha_composition_name<AlphaCompositionOp::ATopPremul>::value;
             break;
-        case opp::AlphaCompositionOp::XOrPremul:
+        case mpp::AlphaCompositionOp::XOrPremul:
             aOs << alpha_composition_name<AlphaCompositionOp::XOrPremul>::value;
             break;
-        case opp::AlphaCompositionOp::PlusPremul:
+        case mpp::AlphaCompositionOp::PlusPremul:
             aOs << alpha_composition_name<AlphaCompositionOp::PlusPremul>::value;
             break;
         default:
@@ -373,40 +373,40 @@ inline std::wostream &operator<<(std::wostream &aOs, const AlphaCompositionOp &a
 {
     switch (aAlphaComposition)
     {
-        case opp::AlphaCompositionOp::Over:
+        case mpp::AlphaCompositionOp::Over:
             aOs << alpha_composition_name<AlphaCompositionOp::Over>::value;
             break;
-        case opp::AlphaCompositionOp::In:
+        case mpp::AlphaCompositionOp::In:
             aOs << alpha_composition_name<AlphaCompositionOp::In>::value;
             break;
-        case opp::AlphaCompositionOp::Out:
+        case mpp::AlphaCompositionOp::Out:
             aOs << alpha_composition_name<AlphaCompositionOp::Out>::value;
             break;
-        case opp::AlphaCompositionOp::ATop:
+        case mpp::AlphaCompositionOp::ATop:
             aOs << alpha_composition_name<AlphaCompositionOp::ATop>::value;
             break;
-        case opp::AlphaCompositionOp::XOr:
+        case mpp::AlphaCompositionOp::XOr:
             aOs << alpha_composition_name<AlphaCompositionOp::XOr>::value;
             break;
-        case opp::AlphaCompositionOp::Plus:
+        case mpp::AlphaCompositionOp::Plus:
             aOs << alpha_composition_name<AlphaCompositionOp::Plus>::value;
             break;
-        case opp::AlphaCompositionOp::OverPremul:
+        case mpp::AlphaCompositionOp::OverPremul:
             aOs << alpha_composition_name<AlphaCompositionOp::OverPremul>::value;
             break;
-        case opp::AlphaCompositionOp::InPremul:
+        case mpp::AlphaCompositionOp::InPremul:
             aOs << alpha_composition_name<AlphaCompositionOp::InPremul>::value;
             break;
-        case opp::AlphaCompositionOp::OutPremul:
+        case mpp::AlphaCompositionOp::OutPremul:
             aOs << alpha_composition_name<AlphaCompositionOp::OutPremul>::value;
             break;
-        case opp::AlphaCompositionOp::ATopPremul:
+        case mpp::AlphaCompositionOp::ATopPremul:
             aOs << alpha_composition_name<AlphaCompositionOp::ATopPremul>::value;
             break;
-        case opp::AlphaCompositionOp::XOrPremul:
+        case mpp::AlphaCompositionOp::XOrPremul:
             aOs << alpha_composition_name<AlphaCompositionOp::XOrPremul>::value;
             break;
-        case opp::AlphaCompositionOp::PlusPremul:
+        case mpp::AlphaCompositionOp::PlusPremul:
             aOs << alpha_composition_name<AlphaCompositionOp::PlusPremul>::value;
             break;
         default:
@@ -474,16 +474,16 @@ inline std::ostream &operator<<(std::ostream &aOs, const BayerGridPosition &aBay
 {
     switch (aBayerGridPosition)
     {
-        case opp::BayerGridPosition::BGGR:
+        case mpp::BayerGridPosition::BGGR:
             aOs << bayer_grid_position_name<BayerGridPosition::BGGR>::value;
             break;
-        case opp::BayerGridPosition::RGGB:
+        case mpp::BayerGridPosition::RGGB:
             aOs << bayer_grid_position_name<BayerGridPosition::RGGB>::value;
             break;
-        case opp::BayerGridPosition::GBRG:
+        case mpp::BayerGridPosition::GBRG:
             aOs << bayer_grid_position_name<BayerGridPosition::GBRG>::value;
             break;
-        case opp::BayerGridPosition::GRBG:
+        case mpp::BayerGridPosition::GRBG:
             aOs << bayer_grid_position_name<BayerGridPosition::GRBG>::value;
             break;
         default:
@@ -497,16 +497,16 @@ inline std::wostream &operator<<(std::wostream &aOs, const BayerGridPosition &aB
 {
     switch (aBayerGridPosition)
     {
-        case opp::BayerGridPosition::BGGR:
+        case mpp::BayerGridPosition::BGGR:
             aOs << bayer_grid_position_name<BayerGridPosition::BGGR>::value;
             break;
-        case opp::BayerGridPosition::RGGB:
+        case mpp::BayerGridPosition::RGGB:
             aOs << bayer_grid_position_name<BayerGridPosition::RGGB>::value;
             break;
-        case opp::BayerGridPosition::GBRG:
+        case mpp::BayerGridPosition::GBRG:
             aOs << bayer_grid_position_name<BayerGridPosition::GBRG>::value;
             break;
-        case opp::BayerGridPosition::GRBG:
+        case mpp::BayerGridPosition::GRBG:
             aOs << bayer_grid_position_name<BayerGridPosition::GRBG>::value;
             break;
         default:
@@ -558,13 +558,13 @@ inline std::ostream &operator<<(std::ostream &aOs, const MirrorAxis &aMirrorAxis
 {
     switch (aMirrorAxis)
     {
-        case opp::MirrorAxis::Horizontal:
+        case mpp::MirrorAxis::Horizontal:
             aOs << mirror_axis_name<MirrorAxis::Horizontal>::value;
             break;
-        case opp::MirrorAxis::Vertical:
+        case mpp::MirrorAxis::Vertical:
             aOs << mirror_axis_name<MirrorAxis::Vertical>::value;
             break;
-        case opp::MirrorAxis::Both:
+        case mpp::MirrorAxis::Both:
             aOs << mirror_axis_name<MirrorAxis::Both>::value;
             break;
         default:
@@ -578,13 +578,13 @@ inline std::wostream &operator<<(std::wostream &aOs, const MirrorAxis &aMirrorAx
 {
     switch (aMirrorAxis)
     {
-        case opp::MirrorAxis::Horizontal:
+        case mpp::MirrorAxis::Horizontal:
             aOs << mirror_axis_name<MirrorAxis::Horizontal>::value;
             break;
-        case opp::MirrorAxis::Vertical:
+        case mpp::MirrorAxis::Vertical:
             aOs << mirror_axis_name<MirrorAxis::Vertical>::value;
             break;
-        case opp::MirrorAxis::Both:
+        case mpp::MirrorAxis::Both:
             aOs << mirror_axis_name<MirrorAxis::Both>::value;
             break;
         default:
@@ -660,22 +660,22 @@ inline std::ostream &operator<<(std::ostream &aOs, const CompareOp &aCompareOp)
 {
     switch (aCompareOp)
     {
-        case opp::CompareOp::Less:
+        case mpp::CompareOp::Less:
             aOs << compare_op_name<CompareOp::Less>::value;
             break;
-        case opp::CompareOp::LessEq:
+        case mpp::CompareOp::LessEq:
             aOs << compare_op_name<CompareOp::LessEq>::value;
             break;
-        case opp::CompareOp::Eq:
+        case mpp::CompareOp::Eq:
             aOs << compare_op_name<CompareOp::Eq>::value;
             break;
-        case opp::CompareOp::Greater:
+        case mpp::CompareOp::Greater:
             aOs << compare_op_name<CompareOp::Greater>::value;
             break;
-        case opp::CompareOp::GreaterEq:
+        case mpp::CompareOp::GreaterEq:
             aOs << compare_op_name<CompareOp::GreaterEq>::value;
             break;
-        case opp::CompareOp::NEq:
+        case mpp::CompareOp::NEq:
             aOs << compare_op_name<CompareOp::NEq>::value;
             break;
         default:
@@ -689,22 +689,22 @@ inline std::wostream &operator<<(std::wostream &aOs, const CompareOp &aCompareOp
 {
     switch (aCompareOp)
     {
-        case opp::CompareOp::Less:
+        case mpp::CompareOp::Less:
             aOs << compare_op_name<CompareOp::Less>::value;
             break;
-        case opp::CompareOp::LessEq:
+        case mpp::CompareOp::LessEq:
             aOs << compare_op_name<CompareOp::LessEq>::value;
             break;
-        case opp::CompareOp::Eq:
+        case mpp::CompareOp::Eq:
             aOs << compare_op_name<CompareOp::Eq>::value;
             break;
-        case opp::CompareOp::Greater:
+        case mpp::CompareOp::Greater:
             aOs << compare_op_name<CompareOp::Greater>::value;
             break;
-        case opp::CompareOp::GreaterEq:
+        case mpp::CompareOp::GreaterEq:
             aOs << compare_op_name<CompareOp::GreaterEq>::value;
             break;
-        case opp::CompareOp::NEq:
+        case mpp::CompareOp::NEq:
             aOs << compare_op_name<CompareOp::NEq>::value;
             break;
         default:
@@ -786,22 +786,22 @@ inline std::ostream &operator<<(std::ostream &aOs, const BorderType &aBorderType
 {
     switch (aBorderType)
     {
-        case opp::BorderType::None:
+        case mpp::BorderType::None:
             aOs << border_type_name<BorderType::None>::value;
             break;
-        case opp::BorderType::Constant:
+        case mpp::BorderType::Constant:
             aOs << border_type_name<BorderType::Constant>::value;
             break;
-        case opp::BorderType::Replicate:
+        case mpp::BorderType::Replicate:
             aOs << border_type_name<BorderType::Replicate>::value;
             break;
-        case opp::BorderType::Mirror:
+        case mpp::BorderType::Mirror:
             aOs << border_type_name<BorderType::Mirror>::value;
             break;
-        case opp::BorderType::MirrorReplicate:
+        case mpp::BorderType::MirrorReplicate:
             aOs << border_type_name<BorderType::MirrorReplicate>::value;
             break;
-        case opp::BorderType::Wrap:
+        case mpp::BorderType::Wrap:
             aOs << border_type_name<BorderType::Wrap>::value;
             break;
         default:
@@ -815,22 +815,22 @@ inline std::wostream &operator<<(std::wostream &aOs, const BorderType &aBorderTy
 {
     switch (aBorderType)
     {
-        case opp::BorderType::None:
+        case mpp::BorderType::None:
             aOs << border_type_name<BorderType::None>::value;
             break;
-        case opp::BorderType::Constant:
+        case mpp::BorderType::Constant:
             aOs << border_type_name<BorderType::Constant>::value;
             break;
-        case opp::BorderType::Replicate:
+        case mpp::BorderType::Replicate:
             aOs << border_type_name<BorderType::Replicate>::value;
             break;
-        case opp::BorderType::Mirror:
+        case mpp::BorderType::Mirror:
             aOs << border_type_name<BorderType::Mirror>::value;
             break;
-        case opp::BorderType::MirrorReplicate:
+        case mpp::BorderType::MirrorReplicate:
             aOs << border_type_name<BorderType::MirrorReplicate>::value;
             break;
-        case opp::BorderType::Wrap:
+        case mpp::BorderType::Wrap:
             aOs << border_type_name<BorderType::Wrap>::value;
             break;
         default:
@@ -844,7 +844,7 @@ inline std::wostream &operator<<(std::wostream &aOs, const BorderType &aBorderTy
 #pragma region HistorgamEvenMode
 /// <summary>
 /// Defines how to evenly spread an integer distribution<para/>
-/// NPP uses a different definition on how two create evenly spaced bins for histograms for integer data. OPP supports
+/// NPP uses a different definition on how two create evenly spaced bins for histograms for integer data. MPP supports
 /// both definitions in its EvenLevels function.
 /// </summary>
 enum class HistorgamEvenMode // NOLINT(performance-enum-size)
@@ -877,10 +877,10 @@ inline std::ostream &operator<<(std::ostream &aOs, const HistorgamEvenMode &aHis
 {
     switch (aHistorgamEvenMode)
     {
-        case opp::HistorgamEvenMode::Default:
+        case mpp::HistorgamEvenMode::Default:
             aOs << historgam_even_mode_name<HistorgamEvenMode::Default>::value;
             break;
-        case opp::HistorgamEvenMode::NPP:
+        case mpp::HistorgamEvenMode::NPP:
             aOs << historgam_even_mode_name<HistorgamEvenMode::NPP>::value;
             break;
         default:
@@ -894,10 +894,10 @@ inline std::wostream &operator<<(std::wostream &aOs, const HistorgamEvenMode &aH
 {
     switch (aHistorgamEvenMode)
     {
-        case opp::HistorgamEvenMode::Default:
+        case mpp::HistorgamEvenMode::Default:
             aOs << historgam_even_mode_name<HistorgamEvenMode::Default>::value;
             break;
-        case opp::HistorgamEvenMode::NPP:
+        case mpp::HistorgamEvenMode::NPP:
             aOs << historgam_even_mode_name<HistorgamEvenMode::NPP>::value;
             break;
         default:
@@ -966,7 +966,7 @@ enum class InterpolationMode // NOLINT(performance-enum-size)
     /// </summary>
     Lanczos3Lobed = 10,
     /// <summary>
-    /// For future versions of OPP, currently not implemented...
+    /// For future versions of MPP, currently not implemented...
     /// </summary>
     SmoothEdge = 0x8000000
 };
@@ -1029,37 +1029,37 @@ inline std::ostream &operator<<(std::ostream &aOs, const InterpolationMode &aInt
     switch (static_cast<InterpolationMode>(static_cast<uint>(aInterpolationMode) &
                                            (static_cast<uint>(InterpolationMode::SmoothEdge) - 1)))
     {
-        case opp::InterpolationMode::Undefined:
+        case mpp::InterpolationMode::Undefined:
             aOs << interpolation_mode_name<InterpolationMode::Undefined>::value;
             break;
-        case opp::InterpolationMode::NearestNeighbor:
+        case mpp::InterpolationMode::NearestNeighbor:
             aOs << interpolation_mode_name<InterpolationMode::NearestNeighbor>::value;
             break;
-        case opp::InterpolationMode::Linear:
+        case mpp::InterpolationMode::Linear:
             aOs << interpolation_mode_name<InterpolationMode::Linear>::value;
             break;
-        case opp::InterpolationMode::CubicHermiteSpline:
+        case mpp::InterpolationMode::CubicHermiteSpline:
             aOs << interpolation_mode_name<InterpolationMode::CubicHermiteSpline>::value;
             break;
-        case opp::InterpolationMode::CubicLagrange:
+        case mpp::InterpolationMode::CubicLagrange:
             aOs << interpolation_mode_name<InterpolationMode::CubicLagrange>::value;
             break;
-        case opp::InterpolationMode::Cubic2ParamBSpline:
+        case mpp::InterpolationMode::Cubic2ParamBSpline:
             aOs << interpolation_mode_name<InterpolationMode::Cubic2ParamBSpline>::value;
             break;
-        case opp::InterpolationMode::Cubic2ParamCatmullRom:
+        case mpp::InterpolationMode::Cubic2ParamCatmullRom:
             aOs << interpolation_mode_name<InterpolationMode::Cubic2ParamCatmullRom>::value;
             break;
-        case opp::InterpolationMode::Cubic2ParamB05C03:
+        case mpp::InterpolationMode::Cubic2ParamB05C03:
             aOs << interpolation_mode_name<InterpolationMode::Cubic2ParamB05C03>::value;
             break;
-        case opp::InterpolationMode::Super:
+        case mpp::InterpolationMode::Super:
             aOs << interpolation_mode_name<InterpolationMode::Super>::value;
             break;
-        case opp::InterpolationMode::Lanczos2Lobed:
+        case mpp::InterpolationMode::Lanczos2Lobed:
             aOs << interpolation_mode_name<InterpolationMode::Lanczos2Lobed>::value;
             break;
-        case opp::InterpolationMode::Lanczos3Lobed:
+        case mpp::InterpolationMode::Lanczos3Lobed:
             aOs << interpolation_mode_name<InterpolationMode::Lanczos3Lobed>::value;
             break;
         default:
@@ -1078,37 +1078,37 @@ inline std::wostream &operator<<(std::wostream &aOs, const InterpolationMode &aI
     switch (static_cast<InterpolationMode>(static_cast<uint>(aInterpolationMode) &
                                            (static_cast<uint>(InterpolationMode::SmoothEdge) - 1)))
     {
-        case opp::InterpolationMode::Undefined:
+        case mpp::InterpolationMode::Undefined:
             aOs << interpolation_mode_name<InterpolationMode::Undefined>::value;
             break;
-        case opp::InterpolationMode::NearestNeighbor:
+        case mpp::InterpolationMode::NearestNeighbor:
             aOs << interpolation_mode_name<InterpolationMode::NearestNeighbor>::value;
             break;
-        case opp::InterpolationMode::Linear:
+        case mpp::InterpolationMode::Linear:
             aOs << interpolation_mode_name<InterpolationMode::Linear>::value;
             break;
-        case opp::InterpolationMode::CubicHermiteSpline:
+        case mpp::InterpolationMode::CubicHermiteSpline:
             aOs << interpolation_mode_name<InterpolationMode::CubicHermiteSpline>::value;
             break;
-        case opp::InterpolationMode::CubicLagrange:
+        case mpp::InterpolationMode::CubicLagrange:
             aOs << interpolation_mode_name<InterpolationMode::CubicLagrange>::value;
             break;
-        case opp::InterpolationMode::Cubic2ParamBSpline:
+        case mpp::InterpolationMode::Cubic2ParamBSpline:
             aOs << interpolation_mode_name<InterpolationMode::Cubic2ParamBSpline>::value;
             break;
-        case opp::InterpolationMode::Cubic2ParamCatmullRom:
+        case mpp::InterpolationMode::Cubic2ParamCatmullRom:
             aOs << interpolation_mode_name<InterpolationMode::Cubic2ParamCatmullRom>::value;
             break;
-        case opp::InterpolationMode::Cubic2ParamB05C03:
+        case mpp::InterpolationMode::Cubic2ParamB05C03:
             aOs << interpolation_mode_name<InterpolationMode::Cubic2ParamB05C03>::value;
             break;
-        case opp::InterpolationMode::Super:
+        case mpp::InterpolationMode::Super:
             aOs << interpolation_mode_name<InterpolationMode::Super>::value;
             break;
-        case opp::InterpolationMode::Lanczos2Lobed:
+        case mpp::InterpolationMode::Lanczos2Lobed:
             aOs << interpolation_mode_name<InterpolationMode::Lanczos2Lobed>::value;
             break;
-        case opp::InterpolationMode::Lanczos3Lobed:
+        case mpp::InterpolationMode::Lanczos3Lobed:
             aOs << interpolation_mode_name<InterpolationMode::Lanczos3Lobed>::value;
             break;
         default:
@@ -1228,37 +1228,37 @@ inline std::ostream &operator<<(std::ostream &aOs, const MaskSize &aMaskSize)
 {
     switch (aMaskSize)
     {
-        case opp::MaskSize::Mask_1x3:
+        case mpp::MaskSize::Mask_1x3:
             aOs << mask_size_name<MaskSize::Mask_1x3>::value;
             break;
-        case opp::MaskSize::Mask_1x5:
+        case mpp::MaskSize::Mask_1x5:
             aOs << mask_size_name<MaskSize::Mask_1x5>::value;
             break;
-        case opp::MaskSize::Mask_3x1:
+        case mpp::MaskSize::Mask_3x1:
             aOs << mask_size_name<MaskSize::Mask_3x1>::value;
             break;
-        case opp::MaskSize::Mask_5x1:
+        case mpp::MaskSize::Mask_5x1:
             aOs << mask_size_name<MaskSize::Mask_5x1>::value;
             break;
-        case opp::MaskSize::Mask_3x3:
+        case mpp::MaskSize::Mask_3x3:
             aOs << mask_size_name<MaskSize::Mask_3x3>::value;
             break;
-        case opp::MaskSize::Mask_5x5:
+        case mpp::MaskSize::Mask_5x5:
             aOs << mask_size_name<MaskSize::Mask_5x5>::value;
             break;
-        case opp::MaskSize::Mask_7x7:
+        case mpp::MaskSize::Mask_7x7:
             aOs << mask_size_name<MaskSize::Mask_7x7>::value;
             break;
-        case opp::MaskSize::Mask_9x9:
+        case mpp::MaskSize::Mask_9x9:
             aOs << mask_size_name<MaskSize::Mask_9x9>::value;
             break;
-        case opp::MaskSize::Mask_11x11:
+        case mpp::MaskSize::Mask_11x11:
             aOs << mask_size_name<MaskSize::Mask_11x11>::value;
             break;
-        case opp::MaskSize::Mask_13x13:
+        case mpp::MaskSize::Mask_13x13:
             aOs << mask_size_name<MaskSize::Mask_13x13>::value;
             break;
-        case opp::MaskSize::Mask_15x15:
+        case mpp::MaskSize::Mask_15x15:
             aOs << mask_size_name<MaskSize::Mask_15x15>::value;
             break;
         default:
@@ -1272,37 +1272,37 @@ inline std::wostream &operator<<(std::wostream &aOs, const MaskSize &aMaskSize)
 {
     switch (aMaskSize)
     {
-        case opp::MaskSize::Mask_1x3:
+        case mpp::MaskSize::Mask_1x3:
             aOs << mask_size_name<MaskSize::Mask_1x3>::value;
             break;
-        case opp::MaskSize::Mask_1x5:
+        case mpp::MaskSize::Mask_1x5:
             aOs << mask_size_name<MaskSize::Mask_1x5>::value;
             break;
-        case opp::MaskSize::Mask_3x1:
+        case mpp::MaskSize::Mask_3x1:
             aOs << mask_size_name<MaskSize::Mask_3x1>::value;
             break;
-        case opp::MaskSize::Mask_5x1:
+        case mpp::MaskSize::Mask_5x1:
             aOs << mask_size_name<MaskSize::Mask_5x1>::value;
             break;
-        case opp::MaskSize::Mask_3x3:
+        case mpp::MaskSize::Mask_3x3:
             aOs << mask_size_name<MaskSize::Mask_3x3>::value;
             break;
-        case opp::MaskSize::Mask_5x5:
+        case mpp::MaskSize::Mask_5x5:
             aOs << mask_size_name<MaskSize::Mask_5x5>::value;
             break;
-        case opp::MaskSize::Mask_7x7:
+        case mpp::MaskSize::Mask_7x7:
             aOs << mask_size_name<MaskSize::Mask_7x7>::value;
             break;
-        case opp::MaskSize::Mask_9x9:
+        case mpp::MaskSize::Mask_9x9:
             aOs << mask_size_name<MaskSize::Mask_9x9>::value;
             break;
-        case opp::MaskSize::Mask_11x11:
+        case mpp::MaskSize::Mask_11x11:
             aOs << mask_size_name<MaskSize::Mask_11x11>::value;
             break;
-        case opp::MaskSize::Mask_13x13:
+        case mpp::MaskSize::Mask_13x13:
             aOs << mask_size_name<MaskSize::Mask_13x13>::value;
             break;
-        case opp::MaskSize::Mask_15x15:
+        case mpp::MaskSize::Mask_15x15:
             aOs << mask_size_name<MaskSize::Mask_15x15>::value;
             break;
         default:
@@ -1374,7 +1374,7 @@ enum class FixedFilter // NOLINT(performance-enum-size)
     /// -1 -1 -1<para/>
     ///  0  0  0<para/>
     ///  1  1  1<para/>
-    /// Note: the filter is mirrored compared to NPP due to different filtering logic (convolution vs correlation). OPP
+    /// Note: the filter is mirrored compared to NPP due to different filtering logic (convolution vs correlation). MPP
     /// uses correlation through out all filtering alike algorithms and in order to obtain the same output as in NPP,
     /// the filter coefficients had to be mirrored.
     /// </summary>
@@ -1386,7 +1386,7 @@ enum class FixedFilter // NOLINT(performance-enum-size)
     /// -1 0 1<para/>
     /// -1 0 1<para/>
     /// Note: The documentation in NPP differs to the actually implemented filter. Nevertheless, this is the filter used
-    /// with correlation filtering logic and gives the same results as NPP. OPP uses correlation through out all
+    /// with correlation filtering logic and gives the same results as NPP. MPP uses correlation through out all
     /// filtering alike algorithms and in order to obtain the same output as in NPP, the filter coefficients had to be
     /// mirrored.
     /// </summary>
@@ -1397,7 +1397,7 @@ enum class FixedFilter // NOLINT(performance-enum-size)
     /// -1 0 0<para/>
     ///  0 1 0<para/>
     ///  0 0 0<para/>
-    /// Note: the filter is mirrored compared to NPP due to different filtering logic (convolution vs correlation). OPP
+    /// Note: the filter is mirrored compared to NPP due to different filtering logic (convolution vs correlation). MPP
     /// uses correlation through out all filtering alike algorithms and in order to obtain the same output as in NPP,
     /// the filter coefficients had to be mirrored.
     /// </summary>
@@ -1408,7 +1408,7 @@ enum class FixedFilter // NOLINT(performance-enum-size)
     /// 0 0 -1<para/>
     /// 0 1  0<para/>
     /// 0 0  0<para/>
-    /// Note: the filter is mirrored compared to NPP due to different filtering logic (convolution vs correlation). OPP
+    /// Note: the filter is mirrored compared to NPP due to different filtering logic (convolution vs correlation). MPP
     /// uses correlation through out all filtering alike algorithms and in order to obtain the same output as in NPP,
     /// the filter coefficients had to be mirrored.
     /// </summary>
@@ -1419,7 +1419,7 @@ enum class FixedFilter // NOLINT(performance-enum-size)
     /// -3 -10 -3<para/>
     ///  0   0  0<para/>
     ///  3  10  3<para/>
-    /// Note: the filter is mirrored compared to NPP due to different filtering logic (convolution vs correlation). OPP
+    /// Note: the filter is mirrored compared to NPP due to different filtering logic (convolution vs correlation). MPP
     /// uses correlation through out all filtering alike algorithms and in order to obtain the same output as in NPP,
     /// the filter coefficients had to be mirrored.
     /// </summary>
@@ -1431,7 +1431,7 @@ enum class FixedFilter // NOLINT(performance-enum-size)
     /// -10 0 10<para/>
     ///  -3 0 3<para/>
     /// Note: The documentation in NPP differs to the actually implemented filter. Nevertheless, this is the filter used
-    /// with correlation filtering logic and gives the same results as NPP. OPP uses correlation through out all
+    /// with correlation filtering logic and gives the same results as NPP. MPP uses correlation through out all
     /// filtering alike algorithms and in order to obtain the same output as in NPP, the filter coefficients had to be
     /// mirrored.
     /// </summary>
@@ -1470,7 +1470,7 @@ enum class FixedFilter // NOLINT(performance-enum-size)
     ///  0  0   0  0  0<para/>
     ///  2  8  12  8  2<para/>
     ///  1  4   6  4  1<para/>
-    /// Note: the filter is mirrored compared to NPP due to different filtering logic (convolution vs correlation). OPP
+    /// Note: the filter is mirrored compared to NPP due to different filtering logic (convolution vs correlation). MPP
     /// uses correlation through out all filtering alike algorithms and in order to obtain the same output as in NPP,
     /// the filter coefficients had to be mirrored.
     /// </summary>
@@ -1488,7 +1488,7 @@ enum class FixedFilter // NOLINT(performance-enum-size)
     /// -4  -8 0  8 4<para/>
     /// -1  -2 0  2 1<para/>
     /// Note: The documentation in NPP differs to the actually implemented filter. Nevertheless, this is the filter used
-    /// with correlation filtering logic and gives the same results as NPP. OPP uses correlation through out all
+    /// with correlation filtering logic and gives the same results as NPP. MPP uses correlation through out all
     /// filtering alike algorithms and in order to obtain the same output as in NPP, the filter coefficients had to be
     /// mirrored.
     /// </summary>
@@ -1592,49 +1592,49 @@ inline std::ostream &operator<<(std::ostream &aOs, const FixedFilter &aFixedFilt
 {
     switch (aFixedFilter)
     {
-        case opp::FixedFilter::HighPass:
+        case mpp::FixedFilter::HighPass:
             aOs << fixed_filter_name<FixedFilter::HighPass>::value;
             break;
-        case opp::FixedFilter::LowPass:
+        case mpp::FixedFilter::LowPass:
             aOs << fixed_filter_name<FixedFilter::LowPass>::value;
             break;
-        case opp::FixedFilter::Laplace:
+        case mpp::FixedFilter::Laplace:
             aOs << fixed_filter_name<FixedFilter::Laplace>::value;
             break;
-        case opp::FixedFilter::PrewittHoriz:
+        case mpp::FixedFilter::PrewittHoriz:
             aOs << fixed_filter_name<FixedFilter::PrewittHoriz>::value;
             break;
-        case opp::FixedFilter::PrewittVert:
+        case mpp::FixedFilter::PrewittVert:
             aOs << fixed_filter_name<FixedFilter::PrewittVert>::value;
             break;
-        case opp::FixedFilter::RobertsDown:
+        case mpp::FixedFilter::RobertsDown:
             aOs << fixed_filter_name<FixedFilter::RobertsDown>::value;
             break;
-        case opp::FixedFilter::RobertsUp:
+        case mpp::FixedFilter::RobertsUp:
             aOs << fixed_filter_name<FixedFilter::RobertsUp>::value;
             break;
-        case opp::FixedFilter::ScharrHoriz:
+        case mpp::FixedFilter::ScharrHoriz:
             aOs << fixed_filter_name<FixedFilter::ScharrHoriz>::value;
             break;
-        case opp::FixedFilter::ScharrVert:
+        case mpp::FixedFilter::ScharrVert:
             aOs << fixed_filter_name<FixedFilter::ScharrVert>::value;
             break;
-        case opp::FixedFilter::Sharpen:
+        case mpp::FixedFilter::Sharpen:
             aOs << fixed_filter_name<FixedFilter::Sharpen>::value;
             break;
-        case opp::FixedFilter::SobelCross:
+        case mpp::FixedFilter::SobelCross:
             aOs << fixed_filter_name<FixedFilter::SobelCross>::value;
             break;
-        case opp::FixedFilter::SobelHoriz:
+        case mpp::FixedFilter::SobelHoriz:
             aOs << fixed_filter_name<FixedFilter::SobelHoriz>::value;
             break;
-        case opp::FixedFilter::SobelVert:
+        case mpp::FixedFilter::SobelVert:
             aOs << fixed_filter_name<FixedFilter::SobelVert>::value;
             break;
-        case opp::FixedFilter::SobelHorizSecond:
+        case mpp::FixedFilter::SobelHorizSecond:
             aOs << fixed_filter_name<FixedFilter::SobelHorizSecond>::value;
             break;
-        case opp::FixedFilter::SobelVertSecond:
+        case mpp::FixedFilter::SobelVertSecond:
             aOs << fixed_filter_name<FixedFilter::SobelVertSecond>::value;
             break;
         default:
@@ -1648,49 +1648,49 @@ inline std::wostream &operator<<(std::wostream &aOs, const FixedFilter &aFixedFi
 {
     switch (aFixedFilter)
     {
-        case opp::FixedFilter::HighPass:
+        case mpp::FixedFilter::HighPass:
             aOs << fixed_filter_name<FixedFilter::HighPass>::value;
             break;
-        case opp::FixedFilter::LowPass:
+        case mpp::FixedFilter::LowPass:
             aOs << fixed_filter_name<FixedFilter::LowPass>::value;
             break;
-        case opp::FixedFilter::Laplace:
+        case mpp::FixedFilter::Laplace:
             aOs << fixed_filter_name<FixedFilter::Laplace>::value;
             break;
-        case opp::FixedFilter::PrewittHoriz:
+        case mpp::FixedFilter::PrewittHoriz:
             aOs << fixed_filter_name<FixedFilter::PrewittHoriz>::value;
             break;
-        case opp::FixedFilter::PrewittVert:
+        case mpp::FixedFilter::PrewittVert:
             aOs << fixed_filter_name<FixedFilter::PrewittVert>::value;
             break;
-        case opp::FixedFilter::RobertsDown:
+        case mpp::FixedFilter::RobertsDown:
             aOs << fixed_filter_name<FixedFilter::RobertsDown>::value;
             break;
-        case opp::FixedFilter::RobertsUp:
+        case mpp::FixedFilter::RobertsUp:
             aOs << fixed_filter_name<FixedFilter::RobertsUp>::value;
             break;
-        case opp::FixedFilter::ScharrHoriz:
+        case mpp::FixedFilter::ScharrHoriz:
             aOs << fixed_filter_name<FixedFilter::ScharrHoriz>::value;
             break;
-        case opp::FixedFilter::ScharrVert:
+        case mpp::FixedFilter::ScharrVert:
             aOs << fixed_filter_name<FixedFilter::ScharrVert>::value;
             break;
-        case opp::FixedFilter::Sharpen:
+        case mpp::FixedFilter::Sharpen:
             aOs << fixed_filter_name<FixedFilter::Sharpen>::value;
             break;
-        case opp::FixedFilter::SobelCross:
+        case mpp::FixedFilter::SobelCross:
             aOs << fixed_filter_name<FixedFilter::SobelCross>::value;
             break;
-        case opp::FixedFilter::SobelHoriz:
+        case mpp::FixedFilter::SobelHoriz:
             aOs << fixed_filter_name<FixedFilter::SobelHoriz>::value;
             break;
-        case opp::FixedFilter::SobelVert:
+        case mpp::FixedFilter::SobelVert:
             aOs << fixed_filter_name<FixedFilter::SobelVert>::value;
             break;
-        case opp::FixedFilter::SobelHorizSecond:
+        case mpp::FixedFilter::SobelHorizSecond:
             aOs << fixed_filter_name<FixedFilter::SobelHorizSecond>::value;
             break;
-        case opp::FixedFilter::SobelVertSecond:
+        case mpp::FixedFilter::SobelVertSecond:
             aOs << fixed_filter_name<FixedFilter::SobelVertSecond>::value;
             break;
         default:
@@ -1778,4 +1778,4 @@ inline std::wostream &operator<<(std::wostream &aOs, const Norm &aNorm)
     return aOs;
 }
 #pragma endregion
-} // namespace opp
+} // namespace mpp

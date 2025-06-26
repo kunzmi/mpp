@@ -5,7 +5,7 @@
 #include <common/image/pixelTypes.h>
 #include <common/maskTupel.h>
 #include <common/numberTypes.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/roundFunctor.h>
 #include <common/statistics/operators.h>
 #include <common/tupel.h>
@@ -16,7 +16,7 @@
 // disable warning for pragma unroll when compiling with host compiler:
 #include <common/disableWarningsBegin.h>
 
-namespace opp::image
+namespace mpp::image
 {
 /// <summary>
 /// Computes an output pixel from one src array -&gt; dst pixel
@@ -31,8 +31,8 @@ template <size_t tupelSize, typename SrcT> struct SrcReductionMinMaxIdxFunctor
     const SrcT *RESTRICT Src1;
     size_t SrcPitch1;
 
-    [[no_unique_address]] opp::MinIdx<SrcT> OpMin;
-    [[no_unique_address]] opp::MaxIdx<SrcT> OpMax;
+    [[no_unique_address]] mpp::MinIdx<SrcT> OpMin;
+    [[no_unique_address]] mpp::MaxIdx<SrcT> OpMax;
 
 #pragma region Constructors
     SrcReductionMinMaxIdxFunctor()
@@ -94,5 +94,5 @@ template <size_t tupelSize, typename SrcT> struct SrcReductionMinMaxIdxFunctor
     }
 #pragma endregion
 };
-} // namespace opp::image
+} // namespace mpp::image
 #include <common/disableWarningsEnd.h>

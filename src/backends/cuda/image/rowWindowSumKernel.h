@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/image/configurations.h>
@@ -18,7 +18,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 /// <summary>
 /// Applies a row window sum filter to each pixel in an image with border control.<para/>
@@ -217,7 +217,7 @@ template <typename ComputeT, typename DstT, size_t TupelSize, RoundingMode round
           typename FilterT>
 void InvokeRowWindowSumKernelDefault(const BorderControlT &aSrcWithBC, DstT *aDst, size_t aPitchDst,
                                      FilterT aScalingValue, int aFilterSize, int aFilterCenter, const Size2D &aSize,
-                                     const opp::cuda::StreamCtx &aStreamCtx)
+                                     const mpp::cuda::StreamCtx &aStreamCtx)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {
@@ -239,5 +239,5 @@ void InvokeRowWindowSumKernelDefault(const BorderControlT &aSrcWithBC, DstT *aDs
     }
 }
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

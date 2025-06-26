@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/image/configurations.h>
@@ -21,7 +21,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 /// <summary>
 /// Same as separableWindowOpKernel with Add operator but adapted to thresholding at the end.
@@ -278,7 +278,7 @@ template <typename ComputeT, typename DstT, size_t TupelSize, int blockHeight, t
 void InvokeThresholdAdaptiveBoxFilterKernelDefault(const BorderControlT &aSrcWithBC, DstT *aDst, size_t aPitchDst,
                                                    const FilterArea &aFilterArea, const ComputeT &aDelta,
                                                    const DstT &aValGT, const DstT &aValLE, const Size2D &aSize,
-                                                   const opp::cuda::StreamCtx &aStreamCtx)
+                                                   const mpp::cuda::StreamCtx &aStreamCtx)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {
@@ -334,5 +334,5 @@ void InvokeThresholdAdaptiveBoxFilterKernelDefault(const BorderControlT &aSrcWit
     }
 }
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

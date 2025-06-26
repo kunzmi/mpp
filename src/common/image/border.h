@@ -3,7 +3,7 @@
 #include <common/image/size2D.h>
 #include <common/vectorTypes.h>
 
-namespace opp::image
+namespace mpp::image
 {
 /// <summary>
 /// A Border defines the number of border pixels on each side of a 2D roi
@@ -124,4 +124,4 @@ std::wostream &operator<<(std::wostream &aOs, const Border &aBorder);
 std::istream &operator>>(std::istream &aIs, Border &aBorder);
 std::wistream &operator>>(std::wistream &aIs, Border &aBorder);
 
-} // namespace opp::image
+} // namespace mpp::image

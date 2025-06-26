@@ -18,7 +18,7 @@
 #include <common/image/functors/srcPlanar4Functor.h>
 #include <common/image/functors/srcSingleChannelFunctor.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <iostream>
 #include <vector>
 // #include <common/arithmetic/ternary_operators.h>
@@ -70,15 +70,15 @@
 #include <cuda_runtime_api.h>
 #include <filesystem>
 #include <ios>
-using namespace opp;
-using namespace opp::cuda;
-using namespace opp::image;
-using namespace opp::image::cuda;
-namespace cpu = opp::image::cpuSimple;
+using namespace mpp;
+using namespace mpp::cuda;
+using namespace mpp::image;
+using namespace mpp::image::cuda;
+namespace cpu = mpp::image::cpuSimple;
 
 int main()
 {
-    // StreamCtx oppCtx = StreamCtxSingleton::Get();
+    // StreamCtx mppCtx = StreamCtxSingleton::Get();
 
     // c_double::Ln(cf);
     // constexpr bool iscf = NonNativeFloatingPoint<BFloat16>;
@@ -122,7 +122,7 @@ int main()
                 it2++;
             }
 
-            opp::fileIO::TIFFFile::WriteTIFF(R"(C:\Users\kunz_\OneDrive\Desktop\Unbenannt-3.tif)",
+            mpp::fileIO::TIFFFile::WriteTIFF(R"(C:\Users\kunz_\OneDrive\Desktop\Unbenannt-3.tif)",
        imgs[0].SizeAlloc().x, imgs[0].SizeAlloc().y, 0.0, PixelTypeEnum::PTE8uC1, imgs[0].Pointer(), imgs[1].Pointer(),
        imgs[2].Pointer(), nullptr, 9);
 
@@ -139,8 +139,8 @@ int main()
         std::cout << "Scalefactor -2 = " << GetScaleFactor(-2) << std::endl;
         std::cout << "Scalefactor -4 = " << GetScaleFactor(-4) << std::endl;*/
 
-#ifdef OPP_CUDA_TEMPLATE_REGISTRY_IS_ACTIVE
-        /*auto reg = opp::cuda::GetTemplateInstances();
+#ifdef MPP_CUDA_TEMPLATE_REGISTRY_IS_ACTIVE
+        /*auto reg = mpp::cuda::GetTemplateInstances();
         for (auto &[functionName, typeInstances] : reg)
         {
             std::cout << "For kernel " << functionName << " (" << typeInstances.size() << "):\n";
@@ -152,7 +152,7 @@ int main()
         std::cout << std::endl; */
 #endif
 
-        std::cout << "Hello world! This is " << OPP_PROJECT_NAME << " version " << OPP_VERSION << "!" << std::endl;
+        std::cout << "Hello world! This is " << MPP_PROJECT_NAME << " version " << MPP_VERSION << "!" << std::endl;
 
         const std::filesystem::path baseDir = std::filesystem::path(PROJECT_SOURCE_DIR) / "test/testData";
 
@@ -166,7 +166,7 @@ int main()
         DevVar<Pixel32fC4> sums(128);
         u8test.SetRoi(Border(-1, 0));
 
-        // InvokeSumSrc(u8test.PointerRoi(), u8test.Pitch(), sums.Pointer(), u8test.SizeRoi(), oppCtx);
+        // InvokeSumSrc(u8test.PointerRoi(), u8test.Pitch(), sums.Pointer(), u8test.SizeRoi(), mppCtx);
 
         auto error = cudaDeviceSynchronize();
         if (error != cudaSuccess)
@@ -230,12 +230,12 @@ int main()
         gpu_flower.Add(gpu_addToFlower, 0);
         gpu_flower.Add(constVal, 0);
         gpu_flower.Add(devConst, gpu_res, 0);
-        gpu_res.Div(gpu_flower, -6, opp::RoundingMode::TowardPositiveInfinity);
+        gpu_res.Div(gpu_flower, -6, mpp::RoundingMode::TowardPositiveInfinity);
 
         cpu_flower.Add(cpu_addToFlower);
         cpu_flower.Add(constVal);
         cpu_flower.Add(hConst, cpu_res);
-        cpu_res.Div(cpu_flower, -6, opp::RoundingMode::TowardPositiveInfinity);
+        cpu_res.Div(cpu_flower, -6, mpp::RoundingMode::TowardPositiveInfinity);
 
         resGPU << gpu_res;
 
@@ -250,7 +250,7 @@ int main()
 
         std::cout << "Done!";
     }
-    catch (opp::OPPException &ex)
+    catch (mpp::MPPException &ex)
     {
         std::cout << ex.what();
     }

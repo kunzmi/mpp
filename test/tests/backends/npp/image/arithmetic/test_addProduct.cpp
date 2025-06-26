@@ -46,11 +46,11 @@
 #include <common/defines.h>
 #include <filesystem>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size = 256;
 
@@ -131,7 +131,7 @@ TEST_CASE("16uC1", "[NPP.Arithmetic.AddProduct]")
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed);
-    // Both, NPP and OPP compile the multiplication + add to a single FMA instruction, which behaves with different
+    // Both, NPP and MPP compile the multiplication + add to a single FMA instruction, which behaves with different
     // rounding behavior than the CPU code for values larger than exact integers as floats. This is known especially for
     // CPU-Debug code. To avoid conflicts with large values, we restrict the test to smaller values:
     cpu_src1.Div(256);
@@ -168,7 +168,7 @@ TEST_CASE("16uC1", "[NPP.Arithmetic.AddProductMasked]")
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed);
-    // Both, NPP and OPP compile the multiplication + add to a single FMA instruction, which behaves with different
+    // Both, NPP and MPP compile the multiplication + add to a single FMA instruction, which behaves with different
     // rounding behavior than the CPU code for values larger than exact integers as floats. This is known especially for
     // CPU-Debug code. To avoid conflicts with large values, we restrict the test to smaller values:
     cpu_src1.Div(256);

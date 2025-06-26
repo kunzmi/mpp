@@ -6,7 +6,7 @@
 #include "needSaturationClamp.h"
 #include "numberTypes.h"
 #include "numeric_limits.h"
-#include "opp_defs.h"
+#include "mpp_defs.h"
 #include "safeCast.h"
 #include "staticCast.h"
 #include "vector_typetraits.h"
@@ -26,100 +26,100 @@
 #include <cuda_fp16.h>
 #include <vector_types.h>
 #else
-namespace opp
+namespace mpp
 {
 // these types are only used with CUDA, but nevertheless they need
 // to be defined, so we set them to some known type of same size:
 using nv_bfloat162 = int;
 using half2        = float;
 using float2       = double;
-} // namespace opp
+} // namespace mpp
 
 // no arguments to these intrinsics directly depend on a template parameter,
 // so a declaration must be available:
-opp::float2 __half22float2(opp::half2);               // NOLINT
-opp::half2 __float22half2_rn(opp::float2);            // NOLINT
-opp::float2 __bfloat1622float2(opp::nv_bfloat162);    // NOLINT
-opp::nv_bfloat162 __float22bfloat162_rn(opp::float2); // NOLINT
+mpp::float2 __half22float2(mpp::half2);               // NOLINT
+mpp::half2 __float22half2_rn(mpp::float2);            // NOLINT
+mpp::float2 __bfloat1622float2(mpp::nv_bfloat162);    // NOLINT
+mpp::nv_bfloat162 __float22bfloat162_rn(mpp::float2); // NOLINT
 
-opp::uint __vnegss2(opp::uint);                                  // NOLINT
-opp::nv_bfloat162 __hneg2(opp::nv_bfloat162);                    // NOLINT
-opp::half2 __hneg2(opp::half2);                                  // NOLINT
-opp::uint __vabsss2(opp::uint);                                  // NOLINT
-opp::uint __vaddus2(opp::uint, opp::uint);                       // NOLINT
-opp::uint __vaddss2(opp::uint, opp::uint);                       // NOLINT
-opp::uint __vsubus2(opp::uint, opp::uint);                       // NOLINT
-opp::uint __vsubss2(opp::uint, opp::uint);                       // NOLINT
-opp::uint __vabsdiffs2(opp::uint, opp::uint);                    // NOLINT
-opp::uint __vabsdiffu2(opp::uint, opp::uint);                    // NOLINT
-opp::uint __vmins2(opp::uint, opp::uint);                        // NOLINT
-opp::uint __vminu2(opp::uint, opp::uint);                        // NOLINT
-opp::uint __vmaxs2(opp::uint, opp::uint);                        // NOLINT
-opp::uint __vmaxu2(opp::uint, opp::uint);                        // NOLINT
-opp::uint __vcmpeq2(opp::uint, opp::uint);                       // NOLINT
-opp::uint __vcmpges2(opp::uint, opp::uint);                      // NOLINT
-opp::uint __vcmpgeu2(opp::uint, opp::uint);                      // NOLINT
-opp::uint __vcmpgts2(opp::uint, opp::uint);                      // NOLINT
-opp::uint __vcmpgtu2(opp::uint, opp::uint);                      // NOLINT
-opp::uint __vcmples2(opp::uint, opp::uint);                      // NOLINT
-opp::uint __vcmpleu2(opp::uint, opp::uint);                      // NOLINT
-opp::uint __vcmplts2(opp::uint, opp::uint);                      // NOLINT
-opp::uint __vcmpltu2(opp::uint, opp::uint);                      // NOLINT
-opp::uint __vcmpne2(opp::uint, opp::uint);                       // NOLINT
-opp::nv_bfloat162 __hadd2(opp::nv_bfloat162, opp::nv_bfloat162); // NOLINT
-opp::half2 __hadd2(opp::half2, opp::half2);                      // NOLINT
-opp::nv_bfloat162 __hsub2(opp::nv_bfloat162, opp::nv_bfloat162); // NOLINT
-opp::half2 __hsub2(opp::half2, opp::half2);                      // NOLINT
-opp::nv_bfloat162 __hmul2(opp::nv_bfloat162, opp::nv_bfloat162); // NOLINT
-opp::half2 __hmul2(opp::half2, opp::half2);                      // NOLINT
-opp::nv_bfloat162 __h2div(opp::nv_bfloat162, opp::nv_bfloat162); // NOLINT
-opp::half2 __h2div(opp::half2, opp::half2);                      // NOLINT
-opp::nv_bfloat162 h2exp(opp::nv_bfloat162);                      // NOLINT
-opp::half2 h2exp(opp::half2);                                    // NOLINT
-opp::nv_bfloat162 h2log(opp::nv_bfloat162);                      // NOLINT
-opp::half2 h2log(opp::half2);                                    // NOLINT
-opp::nv_bfloat162 h2sqrt(opp::nv_bfloat162);                     // NOLINT
-opp::half2 h2sqrt(opp::half2);                                   // NOLINT
-opp::nv_bfloat162 __habs2(opp::nv_bfloat162);                    // NOLINT
-opp::half2 __habs2(opp::half2);                                  // NOLINT
-opp::nv_bfloat162 __hmin2(opp::nv_bfloat162, opp::nv_bfloat162); // NOLINT
-opp::half2 __hmin2(opp::half2, opp::half2);                      // NOLINT
-opp::nv_bfloat162 __hmax2(opp::nv_bfloat162, opp::nv_bfloat162); // NOLINT
-opp::half2 __hmax2(opp::half2, opp::half2);                      // NOLINT
-opp::nv_bfloat162 h2floor(opp::nv_bfloat162);                    // NOLINT
-opp::half2 h2floor(opp::half2);                                  // NOLINT
-opp::nv_bfloat162 h2ceil(opp::nv_bfloat162);                     // NOLINT
-opp::half2 h2ceil(opp::half2);                                   // NOLINT
-opp::nv_bfloat162 h2rint(opp::nv_bfloat162);                     // NOLINT
-opp::half2 h2rint(opp::half2);                                   // NOLINT
-opp::nv_bfloat162 h2trunc(opp::nv_bfloat162);                    // NOLINT
-opp::half2 h2trunc(opp::half2);                                  // NOLINT
-opp::uint __heq2_mask(opp::nv_bfloat162, opp::nv_bfloat162);     // NOLINT
-opp::uint __heq2_mask(opp::half2, opp::half2);                   // NOLINT
-opp::uint __hgt2_mask(opp::nv_bfloat162, opp::nv_bfloat162);     // NOLINT
-opp::uint __hgt2_mask(opp::half2, opp::half2);                   // NOLINT
-opp::uint __hge2_mask(opp::nv_bfloat162, opp::nv_bfloat162);     // NOLINT
-opp::uint __hge2_mask(opp::half2, opp::half2);                   // NOLINT
-opp::uint __hlt2_mask(opp::nv_bfloat162, opp::nv_bfloat162);     // NOLINT
-opp::uint __hlt2_mask(opp::half2, opp::half2);                   // NOLINT
-opp::uint __hle2_mask(opp::nv_bfloat162, opp::nv_bfloat162);     // NOLINT
-opp::uint __hle2_mask(opp::half2, opp::half2);                   // NOLINT
-opp::uint __hne2_mask(opp::nv_bfloat162, opp::nv_bfloat162);     // NOLINT
-opp::uint __hne2_mask(opp::half2, opp::half2);                   // NOLINT
-bool __hbeq2(opp::nv_bfloat162, opp::nv_bfloat162);              // NOLINT
-bool __hbeq2(opp::half2, opp::half2);                            // NOLINT
-bool __hbgt2(opp::nv_bfloat162, opp::nv_bfloat162);              // NOLINT
-bool __hbgt2(opp::half2, opp::half2);                            // NOLINT
-bool __hbge2(opp::nv_bfloat162, opp::nv_bfloat162);              // NOLINT
-bool __hbge2(opp::half2, opp::half2);                            // NOLINT
-bool __hblt2(opp::nv_bfloat162, opp::nv_bfloat162);              // NOLINT
-bool __hblt2(opp::half2, opp::half2);                            // NOLINT
-bool __hble2(opp::nv_bfloat162, opp::nv_bfloat162);              // NOLINT
-bool __hble2(opp::half2, opp::half2);                            // NOLINT
-bool __hbne2(opp::nv_bfloat162, opp::nv_bfloat162);              // NOLINT
+mpp::uint __vnegss2(mpp::uint);                                  // NOLINT
+mpp::nv_bfloat162 __hneg2(mpp::nv_bfloat162);                    // NOLINT
+mpp::half2 __hneg2(mpp::half2);                                  // NOLINT
+mpp::uint __vabsss2(mpp::uint);                                  // NOLINT
+mpp::uint __vaddus2(mpp::uint, mpp::uint);                       // NOLINT
+mpp::uint __vaddss2(mpp::uint, mpp::uint);                       // NOLINT
+mpp::uint __vsubus2(mpp::uint, mpp::uint);                       // NOLINT
+mpp::uint __vsubss2(mpp::uint, mpp::uint);                       // NOLINT
+mpp::uint __vabsdiffs2(mpp::uint, mpp::uint);                    // NOLINT
+mpp::uint __vabsdiffu2(mpp::uint, mpp::uint);                    // NOLINT
+mpp::uint __vmins2(mpp::uint, mpp::uint);                        // NOLINT
+mpp::uint __vminu2(mpp::uint, mpp::uint);                        // NOLINT
+mpp::uint __vmaxs2(mpp::uint, mpp::uint);                        // NOLINT
+mpp::uint __vmaxu2(mpp::uint, mpp::uint);                        // NOLINT
+mpp::uint __vcmpeq2(mpp::uint, mpp::uint);                       // NOLINT
+mpp::uint __vcmpges2(mpp::uint, mpp::uint);                      // NOLINT
+mpp::uint __vcmpgeu2(mpp::uint, mpp::uint);                      // NOLINT
+mpp::uint __vcmpgts2(mpp::uint, mpp::uint);                      // NOLINT
+mpp::uint __vcmpgtu2(mpp::uint, mpp::uint);                      // NOLINT
+mpp::uint __vcmples2(mpp::uint, mpp::uint);                      // NOLINT
+mpp::uint __vcmpleu2(mpp::uint, mpp::uint);                      // NOLINT
+mpp::uint __vcmplts2(mpp::uint, mpp::uint);                      // NOLINT
+mpp::uint __vcmpltu2(mpp::uint, mpp::uint);                      // NOLINT
+mpp::uint __vcmpne2(mpp::uint, mpp::uint);                       // NOLINT
+mpp::nv_bfloat162 __hadd2(mpp::nv_bfloat162, mpp::nv_bfloat162); // NOLINT
+mpp::half2 __hadd2(mpp::half2, mpp::half2);                      // NOLINT
+mpp::nv_bfloat162 __hsub2(mpp::nv_bfloat162, mpp::nv_bfloat162); // NOLINT
+mpp::half2 __hsub2(mpp::half2, mpp::half2);                      // NOLINT
+mpp::nv_bfloat162 __hmul2(mpp::nv_bfloat162, mpp::nv_bfloat162); // NOLINT
+mpp::half2 __hmul2(mpp::half2, mpp::half2);                      // NOLINT
+mpp::nv_bfloat162 __h2div(mpp::nv_bfloat162, mpp::nv_bfloat162); // NOLINT
+mpp::half2 __h2div(mpp::half2, mpp::half2);                      // NOLINT
+mpp::nv_bfloat162 h2exp(mpp::nv_bfloat162);                      // NOLINT
+mpp::half2 h2exp(mpp::half2);                                    // NOLINT
+mpp::nv_bfloat162 h2log(mpp::nv_bfloat162);                      // NOLINT
+mpp::half2 h2log(mpp::half2);                                    // NOLINT
+mpp::nv_bfloat162 h2sqrt(mpp::nv_bfloat162);                     // NOLINT
+mpp::half2 h2sqrt(mpp::half2);                                   // NOLINT
+mpp::nv_bfloat162 __habs2(mpp::nv_bfloat162);                    // NOLINT
+mpp::half2 __habs2(mpp::half2);                                  // NOLINT
+mpp::nv_bfloat162 __hmin2(mpp::nv_bfloat162, mpp::nv_bfloat162); // NOLINT
+mpp::half2 __hmin2(mpp::half2, mpp::half2);                      // NOLINT
+mpp::nv_bfloat162 __hmax2(mpp::nv_bfloat162, mpp::nv_bfloat162); // NOLINT
+mpp::half2 __hmax2(mpp::half2, mpp::half2);                      // NOLINT
+mpp::nv_bfloat162 h2floor(mpp::nv_bfloat162);                    // NOLINT
+mpp::half2 h2floor(mpp::half2);                                  // NOLINT
+mpp::nv_bfloat162 h2ceil(mpp::nv_bfloat162);                     // NOLINT
+mpp::half2 h2ceil(mpp::half2);                                   // NOLINT
+mpp::nv_bfloat162 h2rint(mpp::nv_bfloat162);                     // NOLINT
+mpp::half2 h2rint(mpp::half2);                                   // NOLINT
+mpp::nv_bfloat162 h2trunc(mpp::nv_bfloat162);                    // NOLINT
+mpp::half2 h2trunc(mpp::half2);                                  // NOLINT
+mpp::uint __heq2_mask(mpp::nv_bfloat162, mpp::nv_bfloat162);     // NOLINT
+mpp::uint __heq2_mask(mpp::half2, mpp::half2);                   // NOLINT
+mpp::uint __hgt2_mask(mpp::nv_bfloat162, mpp::nv_bfloat162);     // NOLINT
+mpp::uint __hgt2_mask(mpp::half2, mpp::half2);                   // NOLINT
+mpp::uint __hge2_mask(mpp::nv_bfloat162, mpp::nv_bfloat162);     // NOLINT
+mpp::uint __hge2_mask(mpp::half2, mpp::half2);                   // NOLINT
+mpp::uint __hlt2_mask(mpp::nv_bfloat162, mpp::nv_bfloat162);     // NOLINT
+mpp::uint __hlt2_mask(mpp::half2, mpp::half2);                   // NOLINT
+mpp::uint __hle2_mask(mpp::nv_bfloat162, mpp::nv_bfloat162);     // NOLINT
+mpp::uint __hle2_mask(mpp::half2, mpp::half2);                   // NOLINT
+mpp::uint __hne2_mask(mpp::nv_bfloat162, mpp::nv_bfloat162);     // NOLINT
+mpp::uint __hne2_mask(mpp::half2, mpp::half2);                   // NOLINT
+bool __hbeq2(mpp::nv_bfloat162, mpp::nv_bfloat162);              // NOLINT
+bool __hbeq2(mpp::half2, mpp::half2);                            // NOLINT
+bool __hbgt2(mpp::nv_bfloat162, mpp::nv_bfloat162);              // NOLINT
+bool __hbgt2(mpp::half2, mpp::half2);                            // NOLINT
+bool __hbge2(mpp::nv_bfloat162, mpp::nv_bfloat162);              // NOLINT
+bool __hbge2(mpp::half2, mpp::half2);                            // NOLINT
+bool __hblt2(mpp::nv_bfloat162, mpp::nv_bfloat162);              // NOLINT
+bool __hblt2(mpp::half2, mpp::half2);                            // NOLINT
+bool __hble2(mpp::nv_bfloat162, mpp::nv_bfloat162);              // NOLINT
+bool __hble2(mpp::half2, mpp::half2);                            // NOLINT
+bool __hbne2(mpp::nv_bfloat162, mpp::nv_bfloat162);              // NOLINT
 #endif
 
-namespace opp
+namespace mpp
 {
 
 #pragma region Constructors
@@ -4646,4 +4646,4 @@ std::wistream &operator>>(std::wistream &aIs, Vector4A<T2> &aVec)
     return aIs;
 }
 
-} // namespace opp
+} // namespace mpp

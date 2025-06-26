@@ -6,7 +6,7 @@
 #include <istream>
 #include <ostream>
 
-namespace opp::image
+namespace mpp::image
 {
 /// <summary>
 /// Combines filter size and center point in one struct for a simplified API
@@ -90,4 +90,4 @@ struct alignas(4 * sizeof(int)) FilterArea
         return aOther.Size != Size || aOther.Center != Center;
     }
 };
-} // namespace opp::image
+} // namespace mpp::image

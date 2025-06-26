@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "alphaComp.h"
 #include <backends/cuda/image/configurations.h>
@@ -12,24 +12,24 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAlphaCompCSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst,
                             size_t aPitchDst, remove_vector_t<SrcT> aAlpha1, remove_vector_t<SrcT> aAlpha2,
-                            AlphaCompositionOp aAlphaOp, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+                            AlphaCompositionOp aAlphaOp, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
@@ -46,9 +46,9 @@ void InvokeAlphaCompCSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aS
 
         switch (aAlphaOp)
         {
-            case opp::AlphaCompositionOp::Over:
+            case mpp::AlphaCompositionOp::Over:
             {
-                using AlphaCompOp     = opp::AlphaCompositionC<ComputeT, opp::AlphaCompositionOp::Over>;
+                using AlphaCompOp     = mpp::AlphaCompositionC<ComputeT, mpp::AlphaCompositionOp::Over>;
                 using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, roundingMode>;
                 const AlphaCompOp op(alpha1, alpha2);
                 const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
@@ -56,9 +56,9 @@ void InvokeAlphaCompCSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aS
                                                                                   functor);
             }
             break;
-            case opp::AlphaCompositionOp::In:
+            case mpp::AlphaCompositionOp::In:
             {
-                using AlphaCompOp     = opp::AlphaCompositionC<ComputeT, opp::AlphaCompositionOp::In>;
+                using AlphaCompOp     = mpp::AlphaCompositionC<ComputeT, mpp::AlphaCompositionOp::In>;
                 using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, roundingMode>;
                 const AlphaCompOp op(alpha1, alpha2);
                 const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
@@ -66,9 +66,9 @@ void InvokeAlphaCompCSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aS
                                                                                   functor);
             }
             break;
-            case opp::AlphaCompositionOp::Out:
+            case mpp::AlphaCompositionOp::Out:
             {
-                using AlphaCompOp     = opp::AlphaCompositionC<ComputeT, opp::AlphaCompositionOp::Out>;
+                using AlphaCompOp     = mpp::AlphaCompositionC<ComputeT, mpp::AlphaCompositionOp::Out>;
                 using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, roundingMode>;
                 const AlphaCompOp op(alpha1, alpha2);
                 const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
@@ -76,9 +76,9 @@ void InvokeAlphaCompCSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aS
                                                                                   functor);
             }
             break;
-            case opp::AlphaCompositionOp::ATop:
+            case mpp::AlphaCompositionOp::ATop:
             {
-                using AlphaCompOp     = opp::AlphaCompositionC<ComputeT, opp::AlphaCompositionOp::ATop>;
+                using AlphaCompOp     = mpp::AlphaCompositionC<ComputeT, mpp::AlphaCompositionOp::ATop>;
                 using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, roundingMode>;
                 const AlphaCompOp op(alpha1, alpha2);
                 const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
@@ -86,9 +86,9 @@ void InvokeAlphaCompCSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aS
                                                                                   functor);
             }
             break;
-            case opp::AlphaCompositionOp::XOr:
+            case mpp::AlphaCompositionOp::XOr:
             {
-                using AlphaCompOp     = opp::AlphaCompositionC<ComputeT, opp::AlphaCompositionOp::XOr>;
+                using AlphaCompOp     = mpp::AlphaCompositionC<ComputeT, mpp::AlphaCompositionOp::XOr>;
                 using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, roundingMode>;
                 const AlphaCompOp op(alpha1, alpha2);
                 const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
@@ -96,9 +96,9 @@ void InvokeAlphaCompCSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aS
                                                                                   functor);
             }
             break;
-            case opp::AlphaCompositionOp::Plus:
+            case mpp::AlphaCompositionOp::Plus:
             {
-                using AlphaCompOp     = opp::AlphaCompositionC<ComputeT, opp::AlphaCompositionOp::Plus>;
+                using AlphaCompOp     = mpp::AlphaCompositionC<ComputeT, mpp::AlphaCompositionOp::Plus>;
                 using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, roundingMode>;
                 const AlphaCompOp op(alpha1, alpha2);
                 const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
@@ -106,9 +106,9 @@ void InvokeAlphaCompCSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aS
                                                                                   functor);
             }
             break;
-            case opp::AlphaCompositionOp::OverPremul:
+            case mpp::AlphaCompositionOp::OverPremul:
             {
-                using AlphaCompOp     = opp::AlphaCompositionC<ComputeT, opp::AlphaCompositionOp::OverPremul>;
+                using AlphaCompOp     = mpp::AlphaCompositionC<ComputeT, mpp::AlphaCompositionOp::OverPremul>;
                 using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, roundingMode>;
                 const AlphaCompOp op(alpha1, alpha2);
                 const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
@@ -116,9 +116,9 @@ void InvokeAlphaCompCSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aS
                                                                                   functor);
             }
             break;
-            case opp::AlphaCompositionOp::InPremul:
+            case mpp::AlphaCompositionOp::InPremul:
             {
-                using AlphaCompOp     = opp::AlphaCompositionC<ComputeT, opp::AlphaCompositionOp::InPremul>;
+                using AlphaCompOp     = mpp::AlphaCompositionC<ComputeT, mpp::AlphaCompositionOp::InPremul>;
                 using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, roundingMode>;
                 const AlphaCompOp op(alpha1, alpha2);
                 const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
@@ -126,9 +126,9 @@ void InvokeAlphaCompCSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aS
                                                                                   functor);
             }
             break;
-            case opp::AlphaCompositionOp::OutPremul:
+            case mpp::AlphaCompositionOp::OutPremul:
             {
-                using AlphaCompOp     = opp::AlphaCompositionC<ComputeT, opp::AlphaCompositionOp::OutPremul>;
+                using AlphaCompOp     = mpp::AlphaCompositionC<ComputeT, mpp::AlphaCompositionOp::OutPremul>;
                 using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, roundingMode>;
                 const AlphaCompOp op(alpha1, alpha2);
                 const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
@@ -136,9 +136,9 @@ void InvokeAlphaCompCSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aS
                                                                                   functor);
             }
             break;
-            case opp::AlphaCompositionOp::ATopPremul:
+            case mpp::AlphaCompositionOp::ATopPremul:
             {
-                using AlphaCompOp     = opp::AlphaCompositionC<ComputeT, opp::AlphaCompositionOp::ATopPremul>;
+                using AlphaCompOp     = mpp::AlphaCompositionC<ComputeT, mpp::AlphaCompositionOp::ATopPremul>;
                 using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, roundingMode>;
                 const AlphaCompOp op(alpha1, alpha2);
                 const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
@@ -146,9 +146,9 @@ void InvokeAlphaCompCSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aS
                                                                                   functor);
             }
             break;
-            case opp::AlphaCompositionOp::XOrPremul:
+            case mpp::AlphaCompositionOp::XOrPremul:
             {
-                using AlphaCompOp     = opp::AlphaCompositionC<ComputeT, opp::AlphaCompositionOp::XOrPremul>;
+                using AlphaCompOp     = mpp::AlphaCompositionC<ComputeT, mpp::AlphaCompositionOp::XOrPremul>;
                 using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, roundingMode>;
                 const AlphaCompOp op(alpha1, alpha2);
                 const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
@@ -156,9 +156,9 @@ void InvokeAlphaCompCSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aS
                                                                                   functor);
             }
             break;
-            case opp::AlphaCompositionOp::PlusPremul:
+            case mpp::AlphaCompositionOp::PlusPremul:
             {
-                using AlphaCompOp     = opp::AlphaCompositionC<ComputeT, opp::AlphaCompositionOp::PlusPremul>;
+                using AlphaCompOp     = mpp::AlphaCompositionC<ComputeT, mpp::AlphaCompositionOp::PlusPremul>;
                 using alphaCompSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, AlphaCompOp, roundingMode>;
                 const AlphaCompOp op(alpha1, alpha2);
                 const alphaCompSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
@@ -178,7 +178,7 @@ void InvokeAlphaCompCSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aS
         const typeSrcIsTypeDst *aSrc1, size_t aPitchSrc1, const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,            \
         typeSrcIsTypeDst *aDst, size_t aPitchDst, remove_vector_t<typeSrcIsTypeDst> aAlpha1,                           \
         remove_vector_t<typeSrcIsTypeDst> aAlpha2, AlphaCompositionOp aAlphaOp, const Size2D &aSize,                   \
-        const opp::cuda::StreamCtx &aStreamCtx);
+        const mpp::cuda::StreamCtx &aStreamCtx);
 
 #define ForAllChannelsWithAlpha(type)                                                                                  \
     Instantiate_For(Pixel##type##C1);                                                                                  \
@@ -189,5 +189,5 @@ void InvokeAlphaCompCSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aS
 
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

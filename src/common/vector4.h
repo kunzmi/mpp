@@ -5,12 +5,12 @@
 #include "half_fp16.h"
 #include "needSaturationClamp.h"
 #include "numberTypes.h"
-#include "opp_defs.h"
+#include "mpp_defs.h"
 #include "vector_typetraits.h"
 #include <concepts>
 #include <iostream>
 
-namespace opp
+namespace mpp
 {
 
 // forward declaration:
@@ -28,8 +28,8 @@ enum class Axis4D // NOLINT(performance-enum-size)
     W = 3
 };
 
-std::ostream &operator<<(std::ostream &aOs, const opp::Axis4D &aAxis);
-std::wostream &operator<<(std::wostream &aOs, const opp::Axis4D &aAxis);
+std::ostream &operator<<(std::ostream &aOs, const mpp::Axis4D &aAxis);
+std::wostream &operator<<(std::wostream &aOs, const mpp::Axis4D &aAxis);
 
 /// <summary>
 /// A four T component vector. Can replace CUDA's vector4 types
@@ -91,7 +91,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4
         x = aVec4A.x; // NOLINT
         y = aVec4A.y; // NOLINT
         z = aVec4A.z; // NOLINT
-        if constexpr (opp::ByteSizeType<T> || opp::TwoBytesSizeType<T>)
+        if constexpr (mpp::ByteSizeType<T> || mpp::TwoBytesSizeType<T>)
         {
             w = aVec4A.w;
         }
@@ -2257,4 +2257,4 @@ template <HostCode T2>
 std::wistream &operator>>(std::wistream &aIs, Vector4<T2> &aVec)
     requires ByteSizeType<T2>;
 
-} // namespace opp
+} // namespace mpp

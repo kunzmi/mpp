@@ -10,7 +10,7 @@
 #include <string>
 #include <utility>
 
-namespace opp::image
+namespace mpp::image
 {
 /// <summary>
 /// A Quad represents the coordinates of the corners of an image ROI.<para/>
@@ -114,4 +114,4 @@ template <RealFloatingPoint T> struct Quad
         return aOther.P0 != P0 || aOther.P1 != P1 || aOther.P2 != P2 || aOther.P3 != P3;
     }
 };
-} // namespace opp::image
+} // namespace mpp::image

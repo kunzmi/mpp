@@ -8,7 +8,7 @@
 #include <cuda_bf16.h>
 #include <cuda_fp16.h>
 
-namespace opp::cuda::simd
+namespace mpp::cuda::simd
 {
 template <typename T> struct Neg
 {
@@ -472,4 +472,4 @@ template <typename TTo> struct Convert
         dst[1]             = __float22half2_rn(src1[1]);
     }
 };
-} // namespace opp::cuda::simd
+} // namespace mpp::cuda::simd

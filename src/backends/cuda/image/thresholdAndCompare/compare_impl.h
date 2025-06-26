@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "compare.h"
 #include <backends/cuda/image/configurations.h>
@@ -15,29 +15,29 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeCompareSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst,
                          size_t aPitchDst, CompareOp aCompare, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = vector_size_v<SrcT> == 3 ? 1 : ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         switch (aCompare)
         {
-            case opp::CompareOp::Less:
+            case mpp::CompareOp::Less:
             {
                 if constexpr (ComplexVector<SrcT>)
                 {
@@ -48,16 +48,16 @@ void InvokeCompareSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2
                 }
                 else
                 {
-                    using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Lt<ComputeT>,
+                    using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Lt<ComputeT>,
                                                         RoundingMode::None, voidType, voidType, true>;
-                    const opp::Lt<ComputeT> op;
+                    const mpp::Lt<ComputeT> op;
                     const compareSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcSrc>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                     functor);
                 }
             }
             break;
-            case opp::CompareOp::LessEq:
+            case mpp::CompareOp::LessEq:
             {
                 if constexpr (ComplexVector<SrcT>)
                 {
@@ -68,26 +68,26 @@ void InvokeCompareSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2
                 }
                 else
                 {
-                    using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Le<ComputeT>,
+                    using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Le<ComputeT>,
                                                         RoundingMode::None, voidType, voidType, true>;
-                    const opp::Le<ComputeT> op;
+                    const mpp::Le<ComputeT> op;
                     const compareSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcSrc>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                     functor);
                 }
             }
             break;
-            case opp::CompareOp::Eq:
+            case mpp::CompareOp::Eq:
             {
-                using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Eq<ComputeT>,
+                using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Eq<ComputeT>,
                                                     RoundingMode::None, voidType, voidType, true>;
-                const opp::Eq<ComputeT> op;
+                const mpp::Eq<ComputeT> op;
                 const compareSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcSrc>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                 functor);
             }
             break;
-            case opp::CompareOp::Greater:
+            case mpp::CompareOp::Greater:
             {
                 if constexpr (ComplexVector<SrcT>)
                 {
@@ -98,16 +98,16 @@ void InvokeCompareSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2
                 }
                 else
                 {
-                    using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Gt<ComputeT>,
+                    using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Gt<ComputeT>,
                                                         RoundingMode::None, voidType, voidType, true>;
-                    const opp::Gt<ComputeT> op;
+                    const mpp::Gt<ComputeT> op;
                     const compareSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcSrc>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                     functor);
                 }
             }
             break;
-            case opp::CompareOp::GreaterEq:
+            case mpp::CompareOp::GreaterEq:
             {
                 if constexpr (ComplexVector<SrcT>)
                 {
@@ -118,20 +118,20 @@ void InvokeCompareSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2
                 }
                 else
                 {
-                    using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Ge<ComputeT>,
+                    using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Ge<ComputeT>,
                                                         RoundingMode::None, voidType, voidType, true>;
-                    const opp::Ge<ComputeT> op;
+                    const mpp::Ge<ComputeT> op;
                     const compareSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcSrc>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                     functor);
                 }
             }
             break;
-            case opp::CompareOp::NEq:
+            case mpp::CompareOp::NEq:
             {
-                using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::NEq<ComputeT>,
+                using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::NEq<ComputeT>,
                                                     RoundingMode::None, voidType, voidType, true>;
-                const opp::NEq<ComputeT> op;
+                const mpp::NEq<ComputeT> op;
                 const compareSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcSrc>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                 functor);
@@ -169,15 +169,15 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeCompareSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT *aDst, size_t aPitchDst,
                        CompareOp aCompare, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = vector_size_v<SrcT> == 3 ? 1 : ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         switch (aCompare)
         {
-            case opp::CompareOp::Less:
+            case mpp::CompareOp::Less:
             {
                 if constexpr (ComplexVector<SrcT>)
                 {
@@ -188,16 +188,16 @@ void InvokeCompareSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, D
                 }
                 else
                 {
-                    using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Lt<ComputeT>,
+                    using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Lt<ComputeT>,
                                                            RoundingMode::None, voidType, voidType, true>;
-                    const opp::Lt<ComputeT> op;
+                    const mpp::Lt<ComputeT> op;
                     const compareSrcC functor(aSrc, aPitchSrc, aConst, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcC>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                   functor);
                 }
             }
             break;
-            case opp::CompareOp::LessEq:
+            case mpp::CompareOp::LessEq:
             {
                 if constexpr (ComplexVector<SrcT>)
                 {
@@ -208,26 +208,26 @@ void InvokeCompareSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, D
                 }
                 else
                 {
-                    using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Le<ComputeT>,
+                    using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Le<ComputeT>,
                                                            RoundingMode::None, voidType, voidType, true>;
-                    const opp::Le<ComputeT> op;
+                    const mpp::Le<ComputeT> op;
                     const compareSrcC functor(aSrc, aPitchSrc, aConst, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcC>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                   functor);
                 }
             }
             break;
-            case opp::CompareOp::Eq:
+            case mpp::CompareOp::Eq:
             {
-                using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Eq<ComputeT>,
+                using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Eq<ComputeT>,
                                                        RoundingMode::None, voidType, voidType, true>;
-                const opp::Eq<ComputeT> op;
+                const mpp::Eq<ComputeT> op;
                 const compareSrcC functor(aSrc, aPitchSrc, aConst, op);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcC>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                               functor);
             }
             break;
-            case opp::CompareOp::Greater:
+            case mpp::CompareOp::Greater:
             {
                 if constexpr (ComplexVector<SrcT>)
                 {
@@ -238,16 +238,16 @@ void InvokeCompareSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, D
                 }
                 else
                 {
-                    using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Gt<ComputeT>,
+                    using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Gt<ComputeT>,
                                                            RoundingMode::None, voidType, voidType, true>;
-                    const opp::Gt<ComputeT> op;
+                    const mpp::Gt<ComputeT> op;
                     const compareSrcC functor(aSrc, aPitchSrc, aConst, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcC>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                   functor);
                 }
             }
             break;
-            case opp::CompareOp::GreaterEq:
+            case mpp::CompareOp::GreaterEq:
             {
                 if constexpr (ComplexVector<SrcT>)
                 {
@@ -258,20 +258,20 @@ void InvokeCompareSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, D
                 }
                 else
                 {
-                    using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Ge<ComputeT>,
+                    using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Ge<ComputeT>,
                                                            RoundingMode::None, voidType, voidType, true>;
-                    const opp::Ge<ComputeT> op;
+                    const mpp::Ge<ComputeT> op;
                     const compareSrcC functor(aSrc, aPitchSrc, aConst, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcC>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                   functor);
                 }
             }
             break;
-            case opp::CompareOp::NEq:
+            case mpp::CompareOp::NEq:
             {
-                using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::NEq<ComputeT>,
+                using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::NEq<ComputeT>,
                                                        RoundingMode::None, voidType, voidType, true>;
-                const opp::NEq<ComputeT> op;
+                const mpp::NEq<ComputeT> op;
                 const compareSrcC functor(aSrc, aPitchSrc, aConst, op);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcC>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                               functor);
@@ -309,15 +309,15 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeCompareSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst, DstT *aDst, size_t aPitchDst,
                           CompareOp aCompare, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = vector_size_v<SrcT> == 3 ? 1 : ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         switch (aCompare)
         {
-            case opp::CompareOp::Less:
+            case mpp::CompareOp::Less:
             {
                 if constexpr (ComplexVector<SrcT>)
                 {
@@ -328,16 +328,16 @@ void InvokeCompareSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst
                 }
                 else
                 {
-                    using compareSrcC = SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Lt<ComputeT>,
+                    using compareSrcC = SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Lt<ComputeT>,
                                                               RoundingMode::None, true>;
-                    const opp::Lt<ComputeT> op;
+                    const mpp::Lt<ComputeT> op;
                     const compareSrcC functor(aSrc, aPitchSrc, aConst, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcC>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                   functor);
                 }
             }
             break;
-            case opp::CompareOp::LessEq:
+            case mpp::CompareOp::LessEq:
             {
                 if constexpr (ComplexVector<SrcT>)
                 {
@@ -349,26 +349,26 @@ void InvokeCompareSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst
                 else
                 {
 
-                    using compareSrcC = SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Le<ComputeT>,
+                    using compareSrcC = SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Le<ComputeT>,
                                                               RoundingMode::None, true>;
-                    const opp::Le<ComputeT> op;
+                    const mpp::Le<ComputeT> op;
                     const compareSrcC functor(aSrc, aPitchSrc, aConst, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcC>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                   functor);
                 }
             }
             break;
-            case opp::CompareOp::Eq:
+            case mpp::CompareOp::Eq:
             {
                 using compareSrcC =
-                    SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Eq<ComputeT>, RoundingMode::None, true>;
-                const opp::Eq<ComputeT> op;
+                    SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Eq<ComputeT>, RoundingMode::None, true>;
+                const mpp::Eq<ComputeT> op;
                 const compareSrcC functor(aSrc, aPitchSrc, aConst, op);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcC>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                               functor);
             }
             break;
-            case opp::CompareOp::Greater:
+            case mpp::CompareOp::Greater:
             {
                 if constexpr (ComplexVector<SrcT>)
                 {
@@ -380,16 +380,16 @@ void InvokeCompareSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst
 
                 else
                 {
-                    using compareSrcC = SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Gt<ComputeT>,
+                    using compareSrcC = SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Gt<ComputeT>,
                                                               RoundingMode::None, true>;
-                    const opp::Gt<ComputeT> op;
+                    const mpp::Gt<ComputeT> op;
                     const compareSrcC functor(aSrc, aPitchSrc, aConst, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcC>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                   functor);
                 }
             }
             break;
-            case opp::CompareOp::GreaterEq:
+            case mpp::CompareOp::GreaterEq:
             {
                 if constexpr (ComplexVector<SrcT>)
                 {
@@ -400,20 +400,20 @@ void InvokeCompareSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst
                 }
                 else
                 {
-                    using compareSrcC = SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Ge<ComputeT>,
+                    using compareSrcC = SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Ge<ComputeT>,
                                                               RoundingMode::None, true>;
-                    const opp::Ge<ComputeT> op;
+                    const mpp::Ge<ComputeT> op;
                     const compareSrcC functor(aSrc, aPitchSrc, aConst, op);
                     InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcC>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                   functor);
                 }
             }
             break;
-            case opp::CompareOp::NEq:
+            case mpp::CompareOp::NEq:
             {
-                using compareSrcC = SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::NEq<ComputeT>,
+                using compareSrcC = SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::NEq<ComputeT>,
                                                           RoundingMode::None, true>;
-                const opp::NEq<ComputeT> op;
+                const mpp::NEq<ComputeT> op;
                 const compareSrcC functor(aSrc, aPitchSrc, aConst, op);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcC>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                               functor);
@@ -447,5 +447,5 @@ void InvokeCompareSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst
 
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

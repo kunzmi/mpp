@@ -1,12 +1,12 @@
 #pragma once
 #include <common/complex.h>
 #include <common/defines.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
 #include <concepts>
 
-namespace opp
+namespace mpp
 {
 
 template <RealVector T> struct MinRed
@@ -831,4 +831,4 @@ template <AnyVector SrcT, AnyVector DstT> struct MaximumRelativeError
     }
 };
 
-} // namespace opp
+} // namespace mpp

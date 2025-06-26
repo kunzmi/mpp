@@ -1,7 +1,7 @@
 #pragma once
 #include "exception.h"
 #include "half_fp16.h"
-#include "opp_defs.h"
+#include "mpp_defs.h"
 #include <common/defines.h>
 #include <common/numeric_limits.h>
 #include <concepts>
@@ -21,7 +21,7 @@
 #endif
 
 // NOLINTBEGIN(misc-definitions-in-headers, performance-unnecessary-value-param)
-namespace opp
+namespace mpp
 {
 
 #ifdef IS_HOST_COMPILER
@@ -33,16 +33,16 @@ DEVICE_CODE INLINE HalfFp16::HalfFp16(float aFloat, RoundingMode aRoundingMode)
 {
     switch (aRoundingMode)
     {
-        case opp::RoundingMode::NearestTiesToEven:
+        case mpp::RoundingMode::NearestTiesToEven:
             value = half_float::half(aFloat, std::float_round_style::round_to_nearest);
             break;
-        case opp::RoundingMode::TowardZero:
+        case mpp::RoundingMode::TowardZero:
             value = half_float::half(aFloat, std::float_round_style::round_toward_zero);
             break;
-        case opp::RoundingMode::TowardNegativeInfinity:
+        case mpp::RoundingMode::TowardNegativeInfinity:
             value = half_float::half(aFloat, std::float_round_style::round_toward_neg_infinity);
             break;
-        case opp::RoundingMode::TowardPositiveInfinity:
+        case mpp::RoundingMode::TowardPositiveInfinity:
             value = half_float::half(aFloat, std::float_round_style::round_toward_infinity);
             break;
         default:
@@ -93,16 +93,16 @@ DEVICE_CODE INLINE HalfFp16::HalfFp16(float aFloat, RoundingMode aRoundingMode)
 {
     switch (aRoundingMode)
     {
-        case opp::RoundingMode::NearestTiesToEven:
+        case mpp::RoundingMode::NearestTiesToEven:
             value = __float2half_rn(aFloat);
             break;
-        case opp::RoundingMode::TowardZero:
+        case mpp::RoundingMode::TowardZero:
             value = __float2half_rz(aFloat);
             break;
-        case opp::RoundingMode::TowardNegativeInfinity:
+        case mpp::RoundingMode::TowardNegativeInfinity:
             value = __float2half_rd(aFloat);
             break;
-        case opp::RoundingMode::TowardPositiveInfinity:
+        case mpp::RoundingMode::TowardPositiveInfinity:
             value = __float2half_ru(aFloat);
             break;
         default:
@@ -724,30 +724,30 @@ DEVICE_ONLY_CODE INLINE HalfFp16 HalfFp16::Cos(HalfFp16 aOther)
 #endif
 
 #ifdef IS_HOST_COMPILER
-INLINE std::ostream &operator<<(std::ostream &aOs, const opp::HalfFp16 &aHalf)
+INLINE std::ostream &operator<<(std::ostream &aOs, const mpp::HalfFp16 &aHalf)
 {
     return aOs << static_cast<float>(aHalf.value);
 }
-INLINE std::wostream &operator<<(std::wostream &aOs, const opp::HalfFp16 &aHalf)
+INLINE std::wostream &operator<<(std::wostream &aOs, const mpp::HalfFp16 &aHalf)
 {
     return aOs << static_cast<float>(aHalf.value);
 }
-INLINE std::istream &operator>>(std::istream &aIs, opp::HalfFp16 &aHalf)
+INLINE std::istream &operator>>(std::istream &aIs, mpp::HalfFp16 &aHalf)
 {
     float temp{};
     aIs >> temp;
-    aHalf = opp::HalfFp16(temp);
+    aHalf = mpp::HalfFp16(temp);
     return aIs;
 }
-INLINE std::wistream &operator>>(std::wistream &aIs, opp::HalfFp16 &aHalf)
+INLINE std::wistream &operator>>(std::wistream &aIs, mpp::HalfFp16 &aHalf)
 {
     float temp{};
     aIs >> temp;
-    aHalf = opp::HalfFp16(temp);
+    aHalf = mpp::HalfFp16(temp);
     return aIs;
 }
 #endif
-} // namespace opp
+} // namespace mpp
 
 // NOLINTEND(misc-definitions-in-headers, performance-unnecessary-value-param)
 

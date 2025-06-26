@@ -4,7 +4,7 @@
 #include <concepts>
 #include <cstddef>
 
-namespace opp
+namespace mpp
 {
 
 #ifndef IS_CUDA_COMPILER
@@ -51,7 +51,7 @@ template <std::size_t size> struct MaskTupel : public Tupel<byte, size>
         requires(size == 1)
     {
         return Tupel<byte, size>::value[0] == static_cast<byte>(0);
-    } // namespace opp
+    } // namespace mpp
 
     /// <summary>
     /// Useful helper method when using masks
@@ -226,4 +226,4 @@ template <std::size_t size> struct MaskTupel : public Tupel<byte, size>
 // disable warning for pragma unroll when compiling with host compiler:
 #include <common/disableWarningsEnd.h>
 };
-} // namespace opp
+} // namespace mpp

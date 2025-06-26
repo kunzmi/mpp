@@ -9,8 +9,8 @@
 #include <numeric>
 #include <vector>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
 
 template <typename T> void testCheck(T &aBuffer, size_t aSize)
@@ -30,7 +30,7 @@ TEST_CASE("ScratchBuffer", "[Common]")
     CHECK(reinterpret_cast<size_t>(buffer2.Get<0>()) == 256ull);
 
     CHECK_NOTHROW(testCheck(buffer1, 768));
-    CHECK_THROWS_AS(testCheck(buffer1, 512), opp::ScratchBufferException);
+    CHECK_THROWS_AS(testCheck(buffer1, 512), mpp::ScratchBufferException);
 }
 
 TEST_CASE("ScratchBufferPitch", "[Common]")

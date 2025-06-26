@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/image/configurations.h>
@@ -16,7 +16,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename T, typename reductionOp> __device__ void DoShuffle(T &aVal, reductionOp aOp)
 {
@@ -284,7 +284,7 @@ template <typename SrcT, typename DstT1, typename DstT2, typename DstT3, typenam
           ReductionInitValue NeutralValue2, ReductionInitValue NeutralValue3, ReductionInitValue NeutralValue4,
           ReductionInitValue NeutralValue5>
 void InvokeReduction5AlongXKernelDefault(const SrcT *aSrc, DstT1 *aDst1, DstT2 *aDst2, DstT3 *aDst3, DstT4 *aDst4,
-                                         DstT5 *aDst5, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx,
+                                         DstT5 *aDst5, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx,
                                          const funcType &aFunc)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
@@ -307,5 +307,5 @@ void InvokeReduction5AlongXKernelDefault(const SrcT *aSrc, DstT1 *aDst1, DstT2 *
     }
 }
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

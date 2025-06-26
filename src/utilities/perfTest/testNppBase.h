@@ -8,11 +8,11 @@
 #include <nppcore.h>
 #include <nppdefs.h>
 
-namespace opp
+namespace mpp
 {
-using namespace opp::cuda;
-using namespace opp::image;
-// using namespace opp::image::cuda;
+using namespace mpp::cuda;
+using namespace mpp::image;
+// using namespace mpp::image::cuda;
 
 class TestNppBase : public TestBase
 {
@@ -244,4 +244,4 @@ template <typename SrcT, typename DstT, size_t dstSize> class TestNppSrcSrcReduc
 
   private:
 };
-} // namespace opp
+} // namespace mpp

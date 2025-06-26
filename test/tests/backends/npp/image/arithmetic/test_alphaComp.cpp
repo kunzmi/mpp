@@ -40,11 +40,11 @@
 #include <catch2/catch_test_macros.hpp>
 #include <common/defines.h>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size = 256;
 
@@ -74,70 +74,70 @@ TEST_CASE("8uC1", "[NPP.Arithmetic.AlphaCompC]")
 
     // due to rounding errors, each multiplication can be off by one, so the sum can be off by two in worst case...
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATop);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATop);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATopPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATopPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::In);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::In);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::InPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::InPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Out);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Out);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OutPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OutPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Over);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Over);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OverPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OverPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Plus);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Plus);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::PlusPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::PlusPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS_PREMUL, nppCtx);
 
     npp_res << npp_dst;
@@ -171,70 +171,70 @@ TEST_CASE("8uC3", "[NPP.Arithmetic.AlphaCompC]")
 
     // due to rounding errors, each multiplication can be off by one, so the sum can be off by two in worst case...
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATop);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATop);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATopPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATopPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::In);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::In);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::InPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::InPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Out);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Out);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OutPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OutPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Over);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Over);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OverPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OverPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Plus);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Plus);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::PlusPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::PlusPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS_PREMUL, nppCtx);
 
     npp_res << npp_dst;
@@ -268,70 +268,70 @@ TEST_CASE("8uC4", "[NPP.Arithmetic.AlphaCompC]")
 
     // due to rounding errors, each multiplication can be off by one, so the sum can be off by two in worst case...
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATop);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATop);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATopPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATopPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::In);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::In);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::InPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::InPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Out);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Out);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OutPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OutPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Over);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Over);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OverPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OverPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Plus);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Plus);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::PlusPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::PlusPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS_PREMUL, nppCtx);
 
     npp_res << npp_dst;
@@ -368,70 +368,70 @@ TEST_CASE("8uC4A", "[NPP.Arithmetic.AlphaCompC]")
 
     // due to rounding errors, each multiplication can be off by one, so the sum can be off by two in worst case...
 
-    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATop);
+    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATop);
     npp_src1.AlphaCompA(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATopPremul);
+    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATopPremul);
     npp_src1.AlphaCompA(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, opp::AlphaCompositionOp::In);
+    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::In);
     npp_src1.AlphaCompA(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, opp::AlphaCompositionOp::InPremul);
+    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::InPremul);
     npp_src1.AlphaCompA(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Out);
+    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Out);
     npp_src1.AlphaCompA(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OutPremul);
+    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OutPremul);
     npp_src1.AlphaCompA(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Over);
+    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Over);
     npp_src1.AlphaCompA(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OverPremul);
+    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OverPremul);
     npp_src1.AlphaCompA(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Plus);
+    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Plus);
     npp_src1.AlphaCompA(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, opp::AlphaCompositionOp::PlusPremul);
+    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::PlusPremul);
     npp_src1.AlphaCompA(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS_PREMUL, nppCtx);
 
     npp_res << npp_dst;
@@ -439,7 +439,7 @@ TEST_CASE("8uC4A", "[NPP.Arithmetic.AlphaCompC]")
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 }
 
-// 8s is behaving weirdly, not sure if it is opp or npp, but the results don't match
+// 8s is behaving weirdly, not sure if it is mpp or npp, but the results don't match
 // TEST_CASE("8sC1", "[NPP.Arithmetic.AlphaCompC]")
 //{
 //     const uint seed         = Catch::getSeed();
@@ -468,70 +468,70 @@ TEST_CASE("8uC4A", "[NPP.Arithmetic.AlphaCompC]")
 //
 //     // due to rounding errors, each multiplication can be off by one, so the sum can be off by two in worst case...
 //
-//     cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATop);
+//     cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATop);
 //     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP, nppCtx);
 //
 //     npp_res << npp_dst;
 //
 //     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 //
-//     /*cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATopPremul);
+//     /*cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATopPremul);
 //     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP_PREMUL, nppCtx);
 //
 //     npp_res << npp_dst;
 //
 //     CHECK(cpu_dst.IsSimilar(npp_res, 3));*/
 //
-//     cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::In);
+//     cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::In);
 //     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN, nppCtx);
 //
 //     npp_res << npp_dst;
 //
 //     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 //
-//     cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::InPremul);
+//     cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::InPremul);
 //     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN_PREMUL, nppCtx);
 //
 //     npp_res << npp_dst;
 //
 //     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 //
-//     cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Out);
+//     cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Out);
 //     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT, nppCtx);
 //
 //     npp_res << npp_dst;
 //
 //     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 //
-//     /*cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OutPremul);
+//     /*cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OutPremul);
 //     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT_PREMUL, nppCtx);
 //
 //     npp_res << npp_dst;
 //
 //     CHECK(cpu_dst.IsSimilar(npp_res, 3));*/
 //
-//     cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Over);
+//     cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Over);
 //     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER, nppCtx);
 //
 //     npp_res << npp_dst;
 //
 //     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 //
-//     cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OverPremul);
+//     cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OverPremul);
 //     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER_PREMUL, nppCtx);
 //
 //     npp_res << npp_dst;
 //
 //     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 //
-//     cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Plus);
+//     cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Plus);
 //     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS, nppCtx);
 //
 //     npp_res << npp_dst;
 //
 //     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 //
-//     cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::PlusPremul);
+//     cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::PlusPremul);
 //     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS_PREMUL, nppCtx);
 //
 //     npp_res << npp_dst;
@@ -565,70 +565,70 @@ TEST_CASE("16uC1", "[NPP.Arithmetic.AlphaCompC]")
 
     // due to rounding errors, each multiplication can be off by one, so the sum can be off by two in worst case...
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATop);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATop);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATopPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATopPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::In);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::In);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::InPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::InPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Out);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Out);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OutPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OutPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Over);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Over);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OverPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OverPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Plus);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Plus);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::PlusPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::PlusPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS_PREMUL, nppCtx);
 
     npp_res << npp_dst;
@@ -662,70 +662,70 @@ TEST_CASE("16uC3", "[NPP.Arithmetic.AlphaCompC]")
 
     // due to rounding errors, each multiplication can be off by one, so the sum can be off by two in worst case...
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATop);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATop);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATopPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATopPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::In);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::In);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::InPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::InPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Out);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Out);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OutPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OutPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Over);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Over);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OverPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OverPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Plus);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Plus);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::PlusPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::PlusPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS_PREMUL, nppCtx);
 
     npp_res << npp_dst;
@@ -759,70 +759,70 @@ TEST_CASE("16uC4", "[NPP.Arithmetic.AlphaCompC]")
 
     // due to rounding errors, each multiplication can be off by one, so the sum can be off by two in worst case...
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATop);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATop);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATopPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATopPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::In);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::In);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::InPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::InPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Out);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Out);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OutPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OutPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Over);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Over);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OverPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OverPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Plus);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Plus);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::PlusPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::PlusPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS_PREMUL, nppCtx);
 
     npp_res << npp_dst;
@@ -859,70 +859,70 @@ TEST_CASE("16uC4A", "[NPP.Arithmetic.AlphaCompC]")
 
     // due to rounding errors, each multiplication can be off by one, so the sum can be off by two in worst case...
 
-    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATop);
+    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATop);
     npp_src1.AlphaCompA(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATopPremul);
+    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATopPremul);
     npp_src1.AlphaCompA(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, opp::AlphaCompositionOp::In);
+    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::In);
     npp_src1.AlphaCompA(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, opp::AlphaCompositionOp::InPremul);
+    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::InPremul);
     npp_src1.AlphaCompA(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Out);
+    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Out);
     npp_src1.AlphaCompA(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OutPremul);
+    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OutPremul);
     npp_src1.AlphaCompA(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Over);
+    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Over);
     npp_src1.AlphaCompA(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OverPremul);
+    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OverPremul);
     npp_src1.AlphaCompA(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Plus);
+    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Plus);
     npp_src1.AlphaCompA(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, opp::AlphaCompositionOp::PlusPremul);
+    cpu_src1A.AlphaComp(cpu_src2A, cpu_dstA, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::PlusPremul);
     npp_src1.AlphaCompA(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS_PREMUL, nppCtx);
 
     npp_res << npp_dst;
@@ -959,70 +959,70 @@ TEST_CASE("16sC1", "[NPP.Arithmetic.AlphaCompC]")
     // due to rounding errors, each multiplication can be off by one, so the sum can be off by two in worst case...
     // but here NPP seems off by more in some cases
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATop);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATop);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 5));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATopPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATopPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 5));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::In);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::In);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 5));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::InPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::InPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 5));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Out);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Out);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 5));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OutPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OutPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 5));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Over);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Over);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 5));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OverPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OverPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 5));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Plus);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Plus);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 5));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::PlusPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::PlusPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS_PREMUL, nppCtx);
 
     npp_res << npp_dst;
@@ -1056,70 +1056,70 @@ TEST_CASE("32uC1", "[NPP.Arithmetic.AlphaCompC]")
 
     // due to rounding errors, each multiplication can be off by one, so the sum can be off by two in worst case...
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATop);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATop);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATopPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATopPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::In);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::In);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::InPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::InPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Out);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Out);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OutPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OutPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Over);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Over);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 3));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OverPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OverPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Plus);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Plus);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 2));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::PlusPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::PlusPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS_PREMUL, nppCtx);
 
     npp_res << npp_dst;
@@ -1155,70 +1155,70 @@ TEST_CASE("32sC1", "[NPP.Arithmetic.AlphaCompC]")
 
     // due to rounding errors, each multiplication can be off by one, so the sum can be off by two in worst case...
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATop);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATop);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 3));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATopPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATopPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 3));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::In);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::In);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 3));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::InPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::InPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 3));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Out);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Out);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 3));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OutPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OutPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 3));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Over);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Over);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 3));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OverPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OverPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 3));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Plus);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Plus);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 3));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::PlusPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::PlusPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS_PREMUL, nppCtx);
 
     npp_res << npp_dst;
@@ -1250,70 +1250,70 @@ TEST_CASE("32fC1", "[NPP.Arithmetic.AlphaCompC]")
     cpu_src1 >> npp_src1;
     cpu_src2 >> npp_src2;
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATop);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATop);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 0.00001f));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::ATopPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::ATopPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 0.00001f));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::In);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::In);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 0.00001f));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::InPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::InPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 0.00001f));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Out);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Out);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 0.00001f));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OutPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OutPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 0.00001f));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Over);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Over);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 0.00001f));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::OverPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::OverPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 0.00001f));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::Plus);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::Plus);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 0.00001f));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, opp::AlphaCompositionOp::PlusPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, alpha1.x, alpha2.x, mpp::AlphaCompositionOp::PlusPremul);
     npp_src1.AlphaComp(alpha1.x, npp_src2, alpha2.x, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS_PREMUL, nppCtx);
 
     npp_res << npp_dst;
@@ -1342,7 +1342,7 @@ TEST_CASE("8uC4A", "[NPP.Arithmetic.AlphaComp]")
 
     // due to rounding errors, each multiplication can be off by one, so the sum can be off by two in worst case...
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, opp::AlphaCompositionOp::ATop);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, mpp::AlphaCompositionOp::ATop);
     npp_src1.AlphaCompA(npp_src2, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP, nppCtx);
 
     npp_res << npp_dst;
@@ -1361,7 +1361,7 @@ TEST_CASE("8uC4A", "[NPP.Arithmetic.AlphaComp]")
 
     CHECK(cpu_dst.IsSimilar(npp_res, 3));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, opp::AlphaCompositionOp::ATopPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, mpp::AlphaCompositionOp::ATopPremul);
     npp_src1.AlphaCompA(npp_src2, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP_PREMUL, nppCtx);
 
     npp_res << npp_dst;
@@ -1379,7 +1379,7 @@ TEST_CASE("8uC4A", "[NPP.Arithmetic.AlphaComp]")
 
     CHECK(cpu_dst.IsSimilar(npp_res, 3));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, opp::AlphaCompositionOp::In);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, mpp::AlphaCompositionOp::In);
     npp_src1.AlphaCompA(npp_src2, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN, nppCtx);
 
     npp_res << npp_dst;
@@ -1397,7 +1397,7 @@ TEST_CASE("8uC4A", "[NPP.Arithmetic.AlphaComp]")
 
     CHECK(cpu_dst.IsSimilar(npp_res, 3));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, opp::AlphaCompositionOp::InPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, mpp::AlphaCompositionOp::InPremul);
     npp_src1.AlphaCompA(npp_src2, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN_PREMUL, nppCtx);
 
     npp_res << npp_dst;
@@ -1415,7 +1415,7 @@ TEST_CASE("8uC4A", "[NPP.Arithmetic.AlphaComp]")
 
     CHECK(cpu_dst.IsSimilar(npp_res, 3));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, opp::AlphaCompositionOp::Out);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, mpp::AlphaCompositionOp::Out);
     npp_src1.AlphaCompA(npp_src2, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT, nppCtx);
 
     npp_res << npp_dst;
@@ -1433,7 +1433,7 @@ TEST_CASE("8uC4A", "[NPP.Arithmetic.AlphaComp]")
 
     CHECK(cpu_dst.IsSimilar(npp_res, 3));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, opp::AlphaCompositionOp::OutPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, mpp::AlphaCompositionOp::OutPremul);
     npp_src1.AlphaCompA(npp_src2, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT_PREMUL, nppCtx);
 
     npp_res << npp_dst;
@@ -1451,7 +1451,7 @@ TEST_CASE("8uC4A", "[NPP.Arithmetic.AlphaComp]")
 
     CHECK(cpu_dst.IsSimilar(npp_res, 3));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, opp::AlphaCompositionOp::Over);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, mpp::AlphaCompositionOp::Over);
     npp_src1.AlphaCompA(npp_src2, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER, nppCtx);
 
     npp_res << npp_dst;
@@ -1469,7 +1469,7 @@ TEST_CASE("8uC4A", "[NPP.Arithmetic.AlphaComp]")
 
     CHECK(cpu_dst.IsSimilar(npp_res, 3));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, opp::AlphaCompositionOp::OverPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, mpp::AlphaCompositionOp::OverPremul);
     npp_src1.AlphaCompA(npp_src2, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER_PREMUL, nppCtx);
 
     npp_res << npp_dst;
@@ -1487,7 +1487,7 @@ TEST_CASE("8uC4A", "[NPP.Arithmetic.AlphaComp]")
 
     CHECK(cpu_dst.IsSimilar(npp_res, 3));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, opp::AlphaCompositionOp::Plus);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, mpp::AlphaCompositionOp::Plus);
     npp_src1.AlphaCompA(npp_src2, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS, nppCtx);
 
     npp_res << npp_dst;
@@ -1505,7 +1505,7 @@ TEST_CASE("8uC4A", "[NPP.Arithmetic.AlphaComp]")
 
     CHECK(cpu_dst.IsSimilar(npp_res, 3));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, opp::AlphaCompositionOp::PlusPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, mpp::AlphaCompositionOp::PlusPremul);
     npp_src1.AlphaCompA(npp_src2, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS_PREMUL, nppCtx);
 
     npp_res << npp_dst;
@@ -1545,70 +1545,70 @@ TEST_CASE("32fC4A", "[NPP.Arithmetic.AlphaComp]")
 
     // due to rounding errors, each multiplication can be off by one, so the sum can be off by two in worst case...
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, opp::AlphaCompositionOp::ATop);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, mpp::AlphaCompositionOp::ATop);
     npp_src1.AlphaCompA(npp_src2, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 0.00001f));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, opp::AlphaCompositionOp::ATopPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, mpp::AlphaCompositionOp::ATopPremul);
     npp_src1.AlphaCompA(npp_src2, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_ATOP_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 0.00001f));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, opp::AlphaCompositionOp::In);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, mpp::AlphaCompositionOp::In);
     npp_src1.AlphaCompA(npp_src2, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 0.00001f));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, opp::AlphaCompositionOp::InPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, mpp::AlphaCompositionOp::InPremul);
     npp_src1.AlphaCompA(npp_src2, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_IN_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 0.00001f));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, opp::AlphaCompositionOp::Out);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, mpp::AlphaCompositionOp::Out);
     npp_src1.AlphaCompA(npp_src2, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 0.00001f));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, opp::AlphaCompositionOp::OutPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, mpp::AlphaCompositionOp::OutPremul);
     npp_src1.AlphaCompA(npp_src2, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OUT_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 0.00001f));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, opp::AlphaCompositionOp::Over);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, mpp::AlphaCompositionOp::Over);
     npp_src1.AlphaCompA(npp_src2, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 0.00001f));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, opp::AlphaCompositionOp::OverPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, mpp::AlphaCompositionOp::OverPremul);
     npp_src1.AlphaCompA(npp_src2, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_OVER_PREMUL, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 0.00001f));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, opp::AlphaCompositionOp::Plus);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, mpp::AlphaCompositionOp::Plus);
     npp_src1.AlphaCompA(npp_src2, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS, nppCtx);
 
     npp_res << npp_dst;
 
     CHECK(cpu_dst.IsSimilar(npp_res, 0.00001f));
 
-    cpu_src1.AlphaComp(cpu_src2, cpu_dst, opp::AlphaCompositionOp::PlusPremul);
+    cpu_src1.AlphaComp(cpu_src2, cpu_dst, mpp::AlphaCompositionOp::PlusPremul);
     npp_src1.AlphaCompA(npp_src2, npp_dst, NppiAlphaOp::NPPI_OP_ALPHA_PLUS_PREMUL, nppCtx);
 
     npp_res << npp_dst;

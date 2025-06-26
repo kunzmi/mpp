@@ -8,7 +8,7 @@
 #include <memory>
 #include <vector>
 
-namespace opp::fileIO::bigTiffTag
+namespace mpp::fileIO::bigTiffTag
 {
 struct BigTiffTag
 {
@@ -503,4 +503,4 @@ class BigIFDYResolution : public BigIFDEntry<tiffTag::Rational>
     [[nodiscard]] tiffTag::Rational Value() const;
 };
 
-} // namespace opp::fileIO::bigTiffTag
+} // namespace mpp::fileIO::bigTiffTag

@@ -23,7 +23,7 @@
 #include <common/image/sizePitched.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/utilities.h>
 #include <common/vector_typetraits.h>
@@ -34,7 +34,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace opp::image::cpuSimple
+namespace mpp::image::cpuSimple
 {
 #pragma region Rotate
 template <PixelType T>
@@ -174,4 +174,4 @@ void ImageView<T>::Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                  aConstant, aBorder, aAllowedReadRoi);
 }
 #pragma endregion
-} // namespace opp::image::cpuSimple
+} // namespace mpp::image::cpuSimple

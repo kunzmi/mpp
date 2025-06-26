@@ -6,7 +6,7 @@
 #include <common/vector_typetraits.h>
 #include <concepts>
 
-namespace opp
+namespace mpp
 {
 // template <AnyVector T> struct Set
 //{
@@ -505,4 +505,4 @@ template <RealVector T> struct MinValMaxVal
         }
     }
 };
-} // namespace opp
+} // namespace mpp

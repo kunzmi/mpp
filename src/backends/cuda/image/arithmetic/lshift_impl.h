@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "lshift.h"
 #include <backends/cuda/image/configurations.h>
@@ -15,30 +15,30 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcDstT>
 void InvokeLShiftSrcC(const SrcDstT *aSrc, size_t aPitchSrc, uint aConst, SrcDstT *aDst, size_t aPitchDst,
                       const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<SrcDstT> && oppEnableCudaBackend<SrcDstT>)
+    if constexpr (mppEnablePixelType<SrcDstT> && mppEnableCudaBackend<SrcDstT>)
     {
         using DstT = SrcDstT;
-        OPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE;
+        MPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcDstT)>::value;
 
-        using lshiftSrcC = SrcFunctor<TupelSize, SrcDstT, SrcDstT, SrcDstT, opp::LShift<SrcDstT>, RoundingMode::None>;
+        using lshiftSrcC = SrcFunctor<TupelSize, SrcDstT, SrcDstT, SrcDstT, mpp::LShift<SrcDstT>, RoundingMode::None>;
 
-        const opp::LShift<SrcDstT> op(aConst);
+        const mpp::LShift<SrcDstT> op(aConst);
 
         const lshiftSrcC functor(aSrc, aPitchSrc, op);
 
@@ -71,16 +71,16 @@ template <typename SrcDstT>
 void InvokeLShiftInplaceC(SrcDstT *aSrcDst, size_t aPitchSrcDst, uint aConst, const Size2D &aSize,
                           const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<SrcDstT> && oppEnableCudaBackend<SrcDstT>)
+    if constexpr (mppEnablePixelType<SrcDstT> && mppEnableCudaBackend<SrcDstT>)
     {
         using DstT = SrcDstT;
-        OPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE;
+        MPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcDstT)>::value;
 
-        using lshiftInplaceC = InplaceFunctor<TupelSize, SrcDstT, SrcDstT, opp::LShift<SrcDstT>, RoundingMode::None>;
+        using lshiftInplaceC = InplaceFunctor<TupelSize, SrcDstT, SrcDstT, mpp::LShift<SrcDstT>, RoundingMode::None>;
 
-        const opp::LShift<SrcDstT> op(aConst);
+        const mpp::LShift<SrcDstT> op(aConst);
 
         const lshiftInplaceC functor(op);
 
@@ -109,5 +109,5 @@ void InvokeLShiftInplaceC(SrcDstT *aSrcDst, size_t aPitchSrcDst, uint aConst, co
 
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

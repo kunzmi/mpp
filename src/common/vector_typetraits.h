@@ -4,7 +4,7 @@
 #include <concepts>
 #include <type_traits>
 
-namespace opp
+namespace mpp
 {
 
 // forward declaration:
@@ -142,4 +142,4 @@ concept RealOrComplexFloatingVector = RealOrComplexVector<T> && RealOrComplexFlo
 template <typename T>
 concept RealOrComplexIntVector = RealOrComplexVector<T> && RealOrComplexIntegral<remove_vector_t<T>>;
 
-} // namespace opp
+} // namespace mpp

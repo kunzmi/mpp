@@ -1,11 +1,11 @@
 #pragma once
 #include <common/defines.h>
 #include <common/numberTypes.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
 
-namespace opp
+namespace mpp
 {
 template <RoundingMode roundingMode, typename T> struct RoundFunctor
 {
@@ -52,4 +52,4 @@ template <RoundingMode roundingMode, typename T> struct RoundFunctor
     { // NOP
     }
 };
-} // namespace opp
+} // namespace mpp

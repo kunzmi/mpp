@@ -10,7 +10,7 @@
 
 #include <iostream>
 
-namespace opp::image::cpuSimple
+namespace mpp::image::cpuSimple
 {
 /// <summary>
 /// runs aOp on every pixel of an image. Inplace and outplace operation, no mask.
@@ -52,4 +52,4 @@ size_t reduction(const ImageView<Pixel8uC1> &aMask, const Size2D &aSize, DstT &a
     }
     return pixelsInMask;
 }
-} // namespace opp::image::cpuSimple
+} // namespace mpp::image::cpuSimple

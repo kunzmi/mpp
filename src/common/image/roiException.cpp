@@ -6,7 +6,7 @@
 #include <sstream>
 #include <string>
 
-namespace opp::image
+namespace mpp::image
 {
 
 RoiException::RoiException(const Roi &aRoi, [[maybe_unused]] const std::filesystem::path &aCodeFileName,
@@ -35,7 +35,7 @@ RoiException::RoiException(const Roi &aRoi, [[maybe_unused]] const std::filesyst
 RoiException::RoiException(const Roi &aRoi, const std::string &aMessage,
                            [[maybe_unused]] const std::filesystem::path &aCodeFileName,
                            [[maybe_unused]] int aLineNumber, [[maybe_unused]] const std::string &aFunctionName)
-    : OPPException(aMessage)
+    : MPPException(aMessage)
 {
 #ifdef NDEBUG
     std::stringstream ss;
@@ -60,7 +60,7 @@ RoiException::RoiException(const Roi &aRoi, const std::string &aMessage,
 
 RoiException::RoiException(const std::string &aMessage, [[maybe_unused]] const std::filesystem::path &aCodeFileName,
                            [[maybe_unused]] int aLineNumber, [[maybe_unused]] const std::string &aFunctionName)
-    : OPPException(aMessage)
+    : MPPException(aMessage)
 {
 #ifdef NDEBUG
     std::stringstream ss;
@@ -82,4 +82,4 @@ RoiException::RoiException(const std::string &aMessage, [[maybe_unused]] const s
     What() = ss.str();
 }
 
-} // namespace opp::image
+} // namespace mpp::image

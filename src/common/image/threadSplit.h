@@ -5,7 +5,7 @@
 #include <compare>
 #include <cstddef>
 
-namespace opp::image
+namespace mpp::image
 {
 
 /// <summary>
@@ -421,4 +421,4 @@ template <int WarpAlignmentInBytes, int TupelSize> class ThreadSplit
     }
 };
 
-} // namespace opp::image
+} // namespace mpp::image

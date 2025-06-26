@@ -5,64 +5,64 @@
 #include <string>
 #include <vector>
 
-namespace opp::cuda
+namespace mpp::cuda
 {
-// This is a registry to keep track of all tempalte instantiations we use for OPP CUDA kernels
+// This is a registry to keep track of all tempalte instantiations we use for MPP CUDA kernels
 // All "InvokeKernel..." functions will have a static const member that will register here
 
 // This will only be active if the #define is activated
-// #define OPP_CUDA_TEMPLATE_REGISTRY_IS_ACTIVE 1
+// #define MPP_CUDA_TEMPLATE_REGISTRY_IS_ACTIVE 1
 
-#ifndef OPP_CUDA_TEMPLATE_REGISTRY_IS_ACTIVE
+#ifndef MPP_CUDA_TEMPLATE_REGISTRY_IS_ACTIVE
 // empty define so that nothing is done
-#define OPP_CUDA_REGISTER_TEMPALTE
-#define OPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE
-#define OPP_CUDA_REGISTER_TEMPALTE_SRC_DST
-#define OPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE
-#define OPP_CUDA_REGISTER_TEMPALTE_COMPUTE_DST
+#define MPP_CUDA_REGISTER_TEMPALTE
+#define MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE
+#define MPP_CUDA_REGISTER_TEMPALTE_SRC_DST
+#define MPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE
+#define MPP_CUDA_REGISTER_TEMPALTE_COMPUTE_DST
 #endif
 
-#ifdef OPP_CUDA_TEMPLATE_REGISTRY_IS_ACTIVE
+#ifdef MPP_CUDA_TEMPLATE_REGISTRY_IS_ACTIVE
 
-#define OPP_CUDA_REGISTER_TEMPALTE                                                                                     \
-    constexpr opp::cuda::KernelNameWrapper kernelName(__func__, opp::image::pixel_type_name<SrcT>::value,              \
-                                                      opp::image::pixel_type_name<ComputeT>::value,                    \
-                                                      opp::image::pixel_type_name<DstT>::value);                       \
-    const void *_ = &opp::cuda::TemplateRegistry<kernelName>::sInstance;
+#define MPP_CUDA_REGISTER_TEMPALTE                                                                                     \
+    constexpr mpp::cuda::KernelNameWrapper kernelName(__func__, mpp::image::pixel_type_name<SrcT>::value,              \
+                                                      mpp::image::pixel_type_name<ComputeT>::value,                    \
+                                                      mpp::image::pixel_type_name<DstT>::value);                       \
+    const void *_ = &mpp::cuda::TemplateRegistry<kernelName>::sInstance;
 
-#define OPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE                                                                        \
-    constexpr opp::cuda::KernelNameWrapper kernelName(__func__, opp::image::pixel_type_name<SrcT>::value, "", "");     \
-    const void *_ = &opp::cuda::TemplateRegistry<kernelName>::sInstance;
+#define MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE                                                                        \
+    constexpr mpp::cuda::KernelNameWrapper kernelName(__func__, mpp::image::pixel_type_name<SrcT>::value, "", "");     \
+    const void *_ = &mpp::cuda::TemplateRegistry<kernelName>::sInstance;
 
-#define OPP_CUDA_REGISTER_TEMPALTE_SRC_DST                                                                             \
-    constexpr opp::cuda::KernelNameWrapper kernelName(__func__, opp::image::pixel_type_name<SrcT>::value, "",          \
-                                                      opp::image::pixel_type_name<DstT>::value);                       \
-    const void *_ = &opp::cuda::TemplateRegistry<kernelName>::sInstance;
+#define MPP_CUDA_REGISTER_TEMPALTE_SRC_DST                                                                             \
+    constexpr mpp::cuda::KernelNameWrapper kernelName(__func__, mpp::image::pixel_type_name<SrcT>::value, "",          \
+                                                      mpp::image::pixel_type_name<DstT>::value);                       \
+    const void *_ = &mpp::cuda::TemplateRegistry<kernelName>::sInstance;
 
-#define OPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE                                                                        \
-    constexpr opp::cuda::KernelNameWrapper kernelName(__func__, "", "", opp::image::pixel_type_name<DstT>::value);     \
-    const void *_ = &opp::cuda::TemplateRegistry<kernelName>::sInstance;
+#define MPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE                                                                        \
+    constexpr mpp::cuda::KernelNameWrapper kernelName(__func__, "", "", mpp::image::pixel_type_name<DstT>::value);     \
+    const void *_ = &mpp::cuda::TemplateRegistry<kernelName>::sInstance;
 
-#define OPP_CUDA_REGISTER_TEMPALTE_COMPUTE_DST                                                                         \
-    constexpr opp::cuda::KernelNameWrapper kernelName(__func__, "", opp::image::pixel_type_name<ComputeT>::value,      \
-                                                      opp::image::pixel_type_name<DstT>::value);                       \
-    const void *_ = &opp::cuda::TemplateRegistry<kernelName>::sInstance;
+#define MPP_CUDA_REGISTER_TEMPALTE_COMPUTE_DST                                                                         \
+    constexpr mpp::cuda::KernelNameWrapper kernelName(__func__, "", mpp::image::pixel_type_name<ComputeT>::value,      \
+                                                      mpp::image::pixel_type_name<DstT>::value);                       \
+    const void *_ = &mpp::cuda::TemplateRegistry<kernelName>::sInstance;
 
-struct oppTemplateInstance
+struct mppTemplateInstance
 {
     std::string srcType;
     std::string computeType;
     std::string dstType;
 
-    oppTemplateInstance(const char *aSrcT, const char *aComputeT, const char *aDstT)
+    mppTemplateInstance(const char *aSrcT, const char *aComputeT, const char *aDstT)
         : srcType(aSrcT), computeType(aComputeT), dstType(aDstT)
     {
     }
 };
 
-inline std::map<std::string, std::vector<oppTemplateInstance>> &GetTemplateInstances()
+inline std::map<std::string, std::vector<mppTemplateInstance>> &GetTemplateInstances()
 {
-    static std::map<std::string, std::vector<oppTemplateInstance>> templates;
+    static std::map<std::string, std::vector<mppTemplateInstance>> templates;
     return templates;
 }
 
@@ -105,4 +105,4 @@ template <KernelNameWrapper name> struct TemplateRegistry
 
 template <KernelNameWrapper name> TemplateRegistry<name> TemplateRegistry<name>::sInstance;
 #endif
-} // namespace opp::cuda
+} // namespace mpp::cuda

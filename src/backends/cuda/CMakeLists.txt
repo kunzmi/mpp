@@ -1,11 +1,11 @@
-if (OPP_ENABLE_CUDA_CORE)
+if (MPP_ENABLE_CUDA_CORE)
 
 set(filesForbackends.cuda 
 	cudaException.cpp
 	event.cpp
 	stream.cpp
 )
-if(OPP_ENABLE_CUDA_BACKEND)
+if(MPP_ENABLE_CUDA_BACKEND)
 	set(filesForbackends.cuda ${filesForbackends.cuda} streamCtx.cpp)
 endif()
 
@@ -24,6 +24,6 @@ target_link_libraries(backends.cuda PUBLIC
 						)
 endif()
 
-if(OPP_ENABLE_CUDA_BACKEND)
+if(MPP_ENABLE_CUDA_BACKEND)
 add_subdirectory(image)
 endif()

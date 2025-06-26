@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-namespace opp::fileIO::tiffTag
+namespace mpp::fileIO::tiffTag
 {
 template <class T>
 IFDEntry<T>::IFDEntry(TIFFFile &aFile, ushort aTagID)
@@ -153,4 +153,4 @@ void IFDEntry<std::string>::SavePass2(std::ostream &aStream) // NOLINT(misc-defi
         WritePass2(mValue.c_str(), mValue.size() + 1, aStream); // with trailing '0'
     }
 }
-} // namespace opp::fileIO::tiffTag
+} // namespace mpp::fileIO::tiffTag

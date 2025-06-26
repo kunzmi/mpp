@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "addSquareProductWeightedOutputType.h"
 #include "addWeighted.h"
@@ -14,31 +14,31 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAddWeightedSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst,
                              size_t aPitchDst, remove_vector_t<ComputeT> aAlpha, const Size2D &aSize,
-                             const opp::cuda::StreamCtx &aStreamCtx)
+                             const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using addWeightedSrcSrc =
-            SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AddWeighted<ComputeT>, RoundingMode::None>;
+            SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::AddWeighted<ComputeT>, RoundingMode::None>;
 
-        const opp::AddWeighted<ComputeT> op(aAlpha);
+        const mpp::AddWeighted<ComputeT> op(aAlpha);
 
         const addWeightedSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
@@ -73,18 +73,18 @@ void InvokeAddWeightedSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *a
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAddWeightedInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, size_t aPitchSrc2,
                                  remove_vector_t<ComputeT> aAlpha, const Size2D &aSize,
-                                 const opp::cuda::StreamCtx &aStreamCtx)
+                                 const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using addWeightedInplaceSrc =
-            InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AddWeighted<ComputeT>, RoundingMode::None>;
+            InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::AddWeighted<ComputeT>, RoundingMode::None>;
 
-        const opp::AddWeighted<ComputeT> op(aAlpha);
+        const mpp::AddWeighted<ComputeT> op(aAlpha);
 
         const addWeightedInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
@@ -115,5 +115,5 @@ void InvokeAddWeightedInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT 
 
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

@@ -1,10 +1,10 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "../and_impl.h"
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 
 ForAllChannelsWithAlphaInvokeAndSrcSrc(16u);
@@ -14,5 +14,5 @@ ForAllChannelsWithAlphaInvokeAndInplaceSrc(16u);
 ForAllChannelsWithAlphaInvokeAndInplaceC(16u);
 ForAllChannelsWithAlphaInvokeAndInplaceDevC(16u);
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

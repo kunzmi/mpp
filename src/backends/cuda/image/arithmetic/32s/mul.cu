@@ -1,10 +1,10 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "../mul_impl.h"
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 
 ForAllChannelsWithAlphaInvokeMulSrcSrc(32s);
@@ -20,5 +20,5 @@ ForAllChannelsWithAlphaInvokeMulInplaceCScale(32s);
 ForAllChannelsWithAlphaInvokeMulInplaceDevC(32s);
 ForAllChannelsWithAlphaInvokeMulInplaceDevCScale(32s);
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

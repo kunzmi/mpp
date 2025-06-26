@@ -12,19 +12,19 @@ set(linkListForDummyTest
 						common.fileIO
 						common.image
 )
-if(OPP_ENABLE_CUDA_CORE)
+if(MPP_ENABLE_CUDA_CORE)
 	set(linkListForDummyTest ${linkListForDummyTest} backends.cuda)
 endif()
-if(OPP_ENABLE_CUDA_BACKEND)
+if(MPP_ENABLE_CUDA_BACKEND)
 	set(linkListForDummyTest ${linkListForDummyTest} backends.cuda.image)
 endif()
-if(OPP_ENABLE_NPP_BACKEND)
+if(MPP_ENABLE_NPP_BACKEND)
 	set(linkListForDummyTest ${linkListForDummyTest} 
 						#backends.npp
 						#backends.npp.image
 	)
 endif()
-if(OPP_ENABLE_CPUSIMPLE_BACKEND)
+if(MPP_ENABLE_CPUSIMPLE_BACKEND)
 	set(linkListForDummyTest ${linkListForDummyTest} backends.simple_cpu)
 endif()
 
@@ -36,7 +36,7 @@ target_link_libraries(dummy_test PRIVATE
 						project_warnings)
 
 						
-#if (OPP_ENABLE_NPP_BACKEND AND OPP_ENABLE_CUDA_BACKEND AND OPP_ENABLE_CPUSIMPLE_BACKEND)
+#if (MPP_ENABLE_NPP_BACKEND AND MPP_ENABLE_CUDA_BACKEND AND MPP_ENABLE_CPUSIMPLE_BACKEND)
 #add_executable(perfTest 
 #				perfTest.cpp
 #				)

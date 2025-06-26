@@ -1,17 +1,17 @@
 #pragma once
 #include "testBase.h"
 #include "testNppBase.h"
-#include "testOppBase.h"
+#include "testMppBase.h"
 #include <backends/simple_cpu/image/imageView.h>
 #include <common/vector_typetraits.h>
 
-namespace opp
+namespace mpp
 {
-template <typename oppT, typename nppT> class ArithmeticBase
+template <typename mppT, typename nppT> class ArithmeticBase
 {
   public:
     ArithmeticBase(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : opp(aIterations, aRepeats, aWidth, aHeight), npp(aIterations, aRepeats, aWidth, aHeight), repeats(aRepeats)
+        : mpp(aIterations, aRepeats, aWidth, aHeight), npp(aIterations, aRepeats, aWidth, aHeight), repeats(aRepeats)
     {
     }
     virtual ~ArithmeticBase() = default;
@@ -27,11 +27,11 @@ template <typename oppT, typename nppT> class ArithmeticBase
 
     template <typename ImgT> void Init(const ImgT &aCpuSrc1, const ImgT &aCpuSrc2)
     {
-        opp.Init();
+        mpp.Init();
         npp.Init();
 
-        aCpuSrc1 >> opp.GetSrc1();
-        aCpuSrc2 >> opp.GetSrc2();
+        aCpuSrc1 >> mpp.GetSrc1();
+        aCpuSrc2 >> mpp.GetSrc2();
 
         aCpuSrc1 >> npp.GetSrc1();
         aCpuSrc2 >> npp.GetSrc2();
@@ -39,11 +39,11 @@ template <typename oppT, typename nppT> class ArithmeticBase
 
     void Run(const Roi &aRoi)
     {
-        opp.SetRoi(aRoi);
+        mpp.SetRoi(aRoi);
         npp.SetRoi(aRoi);
 
-        opp.WarmUp();
-        rt_opp = opp.Run();
+        mpp.WarmUp();
+        rt_mpp = mpp.Run();
 
         npp.WarmUp();
         rt_npp = npp.Run();
@@ -54,53 +54,53 @@ template <typename oppT, typename nppT> class ArithmeticBase
         std::cout << GetName() << " for " << GetType() << std::endl;
 
         ImgT resNpp(npp.GetDst().SizeAlloc());
-        ImgT resOpp(opp.GetDst().SizeAlloc());
+        ImgT resMpp(mpp.GetDst().SizeAlloc());
 
         resNpp << npp.GetDst();
-        resOpp << opp.GetDst();
+        resMpp << mpp.GetDst();
 
         resNpp.SetRoi(npp.GetDst().ROI());
-        resOpp.SetRoi(opp.GetDst().ROI());
+        resMpp.SetRoi(mpp.GetDst().ROI());
 
         double maxErrorScalar = 0;
         resT maxError{0};
 
         if constexpr (vector_size_v<resT> == 1)
         {
-            resOpp.MaximumError(resNpp, maxError);
+            resMpp.MaximumError(resNpp, maxError);
             maxErrorScalar = maxError.x;
         }
         else
         {
-            resOpp.MaximumError(resNpp, maxError, maxErrorScalar);
+            resMpp.MaximumError(resNpp, maxError, maxErrorScalar);
         }
         double avgErrorScalar = 0;
         resT avgError{0};
 
         if constexpr (vector_size_v<resT> == 1)
         {
-            resOpp.AverageError(resNpp, avgError);
+            resMpp.AverageError(resNpp, avgError);
             avgErrorScalar = avgError.x;
         }
         else
         {
-            resOpp.AverageError(resNpp, avgError, avgErrorScalar);
+            resMpp.AverageError(resNpp, avgError, avgErrorScalar);
         }
 
-        std::cout << "OPP:" << std::endl;
-        std::cout << rt_opp << std::endl;
+        std::cout << "MPP:" << std::endl;
+        std::cout << rt_mpp << std::endl;
         std::cout << "NPP:" << std::endl;
         std::cout << rt_npp << std::endl;
 
-        const float ratio = rt_npp.Mean / rt_opp.Mean;
+        const float ratio = rt_npp.Mean / rt_mpp.Mean;
         if (ratio >= 1.0f)
         {
-            std::cout << "OPP is " << (rt_npp.Mean - rt_opp.Mean) / static_cast<float>(repeats) << " msec or "
+            std::cout << "MPP is " << (rt_npp.Mean - rt_mpp.Mean) / static_cast<float>(repeats) << " msec or "
                       << ratio * 100.0f - 100.0f << "% faster!" << std::endl;
         }
         else
         {
-            std::cout << "OPP is " << (rt_opp.Mean - rt_npp.Mean) / static_cast<float>(repeats) << " msec or "
+            std::cout << "MPP is " << (rt_mpp.Mean - rt_npp.Mean) / static_cast<float>(repeats) << " msec or "
                       << 1.0f / ratio * 100.0f - 100.0f << "% slower..." << std::endl;
         }
 
@@ -111,17 +111,17 @@ template <typename oppT, typename nppT> class ArithmeticBase
         TestResult res;
 
         res.Name                   = GetName() + " for " + GetType();
-        res.TotalOPP               = rt_opp.Total;
+        res.TotalMPP               = rt_mpp.Total;
         res.TotalNPP               = rt_npp.Total;
-        res.MeanOPP                = rt_opp.Mean;
+        res.MeanMPP                = rt_mpp.Mean;
         res.MeanNPP                = rt_npp.Mean;
-        res.StdOPP                 = rt_opp.Std;
+        res.StdMPP                 = rt_mpp.Std;
         res.StdNPP                 = rt_npp.Std;
-        res.MinOPP                 = rt_opp.Min;
+        res.MinMPP                 = rt_mpp.Min;
         res.MinNPP                 = rt_npp.Min;
-        res.MaxOPP                 = rt_opp.Max;
+        res.MaxMPP                 = rt_mpp.Max;
         res.MaxNPP                 = rt_npp.Max;
-        res.AbsoluteDifferenceMSec = (rt_npp.Mean - rt_opp.Mean) / static_cast<float>(repeats);
+        res.AbsoluteDifferenceMSec = (rt_npp.Mean - rt_mpp.Mean) / static_cast<float>(repeats);
         if (ratio >= 1.0f)
         {
             res.RelativeDifference = ratio * 100.0f - 100.0f;
@@ -134,20 +134,20 @@ template <typename oppT, typename nppT> class ArithmeticBase
     }
 
   private:
-    oppT opp;
+    mppT mpp;
     nppT npp;
 
-    Runtime rt_opp;
+    Runtime rt_mpp;
     Runtime rt_npp;
 
     size_t repeats;
 };
 
-template <PixelType T> class AddOpp : public TestOppSrcSrcDstBase<T>
+template <PixelType T> class AddMpp : public TestMppSrcSrcDstBase<T>
 {
   public:
-    AddOpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : TestOppSrcSrcDstBase<T>(aIterations, aRepeats, aWidth, aHeight)
+    AddMpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+        : TestMppSrcSrcDstBase<T>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -185,11 +185,11 @@ template <typename T> class AddNpp : public TestNppSrcSrcDstBase<T>
     }
 };
 
-template <PixelType T, typename T2> class AddTest : public ArithmeticBase<AddOpp<T>, AddNpp<T2>>
+template <PixelType T, typename T2> class AddTest : public ArithmeticBase<AddMpp<T>, AddNpp<T2>>
 {
   public:
     AddTest(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : ArithmeticBase<AddOpp<T>, AddNpp<T2>>(aIterations, aRepeats, aWidth, aHeight)
+        : ArithmeticBase<AddMpp<T>, AddNpp<T2>>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -204,11 +204,11 @@ template <PixelType T, typename T2> class AddTest : public ArithmeticBase<AddOpp
     }
 };
 
-template <PixelType T> class SubOpp : public TestOppSrcSrcDstBase<T>
+template <PixelType T> class SubMpp : public TestMppSrcSrcDstBase<T>
 {
   public:
-    SubOpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : TestOppSrcSrcDstBase<T>(aIterations, aRepeats, aWidth, aHeight)
+    SubMpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+        : TestMppSrcSrcDstBase<T>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -246,11 +246,11 @@ template <typename T> class SubNpp : public TestNppSrcSrcDstBase<T>
     }
 };
 
-template <PixelType T, typename T2> class SubTest : public ArithmeticBase<SubOpp<T>, SubNpp<T2>>
+template <PixelType T, typename T2> class SubTest : public ArithmeticBase<SubMpp<T>, SubNpp<T2>>
 {
   public:
     SubTest(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : ArithmeticBase<SubOpp<T>, SubNpp<T2>>(aIterations, aRepeats, aWidth, aHeight)
+        : ArithmeticBase<SubMpp<T>, SubNpp<T2>>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -265,11 +265,11 @@ template <PixelType T, typename T2> class SubTest : public ArithmeticBase<SubOpp
     }
 };
 
-template <PixelType T> class MulOpp : public TestOppSrcSrcDstBase<T>
+template <PixelType T> class MulMpp : public TestMppSrcSrcDstBase<T>
 {
   public:
-    MulOpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : TestOppSrcSrcDstBase<T>(aIterations, aRepeats, aWidth, aHeight)
+    MulMpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+        : TestMppSrcSrcDstBase<T>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -307,11 +307,11 @@ template <typename T> class MulNpp : public TestNppSrcSrcDstBase<T>
     }
 };
 
-template <PixelType T, typename T2> class MulTest : public ArithmeticBase<MulOpp<T>, MulNpp<T2>>
+template <PixelType T, typename T2> class MulTest : public ArithmeticBase<MulMpp<T>, MulNpp<T2>>
 {
   public:
     MulTest(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : ArithmeticBase<MulOpp<T>, MulNpp<T2>>(aIterations, aRepeats, aWidth, aHeight)
+        : ArithmeticBase<MulMpp<T>, MulNpp<T2>>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -326,11 +326,11 @@ template <PixelType T, typename T2> class MulTest : public ArithmeticBase<MulOpp
     }
 };
 
-template <PixelType T> class DivOpp : public TestOppSrcSrcDstBase<T>
+template <PixelType T> class DivMpp : public TestMppSrcSrcDstBase<T>
 {
   public:
-    DivOpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : TestOppSrcSrcDstBase<T>(aIterations, aRepeats, aWidth, aHeight)
+    DivMpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+        : TestMppSrcSrcDstBase<T>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -368,11 +368,11 @@ template <typename T> class DivNpp : public TestNppSrcSrcDstBase<T>
     }
 };
 
-template <PixelType T, typename T2> class DivTest : public ArithmeticBase<DivOpp<T>, DivNpp<T2>>
+template <PixelType T, typename T2> class DivTest : public ArithmeticBase<DivMpp<T>, DivNpp<T2>>
 {
   public:
     DivTest(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : ArithmeticBase<DivOpp<T>, DivNpp<T2>>(aIterations, aRepeats, aWidth, aHeight)
+        : ArithmeticBase<DivMpp<T>, DivNpp<T2>>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -386,4 +386,4 @@ template <PixelType T, typename T2> class DivTest : public ArithmeticBase<DivOpp
         return pixel_type_name<T>::value;
     }
 };
-} // namespace opp
+} // namespace mpp

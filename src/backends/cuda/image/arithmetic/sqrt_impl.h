@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "sqrt.h"
 #include <backends/cuda/image/configurations.h>
@@ -15,33 +15,33 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeSqrtSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                    const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using simdOP_t = simd::Sqrt<Tupel<DstT, TupelSize>>;
         if constexpr (simdOP_t::has_simd)
         {
-            using sqrtSrcSIMD = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sqrt<ComputeT>,
+            using sqrtSrcSIMD = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sqrt<ComputeT>,
                                            RoundingMode::NearestTiesToEven, ComputeT, simdOP_t>;
 
-            const opp::Sqrt<ComputeT> op;
+            const mpp::Sqrt<ComputeT> op;
             const simdOP_t opSIMD;
 
             const sqrtSrcSIMD functor(aSrc1, aPitchSrc1, op, opSIMD);
@@ -51,9 +51,9 @@ void InvokeSqrtSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPit
         else
         {
             using sqrtSrc =
-                SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Sqrt<ComputeT>, RoundingMode::NearestTiesToEven>;
+                SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sqrt<ComputeT>, RoundingMode::NearestTiesToEven>;
 
-            const opp::Sqrt<ComputeT> op;
+            const mpp::Sqrt<ComputeT> op;
 
             const sqrtSrc functor(aSrc1, aPitchSrc1, op);
 
@@ -87,19 +87,19 @@ void InvokeSqrtSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPit
 template <typename DstT, typename ComputeT>
 void InvokeSqrtInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_COMPUTE_DST;
+        MPP_CUDA_REGISTER_TEMPALTE_COMPUTE_DST;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using simdOP_t = simd::Sqrt<Tupel<DstT, TupelSize>>;
         if constexpr (simdOP_t::has_simd)
         {
-            using sqrtInplaceSIMD = InplaceFunctor<TupelSize, ComputeT, DstT, opp::Sqrt<ComputeT>,
+            using sqrtInplaceSIMD = InplaceFunctor<TupelSize, ComputeT, DstT, mpp::Sqrt<ComputeT>,
                                                    RoundingMode::NearestTiesToEven, ComputeT, simdOP_t>;
 
-            const opp::Sqrt<ComputeT> op;
+            const mpp::Sqrt<ComputeT> op;
             const simdOP_t opSIMD;
 
             const sqrtInplaceSIMD functor(op, opSIMD);
@@ -110,9 +110,9 @@ void InvokeSqrtInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, 
         else
         {
             using sqrtInplace =
-                InplaceFunctor<TupelSize, ComputeT, DstT, opp::Sqrt<ComputeT>, RoundingMode::NearestTiesToEven>;
+                InplaceFunctor<TupelSize, ComputeT, DstT, mpp::Sqrt<ComputeT>, RoundingMode::NearestTiesToEven>;
 
-            const opp::Sqrt<ComputeT> op;
+            const mpp::Sqrt<ComputeT> op;
 
             const sqrtInplace functor(op);
 
@@ -143,5 +143,5 @@ void InvokeSqrtInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, 
 
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

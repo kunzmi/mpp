@@ -1,4 +1,4 @@
-if (OPP_ENABLE_CPUSIMPLE_BACKEND)
+if (MPP_ENABLE_CPUSIMPLE_BACKEND)
 
 add_library(backends.simple_cpu 
 			image/imageView.cpp

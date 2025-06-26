@@ -1,13 +1,13 @@
 #pragma once
 #include <common/moduleEnabler.h>
-#if OPP_ENABLE_CUDA_CORE
+#if MPP_ENABLE_CUDA_CORE
 
 #include "DevVarView.h"
 #include "cudaException.h"
 #include <common/defines.h>
 #include <cuda_runtime_api.h>
 
-namespace opp::cuda
+namespace mpp::cuda
 {
 /// <summary>
 /// A wrapper class for a CUDA Device variable.
@@ -64,5 +64,5 @@ template <typename T> class DevVar : public DevVarView<T>
     }
 };
 
-} // namespace opp::cuda
-#endif // OPP_ENABLE_CUDA_CORE
+} // namespace mpp::cuda
+#endif // MPP_ENABLE_CUDA_CORE

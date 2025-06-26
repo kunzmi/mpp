@@ -5,13 +5,13 @@
 #include "half_fp16.h"
 #include "needSaturationClamp.h"
 #include "numberTypes.h"
-#include "opp_defs.h"
+#include "mpp_defs.h"
 #include "vector_typetraits.h"
 #include <concepts>
 #include <iostream>
 #include <type_traits>
 
-namespace opp
+namespace mpp
 {
 
 // forward declaration:
@@ -1585,4 +1585,4 @@ template <HostCode T2>
 std::wistream &operator>>(std::wistream &aIs, Vector2<T2> &aVec)
     requires ByteSizeType<T2>;
 
-} // namespace opp
+} // namespace mpp

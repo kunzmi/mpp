@@ -1,10 +1,10 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "../mulMasked_impl.h"
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 
 ForAllChannelsWithAlphaInvokeMulSrcSrcMask(32f);
@@ -14,5 +14,5 @@ ForAllChannelsWithAlphaInvokeMulInplaceSrcMask(32f);
 ForAllChannelsWithAlphaInvokeMulInplaceCMask(32f);
 ForAllChannelsWithAlphaInvokeMulInplaceDevCMask(32f);
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

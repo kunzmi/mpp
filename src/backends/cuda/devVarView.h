@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h>
-#if OPP_ENABLE_CUDA_CORE
+#if MPP_ENABLE_CUDA_CORE
 
 #include "cudaException.h"
 #include "stream.h"
@@ -9,7 +9,7 @@
 #include <cuda_runtime_api.h>
 #include <vector>
 
-namespace opp::cuda
+namespace mpp::cuda
 {
 
 /// <summary>
@@ -308,5 +308,5 @@ template <typename T> class DevVarView
     }
 };
 
-} // namespace opp::cuda
-#endif // OPP_ENABLE_CUDA_CORE
+} // namespace mpp::cuda
+#endif // MPP_ENABLE_CUDA_CORE

@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include <backends/cuda/streamCtx.h>
 #include <common/image/functors/imageFunctors.h>
@@ -8,7 +8,7 @@
 #include <common/image/size2D.h>
 #include <cuda_runtime.h>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 // compute and result types for meanStd reduction:
 template <typename SrcT> struct meanStd_types_scalar_for
@@ -121,7 +121,7 @@ template <typename T> using meanStd_types_for_rt2 = typename meanStd_types_for<T
 template <typename SrcT, typename ComputeT, typename DstT1, typename DstT2>
 void InvokeMeanStdSrc(const SrcT *aSrc1, size_t aPitchSrc1, ComputeT *aTempBuffer1, ComputeT *aTempBuffer2,
                       DstT1 *aDst1, DstT2 *aDst2, remove_vector_t<DstT1> *aDstScalar1,
-                      remove_vector_t<DstT2> *aDstScalar2, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx);
+                      remove_vector_t<DstT2> *aDstScalar2, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

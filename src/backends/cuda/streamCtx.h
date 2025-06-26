@@ -1,13 +1,13 @@
 #pragma once
 #include <common/moduleEnabler.h>
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include <backends/cuda/stream.h>
 #include <common/defines.h>
 #include <cuda_runtime_api.h>
 #include <driver_types.h>
 
-namespace opp::cuda
+namespace mpp::cuda
 {
 
 struct StreamCtx
@@ -89,5 +89,5 @@ class StreamCtxSingleton
     /// <returns></returns>
     static void SetStream(const Stream &aStream);
 };
-} // namespace opp::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

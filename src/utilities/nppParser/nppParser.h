@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-namespace opp::utilities::nppParser
+namespace mpp::utilities::nppParser
 {
 
 class NPPParser
@@ -33,7 +33,7 @@ class NPPParser
 
     static bool GetContext(const std::string &aFName);
 
-    static opp::image::PixelTypeEnum GetPixelType(const Function &aFunction);
+    static mpp::image::PixelTypeEnum GetPixelType(const Function &aFunction);
 
     static bool IsPlanar(const Function &aFunction);
 
@@ -73,4 +73,4 @@ class NPPParser
     static std::vector<Function> GetFunctions(size_t aHeaderID);
 };
 
-} // namespace opp::utilities::nppParser
+} // namespace mpp::utilities::nppParser

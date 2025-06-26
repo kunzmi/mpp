@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/image/configurations.h>
@@ -19,7 +19,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 /// <summary>
 /// Applies a morphology operation to each pixel in an image with border control in a neighborhood where the mask is
@@ -436,7 +436,7 @@ template <typename DstT, size_t TupelSize, typename FilterT, int blockWidth, int
           typename morphOperation, typename postOp>
 void InvokeMorphologyKernelDefault(const BorderControlT &aSrcWithBC, DstT *aDst, size_t aPitchDst, const FilterT *aMask,
                                    const FilterArea &aFilterArea, const Size2D &aSize, morphOperation aMorph,
-                                   postOp aPostOp, const opp::cuda::StreamCtx &aStreamCtx)
+                                   postOp aPostOp, const mpp::cuda::StreamCtx &aStreamCtx)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {
@@ -467,5 +467,5 @@ void InvokeMorphologyKernelDefault(const BorderControlT &aSrcWithBC, DstT *aDst,
     }
 }
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

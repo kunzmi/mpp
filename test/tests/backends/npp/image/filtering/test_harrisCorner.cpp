@@ -32,11 +32,11 @@
 #include <numbers>
 #include <vector>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size = 256;
 
@@ -56,7 +56,7 @@ TEST_CASE("8uC1", "[NPP.Filtering.HarrisCorner]")
     cpu::Image<Pixel32fC1> npp_res(size, size);
     nv::Image8uC1 npp_src1(size, size);
     nv::Image32fC1 npp_dst(size, size);
-    opp::cuda::DevVar<byte> buffer(npp_src1.FilterHarrisCornersBorderGetBufferSize());
+    mpp::cuda::DevVar<byte> buffer(npp_src1.FilterHarrisCornersBorderGetBufferSize());
 
     cpu_src1 >> npp_src1;
 

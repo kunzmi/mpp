@@ -25,7 +25,7 @@
 #include <common/morphology/postOperators.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/utilities.h>
 #include <common/vector_typetraits.h>
@@ -37,7 +37,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace opp::image::cpuSimple
+namespace mpp::image::cpuSimple
 {
 
 #pragma region No mask Erosion/Dilation
@@ -137,8 +137,8 @@ ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const Pixel8uC1 *aMask, 
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     using FilterT = Pixel8uC1;
-    using MorphOp = opp::Erode<T, FilterT>;
-    using PostOp  = opp::NothingMorph<T>;
+    using MorphOp = mpp::Erode<T, FilterT>;
+    using PostOp  = mpp::NothingMorph<T>;
 
     const MorphOp op;
     const PostOp postOp;
@@ -171,8 +171,8 @@ ImageView<T> &ImageView<T>::ErosionGray(ImageView<T> &aDst, const morph_gray_com
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     using FilterT = morph_gray_compute_type_t<T>;
-    using MorphOp = opp::ErodeGray<T, FilterT>;
-    using PostOp  = opp::NothingMorph<T>;
+    using MorphOp = mpp::ErodeGray<T, FilterT>;
+    using PostOp  = mpp::NothingMorph<T>;
 
     const MorphOp op;
     const PostOp postOp;
@@ -238,8 +238,8 @@ ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const Pixel8uC1 *aMask,
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     using FilterT = Pixel8uC1;
-    using MorphOp = opp::Dilate<T, FilterT>;
-    using PostOp  = opp::NothingMorph<T>;
+    using MorphOp = mpp::Dilate<T, FilterT>;
+    using PostOp  = mpp::NothingMorph<T>;
 
     const MorphOp op;
     const PostOp postOp;
@@ -272,8 +272,8 @@ ImageView<T> &ImageView<T>::DilationGray(ImageView<T> &aDst, const morph_gray_co
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     using FilterT = morph_gray_compute_type_t<T>;
-    using MorphOp = opp::DilateGray<T, FilterT>;
-    using PostOp  = opp::NothingMorph<T>;
+    using MorphOp = mpp::DilateGray<T, FilterT>;
+    using PostOp  = mpp::NothingMorph<T>;
 
     const MorphOp op;
     const PostOp postOp;
@@ -433,8 +433,8 @@ ImageView<T> &ImageView<T>::TopHat(ImageView<T> &aTemp, ImageView<T> &aDst, cons
 
     using FilterT  = Pixel8uC1;
     using ComputeT = morph_compute_type_t<T>;
-    using MorphOp  = opp::Dilate<T, FilterT>;
-    using PostOp   = opp::TopHat<T, ComputeT>;
+    using MorphOp  = mpp::Dilate<T, FilterT>;
+    using PostOp   = mpp::TopHat<T, ComputeT>;
 
     const MorphOp op;
     const PostOp postOp(PointerRoi(), Pitch());
@@ -488,8 +488,8 @@ ImageView<T> &ImageView<T>::BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst, co
 
     using FilterT  = Pixel8uC1;
     using ComputeT = morph_compute_type_t<T>;
-    using MorphOp  = opp::Erode<T, FilterT>;
-    using PostOp   = opp::BlackHat<T, ComputeT>;
+    using MorphOp  = mpp::Erode<T, FilterT>;
+    using PostOp   = mpp::BlackHat<T, ComputeT>;
 
     const MorphOp op;
     const PostOp postOp(PointerRoi(), Pitch());
@@ -560,4 +560,4 @@ ImageView<T> &ImageView<T>::MorphologyGradient(ImageView<T> &aDst, const Pixel8u
     return this->MorphologyGradient(aDst, aMask, aFilterArea, aConstant, aBorder, ROI());
 }
 #pragma endregion
-} // namespace opp::image::cpuSimple
+} // namespace mpp::image::cpuSimple

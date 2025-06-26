@@ -140,7 +140,7 @@
 
 ### Improvements
 * Reintroduced support for GCC 5 and 6 (#2836)
-  * As with VS2017, if they start causing trouble again, they will be dropped again.
+  * As with VS2017, if they start causing trouble again, they will be drmpped again.
 * Added workaround for targetting newest MacOS (Sonoma) using GCC (#2837, #2839)
 * `CATCH_CONFIG_DEFAULT_REPORTER` can now be an arbitrary reporter spec
   * Previously it could only be a plain reporter name, so it was impossible to compile in custom arguments to the reporter.
@@ -162,7 +162,7 @@
 
 ### Improvements
 * Restored compatibility with VS2017 (#2792, #2822)
-  * The baseline for Catch2 is still C++14 with some reasonable workarounds for specific compilers, so if VS2017 starts acting up again, the support will be dropped again.
+  * The baseline for Catch2 is still C++14 with some reasonable workarounds for specific compilers, so if VS2017 starts acting up again, the support will be drmpped again.
 * Suppressed clang-tidy's `bugprone-chained-comparison` in assertions (#2801)
 * Improved the static analysis mode to evaluate arguments to `TEST_CASE` and `SECTION` (#2817)
   * Clang-tidy should no longer warn about runtime arguments to these macros being unused in static analysis mode.

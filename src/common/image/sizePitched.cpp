@@ -2,7 +2,7 @@
 #include "sizePitched.h"
 #include <cstddef>
 
-namespace opp::image
+namespace mpp::image
 {
 
 SizePitched::SizePitched(const Size2D &aSize, size_t aPitch) noexcept : mSize(aSize), mPitch(aPitch)
@@ -24,4 +24,4 @@ size_t SizePitched::Pitch() const
     return mPitch;
 }
 
-} // namespace opp::image
+} // namespace mpp::image

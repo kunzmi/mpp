@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-using namespace opp::utilities::nppParser;
+using namespace mpp::utilities::nppParser;
 
 struct NppiFunction
 {

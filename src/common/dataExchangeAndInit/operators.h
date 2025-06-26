@@ -3,12 +3,12 @@
 #include <common/defines.h>
 #include <common/image/channel.h>
 #include <common/image/channelList.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
 #include <concepts>
 
-namespace opp
+namespace mpp
 {
 template <AnyVector TFrom, AnyVector TTo> struct Convert
 {
@@ -41,12 +41,12 @@ template <AnyVector SrcT, AnyVector DstT = SrcT> struct SwapChannel
     }
 };
 template <AnyVector SrcDstT>
-    requires opp::image::ThreeChannel<SrcDstT> || opp::image::FourChannelAlpha<SrcDstT>
+    requires mpp::image::ThreeChannel<SrcDstT> || mpp::image::FourChannelAlpha<SrcDstT>
 struct SwapChannel<SrcDstT, SrcDstT>
 {
-    const opp::image::Channel DstOrder[3];
+    const mpp::image::Channel DstOrder[3];
 
-    SwapChannel(const opp::image::ChannelList<3> &aChannel)
+    SwapChannel(const mpp::image::ChannelList<3> &aChannel)
         : DstOrder{aChannel.data()[0], aChannel.data()[1], aChannel.data()[2]}
     {
     }
@@ -66,12 +66,12 @@ struct SwapChannel<SrcDstT, SrcDstT>
     }
 };
 template <AnyVector SrcDstT>
-    requires opp::image::FourChannelNoAlpha<SrcDstT>
+    requires mpp::image::FourChannelNoAlpha<SrcDstT>
 struct SwapChannel<SrcDstT, SrcDstT>
 {
-    const opp::image::Channel DstOrder[4];
+    const mpp::image::Channel DstOrder[4];
 
-    SwapChannel(const opp::image::ChannelList<4> &aChannel)
+    SwapChannel(const mpp::image::ChannelList<4> &aChannel)
         : DstOrder{aChannel.data()[0], aChannel.data()[1], aChannel.data()[2], aChannel.data()[3]}
     {
     }
@@ -94,18 +94,18 @@ struct SwapChannel<SrcDstT, SrcDstT>
 };
 
 template <AnyVector SrcT, AnyVector DstT>
-    requires opp::image::ThreeChannel<SrcT> && opp::image::FourChannel<DstT>
+    requires mpp::image::ThreeChannel<SrcT> && mpp::image::FourChannel<DstT>
 struct SwapChannel<SrcT, DstT>
 {
-    const opp::image::Channel DstOrder[4];
+    const mpp::image::Channel DstOrder[4];
     const remove_vector_t<DstT> mValue;
 
-    SwapChannel(const opp::image::ChannelList<4> &aChannel, remove_vector_t<DstT> aValue)
+    SwapChannel(const mpp::image::ChannelList<4> &aChannel, remove_vector_t<DstT> aValue)
         : DstOrder{aChannel.data()[0], aChannel.data()[1], aChannel.data()[2], aChannel.data()[3]}, mValue(aValue)
     {
     }
 
-    SwapChannel(const opp::image::ChannelList<4> &aChannel)
+    SwapChannel(const mpp::image::ChannelList<4> &aChannel)
         : DstOrder{aChannel.data()[0], aChannel.data()[1], aChannel.data()[2], aChannel.data()[3]}, mValue(0)
     {
     }
@@ -212,12 +212,12 @@ struct SwapChannel<SrcT, DstT>
 };
 
 template <AnyVector SrcT, AnyVector DstT>
-    requires opp::image::FourChannel<SrcT> && opp::image::ThreeChannel<DstT>
+    requires mpp::image::FourChannel<SrcT> && mpp::image::ThreeChannel<DstT>
 struct SwapChannel<SrcT, DstT>
 {
-    const opp::image::Channel DstOrder[3];
+    const mpp::image::Channel DstOrder[3];
 
-    SwapChannel(const opp::image::ChannelList<3> &aChannel)
+    SwapChannel(const mpp::image::ChannelList<3> &aChannel)
         : DstOrder{aChannel.data()[0], aChannel.data()[1], aChannel.data()[2]}
     {
     }
@@ -239,8 +239,8 @@ template <AnyVector SrcT, AnyVector DstT = SrcT> struct Dup
     }
 };
 template <AnyVector SrcT, AnyVector DstT>
-    requires opp::image::SingleChannel<SrcT> &&
-             (opp::image::TwoChannel<DstT> || opp::image::ThreeChannel<DstT> || opp::image::FourChannel<DstT>)
+    requires mpp::image::SingleChannel<SrcT> &&
+             (mpp::image::TwoChannel<DstT> || mpp::image::ThreeChannel<DstT> || mpp::image::FourChannel<DstT>)
 struct Dup<SrcT, DstT>
 {
     DEVICE_CODE void operator()(const SrcT &aSrc1, DstT &aDst) const
@@ -257,25 +257,25 @@ template <AnyVector SrcT, AnyVector DstT = SrcT> struct Copy
     }
 };
 template <AnyVector SrcT, AnyVector DstT>
-    requires opp::image::SingleChannel<SrcT> &&
-             (opp::image::TwoChannel<DstT> || opp::image::ThreeChannel<DstT> || opp::image::FourChannel<DstT>)
+    requires mpp::image::SingleChannel<SrcT> &&
+             (mpp::image::TwoChannel<DstT> || mpp::image::ThreeChannel<DstT> || mpp::image::FourChannel<DstT>)
 struct Copy<SrcT, DstT>
 {
     DEVICE_CODE void operator()(const SrcT &aSrc1, const SrcT &aSrc2, DstT &aDst) const
-        requires opp::image::TwoChannel<DstT>
+        requires mpp::image::TwoChannel<DstT>
     {
         aDst = DstT(aSrc1.x, aSrc2.x);
     }
     DEVICE_CODE void operator()(const SrcT &aSrc1, const SrcT &aSrc2, const SrcT &aSrc3, DstT &aDst) const
-        requires opp::image::ThreeChannel<DstT> || opp::image::FourChannelAlpha<DstT>
+        requires mpp::image::ThreeChannel<DstT> || mpp::image::FourChannelAlpha<DstT>
     {
         aDst = DstT(aSrc1.x, aSrc2.x, aSrc3.x);
     }
     DEVICE_CODE void operator()(const SrcT &aSrc1, const SrcT &aSrc2, const SrcT &aSrc3, const SrcT &aSrc4,
                                 DstT &aDst) const
-        requires opp::image::FourChannelNoAlpha<DstT>
+        requires mpp::image::FourChannelNoAlpha<DstT>
     {
         aDst = DstT(aSrc1.x, aSrc2.x, aSrc3.x, aSrc4.x);
     }
 };
-} // namespace opp
+} // namespace mpp

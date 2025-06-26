@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "convert.h"
 #include <backends/cuda/image/configurations.h>
@@ -15,23 +15,23 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT, typename DstT>
 void InvokeConvert(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                    const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
@@ -86,43 +86,43 @@ void InvokeConvertRound(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t
 {
     static_assert(RealOrComplexFloatingVector<SrcT>,
                   "Rounding conversion is only valid for floating point source types.");
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         switch (aRoundingMode)
         {
-            case opp::RoundingMode::NearestTiesToEven:
+            case mpp::RoundingMode::NearestTiesToEven:
             {
                 using convert = ConvertFunctor<TupelSize, SrcT, DstT, RoundingMode::NearestTiesToEven>;
                 const convert functor(aSrc1, aPitchSrc1);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::NearestTiesAwayFromZero:
+            case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
                 using convert = ConvertFunctor<TupelSize, SrcT, DstT, RoundingMode::NearestTiesAwayFromZero>;
                 const convert functor(aSrc1, aPitchSrc1);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardZero:
+            case mpp::RoundingMode::TowardZero:
             {
                 using convert = ConvertFunctor<TupelSize, SrcT, DstT, RoundingMode::TowardZero>;
                 const convert functor(aSrc1, aPitchSrc1);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardNegativeInfinity:
+            case mpp::RoundingMode::TowardNegativeInfinity:
             {
                 using convert = ConvertFunctor<TupelSize, SrcT, DstT, RoundingMode::TowardNegativeInfinity>;
                 const convert functor(aSrc1, aPitchSrc1);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardPositiveInfinity:
+            case mpp::RoundingMode::TowardPositiveInfinity:
             {
                 using convert = ConvertFunctor<TupelSize, SrcT, DstT, RoundingMode::TowardPositiveInfinity>;
                 const convert functor(aSrc1, aPitchSrc1);
@@ -161,43 +161,43 @@ void InvokeConvertScaleRound(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, s
                              RoundingMode aRoundingMode, float aScaleFactor, const Size2D &aSize,
                              const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         switch (aRoundingMode)
         {
-            case opp::RoundingMode::NearestTiesToEven:
+            case mpp::RoundingMode::NearestTiesToEven:
             {
                 using convert = ConvertScaleFunctor<TupelSize, SrcT, DstT, RoundingMode::NearestTiesToEven>;
                 const convert functor(aSrc1, aPitchSrc1, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::NearestTiesAwayFromZero:
+            case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
                 using convert = ConvertScaleFunctor<TupelSize, SrcT, DstT, RoundingMode::NearestTiesAwayFromZero>;
                 const convert functor(aSrc1, aPitchSrc1, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardZero:
+            case mpp::RoundingMode::TowardZero:
             {
                 using convert = ConvertScaleFunctor<TupelSize, SrcT, DstT, RoundingMode::TowardZero>;
                 const convert functor(aSrc1, aPitchSrc1, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardNegativeInfinity:
+            case mpp::RoundingMode::TowardNegativeInfinity:
             {
                 using convert = ConvertScaleFunctor<TupelSize, SrcT, DstT, RoundingMode::TowardNegativeInfinity>;
                 const convert functor(aSrc1, aPitchSrc1, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardPositiveInfinity:
+            case mpp::RoundingMode::TowardPositiveInfinity:
             {
                 using convert = ConvertScaleFunctor<TupelSize, SrcT, DstT, RoundingMode::TowardPositiveInfinity>;
                 const convert functor(aSrc1, aPitchSrc1, aScaleFactor);
@@ -231,5 +231,5 @@ void InvokeConvertScaleRound(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, s
 
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

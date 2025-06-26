@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "normDiffL2.h"
 #include "normDiffL2Masked.h"
@@ -14,7 +14,7 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/statistics/operators.h>
 #include <common/statistics/postOperators.h>
@@ -22,38 +22,38 @@
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeNormDiffL2MaskedSrcSrc(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aSrc1, size_t aPitchSrc1,
                                   const SrcT *aSrc2, size_t aPitchSrc2, ComputeT *aTempBuffer, DstT *aDst,
                                   remove_vector_t<DstT> *aDstScalar, const Size2D &aSize,
-                                  const opp::cuda::StreamCtx &aStreamCtx)
+                                  const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
+    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
-        using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL2<SrcT, ComputeT>>;
+        using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL2<SrcT, ComputeT>>;
 
-        const opp::NormDiffL2<SrcT, ComputeT> op;
+        const mpp::NormDiffL2<SrcT, ComputeT> op;
 
         const normL2SrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
-        InvokeReductionMaskedAlongXKernelDefault<SrcT, ComputeT, TupelSize, normL2SrcSrc, opp::Sum<ComputeT, ComputeT>,
+        InvokeReductionMaskedAlongXKernelDefault<SrcT, ComputeT, TupelSize, normL2SrcSrc, mpp::Sum<ComputeT, ComputeT>,
                                                  ReductionInitValue::Zero>(aMask, aPitchMask, aSrc1, aTempBuffer, aSize,
                                                                            aStreamCtx, functor);
 
-        const opp::SqrtPostOp<DstT> postOp;
+        const mpp::SqrtPostOp<DstT> postOp;
 
-        const opp::SumThenSqrtScalar<DstT> postOpScalar;
+        const mpp::SumThenSqrtScalar<DstT> postOpScalar;
 
-        InvokeReductionAlongYKernelDefault<ComputeT, DstT, opp::Sum<DstT, DstT>, ReductionInitValue::Zero,
-                                           opp::SqrtPostOp<DstT>, opp::SumThenSqrtScalar<DstT>>(
+        InvokeReductionAlongYKernelDefault<ComputeT, DstT, mpp::Sum<DstT, DstT>, ReductionInitValue::Zero,
+                                           mpp::SqrtPostOp<DstT>, mpp::SumThenSqrtScalar<DstT>>(
             aTempBuffer, aDst, aDstScalar, aSize.y, postOp, postOpScalar, aStreamCtx);
     }
 }
@@ -82,5 +82,5 @@ void InvokeNormDiffL2MaskedSrcSrc(const Pixel8uC1 *aMask, size_t aPitchMask, con
     Instantiate_For(Pixel##typeIn##C4A);
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

@@ -9,7 +9,7 @@
 #include <istream>
 #include <memory>
 
-namespace opp::fileIO
+namespace mpp::fileIO
 {
 /// <summary>
 /// PseudoFileReader implements FileReader to provide reading capabilities from a given stream.
@@ -48,7 +48,7 @@ class PseudoFileReader : public FileReader
     /// <summary>
     /// Converts from file data type enum to internal data type
     /// </summary>
-    [[nodiscard]] opp::image::PixelTypeEnum GetDataType() const override;
+    [[nodiscard]] mpp::image::PixelTypeEnum GetDataType() const override;
     /// <summary>
     /// Returns the image dimensions stored in the file header.
     /// </summary>
@@ -56,7 +56,7 @@ class PseudoFileReader : public FileReader
     /// <summary>
     /// Returns the dimensions of an X/Y-image plane stored in the file header.
     /// </summary>
-    [[nodiscard]] opp::image::Size2D SizePlane() const override;
+    [[nodiscard]] mpp::image::Size2D SizePlane() const override;
     /// <summary>
     /// Returns the pixel size stored in file header converted to nm.
     /// </summary>
@@ -107,4 +107,4 @@ class PseudoFileReader : public FileReader
     /// </summary>
     [[nodiscard]] FileType GetFileType() const override;
 };
-} // namespace opp::fileIO
+} // namespace mpp::fileIO

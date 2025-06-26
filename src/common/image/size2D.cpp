@@ -5,7 +5,7 @@
 #include <istream>
 #include <ostream>
 
-namespace opp::image
+namespace mpp::image
 {
 Size2D::Size2D() noexcept : Vector2<int>(0)
 {
@@ -388,4 +388,4 @@ bool Size2D::iterator::operator<=(const Size2D::iterator &aRhs) const
 {
     return mValue.Flat <= aRhs.mValue.Flat;
 }
-} // namespace opp::image
+} // namespace mpp::image

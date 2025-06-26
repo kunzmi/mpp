@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include <backends/cuda/streamCtx.h>
 #include <common/defines.h>
@@ -11,14 +11,14 @@
 #include <common/image/size2D.h>
 #include <cuda_runtime.h>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT>
 void InvokePerspectiveBackSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aPitchDst,
                               const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
                               BorderType aBorder, const SrcT &aConstant, const Vector2<int> aAllowedReadRoiOffset,
                               const Size2D &aAllowedReadRoiSize, const Size2D &aSizeSrc, const Size2D &aSizeDst,
-                              const opp::cuda::StreamCtx &aStreamCtx);
+                              const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT>
 void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchSrc1,
@@ -28,7 +28,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                               const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
                               BorderType aBorder, const SrcT &aConstant, const Vector2<int> aAllowedReadRoiOffset,
                               const Size2D &aAllowedReadRoiSize, const Size2D &aSizeSrc, const Size2D &aSizeDst,
-                              const opp::cuda::StreamCtx &aStreamCtx);
+                              const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT>
 void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchSrc1,
@@ -40,7 +40,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                               const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
                               BorderType aBorder, const SrcT &aConstant, const Vector2<int> aAllowedReadRoiOffset,
                               const Size2D &aAllowedReadRoiSize, const Size2D &aSizeSrc, const Size2D &aSizeDst,
-                              const opp::cuda::StreamCtx &aStreamCtx);
+                              const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT>
 void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchSrc1, //
@@ -54,7 +54,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                               const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
                               BorderType aBorder, const SrcT &aConstant, const Vector2<int> aAllowedReadRoiOffset,
                               const Size2D &aAllowedReadRoiSize, const Size2D &aSizeSrc, const Size2D &aSizeDst,
-                              const opp::cuda::StreamCtx &aStreamCtx);
+                              const mpp::cuda::StreamCtx &aStreamCtx);
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

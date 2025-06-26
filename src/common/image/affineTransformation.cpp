@@ -17,7 +17,7 @@
 #include <utility>
 #include <vector>
 
-namespace opp::image
+namespace mpp::image
 {
 template <RealFloatingPoint T> constexpr size_t AffineTransformation<T>::GetIndex(int aRow, int aCol)
 {
@@ -510,4 +510,4 @@ template Vector3<double> operator*(const Vector3<double> &aLeft, const AffineTra
 template Quad<double> operator*(const AffineTransformation<double> &aLeft, const Quad<double> &aRight);
 template Quad<double> operator*(const AffineTransformation<double> &aLeft, const Roi &aRight);
 
-} // namespace opp::image
+} // namespace mpp::image

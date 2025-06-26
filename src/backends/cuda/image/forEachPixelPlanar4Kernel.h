@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/image/configurations.h>
@@ -16,7 +16,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 /// <summary>
 /// runs aFunctor on every pixel of an image. Inplace and outplace operation, no mask. Planar 4 channel destination, for
@@ -193,7 +193,7 @@ void InvokeForEachPixelPlanar4KernelDefault(Vector1<remove_vector_t<DstT>> *__re
                                             Vector1<remove_vector_t<DstT>> *__restrict__ aDst2, size_t aPitchDst2,
                                             Vector1<remove_vector_t<DstT>> *__restrict__ aDst3, size_t aPitchDst3,
                                             Vector1<remove_vector_t<DstT>> *__restrict__ aDst4, size_t aPitchDst4,
-                                            const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx,
+                                            const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx,
                                             const funcType &aFunc)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
@@ -214,5 +214,5 @@ void InvokeForEachPixelPlanar4KernelDefault(Vector1<remove_vector_t<DstT>> *__re
     }
 }
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

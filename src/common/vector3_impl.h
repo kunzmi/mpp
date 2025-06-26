@@ -4,7 +4,7 @@
 #include "needSaturationClamp.h"
 #include "numberTypes.h"
 #include "numeric_limits.h"
-#include "opp_defs.h"
+#include "mpp_defs.h"
 #include "safeCast.h"
 #include "staticCast.h"
 #include "vector_typetraits.h"
@@ -16,7 +16,7 @@
 #include <iostream>
 #include <type_traits>
 
-namespace opp
+namespace mpp
 {
 
 #pragma region Constructors
@@ -2048,4 +2048,4 @@ std::wistream &operator>>(std::wistream &aIs, Vector3<T2> &aVec)
     return aIs;
 }
 
-} // namespace opp
+} // namespace mpp

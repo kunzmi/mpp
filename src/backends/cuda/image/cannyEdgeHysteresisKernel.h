@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/image/configurations.h>
@@ -16,7 +16,7 @@
 #include <device_launch_parameters.h>
 #include <numbers>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <class DstT, typename BorderControlT>
 __device__ DstT processOnePixel(int pixelX, int pixelY, BorderControlT &aSrcWithBC,
@@ -41,7 +41,7 @@ __device__ DstT processOnePixel(int pixelX, int pixelY, BorderControlT &aSrcWith
     // get quantized direction from angle, angles from atan2-function are given in range -pi..pi
     // map this range to 0..3, where 0 = horizontal, 1 = 45deg diagonal, 2 = vertical, 3 = -45deg = 135deg diagonal
     angle.x = round((angle.x / std::numbers::pi_v<float> * 180.0f + 180.0f) / 45.0f);
-    int dir = static_cast<int>(angle.x) % 4; // the modulo maps the negative / opposite direction to the positive one
+    int dir = static_cast<int>(angle.x) % 4; // the modulo maps the negative / mpposite direction to the positive one
 
     int pixelMinus = 0;
     int pixelPlus  = 0;
@@ -145,7 +145,7 @@ void InvokeCannyEdgeHysteresisKernel(const dim3 &aBlockSize, uint aSharedMemory,
 template <typename DstT, size_t TupelSize, typename BorderControlT>
 void InvokeCannyEdgeHysteresisKernelDefault(const BorderControlT &aSrcWithBC, const Pixel32fC1 *aSrcAngle,
                                             size_t aPitchSrcAngle, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
-                                            const opp::cuda::StreamCtx &aStreamCtx)
+                                            const mpp::cuda::StreamCtx &aStreamCtx)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {
@@ -165,5 +165,5 @@ void InvokeCannyEdgeHysteresisKernelDefault(const BorderControlT &aSrcWithBC, co
     }
 }
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

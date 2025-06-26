@@ -13,8 +13,8 @@
 #include <string>
 #include <vector>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
 
 TEST_CASE("Pixel32fC3", "[Common]")
@@ -791,13 +791,13 @@ TEST_CASE("Axis3D", "[Common]")
     CHECK(pix[Axis3D::Y] == 3);
     CHECK(pix[Axis3D::Z] == 4);
 
-    CHECK_THROWS_AS(pix[static_cast<Axis3D>(5)], opp::InvalidArgumentException);
+    CHECK_THROWS_AS(pix[static_cast<Axis3D>(5)], mpp::InvalidArgumentException);
 
     try
     {
         pix[static_cast<Axis3D>(5)] = 12;
     }
-    catch (const opp::InvalidArgumentException &ex)
+    catch (const mpp::InvalidArgumentException &ex)
     {
         CHECK(ex.Message() == "Out of range: 5. Must be X, Y or Z (0, 1 or 2).");
     }

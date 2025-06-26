@@ -10,7 +10,7 @@
 #include <type_traits>
 
 // re-define std::numeric_limits min/max for datatypes that we use, as std::limits is not available on device
-namespace opp
+namespace mpp
 {
 // all types as base, return whatever makes sense...
 template <typename T> struct numeric_limits
@@ -391,4 +391,4 @@ struct numeric_limits_conversion<TFrom, Complex<TTo>> : numeric_limits_conversio
 //     }
 // };
 
-} // namespace opp
+} // namespace mpp

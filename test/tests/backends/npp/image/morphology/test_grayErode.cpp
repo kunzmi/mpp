@@ -19,11 +19,11 @@
 #include <catch2/catch_test_macros.hpp>
 #include <common/defines.h>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size     = 256;
 constexpr int size_tpl = 5;
@@ -41,7 +41,7 @@ TEST_CASE("8uC1", "[NPP.Morpholgy.GrayErode]")
     cpu::Image<Pixel8uC1> npp_res(size, size);
     nv::Image8uC1 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
-    opp::cuda::DevVar<int> mask(size_tpl * size_tpl);
+    mpp::cuda::DevVar<int> mask(size_tpl * size_tpl);
     cpu_tpl.Convert(cpu_tpl2);
     mask << cpu_tpl2.Pointer();
 
@@ -70,7 +70,7 @@ TEST_CASE("32fC1", "[NPP.Morpholgy.GrayErode]")
     cpu::Image<Pixel32fC1> npp_res(size, size);
     nv::Image32fC1 npp_src1(size, size);
     nv::Image32fC1 npp_dst(size, size);
-    opp::cuda::DevVar<float> mask(size_tpl * size_tpl);
+    mpp::cuda::DevVar<float> mask(size_tpl * size_tpl);
     cpu_tpl.Convert(cpu_tpl2);
     mask << cpu_tpl2.Pointer();
 

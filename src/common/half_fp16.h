@@ -1,5 +1,5 @@
 #pragma once
-#include "opp_defs.h"
+#include "mpp_defs.h"
 #include <common/defines.h>
 #include <common/numeric_limits.h>
 #include <concepts>
@@ -12,13 +12,13 @@
 #include <iostream>
 #endif
 
-namespace opp
+namespace mpp
 {
 /// <summary>
 /// We implement our own Half-FP16 type, as different devices use different implementations. This is meant to wrap them
 /// all together to one type: On CPU we use the half-library from Christian Rau, on Cuda devices the fp16 header from
 /// Nvidia and on AMD devices the implementation coming with ROCm. But from an external view, it is always the same
-/// opp::HalfFp16 datatype.
+/// mpp::HalfFp16 datatype.
 /// </summary>
 class alignas(2) HalfFp16
 {
@@ -417,12 +417,12 @@ class alignas(2) HalfFp16
 #endif
 
 #ifdef IS_HOST_COMPILER
-    friend std::ostream &operator<<(std::ostream &aOs, const opp::HalfFp16 &aHalf);
-    friend std::wostream &operator<<(std::wostream &aOs, const opp::HalfFp16 &aHalf);
+    friend std::ostream &operator<<(std::ostream &aOs, const mpp::HalfFp16 &aHalf);
+    friend std::wostream &operator<<(std::wostream &aOs, const mpp::HalfFp16 &aHalf);
 #endif
 };
 
-// bfloat literal: 2.4_hf is read as HalfFp16 when opp namespace is used
+// bfloat literal: 2.4_hf is read as HalfFp16 when mpp namespace is used
 inline HalfFp16 operator"" _hf(long double aValue)
 {
     return HalfFp16(static_cast<float>(aValue));
@@ -449,10 +449,10 @@ DEVICE_CODE inline bool isinf(HalfFp16 aVal) // NOLINT(performance-unnecessary-v
     return half_float::isinf(aVal.value);
 }
 
-std::ostream &operator<<(std::ostream &aOs, const opp::HalfFp16 &aHalf);
-std::wostream &operator<<(std::wostream &aOs, const opp::HalfFp16 &aHalf);
-std::istream &operator>>(std::istream &aIs, opp::HalfFp16 &aHalf);
-std::wistream &operator>>(std::wistream &aIs, opp::HalfFp16 &aHalf);
+std::ostream &operator<<(std::ostream &aOs, const mpp::HalfFp16 &aHalf);
+std::wostream &operator<<(std::wostream &aOs, const mpp::HalfFp16 &aHalf);
+std::istream &operator>>(std::istream &aIs, mpp::HalfFp16 &aHalf);
+std::wistream &operator>>(std::wistream &aIs, mpp::HalfFp16 &aHalf);
 #endif
 
 // 16 bit half precision floating point types
@@ -489,4 +489,4 @@ template <> struct numeric_limits<HalfFp16>
         return HalfFp16::FromUShort(static_cast<ushort>(0x7e00)); // NOLINT
     }
 };
-} // namespace opp
+} // namespace mpp

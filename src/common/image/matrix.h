@@ -25,7 +25,7 @@
 #include <utility>
 #include <vector>
 
-namespace opp::image
+namespace mpp::image
 {
 /// <summary>
 /// A 3x3 matrix for general computation
@@ -344,4 +344,4 @@ extern const Matrix<float> RGBtoXYZ;
 extern const Matrix<float> XYZtoRGB;
 
 template <RealFloatingPoint T> using PerspectiveTransformation = Matrix<T>;
-} // namespace opp::image
+} // namespace mpp::image

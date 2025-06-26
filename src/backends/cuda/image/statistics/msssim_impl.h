@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "msssim.h"
 #include "ssim.h"
@@ -16,7 +16,7 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/statistics/operators.h>
 #include <common/statistics/postOperators.h>
@@ -24,9 +24,9 @@
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename T> struct pixel_block_size_y
 {
@@ -51,11 +51,11 @@ void InvokeMSSSIMSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2,
                         remove_vector_t<DstT> aK1, remove_vector_t<DstT> aK2, const Size2D &aAllowedReadRoiSize1,
                         const Vector2<int> &aOffsetToActualRoi1, const Size2D &aAllowedReadRoiSize2,
                         const Vector2<int> &aOffsetToActualRoi2, const Size2D &aSize,
-                        const opp::cuda::StreamCtx &aStreamCtx)
+                        const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
+    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         if (aIteration < 0 || aIteration >= 5)
         {
@@ -76,52 +76,52 @@ void InvokeMSSSIMSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2,
 
         if (aIteration < 4)
         {
-            const opp::MSSSIM<DstT> postOp(aDynamicRange, aK2);
+            const mpp::MSSSIM<DstT> postOp(aDynamicRange, aK2);
 
             InvokeSSIMFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, pixelBlockSizeY, BCType, FilterT,
-                                          opp::MSSSIM<DstT>>(bc1, bc2, aTempBuffer, aSize.x * sizeof(DstT), postOp,
+                                          mpp::MSSSIM<DstT>>(bc1, bc2, aTempBuffer, aSize.x * sizeof(DstT), postOp,
                                                              aSize, aStreamCtx);
         }
         else
         {
-            const opp::SSIM<DstT> postOp(aDynamicRange, aK1, aK2);
+            const mpp::SSIM<DstT> postOp(aDynamicRange, aK1, aK2);
 
             InvokeSSIMFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, pixelBlockSizeY, BCType, FilterT,
-                                          opp::SSIM<DstT>>(bc1, bc2, aTempBuffer, aSize.x * sizeof(DstT), postOp, aSize,
+                                          mpp::SSIM<DstT>>(bc1, bc2, aTempBuffer, aSize.x * sizeof(DstT), postOp, aSize,
                                                            aStreamCtx);
         }
 
-        using sumSrc = SrcReductionFunctor<TupelSize, ComputeT, ComputeT, opp::Sum<ComputeT, ComputeT>>;
+        using sumSrc = SrcReductionFunctor<TupelSize, ComputeT, ComputeT, mpp::Sum<ComputeT, ComputeT>>;
 
-        const opp::Sum<ComputeT, ComputeT> op;
+        const mpp::Sum<ComputeT, ComputeT> op;
 
         const sumSrc functor(aTempBuffer, aSize.x * sizeof(DstT), op);
 
-        InvokeReductionAlongXKernelDefault<ComputeT, ComputeT, TupelSize, sumSrc, opp::Sum<ComputeT, ComputeT>,
+        InvokeReductionAlongXKernelDefault<ComputeT, ComputeT, TupelSize, sumSrc, mpp::Sum<ComputeT, ComputeT>,
                                            ReductionInitValue::Zero>(aTempBuffer, aTempBufferAvg, aSize, aStreamCtx,
                                                                      functor);
 
-        const opp::DivScalar<DstT> postOpScalar(
+        const mpp::DivScalar<DstT> postOpScalar(
             static_cast<complex_basetype_t<remove_vector_t<DstT>>>(aSize.TotalSize()));
         if (aIteration == 0)
         {
-            const opp::DivPostOp<DstT> postOpAvg(
+            const mpp::DivPostOp<DstT> postOpAvg(
                 static_cast<complex_basetype_t<remove_vector_t<DstT>>>(aSize.TotalSize()) /
                 weights[to_size_t(aIteration)]);
 
-            InvokeReductionAlongYKernelDefault<ComputeT, DstT, opp::Sum<DstT, DstT>, ReductionInitValue::Zero,
-                                               opp::DivPostOp<DstT>, opp::DivScalar<DstT>>(
+            InvokeReductionAlongYKernelDefault<ComputeT, DstT, mpp::Sum<DstT, DstT>, ReductionInitValue::Zero,
+                                               mpp::DivPostOp<DstT>, mpp::DivScalar<DstT>>(
                 aTempBufferAvg, aDst + aIteration, nullptr, aSize.y, postOpAvg, postOpScalar, aStreamCtx);
         }
         else
         {
-            const opp::DivAddToPostOp<DstT> postOpAvg(
+            const mpp::DivAddToPostOp<DstT> postOpAvg(
                 static_cast<complex_basetype_t<remove_vector_t<DstT>>>(aSize.TotalSize()) /
                     weights[to_size_t(aIteration)],
                 aDst);
 
-            InvokeReductionAlongYKernelDefault<ComputeT, DstT, opp::Sum<DstT, DstT>, ReductionInitValue::Zero,
-                                               opp::DivAddToPostOp<DstT>, opp::DivScalar<DstT>>(
+            InvokeReductionAlongYKernelDefault<ComputeT, DstT, mpp::Sum<DstT, DstT>, ReductionInitValue::Zero,
+                                               mpp::DivAddToPostOp<DstT>, mpp::DivScalar<DstT>>(
                 aTempBufferAvg, aDst, nullptr, aSize.y, postOpAvg, postOpScalar, aStreamCtx);
         }
     }
@@ -153,5 +153,5 @@ void InvokeMSSSIMSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2,
     Instantiate_For(Pixel##typeIn##C4A);
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

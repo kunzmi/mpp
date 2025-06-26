@@ -6,7 +6,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-namespace opp
+namespace mpp
 {
 namespace cuda
 {
@@ -186,4 +186,4 @@ void runtest_half_fp16_kernel(HalfFp16 *aDataOut, bool *aBoolOut)
     test_half_fp16_kernel<<<1, 1>>>(aDataOut, aBoolOut);
 }
 } // namespace cuda
-} // namespace opp
+} // namespace mpp

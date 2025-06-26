@@ -1,10 +1,10 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "../copy_impl.h"
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 
 ForAllChannelsWithAlphaInvokeCopy(16s);
@@ -18,5 +18,5 @@ ForAllChannelsNoAlphaInvokeCopy2Planar(16s);
 ForAllChannelsNoAlphaInvokeCopy3Planar(16s);
 ForAllChannelsNoAlphaInvokeCopy4Planar(16s);
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

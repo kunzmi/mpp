@@ -1,5 +1,5 @@
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_CORE
+#if MPP_ENABLE_CUDA_CORE
 
 #include "cudaException.h"
 #include "event.h"
@@ -8,7 +8,7 @@
 #include <cuda_runtime_api.h>
 #include <driver_types.h>
 
-namespace opp::cuda
+namespace mpp::cuda
 {
 Stream::Stream() : mIsOwner(true)
 {
@@ -118,5 +118,5 @@ const Stream Stream::Legacy(cudaStreamLegacy); // NOLINT(cppcoreguidelines-pro-t
 const Stream Stream::PerThread(cudaStreamPerThread); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, cert-err58-cpp)
 
 #include <common/disableWarningsEnd.h>
-} // namespace opp::cuda
-#endif // OPP_ENABLE_CUDA_CORE
+} // namespace mpp::cuda
+#endif // MPP_ENABLE_CUDA_CORE

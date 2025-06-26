@@ -3,10 +3,10 @@
 #include <cstdint>
 #include <type_traits>
 
-// definitions of types, concepts and macros etc. that are used through out in the OPP library. Basically all files
+// definitions of types, concepts and macros etc. that are used through out in the MPP library. Basically all files
 // include this header, so it should't be changed too often...
 
-namespace opp
+namespace mpp
 {
 using byte    = std::uint8_t;
 using sbyte   = std::int8_t;
@@ -189,4 +189,4 @@ template <typename T> struct AlwaysTrue : std::true_type
 {
 };
 
-} // namespace opp
+} // namespace mpp

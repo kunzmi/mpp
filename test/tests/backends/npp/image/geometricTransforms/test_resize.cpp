@@ -19,11 +19,11 @@
 #include <common/image/bound.h>
 #include <common/image/quad.h>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size = 256;
 
@@ -174,7 +174,7 @@ TEST_CASE("8uC3 - downscale", "[NPP.GeometricTransforms.Resize]")
     cpu_dst.NormDiffInf(npp_res, maxErr, maxErrChannel);
     cpu_dst.NormDiffL1(npp_res, summedErr, summedErrChannel);
 
-    /*cpu_dst.Save(root / "scaleOPP.tif");
+    /*cpu_dst.Save(root / "scaleMPP.tif");
     npp_res.Save(root / "scaleNPP.tif");*/
 
     CHECK(maxErr == 1);

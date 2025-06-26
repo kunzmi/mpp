@@ -32,11 +32,11 @@
 #include <numbers>
 #include <vector>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size = 256;
 
@@ -57,7 +57,7 @@ TEST_CASE("8uC1", "[NPP.Filtering.CannyEdge]")
     cpu::Image<Pixel8uC1> npp_res(size, size);
     nv::Image8uC1 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
-    opp::cuda::DevVar<byte> buffer(npp_src1.FilterCannyBorderGetBufferSize());
+    mpp::cuda::DevVar<byte> buffer(npp_src1.FilterCannyBorderGetBufferSize());
 
     cpu_src1.FillRandom(seed);
 

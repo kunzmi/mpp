@@ -23,11 +23,11 @@
 #include <numbers>
 #include <vector>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size = 256;
 
@@ -84,7 +84,7 @@ TEST_CASE("8uC3", "[NPP.Filtering.BilateralGaussFilter]")
     npp_res << npp_dst;
 
     cpu_src1.PrecomputeBilateralGaussFilter(posFilter.data(), 9, sigmaPos.x);
-    cpu_src1.BilateralGaussFilter(cpu_dst, 9, posFilter.data(), sigmaVal.x, opp::Norm::L2, BorderType::Replicate);
+    cpu_src1.BilateralGaussFilter(cpu_dst, 9, posFilter.data(), sigmaVal.x, mpp::Norm::L2, BorderType::Replicate);
 
     // It seems that NPP filters every channel independently...
     Pixel64fC3 maxError;

@@ -11,11 +11,11 @@
 #include <numeric>
 #include <vector>
 
-using namespace opp;
-using namespace opp::cuda;
+using namespace mpp;
+using namespace mpp::cuda;
 using namespace Catch;
 
-namespace opp::cuda
+namespace mpp::cuda
 {
 void runtest_bfloat16_kernel(BFloat16 *aDataOut, bool *aBoolOut);
 }

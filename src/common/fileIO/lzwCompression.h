@@ -2,7 +2,7 @@
 #include <common/defines.h>
 #include <vector>
 
-namespace opp::fileIO
+namespace mpp::fileIO
 {
 // code is taken to large extent from libTiff and its lzw extension (tif_lzw.c)
 
@@ -68,4 +68,4 @@ class BitReader
     uint mNextdata{};
     uint mNextbits{};
 };
-} // namespace opp::fileIO
+} // namespace mpp::fileIO

@@ -47,7 +47,7 @@
 #include <common/image/sizePitched.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/utilities.h>
 #include <common/vector1.h>
@@ -58,7 +58,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace opp::image::cpuSimple
+namespace mpp::image::cpuSimple
 {
 #pragma region Convert
 template <PixelType T>
@@ -88,35 +88,35 @@ ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundi
 
     switch (aRoundingMode)
     {
-        case opp::RoundingMode::NearestTiesToEven:
+        case mpp::RoundingMode::NearestTiesToEven:
         {
             using convert = ConvertFunctor<1, T, TTo, RoundingMode::NearestTiesToEven>;
             const convert functor(PointerRoi(), Pitch());
             forEachPixel(aDst, functor);
         }
         break;
-        case opp::RoundingMode::NearestTiesAwayFromZero:
+        case mpp::RoundingMode::NearestTiesAwayFromZero:
         {
             using convert = ConvertFunctor<1, T, TTo, RoundingMode::NearestTiesAwayFromZero>;
             const convert functor(PointerRoi(), Pitch());
             forEachPixel(aDst, functor);
         }
         break;
-        case opp::RoundingMode::TowardZero:
+        case mpp::RoundingMode::TowardZero:
         {
             using convert = ConvertFunctor<1, T, TTo, RoundingMode::TowardZero>;
             const convert functor(PointerRoi(), Pitch());
             forEachPixel(aDst, functor);
         }
         break;
-        case opp::RoundingMode::TowardNegativeInfinity:
+        case mpp::RoundingMode::TowardNegativeInfinity:
         {
             using convert = ConvertFunctor<1, T, TTo, RoundingMode::TowardNegativeInfinity>;
             const convert functor(PointerRoi(), Pitch());
             forEachPixel(aDst, functor);
         }
         break;
-        case opp::RoundingMode::TowardPositiveInfinity:
+        case mpp::RoundingMode::TowardPositiveInfinity:
         {
             using convert = ConvertFunctor<1, T, TTo, RoundingMode::TowardPositiveInfinity>;
             const convert functor(PointerRoi(), Pitch());
@@ -142,35 +142,35 @@ ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundi
 
     switch (aRoundingMode)
     {
-        case opp::RoundingMode::NearestTiesToEven:
+        case mpp::RoundingMode::NearestTiesToEven:
         {
             using convert = ConvertScaleFunctor<1, T, TTo, RoundingMode::NearestTiesToEven>;
             const convert functor(PointerRoi(), Pitch(), scaleFactorFloat);
             forEachPixel(aDst, functor);
         }
         break;
-        case opp::RoundingMode::NearestTiesAwayFromZero:
+        case mpp::RoundingMode::NearestTiesAwayFromZero:
         {
             using convert = ConvertScaleFunctor<1, T, TTo, RoundingMode::NearestTiesAwayFromZero>;
             const convert functor(PointerRoi(), Pitch(), scaleFactorFloat);
             forEachPixel(aDst, functor);
         }
         break;
-        case opp::RoundingMode::TowardZero:
+        case mpp::RoundingMode::TowardZero:
         {
             using convert = ConvertScaleFunctor<1, T, TTo, RoundingMode::TowardZero>;
             const convert functor(PointerRoi(), Pitch(), scaleFactorFloat);
             forEachPixel(aDst, functor);
         }
         break;
-        case opp::RoundingMode::TowardNegativeInfinity:
+        case mpp::RoundingMode::TowardNegativeInfinity:
         {
             using convert = ConvertScaleFunctor<1, T, TTo, RoundingMode::TowardNegativeInfinity>;
             const convert functor(PointerRoi(), Pitch(), scaleFactorFloat);
             forEachPixel(aDst, functor);
         }
         break;
-        case opp::RoundingMode::TowardPositiveInfinity:
+        case mpp::RoundingMode::TowardPositiveInfinity:
         {
             using convert = ConvertScaleFunctor<1, T, TTo, RoundingMode::TowardPositiveInfinity>;
             const convert functor(PointerRoi(), Pitch(), scaleFactorFloat);
@@ -193,9 +193,9 @@ template <PixelType T> ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst) cons
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    using copySrc = SrcFunctor<1, T, T, T, opp::Copy<T, T>, RoundingMode::None>;
+    using copySrc = SrcFunctor<1, T, T, T, mpp::Copy<T, T>, RoundingMode::None>;
 
-    const opp::Copy<T, T> op;
+    const mpp::Copy<T, T> op;
 
     const copySrc functor(PointerRoi(), Pitch(), op);
     forEachPixel(aDst, functor);
@@ -212,9 +212,9 @@ ImageView<T> &ImageView<T>::CopyMasked(ImageView<T> &aDst, const ImageView<Pixel
     checkSameSize(ROI(), aDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    using copySrc = SrcFunctor<1, T, T, T, opp::Copy<T, T>, RoundingMode::None>;
+    using copySrc = SrcFunctor<1, T, T, T, mpp::Copy<T, T>, RoundingMode::None>;
 
-    const opp::Copy<T, T> op;
+    const mpp::Copy<T, T> op;
 
     const copySrc functor(PointerRoi(), Pitch(), op);
     forEachPixel(aMask, aDst, functor);
@@ -236,9 +236,9 @@ ImageView<TTo> &ImageView<T>::Copy(Channel aSrcChannel, ImageView<TTo> &aDst, Ch
 
     using ComputeT = Vector1<remove_vector_t<T>>;
     using copySrc =
-        SrcSingleChannelFunctor<1, T, ComputeT, ComputeT, opp::Copy<ComputeT, ComputeT>, RoundingMode::None>;
+        SrcSingleChannelFunctor<1, T, ComputeT, ComputeT, mpp::Copy<ComputeT, ComputeT>, RoundingMode::None>;
 
-    const opp::Copy<ComputeT, ComputeT> op;
+    const mpp::Copy<ComputeT, ComputeT> op;
 
     const copySrc functor(PointerRoi(), Pitch(), aSrcChannel, op);
     forEachPixelSingleChannel(aDst, aDstChannel, functor);
@@ -258,9 +258,9 @@ ImageView<TTo> &ImageView<T>::Copy(ImageView<TTo> &aDst, Channel aDstChannel) co
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    using copySrc = SrcFunctor<1, T, T, T, opp::Copy<T, T>, RoundingMode::None>;
+    using copySrc = SrcFunctor<1, T, T, T, mpp::Copy<T, T>, RoundingMode::None>;
 
-    const opp::Copy<T, T> op;
+    const mpp::Copy<T, T> op;
 
     const copySrc functor(PointerRoi(), Pitch(), op);
     forEachPixelSingleChannel(aDst, aDstChannel, functor);
@@ -282,9 +282,9 @@ ImageView<TTo> &ImageView<T>::Copy(Channel aSrcChannel, ImageView<TTo> &aDst) co
 
     using ComputeT = Vector1<remove_vector_t<T>>;
     using copySrc =
-        SrcSingleChannelFunctor<1, T, ComputeT, ComputeT, opp::Copy<ComputeT, ComputeT>, RoundingMode::None>;
+        SrcSingleChannelFunctor<1, T, ComputeT, ComputeT, mpp::Copy<ComputeT, ComputeT>, RoundingMode::None>;
 
-    const opp::Copy<ComputeT, ComputeT> op;
+    const mpp::Copy<ComputeT, ComputeT> op;
 
     const copySrc functor(PointerRoi(), Pitch(), aSrcChannel, op);
     forEachPixel(aDst, functor);
@@ -303,9 +303,9 @@ void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
     checkSameSize(ROI(), aDstChannel1.ROI());
     checkSameSize(ROI(), aDstChannel2.ROI());
 
-    using copySrc = SrcFunctor<1, T, T, T, opp::Copy<T, T>, RoundingMode::None>;
+    using copySrc = SrcFunctor<1, T, T, T, mpp::Copy<T, T>, RoundingMode::None>;
 
-    const opp::Copy<T, T> op;
+    const mpp::Copy<T, T> op;
 
     const copySrc functor(PointerRoi(), Pitch(), op);
 
@@ -325,9 +325,9 @@ void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
     checkSameSize(ROI(), aDstChannel2.ROI());
     checkSameSize(ROI(), aDstChannel3.ROI());
 
-    using copySrc = SrcFunctor<1, T, T, T, opp::Copy<T, T>, RoundingMode::None>;
+    using copySrc = SrcFunctor<1, T, T, T, mpp::Copy<T, T>, RoundingMode::None>;
 
-    const opp::Copy<T, T> op;
+    const mpp::Copy<T, T> op;
 
     const copySrc functor(PointerRoi(), Pitch(), op);
 
@@ -349,9 +349,9 @@ void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
     checkSameSize(ROI(), aDstChannel3.ROI());
     checkSameSize(ROI(), aDstChannel4.ROI());
 
-    using copySrc = SrcFunctor<1, T, T, T, opp::Copy<T, T>, RoundingMode::None>;
+    using copySrc = SrcFunctor<1, T, T, T, mpp::Copy<T, T>, RoundingMode::None>;
 
-    const opp::Copy<T, T> op;
+    const mpp::Copy<T, T> op;
 
     const copySrc functor(PointerRoi(), Pitch(), op);
 
@@ -369,9 +369,9 @@ ImageView<T> &ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aSrcCha
     checkSameSize(aSrcChannel1.ROI(), aDst.ROI());
     checkSameSize(aSrcChannel2.ROI(), aDst.ROI());
 
-    using copySrc = SrcPlanar2Functor<1, T, T, T, opp::Copy<T, T>, RoundingMode::None>;
+    using copySrc = SrcPlanar2Functor<1, T, T, T, mpp::Copy<T, T>, RoundingMode::None>;
 
-    const opp::Copy<T, T> op;
+    const mpp::Copy<T, T> op;
 
     const copySrc functor(aSrcChannel1.PointerRoi(), aSrcChannel1.Pitch(), aSrcChannel2.PointerRoi(),
                           aSrcChannel2.Pitch(), op);
@@ -394,9 +394,9 @@ ImageView<T> &ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aSrcCha
     checkSameSize(aSrcChannel2.ROI(), aDst.ROI());
     checkSameSize(aSrcChannel3.ROI(), aDst.ROI());
 
-    using copySrc = SrcPlanar3Functor<1, T, T, T, opp::Copy<T, T>, RoundingMode::None>;
+    using copySrc = SrcPlanar3Functor<1, T, T, T, mpp::Copy<T, T>, RoundingMode::None>;
 
-    const opp::Copy<T, T> op;
+    const mpp::Copy<T, T> op;
 
     const copySrc functor(aSrcChannel1.PointerRoi(), aSrcChannel1.Pitch(), aSrcChannel2.PointerRoi(),
                           aSrcChannel2.Pitch(), aSrcChannel3.PointerRoi(), aSrcChannel3.Pitch(), op);
@@ -421,9 +421,9 @@ ImageView<T> &ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aSrcCha
     checkSameSize(aSrcChannel3.ROI(), aDst.ROI());
     checkSameSize(aSrcChannel4.ROI(), aDst.ROI());
 
-    using copySrc = SrcPlanar4Functor<1, T, T, T, opp::Copy<T, T>, RoundingMode::None>;
+    using copySrc = SrcPlanar4Functor<1, T, T, T, mpp::Copy<T, T>, RoundingMode::None>;
 
-    const opp::Copy<T, T> op;
+    const mpp::Copy<T, T> op;
 
     const copySrc functor(aSrcChannel1.PointerRoi(), aSrcChannel1.Pitch(), aSrcChannel2.PointerRoi(),
                           aSrcChannel2.Pitch(), aSrcChannel3.PointerRoi(), aSrcChannel3.Pitch(),
@@ -444,8 +444,8 @@ ImageView<TTo> &ImageView<T>::Dup(ImageView<TTo> &aDst) const
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    using dupSrc = SrcFunctor<1, T, T, TTo, opp::Dup<T, TTo>, RoundingMode::None>;
-    const opp::Dup<T, TTo> op;
+    using dupSrc = SrcFunctor<1, T, T, TTo, mpp::Dup<T, TTo>, RoundingMode::None>;
+    const mpp::Dup<T, TTo> op;
     const dupSrc functor(PointerRoi(), Pitch(), op);
     forEachPixel(aDst, functor);
 
@@ -609,9 +609,9 @@ ImageView<TTo> &ImageView<T>::SwapChannel(ImageView<TTo> &aDst,
         }
     }
 
-    using swapChannelSrc = SrcFunctor<1, T, T, TTo, opp::SwapChannel<T, TTo>, RoundingMode::None>;
+    using swapChannelSrc = SrcFunctor<1, T, T, TTo, mpp::SwapChannel<T, TTo>, RoundingMode::None>;
 
-    const opp::SwapChannel<T, TTo> op(aDstChannels);
+    const mpp::SwapChannel<T, TTo> op(aDstChannels);
 
     const swapChannelSrc functor(PointerRoi(), Pitch(), op);
 
@@ -635,9 +635,9 @@ ImageView<T> &ImageView<T>::SwapChannel(const ChannelList<vector_active_size_v<T
         }
     }
 
-    using swapChannelInplace = InplaceFunctor<1, T, T, opp::SwapChannel<T, T>, RoundingMode::None>;
+    using swapChannelInplace = InplaceFunctor<1, T, T, mpp::SwapChannel<T, T>, RoundingMode::None>;
 
-    const opp::SwapChannel<T, T> op(aDstChannels);
+    const mpp::SwapChannel<T, T> op(aDstChannels);
 
     const swapChannelInplace functor(op);
 
@@ -658,9 +658,9 @@ ImageView<TTo> &ImageView<T>::SwapChannel(ImageView<TTo> &aDst,
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    using swapChannelSrcDstAsSrc = SrcDstAsSrcFunctor<1, T, TTo, opp::SwapChannel<T, TTo>>;
+    using swapChannelSrcDstAsSrc = SrcDstAsSrcFunctor<1, T, TTo, mpp::SwapChannel<T, TTo>>;
 
-    const opp::SwapChannel<T, TTo> op(aDstChannels, aValue);
+    const mpp::SwapChannel<T, TTo> op(aDstChannels, aValue);
 
     const swapChannelSrcDstAsSrc functor(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), op);
 
@@ -719,9 +719,9 @@ ImageView<T> &ImageView<T>::Transpose(ImageView<T> &aDst) const
 #pragma region FillRandom
 template <PixelType T> ImageView<T> &ImageView<T>::FillRandom()
 {
-    using randomInplace = InplaceFunctor<1, T, T, opp::FillRandom<T>, RoundingMode::None>;
+    using randomInplace = InplaceFunctor<1, T, T, mpp::FillRandom<T>, RoundingMode::None>;
 
-    const opp::FillRandom<T> op;
+    const mpp::FillRandom<T> op;
     const randomInplace functor(op);
 
     forEachPixel(*this, functor);
@@ -730,9 +730,9 @@ template <PixelType T> ImageView<T> &ImageView<T>::FillRandom()
 
 template <PixelType T> ImageView<T> &ImageView<T>::FillRandom(uint aSeed)
 {
-    using randomInplace = InplaceFunctor<1, T, T, opp::FillRandom<T>, RoundingMode::None>;
+    using randomInplace = InplaceFunctor<1, T, T, mpp::FillRandom<T>, RoundingMode::None>;
 
-    const opp::FillRandom<T> op(aSeed);
+    const mpp::FillRandom<T> op(aSeed);
     const randomInplace functor(op);
 
     forEachPixel(*this, functor);
@@ -741,9 +741,9 @@ template <PixelType T> ImageView<T> &ImageView<T>::FillRandom(uint aSeed)
 
 template <PixelType T> ImageView<T> &ImageView<T>::FillRandomNormal(uint aSeed, double aMean, double aStd)
 {
-    using randomInplace = InplaceFunctor<1, T, T, opp::FillRandomNormal<T>, RoundingMode::None>;
+    using randomInplace = InplaceFunctor<1, T, T, mpp::FillRandomNormal<T>, RoundingMode::None>;
 
-    const opp::FillRandomNormal<T> op(aSeed, aMean, aStd);
+    const mpp::FillRandomNormal<T> op(aSeed, aMean, aStd);
     const randomInplace functor(op);
 
     forEachPixel(*this, functor);
@@ -751,4 +751,4 @@ template <PixelType T> ImageView<T> &ImageView<T>::FillRandomNormal(uint aSeed, 
 }
 #pragma endregion
 
-} // namespace opp::image::cpuSimple
+} // namespace mpp::image::cpuSimple

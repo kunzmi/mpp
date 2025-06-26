@@ -8,7 +8,7 @@
 #ifndef IS_HOST_COMPILER
 #endif // !IS_HOST_COMPILER
 
-namespace opp
+namespace mpp
 {
 namespace cuda
 {
@@ -188,4 +188,4 @@ void runtest_bfloat16_kernel(BFloat16 *aDataOut, bool *aBoolOut)
     test_bfloat16_kernel<<<1, 1>>>(aDataOut, aBoolOut);
 }
 } // namespace cuda
-} // namespace opp
+} // namespace mpp

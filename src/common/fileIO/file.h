@@ -5,7 +5,7 @@
 #include <execution>
 #include <filesystem>
 
-namespace opp::fileIO
+namespace mpp::fileIO
 {
 
 /// <summary>
@@ -128,4 +128,4 @@ class File
 
     static void ClearContent(const std::filesystem::path &aFileName);
 };
-} // namespace opp::fileIO
+} // namespace mpp::fileIO

@@ -28,11 +28,11 @@
 #include <catch2/catch_test_macros.hpp>
 #include <common/defines.h>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size = 256;
 
@@ -52,9 +52,9 @@ TEST_CASE("8uC1", "[NPP.Statistics.HistogramEven]")
 
     constexpr int histSize = 16;
     constexpr int nLevels  = histSize + 1;
-    opp::cuda::DevVar<int> npp_dst(histSize);
-    opp::cuda::DevVar<int> npp_levels(nLevels);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.HistogramRangeGetBufferSize(nLevels, nppCtx));
+    mpp::cuda::DevVar<int> npp_dst(histSize);
+    mpp::cuda::DevVar<int> npp_levels(nLevels);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.HistogramRangeGetBufferSize(nLevels, nppCtx));
 
     std::vector<int> cpu_levels = npp_src1.EvenLevels(nLevels, 0, 256);
     std::vector<int> cpu_dst(histSize);

@@ -4,20 +4,20 @@
 #include <cstddef>
 #include <iostream>
 
-namespace opp
+namespace mpp
 {
 std::ostream &operator<<(std::ostream &aOs, const TestResult &aResult)
 {
     aOs << aResult.Name << ";";
-    aOs << aResult.TotalOPP << ";";
+    aOs << aResult.TotalMPP << ";";
     aOs << aResult.TotalNPP << ";";
-    aOs << aResult.MeanOPP << ";";
+    aOs << aResult.MeanMPP << ";";
     aOs << aResult.MeanNPP << ";";
-    aOs << aResult.StdOPP << ";";
+    aOs << aResult.StdMPP << ";";
     aOs << aResult.StdNPP << ";";
-    aOs << aResult.MinOPP << ";";
+    aOs << aResult.MinMPP << ";";
     aOs << aResult.MinNPP << ";";
-    aOs << aResult.MaxOPP << ";";
+    aOs << aResult.MaxMPP << ";";
     aOs << aResult.MaxNPP << ";";
     aOs << aResult.AbsoluteDifferenceMSec << ";";
     aOs << aResult.RelativeDifference << std::endl;
@@ -59,4 +59,4 @@ Runtime TestBase::GetRuntime()
 {
     return {runtimes, totalRuntime};
 }
-} // namespace opp
+} // namespace mpp

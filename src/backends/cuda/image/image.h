@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "imageView.h"
 #include <backends/cuda/cudaException.h>
@@ -16,7 +16,7 @@
 #include <cuda_runtime_api.h>
 #include <vector>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 
 template <PixelType T> class Image : public ImageView<T>
@@ -85,5 +85,5 @@ template <PixelType T> class Image : public ImageView<T>
         return *this;
     }
 };
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

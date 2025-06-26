@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "imageView.h"
 #include "morphology/morphologyComputeT.h"
@@ -25,18 +25,18 @@
 #include <common/image/size2D.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/utilities.h>
 #include <common/vector_typetraits.h>
 #include <concepts>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 
 #pragma region No mask Erosion/Dilation
 template <PixelType T>
 ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
-                                     const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx) const
+                                     const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     if (aBorder == BorderType::Constant)
@@ -49,7 +49,7 @@ ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const FilterArea &aFilt
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
-                                     const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx) const
+                                     const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -74,7 +74,7 @@ ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const FilterArea &aFilt
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
-                                    const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx) const
+                                    const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     if (aBorder == BorderType::Constant)
@@ -87,7 +87,7 @@ ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const FilterArea &aFilte
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
-                                    const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx) const
+                                    const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -113,7 +113,7 @@ ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const FilterArea &aFilte
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
-                                     const opp::cuda::StreamCtx &aStreamCtx) const
+                                     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->Dilation(aDst, aFilterArea, aBorder, ROI(), aStreamCtx);
@@ -121,7 +121,7 @@ ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const FilterArea &aFilt
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
-                                     const opp::cuda::StreamCtx &aStreamCtx) const
+                                     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->Dilation(aDst, aFilterArea, aConstant, aBorder, ROI(), aStreamCtx);
@@ -129,7 +129,7 @@ ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const FilterArea &aFilt
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
-                                    const opp::cuda::StreamCtx &aStreamCtx) const
+                                    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->Erosion(aDst, aFilterArea, aBorder, ROI(), aStreamCtx);
@@ -137,7 +137,7 @@ ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const FilterArea &aFilte
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
-                                    const opp::cuda::StreamCtx &aStreamCtx) const
+                                    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->Erosion(aDst, aFilterArea, aConstant, aBorder, ROI(), aStreamCtx);
@@ -147,9 +147,9 @@ ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const FilterArea &aFilte
 #pragma region Erosion
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                                     const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi,
-                                    const opp::cuda::StreamCtx &aStreamCtx) const
+                                    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     if (aBorder == BorderType::Constant)
@@ -161,9 +161,9 @@ ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const opp::cuda::DevVarV
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                                     const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
-                                    const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx) const
+                                    const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -206,9 +206,9 @@ ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const opp::cuda::DevVarV
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::ErosionGray(ImageView<T> &aDst,
-                                        const opp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
+                                        const mpp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
                                         const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi,
-                                        const opp::cuda::StreamCtx &aStreamCtx) const
+                                        const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     if (aBorder == BorderType::Constant)
@@ -221,9 +221,9 @@ ImageView<T> &ImageView<T>::ErosionGray(ImageView<T> &aDst,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::ErosionGray(ImageView<T> &aDst,
-                                        const opp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
+                                        const mpp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
                                         const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
-                                        const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx) const
+                                        const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -265,18 +265,18 @@ ImageView<T> &ImageView<T>::ErosionGray(ImageView<T> &aDst,
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                                     const FilterArea &aFilterArea, BorderType aBorder,
-                                    const opp::cuda::StreamCtx &aStreamCtx) const
+                                    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->Erosion(aDst, aMask, aFilterArea, aBorder, ROI(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                                     const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
-                                    const opp::cuda::StreamCtx &aStreamCtx) const
+                                    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->Erosion(aDst, aMask, aFilterArea, aConstant, aBorder, ROI(), aStreamCtx);
@@ -284,9 +284,9 @@ ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const opp::cuda::DevVarV
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::ErosionGray(ImageView<T> &aDst,
-                                        const opp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
+                                        const mpp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
                                         const FilterArea &aFilterArea, BorderType aBorder,
-                                        const opp::cuda::StreamCtx &aStreamCtx) const
+                                        const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->ErosionGray(aDst, aMask, aFilterArea, aBorder, ROI(), aStreamCtx);
@@ -294,9 +294,9 @@ ImageView<T> &ImageView<T>::ErosionGray(ImageView<T> &aDst,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::ErosionGray(ImageView<T> &aDst,
-                                        const opp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
+                                        const mpp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
                                         const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
-                                        const opp::cuda::StreamCtx &aStreamCtx) const
+                                        const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->ErosionGray(aDst, aMask, aFilterArea, aConstant, aBorder, ROI(), aStreamCtx);
@@ -306,9 +306,9 @@ ImageView<T> &ImageView<T>::ErosionGray(ImageView<T> &aDst,
 #pragma region Dilation
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                                      const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi,
-                                     const opp::cuda::StreamCtx &aStreamCtx) const
+                                     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     if (aBorder == BorderType::Constant)
@@ -320,9 +320,9 @@ ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const opp::cuda::DevVar
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                                      const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
-                                     const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx) const
+                                     const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -365,9 +365,9 @@ ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const opp::cuda::DevVar
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::DilationGray(ImageView<T> &aDst,
-                                         const opp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
+                                         const mpp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
                                          const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi,
-                                         const opp::cuda::StreamCtx &aStreamCtx) const
+                                         const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     if (aBorder == BorderType::Constant)
@@ -380,9 +380,9 @@ ImageView<T> &ImageView<T>::DilationGray(ImageView<T> &aDst,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::DilationGray(ImageView<T> &aDst,
-                                         const opp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
+                                         const mpp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
                                          const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
-                                         const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx) const
+                                         const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -424,18 +424,18 @@ ImageView<T> &ImageView<T>::DilationGray(ImageView<T> &aDst,
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                                      const FilterArea &aFilterArea, BorderType aBorder,
-                                     const opp::cuda::StreamCtx &aStreamCtx) const
+                                     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->Dilation(aDst, aMask, aFilterArea, aBorder, ROI(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                                      const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
-                                     const opp::cuda::StreamCtx &aStreamCtx) const
+                                     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->Dilation(aDst, aMask, aFilterArea, aConstant, aBorder, ROI(), aStreamCtx);
@@ -443,9 +443,9 @@ ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const opp::cuda::DevVar
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::DilationGray(ImageView<T> &aDst,
-                                         const opp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
+                                         const mpp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
                                          const FilterArea &aFilterArea, BorderType aBorder,
-                                         const opp::cuda::StreamCtx &aStreamCtx) const
+                                         const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->DilationGray(aDst, aMask, aFilterArea, aBorder, ROI(), aStreamCtx);
@@ -453,9 +453,9 @@ ImageView<T> &ImageView<T>::DilationGray(ImageView<T> &aDst,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::DilationGray(ImageView<T> &aDst,
-                                         const opp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
+                                         const mpp::cuda::DevVarView<morph_gray_compute_type_t<T>> &aMask,
                                          const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
-                                         const opp::cuda::StreamCtx &aStreamCtx) const
+                                         const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->DilationGray(aDst, aMask, aFilterArea, aConstant, aBorder, ROI(), aStreamCtx);
@@ -465,9 +465,9 @@ ImageView<T> &ImageView<T>::DilationGray(ImageView<T> &aDst,
 #pragma region Open
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Open(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+ImageView<T> &ImageView<T>::Open(ImageView<T> &aTemp, ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                                  const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi,
-                                 const opp::cuda::StreamCtx &aStreamCtx) const
+                                 const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     if (aBorder == BorderType::Constant)
@@ -479,9 +479,9 @@ ImageView<T> &ImageView<T>::Open(ImageView<T> &aTemp, ImageView<T> &aDst, const 
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Open(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+ImageView<T> &ImageView<T>::Open(ImageView<T> &aTemp, ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                                  const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
-                                 const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx) const
+                                 const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -539,18 +539,18 @@ ImageView<T> &ImageView<T>::Open(ImageView<T> &aTemp, ImageView<T> &aDst, const 
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Open(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+ImageView<T> &ImageView<T>::Open(ImageView<T> &aTemp, ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                                  const FilterArea &aFilterArea, BorderType aBorder,
-                                 const opp::cuda::StreamCtx &aStreamCtx) const
+                                 const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->Open(aTemp, aDst, aMask, aFilterArea, aBorder, ROI(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Open(ImageView<T> &aTemp, ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+ImageView<T> &ImageView<T>::Open(ImageView<T> &aTemp, ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                                  const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
-                                 const opp::cuda::StreamCtx &aStreamCtx) const
+                                 const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->Open(aTemp, aDst, aMask, aFilterArea, aConstant, aBorder, ROI(), aStreamCtx);
@@ -560,9 +560,9 @@ ImageView<T> &ImageView<T>::Open(ImageView<T> &aTemp, ImageView<T> &aDst, const 
 #pragma region Close
 template <PixelType T>
 ImageView<T> &ImageView<T>::Close(ImageView<T> &aTemp, ImageView<T> &aDst,
-                                  const opp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
+                                  const mpp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
                                   BorderType aBorder, const Roi &aAllowedReadRoi,
-                                  const opp::cuda::StreamCtx &aStreamCtx) const
+                                  const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     if (aBorder == BorderType::Constant)
@@ -575,9 +575,9 @@ ImageView<T> &ImageView<T>::Close(ImageView<T> &aTemp, ImageView<T> &aDst,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Close(ImageView<T> &aTemp, ImageView<T> &aDst,
-                                  const opp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
+                                  const mpp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
                                   T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
-                                  const opp::cuda::StreamCtx &aStreamCtx) const
+                                  const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -636,8 +636,8 @@ ImageView<T> &ImageView<T>::Close(ImageView<T> &aTemp, ImageView<T> &aDst,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Close(ImageView<T> &aTemp, ImageView<T> &aDst,
-                                  const opp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
-                                  BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx) const
+                                  const mpp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
+                                  BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->Close(aTemp, aDst, aMask, aFilterArea, aBorder, ROI(), aStreamCtx);
@@ -645,8 +645,8 @@ ImageView<T> &ImageView<T>::Close(ImageView<T> &aTemp, ImageView<T> &aDst,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Close(ImageView<T> &aTemp, ImageView<T> &aDst,
-                                  const opp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
-                                  T aConstant, BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx) const
+                                  const mpp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
+                                  T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->Close(aTemp, aDst, aMask, aFilterArea, aConstant, aBorder, ROI(), aStreamCtx);
@@ -656,9 +656,9 @@ ImageView<T> &ImageView<T>::Close(ImageView<T> &aTemp, ImageView<T> &aDst,
 #pragma region TopHat
 template <PixelType T>
 ImageView<T> &ImageView<T>::TopHat(ImageView<T> &aTemp, ImageView<T> &aDst,
-                                   const opp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
+                                   const mpp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
                                    BorderType aBorder, const Roi &aAllowedReadRoi,
-                                   const opp::cuda::StreamCtx &aStreamCtx) const
+                                   const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     if (aBorder == BorderType::Constant)
@@ -671,9 +671,9 @@ ImageView<T> &ImageView<T>::TopHat(ImageView<T> &aTemp, ImageView<T> &aDst,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::TopHat(ImageView<T> &aTemp, ImageView<T> &aDst,
-                                   const opp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
+                                   const mpp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
                                    T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
-                                   const opp::cuda::StreamCtx &aStreamCtx) const
+                                   const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -733,8 +733,8 @@ ImageView<T> &ImageView<T>::TopHat(ImageView<T> &aTemp, ImageView<T> &aDst,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::TopHat(ImageView<T> &aTemp, ImageView<T> &aDst,
-                                   const opp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
-                                   BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx) const
+                                   const mpp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
+                                   BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->TopHat(aTemp, aDst, aMask, aFilterArea, aBorder, ROI(), aStreamCtx);
@@ -742,8 +742,8 @@ ImageView<T> &ImageView<T>::TopHat(ImageView<T> &aTemp, ImageView<T> &aDst,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::TopHat(ImageView<T> &aTemp, ImageView<T> &aDst,
-                                   const opp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
-                                   T aConstant, BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx) const
+                                   const mpp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
+                                   T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->TopHat(aTemp, aDst, aMask, aFilterArea, aConstant, aBorder, ROI(), aStreamCtx);
@@ -753,9 +753,9 @@ ImageView<T> &ImageView<T>::TopHat(ImageView<T> &aTemp, ImageView<T> &aDst,
 #pragma region BlackHat
 template <PixelType T>
 ImageView<T> &ImageView<T>::BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst,
-                                     const opp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
+                                     const mpp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
                                      BorderType aBorder, const Roi &aAllowedReadRoi,
-                                     const opp::cuda::StreamCtx &aStreamCtx) const
+                                     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     if (aBorder == BorderType::Constant)
@@ -768,9 +768,9 @@ ImageView<T> &ImageView<T>::BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst,
-                                     const opp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
+                                     const mpp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
                                      T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
-                                     const opp::cuda::StreamCtx &aStreamCtx) const
+                                     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -830,8 +830,8 @@ ImageView<T> &ImageView<T>::BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst,
-                                     const opp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
-                                     BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx) const
+                                     const mpp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
+                                     BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->BlackHat(aTemp, aDst, aMask, aFilterArea, aBorder, ROI(), aStreamCtx);
@@ -839,8 +839,8 @@ ImageView<T> &ImageView<T>::BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst,
-                                     const opp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
-                                     T aConstant, BorderType aBorder, const opp::cuda::StreamCtx &aStreamCtx) const
+                                     const mpp::cuda::DevVarView<Pixel8uC1> &aMask, const FilterArea &aFilterArea,
+                                     T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->BlackHat(aTemp, aDst, aMask, aFilterArea, aConstant, aBorder, ROI(), aStreamCtx);
@@ -849,9 +849,9 @@ ImageView<T> &ImageView<T>::BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst,
 
 #pragma region Morphology Gradient
 template <PixelType T>
-ImageView<T> &ImageView<T>::MorphologyGradient(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+ImageView<T> &ImageView<T>::MorphologyGradient(ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                                                const FilterArea &aFilterArea, BorderType aBorder,
-                                               const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx) const
+                                               const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     if (aBorder == BorderType::Constant)
@@ -863,9 +863,9 @@ ImageView<T> &ImageView<T>::MorphologyGradient(ImageView<T> &aDst, const opp::cu
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MorphologyGradient(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+ImageView<T> &ImageView<T>::MorphologyGradient(ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                                                const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
-                                               const Roi &aAllowedReadRoi, const opp::cuda::StreamCtx &aStreamCtx) const
+                                               const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -907,22 +907,22 @@ ImageView<T> &ImageView<T>::MorphologyGradient(ImageView<T> &aDst, const opp::cu
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MorphologyGradient(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+ImageView<T> &ImageView<T>::MorphologyGradient(ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                                                const FilterArea &aFilterArea, BorderType aBorder,
-                                               const opp::cuda::StreamCtx &aStreamCtx) const
+                                               const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->MorphologyGradient(aDst, aMask, aFilterArea, aBorder, ROI(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MorphologyGradient(ImageView<T> &aDst, const opp::cuda::DevVarView<Pixel8uC1> &aMask,
+ImageView<T> &ImageView<T>::MorphologyGradient(ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                                                const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
-                                               const opp::cuda::StreamCtx &aStreamCtx) const
+                                               const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->MorphologyGradient(aDst, aMask, aFilterArea, aConstant, aBorder, ROI(), aStreamCtx);
 }
 #pragma endregion
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

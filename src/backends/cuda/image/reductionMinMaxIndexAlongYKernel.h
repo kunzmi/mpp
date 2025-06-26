@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/image/configurations.h>
@@ -18,7 +18,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 /// <summary>
 /// runs MinMax with index reduction on one image column, single output value.
@@ -37,8 +37,8 @@ __global__ void reductionMinMaxIdxAlongYKernel(
     int warpLaneId = threadIdx.x;
     int batchId    = threadIdx.y;
 
-    opp::MinIdx<SrcT> redOpMin;
-    opp::MaxIdx<SrcT> redOpMax;
+    mpp::MinIdx<SrcT> redOpMin;
+    mpp::MaxIdx<SrcT> redOpMax;
 
     SrcT resultMin(reduction_init_value_v<ReductionInitValue::Max, SrcT>);
     SrcT resultMax(reduction_init_value_v<ReductionInitValue::Min, SrcT>);
@@ -330,7 +330,7 @@ void InvokeReductionMinMaxIdxAlongYKernelDefault(
     const SrcT *aSrcMin, const SrcT *aSrcMax, const same_vector_size_different_type_t<SrcT, int> *aSrcMinIdxX,
     const same_vector_size_different_type_t<SrcT, int> *aSrcMaxIdxX, SrcT *aDstMin, SrcT *aDstMax, IndexMinMax *aDstIdx,
     remove_vector_t<SrcT> *aDstScalarMin, remove_vector_t<SrcT> *aDstScalarMax, IndexMinMaxChannel *aDstScalarIdx,
-    int aSize, const opp::cuda::StreamCtx &aStreamCtx)
+    int aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {
@@ -350,5 +350,5 @@ void InvokeReductionMinMaxIdxAlongYKernelDefault(
     }
 }
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

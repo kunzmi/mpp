@@ -3,7 +3,7 @@
 #include <istream>
 #include <ostream>
 
-namespace opp::image
+namespace mpp::image
 {
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 Border::Border(int aLowerX, int aLowerY, int aHigherX, int aHigherY) noexcept
@@ -175,4 +175,4 @@ Border operator/(int aLeft, const Border &aRight)
 {
     return {aLeft / aRight.lowerX, aLeft / aRight.lowerY, aLeft / aRight.higherX, aLeft / aRight.higherY};
 }
-} // namespace opp::image
+} // namespace mpp::image

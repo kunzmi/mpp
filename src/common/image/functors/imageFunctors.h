@@ -5,7 +5,7 @@
 #include <common/roundFunctor.h>
 #include <common/vector_typetraits.h>
 
-namespace opp::image
+namespace mpp::image
 {
 template <typename T> struct scalefactor_type
 {
@@ -23,4 +23,4 @@ template <bool LoadBeforeOp> struct ImageFunctor
     static constexpr bool DoLoadBeforeOp = LoadBeforeOp;
 };
 
-} // namespace opp::image
+} // namespace mpp::image

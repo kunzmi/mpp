@@ -10,7 +10,7 @@
 #include <numeric>
 #include <sstream>
 
-using namespace opp;
+using namespace mpp;
 using namespace Catch;
 
 // avoid compiler error "division by zero" by making it non-constant...

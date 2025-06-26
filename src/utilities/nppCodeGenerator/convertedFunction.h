@@ -7,7 +7,7 @@
 #include <utilities/nppParser/function.h>
 #include <vector>
 
-namespace opp::utilities::nppParser
+namespace mpp::utilities::nppParser
 {
 class ConvertedFunction
 {
@@ -215,4 +215,4 @@ inline void to_json(nlohmann::json &aj, const ConvertedFunction &aFunction)
                         {"original", aFunction.mFunction}};
 }
 
-} // namespace opp::utilities::nppParser
+} // namespace mpp::utilities::nppParser

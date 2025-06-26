@@ -2,7 +2,7 @@
 #include <common/defines.h>
 #include <common/image/functors/borderControl.h>
 #include <common/image/pixelTypes.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/vectorTypes.h>
 #include <cstddef>
@@ -10,8 +10,8 @@
 #include <sstream>
 #include <vector>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
 
 TEST_CASE("BorderControl - Constant", "[Common.Image]")

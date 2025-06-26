@@ -5,31 +5,31 @@
 #include <string>
 #include <utility>
 
-namespace opp
+namespace mpp
 {
-std::string &OPPException::What()
+std::string &MPPException::What()
 {
     return mWhat;
 }
-std::string &OPPException::Message()
+std::string &MPPException::Message()
 {
     return mMessage;
 }
-OPPException::OPPException(std::string aMessage) : mMessage(std::move(aMessage))
+MPPException::MPPException(std::string aMessage) : mMessage(std::move(aMessage))
 {
 }
-const char *OPPException::what() const noexcept
+const char *MPPException::what() const noexcept
 {
     return mWhat.c_str();
 }
-const std::string &OPPException::Message() const noexcept
+const std::string &MPPException::Message() const noexcept
 {
     return mMessage;
 }
 
 Exception::Exception(const std::string &aMessage, [[maybe_unused]] const std::filesystem::path &aCodeFileName,
                      [[maybe_unused]] int aLineNumber, [[maybe_unused]] const std::string &aFunctionName)
-    : OPPException(aMessage)
+    : MPPException(aMessage)
 {
 #ifdef NDEBUG
     std::stringstream ss;
@@ -55,7 +55,7 @@ InvalidArgumentException::InvalidArgumentException(const std::string &aArgumentN
                                                    [[maybe_unused]] const std::filesystem::path &aCodeFileName,
                                                    [[maybe_unused]] int aLineNumber,
                                                    [[maybe_unused]] const std::string &aFunctionName)
-    : OPPException(aMessage)
+    : MPPException(aMessage)
 {
 #ifdef NDEBUG
     std::stringstream ss;
@@ -78,4 +78,4 @@ InvalidArgumentException::InvalidArgumentException(const std::string &aArgumentN
 
     What() = ss.str();
 }
-} // namespace opp
+} // namespace mpp

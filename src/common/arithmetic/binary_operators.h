@@ -2,12 +2,12 @@
 #include <common/defines.h>
 #include <common/image/pixelTypes.h>
 #include <common/numeric_limits.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
 #include <concepts>
 
-namespace opp
+namespace mpp
 {
 template <AnyVector T> struct AbsDiff
 {
@@ -469,32 +469,32 @@ template <RealVector T, AlphaCompositionOp alphaOp> struct AlphaCompositionC
     {
         switch (alphaOp)
         {
-            case opp::AlphaCompositionOp::Over:
+            case mpp::AlphaCompositionOp::Over:
                 return alphaSrc1 * aSrc1 + (static_cast<remove_vector_t<T>>(1) - alphaSrc1) * alphaSrc2 * aSrc2;
-            case opp::AlphaCompositionOp::In:
+            case mpp::AlphaCompositionOp::In:
                 return alphaSrc1 * aSrc1 * alphaSrc2;
-            case opp::AlphaCompositionOp::Out:
+            case mpp::AlphaCompositionOp::Out:
                 return alphaSrc1 * aSrc1 * (static_cast<remove_vector_t<T>>(1) - alphaSrc2);
-            case opp::AlphaCompositionOp::ATop:
+            case mpp::AlphaCompositionOp::ATop:
                 return alphaSrc1 * aSrc1 * alphaSrc2 +
                        (static_cast<remove_vector_t<T>>(1) - alphaSrc1) * alphaSrc2 * aSrc2;
-            case opp::AlphaCompositionOp::XOr:
+            case mpp::AlphaCompositionOp::XOr:
                 return alphaSrc1 * aSrc1 * (static_cast<remove_vector_t<T>>(1) - alphaSrc2) +
                        (static_cast<remove_vector_t<T>>(1) - alphaSrc1) * alphaSrc2 * aSrc2;
-            case opp::AlphaCompositionOp::Plus:
+            case mpp::AlphaCompositionOp::Plus:
                 return alphaSrc1 * aSrc1 + alphaSrc2 * aSrc2;
-            case opp::AlphaCompositionOp::OverPremul:
+            case mpp::AlphaCompositionOp::OverPremul:
                 return aSrc1 + (static_cast<remove_vector_t<T>>(1) - alphaSrc1) * aSrc2;
-            case opp::AlphaCompositionOp::InPremul:
+            case mpp::AlphaCompositionOp::InPremul:
                 return aSrc1 * alphaSrc2;
-            case opp::AlphaCompositionOp::OutPremul:
+            case mpp::AlphaCompositionOp::OutPremul:
                 return aSrc1 * (static_cast<remove_vector_t<T>>(1) - alphaSrc2);
-            case opp::AlphaCompositionOp::ATopPremul:
+            case mpp::AlphaCompositionOp::ATopPremul:
                 return aSrc1 * alphaSrc2 + (static_cast<remove_vector_t<T>>(1) - alphaSrc1) * aSrc2;
-            case opp::AlphaCompositionOp::XOrPremul:
+            case mpp::AlphaCompositionOp::XOrPremul:
                 return aSrc1 * (static_cast<remove_vector_t<T>>(1) - alphaSrc2) +
                        (static_cast<remove_vector_t<T>>(1) - alphaSrc1) * aSrc2;
-            case opp::AlphaCompositionOp::PlusPremul:
+            case mpp::AlphaCompositionOp::PlusPremul:
                 return aSrc1 + aSrc2;
         }
         return remove_vector_t<T>();
@@ -590,31 +590,31 @@ template <RealVector T, AlphaCompositionOp alphaOp> struct AlphaComposition
     {
         switch (alphaOp)
         {
-            case opp::AlphaCompositionOp::Over:
+            case mpp::AlphaCompositionOp::Over:
                 return aAlpha1 * aSrc1 + (static_cast<remove_vector_t<T>>(1) - aAlpha1) * aAlpha2 * aSrc2;
-            case opp::AlphaCompositionOp::In:
+            case mpp::AlphaCompositionOp::In:
                 return aAlpha1 * aSrc1 * aAlpha2;
-            case opp::AlphaCompositionOp::Out:
+            case mpp::AlphaCompositionOp::Out:
                 return aAlpha1 * aSrc1 * (static_cast<remove_vector_t<T>>(1) - aAlpha2);
-            case opp::AlphaCompositionOp::ATop:
+            case mpp::AlphaCompositionOp::ATop:
                 return aAlpha1 * aSrc1 * aAlpha2 + (static_cast<remove_vector_t<T>>(1) - aAlpha1) * aAlpha2 * aSrc2;
-            case opp::AlphaCompositionOp::XOr:
+            case mpp::AlphaCompositionOp::XOr:
                 return aAlpha1 * aSrc1 * (static_cast<remove_vector_t<T>>(1) - aAlpha2) +
                        (static_cast<remove_vector_t<T>>(1) - aAlpha1) * aAlpha2 * aSrc2;
-            case opp::AlphaCompositionOp::Plus:
+            case mpp::AlphaCompositionOp::Plus:
                 return aAlpha1 * aSrc1 + aAlpha2 * aSrc2;
-            case opp::AlphaCompositionOp::OverPremul:
+            case mpp::AlphaCompositionOp::OverPremul:
                 return aSrc1 + (static_cast<remove_vector_t<T>>(1) - aAlpha1) * aSrc2;
-            case opp::AlphaCompositionOp::InPremul:
+            case mpp::AlphaCompositionOp::InPremul:
                 return aSrc1 * aAlpha2;
-            case opp::AlphaCompositionOp::OutPremul:
+            case mpp::AlphaCompositionOp::OutPremul:
                 return aSrc1 * (static_cast<remove_vector_t<T>>(1) - aAlpha2);
-            case opp::AlphaCompositionOp::ATopPremul:
+            case mpp::AlphaCompositionOp::ATopPremul:
                 return aSrc1 * aAlpha2 + (static_cast<remove_vector_t<T>>(1) - aAlpha1) * aSrc2;
-            case opp::AlphaCompositionOp::XOrPremul:
+            case mpp::AlphaCompositionOp::XOrPremul:
                 return aSrc1 * (static_cast<remove_vector_t<T>>(1) - aAlpha2) +
                        (static_cast<remove_vector_t<T>>(1) - aAlpha1) * aSrc2;
-            case opp::AlphaCompositionOp::PlusPremul:
+            case mpp::AlphaCompositionOp::PlusPremul:
                 return aSrc1 + aSrc2;
         }
         return remove_vector_t<T>();
@@ -623,24 +623,24 @@ template <RealVector T, AlphaCompositionOp alphaOp> struct AlphaComposition
     {
         switch (alphaOp)
         {
-            case opp::AlphaCompositionOp::Over:
-            case opp::AlphaCompositionOp::OverPremul:
+            case mpp::AlphaCompositionOp::Over:
+            case mpp::AlphaCompositionOp::OverPremul:
                 return aAlpha1 + (static_cast<remove_vector_t<T>>(1) - aAlpha1) * aAlpha2;
-            case opp::AlphaCompositionOp::In:
-            case opp::AlphaCompositionOp::InPremul:
+            case mpp::AlphaCompositionOp::In:
+            case mpp::AlphaCompositionOp::InPremul:
                 return aAlpha1 * aAlpha2;
-            case opp::AlphaCompositionOp::Out:
-            case opp::AlphaCompositionOp::OutPremul:
+            case mpp::AlphaCompositionOp::Out:
+            case mpp::AlphaCompositionOp::OutPremul:
                 return aAlpha1 * (static_cast<remove_vector_t<T>>(1) - aAlpha2);
-            case opp::AlphaCompositionOp::ATop:
-            case opp::AlphaCompositionOp::ATopPremul:
+            case mpp::AlphaCompositionOp::ATop:
+            case mpp::AlphaCompositionOp::ATopPremul:
                 return aAlpha1 * aAlpha2 + (static_cast<remove_vector_t<T>>(1) - aAlpha1) * aAlpha2;
-            case opp::AlphaCompositionOp::XOr:
-            case opp::AlphaCompositionOp::XOrPremul:
+            case mpp::AlphaCompositionOp::XOr:
+            case mpp::AlphaCompositionOp::XOrPremul:
                 return aAlpha1 * (static_cast<remove_vector_t<T>>(1) - aAlpha2) +
                        (static_cast<remove_vector_t<T>>(1) - aAlpha1) * aAlpha2;
-            case opp::AlphaCompositionOp::Plus:
-            case opp::AlphaCompositionOp::PlusPremul:
+            case mpp::AlphaCompositionOp::Plus:
+            case mpp::AlphaCompositionOp::PlusPremul:
             {
                 if constexpr (Is16BitFloat<remove_vector_t<T>>)
                 {
@@ -745,4 +745,4 @@ struct AlphaCompositionScale : public AlphaComposition<T, alphaOp>
         aSrcDst.w = AlphaComposition<T, alphaOp>::ComputeAlpha(alphaSrc1, alphaSrc2) * alphaMax;
     }
 };
-} // namespace opp
+} // namespace mpp

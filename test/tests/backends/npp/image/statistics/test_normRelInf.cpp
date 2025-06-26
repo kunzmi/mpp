@@ -63,11 +63,11 @@
 #include <catch2/catch_test_macros.hpp>
 #include <common/defines.h>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size = 256;
 
@@ -82,8 +82,8 @@ TEST_CASE("8uC1", "[NPP.Statistics.NormRelInf]")
     double npp_res;
     nv::Image8uC1 npp_src1(size, size);
     nv::Image8uC1 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandomNormal(seed, 127, 30);
     cpu_src2.FillRandomNormal(seed + 1, 127, 30);
@@ -111,8 +111,8 @@ TEST_CASE("8uC3", "[NPP.Statistics.NormRelInf]")
     double npp_res[3];
     nv::Image8uC3 npp_src1(size, size);
     nv::Image8uC3 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(3);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(3);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandomNormal(seed, 127, 30);
     cpu_src2.FillRandomNormal(seed + 1, 127, 30);
@@ -142,8 +142,8 @@ TEST_CASE("8uC4", "[NPP.Statistics.NormRelInf]")
     double npp_res[4];
     nv::Image8uC4 npp_src1(size, size);
     nv::Image8uC4 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(4);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(4);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandomNormal(seed, 127, 30);
     cpu_src2.FillRandomNormal(seed + 1, 127, 30);
@@ -176,8 +176,8 @@ TEST_CASE("8uC1", "[NPP.Statistics.NormRelInfMasked]")
     nv::Image8uC1 npp_mask(size, size);
     nv::Image8uC1 npp_src1(size, size);
     nv::Image8uC1 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSizeMasked(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSizeMasked(nppCtx));
 
     cpu_src1.FillRandomNormal(seed, 127, 30);
     cpu_src2.FillRandomNormal(seed + 1, 127, 30);
@@ -209,11 +209,11 @@ TEST_CASE("8uC3", "[NPP.Statistics.NormRelInfMasked]")
     nv::Image8uC1 npp_mask(size, size);
     nv::Image8uC3 npp_src1(size, size);
     nv::Image8uC3 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(3);
-    opp::cuda::DevVarView<double> npp_dst1(npp_dst.Pointer(), sizeof(double));
-    opp::cuda::DevVarView<double> npp_dst2(npp_dst.Pointer() + 1, sizeof(double));
-    opp::cuda::DevVarView<double> npp_dst3(npp_dst.Pointer() + 2, sizeof(double));
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSizeMasked(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(3);
+    mpp::cuda::DevVarView<double> npp_dst1(npp_dst.Pointer(), sizeof(double));
+    mpp::cuda::DevVarView<double> npp_dst2(npp_dst.Pointer() + 1, sizeof(double));
+    mpp::cuda::DevVarView<double> npp_dst3(npp_dst.Pointer() + 2, sizeof(double));
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSizeMasked(nppCtx));
 
     cpu_src1.FillRandomNormal(seed, 127, 30);
     cpu_src2.FillRandomNormal(seed + 1, 127, 30);
@@ -248,8 +248,8 @@ TEST_CASE("8sC1", "[NPP.Statistics.NormRelInfMasked]")
     nv::Image8uC1 npp_mask(size, size);
     nv::Image8sC1 npp_src1(size, size);
     nv::Image8sC1 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSizeMasked(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSizeMasked(nppCtx));
 
     cpu_src1.FillRandomNormal(seed, 0, 30);
     cpu_src2.FillRandomNormal(seed + 1, 0, 30);
@@ -281,11 +281,11 @@ TEST_CASE("8sC3", "[NPP.Statistics.NormRelInfMasked]")
     nv::Image8uC1 npp_mask(size, size);
     nv::Image8sC3 npp_src1(size, size);
     nv::Image8sC3 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(3);
-    opp::cuda::DevVarView<double> npp_dst1(npp_dst.Pointer(), sizeof(double));
-    opp::cuda::DevVarView<double> npp_dst2(npp_dst.Pointer() + 1, sizeof(double));
-    opp::cuda::DevVarView<double> npp_dst3(npp_dst.Pointer() + 2, sizeof(double));
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSizeMasked(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(3);
+    mpp::cuda::DevVarView<double> npp_dst1(npp_dst.Pointer(), sizeof(double));
+    mpp::cuda::DevVarView<double> npp_dst2(npp_dst.Pointer() + 1, sizeof(double));
+    mpp::cuda::DevVarView<double> npp_dst3(npp_dst.Pointer() + 2, sizeof(double));
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSizeMasked(nppCtx));
 
     cpu_src1.FillRandomNormal(seed, 0, 30);
     cpu_src2.FillRandomNormal(seed + 1, 0, 30);
@@ -317,8 +317,8 @@ TEST_CASE("16uC1", "[NPP.Statistics.NormRelInf]")
     double npp_res;
     nv::Image16uC1 npp_src1(size, size);
     nv::Image16uC1 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandomNormal(seed, 30000, 400);
     cpu_src2.FillRandomNormal(seed + 1, 30000, 400);
@@ -346,8 +346,8 @@ TEST_CASE("16uC3", "[NPP.Statistics.NormRelInf]")
     double npp_res[3];
     nv::Image16uC3 npp_src1(size, size);
     nv::Image16uC3 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(3);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(3);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandomNormal(seed, 30000, 400);
     cpu_src2.FillRandomNormal(seed + 1, 30000, 400);
@@ -377,8 +377,8 @@ TEST_CASE("16uC4", "[NPP.Statistics.NormRelInf]")
     double npp_res[4];
     nv::Image16uC4 npp_src1(size, size);
     nv::Image16uC4 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(4);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(4);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandomNormal(seed, 30000, 400);
     cpu_src2.FillRandomNormal(seed + 1, 30000, 400);
@@ -411,8 +411,8 @@ TEST_CASE("16uC1", "[NPP.Statistics.NormRelInfMasked]")
     nv::Image8uC1 npp_mask(size, size);
     nv::Image16uC1 npp_src1(size, size);
     nv::Image16uC1 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSizeMasked(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSizeMasked(nppCtx));
 
     cpu_src1.FillRandomNormal(seed, 30000, 400);
     cpu_src2.FillRandomNormal(seed + 1, 30000, 400);
@@ -444,11 +444,11 @@ TEST_CASE("16uC3", "[NPP.Statistics.NormRelInfMasked]")
     nv::Image8uC1 npp_mask(size, size);
     nv::Image16uC3 npp_src1(size, size);
     nv::Image16uC3 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(3);
-    opp::cuda::DevVarView<double> npp_dst1(npp_dst.Pointer(), sizeof(double));
-    opp::cuda::DevVarView<double> npp_dst2(npp_dst.Pointer() + 1, sizeof(double));
-    opp::cuda::DevVarView<double> npp_dst3(npp_dst.Pointer() + 2, sizeof(double));
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSizeMasked(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(3);
+    mpp::cuda::DevVarView<double> npp_dst1(npp_dst.Pointer(), sizeof(double));
+    mpp::cuda::DevVarView<double> npp_dst2(npp_dst.Pointer() + 1, sizeof(double));
+    mpp::cuda::DevVarView<double> npp_dst3(npp_dst.Pointer() + 2, sizeof(double));
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSizeMasked(nppCtx));
 
     cpu_src1.FillRandomNormal(seed, 30000, 400);
     cpu_src2.FillRandomNormal(seed + 1, 30000, 400);
@@ -480,8 +480,8 @@ TEST_CASE("16sC1", "[NPP.Statistics.NormRelInf]")
     double npp_res;
     nv::Image16sC1 npp_src1(size, size);
     nv::Image16sC1 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandomNormal(seed, 0, 400);
     cpu_src2.FillRandomNormal(seed + 1, 0, 400);
@@ -509,8 +509,8 @@ TEST_CASE("16sC3", "[NPP.Statistics.NormRelInf]")
     double npp_res[3];
     nv::Image16sC3 npp_src1(size, size);
     nv::Image16sC3 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(3);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(3);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandomNormal(seed, 0, 400);
     cpu_src2.FillRandomNormal(seed + 1, 0, 400);
@@ -540,8 +540,8 @@ TEST_CASE("16sC4", "[NPP.Statistics.NormRelInf]")
     double npp_res[4];
     nv::Image16sC4 npp_src1(size, size);
     nv::Image16sC4 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(4);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(4);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandomNormal(seed, 0, 400);
     cpu_src2.FillRandomNormal(seed + 1, 0, 400);
@@ -571,8 +571,8 @@ TEST_CASE("32fC1", "[NPP.Statistics.NormRelInf]")
     double npp_res;
     nv::Image32fC1 npp_src1(size, size);
     nv::Image32fC1 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandomNormal(seed, 0, 400);
     cpu_src2.FillRandomNormal(seed + 1, 0, 400);
@@ -600,8 +600,8 @@ TEST_CASE("32fC3", "[NPP.Statistics.NormRelInf]")
     double npp_res[3];
     nv::Image32fC3 npp_src1(size, size);
     nv::Image32fC3 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(3);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(3);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandomNormal(seed, 0, 400);
     cpu_src2.FillRandomNormal(seed + 1, 0, 400);
@@ -631,8 +631,8 @@ TEST_CASE("32fC4", "[NPP.Statistics.NormRelInf]")
     double npp_res[4];
     nv::Image32fC4 npp_src1(size, size);
     nv::Image32fC4 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(4);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(4);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandomNormal(seed, 0, 400);
     cpu_src2.FillRandomNormal(seed + 1, 0, 400);
@@ -665,8 +665,8 @@ TEST_CASE("32fC1", "[NPP.Statistics.NormRelInfMasked]")
     nv::Image8uC1 npp_mask(size, size);
     nv::Image32fC1 npp_src1(size, size);
     nv::Image32fC1 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSizeMasked(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSizeMasked(nppCtx));
 
     cpu_src1.FillRandomNormal(seed, 0, 400);
     cpu_src2.FillRandomNormal(seed + 1, 0, 400);
@@ -698,11 +698,11 @@ TEST_CASE("32fC3", "[NPP.Statistics.NormRelInfMasked]")
     nv::Image8uC1 npp_mask(size, size);
     nv::Image32fC3 npp_src1(size, size);
     nv::Image32fC3 npp_src2(size, size);
-    opp::cuda::DevVar<double> npp_dst(3);
-    opp::cuda::DevVarView<double> npp_dst1(npp_dst.Pointer(), sizeof(double));
-    opp::cuda::DevVarView<double> npp_dst2(npp_dst.Pointer() + 1, sizeof(double));
-    opp::cuda::DevVarView<double> npp_dst3(npp_dst.Pointer() + 2, sizeof(double));
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSizeMasked(nppCtx));
+    mpp::cuda::DevVar<double> npp_dst(3);
+    mpp::cuda::DevVarView<double> npp_dst1(npp_dst.Pointer(), sizeof(double));
+    mpp::cuda::DevVarView<double> npp_dst2(npp_dst.Pointer() + 1, sizeof(double));
+    mpp::cuda::DevVarView<double> npp_dst3(npp_dst.Pointer() + 2, sizeof(double));
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.NormRelInfGetBufferHostSizeMasked(nppCtx));
 
     cpu_src1.FillRandomNormal(seed, 0, 400);
     cpu_src2.FillRandomNormal(seed + 1, 0, 400);

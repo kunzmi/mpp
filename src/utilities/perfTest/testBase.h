@@ -6,21 +6,21 @@
 #include <string>
 #include <vector>
 
-namespace opp
+namespace mpp
 {
 
 struct TestResult
 {
     std::string Name;
-    float TotalOPP;
+    float TotalMPP;
     float TotalNPP;
-    float MeanOPP;
+    float MeanMPP;
     float MeanNPP;
-    float StdOPP;
+    float StdMPP;
     float StdNPP;
-    float MinOPP;
+    float MinMPP;
     float MinNPP;
-    float MaxOPP;
+    float MaxMPP;
     float MaxNPP;
     float AbsoluteDifferenceMSec;
     float RelativeDifference;
@@ -61,4 +61,4 @@ class TestBase
     cuda::Event endIter;
     cuda::Event endGlobal;
 };
-} // namespace opp
+} // namespace mpp

@@ -9,7 +9,7 @@
 #include "vector4A.h"
 
 // define some common shortcuts:
-namespace opp
+namespace mpp
 {
 using Vec2i = Vector2<int>;
 using Vec3i = Vector3<int>;
@@ -22,4 +22,4 @@ using Vec4f = Vector4<float>;
 using Vec2d = Vector2<double>;
 using Vec3d = Vector3<double>;
 using Vec4d = Vector4<double>;
-} // namespace opp
+} // namespace mpp

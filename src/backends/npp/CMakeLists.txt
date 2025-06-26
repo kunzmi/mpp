@@ -1,4 +1,4 @@
-if (OPP_ENABLE_NPP_BACKEND)
+if (MPP_ENABLE_NPP_BACKEND)
 
 add_library(backends.npp 
 	nppException.cpp
@@ -32,4 +32,4 @@ target_link_libraries(backends.npp PUBLIC
 						)
 
 add_subdirectory(image)
-endif() # OPP_ENABLE_NPP_BACKEND
+endif() # MPP_ENABLE_NPP_BACKEND

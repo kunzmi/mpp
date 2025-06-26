@@ -63,11 +63,11 @@
 #include <catch2/catch_test_macros.hpp>
 #include <common/defines.h>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size = 256;
 
@@ -82,8 +82,8 @@ TEST_CASE("8uC1", "[NPP.Statistics.QualityIndex]")
     float npp_res;
     nv::Image8uC1 npp_src1(size, size);
     nv::Image8uC1 npp_src2(size, size);
-    opp::cuda::DevVar<float> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.QualityIndexGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<float> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.QualityIndexGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -110,8 +110,8 @@ TEST_CASE("8uC3", "[NPP.Statistics.QualityIndex]")
     float npp_res[3];
     nv::Image8uC3 npp_src1(size, size);
     nv::Image8uC3 npp_src2(size, size);
-    opp::cuda::DevVar<float> npp_dst(3);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.QualityIndexGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<float> npp_dst(3);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.QualityIndexGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -143,8 +143,8 @@ TEST_CASE("8uC4", "[NPP.Statistics.QualityIndex]")
     float npp_res[4];
     nv::Image8uC4 npp_src1(size, size);
     nv::Image8uC4 npp_src2(size, size);
-    opp::cuda::DevVar<float> npp_dst(4);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.QualityIndexGetBufferHostSizeA(nppCtx));
+    mpp::cuda::DevVar<float> npp_dst(4);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.QualityIndexGetBufferHostSizeA(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -174,8 +174,8 @@ TEST_CASE("16uC1", "[NPP.Statistics.QualityIndex]")
     float npp_res;
     nv::Image16uC1 npp_src1(size, size);
     nv::Image16uC1 npp_src2(size, size);
-    opp::cuda::DevVar<float> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.QualityIndexGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<float> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.QualityIndexGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -202,8 +202,8 @@ TEST_CASE("16uC3", "[NPP.Statistics.QualityIndex]")
     float npp_res[3];
     nv::Image16uC3 npp_src1(size, size);
     nv::Image16uC3 npp_src2(size, size);
-    opp::cuda::DevVar<float> npp_dst(3);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.QualityIndexGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<float> npp_dst(3);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.QualityIndexGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -235,8 +235,8 @@ TEST_CASE("16uC4", "[NPP.Statistics.QualityIndex]")
     float npp_res[4];
     nv::Image16uC4 npp_src1(size, size);
     nv::Image16uC4 npp_src2(size, size);
-    opp::cuda::DevVar<float> npp_dst(4);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.QualityIndexGetBufferHostSizeA(nppCtx));
+    mpp::cuda::DevVar<float> npp_dst(4);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.QualityIndexGetBufferHostSizeA(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -266,8 +266,8 @@ TEST_CASE("32fC1", "[NPP.Statistics.QualityIndex]")
     float npp_res;
     nv::Image32fC1 npp_src1(size, size);
     nv::Image32fC1 npp_src2(size, size);
-    opp::cuda::DevVar<float> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.QualityIndexGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<float> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.QualityIndexGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -294,8 +294,8 @@ TEST_CASE("32fC3", "[NPP.Statistics.QualityIndex]")
     float npp_res[3];
     nv::Image32fC3 npp_src1(size, size);
     nv::Image32fC3 npp_src2(size, size);
-    opp::cuda::DevVar<float> npp_dst(3);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.QualityIndexGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<float> npp_dst(3);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.QualityIndexGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);
@@ -327,8 +327,8 @@ TEST_CASE("32fC4", "[NPP.Statistics.QualityIndex]")
     float npp_res[4];
     nv::Image32fC4 npp_src1(size, size);
     nv::Image32fC4 npp_src2(size, size);
-    opp::cuda::DevVar<float> npp_dst(4);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.QualityIndexGetBufferHostSizeA(nppCtx));
+    mpp::cuda::DevVar<float> npp_dst(4);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.QualityIndexGetBufferHostSizeA(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);

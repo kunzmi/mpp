@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "absDiff.h"
 #include <backends/cuda/image/configurations.h>
@@ -19,23 +19,23 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAbsDiffSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst,
                          size_t aPitchDst, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
@@ -43,10 +43,10 @@ void InvokeAbsDiffSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2
         if constexpr (simdOP_t::has_simd)
         {
             using ComputeT_SIMD     = absDiff_simd_tupel_compute_type_for_t<SrcT>;
-            using absDiffSrcSrcSIMD = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AbsDiff<ComputeT>,
+            using absDiffSrcSrcSIMD = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::AbsDiff<ComputeT>,
                                                     RoundingMode::None, ComputeT_SIMD, simdOP_t>;
 
-            const opp::AbsDiff<ComputeT> op;
+            const mpp::AbsDiff<ComputeT> op;
             const simdOP_t opSIMD;
 
             const absDiffSrcSrcSIMD functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, opSIMD);
@@ -57,9 +57,9 @@ void InvokeAbsDiffSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2
         else
         {
             using absDiffSrcSrc =
-                SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AbsDiff<ComputeT>, RoundingMode::None>;
+                SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::AbsDiff<ComputeT>, RoundingMode::None>;
 
-            const opp::AbsDiff<ComputeT> op;
+            const mpp::AbsDiff<ComputeT> op;
 
             const absDiffSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
@@ -96,9 +96,9 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAbsDiffSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT *aDst, size_t aPitchDst,
                        const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
@@ -106,10 +106,10 @@ void InvokeAbsDiffSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, D
         if constexpr (simdOP_t::has_simd)
         {
             using ComputeT_SIMD   = absDiff_simd_tupel_compute_type_for_t<SrcT>;
-            using absDiffSrcCSIMD = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AbsDiff<ComputeT>,
+            using absDiffSrcCSIMD = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::AbsDiff<ComputeT>,
                                                        RoundingMode::None, Tupel<ComputeT_SIMD, TupelSize>, simdOP_t>;
 
-            const opp::AbsDiff<ComputeT> op;
+            const mpp::AbsDiff<ComputeT> op;
             const simdOP_t opSIMD;
             const Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
                 Tupel<ComputeT_SIMD, TupelSize>::GetConstant(static_cast<ComputeT_SIMD>(aConst));
@@ -122,9 +122,9 @@ void InvokeAbsDiffSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, D
         else
         {
             using absDiffSrcC =
-                SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AbsDiff<ComputeT>, RoundingMode::None>;
+                SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::AbsDiff<ComputeT>, RoundingMode::None>;
 
-            const opp::AbsDiff<ComputeT> op;
+            const mpp::AbsDiff<ComputeT> op;
 
             const absDiffSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
 
@@ -160,17 +160,17 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAbsDiffSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst, DstT *aDst, size_t aPitchDst,
                           const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         // set to roundingmode NONE, because AbsDiff cannot produce non-integers in computations with ints:
         using absDiffSrcDevC =
-            SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AbsDiff<ComputeT>, RoundingMode::None>;
+            SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::AbsDiff<ComputeT>, RoundingMode::None>;
 
-        const opp::AbsDiff<ComputeT> op;
+        const mpp::AbsDiff<ComputeT> op;
 
         const absDiffSrcDevC functor(aSrc, aPitchSrc, aConst, op);
 
@@ -205,9 +205,9 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAbsDiffInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, size_t aPitchSrc2,
                              const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
@@ -215,10 +215,10 @@ void InvokeAbsDiffInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSr
         if constexpr (simdOP_t::has_simd)
         {
             using ComputeT_SIMD         = absDiff_simd_tupel_compute_type_for_t<SrcT>;
-            using absDiffInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AbsDiff<ComputeT>,
+            using absDiffInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::AbsDiff<ComputeT>,
                                                             RoundingMode::None, ComputeT_SIMD, simdOP_t>;
 
-            const opp::AbsDiff<ComputeT> op;
+            const mpp::AbsDiff<ComputeT> op;
             const simdOP_t opSIMD;
 
             const absDiffInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
@@ -229,9 +229,9 @@ void InvokeAbsDiffInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSr
         else
         {
             using absDiffInplaceSrc =
-                InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::AbsDiff<ComputeT>, RoundingMode::None>;
+                InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::AbsDiff<ComputeT>, RoundingMode::None>;
 
-            const opp::AbsDiff<ComputeT> op;
+            const mpp::AbsDiff<ComputeT> op;
 
             const absDiffInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
@@ -268,9 +268,9 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAbsDiffInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, const Size2D &aSize,
                            const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
@@ -279,10 +279,10 @@ void InvokeAbsDiffInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aCons
         {
             using ComputeT_SIMD = absDiff_simd_tupel_compute_type_for_t<SrcT>;
             using absDiffInplaceCSIMD =
-                InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::AbsDiff<ComputeT>, RoundingMode::None,
+                InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::AbsDiff<ComputeT>, RoundingMode::None,
                                        Tupel<ComputeT_SIMD, TupelSize>, simdOP_t>;
 
-            const opp::AbsDiff<ComputeT> op;
+            const mpp::AbsDiff<ComputeT> op;
             const simdOP_t opSIMD;
             const Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
                 Tupel<ComputeT_SIMD, TupelSize>::GetConstant(static_cast<ComputeT_SIMD>(aConst));
@@ -295,9 +295,9 @@ void InvokeAbsDiffInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aCons
         else
         {
             using absDiffInplaceC =
-                InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::AbsDiff<ComputeT>, RoundingMode::None>;
+                InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::AbsDiff<ComputeT>, RoundingMode::None>;
 
-            const opp::AbsDiff<ComputeT> op;
+            const mpp::AbsDiff<ComputeT> op;
 
             const absDiffInplaceC functor(static_cast<ComputeT>(aConst), op);
 
@@ -334,16 +334,16 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAbsDiffInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aConst, const Size2D &aSize,
                               const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using absDiffInplaceDevC =
-            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, opp::AbsDiff<ComputeT>, RoundingMode::None>;
+            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, mpp::AbsDiff<ComputeT>, RoundingMode::None>;
 
-        const opp::AbsDiff<ComputeT> op;
+        const mpp::AbsDiff<ComputeT> op;
 
         const absDiffInplaceDevC functor(aConst, op);
 
@@ -375,5 +375,5 @@ void InvokeAbsDiffInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aC
 
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

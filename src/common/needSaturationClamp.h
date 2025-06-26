@@ -6,7 +6,7 @@
 
 // define which type conversion from->to need value clamping. E.g. an integer of value 1024 cannot be stored in byte and
 // must thus be clamped to 255
-namespace opp
+namespace mpp
 {
 class HalfFp16;
 class BFloat16;
@@ -288,4 +288,4 @@ template <> struct need_saturation_clamp<ulong64, long64> : std::true_type
 
 template <typename TFrom, typename TTo>
 inline constexpr bool need_saturation_clamp_v = need_saturation_clamp<TFrom, TTo>::value;
-} // namespace opp
+} // namespace mpp

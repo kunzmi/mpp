@@ -1,7 +1,7 @@
 #include "pixelTypes.h"
 #include <ostream>
 
-namespace opp::image
+namespace mpp::image
 {
 std::ostream &operator<<(std::ostream &aOs, const PixelTypeEnum &aPixelType)
 {
@@ -591,4 +591,4 @@ std::wostream &operator<<(std::wostream &aOs, const PixelTypeEnum &aPixelType)
     }
     return aOs;
 }
-} // namespace opp::image
+} // namespace mpp::image

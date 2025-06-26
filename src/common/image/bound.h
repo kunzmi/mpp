@@ -10,7 +10,7 @@
 #include <string>
 #include <utility>
 
-namespace opp::image
+namespace mpp::image
 {
 /// <summary>
 /// A Bound represents the minimum and maximum extent of a Quad.
@@ -64,4 +64,4 @@ template <RealFloatingPoint T> struct Bound
         return aOther.Min != Min || aOther.Max != Max;
     }
 };
-} // namespace opp::image
+} // namespace mpp::image

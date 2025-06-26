@@ -2,7 +2,7 @@
 
 #pragma once
 #include <common/moduleEnabler.h>
-#if OPP_ENABLE_NPP_BACKEND
+#if MPP_ENABLE_NPP_BACKEND
 #include <common/image/pixelTypeEnabler.h>
 
 #include "imageView.h"
@@ -14,7 +14,7 @@
 #include <common/image/size2D.h>
 #include <common/image/sizePitched.h>
 
-namespace opp::image::npp
+namespace mpp::image::npp
 {
 // forward declaration:
 
@@ -46,7 +46,7 @@ class Image16fC2View : public ImageView<Pixel16fC2>
     [[nodiscard]] Image16fC2View GetView(const Border &aBorder = Border());
 
     //NOLINTBEGIN(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
-#if OPPi_ENABLE_HALFFLOAT16_TYPE && OPPi_ENABLE_TWO_CHANNEL
+#if MPPi_ENABLE_HALFFLOAT16_TYPE && MPPi_ENABLE_TWO_CHANNEL
 
     // NppStatus nppiSet_16f_C2R_Ctx(const Npp32f[2] aValues, Npp16f * pDst, int nDstStep, NppiSize oSizeROI, NppStreamContext nppStreamCtx)
     Image16fC2View &Set(const Pixel32fC2 &aValues, const NppStreamContext &nppStreamCtx);
@@ -57,8 +57,8 @@ class Image16fC2View : public ImageView<Pixel16fC2>
     // NppStatus nppiColorTwist32f_16f_C2IR_Ctx(Npp16f * pSrcDst, int nSrcDstStep, NppiSize oSizeROI, const Npp32f[3][4] aTwist, NppStreamContext nppStreamCtx)
     Image16fC2View &ColorTwist32f(const Npp32f aTwist[3][4], const NppStreamContext &nppStreamCtx);
 
-#endif // OPPi_ENABLE_HALFFLOAT16_TYPE && OPPi_ENABLE_TWO_CHANNEL
+#endif // MPPi_ENABLE_HALFFLOAT16_TYPE && MPPi_ENABLE_TWO_CHANNEL
     //NOLINTEND(readability-identifier-naming,readability-avoid-const-params-in-decls, bugprone-easily-swappable-parameters, readability-convert-member-functions-to-static)
 };
-} // namespace opp::image::npp
-#endif // OPP_ENABLE_NPP_BACKEND
+} // namespace mpp::image::npp
+#endif // MPP_ENABLE_NPP_BACKEND

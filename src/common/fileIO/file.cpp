@@ -10,7 +10,7 @@
 #include <string>
 #include <utility>
 
-namespace opp::fileIO
+namespace mpp::fileIO
 {
 FileType GuessFileTypeFromEnding(const std::filesystem::path &aFileName)
 {
@@ -97,4 +97,4 @@ void File::ClearContent(const std::filesystem::path &aFileName)
     clearFile.close();
 }
 
-} // namespace opp::fileIO
+} // namespace mpp::fileIO

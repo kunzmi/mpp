@@ -1,5 +1,5 @@
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_CORE
+#if MPP_ENABLE_CUDA_CORE
 
 #include "cudaException.h"
 #include <common/exception.h>
@@ -10,7 +10,7 @@
 #include <sstream>
 #include <string>
 
-namespace opp::cuda
+namespace mpp::cuda
 {
 const char *CudaException::ConvertErrorCodeToMessage(cudaError_t aErrorCode)
 {
@@ -44,7 +44,7 @@ CudaException::CudaException(cudaError_t aCuResult, [[maybe_unused]] const std::
 CudaException::CudaException(cudaError_t aCuResult, const std::string &aMessage,
                              [[maybe_unused]] const std::filesystem::path &aCodeFileName,
                              [[maybe_unused]] int aLineNumber, [[maybe_unused]] const std::string &aFunctionName)
-    : OPPException(aMessage)
+    : MPPException(aMessage)
 {
     const char *errorDescr = ConvertErrorCodeToMessage(aCuResult);
 
@@ -71,7 +71,7 @@ CudaException::CudaException(cudaError_t aCuResult, const std::string &aMessage,
 
 CudaException::CudaException(const std::string &aMessage, [[maybe_unused]] const std::filesystem::path &aCodeFileName,
                              [[maybe_unused]] int aLineNumber, [[maybe_unused]] const std::string &aFunctionName)
-    : OPPException(aMessage)
+    : MPPException(aMessage)
 {
 #ifdef NDEBUG
     std::stringstream ss;
@@ -98,7 +98,7 @@ CudaUnsupportedException::CudaUnsupportedException(const std::string &aKernelNam
                                                    [[maybe_unused]] const std::filesystem::path &aCodeFileName,
                                                    [[maybe_unused]] int aLineNumber,
                                                    [[maybe_unused]] const std::string &aFunctionName)
-    : OPPException(aMessage), mKernelName(aKernelName)
+    : MPPException(aMessage), mKernelName(aKernelName)
 {
 #ifdef NDEBUG
     std::stringstream ss;
@@ -121,5 +121,5 @@ CudaUnsupportedException::CudaUnsupportedException(const std::string &aKernelNam
     What() = ss.str();
 }
 
-} // namespace opp::cuda
-#endif // OPP_ENABLE_CUDA_CORE
+} // namespace mpp::cuda
+#endif // MPP_ENABLE_CUDA_CORE

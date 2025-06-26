@@ -177,7 +177,7 @@ namespace {
             // This is kinda messy due to trying to support a bunch of
             // different platforms at once.
             // The basic idea is that if we are asked to do autodetection (as
-            // opposed to being told to use posixy colours outright), then we
+            // mpposed to being told to use posixy colours outright), then we
             // only want to use the colours if we are writing to console.
             // However, console might be redirected, so we make an attempt at
             // checking for that on platforms where we know how to do that.

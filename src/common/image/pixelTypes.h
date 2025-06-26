@@ -1,19 +1,19 @@
 #pragma once
 #include <common/complex.h>
 #include <common/defines.h>
-#include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vectorTypes.h>
 #include <concepts>
 #include <ostream>
 
-namespace opp
+namespace mpp
 {
 // forward declaration:
 class HalfFp16;
 class BFloat16;
-} // namespace opp
+} // namespace mpp
 
-namespace opp::image
+namespace mpp::image
 {
 #pragma region Type definitions
 using Pixel64fC1  = Vector1<double>;
@@ -126,7 +126,7 @@ using Pixel8uC4A = Vector4A<byte>;
 
 #pragma region PixelType enum
 /// <summary>
-/// Enumeration of all supported pixel types in OPP
+/// Enumeration of all supported pixel types in MPP
 /// </summary>
 enum class PixelTypeEnum : byte
 {
@@ -248,98 +248,98 @@ constexpr size_t GetChannelCount(PixelTypeEnum aPixelType)
 {
     switch (aPixelType)
     {
-        case opp::image::PixelTypeEnum::Unknown: // treat as single channel
-        case opp::image::PixelTypeEnum::PTE64fC1:
-        case opp::image::PixelTypeEnum::PTE64fcC1:
-        case opp::image::PixelTypeEnum::PTE64sC1:
-        case opp::image::PixelTypeEnum::PTE64scC1:
-        case opp::image::PixelTypeEnum::PTE64uC1:
-        case opp::image::PixelTypeEnum::PTE32fC1:
-        case opp::image::PixelTypeEnum::PTE32fcC1:
-        case opp::image::PixelTypeEnum::PTE16fC1:
-        case opp::image::PixelTypeEnum::PTE16fcC1:
-        case opp::image::PixelTypeEnum::PTE16bfC1:
-        case opp::image::PixelTypeEnum::PTE16bfcC1:
-        case opp::image::PixelTypeEnum::PTE32sC1:
-        case opp::image::PixelTypeEnum::PTE32scC1:
-        case opp::image::PixelTypeEnum::PTE32uC1:
-        case opp::image::PixelTypeEnum::PTE16sC1:
-        case opp::image::PixelTypeEnum::PTE16scC1:
-        case opp::image::PixelTypeEnum::PTE16uC1:
-        case opp::image::PixelTypeEnum::PTE8sC1:
-        case opp::image::PixelTypeEnum::PTE8uC1:
+        case mpp::image::PixelTypeEnum::Unknown: // treat as single channel
+        case mpp::image::PixelTypeEnum::PTE64fC1:
+        case mpp::image::PixelTypeEnum::PTE64fcC1:
+        case mpp::image::PixelTypeEnum::PTE64sC1:
+        case mpp::image::PixelTypeEnum::PTE64scC1:
+        case mpp::image::PixelTypeEnum::PTE64uC1:
+        case mpp::image::PixelTypeEnum::PTE32fC1:
+        case mpp::image::PixelTypeEnum::PTE32fcC1:
+        case mpp::image::PixelTypeEnum::PTE16fC1:
+        case mpp::image::PixelTypeEnum::PTE16fcC1:
+        case mpp::image::PixelTypeEnum::PTE16bfC1:
+        case mpp::image::PixelTypeEnum::PTE16bfcC1:
+        case mpp::image::PixelTypeEnum::PTE32sC1:
+        case mpp::image::PixelTypeEnum::PTE32scC1:
+        case mpp::image::PixelTypeEnum::PTE32uC1:
+        case mpp::image::PixelTypeEnum::PTE16sC1:
+        case mpp::image::PixelTypeEnum::PTE16scC1:
+        case mpp::image::PixelTypeEnum::PTE16uC1:
+        case mpp::image::PixelTypeEnum::PTE8sC1:
+        case mpp::image::PixelTypeEnum::PTE8uC1:
             return 1;
-        case opp::image::PixelTypeEnum::PTE64fC2:
-        case opp::image::PixelTypeEnum::PTE64fcC2:
-        case opp::image::PixelTypeEnum::PTE64sC2:
-        case opp::image::PixelTypeEnum::PTE64scC2:
-        case opp::image::PixelTypeEnum::PTE64uC2:
-        case opp::image::PixelTypeEnum::PTE32fC2:
-        case opp::image::PixelTypeEnum::PTE32fcC2:
-        case opp::image::PixelTypeEnum::PTE16fC2:
-        case opp::image::PixelTypeEnum::PTE16fcC2:
-        case opp::image::PixelTypeEnum::PTE16bfC2:
-        case opp::image::PixelTypeEnum::PTE16bfcC2:
-        case opp::image::PixelTypeEnum::PTE32sC2:
-        case opp::image::PixelTypeEnum::PTE32scC2:
-        case opp::image::PixelTypeEnum::PTE32uC2:
-        case opp::image::PixelTypeEnum::PTE16sC2:
-        case opp::image::PixelTypeEnum::PTE16scC2:
-        case opp::image::PixelTypeEnum::PTE16uC2:
-        case opp::image::PixelTypeEnum::PTE8sC2:
-        case opp::image::PixelTypeEnum::PTE8uC2:
+        case mpp::image::PixelTypeEnum::PTE64fC2:
+        case mpp::image::PixelTypeEnum::PTE64fcC2:
+        case mpp::image::PixelTypeEnum::PTE64sC2:
+        case mpp::image::PixelTypeEnum::PTE64scC2:
+        case mpp::image::PixelTypeEnum::PTE64uC2:
+        case mpp::image::PixelTypeEnum::PTE32fC2:
+        case mpp::image::PixelTypeEnum::PTE32fcC2:
+        case mpp::image::PixelTypeEnum::PTE16fC2:
+        case mpp::image::PixelTypeEnum::PTE16fcC2:
+        case mpp::image::PixelTypeEnum::PTE16bfC2:
+        case mpp::image::PixelTypeEnum::PTE16bfcC2:
+        case mpp::image::PixelTypeEnum::PTE32sC2:
+        case mpp::image::PixelTypeEnum::PTE32scC2:
+        case mpp::image::PixelTypeEnum::PTE32uC2:
+        case mpp::image::PixelTypeEnum::PTE16sC2:
+        case mpp::image::PixelTypeEnum::PTE16scC2:
+        case mpp::image::PixelTypeEnum::PTE16uC2:
+        case mpp::image::PixelTypeEnum::PTE8sC2:
+        case mpp::image::PixelTypeEnum::PTE8uC2:
             return 2;
-        case opp::image::PixelTypeEnum::PTE64fC3:
-        case opp::image::PixelTypeEnum::PTE64fcC3:
-        case opp::image::PixelTypeEnum::PTE64sC3:
-        case opp::image::PixelTypeEnum::PTE64scC3:
-        case opp::image::PixelTypeEnum::PTE64uC3:
-        case opp::image::PixelTypeEnum::PTE32fC3:
-        case opp::image::PixelTypeEnum::PTE32fcC3:
-        case opp::image::PixelTypeEnum::PTE16fC3:
-        case opp::image::PixelTypeEnum::PTE16fcC3:
-        case opp::image::PixelTypeEnum::PTE16bfC3:
-        case opp::image::PixelTypeEnum::PTE16bfcC3:
-        case opp::image::PixelTypeEnum::PTE32sC3:
-        case opp::image::PixelTypeEnum::PTE32scC3:
-        case opp::image::PixelTypeEnum::PTE32uC3:
-        case opp::image::PixelTypeEnum::PTE16sC3:
-        case opp::image::PixelTypeEnum::PTE16scC3:
-        case opp::image::PixelTypeEnum::PTE16uC3:
-        case opp::image::PixelTypeEnum::PTE8sC3:
-        case opp::image::PixelTypeEnum::PTE8uC3:
+        case mpp::image::PixelTypeEnum::PTE64fC3:
+        case mpp::image::PixelTypeEnum::PTE64fcC3:
+        case mpp::image::PixelTypeEnum::PTE64sC3:
+        case mpp::image::PixelTypeEnum::PTE64scC3:
+        case mpp::image::PixelTypeEnum::PTE64uC3:
+        case mpp::image::PixelTypeEnum::PTE32fC3:
+        case mpp::image::PixelTypeEnum::PTE32fcC3:
+        case mpp::image::PixelTypeEnum::PTE16fC3:
+        case mpp::image::PixelTypeEnum::PTE16fcC3:
+        case mpp::image::PixelTypeEnum::PTE16bfC3:
+        case mpp::image::PixelTypeEnum::PTE16bfcC3:
+        case mpp::image::PixelTypeEnum::PTE32sC3:
+        case mpp::image::PixelTypeEnum::PTE32scC3:
+        case mpp::image::PixelTypeEnum::PTE32uC3:
+        case mpp::image::PixelTypeEnum::PTE16sC3:
+        case mpp::image::PixelTypeEnum::PTE16scC3:
+        case mpp::image::PixelTypeEnum::PTE16uC3:
+        case mpp::image::PixelTypeEnum::PTE8sC3:
+        case mpp::image::PixelTypeEnum::PTE8uC3:
             return 3;
-        case opp::image::PixelTypeEnum::PTE64fC4:
-        case opp::image::PixelTypeEnum::PTE64fcC4:
-        case opp::image::PixelTypeEnum::PTE64fC4A:
-        case opp::image::PixelTypeEnum::PTE64sC4:
-        case opp::image::PixelTypeEnum::PTE64scC4:
-        case opp::image::PixelTypeEnum::PTE64uC4:
-        case opp::image::PixelTypeEnum::PTE64sC4A:
-        case opp::image::PixelTypeEnum::PTE64uC4A:
-        case opp::image::PixelTypeEnum::PTE32fC4:
-        case opp::image::PixelTypeEnum::PTE32fC4A:
-        case opp::image::PixelTypeEnum::PTE32fcC4:
-        case opp::image::PixelTypeEnum::PTE16fC4:
-        case opp::image::PixelTypeEnum::PTE16fcC4:
-        case opp::image::PixelTypeEnum::PTE16fC4A:
-        case opp::image::PixelTypeEnum::PTE16bfC4:
-        case opp::image::PixelTypeEnum::PTE16bfcC4:
-        case opp::image::PixelTypeEnum::PTE16bfC4A:
-        case opp::image::PixelTypeEnum::PTE32sC4:
-        case opp::image::PixelTypeEnum::PTE32sC4A:
-        case opp::image::PixelTypeEnum::PTE32scC4:
-        case opp::image::PixelTypeEnum::PTE32uC4:
-        case opp::image::PixelTypeEnum::PTE32uC4A:
-        case opp::image::PixelTypeEnum::PTE16sC4:
-        case opp::image::PixelTypeEnum::PTE16sC4A:
-        case opp::image::PixelTypeEnum::PTE16scC4:
-        case opp::image::PixelTypeEnum::PTE16uC4:
-        case opp::image::PixelTypeEnum::PTE16uC4A:
-        case opp::image::PixelTypeEnum::PTE8sC4:
-        case opp::image::PixelTypeEnum::PTE8sC4A:
-        case opp::image::PixelTypeEnum::PTE8uC4:
-        case opp::image::PixelTypeEnum::PTE8uC4A:
+        case mpp::image::PixelTypeEnum::PTE64fC4:
+        case mpp::image::PixelTypeEnum::PTE64fcC4:
+        case mpp::image::PixelTypeEnum::PTE64fC4A:
+        case mpp::image::PixelTypeEnum::PTE64sC4:
+        case mpp::image::PixelTypeEnum::PTE64scC4:
+        case mpp::image::PixelTypeEnum::PTE64uC4:
+        case mpp::image::PixelTypeEnum::PTE64sC4A:
+        case mpp::image::PixelTypeEnum::PTE64uC4A:
+        case mpp::image::PixelTypeEnum::PTE32fC4:
+        case mpp::image::PixelTypeEnum::PTE32fC4A:
+        case mpp::image::PixelTypeEnum::PTE32fcC4:
+        case mpp::image::PixelTypeEnum::PTE16fC4:
+        case mpp::image::PixelTypeEnum::PTE16fcC4:
+        case mpp::image::PixelTypeEnum::PTE16fC4A:
+        case mpp::image::PixelTypeEnum::PTE16bfC4:
+        case mpp::image::PixelTypeEnum::PTE16bfcC4:
+        case mpp::image::PixelTypeEnum::PTE16bfC4A:
+        case mpp::image::PixelTypeEnum::PTE32sC4:
+        case mpp::image::PixelTypeEnum::PTE32sC4A:
+        case mpp::image::PixelTypeEnum::PTE32scC4:
+        case mpp::image::PixelTypeEnum::PTE32uC4:
+        case mpp::image::PixelTypeEnum::PTE32uC4A:
+        case mpp::image::PixelTypeEnum::PTE16sC4:
+        case mpp::image::PixelTypeEnum::PTE16sC4A:
+        case mpp::image::PixelTypeEnum::PTE16scC4:
+        case mpp::image::PixelTypeEnum::PTE16uC4:
+        case mpp::image::PixelTypeEnum::PTE16uC4A:
+        case mpp::image::PixelTypeEnum::PTE8sC4:
+        case mpp::image::PixelTypeEnum::PTE8sC4A:
+        case mpp::image::PixelTypeEnum::PTE8uC4:
+        case mpp::image::PixelTypeEnum::PTE8uC4A:
             return 4;
         default:
             return 0; // we should never get here...
@@ -350,107 +350,107 @@ constexpr size_t GetPixelSizeInBytes(PixelTypeEnum aPixelType)
 {
     switch (aPixelType)
     {
-        case opp::image::PixelTypeEnum::Unknown:
+        case mpp::image::PixelTypeEnum::Unknown:
             return 1;
-        case opp::image::PixelTypeEnum::PTE64fcC4: // 64
-        case opp::image::PixelTypeEnum::PTE64scC4: // 64
+        case mpp::image::PixelTypeEnum::PTE64fcC4: // 64
+        case mpp::image::PixelTypeEnum::PTE64scC4: // 64
             return 2ULL * 4ULL * 8ULL;
-        case opp::image::PixelTypeEnum::PTE64fcC3: // 48
-        case opp::image::PixelTypeEnum::PTE64scC3: // 48
+        case mpp::image::PixelTypeEnum::PTE64fcC3: // 48
+        case mpp::image::PixelTypeEnum::PTE64scC3: // 48
             return 3ULL * 16ULL;
-        case opp::image::PixelTypeEnum::PTE64fcC2: // 32
-        case opp::image::PixelTypeEnum::PTE64scC2: // 32
-        case opp::image::PixelTypeEnum::PTE64fC4:  // 32
-        case opp::image::PixelTypeEnum::PTE64sC4:  // 32
-        case opp::image::PixelTypeEnum::PTE64uC4:  // 32
-        case opp::image::PixelTypeEnum::PTE64fC4A: // 32
-        case opp::image::PixelTypeEnum::PTE64sC4A: // 32
-        case opp::image::PixelTypeEnum::PTE64uC4A: // 32
-        case opp::image::PixelTypeEnum::PTE32fcC4: // 32
-        case opp::image::PixelTypeEnum::PTE32scC4: // 32
+        case mpp::image::PixelTypeEnum::PTE64fcC2: // 32
+        case mpp::image::PixelTypeEnum::PTE64scC2: // 32
+        case mpp::image::PixelTypeEnum::PTE64fC4:  // 32
+        case mpp::image::PixelTypeEnum::PTE64sC4:  // 32
+        case mpp::image::PixelTypeEnum::PTE64uC4:  // 32
+        case mpp::image::PixelTypeEnum::PTE64fC4A: // 32
+        case mpp::image::PixelTypeEnum::PTE64sC4A: // 32
+        case mpp::image::PixelTypeEnum::PTE64uC4A: // 32
+        case mpp::image::PixelTypeEnum::PTE32fcC4: // 32
+        case mpp::image::PixelTypeEnum::PTE32scC4: // 32
             return 4ULL * 8ULL;
-        case opp::image::PixelTypeEnum::PTE64fC3:  // 24
-        case opp::image::PixelTypeEnum::PTE64sC3:  // 24
-        case opp::image::PixelTypeEnum::PTE64uC3:  // 24
-        case opp::image::PixelTypeEnum::PTE32fcC3: // 24
-        case opp::image::PixelTypeEnum::PTE32scC3: // 24
+        case mpp::image::PixelTypeEnum::PTE64fC3:  // 24
+        case mpp::image::PixelTypeEnum::PTE64sC3:  // 24
+        case mpp::image::PixelTypeEnum::PTE64uC3:  // 24
+        case mpp::image::PixelTypeEnum::PTE32fcC3: // 24
+        case mpp::image::PixelTypeEnum::PTE32scC3: // 24
             return 3ULL * 8ULL;
-        case opp::image::PixelTypeEnum::PTE64fcC1:  // 16
-        case opp::image::PixelTypeEnum::PTE64scC1:  // 16
-        case opp::image::PixelTypeEnum::PTE64fC2:   // 16
-        case opp::image::PixelTypeEnum::PTE64sC2:   // 16
-        case opp::image::PixelTypeEnum::PTE64uC2:   // 16
-        case opp::image::PixelTypeEnum::PTE32fcC2:  // 16
-        case opp::image::PixelTypeEnum::PTE32scC2:  // 16
-        case opp::image::PixelTypeEnum::PTE32fC4:   // 16
-        case opp::image::PixelTypeEnum::PTE32fC4A:  // 16
-        case opp::image::PixelTypeEnum::PTE32sC4:   // 16
-        case opp::image::PixelTypeEnum::PTE32sC4A:  // 16
-        case opp::image::PixelTypeEnum::PTE32uC4:   // 16
-        case opp::image::PixelTypeEnum::PTE32uC4A:  // 16
-        case opp::image::PixelTypeEnum::PTE16fcC4:  // 16
-        case opp::image::PixelTypeEnum::PTE16bfcC4: // 16
-        case opp::image::PixelTypeEnum::PTE16scC4:  // 16
+        case mpp::image::PixelTypeEnum::PTE64fcC1:  // 16
+        case mpp::image::PixelTypeEnum::PTE64scC1:  // 16
+        case mpp::image::PixelTypeEnum::PTE64fC2:   // 16
+        case mpp::image::PixelTypeEnum::PTE64sC2:   // 16
+        case mpp::image::PixelTypeEnum::PTE64uC2:   // 16
+        case mpp::image::PixelTypeEnum::PTE32fcC2:  // 16
+        case mpp::image::PixelTypeEnum::PTE32scC2:  // 16
+        case mpp::image::PixelTypeEnum::PTE32fC4:   // 16
+        case mpp::image::PixelTypeEnum::PTE32fC4A:  // 16
+        case mpp::image::PixelTypeEnum::PTE32sC4:   // 16
+        case mpp::image::PixelTypeEnum::PTE32sC4A:  // 16
+        case mpp::image::PixelTypeEnum::PTE32uC4:   // 16
+        case mpp::image::PixelTypeEnum::PTE32uC4A:  // 16
+        case mpp::image::PixelTypeEnum::PTE16fcC4:  // 16
+        case mpp::image::PixelTypeEnum::PTE16bfcC4: // 16
+        case mpp::image::PixelTypeEnum::PTE16scC4:  // 16
             return 2ULL * 8ULL;
-        case opp::image::PixelTypeEnum::PTE32fC3:   // 12
-        case opp::image::PixelTypeEnum::PTE32sC3:   // 12
-        case opp::image::PixelTypeEnum::PTE32uC3:   // 12
-        case opp::image::PixelTypeEnum::PTE16fcC3:  // 12
-        case opp::image::PixelTypeEnum::PTE16bfcC3: // 12
-        case opp::image::PixelTypeEnum::PTE16scC3:  // 12
+        case mpp::image::PixelTypeEnum::PTE32fC3:   // 12
+        case mpp::image::PixelTypeEnum::PTE32sC3:   // 12
+        case mpp::image::PixelTypeEnum::PTE32uC3:   // 12
+        case mpp::image::PixelTypeEnum::PTE16fcC3:  // 12
+        case mpp::image::PixelTypeEnum::PTE16bfcC3: // 12
+        case mpp::image::PixelTypeEnum::PTE16scC3:  // 12
             return 3ULL * 4ULL;
-        case opp::image::PixelTypeEnum::PTE64fC1:   // 8
-        case opp::image::PixelTypeEnum::PTE64sC1:   // 8
-        case opp::image::PixelTypeEnum::PTE64uC1:   // 8
-        case opp::image::PixelTypeEnum::PTE32fC2:   // 8
-        case opp::image::PixelTypeEnum::PTE32fcC1:  // 8
-        case opp::image::PixelTypeEnum::PTE32scC1:  // 8
-        case opp::image::PixelTypeEnum::PTE32sC2:   // 8
-        case opp::image::PixelTypeEnum::PTE32uC2:   // 8
-        case opp::image::PixelTypeEnum::PTE16fcC2:  // 8
-        case opp::image::PixelTypeEnum::PTE16bfcC2: // 8
-        case opp::image::PixelTypeEnum::PTE16scC2:  // 8
-        case opp::image::PixelTypeEnum::PTE16sC4:   // 8
-        case opp::image::PixelTypeEnum::PTE16sC4A:  // 8
-        case opp::image::PixelTypeEnum::PTE16uC4:   // 8
-        case opp::image::PixelTypeEnum::PTE16uC4A:  // 8
-        case opp::image::PixelTypeEnum::PTE16fC4:   // 8
-        case opp::image::PixelTypeEnum::PTE16fC4A:  // 8
-        case opp::image::PixelTypeEnum::PTE16bfC4:  // 8
-        case opp::image::PixelTypeEnum::PTE16bfC4A: // 8
+        case mpp::image::PixelTypeEnum::PTE64fC1:   // 8
+        case mpp::image::PixelTypeEnum::PTE64sC1:   // 8
+        case mpp::image::PixelTypeEnum::PTE64uC1:   // 8
+        case mpp::image::PixelTypeEnum::PTE32fC2:   // 8
+        case mpp::image::PixelTypeEnum::PTE32fcC1:  // 8
+        case mpp::image::PixelTypeEnum::PTE32scC1:  // 8
+        case mpp::image::PixelTypeEnum::PTE32sC2:   // 8
+        case mpp::image::PixelTypeEnum::PTE32uC2:   // 8
+        case mpp::image::PixelTypeEnum::PTE16fcC2:  // 8
+        case mpp::image::PixelTypeEnum::PTE16bfcC2: // 8
+        case mpp::image::PixelTypeEnum::PTE16scC2:  // 8
+        case mpp::image::PixelTypeEnum::PTE16sC4:   // 8
+        case mpp::image::PixelTypeEnum::PTE16sC4A:  // 8
+        case mpp::image::PixelTypeEnum::PTE16uC4:   // 8
+        case mpp::image::PixelTypeEnum::PTE16uC4A:  // 8
+        case mpp::image::PixelTypeEnum::PTE16fC4:   // 8
+        case mpp::image::PixelTypeEnum::PTE16fC4A:  // 8
+        case mpp::image::PixelTypeEnum::PTE16bfC4:  // 8
+        case mpp::image::PixelTypeEnum::PTE16bfC4A: // 8
             return 8;
-        case opp::image::PixelTypeEnum::PTE16sC3:  // 6
-        case opp::image::PixelTypeEnum::PTE16uC3:  // 6
-        case opp::image::PixelTypeEnum::PTE16fC3:  // 6
-        case opp::image::PixelTypeEnum::PTE16bfC3: // 6
+        case mpp::image::PixelTypeEnum::PTE16sC3:  // 6
+        case mpp::image::PixelTypeEnum::PTE16uC3:  // 6
+        case mpp::image::PixelTypeEnum::PTE16fC3:  // 6
+        case mpp::image::PixelTypeEnum::PTE16bfC3: // 6
             return 6;
-        case opp::image::PixelTypeEnum::PTE32fC1:   // 4
-        case opp::image::PixelTypeEnum::PTE32sC1:   // 4
-        case opp::image::PixelTypeEnum::PTE32uC1:   // 4
-        case opp::image::PixelTypeEnum::PTE16fcC1:  // 4
-        case opp::image::PixelTypeEnum::PTE16bfcC1: // 4
-        case opp::image::PixelTypeEnum::PTE16scC1:  // 4
-        case opp::image::PixelTypeEnum::PTE16sC2:   // 4
-        case opp::image::PixelTypeEnum::PTE16uC2:   // 4
-        case opp::image::PixelTypeEnum::PTE16fC2:   // 4
-        case opp::image::PixelTypeEnum::PTE16bfC2:  // 4
-        case opp::image::PixelTypeEnum::PTE8sC4:    // 4
-        case opp::image::PixelTypeEnum::PTE8sC4A:   // 4
-        case opp::image::PixelTypeEnum::PTE8uC4:    // 4
-        case opp::image::PixelTypeEnum::PTE8uC4A:   // 4
+        case mpp::image::PixelTypeEnum::PTE32fC1:   // 4
+        case mpp::image::PixelTypeEnum::PTE32sC1:   // 4
+        case mpp::image::PixelTypeEnum::PTE32uC1:   // 4
+        case mpp::image::PixelTypeEnum::PTE16fcC1:  // 4
+        case mpp::image::PixelTypeEnum::PTE16bfcC1: // 4
+        case mpp::image::PixelTypeEnum::PTE16scC1:  // 4
+        case mpp::image::PixelTypeEnum::PTE16sC2:   // 4
+        case mpp::image::PixelTypeEnum::PTE16uC2:   // 4
+        case mpp::image::PixelTypeEnum::PTE16fC2:   // 4
+        case mpp::image::PixelTypeEnum::PTE16bfC2:  // 4
+        case mpp::image::PixelTypeEnum::PTE8sC4:    // 4
+        case mpp::image::PixelTypeEnum::PTE8sC4A:   // 4
+        case mpp::image::PixelTypeEnum::PTE8uC4:    // 4
+        case mpp::image::PixelTypeEnum::PTE8uC4A:   // 4
             return 4;
-        case opp::image::PixelTypeEnum::PTE8sC3: // 3
-        case opp::image::PixelTypeEnum::PTE8uC3: // 3
+        case mpp::image::PixelTypeEnum::PTE8sC3: // 3
+        case mpp::image::PixelTypeEnum::PTE8uC3: // 3
             return 3;
-        case opp::image::PixelTypeEnum::PTE16sC1:  // 2
-        case opp::image::PixelTypeEnum::PTE16uC1:  // 2
-        case opp::image::PixelTypeEnum::PTE16fC1:  // 2
-        case opp::image::PixelTypeEnum::PTE16bfC1: // 2
-        case opp::image::PixelTypeEnum::PTE8sC2:   // 2
-        case opp::image::PixelTypeEnum::PTE8uC2:   // 2
+        case mpp::image::PixelTypeEnum::PTE16sC1:  // 2
+        case mpp::image::PixelTypeEnum::PTE16uC1:  // 2
+        case mpp::image::PixelTypeEnum::PTE16fC1:  // 2
+        case mpp::image::PixelTypeEnum::PTE16bfC1: // 2
+        case mpp::image::PixelTypeEnum::PTE8sC2:   // 2
+        case mpp::image::PixelTypeEnum::PTE8uC2:   // 2
             return 2;
-        case opp::image::PixelTypeEnum::PTE8sC1: // 1
-        case opp::image::PixelTypeEnum::PTE8uC1: // 1
+        case mpp::image::PixelTypeEnum::PTE8sC1: // 1
+        case mpp::image::PixelTypeEnum::PTE8uC1: // 1
             return 1;
         default:
             return 0; // we should never get here...
@@ -1123,7 +1123,7 @@ template <> struct default_compute_type_for<Pixel64sC4A>
     using type = Pixel64fC4A;
 };
 
-// 32s -> 64f
+// 32s -> 64f (this is for sure not the best choice in terms of performance but for "correctness")
 template <> struct default_compute_type_for<Pixel32sC1>
 {
     using type = Pixel64fC1;
@@ -1163,7 +1163,7 @@ template <> struct default_compute_type_for<Pixel32scC4>
     using type = Pixel32fcC4;
 };
 
-// 32u -> 64f
+// 32u -> 64f (this is for sure not the best choice in terms of performance but for "correctness")
 template <> struct default_compute_type_for<Pixel32uC1>
 {
     using type = Pixel64fC1;
@@ -1316,68 +1316,6 @@ template <> struct default_ext_compute_type_for<Pixel32scC4>
 {
     using type = Pixel64fcC4;
 };
-
-//// 16s -> 64f
-// template <> struct default_ext_compute_type_for<Pixel16sC1>
-//{
-//     using type = Pixel64fC1;
-// };
-// template <> struct default_ext_compute_type_for<Pixel16sC2>
-//{
-//     using type = Pixel64fC2;
-// };
-// template <> struct default_ext_compute_type_for<Pixel16sC3>
-//{
-//     using type = Pixel64fC3;
-// };
-// template <> struct default_ext_compute_type_for<Pixel16sC4>
-//{
-//     using type = Pixel64fC4;
-// };
-// template <> struct default_ext_compute_type_for<Pixel16sC4A>
-//{
-//     using type = Pixel64fC4A;
-// };
-//
-//// 16sc -> 64fc
-// template <> struct default_ext_compute_type_for<Pixel16scC1>
-//{
-//     using type = Pixel64fcC1;
-// };
-// template <> struct default_ext_compute_type_for<Pixel16scC2>
-//{
-//     using type = Pixel64fcC2;
-// };
-// template <> struct default_ext_compute_type_for<Pixel16scC3>
-//{
-//     using type = Pixel64fcC3;
-// };
-// template <> struct default_ext_compute_type_for<Pixel16scC4>
-//{
-//     using type = Pixel64fcC4;
-// };
-//
-//// 16u -> 64f
-// template <> struct default_ext_compute_type_for<Pixel16uC1>
-//{
-//     using type = Pixel64fC1;
-// };
-// template <> struct default_ext_compute_type_for<Pixel16uC2>
-//{
-//     using type = Pixel64fC2;
-// };
-// template <> struct default_ext_compute_type_for<Pixel16uC3>
-//{
-//     using type = Pixel64fC3;
-// };
-// template <> struct default_ext_compute_type_for<Pixel16uC4>
-//{
-//     using type = Pixel64fC4;
-// };
-// template <> struct default_ext_compute_type_for<Pixel16uC4A>
-//{
-//     using type = Pixel64fC4A;
-// };
 
 template <typename T> using default_ext_compute_type_for_t = typename default_ext_compute_type_for<T>::type;
 #pragma endregion
@@ -2517,4 +2455,4 @@ template <typename pixelT> using pixel_type_enum_t = pixel_type_enum<pixelT>::pi
 #pragma endregion
 #pragma endregion
 
-} // namespace opp::image
+} // namespace mpp::image

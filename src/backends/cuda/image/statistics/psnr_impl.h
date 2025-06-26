@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "mse.h"
 #include "psnr.h"
@@ -14,7 +14,7 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/statistics/operators.h>
 #include <common/statistics/postOperators.h>
@@ -22,36 +22,36 @@
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokePSNRSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2,
                       remove_vector_t<DstT> aValueRange, ComputeT *aTempBuffer, DstT *aDst,
-                      remove_vector_t<DstT> *aDstScalar, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+                      remove_vector_t<DstT> *aDstScalar, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
+    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
-        using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::NormDiffL2<SrcT, ComputeT>>;
+        using normL2SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL2<SrcT, ComputeT>>;
 
-        const opp::NormDiffL2<SrcT, ComputeT> op;
+        const mpp::NormDiffL2<SrcT, ComputeT> op;
 
         const normL2SrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
-        InvokeReductionAlongXKernelDefault<SrcT, ComputeT, TupelSize, normL2SrcSrc, opp::Sum<ComputeT, ComputeT>,
+        InvokeReductionAlongXKernelDefault<SrcT, ComputeT, TupelSize, normL2SrcSrc, mpp::Sum<ComputeT, ComputeT>,
                                            ReductionInitValue::Zero>(aSrc1, aTempBuffer, aSize, aStreamCtx, functor);
 
-        const opp::PSNR<DstT> postOp(static_cast<remove_vector_t<DstT>>(aSize.TotalSize()), aValueRange);
+        const mpp::PSNR<DstT> postOp(static_cast<remove_vector_t<DstT>>(aSize.TotalSize()), aValueRange);
 
-        const opp::PSNRScalar<DstT> postOpScalar(static_cast<remove_vector_t<DstT>>(aSize.TotalSize()), aValueRange);
+        const mpp::PSNRScalar<DstT> postOpScalar(static_cast<remove_vector_t<DstT>>(aSize.TotalSize()), aValueRange);
 
-        InvokeReductionAlongYKernelDefault<ComputeT, DstT, opp::Sum<DstT, DstT>, ReductionInitValue::Zero,
-                                           opp::PSNR<DstT>, opp::PSNRScalar<DstT>>(
+        InvokeReductionAlongYKernelDefault<ComputeT, DstT, mpp::Sum<DstT, DstT>, ReductionInitValue::Zero,
+                                           mpp::PSNR<DstT>, mpp::PSNRScalar<DstT>>(
             aTempBuffer, aDst, aDstScalar, aSize.y, postOp, postOpScalar, aStreamCtx);
     }
 }
@@ -79,5 +79,5 @@ void InvokePSNRSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, s
     Instantiate_For(Pixel##typeIn##C4A);
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

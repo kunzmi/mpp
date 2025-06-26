@@ -6,7 +6,7 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
 #include <common/image/size2D.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/utilities.h>
 #include <common/vector2.h>
 #include <concepts>
@@ -20,7 +20,7 @@
 #include <common/vector1.h>
 #include <numbers>
 
-namespace opp::image
+namespace mpp::image
 {
 template <typename CoordT, MirrorAxis mirrorAxis> struct TransformerMirror
 {
@@ -163,6 +163,6 @@ template <typename CoordT> struct TransformerShift
         return Vector2<CoordT>(aPixelX, aPixelY) - Shift;
     }
 };
-} // namespace opp::image
+} // namespace mpp::image
 
 #undef STD

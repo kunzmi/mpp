@@ -9,7 +9,7 @@
 #include <common/vector_typetraits.h>
 #include <concepts>
 
-namespace opp::image
+namespace mpp::image
 {
 enum class ReductionInitValue
 {
@@ -116,4 +116,4 @@ inline constexpr auto reduction_init_value_v = reduction_init_value<redVal, T>::
 //
 // template <class T> inline constexpr reduction_init_t<T> reduction_init_min_v = reduction_init_min<T>::value;
 
-} // namespace opp::image
+} // namespace mpp::image

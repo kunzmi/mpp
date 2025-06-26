@@ -23,7 +23,7 @@
 #include <utility>
 #include <vector>
 
-namespace opp::fileIO::tiffTag
+namespace mpp::fileIO::tiffTag
 {
 Rational TIFFConvertPixelSizeToDPI(double aPixelSize)
 {
@@ -1154,4 +1154,4 @@ Rational IFDYResolution::Value() const
     return mValue[0];
 }
 
-} // namespace opp::fileIO::tiffTag
+} // namespace mpp::fileIO::tiffTag

@@ -23,9 +23,9 @@
 #include <backends/simple_cpu/image/reductionMasked_impl.h> //NOLINT(misc-include-cleaner)
 #include <backends/simple_cpu/image/reduction_impl.h>       //NOLINT(misc-include-cleaner)
 #include <common/image/pixelTypes.h>
-#include <common/opp_defs.h> //NOLINT(misc-include-cleaner)
+#include <common/mpp_defs.h> //NOLINT(misc-include-cleaner)
 
-namespace opp::image::cpuSimple
+namespace mpp::image::cpuSimple
 {
 
 using Image32fC1View  = ImageView<Pixel32fC1>;
@@ -341,4 +341,4 @@ template ImageView<Pixel32fcC3> &ImageView<Pixel32fcC3>::SwapChannel<Pixel32fcC3
 template ImageView<Pixel32fcC4> &ImageView<Pixel32fcC4>::SwapChannel<Pixel32fcC4>(
     ImageView<Pixel32fcC4> &aDst, const ChannelList<vector_active_size_v<Pixel32fcC4>> &aDstChannels) const;
 
-} // namespace opp::image::cpuSimple
+} // namespace mpp::image::cpuSimple

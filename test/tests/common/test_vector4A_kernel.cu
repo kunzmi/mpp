@@ -13,9 +13,9 @@
 #include <common/vectorTypes_impl.h>
 #include <device_launch_parameters.h>
 
-using namespace opp::image;
+using namespace mpp::image;
 
-namespace opp
+namespace mpp
 {
 namespace cuda
 {
@@ -438,4 +438,4 @@ template void runtest_vector4A_kernel<double>(Pixel64fC4A *aDataIn, Pixel64fC4A 
 // *aComp);
 
 } // namespace cuda
-} // namespace opp
+} // namespace mpp

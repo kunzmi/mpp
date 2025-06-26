@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "rectStdDev.h"
 #include <backends/cuda/image/configurations.h>
@@ -12,25 +12,25 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename Src1T, typename Src2T, typename ComputeT, typename DstT>
 void InvokeRectStdDev(const Src1T *aSrc1, size_t aPitchSrc1, const Src2T *aSrc2, size_t aPitchSrc2, DstT *aDst,
                       size_t aPitchDst, const FilterArea &aFilterArea, const Size2D &aSize,
-                      const opp::cuda::StreamCtx &aStreamCtx)
+                      const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<Src1T> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<Src1T> && mppEnableCudaBackend<DstT>)
     {
         using SrcT = Src1T;
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
@@ -57,5 +57,5 @@ void InvokeRectStdDev(const Src1T *aSrc1, size_t aPitchSrc1, const Src2T *aSrc2,
 
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

@@ -4,13 +4,13 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
 #include <common/image/size2D.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/vector2.h>
 #ifdef IS_HOST_COMPILER
 #include <utility>
 #endif
 
-namespace opp::image
+namespace mpp::image
 {
 
 template <typename PixelT, BorderType borderType> struct ConstantDataSource
@@ -390,4 +390,4 @@ struct BorderControl
         }
     }
 };
-} // namespace opp::image
+} // namespace mpp::image

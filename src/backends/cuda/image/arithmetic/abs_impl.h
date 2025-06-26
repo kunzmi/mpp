@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "abs.h"
 #include <backends/cuda/image/configurations.h>
@@ -15,23 +15,23 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAbsSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                   const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
@@ -39,10 +39,10 @@ void InvokeAbsSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitc
         if constexpr (simdOP_t::has_simd)
         {
             using ComputeT_SIMD = abs_simd_tupel_compute_type_for_t<SrcT>;
-            using absSrcSIMD    = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Abs<ComputeT>, RoundingMode::None,
+            using absSrcSIMD    = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Abs<ComputeT>, RoundingMode::None,
                                              ComputeT_SIMD, simdOP_t>;
 
-            const opp::Abs<ComputeT> op;
+            const mpp::Abs<ComputeT> op;
             const simdOP_t opSIMD;
 
             const absSrcSIMD functor(aSrc1, aPitchSrc1, op, opSIMD);
@@ -51,9 +51,9 @@ void InvokeAbsSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitc
         }
         else
         {
-            using absSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Abs<ComputeT>, RoundingMode::None>;
+            using absSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Abs<ComputeT>, RoundingMode::None>;
 
-            const opp::Abs<ComputeT> op;
+            const mpp::Abs<ComputeT> op;
 
             const absSrc functor(aSrc1, aPitchSrc1, op);
 
@@ -82,9 +82,9 @@ void InvokeAbsSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitc
 template <typename DstT, typename ComputeT>
 void InvokeAbsInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_COMPUTE_DST;
+        MPP_CUDA_REGISTER_TEMPALTE_COMPUTE_DST;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
@@ -92,10 +92,10 @@ void InvokeAbsInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, c
         if constexpr (simdOP_t::has_simd)
         {
             using ComputeT_SIMD  = abs_simd_tupel_compute_type_for_t<DstT>;
-            using absInplaceSIMD = InplaceFunctor<TupelSize, ComputeT, DstT, opp::Abs<ComputeT>, RoundingMode::None,
+            using absInplaceSIMD = InplaceFunctor<TupelSize, ComputeT, DstT, mpp::Abs<ComputeT>, RoundingMode::None,
                                                   ComputeT_SIMD, simdOP_t>;
 
-            const opp::Abs<ComputeT> op;
+            const mpp::Abs<ComputeT> op;
             const simdOP_t opSIMD;
 
             const absInplaceSIMD functor(op, opSIMD);
@@ -105,9 +105,9 @@ void InvokeAbsInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, c
         }
         else
         {
-            using absInplace = InplaceFunctor<TupelSize, ComputeT, DstT, opp::Abs<ComputeT>, RoundingMode::None>;
+            using absInplace = InplaceFunctor<TupelSize, ComputeT, DstT, mpp::Abs<ComputeT>, RoundingMode::None>;
 
-            const opp::Abs<ComputeT> op;
+            const mpp::Abs<ComputeT> op;
 
             const absInplace functor(op);
 
@@ -132,5 +132,5 @@ void InvokeAbsInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, c
 
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

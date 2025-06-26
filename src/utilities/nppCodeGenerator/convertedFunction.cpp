@@ -11,7 +11,7 @@
 #include <utilities/nppParser/nppParser.h>
 #include <vector>
 
-namespace opp::utilities::nppParser
+namespace mpp::utilities::nppParser
 {
 ConvertedFunction::ConvertedFunction(const Function &aFunction)
     : mFunction(aFunction), mReturnType(aFunction.returnType), mName(NPPParser::GetShortName(aFunction)),
@@ -1685,4 +1685,4 @@ std::string ConvertedFunction::GetNeededImageForwardDecl(const std::vector<Conve
     }
     return ss.str();
 }
-} // namespace opp::utilities::nppParser
+} // namespace mpp::utilities::nppParser

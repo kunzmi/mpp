@@ -3,7 +3,7 @@
 #include <concepts>
 #include <cstddef>
 
-namespace opp
+namespace mpp
 {
 // 64 8-bit values for 512 AVX instructions are current reasonable maximum
 constexpr std::size_t MAX_TUPEL_SIZE = 64;
@@ -1077,4 +1077,4 @@ template <typename T, std::size_t size> struct alignas(size * sizeof(T)) Tupel
         return ret;
     }
 };
-} // namespace opp
+} // namespace mpp

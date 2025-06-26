@@ -18,15 +18,15 @@
 #include <random>
 #include <vector>
 
-using namespace opp;
-using namespace opp::cuda;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::cuda;
+using namespace mpp::image;
 using namespace Catch;
 
-namespace opp::cuda
+namespace mpp::cuda
 {
 template <typename T> void runtest_vector4_kernel(Vector4<T> *aDataIn, Vector4<T> *aDataOut, Pixel8uC4 *aComp);
-} // namespace opp::cuda
+} // namespace mpp::cuda
 
 template <typename T> Vector4<T> GetRandomValue(std::default_random_engine & /*aEngine*/)
 {

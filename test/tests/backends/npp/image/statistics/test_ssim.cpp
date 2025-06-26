@@ -13,11 +13,11 @@
 #include <catch2/catch_test_macros.hpp>
 #include <common/defines.h>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size = 256;
 
@@ -33,8 +33,8 @@ TEST_CASE("8uC1", "[NPP.Statistics.SSIM]")
     float npp_res;
     nv::Image8uC1 npp_src1(size, size);
     nv::Image8uC1 npp_src2(size, size);
-    opp::cuda::DevVar<float> npp_dst(1);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.SSIMGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<float> npp_dst(1);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.SSIMGetBufferHostSize(nppCtx));
 
     cpu_src1 >> npp_src1;
     cpu_src2 >> npp_src2;
@@ -58,8 +58,8 @@ TEST_CASE("8uC3", "[NPP.Statistics.SSIM]")
     float npp_res[3];
     nv::Image8uC3 npp_src1(size, size);
     nv::Image8uC3 npp_src2(size, size);
-    opp::cuda::DevVar<float> npp_dst(3);
-    opp::cuda::DevVar<byte> npp_buffer(npp_src1.SSIMGetBufferHostSize(nppCtx));
+    mpp::cuda::DevVar<float> npp_dst(3);
+    mpp::cuda::DevVar<byte> npp_buffer(npp_src1.SSIMGetBufferHostSize(nppCtx));
 
     cpu_src1.FillRandom(seed);
     cpu_src2.FillRandom(seed + 1);

@@ -11,22 +11,22 @@
 #include <type_traits>
 
 #ifdef IS_CUDA_COMPILER
-#include "opp_defs.h"
+#include "mpp_defs.h"
 #include <cuda_bf16.h>
 #include <cuda_fp16.h>
 #include <vector_types.h>
 #else
-namespace opp
+namespace mpp
 {
 // these types are only used with CUDA, but nevertheless they need
 // to be defined, so we set them to some knwon type of same size:
 using nv_bfloat162 = int;
 using half2        = float;
 using float2       = double;
-} // namespace opp
+} // namespace mpp
 #endif
 
-namespace opp
+namespace mpp
 {
 
 // forward declaration
@@ -824,38 +824,38 @@ DEVICE_CODE Complex<T> operator/(T2 aLeft, const Complex<T> &aRight)
     return {static_cast<T>(tempReal / denom), static_cast<T>(tempImag / denom)}; // complex division
 }
 
-// complex literal: gives a complex number with real part 0 and imaginary part being the number before _i when opp
+// complex literal: gives a complex number with real part 0 and imaginary part being the number before _i when mpp
 // namespace is used
 inline Complex<float> operator""_i(long double aValue)
 {
     return {0.0f, static_cast<float>(aValue)};
 }
 
-// complex literal: gives a complex number with real part 0 and imaginary part being the number before _i when opp
+// complex literal: gives a complex number with real part 0 and imaginary part being the number before _i when mpp
 // namespace is used
 inline Complex<int> operator""_i(unsigned long long int aValue)
 {
     return {0, static_cast<int>(aValue)};
 }
 
-// complex literal: gives a complex number with real part 0 and imaginary part being the number before _ih when opp
+// complex literal: gives a complex number with real part 0 and imaginary part being the number before _ih when mpp
 // namespace is used (HalfFp16-complex)
 inline Complex<HalfFp16> operator""_ih(long double aValue)
 {
     return {static_cast<HalfFp16>(0.0f), static_cast<HalfFp16>(static_cast<float>(aValue))};
 }
 
-// complex literal: gives a complex number with real part 0 and imaginary part being the number before _ih when opp
+// complex literal: gives a complex number with real part 0 and imaginary part being the number before _ih when mpp
 // namespace is used (HalfFp16-complex)
 inline Complex<BFloat16> operator""_ib(long double aValue)
 {
     return {static_cast<BFloat16>(0.0f), static_cast<BFloat16>(static_cast<float>(aValue))};
 }
 
-template <opp::HostCode T2> std::ostream &operator<<(std::ostream &aOs, const opp::Complex<T2> &aVec);
-template <opp::HostCode T2> std::wostream &operator<<(std::wostream &aOs, const opp::Complex<T2> &aVec);
-template <opp::HostCode T2> std::istream &operator>>(std::istream &aIs, opp::Complex<T2> &aVec);
-template <opp::HostCode T2> std::wistream &operator>>(std::wistream &aIs, opp::Complex<T2> &aVec);
+template <mpp::HostCode T2> std::ostream &operator<<(std::ostream &aOs, const mpp::Complex<T2> &aVec);
+template <mpp::HostCode T2> std::wostream &operator<<(std::wostream &aOs, const mpp::Complex<T2> &aVec);
+template <mpp::HostCode T2> std::istream &operator>>(std::istream &aIs, mpp::Complex<T2> &aVec);
+template <mpp::HostCode T2> std::wistream &operator>>(std::wistream &aIs, mpp::Complex<T2> &aVec);
 
 template <typename T> struct make_complex
 {
@@ -892,4 +892,4 @@ template <> struct make_complex<double>
 };
 
 template <typename T> using make_complex_t = typename make_complex<T>::type;
-} // namespace opp
+} // namespace mpp

@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h>
-#if OPP_ENABLE_CUDA_CORE
+#if MPP_ENABLE_CUDA_CORE
 
 #include <common/defines.h>
 #include <common/exception.h>
@@ -9,12 +9,12 @@
 #include <iostream>
 #include <sstream>
 
-namespace opp::cuda
+namespace mpp::cuda
 {
 /// <summary>
 /// CudaException is thrown when a CUDA API call via cudaSafeCall does not return cudaSuccess.
 /// </summary>
-class CudaException : public OPPException
+class CudaException : public MPPException
 {
   private:
     static const char *ConvertErrorCodeToMessage(cudaError_t aErrorCode);
@@ -37,7 +37,7 @@ class CudaException : public OPPException
 /// <summary>
 /// CudaUnsupported is thrown when we try to execute a kernel on an unsupported hardware version.
 /// </summary>
-class CudaUnsupportedException : public OPPException
+class CudaUnsupportedException : public MPPException
 {
   private:
     std::string mKernelName;
@@ -53,7 +53,7 @@ class CudaUnsupportedException : public OPPException
     CudaUnsupportedException &operator=(const CudaUnsupportedException &) = delete;
     CudaUnsupportedException &operator=(CudaUnsupportedException &&)      = delete;
 };
-} // namespace opp::cuda
+} // namespace mpp::cuda
 
 /// <summary>
 /// Checks if a cudaError_t is cudaSuccess and throws a corresponding CudaExcption if not
@@ -63,7 +63,7 @@ inline void __cudaSafeCall(cudaError_t aErr, const char *aCodeFile, int aLine, c
 {
     if (cudaSuccess != aErr)
     {
-        throw opp::cuda::CudaException(aErr, aCodeFile, aLine, aFunction);
+        throw mpp::cuda::CudaException(aErr, aCodeFile, aLine, aFunction);
     }
 }
 
@@ -76,7 +76,7 @@ inline void __cudaSafeCall(cudaError_t aErr, const std::string &aMessage, const 
 {
     if (cudaSuccess != aErr)
     {
-        throw opp::cuda::CudaException(aErr, aMessage, aCodeFile, aLine, aFunction);
+        throw mpp::cuda::CudaException(aErr, aMessage, aCodeFile, aLine, aFunction);
     }
 }
 
@@ -93,14 +93,14 @@ inline void __cudaSafeCall(cudaError_t aErr, const std::string &aMessage, const 
     }
 
 #define CUDAEXCEPTION(msg)                                                                                             \
-    (opp::cuda::CudaException((std::ostringstream() << msg).str(), __FILE__, __LINE__, __PRETTY_FUNCTION__))
+    (mpp::cuda::CudaException((std::ostringstream() << msg).str(), __FILE__, __LINE__, __PRETTY_FUNCTION__))
 
 #define peekAndCheckLastCudaError(msg)                                                                                 \
     {                                                                                                                  \
         cudaError_t cudaStatus = cudaPeekAtLastError();                                                                \
         if (cudaStatus != cudaSuccess)                                                                                 \
         {                                                                                                              \
-            throw opp::cuda::CudaException(cudaStatus, (std::ostringstream() << msg).str(), __FILE__, __LINE__,        \
+            throw mpp::cuda::CudaException(cudaStatus, (std::ostringstream() << msg).str(), __FILE__, __LINE__,        \
                                            __PRETTY_FUNCTION__);                                                       \
         }                                                                                                              \
     }
@@ -110,13 +110,13 @@ inline void __cudaSafeCall(cudaError_t aErr, const std::string &aMessage, const 
         cudaError_t cudaStatus = cudaGetLastError();                                                                   \
         if (cudaStatus != cudaSuccess)                                                                                 \
         {                                                                                                              \
-            throw opp::cuda::CudaException(cudaStatus, (std::ostringstream() << msg).str(), __FILE__, __LINE__,        \
+            throw mpp::cuda::CudaException(cudaStatus, (std::ostringstream() << msg).str(), __FILE__, __LINE__,        \
                                            __PRETTY_FUNCTION__);                                                       \
         }                                                                                                              \
     }
 
 #define CUDAUNSUPPORTED(kernelName, msg)                                                                               \
-    (opp::cuda::CudaUnsupportedException((#kernelName), (std::ostringstream() << msg).str(), __FILE__, __LINE__,       \
+    (mpp::cuda::CudaUnsupportedException((#kernelName), (std::ostringstream() << msg).str(), __FILE__, __LINE__,       \
                                          __PRETTY_FUNCTION__))
 // NOLINTEND
 
@@ -138,4 +138,4 @@ inline std::wostream &operator<<(std::wostream &aOs, const dim3 &aDim3)
     return aOs;
 }
 
-#endif // OPP_ENABLE_CUDA_CORE
+#endif // MPP_ENABLE_CUDA_CORE

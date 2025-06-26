@@ -9,7 +9,7 @@
 #include <initializer_list>
 #include <ranges>
 
-namespace opp::image
+namespace mpp::image
 {
 
 /// <summary>
@@ -156,4 +156,4 @@ template <size_t listSize> class ChannelList
     std::array<Channel, listSize> mChannels{0};
 };
 
-} // namespace opp::image
+} // namespace mpp::image

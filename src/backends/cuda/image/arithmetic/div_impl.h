@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "div.h"
 #include <backends/cuda/image/configurations.h>
@@ -25,33 +25,33 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst,
                      size_t aPitchDst, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using simdOP_t = simd::Div<Tupel<DstT, TupelSize>>;
         if constexpr (simdOP_t::has_simd)
         {
-            using divSrcSrcSIMD = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+            using divSrcSrcSIMD = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                 RoundingMode::None, ComputeT, simdOP_t>;
 
-            const opp::Div<ComputeT, DstT> op;
+            const mpp::Div<ComputeT, DstT> op;
             const simdOP_t opSIMD;
 
             const divSrcSrcSIMD functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, opSIMD);
@@ -62,9 +62,9 @@ void InvokeDivSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, si
         else
         {
             using divSrcSrc =
-                SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>, RoundingMode::None>;
+                SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>, RoundingMode::None>;
 
-            const opp::Div<ComputeT, DstT> op;
+            const mpp::Div<ComputeT, DstT> op;
 
             const divSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
@@ -97,62 +97,62 @@ void InvokeDivSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, si
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivSrcSrcScale(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst,
-                          size_t aPitchDst, scalefactor_t<ComputeT> aScaleFactor, opp::RoundingMode aRoundingMode,
+                          size_t aPitchDst, scalefactor_t<ComputeT> aScaleFactor, mpp::RoundingMode aRoundingMode,
                           const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         switch (aRoundingMode)
         {
-            case opp::RoundingMode::NearestTiesToEven:
+            case mpp::RoundingMode::NearestTiesToEven:
             {
-                using divSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                using divSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                           RoundingMode::NearestTiesToEven>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divSrcSrcScale>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                  functor);
             }
             break;
-            case opp::RoundingMode::NearestTiesAwayFromZero:
+            case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
-                using divSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                using divSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                           RoundingMode::NearestTiesAwayFromZero>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divSrcSrcScale>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                  functor);
             }
             break;
-            case opp::RoundingMode::TowardZero:
+            case mpp::RoundingMode::TowardZero:
             {
-                using divSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                using divSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                           RoundingMode::TowardZero>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divSrcSrcScale>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                  functor);
             }
             break;
-            case opp::RoundingMode::TowardNegativeInfinity:
+            case mpp::RoundingMode::TowardNegativeInfinity:
             {
-                using divSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                using divSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                           RoundingMode::TowardNegativeInfinity>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divSrcSrcScale>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                  functor);
             }
             break;
-            case opp::RoundingMode::TowardPositiveInfinity:
+            case mpp::RoundingMode::TowardPositiveInfinity:
             {
-                using divSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                using divSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                           RoundingMode::TowardPositiveInfinity>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divSrcSrcScale>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                  functor);
@@ -171,7 +171,7 @@ void InvokeDivSrcSrcScale(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc
     InvokeDivSrcSrcScale<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(            \
         const typeSrcIsTypeDst *aSrc1, size_t aPitchSrc1, const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,            \
         typeSrcIsTypeDst *aDst, size_t aPitchDst,                                                                      \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, opp::RoundingMode aRoundingMode,     \
+        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, mpp::RoundingMode aRoundingMode,     \
         const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeDivSrcSrcScale(type)                                                                \
@@ -193,19 +193,19 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT *aDst, size_t aPitchDst,
                    const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using simdOP_t = simd::Div<Tupel<DstT, TupelSize>>;
         if constexpr (simdOP_t::has_simd)
         {
-            using divSrcCSIMD = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+            using divSrcCSIMD = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                    RoundingMode::None, Tupel<ComputeT, TupelSize>, simdOP_t>;
 
-            const opp::Div<ComputeT, DstT> op;
+            const mpp::Div<ComputeT, DstT> op;
             const simdOP_t opSIMD;
             const Tupel<ComputeT, TupelSize> tupelConstant =
                 Tupel<ComputeT, TupelSize>::GetConstant(static_cast<ComputeT>(aConst));
@@ -217,9 +217,9 @@ void InvokeDivSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT 
         else
         {
             using divSrcC =
-                SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>, RoundingMode::None>;
+                SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>, RoundingMode::None>;
 
-            const opp::Div<ComputeT, DstT> op;
+            const mpp::Div<ComputeT, DstT> op;
 
             const divSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
 
@@ -252,62 +252,62 @@ void InvokeDivSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT 
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivSrcCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT *aDst, size_t aPitchDst,
-                        scalefactor_t<ComputeT> aScaleFactor, opp::RoundingMode aRoundingMode, const Size2D &aSize,
+                        scalefactor_t<ComputeT> aScaleFactor, mpp::RoundingMode aRoundingMode, const Size2D &aSize,
                         const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         switch (aRoundingMode)
         {
-            case opp::RoundingMode::NearestTiesToEven:
+            case mpp::RoundingMode::NearestTiesToEven:
             {
-                using divSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                using divSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                              RoundingMode::NearestTiesToEven>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divSrcCScale>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                functor);
             }
             break;
-            case opp::RoundingMode::NearestTiesAwayFromZero:
+            case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
-                using divSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                using divSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                              RoundingMode::NearestTiesAwayFromZero>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divSrcCScale>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                functor);
             }
             break;
-            case opp::RoundingMode::TowardZero:
+            case mpp::RoundingMode::TowardZero:
             {
-                using divSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                using divSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                              RoundingMode::TowardZero>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divSrcCScale>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                functor);
             }
             break;
-            case opp::RoundingMode::TowardNegativeInfinity:
+            case mpp::RoundingMode::TowardNegativeInfinity:
             {
-                using divSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                using divSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                              RoundingMode::TowardNegativeInfinity>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divSrcCScale>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                functor);
             }
             break;
-            case opp::RoundingMode::TowardPositiveInfinity:
+            case mpp::RoundingMode::TowardPositiveInfinity:
             {
-                using divSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                using divSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                              RoundingMode::TowardPositiveInfinity>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divSrcCScale>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                functor);
@@ -326,7 +326,7 @@ void InvokeDivSrcCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, 
     InvokeDivSrcCScale<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(              \
         const typeSrcIsTypeDst *aSrc, size_t aPitchSrc, const typeSrcIsTypeDst &aConst, typeSrcIsTypeDst *aDst,        \
         size_t aPitchDst, scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor,                    \
-        opp::RoundingMode aRoundingMode, const Size2D &aSize, const StreamCtx &aStreamCtx);
+        mpp::RoundingMode aRoundingMode, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeDivSrcCScale(type)                                                                  \
     InstantiateInvokeDivSrcCScale_For(Pixel##type##C1);                                                                \
@@ -347,16 +347,16 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst, DstT *aDst, size_t aPitchDst,
                       const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using divSrcDevC =
-            SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>, RoundingMode::None>;
+            SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>, RoundingMode::None>;
 
-        const opp::Div<ComputeT, DstT> op;
+        const mpp::Div<ComputeT, DstT> op;
 
         const divSrcDevC functor(aSrc, aPitchSrc, aConst, op);
 
@@ -388,66 +388,66 @@ void InvokeDivSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst, Ds
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivSrcDevCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst, DstT *aDst, size_t aPitchDst,
-                           scalefactor_t<ComputeT> aScaleFactor, opp::RoundingMode aRoundingMode, const Size2D &aSize,
+                           scalefactor_t<ComputeT> aScaleFactor, mpp::RoundingMode aRoundingMode, const Size2D &aSize,
                            const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         switch (aRoundingMode)
         {
-            case opp::RoundingMode::NearestTiesToEven:
+            case mpp::RoundingMode::NearestTiesToEven:
             {
                 using divSrcDevCScale =
-                    SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                    SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                RoundingMode::NearestTiesToEven>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divSrcDevCScale>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                   functor);
             }
             break;
-            case opp::RoundingMode::NearestTiesAwayFromZero:
+            case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
                 using divSrcDevCScale =
-                    SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                    SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                RoundingMode::NearestTiesAwayFromZero>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divSrcDevCScale>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                   functor);
             }
             break;
-            case opp::RoundingMode::TowardZero:
+            case mpp::RoundingMode::TowardZero:
             {
                 using divSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT,
-                                                                   opp::Div<ComputeT, DstT>, RoundingMode::TowardZero>;
-                const opp::Div<ComputeT, DstT> op;
+                                                                   mpp::Div<ComputeT, DstT>, RoundingMode::TowardZero>;
+                const mpp::Div<ComputeT, DstT> op;
                 const divSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divSrcDevCScale>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                   functor);
             }
             break;
-            case opp::RoundingMode::TowardNegativeInfinity:
+            case mpp::RoundingMode::TowardNegativeInfinity:
             {
                 using divSrcDevCScale =
-                    SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                    SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                RoundingMode::TowardNegativeInfinity>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divSrcDevCScale>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                   functor);
             }
             break;
-            case opp::RoundingMode::TowardPositiveInfinity:
+            case mpp::RoundingMode::TowardPositiveInfinity:
             {
                 using divSrcDevCScale =
-                    SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                    SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                RoundingMode::TowardPositiveInfinity>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divSrcDevCScale>(aDst, aPitchDst, aSize, aStreamCtx,
                                                                                   functor);
@@ -466,7 +466,7 @@ void InvokeDivSrcDevCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aCons
     InvokeDivSrcDevCScale<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(           \
         const typeSrcIsTypeDst *aSrc, size_t aPitchSrc, const typeSrcIsTypeDst *aConst, typeSrcIsTypeDst *aDst,        \
         size_t aPitchDst, scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor,                    \
-        opp::RoundingMode aRoundingMode, const Size2D &aSize, const StreamCtx &aStreamCtx);
+        mpp::RoundingMode aRoundingMode, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeDivSrcDevCScale(type)                                                               \
     InstantiateInvokeDivSrcDevCScale_For(Pixel##type##C1);                                                             \
@@ -487,19 +487,19 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, size_t aPitchSrc2, const Size2D &aSize,
                          const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using simdOP_t = simd::Div<Tupel<DstT, TupelSize>>;
         if constexpr (simdOP_t::has_simd)
         {
-            using divInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+            using divInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                         RoundingMode::None, ComputeT, simdOP_t>;
 
-            const opp::Div<ComputeT, DstT> op;
+            const mpp::Div<ComputeT, DstT> op;
             const simdOP_t opSIMD;
 
             const divInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
@@ -510,9 +510,9 @@ void InvokeDivInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, 
         else
         {
             using divInplaceSrc =
-                InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>, RoundingMode::None>;
+                InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>, RoundingMode::None>;
 
-            const opp::Div<ComputeT, DstT> op;
+            const mpp::Div<ComputeT, DstT> op;
 
             const divInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
@@ -547,66 +547,66 @@ void InvokeDivInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, 
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivInplaceSrcScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, size_t aPitchSrc2,
-                              scalefactor_t<ComputeT> aScaleFactor, opp::RoundingMode aRoundingMode,
+                              scalefactor_t<ComputeT> aScaleFactor, mpp::RoundingMode aRoundingMode,
                               const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         switch (aRoundingMode)
         {
-            case opp::RoundingMode::NearestTiesToEven:
+            case mpp::RoundingMode::NearestTiesToEven:
             {
                 using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                            RoundingMode::NearestTiesToEven>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceSrcScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                      aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::NearestTiesAwayFromZero:
+            case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
                 using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                            RoundingMode::NearestTiesAwayFromZero>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceSrcScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                      aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardZero:
+            case mpp::RoundingMode::TowardZero:
             {
                 using divInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT,
-                                                                  opp::Div<ComputeT, DstT>, RoundingMode::TowardZero>;
-                const opp::Div<ComputeT, DstT> op;
+                                                                  mpp::Div<ComputeT, DstT>, RoundingMode::TowardZero>;
+                const mpp::Div<ComputeT, DstT> op;
                 const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceSrcScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                      aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardNegativeInfinity:
+            case mpp::RoundingMode::TowardNegativeInfinity:
             {
                 using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                            RoundingMode::TowardNegativeInfinity>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceSrcScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                      aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardPositiveInfinity:
+            case mpp::RoundingMode::TowardPositiveInfinity:
             {
                 using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                            RoundingMode::TowardPositiveInfinity>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceSrcScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                      aStreamCtx, functor);
@@ -624,7 +624,7 @@ void InvokeDivInplaceSrcScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aS
     template void                                                                                                      \
     InvokeDivInplaceSrcScale<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(        \
         typeSrcIsTypeDst * aSrcDst, size_t aPitchSrcDst, const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,             \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, opp::RoundingMode aRoundingMode,     \
+        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, mpp::RoundingMode aRoundingMode,     \
         const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeDivInplaceSrcScale(type)                                                            \
@@ -646,19 +646,19 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, const Size2D &aSize,
                        const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using simdOP_t = simd::Div<Tupel<DstT, TupelSize>>;
         if constexpr (simdOP_t::has_simd)
         {
-            using divInplaceCSIMD = InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+            using divInplaceCSIMD = InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                            RoundingMode::None, Tupel<ComputeT, TupelSize>, simdOP_t>;
 
-            const opp::Div<ComputeT, DstT> op;
+            const mpp::Div<ComputeT, DstT> op;
             const simdOP_t opSIMD;
             const Tupel<ComputeT, TupelSize> tupelConstant =
                 Tupel<ComputeT, TupelSize>::GetConstant(static_cast<ComputeT>(aConst));
@@ -671,9 +671,9 @@ void InvokeDivInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, c
         else
         {
             using divInplaceC =
-                InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Div<ComputeT, DstT>, RoundingMode::None>;
+                InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>, RoundingMode::None>;
 
-            const opp::Div<ComputeT, DstT> op;
+            const mpp::Div<ComputeT, DstT> op;
 
             const divInplaceC functor(static_cast<ComputeT>(aConst), op);
 
@@ -707,66 +707,66 @@ void InvokeDivInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, c
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivInplaceCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst,
-                            scalefactor_t<ComputeT> aScaleFactor, opp::RoundingMode aRoundingMode, const Size2D &aSize,
+                            scalefactor_t<ComputeT> aScaleFactor, mpp::RoundingMode aRoundingMode, const Size2D &aSize,
                             const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         switch (aRoundingMode)
         {
-            case opp::RoundingMode::NearestTiesToEven:
+            case mpp::RoundingMode::NearestTiesToEven:
             {
                 using divInplaceCScale =
-                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                 RoundingMode::NearestTiesToEven>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceCScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                    aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::NearestTiesAwayFromZero:
+            case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
                 using divInplaceCScale =
-                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                 RoundingMode::NearestTiesAwayFromZero>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceCScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                    aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardZero:
+            case mpp::RoundingMode::TowardZero:
             {
                 using divInplaceCScale =
-                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                 RoundingMode::TowardZero>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceCScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                    aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardNegativeInfinity:
+            case mpp::RoundingMode::TowardNegativeInfinity:
             {
                 using divInplaceCScale =
-                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                 RoundingMode::TowardNegativeInfinity>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceCScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                    aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardPositiveInfinity:
+            case mpp::RoundingMode::TowardPositiveInfinity:
             {
                 using divInplaceCScale =
-                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                 RoundingMode::TowardPositiveInfinity>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceCScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                    aStreamCtx, functor);
@@ -784,7 +784,7 @@ void InvokeDivInplaceCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aCon
     template void                                                                                                      \
     InvokeDivInplaceCScale<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(          \
         typeSrcIsTypeDst * aSrcDst, size_t aPitchSrcDst, const typeSrcIsTypeDst &aConst,                               \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, opp::RoundingMode aRoundingMode,     \
+        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, mpp::RoundingMode aRoundingMode,     \
         const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeDivInplaceCScale(type)                                                              \
@@ -806,16 +806,16 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aConst, const Size2D &aSize,
                           const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using divInplaceDevC =
-            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, opp::Div<ComputeT, DstT>, RoundingMode::None>;
+            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>, RoundingMode::None>;
 
-        const opp::Div<ComputeT, DstT> op;
+        const mpp::Div<ComputeT, DstT> op;
 
         const divInplaceDevC functor(aConst, op);
 
@@ -849,67 +849,67 @@ void InvokeDivInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aConst
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivInplaceDevCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aConst,
-                               scalefactor_t<ComputeT> aScaleFactor, opp::RoundingMode aRoundingMode,
+                               scalefactor_t<ComputeT> aScaleFactor, mpp::RoundingMode aRoundingMode,
                                const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         switch (aRoundingMode)
         {
-            case opp::RoundingMode::NearestTiesToEven:
+            case mpp::RoundingMode::NearestTiesToEven:
             {
                 using divInplaceDevCScale =
-                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                    RoundingMode::NearestTiesToEven>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divInplaceDevCScale functor(aConst, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceDevCScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                       aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::NearestTiesAwayFromZero:
+            case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
                 using divInplaceDevCScale =
-                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                    RoundingMode::NearestTiesAwayFromZero>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divInplaceDevCScale functor(aConst, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceDevCScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                       aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardZero:
+            case mpp::RoundingMode::TowardZero:
             {
                 using divInplaceDevCScale =
-                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                    RoundingMode::TowardZero>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divInplaceDevCScale functor(aConst, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceDevCScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                       aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardNegativeInfinity:
+            case mpp::RoundingMode::TowardNegativeInfinity:
             {
                 using divInplaceDevCScale =
-                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                    RoundingMode::TowardNegativeInfinity>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divInplaceDevCScale functor(aConst, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceDevCScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                       aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardPositiveInfinity:
+            case mpp::RoundingMode::TowardPositiveInfinity:
             {
                 using divInplaceDevCScale =
-                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::Div<ComputeT, DstT>,
+                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
                                                    RoundingMode::TowardPositiveInfinity>;
-                const opp::Div<ComputeT, DstT> op;
+                const mpp::Div<ComputeT, DstT> op;
                 const divInplaceDevCScale functor(aConst, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceDevCScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                       aStreamCtx, functor);
@@ -927,7 +927,7 @@ void InvokeDivInplaceDevCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *a
     template void                                                                                                      \
     InvokeDivInplaceDevCScale<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(       \
         typeSrcIsTypeDst * aSrcDst, size_t aPitchSrcDst, const typeSrcIsTypeDst *aConst,                               \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, opp::RoundingMode aRoundingMode,     \
+        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, mpp::RoundingMode aRoundingMode,     \
         const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeDivInplaceDevCScale(type)                                                           \
@@ -949,19 +949,19 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivInvInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, size_t aPitchSrc2,
                             const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using simdOP_t = simd::DivInv<Tupel<DstT, TupelSize>>;
         if constexpr (simdOP_t::has_simd)
         {
-            using divInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::DivInv<ComputeT, DstT>,
+            using divInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
                                                         RoundingMode::None, ComputeT, simdOP_t>;
 
-            const opp::DivInv<ComputeT, DstT> op;
+            const mpp::DivInv<ComputeT, DstT> op;
             const simdOP_t opSIMD;
 
             const divInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
@@ -972,9 +972,9 @@ void InvokeDivInvInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc
         else
         {
             using divInplaceSrc =
-                InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::DivInv<ComputeT, DstT>, RoundingMode::None>;
+                InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>, RoundingMode::None>;
 
-            const opp::DivInv<ComputeT, DstT> op;
+            const mpp::DivInv<ComputeT, DstT> op;
 
             const divInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
@@ -1009,67 +1009,67 @@ void InvokeDivInvInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivInvInplaceSrcScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, size_t aPitchSrc2,
-                                 scalefactor_t<ComputeT> aScaleFactor, opp::RoundingMode aRoundingMode,
+                                 scalefactor_t<ComputeT> aScaleFactor, mpp::RoundingMode aRoundingMode,
                                  const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         switch (aRoundingMode)
         {
-            case opp::RoundingMode::NearestTiesToEven:
+            case mpp::RoundingMode::NearestTiesToEven:
             {
                 using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::DivInv<ComputeT, DstT>,
+                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
                                            RoundingMode::NearestTiesToEven>;
-                const opp::DivInv<ComputeT, DstT> op;
+                const mpp::DivInv<ComputeT, DstT> op;
                 const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceSrcScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                      aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::NearestTiesAwayFromZero:
+            case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
                 using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::DivInv<ComputeT, DstT>,
+                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
                                            RoundingMode::NearestTiesAwayFromZero>;
-                const opp::DivInv<ComputeT, DstT> op;
+                const mpp::DivInv<ComputeT, DstT> op;
                 const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceSrcScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                      aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardZero:
+            case mpp::RoundingMode::TowardZero:
             {
                 using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::DivInv<ComputeT, DstT>,
+                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
                                            RoundingMode::TowardZero>;
-                const opp::DivInv<ComputeT, DstT> op;
+                const mpp::DivInv<ComputeT, DstT> op;
                 const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceSrcScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                      aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardNegativeInfinity:
+            case mpp::RoundingMode::TowardNegativeInfinity:
             {
                 using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::DivInv<ComputeT, DstT>,
+                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
                                            RoundingMode::TowardNegativeInfinity>;
-                const opp::DivInv<ComputeT, DstT> op;
+                const mpp::DivInv<ComputeT, DstT> op;
                 const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceSrcScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                      aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardPositiveInfinity:
+            case mpp::RoundingMode::TowardPositiveInfinity:
             {
                 using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, opp::DivInv<ComputeT, DstT>,
+                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
                                            RoundingMode::TowardPositiveInfinity>;
-                const opp::DivInv<ComputeT, DstT> op;
+                const mpp::DivInv<ComputeT, DstT> op;
                 const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceSrcScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                      aStreamCtx, functor);
@@ -1087,7 +1087,7 @@ void InvokeDivInvInplaceSrcScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT 
     template void                                                                                                      \
     InvokeDivInvInplaceSrcScale<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(     \
         typeSrcIsTypeDst * aSrcDst, size_t aPitchSrcDst, const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,             \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, opp::RoundingMode aRoundingMode,     \
+        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, mpp::RoundingMode aRoundingMode,     \
         const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeDivInvInplaceSrcScale(type)                                                         \
@@ -1109,19 +1109,19 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivInvInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, const Size2D &aSize,
                           const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using simdOP_t = simd::DivInv<Tupel<DstT, TupelSize>>;
         if constexpr (simdOP_t::has_simd)
         {
-            using divInplaceCSIMD = InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::DivInv<ComputeT, DstT>,
+            using divInplaceCSIMD = InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
                                                            RoundingMode::None, Tupel<ComputeT, TupelSize>, simdOP_t>;
 
-            const opp::DivInv<ComputeT, DstT> op;
+            const mpp::DivInv<ComputeT, DstT> op;
             const simdOP_t opSIMD;
             const Tupel<ComputeT, TupelSize> tupelConstant =
                 Tupel<ComputeT, TupelSize>::GetConstant(static_cast<ComputeT>(aConst));
@@ -1134,9 +1134,9 @@ void InvokeDivInvInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst
         else
         {
             using divInplaceC =
-                InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::DivInv<ComputeT, DstT>, RoundingMode::None>;
+                InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>, RoundingMode::None>;
 
-            const opp::DivInv<ComputeT, DstT> op;
+            const mpp::DivInv<ComputeT, DstT> op;
 
             const divInplaceC functor(static_cast<ComputeT>(aConst), op);
 
@@ -1171,67 +1171,67 @@ void InvokeDivInvInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivInvInplaceCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst,
-                               scalefactor_t<ComputeT> aScaleFactor, opp::RoundingMode aRoundingMode,
+                               scalefactor_t<ComputeT> aScaleFactor, mpp::RoundingMode aRoundingMode,
                                const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         switch (aRoundingMode)
         {
-            case opp::RoundingMode::NearestTiesToEven:
+            case mpp::RoundingMode::NearestTiesToEven:
             {
                 using divInplaceCScale =
-                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::DivInv<ComputeT, DstT>,
+                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
                                                 RoundingMode::NearestTiesToEven>;
-                const opp::DivInv<ComputeT, DstT> op;
+                const mpp::DivInv<ComputeT, DstT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceCScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                    aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::NearestTiesAwayFromZero:
+            case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
                 using divInplaceCScale =
-                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::DivInv<ComputeT, DstT>,
+                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
                                                 RoundingMode::NearestTiesAwayFromZero>;
-                const opp::DivInv<ComputeT, DstT> op;
+                const mpp::DivInv<ComputeT, DstT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceCScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                    aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardZero:
+            case mpp::RoundingMode::TowardZero:
             {
                 using divInplaceCScale =
-                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::DivInv<ComputeT, DstT>,
+                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
                                                 RoundingMode::TowardZero>;
-                const opp::DivInv<ComputeT, DstT> op;
+                const mpp::DivInv<ComputeT, DstT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceCScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                    aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardNegativeInfinity:
+            case mpp::RoundingMode::TowardNegativeInfinity:
             {
                 using divInplaceCScale =
-                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::DivInv<ComputeT, DstT>,
+                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
                                                 RoundingMode::TowardNegativeInfinity>;
-                const opp::DivInv<ComputeT, DstT> op;
+                const mpp::DivInv<ComputeT, DstT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceCScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                    aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardPositiveInfinity:
+            case mpp::RoundingMode::TowardPositiveInfinity:
             {
                 using divInplaceCScale =
-                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::DivInv<ComputeT, DstT>,
+                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
                                                 RoundingMode::TowardPositiveInfinity>;
-                const opp::DivInv<ComputeT, DstT> op;
+                const mpp::DivInv<ComputeT, DstT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceCScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                    aStreamCtx, functor);
@@ -1249,7 +1249,7 @@ void InvokeDivInvInplaceCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &a
     template void                                                                                                      \
     InvokeDivInvInplaceCScale<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(       \
         typeSrcIsTypeDst * aSrcDst, size_t aPitchSrcDst, const typeSrcIsTypeDst &aConst,                               \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, opp::RoundingMode aRoundingMode,     \
+        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, mpp::RoundingMode aRoundingMode,     \
         const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeDivInvInplaceCScale(type)                                                           \
@@ -1271,16 +1271,16 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivInvInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aConst, const Size2D &aSize,
                              const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using divInplaceDevC =
-            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, opp::DivInv<ComputeT, DstT>, RoundingMode::None>;
+            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>, RoundingMode::None>;
 
-        const opp::DivInv<ComputeT, DstT> op;
+        const mpp::DivInv<ComputeT, DstT> op;
 
         const divInplaceDevC functor(aConst, op);
 
@@ -1314,67 +1314,67 @@ void InvokeDivInvInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aCo
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivInvInplaceDevCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aConst,
-                                  scalefactor_t<ComputeT> aScaleFactor, opp::RoundingMode aRoundingMode,
+                                  scalefactor_t<ComputeT> aScaleFactor, mpp::RoundingMode aRoundingMode,
                                   const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         switch (aRoundingMode)
         {
-            case opp::RoundingMode::NearestTiesToEven:
+            case mpp::RoundingMode::NearestTiesToEven:
             {
                 using divInplaceDevCScale =
-                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::DivInv<ComputeT, DstT>,
+                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
                                                    RoundingMode::NearestTiesToEven>;
-                const opp::DivInv<ComputeT, DstT> op;
+                const mpp::DivInv<ComputeT, DstT> op;
                 const divInplaceDevCScale functor(aConst, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceDevCScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                       aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::NearestTiesAwayFromZero:
+            case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
                 using divInplaceDevCScale =
-                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::DivInv<ComputeT, DstT>,
+                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
                                                    RoundingMode::NearestTiesAwayFromZero>;
-                const opp::DivInv<ComputeT, DstT> op;
+                const mpp::DivInv<ComputeT, DstT> op;
                 const divInplaceDevCScale functor(aConst, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceDevCScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                       aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardZero:
+            case mpp::RoundingMode::TowardZero:
             {
                 using divInplaceDevCScale =
-                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::DivInv<ComputeT, DstT>,
+                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
                                                    RoundingMode::TowardZero>;
-                const opp::DivInv<ComputeT, DstT> op;
+                const mpp::DivInv<ComputeT, DstT> op;
                 const divInplaceDevCScale functor(aConst, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceDevCScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                       aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardNegativeInfinity:
+            case mpp::RoundingMode::TowardNegativeInfinity:
             {
                 using divInplaceDevCScale =
-                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::DivInv<ComputeT, DstT>,
+                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
                                                    RoundingMode::TowardNegativeInfinity>;
-                const opp::DivInv<ComputeT, DstT> op;
+                const mpp::DivInv<ComputeT, DstT> op;
                 const divInplaceDevCScale functor(aConst, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceDevCScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                       aStreamCtx, functor);
             }
             break;
-            case opp::RoundingMode::TowardPositiveInfinity:
+            case mpp::RoundingMode::TowardPositiveInfinity:
             {
                 using divInplaceDevCScale =
-                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, opp::DivInv<ComputeT, DstT>,
+                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
                                                    RoundingMode::TowardPositiveInfinity>;
-                const opp::DivInv<ComputeT, DstT> op;
+                const mpp::DivInv<ComputeT, DstT> op;
                 const divInplaceDevCScale functor(aConst, op, aScaleFactor);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, divInplaceDevCScale>(aSrcDst, aPitchSrcDst, aSize,
                                                                                       aStreamCtx, functor);
@@ -1392,7 +1392,7 @@ void InvokeDivInvInplaceDevCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT
     template void                                                                                                      \
     InvokeDivInvInplaceDevCScale<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(    \
         typeSrcIsTypeDst * aSrcDst, size_t aPitchSrcDst, const typeSrcIsTypeDst *aConst,                               \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, opp::RoundingMode aRoundingMode,     \
+        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, mpp::RoundingMode aRoundingMode,     \
         const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeDivInvInplaceDevCScale(type)                                                        \
@@ -1410,5 +1410,5 @@ void InvokeDivInvInplaceDevCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT
 
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

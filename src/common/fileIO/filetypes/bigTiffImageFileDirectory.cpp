@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-namespace opp::fileIO
+namespace mpp::fileIO
 {
 using namespace tiffTag;
 namespace bigTiffTag
@@ -711,4 +711,4 @@ Rational BigIFDYResolution::Value() const
 }
 
 } // namespace bigTiffTag
-} // namespace opp::fileIO
+} // namespace mpp::fileIO

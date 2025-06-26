@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "integral.h"
 #include <backends/cuda/image/configurations.h>
@@ -12,23 +12,23 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeIntegralSrc(const SrcT *aSrc, size_t aPitchSrc, DstT *aTemp, size_t aPitchTemp, DstT *aDst, size_t aPitchDst,
-                       const DstT &aStartValue, const Size2D &aSizeDst, const opp::cuda::StreamCtx &aStreamCtx)
+                       const DstT &aStartValue, const Size2D &aSizeDst, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
@@ -49,7 +49,7 @@ void InvokeIntegralSrc(const SrcT *aSrc, size_t aPitchSrc, DstT *aTemp, size_t a
 #define Instantiate_For(typeSrc, typeDst)                                                                              \
     template void InvokeIntegralSrc(const typeSrc *aSrc, size_t aPitchSrc, typeDst *aTemp, size_t aPitchTemp,          \
                                     typeDst *aDst, size_t aPitchDst, const typeDst &aStartValue,                       \
-                                    const Size2D &aSizeDst, const opp::cuda::StreamCtx &aStreamCtx);
+                                    const Size2D &aSizeDst, const mpp::cuda::StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlpha(typeSrc, typeDst)                                                                        \
     Instantiate_For(Pixel##typeSrc##C1, Pixel##typeDst##C1);                                                           \
@@ -58,5 +58,5 @@ void InvokeIntegralSrc(const SrcT *aSrc, size_t aPitchSrc, DstT *aTemp, size_t a
     Instantiate_For(Pixel##typeSrc##C4, Pixel##typeDst##C4);
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

@@ -10,7 +10,7 @@
 #include <numbers>
 #include <vector>
 
-namespace opp
+namespace mpp
 {
 /// <summary>
 /// Our own cast function that does mostly just a static cast. But for floating point to integer casts, behaviour is
@@ -191,4 +191,4 @@ DEVICE_ONLY_CODE TTo StaticCast(TFrom aValue)
 #endif
     return ret;
 }
-} // namespace opp
+} // namespace mpp

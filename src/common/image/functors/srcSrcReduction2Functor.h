@@ -5,7 +5,7 @@
 #include <common/image/pixelTypes.h>
 #include <common/maskTupel.h>
 #include <common/numberTypes.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/roundFunctor.h>
 #include <common/statistics/operators.h>
 #include <common/tupel.h>
@@ -16,7 +16,7 @@
 // disable warning for pragma unroll when compiling with host compiler:
 #include <common/disableWarningsBegin.h>
 
-namespace opp::image
+namespace mpp::image
 {
 /// <summary>
 /// Performs a reduction operation with two input images and two seperate output values
@@ -128,5 +128,5 @@ struct SrcSrcReduction2Functor
     }
 #pragma endregion
 };
-} // namespace opp::image
+} // namespace mpp::image
 #include <common/disableWarningsEnd.h>

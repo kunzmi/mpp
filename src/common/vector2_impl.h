@@ -6,7 +6,7 @@
 #include "needSaturationClamp.h"
 #include "numberTypes.h"
 #include "numeric_limits.h"
-#include "opp_defs.h"
+#include "mpp_defs.h"
 #include "safeCast.h"
 #include "staticCast.h"
 #include "vector2.h"
@@ -22,24 +22,24 @@
 #include <cuda_fp16.h>
 #include <vector_types.h>
 #else
-namespace opp
+namespace mpp
 {
 // these types are only used with CUDA, but nevertheless they need
 // to be defined, so we set them to some knwon type of same size:
 using nv_bfloat162 = int;
 using half2        = float;
 using float2       = double;
-} // namespace opp
+} // namespace mpp
 
 // no arguments to these intrinsics directly depend on a template parameter,
 // so a declaration must be available:
-opp::float2 __half22float2(opp::half2);               // NOLINT
-opp::half2 __float22half2_rn(opp::float2);            // NOLINT
-opp::float2 __bfloat1622float2(opp::nv_bfloat162);    // NOLINT
-opp::nv_bfloat162 __float22bfloat162_rn(opp::float2); // NOLINT
+mpp::float2 __half22float2(mpp::half2);               // NOLINT
+mpp::half2 __float22half2_rn(mpp::float2);            // NOLINT
+mpp::float2 __bfloat1622float2(mpp::nv_bfloat162);    // NOLINT
+mpp::nv_bfloat162 __float22bfloat162_rn(mpp::float2); // NOLINT
 #endif
 
-namespace opp
+namespace mpp
 {
 
 #pragma region Constructors
@@ -2854,4 +2854,4 @@ std::wistream &operator>>(std::wistream &aIs, Vector2<T2> &aVec)
     return aIs;
 }
 
-} // namespace opp
+} // namespace mpp

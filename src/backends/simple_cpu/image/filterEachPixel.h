@@ -11,7 +11,7 @@
 
 #include <iostream>
 
-namespace opp::image::cpuSimple
+namespace mpp::image::cpuSimple
 {
 // forward declaration
 template <PixelType T> class ImageView;
@@ -117,4 +117,4 @@ void ssimEachPixel(const ImageView<SrcT> &aSrc1, const ImageView<SrcT> &aSrc2, I
                    const FilterT *aFilter, const FilterArea &aFilterArea, BorderType aBorderType,
                    const Roi &aAllowedReadRoi1, const Roi &aAllowedReadRoi2, postOP aPostOp);
 
-} // namespace opp::image::cpuSimple
+} // namespace mpp::image::cpuSimple

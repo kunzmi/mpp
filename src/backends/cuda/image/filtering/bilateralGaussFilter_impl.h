@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "bilateralGaussFilter.h"
 #include <backends/cuda/image/bilateralGaussFilterKernel.h>
@@ -11,15 +11,15 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 
 template <typename T> struct pixel_block_size_x
@@ -58,13 +58,13 @@ struct tupel_size<T>
 template <typename SrcT, typename DstT>
 void InvokeBilateralGaussFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst,
                                 const FilterArea &aFilterArea, const Pixel32fC1 *aPreCompGeomDistCoeff,
-                                float aValSquareSigma, opp::Norm aNorm, BorderType aBorderType, const SrcT &aConstant,
+                                float aValSquareSigma, mpp::Norm aNorm, BorderType aBorderType, const SrcT &aConstant,
                                 const Size2D &aAllowedReadRoiSize, const Vector2<int> &aOffsetToActualRoi,
-                                const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+                                const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
         constexpr size_t TupelSize = tupel_size<DstT>::value;
         using ComputeT             = filter_compute_type_for_t<SrcT>;
@@ -75,24 +75,24 @@ void InvokeBilateralGaussFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst
 
         switch (aBorderType)
         {
-            case opp::BorderType::None:
+            case mpp::BorderType::None:
             {
                 using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
                 const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
 
-                if (aNorm == opp::Norm::L1 || vector_active_size_v<SrcT> == 1)
+                if (aNorm == mpp::Norm::L1 || vector_active_size_v<SrcT> == 1)
                 {
                     InvokeBilateralGaussFilterKernelDefault<ComputeT, DstT, TupelSize, pixelBlockSizeX, pixelBlockSizeY,
-                                                            RoundingMode::NearestTiesToEven, BCType, opp::Norm::L1>(
+                                                            RoundingMode::NearestTiesToEven, BCType, mpp::Norm::L1>(
                         bc, aDst, aPitchDst, aFilterArea, aPreCompGeomDistCoeff, aValSquareSigma, aSize, aStreamCtx);
                 }
                 if constexpr (vector_active_size_v<SrcT> > 1)
                 {
-                    if (aNorm == opp::Norm::L2)
+                    if (aNorm == mpp::Norm::L2)
                     {
                         InvokeBilateralGaussFilterKernelDefault<ComputeT, DstT, TupelSize, pixelBlockSizeX,
                                                                 pixelBlockSizeY, RoundingMode::NearestTiesToEven,
-                                                                BCType, opp::Norm::L2>(
+                                                                BCType, mpp::Norm::L2>(
                             bc, aDst, aPitchDst, aFilterArea, aPreCompGeomDistCoeff, aValSquareSigma, aSize,
                             aStreamCtx);
                     }
@@ -103,24 +103,24 @@ void InvokeBilateralGaussFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst
                 }
             }
             break;
-            case opp::BorderType::Constant:
+            case mpp::BorderType::Constant:
             {
                 using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
                 const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
 
-                if (aNorm == opp::Norm::L1 || vector_active_size_v<SrcT> == 1)
+                if (aNorm == mpp::Norm::L1 || vector_active_size_v<SrcT> == 1)
                 {
                     InvokeBilateralGaussFilterKernelDefault<ComputeT, DstT, TupelSize, pixelBlockSizeX, pixelBlockSizeY,
-                                                            RoundingMode::NearestTiesToEven, BCType, opp::Norm::L1>(
+                                                            RoundingMode::NearestTiesToEven, BCType, mpp::Norm::L1>(
                         bc, aDst, aPitchDst, aFilterArea, aPreCompGeomDistCoeff, aValSquareSigma, aSize, aStreamCtx);
                 }
                 if constexpr (vector_active_size_v<SrcT> > 1)
                 {
-                    if (aNorm == opp::Norm::L2)
+                    if (aNorm == mpp::Norm::L2)
                     {
                         InvokeBilateralGaussFilterKernelDefault<ComputeT, DstT, TupelSize, pixelBlockSizeX,
                                                                 pixelBlockSizeY, RoundingMode::NearestTiesToEven,
-                                                                BCType, opp::Norm::L2>(
+                                                                BCType, mpp::Norm::L2>(
                             bc, aDst, aPitchDst, aFilterArea, aPreCompGeomDistCoeff, aValSquareSigma, aSize,
                             aStreamCtx);
                     }
@@ -131,24 +131,24 @@ void InvokeBilateralGaussFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst
                 }
             }
             break;
-            case opp::BorderType::Replicate:
+            case mpp::BorderType::Replicate:
             {
                 using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
                 const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
 
-                if (aNorm == opp::Norm::L1 || vector_active_size_v<SrcT> == 1)
+                if (aNorm == mpp::Norm::L1 || vector_active_size_v<SrcT> == 1)
                 {
                     InvokeBilateralGaussFilterKernelDefault<ComputeT, DstT, TupelSize, pixelBlockSizeX, pixelBlockSizeY,
-                                                            RoundingMode::NearestTiesToEven, BCType, opp::Norm::L1>(
+                                                            RoundingMode::NearestTiesToEven, BCType, mpp::Norm::L1>(
                         bc, aDst, aPitchDst, aFilterArea, aPreCompGeomDistCoeff, aValSquareSigma, aSize, aStreamCtx);
                 }
                 if constexpr (vector_active_size_v<SrcT> > 1)
                 {
-                    if (aNorm == opp::Norm::L2)
+                    if (aNorm == mpp::Norm::L2)
                     {
                         InvokeBilateralGaussFilterKernelDefault<ComputeT, DstT, TupelSize, pixelBlockSizeX,
                                                                 pixelBlockSizeY, RoundingMode::NearestTiesToEven,
-                                                                BCType, opp::Norm::L2>(
+                                                                BCType, mpp::Norm::L2>(
                             bc, aDst, aPitchDst, aFilterArea, aPreCompGeomDistCoeff, aValSquareSigma, aSize,
                             aStreamCtx);
                     }
@@ -159,24 +159,24 @@ void InvokeBilateralGaussFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst
                 }
             }
             break;
-            case opp::BorderType::Mirror:
+            case mpp::BorderType::Mirror:
             {
                 using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
                 const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
 
-                if (aNorm == opp::Norm::L1 || vector_active_size_v<SrcT> == 1)
+                if (aNorm == mpp::Norm::L1 || vector_active_size_v<SrcT> == 1)
                 {
                     InvokeBilateralGaussFilterKernelDefault<ComputeT, DstT, TupelSize, pixelBlockSizeX, pixelBlockSizeY,
-                                                            RoundingMode::NearestTiesToEven, BCType, opp::Norm::L1>(
+                                                            RoundingMode::NearestTiesToEven, BCType, mpp::Norm::L1>(
                         bc, aDst, aPitchDst, aFilterArea, aPreCompGeomDistCoeff, aValSquareSigma, aSize, aStreamCtx);
                 }
                 if constexpr (vector_active_size_v<SrcT> > 1)
                 {
-                    if (aNorm == opp::Norm::L2)
+                    if (aNorm == mpp::Norm::L2)
                     {
                         InvokeBilateralGaussFilterKernelDefault<ComputeT, DstT, TupelSize, pixelBlockSizeX,
                                                                 pixelBlockSizeY, RoundingMode::NearestTiesToEven,
-                                                                BCType, opp::Norm::L2>(
+                                                                BCType, mpp::Norm::L2>(
                             bc, aDst, aPitchDst, aFilterArea, aPreCompGeomDistCoeff, aValSquareSigma, aSize,
                             aStreamCtx);
                     }
@@ -187,24 +187,24 @@ void InvokeBilateralGaussFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst
                 }
             }
             break;
-            case opp::BorderType::MirrorReplicate:
+            case mpp::BorderType::MirrorReplicate:
             {
                 using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
                 const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
 
-                if (aNorm == opp::Norm::L1 || vector_active_size_v<SrcT> == 1)
+                if (aNorm == mpp::Norm::L1 || vector_active_size_v<SrcT> == 1)
                 {
                     InvokeBilateralGaussFilterKernelDefault<ComputeT, DstT, TupelSize, pixelBlockSizeX, pixelBlockSizeY,
-                                                            RoundingMode::NearestTiesToEven, BCType, opp::Norm::L1>(
+                                                            RoundingMode::NearestTiesToEven, BCType, mpp::Norm::L1>(
                         bc, aDst, aPitchDst, aFilterArea, aPreCompGeomDistCoeff, aValSquareSigma, aSize, aStreamCtx);
                 }
                 if constexpr (vector_active_size_v<SrcT> > 1)
                 {
-                    if (aNorm == opp::Norm::L2)
+                    if (aNorm == mpp::Norm::L2)
                     {
                         InvokeBilateralGaussFilterKernelDefault<ComputeT, DstT, TupelSize, pixelBlockSizeX,
                                                                 pixelBlockSizeY, RoundingMode::NearestTiesToEven,
-                                                                BCType, opp::Norm::L2>(
+                                                                BCType, mpp::Norm::L2>(
                             bc, aDst, aPitchDst, aFilterArea, aPreCompGeomDistCoeff, aValSquareSigma, aSize,
                             aStreamCtx);
                     }
@@ -215,24 +215,24 @@ void InvokeBilateralGaussFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst
                 }
             }
             break;
-            case opp::BorderType::Wrap:
+            case mpp::BorderType::Wrap:
             {
                 using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
                 const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
 
-                if (aNorm == opp::Norm::L1 || vector_active_size_v<SrcT> == 1)
+                if (aNorm == mpp::Norm::L1 || vector_active_size_v<SrcT> == 1)
                 {
                     InvokeBilateralGaussFilterKernelDefault<ComputeT, DstT, TupelSize, pixelBlockSizeX, pixelBlockSizeY,
-                                                            RoundingMode::NearestTiesToEven, BCType, opp::Norm::L1>(
+                                                            RoundingMode::NearestTiesToEven, BCType, mpp::Norm::L1>(
                         bc, aDst, aPitchDst, aFilterArea, aPreCompGeomDistCoeff, aValSquareSigma, aSize, aStreamCtx);
                 }
                 if constexpr (vector_active_size_v<SrcT> > 1)
                 {
-                    if (aNorm == opp::Norm::L2)
+                    if (aNorm == mpp::Norm::L2)
                     {
                         InvokeBilateralGaussFilterKernelDefault<ComputeT, DstT, TupelSize, pixelBlockSizeX,
                                                                 pixelBlockSizeY, RoundingMode::NearestTiesToEven,
-                                                                BCType, opp::Norm::L2>(
+                                                                BCType, mpp::Norm::L2>(
                             bc, aDst, aPitchDst, aFilterArea, aPreCompGeomDistCoeff, aValSquareSigma, aSize,
                             aStreamCtx);
                     }
@@ -256,7 +256,7 @@ void InvokeBilateralGaussFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst
 #define Instantiate_For(typeSrc, typeDst)                                                                              \
     template void InvokeBilateralGaussFilter<typeSrc, typeDst>(                                                        \
         const typeSrc *aSrc1, size_t aPitchSrc1, typeDst *aDst, size_t aPitchDst, const FilterArea &aFilterArea,       \
-        const Pixel32fC1 *aPreCompGeomDistCoeff, float aValSquareSigma, opp::Norm aNorm, BorderType aBorderType,       \
+        const Pixel32fC1 *aPreCompGeomDistCoeff, float aValSquareSigma, mpp::Norm aNorm, BorderType aBorderType,       \
         const typeSrc &aConstant, const Size2D &aAllowedReadRoiSize, const Vector2<int> &aOffsetToActualRoi,           \
         const Size2D &aSize, const StreamCtx &aStreamCtx);
 
@@ -275,5 +275,5 @@ void InvokeBilateralGaussFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst
 
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

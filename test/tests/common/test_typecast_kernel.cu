@@ -11,7 +11,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-namespace opp
+namespace mpp
 {
 namespace cuda
 {
@@ -121,4 +121,4 @@ template void runtest_typecast_kernel<Vector4<float>>(char *, Vector4<float> *aD
 template void runtest_typecast_kernel<Vector4<BFloat16>>(char *, Vector4<BFloat16> *aDataIn);
 template void runtest_typecast_kernel<Vector4<HalfFp16>>(char *, Vector4<HalfFp16> *aDataIn);
 } // namespace cuda
-} // namespace opp
+} // namespace mpp

@@ -22,7 +22,7 @@
 #include <memory>
 #include <vector>
 
-namespace opp::fileIO
+namespace mpp::fileIO
 {
 using namespace tiffTag;
 using namespace bigTiffTag;
@@ -39,7 +39,7 @@ TIFFFile::TIFFFile(const std::filesystem::path &aFileName) : File(aFileName)
 {
 }
 
-TIFFFile::TIFFFile(const opp::image::Size2D &aSize, opp::image::PixelTypeEnum aDataType, double aPixelSize) : File("")
+TIFFFile::TIFFFile(const mpp::image::Size2D &aSize, mpp::image::PixelTypeEnum aDataType, double aPixelSize) : File("")
 {
     if (!CanWriteAs(aSize, aDataType))
     {
@@ -1335,17 +1335,17 @@ void TIFFFile::DecodeDifferencingPredictor(size_t aIdx)
     }
 }
 
-void TIFFFile::EncodeDifferencingPredictor(void *aData, opp::image::PixelTypeEnum aDataType, uint aWidth, uint aHeight)
+void TIFFFile::EncodeDifferencingPredictor(void *aData, mpp::image::PixelTypeEnum aDataType, uint aWidth, uint aHeight)
 {
     // all unsigned int data types:
-    if (aDataType != opp::image::PixelTypeEnum::PTE32uC1 && aDataType != opp::image::PixelTypeEnum::PTE16uC1 &&
-        aDataType != opp::image::PixelTypeEnum::PTE8uC1 && aDataType != opp::image::PixelTypeEnum::PTE32uC2 &&
-        aDataType != opp::image::PixelTypeEnum::PTE16uC2 && aDataType != opp::image::PixelTypeEnum::PTE8uC2 &&
-        aDataType != opp::image::PixelTypeEnum::PTE32uC3 && aDataType != opp::image::PixelTypeEnum::PTE16uC3 &&
-        aDataType != opp::image::PixelTypeEnum::PTE8uC3 && aDataType != opp::image::PixelTypeEnum::PTE32uC4 &&
-        aDataType != opp::image::PixelTypeEnum::PTE16uC4 && aDataType != opp::image::PixelTypeEnum::PTE8uC4 &&
-        aDataType != opp::image::PixelTypeEnum::PTE32uC4A && aDataType != opp::image::PixelTypeEnum::PTE16uC4A &&
-        aDataType != opp::image::PixelTypeEnum::PTE8uC4A)
+    if (aDataType != mpp::image::PixelTypeEnum::PTE32uC1 && aDataType != mpp::image::PixelTypeEnum::PTE16uC1 &&
+        aDataType != mpp::image::PixelTypeEnum::PTE8uC1 && aDataType != mpp::image::PixelTypeEnum::PTE32uC2 &&
+        aDataType != mpp::image::PixelTypeEnum::PTE16uC2 && aDataType != mpp::image::PixelTypeEnum::PTE8uC2 &&
+        aDataType != mpp::image::PixelTypeEnum::PTE32uC3 && aDataType != mpp::image::PixelTypeEnum::PTE16uC3 &&
+        aDataType != mpp::image::PixelTypeEnum::PTE8uC3 && aDataType != mpp::image::PixelTypeEnum::PTE32uC4 &&
+        aDataType != mpp::image::PixelTypeEnum::PTE16uC4 && aDataType != mpp::image::PixelTypeEnum::PTE8uC4 &&
+        aDataType != mpp::image::PixelTypeEnum::PTE32uC4A && aDataType != mpp::image::PixelTypeEnum::PTE16uC4A &&
+        aDataType != mpp::image::PixelTypeEnum::PTE8uC4A)
     {
         throw EXCEPTION("EncodeDifferencingPredictor is only available for Pixel32uC1/2/3/4/4A, Pixel16uC1/2/3/4/4A "
                         "and Pixel8uC1/2/3/4/4A pixeltype.");
@@ -1360,9 +1360,9 @@ void TIFFFile::EncodeDifferencingPredictor(void *aData, opp::image::PixelTypeEnu
     const size_t width  = to_size_t(aWidth);
     size_t lineOffset   = 0;
 
-    const size_t samplesPerPixel = opp::image::GetChannelCount(aDataType);
+    const size_t samplesPerPixel = mpp::image::GetChannelCount(aDataType);
 
-    const size_t bitsPerSample = 8 * opp::image::GetPixelSizeInBytes(aDataType) / samplesPerPixel;
+    const size_t bitsPerSample = 8 * mpp::image::GetPixelSizeInBytes(aDataType) / samplesPerPixel;
 
     const size_t imageOffset     = 0;
     const size_t nextPixelOffset = samplesPerPixel;
@@ -1755,11 +1755,11 @@ bool TIFFFile::IsLittleEndian()
     return File::IsLittleEndian();
 }
 
-bool TIFFFile::CanWriteAs(int aDimX, int aDimY, opp::image::PixelTypeEnum aDatatype)
+bool TIFFFile::CanWriteAs(int aDimX, int aDimY, mpp::image::PixelTypeEnum aDatatype)
 {
     if (aDimX < 32767 && aDimY < 32767 && aDimX > 0 && aDimY > 0) // NOLINT
     {
-        if (aDatatype != opp::image::PixelTypeEnum::Unknown)
+        if (aDatatype != mpp::image::PixelTypeEnum::Unknown)
         {
             return true;
         }
@@ -1767,12 +1767,12 @@ bool TIFFFile::CanWriteAs(int aDimX, int aDimY, opp::image::PixelTypeEnum aDatat
     return false;
 }
 
-bool TIFFFile::CanWriteAs(const Vec2i &aDim, opp::image::PixelTypeEnum aDatatype)
+bool TIFFFile::CanWriteAs(const Vec2i &aDim, mpp::image::PixelTypeEnum aDatatype)
 {
     return CanWriteAs(aDim.x, aDim.y, aDatatype);
 }
 
-bool TIFFFile::CanWriteAs(const Vec3i &aDim, opp::image::PixelTypeEnum aDatatype)
+bool TIFFFile::CanWriteAs(const Vec3i &aDim, mpp::image::PixelTypeEnum aDatatype)
 {
     if (aDim.z != 1)
     {
@@ -1781,342 +1781,342 @@ bool TIFFFile::CanWriteAs(const Vec3i &aDim, opp::image::PixelTypeEnum aDatatype
     return CanWriteAs(aDim.x, aDim.y, aDatatype);
 }
 
-opp::image::PixelTypeEnum TIFFFile::GetDataTypeUnsigned() const
+mpp::image::PixelTypeEnum TIFFFile::GetDataTypeUnsigned() const
 {
     // NOLINTBEGIN
     if (mSamplesPerPixel == 1 || mIsPlanar)
     {
         if (mBitsPerSample == 8)
         {
-            return opp::image::PixelTypeEnum::PTE8uC1;
+            return mpp::image::PixelTypeEnum::PTE8uC1;
         }
         if (mBitsPerSample == 16)
         {
-            return opp::image::PixelTypeEnum::PTE16uC1;
+            return mpp::image::PixelTypeEnum::PTE16uC1;
         }
         if (mBitsPerSample == 32)
         {
-            return opp::image::PixelTypeEnum::PTE32uC1;
+            return mpp::image::PixelTypeEnum::PTE32uC1;
         }
         if (mBitsPerSample == 64)
         {
-            return opp::image::PixelTypeEnum::PTE64uC1;
+            return mpp::image::PixelTypeEnum::PTE64uC1;
         }
     }
     if (mSamplesPerPixel == 2)
     {
         if (mBitsPerSample == 8)
         {
-            return opp::image::PixelTypeEnum::PTE8uC2;
+            return mpp::image::PixelTypeEnum::PTE8uC2;
         }
         if (mBitsPerSample == 16)
         {
-            return opp::image::PixelTypeEnum::PTE16uC2;
+            return mpp::image::PixelTypeEnum::PTE16uC2;
         }
         if (mBitsPerSample == 32)
         {
-            return opp::image::PixelTypeEnum::PTE32uC2;
+            return mpp::image::PixelTypeEnum::PTE32uC2;
         }
         if (mBitsPerSample == 64)
         {
-            return opp::image::PixelTypeEnum::PTE64uC2;
+            return mpp::image::PixelTypeEnum::PTE64uC2;
         }
     }
     if (mSamplesPerPixel == 3)
     {
         if (mBitsPerSample == 8)
         {
-            return opp::image::PixelTypeEnum::PTE8uC3;
+            return mpp::image::PixelTypeEnum::PTE8uC3;
         }
         if (mBitsPerSample == 16)
         {
-            return opp::image::PixelTypeEnum::PTE16uC3;
+            return mpp::image::PixelTypeEnum::PTE16uC3;
         }
         if (mBitsPerSample == 32)
         {
-            return opp::image::PixelTypeEnum::PTE32uC3;
+            return mpp::image::PixelTypeEnum::PTE32uC3;
         }
         if (mBitsPerSample == 64)
         {
-            return opp::image::PixelTypeEnum::PTE64uC3;
+            return mpp::image::PixelTypeEnum::PTE64uC3;
         }
     }
     if (mSamplesPerPixel == 4)
     {
         if (mBitsPerSample == 8)
         {
-            return opp::image::PixelTypeEnum::PTE8uC4;
+            return mpp::image::PixelTypeEnum::PTE8uC4;
         }
         if (mBitsPerSample == 16)
         {
-            return opp::image::PixelTypeEnum::PTE16uC4;
+            return mpp::image::PixelTypeEnum::PTE16uC4;
         }
         if (mBitsPerSample == 32)
         {
-            return opp::image::PixelTypeEnum::PTE32uC4;
+            return mpp::image::PixelTypeEnum::PTE32uC4;
         }
         if (mBitsPerSample == 64)
         {
-            return opp::image::PixelTypeEnum::PTE64uC4;
+            return mpp::image::PixelTypeEnum::PTE64uC4;
         }
     }
-    return opp::image::PixelTypeEnum::Unknown;
+    return mpp::image::PixelTypeEnum::Unknown;
     // NOLINTEND
 }
 
-opp::image::PixelTypeEnum TIFFFile::GetDataTypeSigned() const
+mpp::image::PixelTypeEnum TIFFFile::GetDataTypeSigned() const
 {
     // NOLINTBEGIN
     if (mSamplesPerPixel == 1 || mIsPlanar)
     {
         if (mBitsPerSample == 8)
         {
-            return opp::image::PixelTypeEnum::PTE8sC1;
+            return mpp::image::PixelTypeEnum::PTE8sC1;
         }
         if (mBitsPerSample == 16)
         {
-            return opp::image::PixelTypeEnum::PTE16sC1;
+            return mpp::image::PixelTypeEnum::PTE16sC1;
         }
         if (mBitsPerSample == 32)
         {
-            return opp::image::PixelTypeEnum::PTE32sC1;
+            return mpp::image::PixelTypeEnum::PTE32sC1;
         }
         if (mBitsPerSample == 64)
         {
-            return opp::image::PixelTypeEnum::PTE64sC1;
+            return mpp::image::PixelTypeEnum::PTE64sC1;
         }
     }
     if (mSamplesPerPixel == 2)
     {
         if (mBitsPerSample == 8)
         {
-            return opp::image::PixelTypeEnum::PTE8sC2;
+            return mpp::image::PixelTypeEnum::PTE8sC2;
         }
         if (mBitsPerSample == 16)
         {
-            return opp::image::PixelTypeEnum::PTE16sC2;
+            return mpp::image::PixelTypeEnum::PTE16sC2;
         }
         if (mBitsPerSample == 32)
         {
-            return opp::image::PixelTypeEnum::PTE32sC2;
+            return mpp::image::PixelTypeEnum::PTE32sC2;
         }
         if (mBitsPerSample == 64)
         {
-            return opp::image::PixelTypeEnum::PTE64sC2;
+            return mpp::image::PixelTypeEnum::PTE64sC2;
         }
     }
     if (mSamplesPerPixel == 3)
     {
         if (mBitsPerSample == 8)
         {
-            return opp::image::PixelTypeEnum::PTE8sC3;
+            return mpp::image::PixelTypeEnum::PTE8sC3;
         }
         if (mBitsPerSample == 16)
         {
-            return opp::image::PixelTypeEnum::PTE16sC3;
+            return mpp::image::PixelTypeEnum::PTE16sC3;
         }
         if (mBitsPerSample == 32)
         {
-            return opp::image::PixelTypeEnum::PTE32sC3;
+            return mpp::image::PixelTypeEnum::PTE32sC3;
         }
         if (mBitsPerSample == 64)
         {
-            return opp::image::PixelTypeEnum::PTE64sC3;
+            return mpp::image::PixelTypeEnum::PTE64sC3;
         }
     }
     if (mSamplesPerPixel == 4)
     {
         if (mBitsPerSample == 8)
         {
-            return opp::image::PixelTypeEnum::PTE8sC4;
+            return mpp::image::PixelTypeEnum::PTE8sC4;
         }
         if (mBitsPerSample == 16)
         {
-            return opp::image::PixelTypeEnum::PTE16sC4;
+            return mpp::image::PixelTypeEnum::PTE16sC4;
         }
         if (mBitsPerSample == 32)
         {
-            return opp::image::PixelTypeEnum::PTE32sC4;
+            return mpp::image::PixelTypeEnum::PTE32sC4;
         }
         if (mBitsPerSample == 64)
         {
-            return opp::image::PixelTypeEnum::PTE64sC4;
+            return mpp::image::PixelTypeEnum::PTE64sC4;
         }
     }
-    return opp::image::PixelTypeEnum::Unknown;
+    return mpp::image::PixelTypeEnum::Unknown;
     // NOLINTEND
 }
 
-opp::image::PixelTypeEnum TIFFFile::GetDataTypeFloat() const
+mpp::image::PixelTypeEnum TIFFFile::GetDataTypeFloat() const
 {
     // NOLINTBEGIN
     if (mSamplesPerPixel == 1 || mIsPlanar)
     {
         if (mBitsPerSample == 32)
         {
-            return opp::image::PixelTypeEnum::PTE32fC1;
+            return mpp::image::PixelTypeEnum::PTE32fC1;
         }
         if (mBitsPerSample == 64)
         {
-            return opp::image::PixelTypeEnum::PTE64fC1;
+            return mpp::image::PixelTypeEnum::PTE64fC1;
         }
     }
     if (mSamplesPerPixel == 2)
     {
         if (mBitsPerSample == 32)
         {
-            return opp::image::PixelTypeEnum::PTE32fC2;
+            return mpp::image::PixelTypeEnum::PTE32fC2;
         }
         if (mBitsPerSample == 64)
         {
-            return opp::image::PixelTypeEnum::PTE64fC2;
+            return mpp::image::PixelTypeEnum::PTE64fC2;
         }
     }
     if (mSamplesPerPixel == 3)
     {
         if (mBitsPerSample == 32)
         {
-            return opp::image::PixelTypeEnum::PTE32fC3;
+            return mpp::image::PixelTypeEnum::PTE32fC3;
         }
         if (mBitsPerSample == 64)
         {
-            return opp::image::PixelTypeEnum::PTE64fC3;
+            return mpp::image::PixelTypeEnum::PTE64fC3;
         }
     }
     if (mSamplesPerPixel == 4)
     {
         if (mBitsPerSample == 32)
         {
-            return opp::image::PixelTypeEnum::PTE32fC4;
+            return mpp::image::PixelTypeEnum::PTE32fC4;
         }
         if (mBitsPerSample == 64)
         {
-            return opp::image::PixelTypeEnum::PTE64fC4;
+            return mpp::image::PixelTypeEnum::PTE64fC4;
         }
     }
-    return opp::image::PixelTypeEnum::Unknown;
+    return mpp::image::PixelTypeEnum::Unknown;
     // NOLINTEND
 }
 
-opp::image::PixelTypeEnum TIFFFile::GetDataTypeComplex() const
+mpp::image::PixelTypeEnum TIFFFile::GetDataTypeComplex() const
 {
     // NOLINTBEGIN
     if (mSamplesPerPixel == 1 || mIsPlanar)
     {
         if (mBitsPerSample == 32)
         {
-            return opp::image::PixelTypeEnum::PTE16scC1;
+            return mpp::image::PixelTypeEnum::PTE16scC1;
         }
         if (mBitsPerSample == 64)
         {
-            return opp::image::PixelTypeEnum::PTE32scC1;
+            return mpp::image::PixelTypeEnum::PTE32scC1;
         }
         if (mBitsPerSample == 128)
         {
-            return opp::image::PixelTypeEnum::PTE64scC1;
+            return mpp::image::PixelTypeEnum::PTE64scC1;
         }
     }
     if (mSamplesPerPixel == 2)
     {
         if (mBitsPerSample == 32)
         {
-            return opp::image::PixelTypeEnum::PTE16scC2;
+            return mpp::image::PixelTypeEnum::PTE16scC2;
         }
         if (mBitsPerSample == 64)
         {
-            return opp::image::PixelTypeEnum::PTE32scC2;
+            return mpp::image::PixelTypeEnum::PTE32scC2;
         }
         if (mBitsPerSample == 128)
         {
-            return opp::image::PixelTypeEnum::PTE64scC2;
+            return mpp::image::PixelTypeEnum::PTE64scC2;
         }
     }
     if (mSamplesPerPixel == 3)
     {
         if (mBitsPerSample == 32)
         {
-            return opp::image::PixelTypeEnum::PTE16scC3;
+            return mpp::image::PixelTypeEnum::PTE16scC3;
         }
         if (mBitsPerSample == 64)
         {
-            return opp::image::PixelTypeEnum::PTE32scC3;
+            return mpp::image::PixelTypeEnum::PTE32scC3;
         }
         if (mBitsPerSample == 128)
         {
-            return opp::image::PixelTypeEnum::PTE64scC3;
+            return mpp::image::PixelTypeEnum::PTE64scC3;
         }
     }
     if (mSamplesPerPixel == 4)
     {
         if (mBitsPerSample == 32)
         {
-            return opp::image::PixelTypeEnum::PTE16scC4;
+            return mpp::image::PixelTypeEnum::PTE16scC4;
         }
         if (mBitsPerSample == 64)
         {
-            return opp::image::PixelTypeEnum::PTE32scC4;
+            return mpp::image::PixelTypeEnum::PTE32scC4;
         }
         if (mBitsPerSample == 128)
         {
-            return opp::image::PixelTypeEnum::PTE64scC4;
+            return mpp::image::PixelTypeEnum::PTE64scC4;
         }
     }
-    return opp::image::PixelTypeEnum::Unknown;
+    return mpp::image::PixelTypeEnum::Unknown;
     // NOLINTEND
 }
 
-opp::image::PixelTypeEnum TIFFFile::GetDataTypeComplexFloat() const
+mpp::image::PixelTypeEnum TIFFFile::GetDataTypeComplexFloat() const
 {
     // NOLINTBEGIN
     if (mSamplesPerPixel == 1 || mIsPlanar)
     {
         if (mBitsPerSample == 64)
         {
-            return opp::image::PixelTypeEnum::PTE32fcC1;
+            return mpp::image::PixelTypeEnum::PTE32fcC1;
         }
         if (mBitsPerSample == 128)
         {
-            return opp::image::PixelTypeEnum::PTE64fcC1;
+            return mpp::image::PixelTypeEnum::PTE64fcC1;
         }
     }
     if (mSamplesPerPixel == 2)
     {
         if (mBitsPerSample == 64)
         {
-            return opp::image::PixelTypeEnum::PTE32fcC2;
+            return mpp::image::PixelTypeEnum::PTE32fcC2;
         }
         if (mBitsPerSample == 128)
         {
-            return opp::image::PixelTypeEnum::PTE64fcC2;
+            return mpp::image::PixelTypeEnum::PTE64fcC2;
         }
     }
     if (mSamplesPerPixel == 3)
     {
         if (mBitsPerSample == 64)
         {
-            return opp::image::PixelTypeEnum::PTE32fcC3;
+            return mpp::image::PixelTypeEnum::PTE32fcC3;
         }
         if (mBitsPerSample == 128)
         {
-            return opp::image::PixelTypeEnum::PTE64fcC3;
+            return mpp::image::PixelTypeEnum::PTE64fcC3;
         }
     }
     if (mSamplesPerPixel == 4)
     {
         if (mBitsPerSample == 64)
         {
-            return opp::image::PixelTypeEnum::PTE32fcC4;
+            return mpp::image::PixelTypeEnum::PTE32fcC4;
         }
         if (mBitsPerSample == 128)
         {
-            return opp::image::PixelTypeEnum::PTE64fcC4;
+            return mpp::image::PixelTypeEnum::PTE64fcC4;
         }
     }
-    return opp::image::PixelTypeEnum::Unknown;
+    return mpp::image::PixelTypeEnum::Unknown;
     // NOLINTEND
 }
 
-opp::image::PixelTypeEnum TIFFFile::GetDataType() const
+mpp::image::PixelTypeEnum TIFFFile::GetDataType() const
 {
     switch (mSampleFormat)
     {
@@ -2133,430 +2133,430 @@ opp::image::PixelTypeEnum TIFFFile::GetDataType() const
         case TIFFSampleFormat::COMPLEXIEEEFP:
             return GetDataTypeComplexFloat();
         default:
-            return opp::image::PixelTypeEnum::Unknown;
+            return mpp::image::PixelTypeEnum::Unknown;
     }
 }
 
-void TIFFFile::SetDataType(opp::image::PixelTypeEnum aDataType)
+void TIFFFile::SetDataType(mpp::image::PixelTypeEnum aDataType)
 {
     // NOLINTBEGIN
     switch (aDataType)
     {
-        case opp::image::PixelTypeEnum::PTE64fC1:
+        case mpp::image::PixelTypeEnum::PTE64fC1:
             mSampleFormat              = TIFFSampleFormat::IEEEFP;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 1;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE64fC2:
+        case mpp::image::PixelTypeEnum::PTE64fC2:
             mSampleFormat              = TIFFSampleFormat::IEEEFP;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 2;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE64fC3:
+        case mpp::image::PixelTypeEnum::PTE64fC3:
             mSampleFormat              = TIFFSampleFormat::IEEEFP;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 3;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE64fC4:
+        case mpp::image::PixelTypeEnum::PTE64fC4:
             mSampleFormat              = TIFFSampleFormat::IEEEFP;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE64fC4A:
+        case mpp::image::PixelTypeEnum::PTE64fC4A:
             mSampleFormat              = TIFFSampleFormat::IEEEFP;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE64fcC1:
+        case mpp::image::PixelTypeEnum::PTE64fcC1:
             mSampleFormat              = TIFFSampleFormat::COMPLEXIEEEFP;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 1;
             mBitsPerSample             = 128;
             return;
-        case opp::image::PixelTypeEnum::PTE64fcC2:
+        case mpp::image::PixelTypeEnum::PTE64fcC2:
             mSampleFormat              = TIFFSampleFormat::COMPLEXIEEEFP;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 2;
             mBitsPerSample             = 128;
             return;
-        case opp::image::PixelTypeEnum::PTE64fcC3:
+        case mpp::image::PixelTypeEnum::PTE64fcC3:
             mSampleFormat              = TIFFSampleFormat::COMPLEXIEEEFP;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 3;
             mBitsPerSample             = 128;
             return;
-        case opp::image::PixelTypeEnum::PTE64fcC4:
+        case mpp::image::PixelTypeEnum::PTE64fcC4:
             mSampleFormat              = TIFFSampleFormat::COMPLEXIEEEFP;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 128;
             return;
-        case opp::image::PixelTypeEnum::PTE32fC1:
+        case mpp::image::PixelTypeEnum::PTE32fC1:
             mSampleFormat              = TIFFSampleFormat::IEEEFP;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 1;
             mBitsPerSample             = 32;
             return;
-        case opp::image::PixelTypeEnum::PTE32fC2:
+        case mpp::image::PixelTypeEnum::PTE32fC2:
             mSampleFormat              = TIFFSampleFormat::IEEEFP;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 2;
             mBitsPerSample             = 32;
             return;
-        case opp::image::PixelTypeEnum::PTE32fC3:
+        case mpp::image::PixelTypeEnum::PTE32fC3:
             mSampleFormat              = TIFFSampleFormat::IEEEFP;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 3;
             mBitsPerSample             = 32;
             return;
-        case opp::image::PixelTypeEnum::PTE32fC4:
+        case mpp::image::PixelTypeEnum::PTE32fC4:
             mSampleFormat              = TIFFSampleFormat::IEEEFP;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 32;
             return;
-        case opp::image::PixelTypeEnum::PTE32fC4A:
+        case mpp::image::PixelTypeEnum::PTE32fC4A:
             mSampleFormat              = TIFFSampleFormat::IEEEFP;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 32;
             return;
-        case opp::image::PixelTypeEnum::PTE32fcC1:
+        case mpp::image::PixelTypeEnum::PTE32fcC1:
             mSampleFormat              = TIFFSampleFormat::COMPLEXIEEEFP;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 1;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE32fcC2:
+        case mpp::image::PixelTypeEnum::PTE32fcC2:
             mSampleFormat              = TIFFSampleFormat::COMPLEXIEEEFP;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 2;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE32fcC3:
+        case mpp::image::PixelTypeEnum::PTE32fcC3:
             mSampleFormat              = TIFFSampleFormat::COMPLEXIEEEFP;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 3;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE32fcC4:
+        case mpp::image::PixelTypeEnum::PTE32fcC4:
             mSampleFormat              = TIFFSampleFormat::COMPLEXIEEEFP;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE64sC1:
+        case mpp::image::PixelTypeEnum::PTE64sC1:
             mSampleFormat              = TIFFSampleFormat::INT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 1;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE64sC2:
+        case mpp::image::PixelTypeEnum::PTE64sC2:
             mSampleFormat              = TIFFSampleFormat::INT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 2;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE64sC3:
+        case mpp::image::PixelTypeEnum::PTE64sC3:
             mSampleFormat              = TIFFSampleFormat::INT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 3;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE64sC4:
+        case mpp::image::PixelTypeEnum::PTE64sC4:
             mSampleFormat              = TIFFSampleFormat::INT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE64sC4A:
+        case mpp::image::PixelTypeEnum::PTE64sC4A:
             mSampleFormat              = TIFFSampleFormat::INT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE64scC1:
+        case mpp::image::PixelTypeEnum::PTE64scC1:
             mSampleFormat              = TIFFSampleFormat::COMPLEXINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 1;
             mBitsPerSample             = 128;
             return;
-        case opp::image::PixelTypeEnum::PTE64scC2:
+        case mpp::image::PixelTypeEnum::PTE64scC2:
             mSampleFormat              = TIFFSampleFormat::COMPLEXINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 2;
             mBitsPerSample             = 128;
             return;
-        case opp::image::PixelTypeEnum::PTE64scC3:
+        case mpp::image::PixelTypeEnum::PTE64scC3:
             mSampleFormat              = TIFFSampleFormat::COMPLEXINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 3;
             mBitsPerSample             = 128;
             return;
-        case opp::image::PixelTypeEnum::PTE64scC4:
+        case mpp::image::PixelTypeEnum::PTE64scC4:
             mSampleFormat              = TIFFSampleFormat::COMPLEXINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 128;
             return;
-        case opp::image::PixelTypeEnum::PTE64uC1:
+        case mpp::image::PixelTypeEnum::PTE64uC1:
             mSampleFormat              = TIFFSampleFormat::UINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 1;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE64uC2:
+        case mpp::image::PixelTypeEnum::PTE64uC2:
             mSampleFormat              = TIFFSampleFormat::UINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 2;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE64uC3:
+        case mpp::image::PixelTypeEnum::PTE64uC3:
             mSampleFormat              = TIFFSampleFormat::UINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 3;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE64uC4:
+        case mpp::image::PixelTypeEnum::PTE64uC4:
             mSampleFormat              = TIFFSampleFormat::UINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE64uC4A:
+        case mpp::image::PixelTypeEnum::PTE64uC4A:
             mSampleFormat              = TIFFSampleFormat::UINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE32sC1:
+        case mpp::image::PixelTypeEnum::PTE32sC1:
             mSampleFormat              = TIFFSampleFormat::INT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 1;
             mBitsPerSample             = 32;
             return;
-        case opp::image::PixelTypeEnum::PTE32sC2:
+        case mpp::image::PixelTypeEnum::PTE32sC2:
             mSampleFormat              = TIFFSampleFormat::INT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 2;
             mBitsPerSample             = 32;
             return;
-        case opp::image::PixelTypeEnum::PTE32sC3:
+        case mpp::image::PixelTypeEnum::PTE32sC3:
             mSampleFormat              = TIFFSampleFormat::INT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 3;
             mBitsPerSample             = 32;
             return;
-        case opp::image::PixelTypeEnum::PTE32sC4:
+        case mpp::image::PixelTypeEnum::PTE32sC4:
             mSampleFormat              = TIFFSampleFormat::INT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 32;
             return;
-        case opp::image::PixelTypeEnum::PTE32sC4A:
+        case mpp::image::PixelTypeEnum::PTE32sC4A:
             mSampleFormat              = TIFFSampleFormat::INT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 32;
             return;
-        case opp::image::PixelTypeEnum::PTE32scC1:
+        case mpp::image::PixelTypeEnum::PTE32scC1:
             mSampleFormat              = TIFFSampleFormat::COMPLEXINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 1;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE32scC2:
+        case mpp::image::PixelTypeEnum::PTE32scC2:
             mSampleFormat              = TIFFSampleFormat::COMPLEXINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 2;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE32scC3:
+        case mpp::image::PixelTypeEnum::PTE32scC3:
             mSampleFormat              = TIFFSampleFormat::COMPLEXINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 3;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE32scC4:
+        case mpp::image::PixelTypeEnum::PTE32scC4:
             mSampleFormat              = TIFFSampleFormat::COMPLEXINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 64;
             return;
-        case opp::image::PixelTypeEnum::PTE32uC1:
+        case mpp::image::PixelTypeEnum::PTE32uC1:
             mSampleFormat              = TIFFSampleFormat::UINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 1;
             mBitsPerSample             = 32;
             return;
-        case opp::image::PixelTypeEnum::PTE32uC2:
+        case mpp::image::PixelTypeEnum::PTE32uC2:
             mSampleFormat              = TIFFSampleFormat::UINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 2;
             mBitsPerSample             = 32;
             return;
-        case opp::image::PixelTypeEnum::PTE32uC3:
+        case mpp::image::PixelTypeEnum::PTE32uC3:
             mSampleFormat              = TIFFSampleFormat::UINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 3;
             mBitsPerSample             = 32;
             return;
-        case opp::image::PixelTypeEnum::PTE32uC4:
+        case mpp::image::PixelTypeEnum::PTE32uC4:
             mSampleFormat              = TIFFSampleFormat::UINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 32;
             return;
-        case opp::image::PixelTypeEnum::PTE32uC4A:
+        case mpp::image::PixelTypeEnum::PTE32uC4A:
             mSampleFormat              = TIFFSampleFormat::UINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 32;
             return;
-        case opp::image::PixelTypeEnum::PTE16sC1:
+        case mpp::image::PixelTypeEnum::PTE16sC1:
             mSampleFormat              = TIFFSampleFormat::INT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 1;
             mBitsPerSample             = 16;
             return;
-        case opp::image::PixelTypeEnum::PTE16sC2:
+        case mpp::image::PixelTypeEnum::PTE16sC2:
             mSampleFormat              = TIFFSampleFormat::INT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 2;
             mBitsPerSample             = 16;
             return;
-        case opp::image::PixelTypeEnum::PTE16sC3:
+        case mpp::image::PixelTypeEnum::PTE16sC3:
             mSampleFormat              = TIFFSampleFormat::INT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 3;
             mBitsPerSample             = 16;
             return;
-        case opp::image::PixelTypeEnum::PTE16sC4:
+        case mpp::image::PixelTypeEnum::PTE16sC4:
             mSampleFormat              = TIFFSampleFormat::INT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 16;
             return;
-        case opp::image::PixelTypeEnum::PTE16sC4A:
+        case mpp::image::PixelTypeEnum::PTE16sC4A:
             mSampleFormat              = TIFFSampleFormat::INT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 16;
             return;
-        case opp::image::PixelTypeEnum::PTE16scC1:
+        case mpp::image::PixelTypeEnum::PTE16scC1:
             mSampleFormat              = TIFFSampleFormat::COMPLEXINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 1;
             mBitsPerSample             = 32;
             return;
-        case opp::image::PixelTypeEnum::PTE16scC2:
+        case mpp::image::PixelTypeEnum::PTE16scC2:
             mSampleFormat              = TIFFSampleFormat::COMPLEXINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 2;
             mBitsPerSample             = 32;
             return;
-        case opp::image::PixelTypeEnum::PTE16scC3:
+        case mpp::image::PixelTypeEnum::PTE16scC3:
             mSampleFormat              = TIFFSampleFormat::COMPLEXINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 3;
             mBitsPerSample             = 32;
             return;
-        case opp::image::PixelTypeEnum::PTE16scC4:
+        case mpp::image::PixelTypeEnum::PTE16scC4:
             mSampleFormat              = TIFFSampleFormat::COMPLEXINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 32;
             return;
-        case opp::image::PixelTypeEnum::PTE16uC1:
+        case mpp::image::PixelTypeEnum::PTE16uC1:
             mSampleFormat              = TIFFSampleFormat::UINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 1;
             mBitsPerSample             = 16;
             return;
-        case opp::image::PixelTypeEnum::PTE16uC2:
+        case mpp::image::PixelTypeEnum::PTE16uC2:
             mSampleFormat              = TIFFSampleFormat::UINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 2;
             mBitsPerSample             = 16;
             return;
-        case opp::image::PixelTypeEnum::PTE16uC3:
+        case mpp::image::PixelTypeEnum::PTE16uC3:
             mSampleFormat              = TIFFSampleFormat::UINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 3;
             mBitsPerSample             = 16;
             return;
-        case opp::image::PixelTypeEnum::PTE16uC4:
+        case mpp::image::PixelTypeEnum::PTE16uC4:
             mSampleFormat              = TIFFSampleFormat::UINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 16;
             return;
-        case opp::image::PixelTypeEnum::PTE16uC4A:
+        case mpp::image::PixelTypeEnum::PTE16uC4A:
             mSampleFormat              = TIFFSampleFormat::UINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 16;
             return;
-        case opp::image::PixelTypeEnum::PTE8sC1:
+        case mpp::image::PixelTypeEnum::PTE8sC1:
             mSampleFormat              = TIFFSampleFormat::INT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 1;
             mBitsPerSample             = 8;
             return;
-        case opp::image::PixelTypeEnum::PTE8sC2:
+        case mpp::image::PixelTypeEnum::PTE8sC2:
             mSampleFormat              = TIFFSampleFormat::INT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 2;
             mBitsPerSample             = 8;
             return;
-        case opp::image::PixelTypeEnum::PTE8sC3:
+        case mpp::image::PixelTypeEnum::PTE8sC3:
             mSampleFormat              = TIFFSampleFormat::INT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 8;
             return;
-        case opp::image::PixelTypeEnum::PTE8sC4:
+        case mpp::image::PixelTypeEnum::PTE8sC4:
             mSampleFormat              = TIFFSampleFormat::INT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 8;
             return;
-        case opp::image::PixelTypeEnum::PTE8sC4A:
+        case mpp::image::PixelTypeEnum::PTE8sC4A:
             mSampleFormat              = TIFFSampleFormat::INT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 8;
             return;
-        case opp::image::PixelTypeEnum::PTE8uC1:
+        case mpp::image::PixelTypeEnum::PTE8uC1:
             mSampleFormat              = TIFFSampleFormat::UINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 1;
             mBitsPerSample             = 8;
             return;
-        case opp::image::PixelTypeEnum::PTE8uC2:
+        case mpp::image::PixelTypeEnum::PTE8uC2:
             mSampleFormat              = TIFFSampleFormat::UINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::BlackIsZero;
             mSamplesPerPixel           = 2;
             mBitsPerSample             = 8;
             return;
-        case opp::image::PixelTypeEnum::PTE8uC3:
+        case mpp::image::PixelTypeEnum::PTE8uC3:
             mSampleFormat              = TIFFSampleFormat::UINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 3;
             mBitsPerSample             = 8;
             return;
-        case opp::image::PixelTypeEnum::PTE8uC4:
+        case mpp::image::PixelTypeEnum::PTE8uC4:
             mSampleFormat              = TIFFSampleFormat::UINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
             mBitsPerSample             = 8;
             return;
-        case opp::image::PixelTypeEnum::PTE8uC4A:
+        case mpp::image::PixelTypeEnum::PTE8uC4A:
             mSampleFormat              = TIFFSampleFormat::UINT;
             mPhotometricInterpretation = TIFFPhotometricInterpretation::RGB;
             mSamplesPerPixel           = 4;
@@ -2646,7 +2646,7 @@ Vec3i TIFFFile::Size() const
     return {Width(), Height(), Depth()};
 }
 
-opp::image::Size2D TIFFFile::SizePlane() const
+mpp::image::Size2D TIFFFile::SizePlane() const
 {
     return {Width(), Height()};
 }
@@ -2845,7 +2845,7 @@ FileType TIFFFile::GetFileType() const
 }
 
 void TIFFFile::WriteTIFF(const std::filesystem::path &aFileName, int aDimX, int aDimY, double aPixelSize,
-                         opp::image::PixelTypeEnum aDatatype, const void *aData)
+                         mpp::image::PixelTypeEnum aDatatype, const void *aData)
 {
     if (!CanWriteAs(aDimX, aDimY, aDatatype))
     {
@@ -2920,7 +2920,7 @@ void TIFFFile::WriteTIFF(const std::filesystem::path &aFileName, int aDimX, int 
 }
 
 void TIFFFile::WriteTIFF(const std::filesystem::path &aFileName, int aDimX, int aDimY, double aPixelSize,
-                         opp::image::PixelTypeEnum aDatatype, void *aData, int aZIPCompressionLevel)
+                         mpp::image::PixelTypeEnum aDatatype, void *aData, int aZIPCompressionLevel)
 {
     if (!CanWriteAs(aDimX, aDimY, aDatatype))
     {
@@ -2931,22 +2931,22 @@ void TIFFFile::WriteTIFF(const std::filesystem::path &aFileName, int aDimX, int 
 
     bool diffEncoded = false;
     // all unsigned int pixel types:
-    if (aDatatype == opp::image::PixelTypeEnum::PTE8uC1 || aDatatype == opp::image::PixelTypeEnum::PTE8uC2 ||
-        aDatatype == opp::image::PixelTypeEnum::PTE8uC3 || aDatatype == opp::image::PixelTypeEnum::PTE8uC4 ||
-        aDatatype == opp::image::PixelTypeEnum::PTE8uC4A || //
-        aDatatype == opp::image::PixelTypeEnum::PTE16uC1 || aDatatype == opp::image::PixelTypeEnum::PTE16uC2 ||
-        aDatatype == opp::image::PixelTypeEnum::PTE16uC3 || aDatatype == opp::image::PixelTypeEnum::PTE16uC4 ||
-        aDatatype == opp::image::PixelTypeEnum::PTE16uC4A || //
-        aDatatype == opp::image::PixelTypeEnum::PTE32uC1 || aDatatype == opp::image::PixelTypeEnum::PTE32uC2 ||
-        aDatatype == opp::image::PixelTypeEnum::PTE32uC3 || aDatatype == opp::image::PixelTypeEnum::PTE32uC4 ||
-        aDatatype == opp::image::PixelTypeEnum::PTE32uC4A)
+    if (aDatatype == mpp::image::PixelTypeEnum::PTE8uC1 || aDatatype == mpp::image::PixelTypeEnum::PTE8uC2 ||
+        aDatatype == mpp::image::PixelTypeEnum::PTE8uC3 || aDatatype == mpp::image::PixelTypeEnum::PTE8uC4 ||
+        aDatatype == mpp::image::PixelTypeEnum::PTE8uC4A || //
+        aDatatype == mpp::image::PixelTypeEnum::PTE16uC1 || aDatatype == mpp::image::PixelTypeEnum::PTE16uC2 ||
+        aDatatype == mpp::image::PixelTypeEnum::PTE16uC3 || aDatatype == mpp::image::PixelTypeEnum::PTE16uC4 ||
+        aDatatype == mpp::image::PixelTypeEnum::PTE16uC4A || //
+        aDatatype == mpp::image::PixelTypeEnum::PTE32uC1 || aDatatype == mpp::image::PixelTypeEnum::PTE32uC2 ||
+        aDatatype == mpp::image::PixelTypeEnum::PTE32uC3 || aDatatype == mpp::image::PixelTypeEnum::PTE32uC4 ||
+        aDatatype == mpp::image::PixelTypeEnum::PTE32uC4A)
     {
         EncodeDifferencingPredictor(dataIn, aDatatype, uint(aDimX), uint(aDimY));
         diffEncoded = true;
     }
 
     size_t compressedSize = 0;
-    const size_t dataSize = to_size_t(aDimX * aDimY) * opp::image::GetPixelSizeInBytes(aDatatype);
+    const size_t dataSize = to_size_t(aDimX * aDimY) * mpp::image::GetPixelSizeInBytes(aDatatype);
 
     ZLIBEncoder zlib(aZIPCompressionLevel);
     std::vector<byte> buffer(dataSize * 2, 0); // * 2 for safety
@@ -3026,8 +3026,8 @@ void TIFFFile::WriteTIFF(const std::filesystem::path &aFileName, int aDimX, int 
     }
 }
 
-void opp::fileIO::TIFFFile::WriteTIFF(const std::filesystem::path &aFileName, int aDimX, int aDimY, double aPixelSize,
-                                      opp::image::PixelTypeEnum aDatatype, const void *aData0, const void *aData1,
+void mpp::fileIO::TIFFFile::WriteTIFF(const std::filesystem::path &aFileName, int aDimX, int aDimY, double aPixelSize,
+                                      mpp::image::PixelTypeEnum aDatatype, const void *aData0, const void *aData1,
                                       const void *aData2, const void *aData3)
 {
     if (GetChannelCount(aDatatype) > 1)
@@ -3166,7 +3166,7 @@ void opp::fileIO::TIFFFile::WriteTIFF(const std::filesystem::path &aFileName, in
 }
 
 void fileIO::TIFFFile::WriteTIFF(const std::filesystem::path &aFileName, int aDimX, int aDimY, double aPixelSize,
-                                 opp::image::PixelTypeEnum aDatatype, void *aData0, void *aData1, void *aData2,
+                                 mpp::image::PixelTypeEnum aDatatype, void *aData0, void *aData1, void *aData2,
                                  void *aData3, int aZIPCompressionLevel)
 {
     if (GetChannelCount(aDatatype) > 1)
@@ -3219,9 +3219,9 @@ void fileIO::TIFFFile::WriteTIFF(const std::filesystem::path &aFileName, int aDi
 
     bool diffEncoded = false;
     // all unsigned int pixel types:
-    if (aDatatype == opp::image::PixelTypeEnum::PTE8uC1 ||  //
-        aDatatype == opp::image::PixelTypeEnum::PTE16uC1 || //
-        aDatatype == opp::image::PixelTypeEnum::PTE32uC1)
+    if (aDatatype == mpp::image::PixelTypeEnum::PTE8uC1 ||  //
+        aDatatype == mpp::image::PixelTypeEnum::PTE16uC1 || //
+        aDatatype == mpp::image::PixelTypeEnum::PTE32uC1)
     {
         EncodeDifferencingPredictor(dataIn0, aDatatype, uint(aDimX), uint(aDimY));
         if (dataIn1 != nullptr)
@@ -3244,7 +3244,7 @@ void fileIO::TIFFFile::WriteTIFF(const std::filesystem::path &aFileName, int aDi
     size_t compressedSize2 = 0;
     size_t compressedSize3 = 0;
     std::vector<uint> compressedSizes(to_size_t(countColorChannels));
-    const size_t dataSize = to_size_t(aDimX * aDimY) * opp::image::GetPixelSizeInBytes(aDatatype);
+    const size_t dataSize = to_size_t(aDimX * aDimY) * mpp::image::GetPixelSizeInBytes(aDatatype);
 
     ZLIBEncoder zlib(aZIPCompressionLevel);
     std::vector<byte> buffer0(dataSize * 2, 0); // * 2 for safety
@@ -3394,4 +3394,4 @@ void fileIO::TIFFFile::WriteTIFF(const std::filesystem::path &aFileName, int aDi
                               "Error while writing to file stream. Something must have been wrong before this point.");
     }
 }
-} // namespace opp::fileIO
+} // namespace mpp::fileIO

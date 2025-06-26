@@ -1,10 +1,10 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "../addMasked_impl.h"
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 
 ForAllChannelsWithAlphaInvokeAddSrcSrcMask(8s);
@@ -20,5 +20,5 @@ ForAllChannelsWithAlphaInvokeAddInplaceCScaleMask(8s);
 ForAllChannelsWithAlphaInvokeAddInplaceDevCMask(8s);
 ForAllChannelsWithAlphaInvokeAddInplaceDevCScaleMask(8s);
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

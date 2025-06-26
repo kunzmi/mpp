@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "copySubpix.h"
 #include <backends/cuda/image/configurations.h>
@@ -16,23 +16,23 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT, typename DstT>
 void InvokeCopySubpix(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, const Pixel32fC2 &aDelta,
-                      InterpolationMode aInterpolation, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+                      InterpolationMode aInterpolation, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<DstT> && oppEnableCudaBackend<DstT>)
+    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
@@ -52,7 +52,7 @@ void InvokeCopySubpix(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t a
 
         switch (aInterpolation)
         {
-            case opp::InterpolationMode::Linear:
+            case mpp::InterpolationMode::Linear:
             {
                 using InterpolatorT =
                     Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol, InterpolationMode::Linear>;
@@ -65,7 +65,7 @@ void InvokeCopySubpix(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t a
                                                                                functor);
             }
             break;
-            case opp::InterpolationMode::CubicHermiteSpline:
+            case mpp::InterpolationMode::CubicHermiteSpline:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol,
                                                    InterpolationMode::CubicHermiteSpline>;
@@ -78,7 +78,7 @@ void InvokeCopySubpix(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t a
                                                                                functor);
             }
             break;
-            case opp::InterpolationMode::CubicLagrange:
+            case mpp::InterpolationMode::CubicLagrange:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol,
                                                    InterpolationMode::CubicLagrange>;
@@ -91,7 +91,7 @@ void InvokeCopySubpix(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t a
                                                                                functor);
             }
             break;
-            case opp::InterpolationMode::Cubic2ParamBSpline:
+            case mpp::InterpolationMode::Cubic2ParamBSpline:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol,
                                                    InterpolationMode::Cubic2ParamBSpline>;
@@ -104,7 +104,7 @@ void InvokeCopySubpix(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t a
                                                                                functor);
             }
             break;
-            case opp::InterpolationMode::Cubic2ParamCatmullRom:
+            case mpp::InterpolationMode::Cubic2ParamCatmullRom:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol,
                                                    InterpolationMode::Cubic2ParamCatmullRom>;
@@ -117,7 +117,7 @@ void InvokeCopySubpix(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t a
                                                                                functor);
             }
             break;
-            case opp::InterpolationMode::Cubic2ParamB05C03:
+            case mpp::InterpolationMode::Cubic2ParamB05C03:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol,
                                                    InterpolationMode::Cubic2ParamB05C03>;
@@ -130,7 +130,7 @@ void InvokeCopySubpix(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t a
                                                                                functor);
             }
             break;
-            case opp::InterpolationMode::Lanczos2Lobed:
+            case mpp::InterpolationMode::Lanczos2Lobed:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol,
                                                    InterpolationMode::Lanczos2Lobed>;
@@ -143,7 +143,7 @@ void InvokeCopySubpix(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t a
                                                                                functor);
             }
             break;
-            case opp::InterpolationMode::Lanczos3Lobed:
+            case mpp::InterpolationMode::Lanczos3Lobed:
             {
                 using InterpolatorT = Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol,
                                                    InterpolationMode::Lanczos3Lobed>;
@@ -170,7 +170,7 @@ void InvokeCopySubpix(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t a
     template void InvokeCopySubpix<typeSrcIsTypeDst, typeSrcIsTypeDst>(                                                \
         const typeSrcIsTypeDst *aSrc1, size_t aPitchSrc1, typeSrcIsTypeDst *aDst, size_t aPitchDst,                    \
         const Pixel32fC2 &aDelta, InterpolationMode aInterpolation, const Size2D &aSize,                               \
-        const opp::cuda::StreamCtx &aStreamCtx);
+        const mpp::cuda::StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlpha(type)                                                                                    \
     Instantiate_For(Pixel##type##C1);                                                                                  \
@@ -187,5 +187,5 @@ void InvokeCopySubpix(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t a
 
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

@@ -5,7 +5,7 @@
 #include <common/vector_typetraits.h>
 #include <concepts>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 // Get the output type for AddSquare, AddProduct and AddWeighted functions:
 template <AnyVector T> struct add_spw_output_for
@@ -50,4 +50,4 @@ struct add_spw_output_for<T>
 };
 
 template <typename T> using add_spw_output_for_t = typename add_spw_output_for<T>::type;
-} // namespace opp::image::cuda
+} // namespace mpp::image::cuda

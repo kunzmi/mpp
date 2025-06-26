@@ -16,11 +16,11 @@
 #include <catch2/catch_test_macros.hpp>
 #include <common/defines.h>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size     = 256;
 constexpr int size_tpl = 16;
@@ -41,7 +41,7 @@ TEST_CASE("8uC1", "[NPP.Statistics.CrossCorrelationCoefficient]")
     nv::Image32fC1 npp_dst(size, size);
     size_t bufferSize =
         std::max(npp_dst.SameNormLevelGetBufferHostSize(nppCtx), npp_dst.ValidNormLevelGetBufferHostSize(nppCtx));
-    opp::cuda::DevVar<byte> buffer(bufferSize);
+    mpp::cuda::DevVar<byte> buffer(bufferSize);
 
     cpu_src1 >> npp_src1;
     cpu_tpl >> npp_tpl;
@@ -95,7 +95,7 @@ TEST_CASE("16uC1", "[NPP.Statistics.CrossCorrelationCoefficient]")
     nv::Image32fC1 npp_dst(size, size);
     size_t bufferSize =
         std::max(npp_dst.SameNormLevelGetBufferHostSize(nppCtx), npp_dst.ValidNormLevelGetBufferHostSize(nppCtx));
-    opp::cuda::DevVar<byte> buffer(bufferSize);
+    mpp::cuda::DevVar<byte> buffer(bufferSize);
 
     img.Convert(cpu_src1);
     tpl.Convert(cpu_tpl);
@@ -152,7 +152,7 @@ TEST_CASE("32fC1", "[NPP.Statistics.CrossCorrelationCoefficient]")
     nv::Image32fC1 npp_dst(size, size);
     size_t bufferSize =
         std::max(npp_dst.SameNormLevelGetBufferHostSize(nppCtx), npp_dst.ValidNormLevelGetBufferHostSize(nppCtx));
-    opp::cuda::DevVar<byte> buffer(bufferSize);
+    mpp::cuda::DevVar<byte> buffer(bufferSize);
 
     img.Convert(cpu_src1);
     tpl.Convert(cpu_tpl);

@@ -1,17 +1,17 @@
 #pragma once
 #include "testNppBase.h"
-#include "testOppBase.h"
+#include "testMppBase.h"
 #include <backends/simple_cpu/image/imageView.h>
 #include <common/image/filterArea.h>
 #include <common/vector_typetraits.h>
 
-namespace opp
+namespace mpp
 {
-template <typename oppT, typename nppT> class GeometricTransformBase
+template <typename mppT, typename nppT> class GeometricTransformBase
 {
   public:
     GeometricTransformBase(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : opp(aIterations, aRepeats, aWidth, aHeight), npp(aIterations, aRepeats, aWidth, aHeight), repeats(aRepeats)
+        : mpp(aIterations, aRepeats, aWidth, aHeight), npp(aIterations, aRepeats, aWidth, aHeight), repeats(aRepeats)
     {
     }
     virtual ~GeometricTransformBase() = default;
@@ -27,23 +27,23 @@ template <typename oppT, typename nppT> class GeometricTransformBase
 
     template <typename ImgT> void Init(const ImgT &aCpuSrc1)
     {
-        opp.Init();
+        mpp.Init();
         npp.Init();
 
-        aCpuSrc1 >> opp.GetSrc1();
+        aCpuSrc1 >> mpp.GetSrc1();
         aCpuSrc1 >> npp.GetSrc1();
         // set pixel outside of transform area to well defined values:
-        aCpuSrc1 >> opp.GetDst();
+        aCpuSrc1 >> mpp.GetDst();
         aCpuSrc1 >> npp.GetDst();
     }
 
     void Run(const Roi &aRoi)
     {
-        opp.SetRoi(aRoi);
+        mpp.SetRoi(aRoi);
         npp.SetRoi(aRoi);
 
-        opp.WarmUp();
-        rt_opp = opp.Run();
+        mpp.WarmUp();
+        rt_mpp = mpp.Run();
 
         npp.WarmUp();
         rt_npp = npp.Run();
@@ -52,58 +52,58 @@ template <typename oppT, typename nppT> class GeometricTransformBase
     template <typename ImgT, PixelType resT> TestResult GetResult()
     {
         std::stringstream ss;
-        ss << GetName() << " for " << GetType() << " and interpolation mode " << opp.interpol;
+        ss << GetName() << " for " << GetType() << " and interpolation mode " << mpp.interpol;
 
         std::cout << ss.str() << std::endl;
 
         ImgT resNpp(npp.GetDst().SizeAlloc());
-        ImgT resOpp(opp.GetDst().SizeAlloc());
+        ImgT resMpp(mpp.GetDst().SizeAlloc());
 
         resNpp << npp.GetDst();
-        resOpp << opp.GetDst();
+        resMpp << mpp.GetDst();
 
         resNpp.SetRoi(npp.GetDst().ROI());
-        resOpp.SetRoi(opp.GetDst().ROI());
+        resMpp.SetRoi(mpp.GetDst().ROI());
 
         double maxErrorScalar = 0;
         resT maxError{0};
 
         if constexpr (vector_size_v<resT> == 1)
         {
-            resOpp.MaximumError(resNpp, maxError);
+            resMpp.MaximumError(resNpp, maxError);
             maxErrorScalar = maxError.x;
         }
         else
         {
-            resOpp.MaximumError(resNpp, maxError, maxErrorScalar);
+            resMpp.MaximumError(resNpp, maxError, maxErrorScalar);
         }
         double avgErrorScalar = 0;
         resT avgError{0};
 
         if constexpr (vector_size_v<resT> == 1)
         {
-            resOpp.AverageError(resNpp, avgError);
+            resMpp.AverageError(resNpp, avgError);
             avgErrorScalar = avgError.x;
         }
         else
         {
-            resOpp.AverageError(resNpp, avgError, avgErrorScalar);
+            resMpp.AverageError(resNpp, avgError, avgErrorScalar);
         }
 
-        std::cout << "OPP:" << std::endl;
-        std::cout << rt_opp << std::endl;
+        std::cout << "MPP:" << std::endl;
+        std::cout << rt_mpp << std::endl;
         std::cout << "NPP:" << std::endl;
         std::cout << rt_npp << std::endl;
 
-        const float ratio = rt_npp.Mean / rt_opp.Mean;
+        const float ratio = rt_npp.Mean / rt_mpp.Mean;
         if (ratio >= 1.0f)
         {
-            std::cout << "OPP is " << (rt_npp.Mean - rt_opp.Mean) / static_cast<float>(repeats) << " msec or "
+            std::cout << "MPP is " << (rt_npp.Mean - rt_mpp.Mean) / static_cast<float>(repeats) << " msec or "
                       << ratio * 100.0f - 100.0f << "% faster!" << std::endl;
         }
         else
         {
-            std::cout << "OPP is " << (rt_opp.Mean - rt_npp.Mean) / static_cast<float>(repeats) << " msec or "
+            std::cout << "MPP is " << (rt_mpp.Mean - rt_npp.Mean) / static_cast<float>(repeats) << " msec or "
                       << 1.0f / ratio * 100.0f - 100.0f << "% slower..." << std::endl;
         }
 
@@ -114,17 +114,17 @@ template <typename oppT, typename nppT> class GeometricTransformBase
         TestResult res;
 
         res.Name                   = ss.str();
-        res.TotalOPP               = rt_opp.Total;
+        res.TotalMPP               = rt_mpp.Total;
         res.TotalNPP               = rt_npp.Total;
-        res.MeanOPP                = rt_opp.Mean;
+        res.MeanMPP                = rt_mpp.Mean;
         res.MeanNPP                = rt_npp.Mean;
-        res.StdOPP                 = rt_opp.Std;
+        res.StdMPP                 = rt_mpp.Std;
         res.StdNPP                 = rt_npp.Std;
-        res.MinOPP                 = rt_opp.Min;
+        res.MinMPP                 = rt_mpp.Min;
         res.MinNPP                 = rt_npp.Min;
-        res.MaxOPP                 = rt_opp.Max;
+        res.MaxMPP                 = rt_mpp.Max;
         res.MaxNPP                 = rt_npp.Max;
-        res.AbsoluteDifferenceMSec = (rt_npp.Mean - rt_opp.Mean) / static_cast<float>(repeats);
+        res.AbsoluteDifferenceMSec = (rt_npp.Mean - rt_mpp.Mean) / static_cast<float>(repeats);
         if (ratio >= 1.0f)
         {
             res.RelativeDifference = ratio * 100.0f - 100.0f;
@@ -137,20 +137,20 @@ template <typename oppT, typename nppT> class GeometricTransformBase
     }
 
   protected:
-    oppT opp;
+    mppT mpp;
     nppT npp;
 
-    Runtime rt_opp;
+    Runtime rt_mpp;
     Runtime rt_npp;
 
     size_t repeats;
 };
 
-template <PixelType T> class AffineTransformOpp : public TestOppSrcDstBase<T>
+template <PixelType T> class AffineTransformMpp : public TestMppSrcDstBase<T>
 {
   public:
-    AffineTransformOpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : TestOppSrcDstBase<T>(aIterations, aRepeats, aWidth, aHeight)
+    AffineTransformMpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+        : TestMppSrcDstBase<T>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -185,23 +185,23 @@ template <typename T> class AffineTransformNpp : public TestNppSrcDstBase<T>
 };
 
 template <PixelType T, typename T2>
-class AffineTransformTest : public GeometricTransformBase<AffineTransformOpp<T>, AffineTransformNpp<T2>>
+class AffineTransformTest : public GeometricTransformBase<AffineTransformMpp<T>, AffineTransformNpp<T2>>
 {
   public:
     AffineTransformTest(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : GeometricTransformBase<AffineTransformOpp<T>, AffineTransformNpp<T2>>(aIterations, aRepeats, aWidth, aHeight)
+        : GeometricTransformBase<AffineTransformMpp<T>, AffineTransformNpp<T2>>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
     template <typename ImgT>
     void Init(const ImgT &aCpuSrc1, const AffineTransformation<double> &aTransform, InterpolationMode aInterpol)
     {
-        GeometricTransformBase<AffineTransformOpp<T>, AffineTransformNpp<T2>>::Init(aCpuSrc1);
+        GeometricTransformBase<AffineTransformMpp<T>, AffineTransformNpp<T2>>::Init(aCpuSrc1);
 
-        this->opp.affine = aTransform;
+        this->mpp.affine = aTransform;
         this->npp.affine = aTransform;
 
-        this->opp.interpol = aInterpol;
+        this->mpp.interpol = aInterpol;
         this->npp.interpol = static_cast<int>(aInterpol);
     }
 
@@ -216,11 +216,11 @@ class AffineTransformTest : public GeometricTransformBase<AffineTransformOpp<T>,
     }
 };
 
-template <PixelType T> class PerspectiveTransformOpp : public TestOppSrcDstBase<T>
+template <PixelType T> class PerspectiveTransformMpp : public TestMppSrcDstBase<T>
 {
   public:
-    PerspectiveTransformOpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : TestOppSrcDstBase<T>(aIterations, aRepeats, aWidth, aHeight)
+    PerspectiveTransformMpp(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
+        : TestMppSrcDstBase<T>(aIterations, aRepeats, aWidth, aHeight)
     {
     }
 
@@ -255,11 +255,11 @@ template <typename T> class PerspectiveTransformNpp : public TestNppSrcDstBase<T
 };
 
 template <PixelType T, typename T2>
-class PerspectiveTransformTest : public GeometricTransformBase<PerspectiveTransformOpp<T>, PerspectiveTransformNpp<T2>>
+class PerspectiveTransformTest : public GeometricTransformBase<PerspectiveTransformMpp<T>, PerspectiveTransformNpp<T2>>
 {
   public:
     PerspectiveTransformTest(size_t aIterations, size_t aRepeats, int aWidth, int aHeight)
-        : GeometricTransformBase<PerspectiveTransformOpp<T>, PerspectiveTransformNpp<T2>>(aIterations, aRepeats, aWidth,
+        : GeometricTransformBase<PerspectiveTransformMpp<T>, PerspectiveTransformNpp<T2>>(aIterations, aRepeats, aWidth,
                                                                                           aHeight)
     {
     }
@@ -267,12 +267,12 @@ class PerspectiveTransformTest : public GeometricTransformBase<PerspectiveTransf
     template <typename ImgT>
     void Init(const ImgT &aCpuSrc1, const PerspectiveTransformation<double> &aTransform, InterpolationMode aInterpol)
     {
-        GeometricTransformBase<PerspectiveTransformOpp<T>, PerspectiveTransformNpp<T2>>::Init(aCpuSrc1);
+        GeometricTransformBase<PerspectiveTransformMpp<T>, PerspectiveTransformNpp<T2>>::Init(aCpuSrc1);
 
-        this->opp.perspective = aTransform;
+        this->mpp.perspective = aTransform;
         this->npp.perspective = aTransform;
 
-        this->opp.interpol = aInterpol;
+        this->mpp.interpol = aInterpol;
         this->npp.interpol = static_cast<int>(aInterpol);
     }
 
@@ -286,4 +286,4 @@ class PerspectiveTransformTest : public GeometricTransformBase<PerspectiveTransf
         return pixel_type_name<T>::value;
     }
 };
-} // namespace opp
+} // namespace mpp

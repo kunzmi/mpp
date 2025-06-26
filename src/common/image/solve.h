@@ -1,6 +1,6 @@
 #pragma once
 
-namespace opp::image
+namespace mpp::image
 {
 /// <summary>
 /// Solve n x n-linear system of equations using gaussian elemination with partial pivoting
@@ -20,4 +20,4 @@ bool solve(double *aMatrix, double *aVec, int aN);
 /// <returns></returns>
 bool solve(float *aMatrix, float *aVec, int aN);
 
-} // namespace opp::image
+} // namespace mpp::image

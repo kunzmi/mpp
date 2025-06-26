@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include <backends/cuda/streamCtx.h>
 #include <common/image/functors/imageFunctors.h>
@@ -8,7 +8,7 @@
 #include <common/image/size2D.h>
 #include <cuda_runtime.h>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 
 // level types for histogram even:
@@ -56,13 +56,13 @@ template <typename T> using hist_even_level_types_for_t = typename hist_even_lev
 template <typename SrcT, typename LevelT = hist_even_level_types_for_t<SrcT>>
 size_t InvokeHistogramEvenGetBufferSize(const SrcT *aSrc1, size_t aPitchSrc1,
                                         const int aLevels[vector_active_size<SrcT>::value], const Size2D &aSize,
-                                        const opp::cuda::StreamCtx &aStreamCtx);
+                                        const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT, typename LevelT>
 void InvokeHistogramEven(const SrcT *aSrc1, size_t aPitchSrc1, void *aTempBuffer, size_t aTempBufferSize,
                          int *aHist[vector_active_size<SrcT>::value],
                          const int aLevels[vector_active_size<SrcT>::value], const LevelT &aLowerLevel,
-                         const LevelT &aUpperLevel, const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx);
+                         const LevelT &aUpperLevel, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

@@ -1,12 +1,12 @@
 #pragma once
 #include <common/complex.h>
 #include <common/defines.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
 #include <concepts>
 
-namespace opp
+namespace mpp
 {
 
 template <AnyVector T> struct SumScalar
@@ -578,4 +578,4 @@ template <AnyVector T> struct MSSSIM
     }
 };
 
-} // namespace opp
+} // namespace mpp

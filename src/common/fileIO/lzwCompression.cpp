@@ -3,7 +3,7 @@
 #include <common/safeCast.h>
 #include <cstring>
 
-namespace opp::fileIO
+namespace mpp::fileIO
 {
 LZWDecoder::LZWDecoder() : mBuffer(CSIZE), dec_codetab(mBuffer.data())
 {
@@ -167,4 +167,4 @@ ushort BitReader::GetNextCode(uint aNumberOfBits)
     mNextbits -= aNumberOfBits;
     return code;
 }
-} // namespace opp::fileIO
+} // namespace mpp::fileIO

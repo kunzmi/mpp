@@ -1,9 +1,9 @@
 #pragma once
 #include <common/defines.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/vectorTypes.h>
 
-namespace opp
+namespace mpp
 {
 
 // In order to reduce the number of passed pointers to the Min/Max with Index functions, we define a small structure
@@ -20,4 +20,4 @@ struct IndexMinMaxChannel
     Vector2<int> IndexMax;
     int ChannelMax;
 };
-} // namespace opp
+} // namespace mpp

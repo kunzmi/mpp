@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "perspectiveBack.h"
 #include <backends/cuda/image/configurations.h>
@@ -20,26 +20,26 @@
 #include <common/image/roi.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT>
 void InvokePerspectiveBackSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aPitchDst,
                               const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
                               BorderType aBorder, const SrcT &aConstant, const Vector2<int> aAllowedReadRoiOffset,
                               const Size2D &aAllowedReadRoiSize, const Size2D &aSizeSrc, const Size2D &aSizeDst,
-                              const opp::cuda::StreamCtx &aStreamCtx)
+                              const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
+    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
+        MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
@@ -52,7 +52,7 @@ void InvokePerspectiveBackSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, 
         auto runOverInterpolation = [&]<typename bcT>(const bcT &aBC) {
             switch (aInterpolation)
             {
-                case opp::InterpolationMode::NearestNeighbor:
+                case mpp::InterpolationMode::NearestNeighbor:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT = Interpolator<SrcT, bcT, CoordTInterpol, InterpolationMode::NearestNeighbor>;
@@ -65,7 +65,7 @@ void InvokePerspectiveBackSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, 
                                                                                functor);
                 }
                 break;
-                case opp::InterpolationMode::Linear:
+                case mpp::InterpolationMode::Linear:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT =
@@ -79,7 +79,7 @@ void InvokePerspectiveBackSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, 
                                                                                functor);
                 }
                 break;
-                case opp::InterpolationMode::CubicHermiteSpline:
+                case mpp::InterpolationMode::CubicHermiteSpline:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -93,7 +93,7 @@ void InvokePerspectiveBackSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, 
                                                                                functor);
                 }
                 break;
-                case opp::InterpolationMode::CubicLagrange:
+                case mpp::InterpolationMode::CubicLagrange:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -107,7 +107,7 @@ void InvokePerspectiveBackSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, 
                                                                                functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamBSpline:
+                case mpp::InterpolationMode::Cubic2ParamBSpline:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -121,7 +121,7 @@ void InvokePerspectiveBackSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, 
                                                                                functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamCatmullRom:
+                case mpp::InterpolationMode::Cubic2ParamCatmullRom:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -135,7 +135,7 @@ void InvokePerspectiveBackSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, 
                                                                                functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamB05C03:
+                case mpp::InterpolationMode::Cubic2ParamB05C03:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -149,7 +149,7 @@ void InvokePerspectiveBackSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, 
                                                                                functor);
                 }
                 break;
-                case opp::InterpolationMode::Lanczos2Lobed:
+                case mpp::InterpolationMode::Lanczos2Lobed:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -163,7 +163,7 @@ void InvokePerspectiveBackSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, 
                                                                                functor);
                 }
                 break;
-                case opp::InterpolationMode::Lanczos3Lobed:
+                case mpp::InterpolationMode::Lanczos3Lobed:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -187,7 +187,7 @@ void InvokePerspectiveBackSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, 
 
         switch (aBorder)
         {
-            case opp::BorderType::None:
+            case mpp::BorderType::None:
             {
                 // for interpolation at the border we will still use replicate:
                 using BCType = BorderControl<SrcT, BorderType::Replicate, true, false, false, false>;
@@ -196,7 +196,7 @@ void InvokePerspectiveBackSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, 
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Constant:
+            case mpp::BorderType::Constant:
             {
                 using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
                 const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset, aConstant);
@@ -204,7 +204,7 @@ void InvokePerspectiveBackSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, 
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Replicate:
+            case mpp::BorderType::Replicate:
             {
                 using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
                 const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
@@ -212,7 +212,7 @@ void InvokePerspectiveBackSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, 
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Mirror:
+            case mpp::BorderType::Mirror:
             {
                 using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
                 const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
@@ -220,7 +220,7 @@ void InvokePerspectiveBackSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, 
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::MirrorReplicate:
+            case mpp::BorderType::MirrorReplicate:
             {
                 using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
                 const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
@@ -228,7 +228,7 @@ void InvokePerspectiveBackSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, 
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Wrap:
+            case mpp::BorderType::Wrap:
             {
                 using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
                 const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
@@ -250,7 +250,7 @@ void InvokePerspectiveBackSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, 
         const typeSrc *aSrc1, size_t aPitchSrc1, typeSrc *aDst, size_t aPitchDst,                                      \
         const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,   \
         const typeSrc &aConstant, const Vector2<int> aAllowedReadRoiOffset, const Size2D &aAllowedReadRoiSize,         \
-        const Size2D &aSizeSrc, const Size2D &aSizeDst, const opp::cuda::StreamCtx &aStreamCtx);
+        const Size2D &aSizeSrc, const Size2D &aSizeDst, const mpp::cuda::StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlpha(type)                                                                                    \
     Instantiate_For(Pixel##type##C1);                                                                                  \
@@ -275,11 +275,11 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                               const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
                               BorderType aBorder, const SrcT &aConstant, const Vector2<int> aAllowedReadRoiOffset,
                               const Size2D &aAllowedReadRoiSize, const Size2D &aSizeSrc, const Size2D &aSizeDst,
-                              const opp::cuda::StreamCtx &aStreamCtx)
+                              const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
+    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
+        MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
@@ -292,7 +292,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
         auto runOverInterpolation = [&]<typename bcT>(const bcT &aBC) {
             switch (aInterpolation)
             {
-                case opp::InterpolationMode::NearestNeighbor:
+                case mpp::InterpolationMode::NearestNeighbor:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT = Interpolator<SrcT, bcT, CoordTInterpol, InterpolationMode::NearestNeighbor>;
@@ -305,7 +305,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Linear:
+                case mpp::InterpolationMode::Linear:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT =
@@ -319,7 +319,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::CubicHermiteSpline:
+                case mpp::InterpolationMode::CubicHermiteSpline:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -333,7 +333,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::CubicLagrange:
+                case mpp::InterpolationMode::CubicLagrange:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -347,7 +347,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamBSpline:
+                case mpp::InterpolationMode::Cubic2ParamBSpline:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -361,7 +361,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamCatmullRom:
+                case mpp::InterpolationMode::Cubic2ParamCatmullRom:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -375,7 +375,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamB05C03:
+                case mpp::InterpolationMode::Cubic2ParamB05C03:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -389,7 +389,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Lanczos2Lobed:
+                case mpp::InterpolationMode::Lanczos2Lobed:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -403,7 +403,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Lanczos3Lobed:
+                case mpp::InterpolationMode::Lanczos3Lobed:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -427,7 +427,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
 
         switch (aBorder)
         {
-            case opp::BorderType::None:
+            case mpp::BorderType::None:
             {
                 // for interpolation at the border we will still use replicate:
                 using BCType = BorderControl<SrcT, BorderType::Replicate, true, false, false, true>;
@@ -436,7 +436,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Constant:
+            case mpp::BorderType::Constant:
             {
                 using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset,
@@ -445,7 +445,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Replicate:
+            case mpp::BorderType::Replicate:
             {
                 using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
@@ -453,7 +453,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Mirror:
+            case mpp::BorderType::Mirror:
             {
                 using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
@@ -461,7 +461,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::MirrorReplicate:
+            case mpp::BorderType::MirrorReplicate:
             {
                 using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
@@ -469,7 +469,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Wrap:
+            case mpp::BorderType::Wrap:
             {
                 using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
@@ -493,7 +493,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
         size_t aPitchDst1, Vector1<remove_vector_t<typeSrc>> *aDst2, size_t aPitchDst2,                                \
         const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,   \
         const typeSrc &aConstant, const Vector2<int> aAllowedReadRoiOffset, const Size2D &aAllowedReadRoiSize,         \
-        const Size2D &aSizeSrc, const Size2D &aSizeDst, const opp::cuda::StreamCtx &aStreamCtx);
+        const Size2D &aSizeSrc, const Size2D &aSizeDst, const mpp::cuda::StreamCtx &aStreamCtx);
 
 #define InstantiateInvokePerspectiveBackSrcP2_ForGeomType(type)                                                        \
     InstantiateInvokePerspectiveBackSrcP2_For(Pixel##type##C2);
@@ -510,11 +510,11 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                               const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,
                               BorderType aBorder, const SrcT &aConstant, const Vector2<int> aAllowedReadRoiOffset,
                               const Size2D &aAllowedReadRoiSize, const Size2D &aSizeSrc, const Size2D &aSizeDst,
-                              const opp::cuda::StreamCtx &aStreamCtx)
+                              const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
+    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
+        MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
@@ -527,7 +527,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
         auto runOverInterpolation = [&]<typename bcT>(const bcT &aBC) {
             switch (aInterpolation)
             {
-                case opp::InterpolationMode::NearestNeighbor:
+                case mpp::InterpolationMode::NearestNeighbor:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT = Interpolator<SrcT, bcT, CoordTInterpol, InterpolationMode::NearestNeighbor>;
@@ -540,7 +540,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Linear:
+                case mpp::InterpolationMode::Linear:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT =
@@ -554,7 +554,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::CubicHermiteSpline:
+                case mpp::InterpolationMode::CubicHermiteSpline:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -568,7 +568,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::CubicLagrange:
+                case mpp::InterpolationMode::CubicLagrange:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -582,7 +582,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamBSpline:
+                case mpp::InterpolationMode::Cubic2ParamBSpline:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -596,7 +596,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamCatmullRom:
+                case mpp::InterpolationMode::Cubic2ParamCatmullRom:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -610,7 +610,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamB05C03:
+                case mpp::InterpolationMode::Cubic2ParamB05C03:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -624,7 +624,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Lanczos2Lobed:
+                case mpp::InterpolationMode::Lanczos2Lobed:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -638,7 +638,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                         aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Lanczos3Lobed:
+                case mpp::InterpolationMode::Lanczos3Lobed:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -662,7 +662,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
 
         switch (aBorder)
         {
-            case opp::BorderType::None:
+            case mpp::BorderType::None:
             {
                 // for interpolation at the border we will still use replicate:
                 using BCType = BorderControl<SrcT, BorderType::Replicate, true, false, false, true>;
@@ -672,7 +672,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Constant:
+            case mpp::BorderType::Constant:
             {
                 using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
@@ -681,7 +681,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Replicate:
+            case mpp::BorderType::Replicate:
             {
                 using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
@@ -690,7 +690,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Mirror:
+            case mpp::BorderType::Mirror:
             {
                 using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
@@ -699,7 +699,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::MirrorReplicate:
+            case mpp::BorderType::MirrorReplicate:
             {
                 using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
@@ -708,7 +708,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Wrap:
+            case mpp::BorderType::Wrap:
             {
                 using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
@@ -735,7 +735,7 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
         Vector1<remove_vector_t<typeSrc>> *aDst3, size_t aPitchDst3,                                                   \
         const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,   \
         const typeSrc &aConstant, const Vector2<int> aAllowedReadRoiOffset, const Size2D &aAllowedReadRoiSize,         \
-        const Size2D &aSizeSrc, const Size2D &aSizeDst, const opp::cuda::StreamCtx &aStreamCtx);
+        const Size2D &aSizeSrc, const Size2D &aSizeDst, const mpp::cuda::StreamCtx &aStreamCtx);
 
 #define InstantiateInvokePerspectiveBackSrcP3_ForGeomType(type)                                                        \
     InstantiateInvokePerspectiveBackSrcP3_For(Pixel##type##C3);
@@ -751,11 +751,11 @@ void InvokePerspectiveBackSrc(
     size_t aPitchDst3, Vector1<remove_vector_t<SrcT>> *aDst4, size_t aPitchDst4,
     const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, BorderType aBorder,
     const SrcT &aConstant, const Vector2<int> aAllowedReadRoiOffset, const Size2D &aAllowedReadRoiSize,
-    const Size2D &aSizeSrc, const Size2D &aSizeDst, const opp::cuda::StreamCtx &aStreamCtx)
+    const Size2D &aSizeSrc, const Size2D &aSizeDst, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
+    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
+        MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
@@ -768,7 +768,7 @@ void InvokePerspectiveBackSrc(
         auto runOverInterpolation = [&]<typename bcT>(const bcT &aBC) {
             switch (aInterpolation)
             {
-                case opp::InterpolationMode::NearestNeighbor:
+                case mpp::InterpolationMode::NearestNeighbor:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT = Interpolator<SrcT, bcT, CoordTInterpol, InterpolationMode::NearestNeighbor>;
@@ -782,7 +782,7 @@ void InvokePerspectiveBackSrc(
                         aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Linear:
+                case mpp::InterpolationMode::Linear:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT =
@@ -797,7 +797,7 @@ void InvokePerspectiveBackSrc(
                         aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::CubicHermiteSpline:
+                case mpp::InterpolationMode::CubicHermiteSpline:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -812,7 +812,7 @@ void InvokePerspectiveBackSrc(
                         aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::CubicLagrange:
+                case mpp::InterpolationMode::CubicLagrange:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -827,7 +827,7 @@ void InvokePerspectiveBackSrc(
                         aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamBSpline:
+                case mpp::InterpolationMode::Cubic2ParamBSpline:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -842,7 +842,7 @@ void InvokePerspectiveBackSrc(
                         aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamCatmullRom:
+                case mpp::InterpolationMode::Cubic2ParamCatmullRom:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -857,7 +857,7 @@ void InvokePerspectiveBackSrc(
                         aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Cubic2ParamB05C03:
+                case mpp::InterpolationMode::Cubic2ParamB05C03:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -872,7 +872,7 @@ void InvokePerspectiveBackSrc(
                         aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Lanczos2Lobed:
+                case mpp::InterpolationMode::Lanczos2Lobed:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -887,7 +887,7 @@ void InvokePerspectiveBackSrc(
                         aStreamCtx, functor);
                 }
                 break;
-                case opp::InterpolationMode::Lanczos3Lobed:
+                case mpp::InterpolationMode::Lanczos3Lobed:
                 {
                     constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
                     using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
@@ -912,7 +912,7 @@ void InvokePerspectiveBackSrc(
 
         switch (aBorder)
         {
-            case opp::BorderType::None:
+            case mpp::BorderType::None:
             {
                 // for interpolation at the border we will still use replicate:
                 using BCType = BorderControl<SrcT, BorderType::Replicate, true, false, false, true>;
@@ -922,7 +922,7 @@ void InvokePerspectiveBackSrc(
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Constant:
+            case mpp::BorderType::Constant:
             {
                 using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
@@ -931,7 +931,7 @@ void InvokePerspectiveBackSrc(
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Replicate:
+            case mpp::BorderType::Replicate:
             {
                 using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
@@ -940,7 +940,7 @@ void InvokePerspectiveBackSrc(
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Mirror:
+            case mpp::BorderType::Mirror:
             {
                 using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
@@ -949,7 +949,7 @@ void InvokePerspectiveBackSrc(
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::MirrorReplicate:
+            case mpp::BorderType::MirrorReplicate:
             {
                 using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
@@ -958,7 +958,7 @@ void InvokePerspectiveBackSrc(
                 runOverInterpolation(bc);
             }
             break;
-            case opp::BorderType::Wrap:
+            case mpp::BorderType::Wrap:
             {
                 using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
@@ -987,11 +987,11 @@ void InvokePerspectiveBackSrc(
         size_t aPitchDst4, const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation,    \
         BorderType aBorder, const typeSrc &aConstant, const Vector2<int> aAllowedReadRoiOffset,                        \
         const Size2D &aAllowedReadRoiSize, const Size2D &aSizeSrc, const Size2D &aSizeDst,                             \
-        const opp::cuda::StreamCtx &aStreamCtx);
+        const mpp::cuda::StreamCtx &aStreamCtx);
 
 #define InstantiateInvokePerspectiveBackSrcP4_ForGeomType(type)                                                        \
     InstantiateInvokePerspectiveBackSrcP4_For(Pixel##type##C4);
 
 #pragma endregion
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

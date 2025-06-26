@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h>
-#if OPP_ENABLE_NPP_BACKEND
+#if MPP_ENABLE_NPP_BACKEND
 #include <common/image/pixelTypeEnabler.h>
 
 #include <backends/cuda/cudaException.h>
@@ -29,7 +29,7 @@
 #include <utility>
 #include <vector>
 
-namespace opp::image::npp
+namespace mpp::image::npp
 {
 
 template <PixelType T> class ImageView
@@ -484,14 +484,14 @@ template <PixelType T> class ImageView
         return nppCtx;
     }
 
-    static void SetStream(const opp::cuda::Stream &aStream)
+    static void SetStream(const mpp::cuda::Stream &aStream)
     {
         nppSafeCall(nppSetStream(aStream.Original()));
     }
 
-    [[nodiscard]] static opp::cuda::Stream GetStream()
+    [[nodiscard]] static mpp::cuda::Stream GetStream()
     {
-        return opp::cuda::Stream(nppGetStream());
+        return mpp::cuda::Stream(nppGetStream());
     }
 
     [[nodiscard]] size_t FilterBoxBorderAdvancedGetDeviceBufferSize() const
@@ -701,5 +701,5 @@ template <PixelType T> class ImageView
                                             reinterpret_cast<const double(*)[3]>(&aCoeffs)));
     }
 };
-} // namespace opp::image::npp
-#endif // OPP_ENABLE_NPP_BACKEND
+} // namespace mpp::image::npp
+#endif // MPP_ENABLE_NPP_BACKEND

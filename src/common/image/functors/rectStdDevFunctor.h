@@ -5,7 +5,7 @@
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
 #include <common/numberTypes.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
 #include <common/vectorTypes.h>
@@ -15,7 +15,7 @@
 // disable warning for pragma unroll when compiling with host compiler:
 #include <common/disableWarningsBegin.h>
 
-namespace opp::image
+namespace mpp::image
 {
 /// <summary>
 /// Specialized functor to compute StdDev from integral images.
@@ -126,5 +126,5 @@ struct RectStdDevFunctor : public ImageFunctor<false>
     }
 #pragma endregion
 };
-} // namespace opp::image
+} // namespace mpp::image
 #include <common/disableWarningsEnd.h>

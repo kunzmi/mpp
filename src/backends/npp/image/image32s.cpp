@@ -1,5 +1,5 @@
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_NPP_BACKEND
+#if MPP_ENABLE_NPP_BACKEND
 #include <common/image/pixelTypeEnabler.h> //NOLINT(misc-include-cleaner)
 
 #include "image32s.h"
@@ -16,9 +16,9 @@
 #include <nppdefs.h>
 #include <nppi_support_functions.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::npp
+namespace mpp::image::npp
 {
 
 Image32sC1::Image32sC1(int aWidth, int aHeight) : Image32sC1(Size2D(aWidth, aHeight))
@@ -273,5 +273,5 @@ Image32sC4 &Image32sC4::operator=(Image32sC4 &&aOther) noexcept
     return *this;
 }
 
-} // namespace opp::image::npp
-#endif // OPP_ENABLE_NPP_BACKEND
+} // namespace mpp::image::npp
+#endif // MPP_ENABLE_NPP_BACKEND

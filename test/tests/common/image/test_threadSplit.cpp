@@ -11,8 +11,8 @@
 #include <cstdint>
 #include <vector>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
 
 // Pointers should all be allocated with a multiple of 256, the alignment that cuda_malloc gives us

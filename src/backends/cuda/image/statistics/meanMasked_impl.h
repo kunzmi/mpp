@@ -1,4 +1,4 @@
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "mean.h"
 #include "meanMasked.h"
@@ -14,7 +14,7 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/statistics/operators.h>
 #include <common/statistics/postOperators.h>
@@ -22,33 +22,33 @@
 #include <common/vectorTypes.h>
 #include <cuda_runtime.h>
 
-using namespace opp::cuda;
+using namespace mpp::cuda;
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMeanMaskedSrc(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aSrc, size_t aPitchSrc,
                          ComputeT *aTempBuffer, ulong64 *aMaskBuffer, DstT *aDst, remove_vector_t<DstT> *aDstScalar,
-                         const Size2D &aSize, const opp::cuda::StreamCtx &aStreamCtx)
+                         const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (oppEnablePixelType<SrcT> && oppEnableCudaBackend<SrcT>)
+    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
     {
-        OPP_CUDA_REGISTER_TEMPALTE;
+        MPP_CUDA_REGISTER_TEMPALTE;
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
-        using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, opp::Sum<SrcT, ComputeT>>;
+        using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::Sum<SrcT, ComputeT>>;
 
-        const opp::Sum<SrcT, ComputeT> op;
+        const mpp::Sum<SrcT, ComputeT> op;
 
         const sumSrc functor(aSrc, aPitchSrc, op);
 
         InvokeReductionMaskedCountingAlongXKernelDefault<SrcT, ComputeT, TupelSize, sumSrc,
-                                                         opp::Sum<ComputeT, ComputeT>, ReductionInitValue::Zero>(
+                                                         mpp::Sum<ComputeT, ComputeT>, ReductionInitValue::Zero>(
             aMask, aPitchMask, aSrc, aTempBuffer, aMaskBuffer, aSize, aStreamCtx, functor);
 
-        InvokeReductionMaskedCountingAlongYKernelDefault<ComputeT, DstT, opp::Sum<DstT, DstT>, ReductionInitValue::Zero,
-                                                         opp::DivPostOp<DstT>, opp::DivScalar<DstT>>(
+        InvokeReductionMaskedCountingAlongYKernelDefault<ComputeT, DstT, mpp::Sum<DstT, DstT>, ReductionInitValue::Zero,
+                                                         mpp::DivPostOp<DstT>, mpp::DivScalar<DstT>>(
             aMaskBuffer, aTempBuffer, aDst, aDstScalar, aSize.y, aStreamCtx);
     }
 }
@@ -75,5 +75,5 @@ void InvokeMeanMaskedSrc(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *
     Instantiate_For(Pixel##typeIn##C4A);
 #pragma endregion
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

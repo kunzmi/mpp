@@ -11,7 +11,7 @@
 #include <memory>
 #include <vector>
 
-namespace opp::fileIO
+namespace mpp::fileIO
 {
 struct TiffFileHeader
 {
@@ -66,11 +66,11 @@ class TIFFFile : public FileReader, public FileWriter
 
     std::vector<std::vector<TiffReadElement>> mReadSegments;
 
-    [[nodiscard]] opp::image::PixelTypeEnum GetDataTypeUnsigned() const;
-    [[nodiscard]] opp::image::PixelTypeEnum GetDataTypeSigned() const;
-    [[nodiscard]] opp::image::PixelTypeEnum GetDataTypeFloat() const;
-    [[nodiscard]] opp::image::PixelTypeEnum GetDataTypeComplex() const;
-    [[nodiscard]] opp::image::PixelTypeEnum GetDataTypeComplexFloat() const;
+    [[nodiscard]] mpp::image::PixelTypeEnum GetDataTypeUnsigned() const;
+    [[nodiscard]] mpp::image::PixelTypeEnum GetDataTypeSigned() const;
+    [[nodiscard]] mpp::image::PixelTypeEnum GetDataTypeFloat() const;
+    [[nodiscard]] mpp::image::PixelTypeEnum GetDataTypeComplex() const;
+    [[nodiscard]] mpp::image::PixelTypeEnum GetDataTypeComplexFloat() const;
 
     void ReadTIFF();
     void ReadBigTIFF();
@@ -81,7 +81,7 @@ class TIFFFile : public FileReader, public FileWriter
     void ReadPlanePackBitsCompression(size_t aIdx);
     void DecodeDifferencingPredictor(size_t aIdx);
 
-    static void EncodeDifferencingPredictor(void *aData, opp::image::PixelTypeEnum aDataType, uint aWidth,
+    static void EncodeDifferencingPredictor(void *aData, mpp::image::PixelTypeEnum aDataType, uint aWidth,
                                             uint aHeight);
 
   public:
@@ -93,7 +93,7 @@ class TIFFFile : public FileReader, public FileWriter
     /// <summary>
     /// Creates a new TIFFFile instance in memory that can be saved to disk later.
     /// </summary>
-    TIFFFile(const opp::image::Size2D &aSize, opp::image::PixelTypeEnum aDataType, double aPixelSize = 1.0);
+    TIFFFile(const mpp::image::Size2D &aSize, mpp::image::PixelTypeEnum aDataType, double aPixelSize = 1.0);
 
     ~TIFFFile() override = default;
 
@@ -108,12 +108,12 @@ class TIFFFile : public FileReader, public FileWriter
     /// <summary>
     /// Converts from Tiff data type enum to internal data type
     /// </summary>
-    [[nodiscard]] opp::image::PixelTypeEnum GetDataType() const override;
+    [[nodiscard]] mpp::image::PixelTypeEnum GetDataType() const override;
 
     /// <summary>
     /// Converts from internal data type to Tiff data type enum<para/>
     /// </summary>
-    void SetDataType(opp::image::PixelTypeEnum aDataType) override;
+    void SetDataType(mpp::image::PixelTypeEnum aDataType) override;
 
     /// <summary>
     /// Opens the file and reads the entire content.
@@ -175,7 +175,7 @@ class TIFFFile : public FileReader, public FileWriter
     /// <summary>
     /// Returns the dimensions of an X/Y-image plane stored in the file header.
     /// </summary>
-    [[nodiscard]] opp::image::Size2D SizePlane() const override;
+    [[nodiscard]] mpp::image::Size2D SizePlane() const override;
 
     /// <summary>
     /// Returns the pixel size stored in file header converted to nm.
@@ -260,35 +260,35 @@ class TIFFFile : public FileReader, public FileWriter
     /// <summary>
     /// Determines if a given image dimension and datatype can be written to a Tiff file
     /// </summary>
-    [[nodiscard]] static bool CanWriteAs(int aDimX, int aDimY, opp::image::PixelTypeEnum aDatatype);
+    [[nodiscard]] static bool CanWriteAs(int aDimX, int aDimY, mpp::image::PixelTypeEnum aDatatype);
 
     /// <summary>
     /// Determines if a given image dimension and datatype can be written to a Tiff file
     /// </summary>
-    [[nodiscard]] static bool CanWriteAs(const Vec2i &aDim, opp::image::PixelTypeEnum aDatatype);
+    [[nodiscard]] static bool CanWriteAs(const Vec2i &aDim, mpp::image::PixelTypeEnum aDatatype);
 
     /// <summary>
     /// Determines if a given image dimension and datatype can be written to a Tiff file
     /// </summary>
-    [[nodiscard]] static bool CanWriteAs(const Vec3i &aDim, opp::image::PixelTypeEnum aDatatype);
+    [[nodiscard]] static bool CanWriteAs(const Vec3i &aDim, mpp::image::PixelTypeEnum aDatatype);
 
     /// <summary>
     /// Writes data to a tiff file
     /// </summary>
     static void WriteTIFF(const std::filesystem::path &aFileName, int aDimX, int aDimY, double aPixelSize,
-                          opp::image::PixelTypeEnum aDatatype, const void *aData);
+                          mpp::image::PixelTypeEnum aDatatype, const void *aData);
 
     /// <summary>
     /// Writes data to a tiff file with compression (input data will be modified!)
     /// </summary>
     static void WriteTIFF(const std::filesystem::path &aFileName, int aDimX, int aDimY, double aPixelSize,
-                          opp::image::PixelTypeEnum aDatatype, void *aData, int aZIPCompressionLevel);
+                          mpp::image::PixelTypeEnum aDatatype, void *aData, int aZIPCompressionLevel);
 
     /// <summary>
     /// Writes data to a tiff file. Pass nullptr if less than 4 color planes. (planar color planes)
     /// </summary>
     static void WriteTIFF(const std::filesystem::path &aFileName, int aDimX, int aDimY, double aPixelSize,
-                          opp::image::PixelTypeEnum aDatatype, const void *aData0, const void *aData1,
+                          mpp::image::PixelTypeEnum aDatatype, const void *aData0, const void *aData1,
                           const void *aData2, const void *aData3);
 
     /// <summary>
@@ -296,7 +296,7 @@ class TIFFFile : public FileReader, public FileWriter
     /// input data will be modified!)
     /// </summary>
     static void WriteTIFF(const std::filesystem::path &aFileName, int aDimX, int aDimY, double aPixelSize,
-                          opp::image::PixelTypeEnum aDatatype, void *aData0, void *aData1, void *aData2, void *aData3,
+                          mpp::image::PixelTypeEnum aDatatype, void *aData0, void *aData1, void *aData2, void *aData3,
                           int aZIPCompressionLevel);
 
     [[nodiscard]] bool IsLittleEndian();
@@ -306,4 +306,4 @@ class TIFFFile : public FileReader, public FileWriter
     friend class bigTiffTag::BigImageFileDirectory;
     friend class bigTiffTag::BigImageFileDirectoryEntry;
 };
-} // namespace opp::fileIO
+} // namespace mpp::fileIO

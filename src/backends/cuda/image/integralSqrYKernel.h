@@ -1,6 +1,6 @@
 #pragma once
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if OPP_ENABLE_CUDA_BACKEND
+#if MPP_ENABLE_CUDA_BACKEND
 
 #include "integralXKernel.h" // for doShuffleUp functions
 #include <backends/cuda/cudaException.h>
@@ -16,7 +16,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-namespace opp::image::cuda
+namespace mpp::image::cuda
 {
 /// <summary>
 /// performs integral image computation in X direction but on a transposed image, thus in Y direction (inplace).
@@ -163,7 +163,7 @@ void InvokeIntegralYKernel(const dim3 &aBlockSize, uint aSharedMemory, int aWarp
 
 template <typename SrcDstT, size_t TupelSize>
 void InvokeIntegralYKernelDefault(SrcDstT *aSrcDst, size_t aPitchSrcDst, SrcDstT aStartValue, const Size2D &aSize,
-                                  const opp::cuda::StreamCtx &aStreamCtx)
+                                  const mpp::cuda::StreamCtx &aStreamCtx)
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {
@@ -183,5 +183,5 @@ void InvokeIntegralYKernelDefault(SrcDstT *aSrcDst, size_t aPitchSrcDst, SrcDstT
     }
 }
 
-} // namespace opp::image::cuda
-#endif // OPP_ENABLE_CUDA_BACKEND
+} // namespace mpp::image::cuda
+#endif // MPP_ENABLE_CUDA_BACKEND

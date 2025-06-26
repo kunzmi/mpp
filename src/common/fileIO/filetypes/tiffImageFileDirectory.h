@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-namespace opp::fileIO
+namespace mpp::fileIO
 {
 // forward declaration
 class TIFFFile;
@@ -787,4 +787,4 @@ class IFDYResolution : public IFDEntry<Rational>
 };
 
 } // namespace tiffTag
-} // namespace opp::fileIO
+} // namespace mpp::fileIO

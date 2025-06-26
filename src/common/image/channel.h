@@ -9,7 +9,7 @@
 #include <common/vector4A.h>
 #include <iostream>
 
-namespace opp::image
+namespace mpp::image
 {
 enum class RGBA : uint
 {
@@ -271,4 +271,4 @@ inline std::wostream &operator<<(std::wostream &aOs, const Channel &aChannel)
     return aOs;
 }
 
-} // namespace opp::image
+} // namespace mpp::image

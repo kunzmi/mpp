@@ -3,7 +3,7 @@
 #include <common/defines.h>
 #include <cstddef>
 
-namespace opp::image
+namespace mpp::image
 {
 /// <summary>
 /// A specialized type to describe size in 2D (number of pixels in X and Y) with pitch information
@@ -28,4 +28,4 @@ class SizePitched
     Size2D mSize;
     size_t mPitch;
 };
-} // namespace opp::image
+} // namespace mpp::image

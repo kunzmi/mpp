@@ -3,12 +3,12 @@
 #include "complex_impl.h" //NOLINT(misc-include-cleaner)
 #include "defines.h"
 #include "half_fp16.h" //NOLINT(misc-include-cleaner)
-#include "opp_defs.h"  //NOLINT(misc-include-cleaner)
+#include "mpp_defs.h"  //NOLINT(misc-include-cleaner)
 
-// Note: we instantiate all complex types we support in OPP here, so that we only need to include the normal header file
+// Note: we instantiate all complex types we support in MPP here, so that we only need to include the normal header file
 // in all host code
 
-namespace opp
+namespace mpp
 {
 template struct Complex<sbyte>;
 template struct Complex<short>;
@@ -133,44 +133,44 @@ template Complex<BFloat16>::Complex(Complex<float> &) noexcept;
 template Complex<BFloat16>::Complex(Complex<double> &) noexcept;
 template Complex<BFloat16>::Complex(Complex<HalfFp16> &) noexcept;
 
-template std::ostream &operator<<(std::ostream &aOs, const opp::Complex<opp::sbyte> &aVec);
-template std::wostream &operator<<(std::wostream &aOs, const opp::Complex<opp::sbyte> &aVec);
-template std::istream &operator>>(std::istream &aIs, opp::Complex<opp::sbyte> &aVec);
-template std::wistream &operator>>(std::wistream &aIs, opp::Complex<opp::sbyte> &aVec);
+template std::ostream &operator<<(std::ostream &aOs, const mpp::Complex<mpp::sbyte> &aVec);
+template std::wostream &operator<<(std::wostream &aOs, const mpp::Complex<mpp::sbyte> &aVec);
+template std::istream &operator>>(std::istream &aIs, mpp::Complex<mpp::sbyte> &aVec);
+template std::wistream &operator>>(std::wistream &aIs, mpp::Complex<mpp::sbyte> &aVec);
 
-template std::ostream &operator<<(std::ostream &aOs, const opp::Complex<short> &aVec);
-template std::wostream &operator<<(std::wostream &aOs, const opp::Complex<short> &aVec);
-template std::istream &operator>>(std::istream &aIs, opp::Complex<short> &aVec);
-template std::wistream &operator>>(std::wistream &aIs, opp::Complex<short> &aVec);
+template std::ostream &operator<<(std::ostream &aOs, const mpp::Complex<short> &aVec);
+template std::wostream &operator<<(std::wostream &aOs, const mpp::Complex<short> &aVec);
+template std::istream &operator>>(std::istream &aIs, mpp::Complex<short> &aVec);
+template std::wistream &operator>>(std::wistream &aIs, mpp::Complex<short> &aVec);
 
-template std::ostream &operator<<(std::ostream &aOs, const opp::Complex<long64> &aVec);
-template std::wostream &operator<<(std::wostream &aOs, const opp::Complex<long64> &aVec);
-template std::istream &operator>>(std::istream &aIs, opp::Complex<long64> &aVec);
-template std::wistream &operator>>(std::wistream &aIs, opp::Complex<long64> &aVec);
+template std::ostream &operator<<(std::ostream &aOs, const mpp::Complex<long64> &aVec);
+template std::wostream &operator<<(std::wostream &aOs, const mpp::Complex<long64> &aVec);
+template std::istream &operator>>(std::istream &aIs, mpp::Complex<long64> &aVec);
+template std::wistream &operator>>(std::wistream &aIs, mpp::Complex<long64> &aVec);
 
-template std::ostream &operator<<(std::ostream &aOs, const opp::Complex<int> &aVec);
-template std::wostream &operator<<(std::wostream &aOs, const opp::Complex<int> &aVec);
-template std::istream &operator>>(std::istream &aIs, opp::Complex<int> &aVec);
-template std::wistream &operator>>(std::wistream &aIs, opp::Complex<int> &aVec);
+template std::ostream &operator<<(std::ostream &aOs, const mpp::Complex<int> &aVec);
+template std::wostream &operator<<(std::wostream &aOs, const mpp::Complex<int> &aVec);
+template std::istream &operator>>(std::istream &aIs, mpp::Complex<int> &aVec);
+template std::wistream &operator>>(std::wistream &aIs, mpp::Complex<int> &aVec);
 
-template std::ostream &operator<<(std::ostream &aOs, const opp::Complex<float> &aVec);
-template std::wostream &operator<<(std::wostream &aOs, const opp::Complex<float> &aVec);
-template std::istream &operator>>(std::istream &aIs, opp::Complex<float> &aVec);
-template std::wistream &operator>>(std::wistream &aIs, opp::Complex<float> &aVec);
+template std::ostream &operator<<(std::ostream &aOs, const mpp::Complex<float> &aVec);
+template std::wostream &operator<<(std::wostream &aOs, const mpp::Complex<float> &aVec);
+template std::istream &operator>>(std::istream &aIs, mpp::Complex<float> &aVec);
+template std::wistream &operator>>(std::wistream &aIs, mpp::Complex<float> &aVec);
 
-template std::ostream &operator<<(std::ostream &aOs, const opp::Complex<double> &aVec);
-template std::wostream &operator<<(std::wostream &aOs, const opp::Complex<double> &aVec);
-template std::istream &operator>>(std::istream &aIs, opp::Complex<double> &aVec);
-template std::wistream &operator>>(std::wistream &aIs, opp::Complex<double> &aVec);
+template std::ostream &operator<<(std::ostream &aOs, const mpp::Complex<double> &aVec);
+template std::wostream &operator<<(std::wostream &aOs, const mpp::Complex<double> &aVec);
+template std::istream &operator>>(std::istream &aIs, mpp::Complex<double> &aVec);
+template std::wistream &operator>>(std::wistream &aIs, mpp::Complex<double> &aVec);
 
-template std::ostream &operator<<(std::ostream &aOs, const opp::Complex<opp::HalfFp16> &aVec);
-template std::wostream &operator<<(std::wostream &aOs, const opp::Complex<opp::HalfFp16> &aVec);
-template std::istream &operator>>(std::istream &aIs, opp::Complex<opp::HalfFp16> &aVec);
-template std::wistream &operator>>(std::wistream &aIs, opp::Complex<opp::HalfFp16> &aVec);
+template std::ostream &operator<<(std::ostream &aOs, const mpp::Complex<mpp::HalfFp16> &aVec);
+template std::wostream &operator<<(std::wostream &aOs, const mpp::Complex<mpp::HalfFp16> &aVec);
+template std::istream &operator>>(std::istream &aIs, mpp::Complex<mpp::HalfFp16> &aVec);
+template std::wistream &operator>>(std::wistream &aIs, mpp::Complex<mpp::HalfFp16> &aVec);
 
-template std::ostream &operator<<(std::ostream &aOs, const opp::Complex<opp::BFloat16> &aVec);
-template std::wostream &operator<<(std::wostream &aOs, const opp::Complex<opp::BFloat16> &aVec);
-template std::istream &operator>>(std::istream &aIs, opp::Complex<opp::BFloat16> &aVec);
-template std::wistream &operator>>(std::wistream &aIs, opp::Complex<opp::BFloat16> &aVec);
+template std::ostream &operator<<(std::ostream &aOs, const mpp::Complex<mpp::BFloat16> &aVec);
+template std::wostream &operator<<(std::wostream &aOs, const mpp::Complex<mpp::BFloat16> &aVec);
+template std::istream &operator>>(std::istream &aIs, mpp::Complex<mpp::BFloat16> &aVec);
+template std::wistream &operator>>(std::wistream &aIs, mpp::Complex<mpp::BFloat16> &aVec);
 
-} // namespace opp
+} // namespace mpp

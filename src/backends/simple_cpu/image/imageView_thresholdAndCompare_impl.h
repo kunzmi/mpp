@@ -48,7 +48,7 @@
 #include <common/image/sizePitched.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/utilities.h>
 #include <common/vector_typetraits.h>
@@ -59,7 +59,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace opp::image::cpuSimple
+namespace mpp::image::cpuSimple
 {
 
 #pragma region Compare
@@ -77,7 +77,7 @@ ImageView<Pixel8uC1> &ImageView<T>::Compare(const ImageView<T> &aSrc2, CompareOp
 
     switch (aCompare)
     {
-        case opp::CompareOp::Less:
+        case mpp::CompareOp::Less:
         {
             if constexpr (ComplexVector<SrcT>)
             {
@@ -88,15 +88,15 @@ ImageView<Pixel8uC1> &ImageView<T>::Compare(const ImageView<T> &aSrc2, CompareOp
             }
             else
             {
-                using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Lt<ComputeT>,
+                using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Lt<ComputeT>,
                                                     RoundingMode::None, voidType, voidType, true>;
-                const opp::Lt<ComputeT> op;
+                const mpp::Lt<ComputeT> op;
                 const compareSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
                 forEachPixel(aDst, functor);
             }
         }
         break;
-        case opp::CompareOp::LessEq:
+        case mpp::CompareOp::LessEq:
         {
             if constexpr (ComplexVector<SrcT>)
             {
@@ -107,24 +107,24 @@ ImageView<Pixel8uC1> &ImageView<T>::Compare(const ImageView<T> &aSrc2, CompareOp
             }
             else
             {
-                using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Le<ComputeT>,
+                using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Le<ComputeT>,
                                                     RoundingMode::None, voidType, voidType, true>;
-                const opp::Le<ComputeT> op;
+                const mpp::Le<ComputeT> op;
                 const compareSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
                 forEachPixel(aDst, functor);
             }
         }
         break;
-        case opp::CompareOp::Eq:
+        case mpp::CompareOp::Eq:
         {
-            using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Eq<ComputeT>, RoundingMode::None,
+            using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Eq<ComputeT>, RoundingMode::None,
                                                 voidType, voidType, true>;
-            const opp::Eq<ComputeT> op;
+            const mpp::Eq<ComputeT> op;
             const compareSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
             forEachPixel(aDst, functor);
         }
         break;
-        case opp::CompareOp::Greater:
+        case mpp::CompareOp::Greater:
         {
             if constexpr (ComplexVector<SrcT>)
             {
@@ -135,15 +135,15 @@ ImageView<Pixel8uC1> &ImageView<T>::Compare(const ImageView<T> &aSrc2, CompareOp
             }
             else
             {
-                using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Gt<ComputeT>,
+                using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Gt<ComputeT>,
                                                     RoundingMode::None, voidType, voidType, true>;
-                const opp::Gt<ComputeT> op;
+                const mpp::Gt<ComputeT> op;
                 const compareSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
                 forEachPixel(aDst, functor);
             }
         }
         break;
-        case opp::CompareOp::GreaterEq:
+        case mpp::CompareOp::GreaterEq:
         {
             if constexpr (ComplexVector<SrcT>)
             {
@@ -154,19 +154,19 @@ ImageView<Pixel8uC1> &ImageView<T>::Compare(const ImageView<T> &aSrc2, CompareOp
             }
             else
             {
-                using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Ge<ComputeT>,
+                using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Ge<ComputeT>,
                                                     RoundingMode::None, voidType, voidType, true>;
-                const opp::Ge<ComputeT> op;
+                const mpp::Ge<ComputeT> op;
                 const compareSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
                 forEachPixel(aDst, functor);
             }
         }
         break;
-        case opp::CompareOp::NEq:
+        case mpp::CompareOp::NEq:
         {
-            using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::NEq<ComputeT>, RoundingMode::None,
+            using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::NEq<ComputeT>, RoundingMode::None,
                                                 voidType, voidType, true>;
-            const opp::NEq<ComputeT> op;
+            const mpp::NEq<ComputeT> op;
             const compareSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
             forEachPixel(aDst, functor);
         }
@@ -189,7 +189,7 @@ ImageView<Pixel8uC1> &ImageView<T>::Compare(const T &aConst, CompareOp aCompare,
 
     switch (aCompare)
     {
-        case opp::CompareOp::Less:
+        case mpp::CompareOp::Less:
         {
             if constexpr (ComplexVector<SrcT>)
             {
@@ -200,15 +200,15 @@ ImageView<Pixel8uC1> &ImageView<T>::Compare(const T &aConst, CompareOp aCompare,
             }
             else
             {
-                using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Lt<ComputeT>,
+                using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Lt<ComputeT>,
                                                        RoundingMode::None, voidType, voidType, true>;
-                const opp::Lt<ComputeT> op;
+                const mpp::Lt<ComputeT> op;
                 const compareSrcC functor(PointerRoi(), Pitch(), aConst, op);
                 forEachPixel(aDst, functor);
             }
         }
         break;
-        case opp::CompareOp::LessEq:
+        case mpp::CompareOp::LessEq:
         {
             if constexpr (ComplexVector<SrcT>)
             {
@@ -219,24 +219,24 @@ ImageView<Pixel8uC1> &ImageView<T>::Compare(const T &aConst, CompareOp aCompare,
             }
             else
             {
-                using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Le<ComputeT>,
+                using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Le<ComputeT>,
                                                        RoundingMode::None, voidType, voidType, true>;
-                const opp::Le<ComputeT> op;
+                const mpp::Le<ComputeT> op;
                 const compareSrcC functor(PointerRoi(), Pitch(), aConst, op);
                 forEachPixel(aDst, functor);
             }
         }
         break;
-        case opp::CompareOp::Eq:
+        case mpp::CompareOp::Eq:
         {
-            using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Eq<ComputeT>,
+            using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Eq<ComputeT>,
                                                    RoundingMode::None, voidType, voidType, true>;
-            const opp::Eq<ComputeT> op;
+            const mpp::Eq<ComputeT> op;
             const compareSrcC functor(PointerRoi(), Pitch(), aConst, op);
             forEachPixel(aDst, functor);
         }
         break;
-        case opp::CompareOp::Greater:
+        case mpp::CompareOp::Greater:
         {
             if constexpr (ComplexVector<SrcT>)
             {
@@ -247,15 +247,15 @@ ImageView<Pixel8uC1> &ImageView<T>::Compare(const T &aConst, CompareOp aCompare,
             }
             else
             {
-                using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Gt<ComputeT>,
+                using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Gt<ComputeT>,
                                                        RoundingMode::None, voidType, voidType, true>;
-                const opp::Gt<ComputeT> op;
+                const mpp::Gt<ComputeT> op;
                 const compareSrcC functor(PointerRoi(), Pitch(), aConst, op);
                 forEachPixel(aDst, functor);
             }
         }
         break;
-        case opp::CompareOp::GreaterEq:
+        case mpp::CompareOp::GreaterEq:
         {
             if constexpr (ComplexVector<SrcT>)
             {
@@ -266,19 +266,19 @@ ImageView<Pixel8uC1> &ImageView<T>::Compare(const T &aConst, CompareOp aCompare,
             }
             else
             {
-                using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Ge<ComputeT>,
+                using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Ge<ComputeT>,
                                                        RoundingMode::None, voidType, voidType, true>;
-                const opp::Ge<ComputeT> op;
+                const mpp::Ge<ComputeT> op;
                 const compareSrcC functor(PointerRoi(), Pitch(), aConst, op);
                 forEachPixel(aDst, functor);
             }
         }
         break;
-        case opp::CompareOp::NEq:
+        case mpp::CompareOp::NEq:
         {
-            using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::NEq<ComputeT>,
+            using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::NEq<ComputeT>,
                                                    RoundingMode::None, voidType, voidType, true>;
-            const opp::NEq<ComputeT> op;
+            const mpp::NEq<ComputeT> op;
             const compareSrcC functor(PointerRoi(), Pitch(), aConst, op);
             forEachPixel(aDst, functor);
         }
@@ -304,9 +304,9 @@ ImageView<Pixel8uC1> &ImageView<T>::CompareEqEps(const ImageView<T> &aSrc2,
     using DstT                 = Pixel8uC1;
     constexpr size_t TupelSize = 1;
 
-    using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::EqEps<ComputeT>, RoundingMode::None,
+    using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::EqEps<ComputeT>, RoundingMode::None,
                                         voidType, voidType, true>;
-    const opp::EqEps<ComputeT> op(aEpsilon);
+    const mpp::EqEps<ComputeT> op(aEpsilon);
     const compareSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
     forEachPixel(aDst, functor);
 
@@ -325,9 +325,9 @@ ImageView<Pixel8uC1> &ImageView<T>::CompareEqEps(const T &aConst, complex_basety
     using DstT                 = Pixel8uC1;
     constexpr size_t TupelSize = 1;
 
-    using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::EqEps<ComputeT>, RoundingMode::None,
+    using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::EqEps<ComputeT>, RoundingMode::None,
                                            voidType, voidType, true>;
-    const opp::EqEps<ComputeT> op(aEpsilon);
+    const mpp::EqEps<ComputeT> op(aEpsilon);
     const compareSrcC functor(PointerRoi(), Pitch(), aConst, op);
     forEachPixel(aDst, functor);
     return aDst;
@@ -340,10 +340,10 @@ ImageView<T> &ImageView<T>::Threshold(const T &aThreshold, CompareOp aCompare, I
 {
     switch (aCompare)
     {
-        case opp::CompareOp::Less:
+        case mpp::CompareOp::Less:
             return ThresholdLT(aThreshold, aDst);
             break;
-        case opp::CompareOp::Greater:
+        case mpp::CompareOp::Greater:
             return ThresholdGT(aThreshold, aDst);
             break;
         default:
@@ -364,8 +364,8 @@ ImageView<T> &ImageView<T>::ThresholdLT(const T &aThreshold, ImageView<T> &aDst)
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using thresholdSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Max<ComputeT>, RoundingMode::None>;
-    const opp::Max<ComputeT> op;
+    using thresholdSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Max<ComputeT>, RoundingMode::None>;
+    const mpp::Max<ComputeT> op;
     const thresholdSrcC functor(PointerRoi(), Pitch(), aThreshold, op);
     forEachPixel(aDst, functor);
     return aDst;
@@ -381,8 +381,8 @@ ImageView<T> &ImageView<T>::ThresholdGT(const T &aThreshold, ImageView<T> &aDst)
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using thresholdSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, opp::Min<ComputeT>, RoundingMode::None>;
-    const opp::Min<ComputeT> op;
+    using thresholdSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Min<ComputeT>, RoundingMode::None>;
+    const mpp::Min<ComputeT> op;
     const thresholdSrcC functor(PointerRoi(), Pitch(), aThreshold, op);
     forEachPixel(aDst, functor);
     return aDst;
@@ -393,10 +393,10 @@ ImageView<T> &ImageView<T>::Threshold(const T &aThreshold, CompareOp aCompare)
 {
     switch (aCompare)
     {
-        case opp::CompareOp::Less:
+        case mpp::CompareOp::Less:
             return ThresholdLT(aThreshold);
             break;
-        case opp::CompareOp::Greater:
+        case mpp::CompareOp::Greater:
             return ThresholdGT(aThreshold);
             break;
         default:
@@ -414,8 +414,8 @@ ImageView<T> &ImageView<T>::ThresholdLT(const T &aThreshold)
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using thresholdInplaceC = InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Max<ComputeT>, RoundingMode::None>;
-    const opp::Max<ComputeT> op;
+    using thresholdInplaceC = InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::Max<ComputeT>, RoundingMode::None>;
+    const mpp::Max<ComputeT> op;
     const thresholdInplaceC functor(aThreshold, op);
     forEachPixel(*this, functor);
     return *this;
@@ -428,8 +428,8 @@ ImageView<T> &ImageView<T>::ThresholdGT(const T &aThreshold)
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using thresholdInplaceC = InplaceConstantFunctor<TupelSize, ComputeT, DstT, opp::Min<ComputeT>, RoundingMode::None>;
-    const opp::Min<ComputeT> op;
+    using thresholdInplaceC = InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::Min<ComputeT>, RoundingMode::None>;
+    const mpp::Min<ComputeT> op;
     const thresholdInplaceC functor(aThreshold, op);
     forEachPixel(*this, functor);
     return *this;
@@ -442,10 +442,10 @@ ImageView<T> &ImageView<T>::Threshold(const T &aThreshold, const T &aValue, Comp
 {
     switch (aCompare)
     {
-        case opp::CompareOp::Less:
+        case mpp::CompareOp::Less:
             return ThresholdLT(aThreshold, aValue, aDst);
             break;
-        case opp::CompareOp::Greater:
+        case mpp::CompareOp::Greater:
             return ThresholdGT(aThreshold, aValue, aDst);
             break;
         default:
@@ -466,8 +466,8 @@ ImageView<T> &ImageView<T>::ThresholdLT(const T &aThreshold, const T &aValue, Im
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using thresholdSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::MaxVal<ComputeT>, RoundingMode::None>;
-    const opp::MaxVal<ComputeT> op(aValue, aThreshold);
+    using thresholdSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::MaxVal<ComputeT>, RoundingMode::None>;
+    const mpp::MaxVal<ComputeT> op(aValue, aThreshold);
     const thresholdSrc functor(PointerRoi(), Pitch(), op);
     forEachPixel(aDst, functor);
     return aDst;
@@ -483,8 +483,8 @@ ImageView<T> &ImageView<T>::ThresholdGT(const T &aThreshold, const T &aValue, Im
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using thresholdSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::MinVal<ComputeT>, RoundingMode::None>;
-    const opp::MinVal<ComputeT> op(aValue, aThreshold);
+    using thresholdSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::MinVal<ComputeT>, RoundingMode::None>;
+    const mpp::MinVal<ComputeT> op(aValue, aThreshold);
     const thresholdSrc functor(PointerRoi(), Pitch(), op);
     forEachPixel(aDst, functor);
     return aDst;
@@ -495,10 +495,10 @@ ImageView<T> &ImageView<T>::Threshold(const T &aThreshold, const T &aValue, Comp
 {
     switch (aCompare)
     {
-        case opp::CompareOp::Less:
+        case mpp::CompareOp::Less:
             return ThresholdLT(aThreshold, aValue);
             break;
-        case opp::CompareOp::Greater:
+        case mpp::CompareOp::Greater:
             return ThresholdGT(aThreshold, aValue);
             break;
         default:
@@ -516,8 +516,8 @@ ImageView<T> &ImageView<T>::ThresholdLT(const T &aThreshold, const T &aValue)
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using thresholdInplace = InplaceFunctor<TupelSize, ComputeT, DstT, opp::MaxVal<ComputeT>, RoundingMode::None>;
-    const opp::MaxVal<ComputeT> op(aValue, aThreshold);
+    using thresholdInplace = InplaceFunctor<TupelSize, ComputeT, DstT, mpp::MaxVal<ComputeT>, RoundingMode::None>;
+    const mpp::MaxVal<ComputeT> op(aValue, aThreshold);
     const thresholdInplace functor(op);
     forEachPixel(*this, functor);
     return *this;
@@ -530,8 +530,8 @@ ImageView<T> &ImageView<T>::ThresholdGT(const T &aThreshold, const T &aValue)
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using thresholdInplace = InplaceFunctor<TupelSize, ComputeT, DstT, opp::MinVal<ComputeT>, RoundingMode::None>;
-    const opp::MinVal<ComputeT> op(aValue, aThreshold);
+    using thresholdInplace = InplaceFunctor<TupelSize, ComputeT, DstT, mpp::MinVal<ComputeT>, RoundingMode::None>;
+    const mpp::MinVal<ComputeT> op(aValue, aThreshold);
     const thresholdInplace functor(op);
     forEachPixel(*this, functor);
     return *this;
@@ -548,8 +548,8 @@ ImageView<T> &ImageView<T>::ThresholdLTGT(const T &aThresholdLT, const T &aValue
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using thresholdSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, opp::MinValMaxVal<ComputeT>, RoundingMode::None>;
-    const opp::MinValMaxVal<ComputeT> op(aValueGT, aThresholdGT, aValueLT, aThresholdLT);
+    using thresholdSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::MinValMaxVal<ComputeT>, RoundingMode::None>;
+    const mpp::MinValMaxVal<ComputeT> op(aValueGT, aThresholdGT, aValueLT, aThresholdLT);
     const thresholdSrc functor(PointerRoi(), Pitch(), op);
     forEachPixel(aDst, functor);
     return aDst;
@@ -563,11 +563,11 @@ ImageView<T> &ImageView<T>::ThresholdLTGT(const T &aThresholdLT, const T &aValue
     using DstT                 = T;
     constexpr size_t TupelSize = 1;
 
-    using thresholdInplace = InplaceFunctor<TupelSize, ComputeT, DstT, opp::MinValMaxVal<ComputeT>, RoundingMode::None>;
-    const opp::MinValMaxVal<ComputeT> op(aValueGT, aThresholdGT, aValueLT, aThresholdLT);
+    using thresholdInplace = InplaceFunctor<TupelSize, ComputeT, DstT, mpp::MinValMaxVal<ComputeT>, RoundingMode::None>;
+    const mpp::MinValMaxVal<ComputeT> op(aValueGT, aThresholdGT, aValueLT, aThresholdLT);
     const thresholdInplace functor(op);
     forEachPixel(*this, functor);
     return *this;
 }
 #pragma endregion
-} // namespace opp::image::cpuSimple
+} // namespace mpp::image::cpuSimple

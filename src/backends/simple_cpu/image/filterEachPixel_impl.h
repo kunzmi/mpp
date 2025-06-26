@@ -12,7 +12,7 @@
 
 #include <iostream>
 
-namespace opp::image::cpuSimple
+namespace mpp::image::cpuSimple
 {
 
 template <typename BorderControlT, typename ComputeT, typename DstT, typename FilterT>
@@ -64,7 +64,7 @@ void filterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst, const F
 
     switch (aBorderType)
     {
-        case opp::BorderType::None:
+        case mpp::BorderType::None:
         {
             using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -72,7 +72,7 @@ void filterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst, const F
             filterEachPixel<BCType, ComputeT, DstT, FilterT>(bc, aDst, aFilter, aFilterArea, aScale);
         }
         break;
-        case opp::BorderType::Constant:
+        case mpp::BorderType::Constant:
         {
             using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset, aConstant);
@@ -80,7 +80,7 @@ void filterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst, const F
             filterEachPixel<BCType, ComputeT, DstT, FilterT>(bc, aDst, aFilter, aFilterArea, aScale);
         }
         break;
-        case opp::BorderType::Replicate:
+        case mpp::BorderType::Replicate:
         {
             using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -88,7 +88,7 @@ void filterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst, const F
             filterEachPixel<BCType, ComputeT, DstT, FilterT>(bc, aDst, aFilter, aFilterArea, aScale);
         }
         break;
-        case opp::BorderType::Mirror:
+        case mpp::BorderType::Mirror:
         {
             using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -96,7 +96,7 @@ void filterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst, const F
             filterEachPixel<BCType, ComputeT, DstT, FilterT>(bc, aDst, aFilter, aFilterArea, aScale);
         }
         break;
-        case opp::BorderType::MirrorReplicate:
+        case mpp::BorderType::MirrorReplicate:
         {
             using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -104,7 +104,7 @@ void filterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst, const F
             filterEachPixel<BCType, ComputeT, DstT, FilterT>(bc, aDst, aFilter, aFilterArea, aScale);
         }
         break;
-        case opp::BorderType::Wrap:
+        case mpp::BorderType::Wrap:
         {
             using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -157,7 +157,7 @@ void minFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, cons
 
     switch (aBorderType)
     {
-        case opp::BorderType::None:
+        case mpp::BorderType::None:
         {
             using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -165,7 +165,7 @@ void minFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, cons
             minFilterEachPixel(bc, aDst, aFilterArea);
         }
         break;
-        case opp::BorderType::Constant:
+        case mpp::BorderType::Constant:
         {
             using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset, aConstant);
@@ -173,7 +173,7 @@ void minFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, cons
             minFilterEachPixel(bc, aDst, aFilterArea);
         }
         break;
-        case opp::BorderType::Replicate:
+        case mpp::BorderType::Replicate:
         {
             using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -181,7 +181,7 @@ void minFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, cons
             minFilterEachPixel(bc, aDst, aFilterArea);
         }
         break;
-        case opp::BorderType::Mirror:
+        case mpp::BorderType::Mirror:
         {
             using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -189,7 +189,7 @@ void minFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, cons
             minFilterEachPixel(bc, aDst, aFilterArea);
         }
         break;
-        case opp::BorderType::MirrorReplicate:
+        case mpp::BorderType::MirrorReplicate:
         {
             using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -197,7 +197,7 @@ void minFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, cons
             minFilterEachPixel(bc, aDst, aFilterArea);
         }
         break;
-        case opp::BorderType::Wrap:
+        case mpp::BorderType::Wrap:
         {
             using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -250,7 +250,7 @@ void maxFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, cons
 
     switch (aBorderType)
     {
-        case opp::BorderType::None:
+        case mpp::BorderType::None:
         {
             using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -258,7 +258,7 @@ void maxFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, cons
             maxFilterEachPixel(bc, aDst, aFilterArea);
         }
         break;
-        case opp::BorderType::Constant:
+        case mpp::BorderType::Constant:
         {
             using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset, aConstant);
@@ -266,7 +266,7 @@ void maxFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, cons
             maxFilterEachPixel(bc, aDst, aFilterArea);
         }
         break;
-        case opp::BorderType::Replicate:
+        case mpp::BorderType::Replicate:
         {
             using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -274,7 +274,7 @@ void maxFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, cons
             maxFilterEachPixel(bc, aDst, aFilterArea);
         }
         break;
-        case opp::BorderType::Mirror:
+        case mpp::BorderType::Mirror:
         {
             using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -282,7 +282,7 @@ void maxFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, cons
             maxFilterEachPixel(bc, aDst, aFilterArea);
         }
         break;
-        case opp::BorderType::MirrorReplicate:
+        case mpp::BorderType::MirrorReplicate:
         {
             using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -290,7 +290,7 @@ void maxFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, cons
             maxFilterEachPixel(bc, aDst, aFilterArea);
         }
         break;
-        case opp::BorderType::Wrap:
+        case mpp::BorderType::Wrap:
         {
             using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -367,7 +367,7 @@ void wienerFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, c
 
     switch (aBorderType)
     {
-        case opp::BorderType::None:
+        case mpp::BorderType::None:
         {
             using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -375,7 +375,7 @@ void wienerFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, c
             wienerFilterEachPixel(bc, aDst, aFilterArea, aNoise);
         }
         break;
-        case opp::BorderType::Constant:
+        case mpp::BorderType::Constant:
         {
             using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset, aConstant);
@@ -383,7 +383,7 @@ void wienerFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, c
             wienerFilterEachPixel(bc, aDst, aFilterArea, aNoise);
         }
         break;
-        case opp::BorderType::Replicate:
+        case mpp::BorderType::Replicate:
         {
             using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -391,7 +391,7 @@ void wienerFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, c
             wienerFilterEachPixel(bc, aDst, aFilterArea, aNoise);
         }
         break;
-        case opp::BorderType::Mirror:
+        case mpp::BorderType::Mirror:
         {
             using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -399,7 +399,7 @@ void wienerFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, c
             wienerFilterEachPixel(bc, aDst, aFilterArea, aNoise);
         }
         break;
-        case opp::BorderType::MirrorReplicate:
+        case mpp::BorderType::MirrorReplicate:
         {
             using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -407,7 +407,7 @@ void wienerFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, c
             wienerFilterEachPixel(bc, aDst, aFilterArea, aNoise);
         }
         break;
-        case opp::BorderType::Wrap:
+        case mpp::BorderType::Wrap:
         {
             using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -480,7 +480,7 @@ void thresholdAdaptiveBoxFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<
 
     switch (aBorderType)
     {
-        case opp::BorderType::None:
+        case mpp::BorderType::None:
         {
             using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -488,7 +488,7 @@ void thresholdAdaptiveBoxFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<
             thresholdAdaptiveBoxFilterEachPixel(bc, aDst, aFilterArea, aDelta, aValGT, aValLE);
         }
         break;
-        case opp::BorderType::Constant:
+        case mpp::BorderType::Constant:
         {
             using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset, aConstant);
@@ -496,7 +496,7 @@ void thresholdAdaptiveBoxFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<
             thresholdAdaptiveBoxFilterEachPixel(bc, aDst, aFilterArea, aDelta, aValGT, aValLE);
         }
         break;
-        case opp::BorderType::Replicate:
+        case mpp::BorderType::Replicate:
         {
             using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -504,7 +504,7 @@ void thresholdAdaptiveBoxFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<
             thresholdAdaptiveBoxFilterEachPixel(bc, aDst, aFilterArea, aDelta, aValGT, aValLE);
         }
         break;
-        case opp::BorderType::Mirror:
+        case mpp::BorderType::Mirror:
         {
             using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -512,7 +512,7 @@ void thresholdAdaptiveBoxFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<
             thresholdAdaptiveBoxFilterEachPixel(bc, aDst, aFilterArea, aDelta, aValGT, aValLE);
         }
         break;
-        case opp::BorderType::MirrorReplicate:
+        case mpp::BorderType::MirrorReplicate:
         {
             using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -520,7 +520,7 @@ void thresholdAdaptiveBoxFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<
             thresholdAdaptiveBoxFilterEachPixel(bc, aDst, aFilterArea, aDelta, aValGT, aValLE);
         }
         break;
-        case opp::BorderType::Wrap:
+        case mpp::BorderType::Wrap:
         {
             using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -629,7 +629,7 @@ void bilateralFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst
 
     switch (aBorderType)
     {
-        case opp::BorderType::None:
+        case mpp::BorderType::None:
         {
             using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -638,7 +638,7 @@ void bilateralFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst
                                                                       aFilterArea, aNorm);
         }
         break;
-        case opp::BorderType::Constant:
+        case mpp::BorderType::Constant:
         {
             using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset, aConstant);
@@ -647,7 +647,7 @@ void bilateralFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst
                                                                       aFilterArea, aNorm);
         }
         break;
-        case opp::BorderType::Replicate:
+        case mpp::BorderType::Replicate:
         {
             using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -656,7 +656,7 @@ void bilateralFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst
                                                                       aFilterArea, aNorm);
         }
         break;
-        case opp::BorderType::Mirror:
+        case mpp::BorderType::Mirror:
         {
             using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -665,7 +665,7 @@ void bilateralFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst
                                                                       aFilterArea, aNorm);
         }
         break;
-        case opp::BorderType::MirrorReplicate:
+        case mpp::BorderType::MirrorReplicate:
         {
             using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -674,7 +674,7 @@ void bilateralFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst
                                                                       aFilterArea, aNorm);
         }
         break;
-        case opp::BorderType::Wrap:
+        case mpp::BorderType::Wrap:
         {
             using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -825,7 +825,7 @@ void gradientVectorEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDstX
 
     switch (aBorderType)
     {
-        case opp::BorderType::None:
+        case mpp::BorderType::None:
         {
             using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -834,7 +834,7 @@ void gradientVectorEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDstX
                 bc, aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance, aFilterX, aFilterY, aFilterArea, aNorm);
         }
         break;
-        case opp::BorderType::Constant:
+        case mpp::BorderType::Constant:
         {
             using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset, aConstant);
@@ -843,7 +843,7 @@ void gradientVectorEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDstX
                 bc, aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance, aFilterX, aFilterY, aFilterArea, aNorm);
         }
         break;
-        case opp::BorderType::Replicate:
+        case mpp::BorderType::Replicate:
         {
             using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -852,7 +852,7 @@ void gradientVectorEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDstX
                 bc, aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance, aFilterX, aFilterY, aFilterArea, aNorm);
         }
         break;
-        case opp::BorderType::Mirror:
+        case mpp::BorderType::Mirror:
         {
             using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -861,7 +861,7 @@ void gradientVectorEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDstX
                 bc, aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance, aFilterX, aFilterY, aFilterArea, aNorm);
         }
         break;
-        case opp::BorderType::MirrorReplicate:
+        case mpp::BorderType::MirrorReplicate:
         {
             using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -870,7 +870,7 @@ void gradientVectorEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDstX
                 bc, aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance, aFilterX, aFilterY, aFilterArea, aNorm);
         }
         break;
-        case opp::BorderType::Wrap:
+        case mpp::BorderType::Wrap:
         {
             using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -951,7 +951,7 @@ void unsharpFilterEachPixel(const ImageView<SrcT> &aSrc, const ImageView<DstT> &
 
     switch (aBorderType)
     {
-        case opp::BorderType::None:
+        case mpp::BorderType::None:
         {
             using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -960,7 +960,7 @@ void unsharpFilterEachPixel(const ImageView<SrcT> &aSrc, const ImageView<DstT> &
                                                                     aFilterArea);
         }
         break;
-        case opp::BorderType::Constant:
+        case mpp::BorderType::Constant:
         {
             using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset, aConstant);
@@ -969,7 +969,7 @@ void unsharpFilterEachPixel(const ImageView<SrcT> &aSrc, const ImageView<DstT> &
                                                                     aFilterArea);
         }
         break;
-        case opp::BorderType::Replicate:
+        case mpp::BorderType::Replicate:
         {
             using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -978,7 +978,7 @@ void unsharpFilterEachPixel(const ImageView<SrcT> &aSrc, const ImageView<DstT> &
                                                                     aFilterArea);
         }
         break;
-        case opp::BorderType::Mirror:
+        case mpp::BorderType::Mirror:
         {
             using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -987,7 +987,7 @@ void unsharpFilterEachPixel(const ImageView<SrcT> &aSrc, const ImageView<DstT> &
                                                                     aFilterArea);
         }
         break;
-        case opp::BorderType::MirrorReplicate:
+        case mpp::BorderType::MirrorReplicate:
         {
             using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -996,7 +996,7 @@ void unsharpFilterEachPixel(const ImageView<SrcT> &aSrc, const ImageView<DstT> &
                                                                     aFilterArea);
         }
         break;
-        case opp::BorderType::Wrap:
+        case mpp::BorderType::Wrap:
         {
             using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1030,7 +1030,7 @@ DstT cannyEdgeMaxSupression(int pixelX, int pixelY, BorderControlT &aSrcWithBC, 
     // get quantized direction from angle, angles from atan2-function are given in range -pi..pi
     // map this range to 0..3, where 0 = horizontal, 1 = 45deg diagonal, 2 = vertical, 3 = -45deg = 135deg diagonal
     angle.x = round((angle.x / std::numbers::pi_v<float> * 180.0f + 180.0f) / 45.0f);
-    int dir = static_cast<int>(angle.x) % 4; // the modulo maps the negative / opposite direction to the positive one
+    int dir = static_cast<int>(angle.x) % 4; // the modulo maps the negative / mpposite direction to the positive one
 
     SrcT pixelMinus;
     SrcT pixelPlus;
@@ -1092,7 +1092,7 @@ DstT cannyEdgeHysteresis(int pixelX, int pixelY, BorderControlT &aSrcWithBC, con
     // get quantized direction from angle, angles from atan2-function are given in range -pi..pi
     // map this range to 0..3, where 0 = horizontal, 1 = 45deg diagonal, 2 = vertical, 3 = -45deg = 135deg diagonal
     angle.x = round((angle.x / std::numbers::pi_v<float> * 180.0f + 180.0f) / 45.0f);
-    int dir = static_cast<int>(angle.x) % 4; // the modulo maps the negative / opposite direction to the positive one
+    int dir = static_cast<int>(angle.x) % 4; // the modulo maps the negative / mpposite direction to the positive one
 
     int pixelMinus = 0;
     int pixelPlus  = 0;
@@ -1226,7 +1226,7 @@ void crossCorrelationEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDs
 
     switch (aBorderType)
     {
-        case opp::BorderType::None:
+        case mpp::BorderType::None:
         {
             using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1234,7 +1234,7 @@ void crossCorrelationEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDs
             crossCorrelationEachPixel<BCType, DstT, SrcT>(bc, aDst, aTemplate, aFilterArea);
         }
         break;
-        case opp::BorderType::Constant:
+        case mpp::BorderType::Constant:
         {
             using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset, aConstant);
@@ -1242,7 +1242,7 @@ void crossCorrelationEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDs
             crossCorrelationEachPixel<BCType, DstT, SrcT>(bc, aDst, aTemplate, aFilterArea);
         }
         break;
-        case opp::BorderType::Replicate:
+        case mpp::BorderType::Replicate:
         {
             using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1250,7 +1250,7 @@ void crossCorrelationEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDs
             crossCorrelationEachPixel<BCType, DstT, SrcT>(bc, aDst, aTemplate, aFilterArea);
         }
         break;
-        case opp::BorderType::Mirror:
+        case mpp::BorderType::Mirror:
         {
             using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1258,7 +1258,7 @@ void crossCorrelationEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDs
             crossCorrelationEachPixel<BCType, DstT, SrcT>(bc, aDst, aTemplate, aFilterArea);
         }
         break;
-        case opp::BorderType::MirrorReplicate:
+        case mpp::BorderType::MirrorReplicate:
         {
             using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1266,7 +1266,7 @@ void crossCorrelationEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDs
             crossCorrelationEachPixel<BCType, DstT, SrcT>(bc, aDst, aTemplate, aFilterArea);
         }
         break;
-        case opp::BorderType::Wrap:
+        case mpp::BorderType::Wrap:
         {
             using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1329,7 +1329,7 @@ void crossCorrelationNormalizedEachPixel(const ImageView<SrcT> &aSrc, ImageView<
 
     switch (aBorderType)
     {
-        case opp::BorderType::None:
+        case mpp::BorderType::None:
         {
             using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1337,7 +1337,7 @@ void crossCorrelationNormalizedEachPixel(const ImageView<SrcT> &aSrc, ImageView<
             crossCorrelationNormalizedEachPixel<BCType, DstT, SrcT>(bc, aDst, aTemplate, aFilterArea);
         }
         break;
-        case opp::BorderType::Constant:
+        case mpp::BorderType::Constant:
         {
             using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset, aConstant);
@@ -1345,7 +1345,7 @@ void crossCorrelationNormalizedEachPixel(const ImageView<SrcT> &aSrc, ImageView<
             crossCorrelationNormalizedEachPixel<BCType, DstT, SrcT>(bc, aDst, aTemplate, aFilterArea);
         }
         break;
-        case opp::BorderType::Replicate:
+        case mpp::BorderType::Replicate:
         {
             using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1353,7 +1353,7 @@ void crossCorrelationNormalizedEachPixel(const ImageView<SrcT> &aSrc, ImageView<
             crossCorrelationNormalizedEachPixel<BCType, DstT, SrcT>(bc, aDst, aTemplate, aFilterArea);
         }
         break;
-        case opp::BorderType::Mirror:
+        case mpp::BorderType::Mirror:
         {
             using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1361,7 +1361,7 @@ void crossCorrelationNormalizedEachPixel(const ImageView<SrcT> &aSrc, ImageView<
             crossCorrelationNormalizedEachPixel<BCType, DstT, SrcT>(bc, aDst, aTemplate, aFilterArea);
         }
         break;
-        case opp::BorderType::MirrorReplicate:
+        case mpp::BorderType::MirrorReplicate:
         {
             using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1369,7 +1369,7 @@ void crossCorrelationNormalizedEachPixel(const ImageView<SrcT> &aSrc, ImageView<
             crossCorrelationNormalizedEachPixel<BCType, DstT, SrcT>(bc, aDst, aTemplate, aFilterArea);
         }
         break;
-        case opp::BorderType::Wrap:
+        case mpp::BorderType::Wrap:
         {
             using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1459,7 +1459,7 @@ void crossCorrelationCoefficientEachPixel(const ImageView<SrcT> &aSrc, ImageView
 
     switch (aBorderType)
     {
-        case opp::BorderType::None:
+        case mpp::BorderType::None:
         {
             using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1467,7 +1467,7 @@ void crossCorrelationCoefficientEachPixel(const ImageView<SrcT> &aSrc, ImageView
             crossCorrelationCoefficientEachPixel<BCType, DstT, SrcT>(bc, aDst, aTemplate, aFilterArea);
         }
         break;
-        case opp::BorderType::Constant:
+        case mpp::BorderType::Constant:
         {
             using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset, aConstant);
@@ -1475,7 +1475,7 @@ void crossCorrelationCoefficientEachPixel(const ImageView<SrcT> &aSrc, ImageView
             crossCorrelationCoefficientEachPixel<BCType, DstT, SrcT>(bc, aDst, aTemplate, aFilterArea);
         }
         break;
-        case opp::BorderType::Replicate:
+        case mpp::BorderType::Replicate:
         {
             using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1483,7 +1483,7 @@ void crossCorrelationCoefficientEachPixel(const ImageView<SrcT> &aSrc, ImageView
             crossCorrelationCoefficientEachPixel<BCType, DstT, SrcT>(bc, aDst, aTemplate, aFilterArea);
         }
         break;
-        case opp::BorderType::Mirror:
+        case mpp::BorderType::Mirror:
         {
             using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1491,7 +1491,7 @@ void crossCorrelationCoefficientEachPixel(const ImageView<SrcT> &aSrc, ImageView
             crossCorrelationCoefficientEachPixel<BCType, DstT, SrcT>(bc, aDst, aTemplate, aFilterArea);
         }
         break;
-        case opp::BorderType::MirrorReplicate:
+        case mpp::BorderType::MirrorReplicate:
         {
             using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1499,7 +1499,7 @@ void crossCorrelationCoefficientEachPixel(const ImageView<SrcT> &aSrc, ImageView
             crossCorrelationCoefficientEachPixel<BCType, DstT, SrcT>(bc, aDst, aTemplate, aFilterArea);
         }
         break;
-        case opp::BorderType::Wrap:
+        case mpp::BorderType::Wrap:
         {
             using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1563,7 +1563,7 @@ void squareDistanceNormalizedEachPixel(const ImageView<SrcT> &aSrc, ImageView<Ds
 
     switch (aBorderType)
     {
-        case opp::BorderType::None:
+        case mpp::BorderType::None:
         {
             using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1571,7 +1571,7 @@ void squareDistanceNormalizedEachPixel(const ImageView<SrcT> &aSrc, ImageView<Ds
             squareDistanceNormalizedEachPixel<BCType, DstT, SrcT>(bc, aDst, aTemplate, aFilterArea);
         }
         break;
-        case opp::BorderType::Constant:
+        case mpp::BorderType::Constant:
         {
             using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset, aConstant);
@@ -1579,7 +1579,7 @@ void squareDistanceNormalizedEachPixel(const ImageView<SrcT> &aSrc, ImageView<Ds
             squareDistanceNormalizedEachPixel<BCType, DstT, SrcT>(bc, aDst, aTemplate, aFilterArea);
         }
         break;
-        case opp::BorderType::Replicate:
+        case mpp::BorderType::Replicate:
         {
             using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1587,7 +1587,7 @@ void squareDistanceNormalizedEachPixel(const ImageView<SrcT> &aSrc, ImageView<Ds
             squareDistanceNormalizedEachPixel<BCType, DstT, SrcT>(bc, aDst, aTemplate, aFilterArea);
         }
         break;
-        case opp::BorderType::Mirror:
+        case mpp::BorderType::Mirror:
         {
             using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1595,7 +1595,7 @@ void squareDistanceNormalizedEachPixel(const ImageView<SrcT> &aSrc, ImageView<Ds
             squareDistanceNormalizedEachPixel<BCType, DstT, SrcT>(bc, aDst, aTemplate, aFilterArea);
         }
         break;
-        case opp::BorderType::MirrorReplicate:
+        case mpp::BorderType::MirrorReplicate:
         {
             using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1603,7 +1603,7 @@ void squareDistanceNormalizedEachPixel(const ImageView<SrcT> &aSrc, ImageView<Ds
             squareDistanceNormalizedEachPixel<BCType, DstT, SrcT>(bc, aDst, aTemplate, aFilterArea);
         }
         break;
-        case opp::BorderType::Wrap:
+        case mpp::BorderType::Wrap:
         {
             using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1659,7 +1659,7 @@ void moprhologyEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, con
 
     switch (aBorderType)
     {
-        case opp::BorderType::None:
+        case mpp::BorderType::None:
         {
             using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1667,7 +1667,7 @@ void moprhologyEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, con
             moprhologyEachPixel<BCType, SrcT>(bc, aDst, aMask, aFilterArea, aMorph, aPostOp);
         }
         break;
-        case opp::BorderType::Constant:
+        case mpp::BorderType::Constant:
         {
             using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset, aConstant);
@@ -1675,7 +1675,7 @@ void moprhologyEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, con
             moprhologyEachPixel<BCType, SrcT>(bc, aDst, aMask, aFilterArea, aMorph, aPostOp);
         }
         break;
-        case opp::BorderType::Replicate:
+        case mpp::BorderType::Replicate:
         {
             using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1683,7 +1683,7 @@ void moprhologyEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, con
             moprhologyEachPixel<BCType, SrcT>(bc, aDst, aMask, aFilterArea, aMorph, aPostOp);
         }
         break;
-        case opp::BorderType::Mirror:
+        case mpp::BorderType::Mirror:
         {
             using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1691,7 +1691,7 @@ void moprhologyEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, con
             moprhologyEachPixel<BCType, SrcT>(bc, aDst, aMask, aFilterArea, aMorph, aPostOp);
         }
         break;
-        case opp::BorderType::MirrorReplicate:
+        case mpp::BorderType::MirrorReplicate:
         {
             using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1699,7 +1699,7 @@ void moprhologyEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, con
             moprhologyEachPixel<BCType, SrcT>(bc, aDst, aMask, aFilterArea, aMorph, aPostOp);
         }
         break;
-        case opp::BorderType::Wrap:
+        case mpp::BorderType::Wrap:
         {
             using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1765,7 +1765,7 @@ void moprhologyGradientEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &a
 
     switch (aBorderType)
     {
-        case opp::BorderType::None:
+        case mpp::BorderType::None:
         {
             using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1773,7 +1773,7 @@ void moprhologyGradientEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &a
             moprhologyGradientEachPixel<BCType, SrcT>(bc, aDst, aMask, aFilterArea);
         }
         break;
-        case opp::BorderType::Constant:
+        case mpp::BorderType::Constant:
         {
             using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset, aConstant);
@@ -1781,7 +1781,7 @@ void moprhologyGradientEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &a
             moprhologyGradientEachPixel<BCType, SrcT>(bc, aDst, aMask, aFilterArea);
         }
         break;
-        case opp::BorderType::Replicate:
+        case mpp::BorderType::Replicate:
         {
             using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1789,7 +1789,7 @@ void moprhologyGradientEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &a
             moprhologyGradientEachPixel<BCType, SrcT>(bc, aDst, aMask, aFilterArea);
         }
         break;
-        case opp::BorderType::Mirror:
+        case mpp::BorderType::Mirror:
         {
             using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1797,7 +1797,7 @@ void moprhologyGradientEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &a
             moprhologyGradientEachPixel<BCType, SrcT>(bc, aDst, aMask, aFilterArea);
         }
         break;
-        case opp::BorderType::MirrorReplicate:
+        case mpp::BorderType::MirrorReplicate:
         {
             using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1805,7 +1805,7 @@ void moprhologyGradientEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &a
             moprhologyGradientEachPixel<BCType, SrcT>(bc, aDst, aMask, aFilterArea);
         }
         break;
-        case opp::BorderType::Wrap:
+        case mpp::BorderType::Wrap:
         {
             using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
             const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
@@ -1872,7 +1872,7 @@ void ssimEachPixel(const ImageView<SrcT> &aSrc1, const ImageView<SrcT> &aSrc2, I
 
     switch (aBorderType)
     {
-        case opp::BorderType::Replicate:
+        case mpp::BorderType::Replicate:
         {
             using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
             const BCType bc1(allowedPtr1, aSrc1.Pitch(), aAllowedReadRoi1.Size(), roiOffset1);
@@ -1887,4 +1887,4 @@ void ssimEachPixel(const ImageView<SrcT> &aSrc1, const ImageView<SrcT> &aSrc2, I
     }
 }
 
-} // namespace opp::image::cpuSimple
+} // namespace mpp::image::cpuSimple

@@ -2,12 +2,12 @@
 #include <common/complex.h>
 #include <common/defines.h>
 #include <common/image/gotoPtr.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
 #include <concepts>
 
-namespace opp
+namespace mpp
 {
 template <typename DstT> struct NothingMorph
 {
@@ -26,7 +26,7 @@ template <typename SrcDstT, typename ComputeT> struct TopHat
 
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, SrcDstT &aDst) const
     {
-        const SrcDstT *pixelSrc = opp::image::gotoPtr(Src, SrcPitch, aPixelX, aPixelY);
+        const SrcDstT *pixelSrc = mpp::image::gotoPtr(Src, SrcPitch, aPixelX, aPixelY);
 
         ComputeT srcPixel = ComputeT(*pixelSrc);
         ComputeT dstPixel = ComputeT(aDst);
@@ -44,7 +44,7 @@ template <typename SrcDstT, typename ComputeT> struct BlackHat
 
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, SrcDstT &aDst) const
     {
-        const SrcDstT *pixelSrc = opp::image::gotoPtr(Src, SrcPitch, aPixelX, aPixelY);
+        const SrcDstT *pixelSrc = mpp::image::gotoPtr(Src, SrcPitch, aPixelX, aPixelY);
 
         ComputeT srcPixel = ComputeT(*pixelSrc);
         ComputeT dstPixel = ComputeT(aDst);
@@ -52,4 +52,4 @@ template <typename SrcDstT, typename ComputeT> struct BlackHat
     }
 };
 
-} // namespace opp
+} // namespace mpp

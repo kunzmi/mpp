@@ -10,7 +10,7 @@
 
 #include <iostream>
 
-namespace opp::image::cpuSimple
+namespace mpp::image::cpuSimple
 {
 // forward declaration
 template <PixelType T> class ImageView;
@@ -25,4 +25,4 @@ template <typename DstT, typename functor> void forEachPixel(ImageView<DstT> &aD
 /// </summary>
 template <typename DstT, typename functor, bool xUneven = false>
 void forEachPixel(ImageView<DstT> &aDst, const Size2D aSize, const functor &aOp);
-} // namespace opp::image::cpuSimple
+} // namespace mpp::image::cpuSimple

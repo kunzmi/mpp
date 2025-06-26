@@ -18,13 +18,13 @@
 #include <common/image/affineTransformation.h>
 #include <common/image/bound.h>
 #include <common/image/quad.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size = 256;
 
@@ -108,7 +108,7 @@ TEST_CASE("8uC3", "[NPP.GeometricTransforms.Mirror]")
 
     cpu_src1.NormDiffL1(npp_res, summedErr, summedErrChannel);
 
-    cpu_src1.Save(root / "mirrorOpp.tif");
+    // cpu_src1.Save(root / "mirrorMpp.tif");
     CHECK(summedErr == 0);
 }
 

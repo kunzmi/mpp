@@ -11,7 +11,7 @@
 #include <memory>
 #include <typeinfo>
 
-namespace opp::fileIO
+namespace mpp::fileIO
 {
 constexpr size_t FILEREADER_CHUNK_SIZE = 10ull * 1024ull * 1024ull; // 10MB
 
@@ -78,7 +78,7 @@ class FileReader : public virtual File
     /// <summary>
     /// Converts from file data type enum to internal data type
     /// </summary>
-    [[nodiscard]] virtual opp::image::PixelTypeEnum GetDataType() const = 0;
+    [[nodiscard]] virtual mpp::image::PixelTypeEnum GetDataType() const = 0;
     /// <summary>
     /// Returns the image dimensions stored in the file header.
     /// </summary>
@@ -86,7 +86,7 @@ class FileReader : public virtual File
     /// <summary>
     /// Returns the dimensions of an X/Y-image plane stored in the file header.
     /// </summary>
-    [[nodiscard]] virtual opp::image::Size2D SizePlane() const = 0;
+    [[nodiscard]] virtual mpp::image::Size2D SizePlane() const = 0;
     /// <summary>
     /// Returns the pixel size stored in file header converted to nm.
     /// </summary>
@@ -167,7 +167,7 @@ class FileReader : public virtual File
     template <typename T> [[nodiscard]] T *Pixels()
     {
 
-        if (opp::image::pixel_type_enum<T>::pixelType != GetDataType())
+        if (mpp::image::pixel_type_enum<T>::pixelType != GetDataType())
         {
             throw FILEIOEXCEPTION(FileName(), "Trying to access pixel data with incompatible data type. Requested: "
                                                   << typeid(T).name() << " but pixel data type is: " << GetDataType());
@@ -181,7 +181,7 @@ class FileReader : public virtual File
     /// </summary>
     template <typename T> [[nodiscard]] T *Pixels(size_t aIdx)
     {
-        if (opp::image::pixel_type_enum<T>::pixelType != GetDataType())
+        if (mpp::image::pixel_type_enum<T>::pixelType != GetDataType())
         {
             throw FILEIOEXCEPTION(FileName(), "Trying to access pixel data with incompatible data type. Requested: "
                                                   << typeid(T).name() << " but pixel data type is: " << GetDataType());
@@ -257,4 +257,4 @@ class FileReader : public virtual File
     void SeekRead(size_t aPos, std::ios_base::seekdir aDir = std::ios_base::beg);
     size_t TellRead();
 };
-} // namespace opp::fileIO
+} // namespace mpp::fileIO

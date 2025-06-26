@@ -2,12 +2,12 @@
 #include <common/complex.h>
 #include <common/defines.h>
 #include <common/numeric_limits.h>
-#include <common/opp_defs.h>
+#include <common/mpp_defs.h>
 #include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
 #include <concepts>
 
-namespace opp
+namespace mpp
 {
 template <typename DstT, typename FilterT> struct Dilate
 {
@@ -65,4 +65,4 @@ template <typename DstT, typename FilterT> struct ErodeGray
     }
 };
 
-} // namespace opp
+} // namespace mpp

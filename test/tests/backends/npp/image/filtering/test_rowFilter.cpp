@@ -28,11 +28,11 @@
 #include <catch2/catch_test_macros.hpp>
 #include <common/defines.h>
 
-using namespace opp;
-using namespace opp::image;
+using namespace mpp;
+using namespace mpp::image;
 using namespace Catch;
-namespace cpu = opp::image::cpuSimple;
-namespace nv  = opp::image::npp;
+namespace cpu = mpp::image::cpuSimple;
+namespace nv  = mpp::image::npp;
 
 constexpr int size = 256;
 
@@ -47,7 +47,7 @@ TEST_CASE("8uC1", "[NPP.Filtering.RowFilter]")
     nv::Image8uC1 npp_src1(size, size);
     nv::Image8uC1 npp_dst(size, size);
     cpu::Image<Pixel32fC1> filter(5, 1);
-    opp::cuda::DevVar<float> filterd(5 * 1);
+    mpp::cuda::DevVar<float> filterd(5 * 1);
 
     cpu_src1.FillRandom(seed);
     filter.FillRandom(seed + 1);
@@ -77,7 +77,7 @@ TEST_CASE("8uC3", "[NPP.Filtering.RowFilter]")
     nv::Image8uC3 npp_src1(size, size);
     nv::Image8uC3 npp_dst(size, size);
     cpu::Image<Pixel32fC1> filter(5, 1);
-    opp::cuda::DevVar<float> filterd(5 * 1);
+    mpp::cuda::DevVar<float> filterd(5 * 1);
 
     cpu_src1.FillRandom(seed);
     filter.FillRandom(seed + 1);
@@ -107,7 +107,7 @@ TEST_CASE("8uC4", "[NPP.Filtering.RowFilter]")
     nv::Image8uC4 npp_src1(size, size);
     nv::Image8uC4 npp_dst(size, size);
     cpu::Image<Pixel32fC1> filter(5, 1);
-    opp::cuda::DevVar<float> filterd(5 * 1);
+    mpp::cuda::DevVar<float> filterd(5 * 1);
 
     cpu_src1.FillRandom(seed);
     filter.FillRandom(seed + 1);
@@ -137,7 +137,7 @@ TEST_CASE("16uC1", "[NPP.Filtering.RowFilter]")
     nv::Image16uC1 npp_src1(size, size);
     nv::Image16uC1 npp_dst(size, size);
     cpu::Image<Pixel32fC1> filter(5, 1);
-    opp::cuda::DevVar<float> filterd(5 * 1);
+    mpp::cuda::DevVar<float> filterd(5 * 1);
 
     cpu_src1.FillRandom(seed);
     filter.FillRandom(seed + 1);
@@ -167,7 +167,7 @@ TEST_CASE("16uC3", "[NPP.Filtering.RowFilter]")
     nv::Image16uC3 npp_src1(size, size);
     nv::Image16uC3 npp_dst(size, size);
     cpu::Image<Pixel32fC1> filter(5, 1);
-    opp::cuda::DevVar<float> filterd(5 * 1);
+    mpp::cuda::DevVar<float> filterd(5 * 1);
 
     cpu_src1.FillRandom(seed);
     filter.FillRandom(seed + 1);
@@ -197,7 +197,7 @@ TEST_CASE("16uC4", "[NPP.Filtering.RowFilter]")
     nv::Image16uC4 npp_src1(size, size);
     nv::Image16uC4 npp_dst(size, size);
     cpu::Image<Pixel32fC1> filter(5, 1);
-    opp::cuda::DevVar<float> filterd(5 * 1);
+    mpp::cuda::DevVar<float> filterd(5 * 1);
 
     cpu_src1.FillRandom(seed);
     filter.FillRandom(seed + 1);
@@ -227,7 +227,7 @@ TEST_CASE("16sC1", "[NPP.Filtering.RowFilter]")
     nv::Image16sC1 npp_src1(size, size);
     nv::Image16sC1 npp_dst(size, size);
     cpu::Image<Pixel32fC1> filter(5, 1);
-    opp::cuda::DevVar<float> filterd(5 * 1);
+    mpp::cuda::DevVar<float> filterd(5 * 1);
 
     cpu_src1.FillRandom(seed);
     filter.FillRandom(seed + 1);
@@ -257,7 +257,7 @@ TEST_CASE("16sC3", "[NPP.Filtering.RowFilter]")
     nv::Image16sC3 npp_src1(size, size);
     nv::Image16sC3 npp_dst(size, size);
     cpu::Image<Pixel32fC1> filter(5, 1);
-    opp::cuda::DevVar<float> filterd(5 * 1);
+    mpp::cuda::DevVar<float> filterd(5 * 1);
 
     cpu_src1.FillRandom(seed);
     filter.FillRandom(seed + 1);
@@ -287,7 +287,7 @@ TEST_CASE("16sC4", "[NPP.Filtering.RowFilter]")
     nv::Image16sC4 npp_src1(size, size);
     nv::Image16sC4 npp_dst(size, size);
     cpu::Image<Pixel32fC1> filter(5, 1);
-    opp::cuda::DevVar<float> filterd(5 * 1);
+    mpp::cuda::DevVar<float> filterd(5 * 1);
 
     cpu_src1.FillRandom(seed);
     filter.FillRandom(seed + 1);
@@ -317,7 +317,7 @@ TEST_CASE("32fC1", "[NPP.Filtering.RowFilter]")
     nv::Image32fC1 npp_src1(size, size);
     nv::Image32fC1 npp_dst(size, size);
     cpu::Image<Pixel32fC1> filter(5, 1);
-    opp::cuda::DevVar<float> filterd(5 * 1);
+    mpp::cuda::DevVar<float> filterd(5 * 1);
 
     cpu_src1.FillRandom(seed);
     filter.FillRandom(seed + 1);
@@ -346,7 +346,7 @@ TEST_CASE("32fC3", "[NPP.Filtering.RowFilter]")
     nv::Image32fC3 npp_src1(size, size);
     nv::Image32fC3 npp_dst(size, size);
     cpu::Image<Pixel32fC1> filter(5, 1);
-    opp::cuda::DevVar<float> filterd(5 * 1);
+    mpp::cuda::DevVar<float> filterd(5 * 1);
 
     cpu_src1.FillRandom(seed);
     filter.FillRandom(seed + 1);
@@ -375,7 +375,7 @@ TEST_CASE("32fC4", "[NPP.Filtering.RowFilter]")
     nv::Image32fC4 npp_src1(size, size);
     nv::Image32fC4 npp_dst(size, size);
     cpu::Image<Pixel32fC1> filter(5, 1);
-    opp::cuda::DevVar<float> filterd(5 * 1);
+    mpp::cuda::DevVar<float> filterd(5 * 1);
 
     cpu_src1.FillRandom(seed);
     filter.FillRandom(seed + 1);
@@ -406,7 +406,7 @@ TEST_CASE("32fC4A", "[NPP.Filtering.RowFilter]")
     cpu::Image<Pixel32fC4> npp_res(size, size);
     nv::Image32fC4 npp_dst(size, size);
     cpu::Image<Pixel32fC1> filter(5, 1);
-    opp::cuda::DevVar<float> filterd(5 * 1);
+    mpp::cuda::DevVar<float> filterd(5 * 1);
 
     cpu_src1.FillRandom(seed);
     filter.FillRandom(seed + 1);

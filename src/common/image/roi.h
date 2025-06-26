@@ -6,7 +6,7 @@
 #include <istream>
 #include <ostream>
 
-namespace opp::image
+namespace mpp::image
 {
 /// <summary>
 /// A 2D roi represented as a start pixel and a size
@@ -252,4 +252,4 @@ Roi operator/(const Roi &aLeft, const Vec2i &aRight);
 Roi operator/(const Roi &aLeft, int aRight);
 // Roi operator/(int aLeft, const Roi &aRight);
 
-} // namespace opp::image
+} // namespace mpp::image

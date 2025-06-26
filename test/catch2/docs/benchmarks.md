@@ -83,7 +83,7 @@ TEST_CASE("Fibonacci") {
 ```
 There's a few things to note:
 - As `BENCHMARK` expands to a lambda expression it is necessary to add a semicolon after
- the closing brace (as opposed to the first experimental version).
+ the closing brace (as mpposed to the first experimental version).
 - The `return` is a handy way to avoid the compiler optimizing away the benchmark code.
 
 Running this already runs the benchmarks and outputs something similar to:
