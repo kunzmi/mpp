@@ -1,6 +1,6 @@
 #pragma once
-#include "testNppBase.h"
 #include "testMppBase.h"
+#include "testNppBase.h"
 #include <backends/simple_cpu/image/imageView.h>
 #include <common/image/filterArea.h>
 #include <common/vector_typetraits.h>
@@ -24,6 +24,9 @@ template <typename mppT, typename nppT> class StatisticsSrcBase
 
     virtual std::string GetName() = 0;
     virtual std::string GetType() = 0;
+    virtual int GetOrder1()       = 0;
+    virtual int GetOrder2()       = 0;
+    virtual int GetOrder3()       = 0;
 
     template <typename ImgT> void Init(const ImgT &aCpuSrc1)
     {
@@ -101,6 +104,9 @@ template <typename mppT, typename nppT> class StatisticsSrcBase
         {
             res.RelativeDifference = -1.0f / ratio * 100.0f + 100.0f;
         }
+        res.Order1 = GetOrder1();
+        res.Order2 = GetOrder2();
+        res.Order3 = GetOrder3();
         return res;
     }
 
@@ -131,6 +137,9 @@ template <typename mppT, typename nppT> class StatisticsSrcSrcBase
 
     virtual std::string GetName() = 0;
     virtual std::string GetType() = 0;
+    virtual int GetOrder1()       = 0;
+    virtual int GetOrder2()       = 0;
+    virtual int GetOrder3()       = 0;
 
     template <typename ImgT> void Init(const ImgT &aCpuSrc1, const ImgT &aCpuSrc2)
     {
@@ -211,6 +220,9 @@ template <typename mppT, typename nppT> class StatisticsSrcSrcBase
         {
             res.RelativeDifference = -1.0f / ratio * 100.0f + 100.0f;
         }
+        res.Order1 = GetOrder1();
+        res.Order2 = GetOrder2();
+        res.Order3 = GetOrder3();
         return res;
     }
 
@@ -287,6 +299,29 @@ class QualityIndexTest
     {
         return pixel_type_name<SrcT>::value;
     }
+    int GetOrder1() override
+    {
+        return 600 + 0;
+    }
+    int GetOrder2() override
+    {
+        return 0;
+    }
+    int GetOrder3() override
+    {
+        if constexpr (RealOrComplexFloatingVector<SrcT>)
+        {
+            return channel_count_v<SrcT> + 64 + sizeof(pixel_basetype_t<SrcT>) * 128;
+        }
+        else if constexpr (RealSignedVector<SrcT>)
+        {
+            return channel_count_v<SrcT> + 32 + sizeof(pixel_basetype_t<SrcT>) * 128;
+        }
+        else
+        {
+            return channel_count_v<SrcT> + sizeof(pixel_basetype_t<SrcT>) * 128;
+        }
+    }
 };
 
 template <PixelType SrcT, typename DstT> class MaxMpp : public TestMppSrcReductionBase<SrcT, DstT>
@@ -358,6 +393,29 @@ class MaxTest : public StatisticsSrcBase<MaxMpp<SrcT, DstT>, MaxNpp<SrcT2, DstT2
     {
         return pixel_type_name<SrcT>::value;
     }
+    int GetOrder1() override
+    {
+        return 600 + 1;
+    }
+    int GetOrder2() override
+    {
+        return 0;
+    }
+    int GetOrder3() override
+    {
+        if constexpr (RealOrComplexFloatingVector<SrcT>)
+        {
+            return channel_count_v<SrcT> + 64 + sizeof(pixel_basetype_t<SrcT>) * 128;
+        }
+        else if constexpr (RealSignedVector<SrcT>)
+        {
+            return channel_count_v<SrcT> + 32 + sizeof(pixel_basetype_t<SrcT>) * 128;
+        }
+        else
+        {
+            return channel_count_v<SrcT> + sizeof(pixel_basetype_t<SrcT>) * 128;
+        }
+    }
 };
 
 template <PixelType SrcT, typename DstT> class MeanMpp : public TestMppSrcReductionBase<SrcT, DstT>
@@ -428,6 +486,29 @@ class MeanTest : public StatisticsSrcBase<MeanMpp<SrcT, DstT>, MeanNpp<SrcT2, Ds
     std::string GetType() override
     {
         return pixel_type_name<SrcT>::value;
+    }
+    int GetOrder1() override
+    {
+        return 600 + 2;
+    }
+    int GetOrder2() override
+    {
+        return 0;
+    }
+    int GetOrder3() override
+    {
+        if constexpr (RealOrComplexFloatingVector<SrcT>)
+        {
+            return channel_count_v<SrcT> + 64 + sizeof(pixel_basetype_t<SrcT>) * 128;
+        }
+        else if constexpr (RealSignedVector<SrcT>)
+        {
+            return channel_count_v<SrcT> + 32 + sizeof(pixel_basetype_t<SrcT>) * 128;
+        }
+        else
+        {
+            return channel_count_v<SrcT> + sizeof(pixel_basetype_t<SrcT>) * 128;
+        }
     }
 };
 
@@ -517,6 +598,29 @@ class MeanStdTest : public StatisticsSrcBase<MeanStdMpp<SrcT, DstT>, MeanStdNpp<
     {
         return pixel_type_name<SrcT>::value;
     }
+    int GetOrder1() override
+    {
+        return 600 + 3;
+    }
+    int GetOrder2() override
+    {
+        return 0;
+    }
+    int GetOrder3() override
+    {
+        if constexpr (RealOrComplexFloatingVector<SrcT>)
+        {
+            return channel_count_v<SrcT> + 64 + sizeof(pixel_basetype_t<SrcT>) * 128;
+        }
+        else if constexpr (RealSignedVector<SrcT>)
+        {
+            return channel_count_v<SrcT> + 32 + sizeof(pixel_basetype_t<SrcT>) * 128;
+        }
+        else
+        {
+            return channel_count_v<SrcT> + sizeof(pixel_basetype_t<SrcT>) * 128;
+        }
+    }
 };
 
 template <PixelType SrcT, typename DstT> class MSEMpp : public TestMppSrcSrcReductionBase<SrcT, DstT>
@@ -588,6 +692,29 @@ class MSETest : public StatisticsSrcSrcBase<MSEMpp<SrcT, DstT>, MSENpp<SrcT2, Ds
     std::string GetType() override
     {
         return pixel_type_name<SrcT>::value;
+    }
+    int GetOrder1() override
+    {
+        return 600 + 4;
+    }
+    int GetOrder2() override
+    {
+        return 0;
+    }
+    int GetOrder3() override
+    {
+        if constexpr (RealOrComplexFloatingVector<SrcT>)
+        {
+            return channel_count_v<SrcT> + 64 + sizeof(pixel_basetype_t<SrcT>) * 128;
+        }
+        else if constexpr (RealSignedVector<SrcT>)
+        {
+            return channel_count_v<SrcT> + 32 + sizeof(pixel_basetype_t<SrcT>) * 128;
+        }
+        else
+        {
+            return channel_count_v<SrcT> + sizeof(pixel_basetype_t<SrcT>) * 128;
+        }
     }
 };
 } // namespace mpp

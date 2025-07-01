@@ -47,6 +47,7 @@ void InvokeSubSrcSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using simdOP_t = simd::Sub<Tupel<DstT, TupelSize>>;
+
         if constexpr (simdOP_t::has_simd)
         {
             using ComputeT_SIMD = sub_simd_tupel_compute_type_for_t<SrcT>;

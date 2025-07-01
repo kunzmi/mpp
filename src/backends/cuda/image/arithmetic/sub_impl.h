@@ -46,6 +46,7 @@ void InvokeSubSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, si
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using simdOP_t = simd::Sub<Tupel<DstT, TupelSize>>;
+
         if constexpr (simdOP_t::has_simd)
         {
             using ComputeT_SIMD = sub_simd_tupel_compute_type_for_t<SrcT>;

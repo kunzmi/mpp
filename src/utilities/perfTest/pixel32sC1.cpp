@@ -18,7 +18,7 @@
 #include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
 #include <cstddef>
-#include <fstream>
+#include <vector>
 
 using namespace mpp;
 using namespace mpp::cuda;
@@ -28,7 +28,7 @@ namespace nv  = mpp::image::npp;
 namespace cpu = mpp::image::cpuSimple;
 
 void runPixel32sC1(size_t aIterations, size_t aRepeats, int aWidth, int aHeight, const mpp::image::Border &aBorder,
-                   std::ofstream &aCsv)
+                   std::vector<mpp::TestResult> &aTestResult, TestsToRun aTestsToRun)
 {
     using mppT       = Pixel32sC1;
     using nppT       = nv::Image32sC1;
@@ -61,43 +61,49 @@ void runPixel32sC1(size_t aIterations, size_t aRepeats, int aWidth, int aHeight,
     cpu_src2.FillRandom(1);
     cpu_src2.Add({1}); // avoid division by 0...
 
-    testAdd.Init(cpu_src1, cpu_src2);
-    testAdd.Run(roi);
-    aCsv << testAdd.GetResult<cpu::Image<mppT>, resDoubleT>();
+    if (aTestsToRun.Arithmetic)
+    {
+        testAdd.Init(cpu_src1, cpu_src2);
+        testAdd.Run(roi);
+        aTestResult.emplace_back(testAdd.GetResult<cpu::Image<mppT>, resDoubleT>());
 
-    testSub.Init(cpu_src1, cpu_src2);
-    testSub.Run(roi);
-    aCsv << testSub.GetResult<cpu::Image<mppT>, resDoubleT>();
+        testSub.Init(cpu_src1, cpu_src2);
+        testSub.Run(roi);
+        aTestResult.emplace_back(testSub.GetResult<cpu::Image<mppT>, resDoubleT>());
 
-    testMul.Init(cpu_src1, cpu_src2);
-    testMul.Run(roi);
-    aCsv << testMul.GetResult<cpu::Image<mppT>, resDoubleT>();
+        testMul.Init(cpu_src1, cpu_src2);
+        testMul.Run(roi);
+        aTestResult.emplace_back(testMul.GetResult<cpu::Image<mppT>, resDoubleT>());
 
-    testDiv.Init(cpu_src1, cpu_src2);
-    testDiv.Run(roi);
-    aCsv << testDiv.GetResult<cpu::Image<mppT>, resDoubleT>();
+        testDiv.Init(cpu_src1, cpu_src2);
+        testDiv.Run(roi);
+        aTestResult.emplace_back(testDiv.GetResult<cpu::Image<mppT>, resDoubleT>());
+    }
 
-    testAffineTransformation.Init(cpu_src1, affine, InterpolationMode::NearestNeighbor);
-    testAffineTransformation.Run(roi);
-    aCsv << testAffineTransformation.GetResult<cpu::Image<mppT>, resDoubleT>();
+    if (aTestsToRun.GeometryTransform)
+    {
+        testAffineTransformation.Init(cpu_src1, affine, InterpolationMode::NearestNeighbor);
+        testAffineTransformation.Run(roi);
+        aTestResult.emplace_back(testAffineTransformation.GetResult<cpu::Image<mppT>, resDoubleT>());
 
-    testAffineTransformation.Init(cpu_src1, affine, InterpolationMode::Linear);
-    testAffineTransformation.Run(roi);
-    aCsv << testAffineTransformation.GetResult<cpu::Image<mppT>, resDoubleT>();
+        testAffineTransformation.Init(cpu_src1, affine, InterpolationMode::Linear);
+        testAffineTransformation.Run(roi);
+        aTestResult.emplace_back(testAffineTransformation.GetResult<cpu::Image<mppT>, resDoubleT>());
 
-    testAffineTransformation.Init(cpu_src1, affine, InterpolationMode::CubicLagrange);
-    testAffineTransformation.Run(roi);
-    aCsv << testAffineTransformation.GetResult<cpu::Image<mppT>, resDoubleT>();
+        testAffineTransformation.Init(cpu_src1, affine, InterpolationMode::CubicLagrange);
+        testAffineTransformation.Run(roi);
+        aTestResult.emplace_back(testAffineTransformation.GetResult<cpu::Image<mppT>, resDoubleT>());
 
-    testPerspectiveTransformation.Init(cpu_src1, perspective, InterpolationMode::NearestNeighbor);
-    testPerspectiveTransformation.Run(roi);
-    aCsv << testPerspectiveTransformation.GetResult<cpu::Image<mppT>, resDoubleT>();
+        testPerspectiveTransformation.Init(cpu_src1, perspective, InterpolationMode::NearestNeighbor);
+        testPerspectiveTransformation.Run(roi);
+        aTestResult.emplace_back(testPerspectiveTransformation.GetResult<cpu::Image<mppT>, resDoubleT>());
 
-    testPerspectiveTransformation.Init(cpu_src1, perspective, InterpolationMode::Linear);
-    testPerspectiveTransformation.Run(roi);
-    aCsv << testPerspectiveTransformation.GetResult<cpu::Image<mppT>, resDoubleT>();
+        testPerspectiveTransformation.Init(cpu_src1, perspective, InterpolationMode::Linear);
+        testPerspectiveTransformation.Run(roi);
+        aTestResult.emplace_back(testPerspectiveTransformation.GetResult<cpu::Image<mppT>, resDoubleT>());
 
-    testPerspectiveTransformation.Init(cpu_src1, perspective, InterpolationMode::CubicLagrange);
-    testPerspectiveTransformation.Run(roi);
-    aCsv << testPerspectiveTransformation.GetResult<cpu::Image<mppT>, resDoubleT>();
+        testPerspectiveTransformation.Init(cpu_src1, perspective, InterpolationMode::CubicLagrange);
+        testPerspectiveTransformation.Run(roi);
+        aTestResult.emplace_back(testPerspectiveTransformation.GetResult<cpu::Image<mppT>, resDoubleT>());
+    }
 }

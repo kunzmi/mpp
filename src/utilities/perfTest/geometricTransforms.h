@@ -1,6 +1,6 @@
 #pragma once
-#include "testNppBase.h"
 #include "testMppBase.h"
+#include "testNppBase.h"
 #include <backends/simple_cpu/image/imageView.h>
 #include <common/image/filterArea.h>
 #include <common/vector_typetraits.h>
@@ -24,6 +24,9 @@ template <typename mppT, typename nppT> class GeometricTransformBase
 
     virtual std::string GetName() = 0;
     virtual std::string GetType() = 0;
+    virtual int GetOrder1()       = 0;
+    virtual int GetOrder2()       = 0;
+    virtual int GetOrder3()       = 0;
 
     template <typename ImgT> void Init(const ImgT &aCpuSrc1)
     {
@@ -133,6 +136,9 @@ template <typename mppT, typename nppT> class GeometricTransformBase
         {
             res.RelativeDifference = -1.0f / ratio * 100.0f + 100.0f;
         }
+        res.Order1 = GetOrder1();
+        res.Order2 = GetOrder2();
+        res.Order3 = GetOrder3();
         return res;
     }
 
@@ -214,6 +220,29 @@ class AffineTransformTest : public GeometricTransformBase<AffineTransformMpp<T>,
     {
         return pixel_type_name<T>::value;
     }
+    int GetOrder1() override
+    {
+        return 400 + 0;
+    }
+    int GetOrder2() override
+    {
+        return this->npp.interpol;
+    }
+    int GetOrder3() override
+    {
+        if constexpr (RealOrComplexFloatingVector<T>)
+        {
+            return channel_count_v<T> + 64 + sizeof(pixel_basetype_t<T>) * 128;
+        }
+        else if constexpr (RealSignedVector<T>)
+        {
+            return channel_count_v<T> + 32 + sizeof(pixel_basetype_t<T>) * 128;
+        }
+        else
+        {
+            return channel_count_v<T> + sizeof(pixel_basetype_t<T>) * 128;
+        }
+    }
 };
 
 template <PixelType T> class PerspectiveTransformMpp : public TestMppSrcDstBase<T>
@@ -284,6 +313,29 @@ class PerspectiveTransformTest : public GeometricTransformBase<PerspectiveTransf
     std::string GetType() override
     {
         return pixel_type_name<T>::value;
+    }
+    int GetOrder1() override
+    {
+        return 400 + 1;
+    }
+    int GetOrder2() override
+    {
+        return this->npp.interpol;
+    }
+    int GetOrder3() override
+    {
+        if constexpr (RealOrComplexFloatingVector<T>)
+        {
+            return channel_count_v<T> + 64 + sizeof(pixel_basetype_t<T>) * 128;
+        }
+        else if constexpr (RealSignedVector<T>)
+        {
+            return channel_count_v<T> + 32 + sizeof(pixel_basetype_t<T>) * 128;
+        }
+        else
+        {
+            return channel_count_v<T> + sizeof(pixel_basetype_t<T>) * 128;
+        }
     }
 };
 } // namespace mpp

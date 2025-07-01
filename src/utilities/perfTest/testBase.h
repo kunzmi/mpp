@@ -9,6 +9,17 @@
 namespace mpp
 {
 
+struct TestsToRun
+{
+    bool Arithmetic{true};
+    bool DataExchange{true};
+    bool Filtering{true};
+    bool GeometryTransform{true};
+    bool Morphology{true};
+    bool Statistics{true};
+    bool Threshold{true};
+};
+
 struct TestResult
 {
     std::string Name;
@@ -24,6 +35,12 @@ struct TestResult
     float MaxNPP;
     float AbsoluteDifferenceMSec;
     float RelativeDifference;
+    bool IsAligned;
+    int Order1;
+    int Order2;
+    int Order3;
+
+    [[nodiscard]] bool operator<(const TestResult &aOther) const;
 };
 
 std::ostream &operator<<(std::ostream &aOs, const TestResult &aResult);

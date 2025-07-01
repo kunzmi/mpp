@@ -1,5 +1,5 @@
-#include "runtime.h"
 #include "testBase.h"
+#include "runtime.h"
 #include <backends/cuda/event.h>
 #include <cstddef>
 #include <iostream>
@@ -8,20 +8,33 @@ namespace mpp
 {
 std::ostream &operator<<(std::ostream &aOs, const TestResult &aResult)
 {
-    aOs << aResult.Name << ";";
-    aOs << aResult.TotalMPP << ";";
-    aOs << aResult.TotalNPP << ";";
-    aOs << aResult.MeanMPP << ";";
-    aOs << aResult.MeanNPP << ";";
-    aOs << aResult.StdMPP << ";";
-    aOs << aResult.StdNPP << ";";
-    aOs << aResult.MinMPP << ";";
-    aOs << aResult.MinNPP << ";";
-    aOs << aResult.MaxMPP << ";";
-    aOs << aResult.MaxNPP << ";";
-    aOs << aResult.AbsoluteDifferenceMSec << ";";
+    aOs << aResult.Name << "\t";
+    aOs << aResult.TotalMPP << "\t";
+    aOs << aResult.TotalNPP << "\t";
+    aOs << aResult.MeanMPP << "\t";
+    aOs << aResult.MeanNPP << "\t";
+    aOs << aResult.StdMPP << "\t";
+    aOs << aResult.StdNPP << "\t";
+    aOs << aResult.MinMPP << "\t";
+    aOs << aResult.MinNPP << "\t";
+    aOs << aResult.MaxMPP << "\t";
+    aOs << aResult.MaxNPP << "\t";
+    aOs << aResult.AbsoluteDifferenceMSec << "\t";
     aOs << aResult.RelativeDifference << std::endl;
     return aOs;
+}
+
+bool TestResult::operator<(const TestResult &aOther) const
+{
+    if (Order1 == aOther.Order1)
+    {
+        if (Order2 == aOther.Order2)
+        {
+            return Order3 < aOther.Order3;
+        }
+        return Order2 < aOther.Order2;
+    }
+    return Order1 < aOther.Order1;
 }
 
 TestBase::TestBase(size_t aIterations, size_t aRepeats)

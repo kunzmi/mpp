@@ -47,6 +47,7 @@ void InvokeAddSrcSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
         using simdOP_t = simd::Add<Tupel<DstT, TupelSize>>;
+
         if constexpr (simdOP_t::has_simd)
         {
             using ComputeT_SIMD = add_simd_tupel_compute_type_for_t<SrcT>;

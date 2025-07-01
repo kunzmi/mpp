@@ -1,7 +1,7 @@
 #pragma once
 #include "testBase.h"
-#include "testNppBase.h"
 #include "testMppBase.h"
+#include "testNppBase.h"
 #include <backends/simple_cpu/image/imageView.h>
 #include <common/vector_typetraits.h>
 
@@ -24,6 +24,9 @@ template <typename mppT, typename nppT> class ArithmeticBase
 
     virtual std::string GetName() = 0;
     virtual std::string GetType() = 0;
+    virtual int GetOrder1()       = 0;
+    virtual int GetOrder2()       = 0;
+    virtual int GetOrder3()       = 0;
 
     template <typename ImgT> void Init(const ImgT &aCpuSrc1, const ImgT &aCpuSrc2)
     {
@@ -130,6 +133,9 @@ template <typename mppT, typename nppT> class ArithmeticBase
         {
             res.RelativeDifference = -1.0f / ratio * 100.0f + 100.0f;
         }
+        res.Order1 = GetOrder1();
+        res.Order2 = GetOrder2();
+        res.Order3 = GetOrder3();
         return res;
     }
 
@@ -202,6 +208,29 @@ template <PixelType T, typename T2> class AddTest : public ArithmeticBase<AddMpp
     {
         return pixel_type_name<T>::value;
     }
+    int GetOrder1() override
+    {
+        return 100 + 0;
+    }
+    int GetOrder2() override
+    {
+        return 0;
+    }
+    int GetOrder3() override
+    {
+        if constexpr (RealOrComplexFloatingVector<T>)
+        {
+            return channel_count_v<T> + 64 + sizeof(pixel_basetype_t<T>) * 128;
+        }
+        else if constexpr (RealSignedVector<T>)
+        {
+            return channel_count_v<T> + 32 + sizeof(pixel_basetype_t<T>) * 128;
+        }
+        else
+        {
+            return channel_count_v<T> + sizeof(pixel_basetype_t<T>) * 128;
+        }
+    }
 };
 
 template <PixelType T> class SubMpp : public TestMppSrcSrcDstBase<T>
@@ -262,6 +291,29 @@ template <PixelType T, typename T2> class SubTest : public ArithmeticBase<SubMpp
     std::string GetType() override
     {
         return pixel_type_name<T>::value;
+    }
+    int GetOrder1() override
+    {
+        return 100 + 1;
+    }
+    int GetOrder2() override
+    {
+        return 0;
+    }
+    int GetOrder3() override
+    {
+        if constexpr (RealOrComplexFloatingVector<T>)
+        {
+            return channel_count_v<T> + 64 + sizeof(pixel_basetype_t<T>) * 128;
+        }
+        else if constexpr (RealSignedVector<T>)
+        {
+            return channel_count_v<T> + 32 + sizeof(pixel_basetype_t<T>) * 128;
+        }
+        else
+        {
+            return channel_count_v<T> + sizeof(pixel_basetype_t<T>) * 128;
+        }
     }
 };
 
@@ -324,6 +376,29 @@ template <PixelType T, typename T2> class MulTest : public ArithmeticBase<MulMpp
     {
         return pixel_type_name<T>::value;
     }
+    int GetOrder1() override
+    {
+        return 100 + 2;
+    }
+    int GetOrder2() override
+    {
+        return 0;
+    }
+    int GetOrder3() override
+    {
+        if constexpr (RealOrComplexFloatingVector<T>)
+        {
+            return channel_count_v<T> + 64 + sizeof(pixel_basetype_t<T>) * 128;
+        }
+        else if constexpr (RealSignedVector<T>)
+        {
+            return channel_count_v<T> + 32 + sizeof(pixel_basetype_t<T>) * 128;
+        }
+        else
+        {
+            return channel_count_v<T> + sizeof(pixel_basetype_t<T>) * 128;
+        }
+    }
 };
 
 template <PixelType T> class DivMpp : public TestMppSrcSrcDstBase<T>
@@ -384,6 +459,29 @@ template <PixelType T, typename T2> class DivTest : public ArithmeticBase<DivMpp
     std::string GetType() override
     {
         return pixel_type_name<T>::value;
+    }
+    int GetOrder1() override
+    {
+        return 100 + 3;
+    }
+    int GetOrder2() override
+    {
+        return 0;
+    }
+    int GetOrder3() override
+    {
+        if constexpr (RealOrComplexFloatingVector<T>)
+        {
+            return channel_count_v<T> + 64 + sizeof(pixel_basetype_t<T>) * 128;
+        }
+        else if constexpr (RealSignedVector<T>)
+        {
+            return channel_count_v<T> + 32 + sizeof(pixel_basetype_t<T>) * 128;
+        }
+        else
+        {
+            return channel_count_v<T> + sizeof(pixel_basetype_t<T>) * 128;
+        }
     }
 };
 } // namespace mpp
