@@ -3716,6 +3716,21 @@ void Image8uC3View::GradientVectorSobelBorder(Image16sC1View &pDstX, Image16sC1V
                    "ROI Src: " << ROI() << "ROI pDstX: " << pDstX.ROI() << "ROI pDstY: " << pDstY.ROI() << "ROI pDstMag: " << pDstMag.ROI() << "ROI pDstAngle: " << pDstAngle.ROI());
 }
 
+Image8uC1View &Image8uC3View::FilterCannyBorder(Image8uC1View &pDst, NppiDifferentialKernel eFilterType, NppiMaskSize eMaskSize, const Pixel16sC1 &nLowThreshold, const Pixel16sC1 &nHighThreshold, NppiNorm eNorm, NppiBorderType eBorderType, mpp::cuda::DevVarView<byte> &pDeviceBuffer, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
+{
+    NppiSize filterSize{aFilterArea.width, aFilterArea.height};
+    const NppiPoint filterOffset{aFilterArea.x, aFilterArea.y};
+    if (aFilterArea.Size() == Size2D())
+    {
+        filterSize.width  = ROI().width;
+        filterSize.height = ROI().height;
+    }
+    checkSameSize(ROI(), pDst.ROI());
+    nppSafeCallExt(nppiFilterCannyBorder_8u_C3C1R_Ctx(reinterpret_cast<const Npp8u *>(PointerRoi()), to_int(Pitch()), filterSize, filterOffset, reinterpret_cast<Npp8u *>(pDst.PointerRoi()), to_int(pDst.Pitch()), NppiSizeRoi(), eFilterType, eMaskSize, nLowThreshold.x, nHighThreshold.x, eNorm, eBorderType, pDeviceBuffer.Pointer(), nppStreamCtx),
+                   "ROI Src: " << ROI() << "ROI Dst: " << pDst.ROI());
+    return pDst;
+}
+
 void Image8uC3View::HistogramOfGradientsBorder(const NppiPoint *hpLocations, int nLocations, Npp32f *pDstWindowDescriptorBuffer, const NppiHOGConfig oHOGConfig, mpp::cuda::DevVarView<byte> &pScratchBuffer, NppiBorderType eBorderType, const NppStreamContext &nppStreamCtx, const Roi &aFilterArea) const
 {
     NppiSize filterSize{aFilterArea.width, aFilterArea.height};

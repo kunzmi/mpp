@@ -5,12 +5,12 @@
 #include <common/defines.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
-#include <common/numberTypes.h>
 #include <common/mpp_defs.h>
+#include <common/numberTypes.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
-#include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vectorTypes.h>
 #include <concepts>
 
 // disable warning for pragma unroll when compiling with host compiler:
@@ -31,6 +31,8 @@ template <size_t tupelSize, typename ComputeT, typename DstT, typename operation
           typename operation_SIMD = voidType>
 struct InplaceFunctor : public ImageFunctor<true>
 {
+    char dummy; // Since Cuda 12.9, if this dummy isn't present, NVCC doesn't compile and throws "error: Empty parameter
+                // types are not supported"
     [[no_unique_address]] operation Op;
     [[no_unique_address]] operation_SIMD OpSIMD;
 

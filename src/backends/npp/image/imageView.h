@@ -21,6 +21,7 @@
 #include <common/safeCast.h>
 #include <common/vector_typetraits.h>
 #include <cstddef>
+#include <cuda_runtime_api.h>
 #include <nppcore.h>
 #include <nppdefs.h>
 #include <nppi_filtering_functions.h>
@@ -480,18 +481,28 @@ template <PixelType T> class ImageView
     [[nodiscard]] static NppStreamContext GetStreamContext()
     {
         NppStreamContext nppCtx{};
-        nppSafeCall(nppGetStreamContext(&nppCtx));
+
+        cudaSafeCall(cudaGetDevice(&nppCtx.nCudaDeviceId));
+
+        cudaDeviceProp props{};
+        cudaSafeCall(cudaGetDeviceProperties(&props, nppCtx.nCudaDeviceId));
+        nppCtx.nMultiProcessorCount               = props.multiProcessorCount;
+        nppCtx.nMaxThreadsPerMultiProcessor       = props.maxThreadsPerMultiProcessor;
+        nppCtx.nMaxThreadsPerBlock                = props.maxThreadsPerBlock;
+        nppCtx.nSharedMemPerBlock                 = props.sharedMemPerBlock;
+        nppCtx.nCudaDevAttrComputeCapabilityMajor = props.major;
+        nppCtx.nCudaDevAttrComputeCapabilityMinor = props.minor;
+
         return nppCtx;
     }
 
-    static void SetStream(const mpp::cuda::Stream &aStream)
+    [[nodiscard]] static NppStreamContext GetStreamContext(const mpp::cuda::Stream &aStream)
     {
-        nppSafeCall(nppSetStream(aStream.Original()));
-    }
+        NppStreamContext nppCtx = GetStreamContext();
+        nppCtx.hStream          = aStream.Original();
 
-    [[nodiscard]] static mpp::cuda::Stream GetStream()
-    {
-        return mpp::cuda::Stream(nppGetStream());
+        nppSafeCall(cudaStreamGetFlags(nppCtx.hStream, &nppCtx.nStreamFlags));
+        return nppCtx;
     }
 
     [[nodiscard]] size_t FilterBoxBorderAdvancedGetDeviceBufferSize() const
