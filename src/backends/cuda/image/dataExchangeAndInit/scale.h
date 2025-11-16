@@ -10,7 +10,7 @@
 
 namespace mpp::image::cuda
 {
-template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+template <typename SrcT, typename ComputeT = default_floating_compute_type_for_t<SrcT>, typename DstT>
 void InvokeScale(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst,
                  scalefactor_t<ComputeT> aScaleFactor, scalefactor_t<ComputeT> aSrcMin, scalefactor_t<ComputeT> aDstMin,
                  const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);

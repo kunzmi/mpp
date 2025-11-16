@@ -63,9 +63,10 @@ void InvokeSqrtSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPit
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT including SIMD activation if possible
+// using default_floating_compute_type_for_t for computeT including SIMD activation if possible
 #define InstantiateInvokeSqrtSrc_For(typeSrcIsTypeDst)                                                                 \
-    template void InvokeSqrtSrc<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(     \
+    template void                                                                                                      \
+    InvokeSqrtSrc<typeSrcIsTypeDst, default_floating_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(          \
         const typeSrcIsTypeDst *aSrc1, size_t aPitchSrc1, typeSrcIsTypeDst *aDst, size_t aPitchDst,                    \
         const Size2D &aSize, const StreamCtx &aStreamCtx);
 
@@ -123,9 +124,9 @@ void InvokeSqrtInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, 
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT including SIMD activation if possible
+// using default_floating_compute_type_for_t for computeT including SIMD activation if possible
 #define InstantiateInvokeSqrtInplace_For(typeSrcIsTypeDst)                                                             \
-    template void InvokeSqrtInplace<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>>(                   \
+    template void InvokeSqrtInplace<typeSrcIsTypeDst, default_floating_compute_type_for_t<typeSrcIsTypeDst>>(          \
         typeSrcIsTypeDst * aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeSqrtInplace(type)                                                                   \

@@ -743,21 +743,21 @@ TEST_CASE("16scC1", "[NPP.Arithmetic.Mul]")
 
     npp_res << npp_dst;
 
-    CHECK(cpu_dst.IsSimilar(npp_res, 2));
+    CHECK(cpu_dst.IsSimilar(npp_res, 1));
 
     cpu_src1.Mul(cpu_src2, cpu_dst, 16);
     npp_src1.Mul(npp_src2, npp_dst, 16, nppCtx);
 
     npp_res << npp_dst;
 
-    CHECK(cpu_dst.IsSimilar(npp_res, 2));
+    CHECK(cpu_dst.IsSimilar(npp_res, 1));
 
     cpu_dst.Mul(cpu_src2, 16);
     npp_dst.Mul(npp_src2, 16, nppCtx);
 
     npp_res << npp_dst;
 
-    CHECK(cpu_dst.IsSimilar(npp_res, 2));
+    CHECK(cpu_dst.IsSimilar(npp_res, 1));
 }
 
 TEST_CASE("16scC3", "[NPP.Arithmetic.Mul]")
@@ -784,21 +784,21 @@ TEST_CASE("16scC3", "[NPP.Arithmetic.Mul]")
 
     npp_res << npp_dst;
 
-    CHECK(cpu_dst.IsSimilar(npp_res, 2));
+    CHECK(cpu_dst.IsSimilar(npp_res, 1));
 
     cpu_src1.Mul(cpu_src2, cpu_dst, 16);
     npp_src1.Mul(npp_src2, npp_dst, 16, nppCtx);
 
     npp_res << npp_dst;
 
-    CHECK(cpu_dst.IsSimilar(npp_res, 2));
+    CHECK(cpu_dst.IsSimilar(npp_res, 1));
 
     cpu_dst.Mul(cpu_src2, 16);
     npp_dst.Mul(npp_src2, 16, nppCtx);
 
     npp_res << npp_dst;
 
-    CHECK(cpu_dst.IsSimilar(npp_res, 2));
+    CHECK(cpu_dst.IsSimilar(npp_res, 1));
 }
 
 TEST_CASE("16scC4", "[NPP.Arithmetic.Mul]")
@@ -834,7 +834,7 @@ TEST_CASE("16scC4", "[NPP.Arithmetic.Mul]")
         elem.Value().w = 0;
     }
 
-    CHECK(cpu_dst.IsSimilar(npp_res, 2));
+    CHECK(cpu_dst.IsSimilar(npp_res, 1));
 
     cpu_src1.Mul(cpu_src2, cpu_dst, 16);
     npp_src1.MulA(npp_src2, npp_dst, 16, nppCtx);
@@ -850,7 +850,7 @@ TEST_CASE("16scC4", "[NPP.Arithmetic.Mul]")
         elem.Value().w = 0;
     }
 
-    CHECK(cpu_dst.IsSimilar(npp_res, 2));
+    CHECK(cpu_dst.IsSimilar(npp_res, 1));
 
     cpu_dst.Mul(cpu_src2, 16);
     npp_dst.MulA(npp_src2, 16, nppCtx);
@@ -866,7 +866,7 @@ TEST_CASE("16scC4", "[NPP.Arithmetic.Mul]")
         elem.Value().w = 0;
     }
 
-    CHECK(cpu_dst.IsSimilar(npp_res, 2));
+    CHECK(cpu_dst.IsSimilar(npp_res, 1));
 }
 
 TEST_CASE("8uC1", "[NPP.Arithmetic.MulC]")
@@ -1538,21 +1538,21 @@ TEST_CASE("16scC1", "[NPP.Arithmetic.MulC]")
 
     npp_res << npp_dst;
 
-    CHECK(cpu_dst.IsSimilar(npp_res, 2));
+    CHECK(cpu_dst.IsSimilar(npp_res, 1));
 
     cpu_src1.Mul(constVal, cpu_dst, 16);
     npp_src1.Mul(constVal, npp_dst, 16, nppCtx);
 
     npp_res << npp_dst;
 
-    CHECK(cpu_dst.IsSimilar(npp_res, 2));
+    CHECK(cpu_dst.IsSimilar(npp_res, 1));
 
     cpu_dst.Mul(constVal, 16);
     npp_dst.Mul(constVal, 16, nppCtx);
 
     npp_res << npp_dst;
 
-    CHECK(cpu_dst.IsSimilar(npp_res, 2));
+    CHECK(cpu_dst.IsSimilar(npp_res, 1));
 }
 
 TEST_CASE("16scC3", "[NPP.Arithmetic.MulC]")
@@ -1578,21 +1578,21 @@ TEST_CASE("16scC3", "[NPP.Arithmetic.MulC]")
 
     npp_res << npp_dst;
 
-    CHECK(cpu_dst.IsSimilar(npp_res, 2));
+    CHECK(cpu_dst.IsSimilar(npp_res, 1));
 
     cpu_src1.Mul(constVal, cpu_dst, 16);
     npp_src1.Mul(constVal, npp_dst, 16, nppCtx);
 
     npp_res << npp_dst;
 
-    CHECK(cpu_dst.IsSimilar(npp_res, 2));
+    CHECK(cpu_dst.IsSimilar(npp_res, 1));
 
     cpu_dst.Mul(constVal, 16);
     npp_dst.Mul(constVal, 16, nppCtx);
 
     npp_res << npp_dst;
 
-    CHECK(cpu_dst.IsSimilar(npp_res, 2));
+    CHECK(cpu_dst.IsSimilar(npp_res, 1));
 }
 
 TEST_CASE("16scC4", "[NPP.Arithmetic.MulC]")
@@ -1627,7 +1627,7 @@ TEST_CASE("16scC4", "[NPP.Arithmetic.MulC]")
         elem.Value().w = 0;
     }
 
-    CHECK(cpu_dst.IsSimilar(npp_res, 2));
+    CHECK(cpu_dst.IsSimilar(npp_res, 1));
 
     cpu_src1.Mul(constVal, cpu_dst, 16);
     npp_src1.MulA(constVal.XYZ(), npp_dst, 16, nppCtx);
@@ -1643,7 +1643,7 @@ TEST_CASE("16scC4", "[NPP.Arithmetic.MulC]")
         elem.Value().w = 0;
     }
 
-    CHECK(cpu_dst.IsSimilar(npp_res, 2));
+    CHECK(cpu_dst.IsSimilar(npp_res, 1));
 
     cpu_dst.Mul(constVal, 16);
     npp_dst.MulA(constVal.XYZ(), npp_dst, 16, nppCtx);
@@ -1659,5 +1659,5 @@ TEST_CASE("16scC4", "[NPP.Arithmetic.MulC]")
         elem.Value().w = 0;
     }
 
-    CHECK(cpu_dst.IsSimilar(npp_res, 2));
+    CHECK(cpu_dst.IsSimilar(npp_res, 1));
 }

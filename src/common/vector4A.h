@@ -1,10 +1,10 @@
 #pragma once
 #include "defines.h"
+#include "mpp_defs.h"
 #include "needSaturationClamp.h"
 #include "numberTypes.h"
-#include "mpp_defs.h"
-#include "vector4.h"
 #include "vector_typetraits.h"
+#include "vector4.h"
 #include <common/utilities.h>
 #include <concepts>
 #include <iostream>
@@ -155,7 +155,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     /// Type conversion using CUDA intrinsics for float2 to BFloat2
     /// </summary>
     template <Number T2>
-    DEVICE_CODE Vector4A(const Vector4A<T2> &aVec, RoundingMode aRoundingMode) noexcept
+    DEVICE_CODE Vector4A(const Vector4A<T2> &aVec, RoundingMode aRoundingMode)
         requires IsBFloat16<T> && IsFloat<T2>;
 
     /// <summary>
@@ -169,14 +169,14 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     /// Type conversion using CUDA intrinsics for float2 to half2
     /// </summary>
     template <Number T2>
-    DEVICE_CODE Vector4A(const Vector4A<T2> &aVec, RoundingMode aRoundingMode) noexcept
+    DEVICE_CODE Vector4A(const Vector4A<T2> &aVec, RoundingMode aRoundingMode)
         requires IsHalfFp16<T> && IsFloat<T2>;
 
     /// <summary>
     /// Type conversion for complex with rounding (only for float to bfloat/halffloat)
     /// </summary>
     template <Number T2>
-    DEVICE_CODE Vector4A(const Vector4A<T2> &aVec, RoundingMode aRoundingMode) noexcept
+    DEVICE_CODE Vector4A(const Vector4A<T2> &aVec, RoundingMode aRoundingMode)
         requires ComplexFloatingPoint<T> && ComplexFloatingPoint<T2> &&
                  NonNativeFloatingPoint<complex_basetype_t<remove_vector_t<T>>> &&
                  std::same_as<float, complex_basetype_t<remove_vector_t<T2>>>;
@@ -526,6 +526,12 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     /// <summary>
     /// Component wise addition
     /// </summary>
+    DEVICE_CODE Vector4A &operator+=(complex_basetype_t<T> aOther)
+        requires ComplexNumber<T>;
+
+    /// <summary>
+    /// Component wise addition
+    /// </summary>
     DEVICE_CODE Vector4A &operator+=(const Vector4A &aOther);
 
     /// <summary>
@@ -609,6 +615,12 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     /// Component wise subtraction
     /// </summary>
     DEVICE_CODE Vector4A &operator-=(T aOther);
+
+    /// <summary>
+    /// Component wise subtraction
+    /// </summary>
+    DEVICE_CODE Vector4A &operator-=(complex_basetype_t<T> aOther)
+        requires ComplexNumber<T>;
 
     /// <summary>
     /// Component wise subtraction
@@ -741,6 +753,12 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     /// <summary>
     /// Component wise multiplication
     /// </summary>
+    DEVICE_CODE Vector4A &operator*=(complex_basetype_t<T> aOther)
+        requires ComplexNumber<T>;
+
+    /// <summary>
+    /// Component wise multiplication
+    /// </summary>
     DEVICE_CODE Vector4A &operator*=(const Vector4A &aOther);
 
     /// <summary>
@@ -780,6 +798,12 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     /// <summary>
     /// Component wise division
     /// </summary>
+    DEVICE_CODE Vector4A &operator/=(complex_basetype_t<T> aOther)
+        requires ComplexNumber<T>;
+
+    /// <summary>
+    /// Component wise division
+    /// </summary>
     DEVICE_CODE Vector4A &operator/=(const Vector4A &aOther);
 
     /// <summary>
@@ -815,6 +839,202 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     /// Component wise division
     /// </summary>
     DEVICE_CODE [[nodiscard]] Vector4A operator/(const Vector4A &aOther) const;
+
+    /// <summary>
+    /// Inplace Integer division with element wise round()
+    /// </summary>
+    DEVICE_CODE Vector4A &DivRound(const Vector4A &aOther)
+        requires RealIntegral<T>;
+
+    /// <summary>
+    /// Inplace Integer division with element wise round nearest ties to even
+    /// </summary>
+    DEVICE_CODE Vector4A &DivRoundNearest(const Vector4A &aOther)
+        requires RealIntegral<T>;
+
+    /// <summary>
+    /// Inplace Integer division with element wise round toward zero
+    /// </summary>
+    DEVICE_CODE Vector4A &DivRoundZero(const Vector4A &aOther)
+        requires RealIntegral<T>;
+
+    /// <summary>
+    /// Inplace Integer division with element wise floor()
+    /// </summary>
+    DEVICE_CODE Vector4A &DivFloor(const Vector4A &aOther)
+        requires RealIntegral<T>;
+
+    /// <summary>
+    /// Inplace Integer division with element wise ceil()
+    /// </summary>
+    DEVICE_CODE Vector4A &DivCeil(const Vector4A &aOther)
+        requires RealIntegral<T>;
+
+    /// <summary>
+    /// Inplace Integer division with element wise round() (inverted inplace div: this = aOther / this)
+    /// </summary>
+    DEVICE_CODE Vector4A &DivInvRound(const Vector4A &aOther)
+        requires RealIntegral<T>;
+
+    /// <summary>
+    /// Inplace Integer division with element wise round nearest ties to even (inverted inplace div: this =
+    /// aOther / this)
+    /// </summary>
+    DEVICE_CODE Vector4A &DivInvRoundNearest(const Vector4A &aOther)
+        requires RealIntegral<T>;
+
+    /// <summary>
+    /// Inplace Integer division with element wise round toward zero (inverted inplace div: this = aOther /
+    /// this)
+    /// </summary>
+    DEVICE_CODE Vector4A &DivInvRoundZero(const Vector4A &aOther)
+        requires RealIntegral<T>;
+
+    /// <summary>
+    /// Inplace Integer division with element wise floor() (inverted inplace div: this = aOther / this)
+    /// </summary>
+    DEVICE_CODE Vector4A &DivInvFloor(const Vector4A &aOther)
+        requires RealIntegral<T>;
+
+    /// <summary>
+    /// Inplace Integer division with element wise ceil() (inverted inplace div: this = aOther / this)
+    /// </summary>
+    DEVICE_CODE Vector4A &DivInvCeil(const Vector4A &aOther)
+        requires RealIntegral<T>;
+
+    /// <summary>
+    /// Integer division with element wise round()
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector4A DivRound(const Vector4A &aLeft, const Vector4A &aRight)
+        requires RealIntegral<T>;
+
+    /// <summary>
+    /// Integer division with element wise round nearest ties to even
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector4A DivRoundNearest(const Vector4A &aLeft, const Vector4A &aRight)
+        requires RealIntegral<T>;
+
+    /// <summary>
+    /// Integer division with element wise round toward zero
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector4A DivRoundZero(const Vector4A &aLeft, const Vector4A &aRight)
+        requires RealIntegral<T>;
+
+    /// <summary>
+    /// Integer division with element wise floor()
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector4A DivFloor(const Vector4A &aLeft, const Vector4A &aRight)
+        requires RealIntegral<T>;
+
+    /// <summary>
+    /// Integer division with element wise ceil()
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector4A DivCeil(const Vector4A &aLeft, const Vector4A &aRight)
+        requires RealIntegral<T>;
+
+    /// <summary>
+    /// Inplace integer division with element wise round nearest ties to even (for scaling operations)
+    /// </summary>
+    DEVICE_CODE Vector4A &DivScaleRoundNearest(T aScale)
+        requires RealIntegral<T>;
+
+    /// <summary>
+    /// Inplace Integer division with element wise round()
+    /// </summary>
+    DEVICE_CODE Vector4A &DivRound(const Vector4A &aOther)
+        requires ComplexIntegral<T>;
+
+    /// <summary>
+    /// Inplace Integer division with element wise round nearest ties to even
+    /// </summary>
+    DEVICE_CODE Vector4A &DivRoundNearest(const Vector4A &aOther)
+        requires ComplexIntegral<T>;
+
+    /// <summary>
+    /// Inplace Integer division with element wise round toward zero
+    /// </summary>
+    DEVICE_CODE Vector4A &DivRoundZero(const Vector4A &aOther)
+        requires ComplexIntegral<T>;
+
+    /// <summary>
+    /// Inplace Integer division with element wise floor()
+    /// </summary>
+    DEVICE_CODE Vector4A &DivFloor(const Vector4A &aOther)
+        requires ComplexIntegral<T>;
+
+    /// <summary>
+    /// Inplace Integer division with element wise ceil()
+    /// </summary>
+    DEVICE_CODE Vector4A &DivCeil(const Vector4A &aOther)
+        requires ComplexIntegral<T>;
+
+    /// <summary>
+    /// Inplace Integer division with element wise round() (inverted inplace div: this = aOther / this)
+    /// </summary>
+    DEVICE_CODE Vector4A &DivInvRound(const Vector4A &aOther)
+        requires ComplexIntegral<T>;
+
+    /// <summary>
+    /// Inplace Integer division with element wise round nearest ties to even (inverted inplace div: this =
+    /// aOther / this)
+    /// </summary>
+    DEVICE_CODE Vector4A &DivInvRoundNearest(const Vector4A &aOther)
+        requires ComplexIntegral<T>;
+
+    /// <summary>
+    /// Inplace Integer division with element wise round toward zero (inverted inplace div: this = aOther /
+    /// this)
+    /// </summary>
+    DEVICE_CODE Vector4A &DivInvRoundZero(const Vector4A &aOther)
+        requires ComplexIntegral<T>;
+
+    /// <summary>
+    /// Inplace Integer division with element wise floor() (inverted inplace div: this = aOther / this)
+    /// </summary>
+    DEVICE_CODE Vector4A &DivInvFloor(const Vector4A &aOther)
+        requires ComplexIntegral<T>;
+
+    /// <summary>
+    /// Inplace Integer division with element wise ceil() (inverted inplace div: this = aOther / this)
+    /// </summary>
+    DEVICE_CODE Vector4A &DivInvCeil(const Vector4A &aOther)
+        requires ComplexIntegral<T>;
+
+    /// <summary>
+    /// Integer division with element wise round()
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector4A DivRound(const Vector4A &aLeft, const Vector4A &aRight)
+        requires ComplexIntegral<T>;
+
+    /// <summary>
+    /// Integer division with element wise round nearest ties to even
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector4A DivRoundNearest(const Vector4A &aLeft, const Vector4A &aRight)
+        requires ComplexIntegral<T>;
+
+    /// <summary>
+    /// Integer division with element wise round toward zero
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector4A DivRoundZero(const Vector4A &aLeft, const Vector4A &aRight)
+        requires ComplexIntegral<T>;
+
+    /// <summary>
+    /// Integer division with element wise floor()
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector4A DivFloor(const Vector4A &aLeft, const Vector4A &aRight)
+        requires ComplexIntegral<T>;
+
+    /// <summary>
+    /// Integer division with element wise ceil()
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Vector4A DivCeil(const Vector4A &aLeft, const Vector4A &aRight)
+        requires ComplexIntegral<T>;
+
+    /// <summary>
+    /// Inplace integer division with element wise round nearest ties to even (for scaling operations)
+    /// </summary>
+    DEVICE_CODE Vector4A &DivScaleRoundNearest(complex_basetype_t<T> aScale)
+        requires ComplexIntegral<T>;
 
     /// <summary>
     /// Component wise division SIMD
@@ -1245,7 +1465,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE Vector4A<T> &AbsDiff(const Vector4A<T> &aOther)
-        requires HostCode<T> && NativeFloatingPoint<T>;
+        requires HostCode<T> && RealSignedNumber<T> && NativeNumber<T>;
 
     /// <summary>
     /// Element wise absolute difference
@@ -1257,7 +1477,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4A<T> AbsDiff(const Vector4A<T> &aLeft, const Vector4A<T> &aRight)
-        requires HostCode<T> && NativeFloatingPoint<T>;
+        requires HostCode<T> && RealSignedNumber<T> && NativeNumber<T>;
 
     /// <summary>
     /// Element wise absolute difference
@@ -1269,7 +1489,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE Vector4A<T> &AbsDiff(const Vector4A<T> &aOther)
-        requires DeviceCode<T> && NativeFloatingPoint<T>;
+        requires DeviceCode<T> && RealSignedNumber<T> && NativeNumber<T>;
 
     /// <summary>
     /// Element wise absolute difference (SIMD)
@@ -1299,7 +1519,7 @@ template <Number T> struct alignas(4 * sizeof(T)) Vector4A
     /// Element wise absolute difference
     /// </summary>
     DEVICE_CODE [[nodiscard]] static Vector4A<T> AbsDiff(const Vector4A<T> &aLeft, const Vector4A<T> &aRight)
-        requires DeviceCode<T> && NativeFloatingPoint<T>;
+        requires DeviceCode<T> && RealSignedNumber<T> && NativeNumber<T>;
 
     /// <summary>
     /// Element wise absolute difference

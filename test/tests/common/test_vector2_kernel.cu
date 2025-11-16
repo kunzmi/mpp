@@ -362,6 +362,7 @@ template <typename T> __global__ void test_vector2_kernel(Vector2<T> *aDataIn, V
     }
     if (blockIdx.x == 9)
     {
+        counterOut  = 164;
         counterComp = 10;
         counterIn   = 220;
 
@@ -404,6 +405,101 @@ template <typename T> __global__ void test_vector2_kernel(Vector2<T> *aDataIn, V
             }
             counterComp += 1;
             counterIn += 3;
+        }
+
+        if constexpr (RealOrComplexIntegral<T>)
+        {
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut].DivRoundNearest(aDataIn[counterIn + 1]);
+            aDataOut[counterOut + 1] = Vector2<T>::DivRoundNearest(aDataIn[counterIn], aDataIn[counterIn + 1]);
+            aDataOut[counterOut + 2] = aDataIn[counterIn];
+            aDataOut[counterOut + 2].DivInvRoundNearest(aDataIn[counterIn + 1]);
+            counterOut += 3;
+            counterIn += 2;
+
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut].DivRound(aDataIn[counterIn + 1]);
+            aDataOut[counterOut + 1] = Vector2<T>::DivRound(aDataIn[counterIn], aDataIn[counterIn + 1]);
+            aDataOut[counterOut + 2] = aDataIn[counterIn];
+            aDataOut[counterOut + 2].DivInvRound(aDataIn[counterIn + 1]);
+            counterOut += 3;
+            counterIn += 2;
+
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut].DivRoundZero(aDataIn[counterIn + 1]);
+            aDataOut[counterOut + 1] = Vector2<T>::DivRoundZero(aDataIn[counterIn], aDataIn[counterIn + 1]);
+            aDataOut[counterOut + 2] = aDataIn[counterIn];
+            aDataOut[counterOut + 2].DivInvRoundZero(aDataIn[counterIn + 1]);
+            counterOut += 3;
+            counterIn += 2;
+
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut].DivFloor(aDataIn[counterIn + 1]);
+            aDataOut[counterOut + 1] = Vector2<T>::DivFloor(aDataIn[counterIn], aDataIn[counterIn + 1]);
+            aDataOut[counterOut + 2] = aDataIn[counterIn];
+            aDataOut[counterOut + 2].DivInvFloor(aDataIn[counterIn + 1]);
+            counterOut += 3;
+            counterIn += 2;
+
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut].DivCeil(aDataIn[counterIn + 1]);
+            aDataOut[counterOut + 1] = Vector2<T>::DivCeil(aDataIn[counterIn], aDataIn[counterIn + 1]);
+            aDataOut[counterOut + 2] = aDataIn[counterIn];
+            aDataOut[counterOut + 2].DivInvCeil(aDataIn[counterIn + 1]);
+            counterOut += 3;
+            counterIn += 2;
+        }
+        if constexpr (RealIntegral<T>)
+        {
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut].DivScaleRoundNearest(aDataIn[counterIn + 1].x);
+            counterOut += 1;
+            counterIn += 2;
+        }
+        if constexpr (RealNumber<T>)
+        {
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut] += aDataIn[counterIn + 1].x;
+            counterOut += 1;
+            counterIn += 2;
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut] -= aDataIn[counterIn + 1].x;
+            counterOut += 1;
+            counterIn += 2;
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut] *= aDataIn[counterIn + 1].x;
+            counterOut += 1;
+            counterIn += 2;
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut] /= aDataIn[counterIn + 1].x;
+            counterOut += 1;
+            counterIn += 2;
+        }
+        if constexpr (ComplexIntegral<T>)
+        {
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut].DivScaleRoundNearest(aDataIn[counterIn + 1].x.real);
+            counterOut += 1;
+            counterIn += 2;
+        }
+        if constexpr (ComplexNumber<T>)
+        {
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut] += aDataIn[counterIn + 1].x.real;
+            counterOut += 1;
+            counterIn += 2;
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut] -= aDataIn[counterIn + 1].x.real;
+            counterOut += 1;
+            counterIn += 2;
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut] *= aDataIn[counterIn + 1].x.real;
+            counterOut += 1;
+            counterIn += 2;
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut] /= aDataIn[counterIn + 1].x.real;
+            counterOut += 1;
+            counterIn += 2;
         }
     }
     // 74  12

@@ -683,6 +683,7 @@ void fillData(std::vector<Vector2<T>> &aDataIn, std::vector<Vector2<T>> &aDataOu
     }
     // if (blockIdx.x == 9)
     {
+        counterOut  = 164;
         counterComp = 10;  // 6 - 4; // 6
         counterIn   = 220; // 120 - 44;
 
@@ -792,27 +793,126 @@ void fillData(std::vector<Vector2<T>> &aDataIn, std::vector<Vector2<T>> &aDataOu
             counterIn += 3;
         }
 
+        if constexpr (RealOrComplexIntegral<T>)
+        {
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut].DivRoundNearest(aDataIn[counterIn + 1]);
+            aDataOut[counterOut + 1] = Vector2<T>::DivRoundNearest(aDataIn[counterIn], aDataIn[counterIn + 1]);
+            aDataOut[counterOut + 2] = aDataIn[counterIn];
+            aDataOut[counterOut + 2].DivInvRoundNearest(aDataIn[counterIn + 1]);
+            counterOut += 3;
+            counterIn += 2;
+
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut].DivRound(aDataIn[counterIn + 1]);
+            aDataOut[counterOut + 1] = Vector2<T>::DivRound(aDataIn[counterIn], aDataIn[counterIn + 1]);
+            aDataOut[counterOut + 2] = aDataIn[counterIn];
+            aDataOut[counterOut + 2].DivInvRound(aDataIn[counterIn + 1]);
+            counterOut += 3;
+            counterIn += 2;
+
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut].DivRoundZero(aDataIn[counterIn + 1]);
+            aDataOut[counterOut + 1] = Vector2<T>::DivRoundZero(aDataIn[counterIn], aDataIn[counterIn + 1]);
+            aDataOut[counterOut + 2] = aDataIn[counterIn];
+            aDataOut[counterOut + 2].DivInvRoundZero(aDataIn[counterIn + 1]);
+            counterOut += 3;
+            counterIn += 2;
+
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut].DivFloor(aDataIn[counterIn + 1]);
+            aDataOut[counterOut + 1] = Vector2<T>::DivFloor(aDataIn[counterIn], aDataIn[counterIn + 1]);
+            aDataOut[counterOut + 2] = aDataIn[counterIn];
+            aDataOut[counterOut + 2].DivInvFloor(aDataIn[counterIn + 1]);
+            counterOut += 3;
+            counterIn += 2;
+
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut].DivCeil(aDataIn[counterIn + 1]);
+            aDataOut[counterOut + 1] = Vector2<T>::DivCeil(aDataIn[counterIn], aDataIn[counterIn + 1]);
+            aDataOut[counterOut + 2] = aDataIn[counterIn];
+            aDataOut[counterOut + 2].DivInvCeil(aDataIn[counterIn + 1]);
+            counterOut += 3;
+            counterIn += 2;
+        }
+        if constexpr (RealIntegral<T>)
+        {
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut].DivScaleRoundNearest(aDataIn[counterIn + 1].x);
+            counterOut += 1;
+            counterIn += 2;
+        }
+        if constexpr (RealNumber<T>)
+        {
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut] += aDataIn[counterIn + 1].x;
+            counterOut += 1;
+            counterIn += 2;
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut] -= aDataIn[counterIn + 1].x;
+            counterOut += 1;
+            counterIn += 2;
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut] *= aDataIn[counterIn + 1].x;
+            counterOut += 1;
+            counterIn += 2;
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut] /= aDataIn[counterIn + 1].x;
+            counterOut += 1;
+            counterIn += 2;
+        }
+        if constexpr (ComplexIntegral<T>)
+        {
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut].DivScaleRoundNearest(aDataIn[counterIn + 1].x.real);
+            counterOut += 1;
+            counterIn += 2;
+        }
+        if constexpr (ComplexNumber<T>)
+        {
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut] += aDataIn[counterIn + 1].x.real;
+            counterOut += 1;
+            counterIn += 2;
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut] -= aDataIn[counterIn + 1].x.real;
+            counterOut += 1;
+            counterIn += 2;
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut] *= aDataIn[counterIn + 1].x.real;
+            counterOut += 1;
+            counterIn += 2;
+            aDataOut[counterOut] = aDataIn[counterIn];
+            aDataOut[counterOut] /= aDataIn[counterIn + 1].x.real;
+            counterOut += 1;
+            counterIn += 2;
+        }
+
         /* counterComp = 7;
          counterIn   = 15;*/
     }
 }
 
+constexpr size_t sizeIn   = 255;
+constexpr size_t sizeOut  = 185;
+constexpr size_t sizeComp = 20;
+
 TEST_CASE("Pixel64fC2 CUDA", "[Common]")
 {
     cudaSafeCall(cudaSetDevice(DEFAULT_CUDA_DEVICE_ID));
 
-    std::vector<Pixel64fC2> dataIn(235);
-    std::vector<Pixel64fC2> dataOut(170, Pixel64fC2(0));
-    std::vector<Pixel64fC2> dataOutGPU(170);
-    std::vector<Pixel8uC2> dataComp(20);
-    std::vector<Pixel8uC2> dataCompGPU(20);
-    std::vector<double> epsilon(170, 0.0);
+    std::vector<Pixel64fC2> dataIn(sizeIn);
+    std::vector<Pixel64fC2> dataOut(sizeOut, Pixel64fC2(0));
+    std::vector<Pixel64fC2> dataOutGPU(sizeOut);
+    std::vector<Pixel8uC2> dataComp(sizeComp);
+    std::vector<Pixel8uC2> dataCompGPU(sizeComp);
+    std::vector<double> epsilon(sizeOut, 0.0);
 
     fillData(dataIn, dataOut, dataComp, epsilon);
 
-    DevVar<Pixel64fC2> d_dataIn(235);
-    DevVar<Pixel64fC2> d_dataOut(170);
-    DevVar<Pixel8uC2> d_dataComp(20);
+    DevVar<Pixel64fC2> d_dataIn(sizeIn);
+    DevVar<Pixel64fC2> d_dataOut(sizeOut);
+    DevVar<Pixel8uC2> d_dataComp(sizeComp);
 
     d_dataIn << dataIn;
     d_dataOut.Memset(0);
@@ -843,18 +943,18 @@ TEST_CASE("Pixel32fC2 CUDA", "[Common]")
 {
     cudaSafeCall(cudaSetDevice(DEFAULT_CUDA_DEVICE_ID));
 
-    std::vector<Pixel32fC2> dataIn(235);
-    std::vector<Pixel32fC2> dataOut(170, Pixel32fC2(0));
-    std::vector<Pixel32fC2> dataOutGPU(170);
-    std::vector<Pixel8uC2> dataComp(20);
-    std::vector<Pixel8uC2> dataCompGPU(20);
-    std::vector<float> epsilon(170, 0.0f);
+    std::vector<Pixel32fC2> dataIn(sizeIn);
+    std::vector<Pixel32fC2> dataOut(sizeOut, Pixel32fC2(0));
+    std::vector<Pixel32fC2> dataOutGPU(sizeOut);
+    std::vector<Pixel8uC2> dataComp(sizeComp);
+    std::vector<Pixel8uC2> dataCompGPU(sizeComp);
+    std::vector<float> epsilon(sizeOut, 0.0f);
 
     fillData(dataIn, dataOut, dataComp, epsilon);
 
-    DevVar<Pixel32fC2> d_dataIn(235);
-    DevVar<Pixel32fC2> d_dataOut(170);
-    DevVar<Pixel8uC2> d_dataComp(20);
+    DevVar<Pixel32fC2> d_dataIn(sizeIn);
+    DevVar<Pixel32fC2> d_dataOut(sizeOut);
+    DevVar<Pixel8uC2> d_dataComp(sizeComp);
 
     d_dataIn << dataIn;
     d_dataOut.Memset(0);
@@ -885,18 +985,18 @@ TEST_CASE("Pixel16bfC2 CUDA", "[Common]")
 {
     cudaSafeCall(cudaSetDevice(DEFAULT_CUDA_DEVICE_ID));
 
-    std::vector<Pixel16bfC2> dataIn(235);
-    std::vector<Pixel16bfC2> dataOut(170, Pixel16bfC2(0.0_bf));
-    std::vector<Pixel16bfC2> dataOutGPU(170);
-    std::vector<Pixel8uC2> dataComp(20);
-    std::vector<Pixel8uC2> dataCompGPU(20);
-    std::vector<BFloat16> epsilon(170, 0.0_bf);
+    std::vector<Pixel16bfC2> dataIn(sizeIn);
+    std::vector<Pixel16bfC2> dataOut(sizeOut, Pixel16bfC2(0.0_bf));
+    std::vector<Pixel16bfC2> dataOutGPU(sizeOut);
+    std::vector<Pixel8uC2> dataComp(sizeComp);
+    std::vector<Pixel8uC2> dataCompGPU(sizeComp);
+    std::vector<BFloat16> epsilon(sizeOut, 0.0_bf);
 
     fillData(dataIn, dataOut, dataComp, epsilon);
 
-    DevVar<Pixel16bfC2> d_dataIn(235);
-    DevVar<Pixel16bfC2> d_dataOut(170);
-    DevVar<Pixel8uC2> d_dataComp(20);
+    DevVar<Pixel16bfC2> d_dataIn(sizeIn);
+    DevVar<Pixel16bfC2> d_dataOut(sizeOut);
+    DevVar<Pixel8uC2> d_dataComp(sizeComp);
 
     d_dataIn << dataIn;
     d_dataOut.Memset(0);
@@ -927,18 +1027,18 @@ TEST_CASE("Pixel16fC2 CUDA", "[Common]")
 {
     cudaSafeCall(cudaSetDevice(DEFAULT_CUDA_DEVICE_ID));
 
-    std::vector<Pixel16fC2> dataIn(235);
-    std::vector<Pixel16fC2> dataOut(170, Pixel16fC2(0.0_hf));
-    std::vector<Pixel16fC2> dataOutGPU(170);
-    std::vector<Pixel8uC2> dataComp(20);
-    std::vector<Pixel8uC2> dataCompGPU(20);
-    std::vector<HalfFp16> epsilon(170, 0.0_hf);
+    std::vector<Pixel16fC2> dataIn(sizeIn);
+    std::vector<Pixel16fC2> dataOut(sizeOut, Pixel16fC2(0.0_hf));
+    std::vector<Pixel16fC2> dataOutGPU(sizeOut);
+    std::vector<Pixel8uC2> dataComp(sizeComp);
+    std::vector<Pixel8uC2> dataCompGPU(sizeComp);
+    std::vector<HalfFp16> epsilon(sizeOut, 0.0_hf);
 
     fillData(dataIn, dataOut, dataComp, epsilon);
 
-    DevVar<Pixel16fC2> d_dataIn(235);
-    DevVar<Pixel16fC2> d_dataOut(170);
-    DevVar<Pixel8uC2> d_dataComp(20);
+    DevVar<Pixel16fC2> d_dataIn(sizeIn);
+    DevVar<Pixel16fC2> d_dataOut(sizeOut);
+    DevVar<Pixel8uC2> d_dataComp(sizeComp);
 
     d_dataIn << dataIn;
     d_dataOut.Memset(0);
@@ -969,18 +1069,18 @@ TEST_CASE("Pixel32sC2 CUDA", "[Common]")
 {
     cudaSafeCall(cudaSetDevice(DEFAULT_CUDA_DEVICE_ID));
 
-    std::vector<Pixel32sC2> dataIn(235);
-    std::vector<Pixel32sC2> dataOut(170, Pixel32sC2(0));
-    std::vector<Pixel32sC2> dataOutGPU(170);
-    std::vector<Pixel8uC2> dataComp(20);
-    std::vector<Pixel8uC2> dataCompGPU(20);
-    std::vector<int> epsilon(170, 0);
+    std::vector<Pixel32sC2> dataIn(sizeIn);
+    std::vector<Pixel32sC2> dataOut(sizeOut, Pixel32sC2(0));
+    std::vector<Pixel32sC2> dataOutGPU(sizeOut);
+    std::vector<Pixel8uC2> dataComp(sizeComp);
+    std::vector<Pixel8uC2> dataCompGPU(sizeComp);
+    std::vector<int> epsilon(sizeOut, 0);
 
     fillData(dataIn, dataOut, dataComp, epsilon);
 
-    DevVar<Pixel32sC2> d_dataIn(235);
-    DevVar<Pixel32sC2> d_dataOut(170);
-    DevVar<Pixel8uC2> d_dataComp(20);
+    DevVar<Pixel32sC2> d_dataIn(sizeIn);
+    DevVar<Pixel32sC2> d_dataOut(sizeOut);
+    DevVar<Pixel8uC2> d_dataComp(sizeComp);
 
     d_dataIn << dataIn;
     d_dataOut.Memset(0);
@@ -1004,18 +1104,18 @@ TEST_CASE("Pixel32uC2 CUDA", "[Common]")
 {
     cudaSafeCall(cudaSetDevice(DEFAULT_CUDA_DEVICE_ID));
 
-    std::vector<Pixel32uC2> dataIn(235);
-    std::vector<Pixel32uC2> dataOut(170, Pixel32uC2(0));
-    std::vector<Pixel32uC2> dataOutGPU(170);
-    std::vector<Pixel8uC2> dataComp(20);
-    std::vector<Pixel8uC2> dataCompGPU(20);
-    std::vector<uint> epsilon(170, 0);
+    std::vector<Pixel32uC2> dataIn(sizeIn);
+    std::vector<Pixel32uC2> dataOut(sizeOut, Pixel32uC2(0));
+    std::vector<Pixel32uC2> dataOutGPU(sizeOut);
+    std::vector<Pixel8uC2> dataComp(sizeComp);
+    std::vector<Pixel8uC2> dataCompGPU(sizeComp);
+    std::vector<uint> epsilon(sizeOut, 0);
 
     fillData(dataIn, dataOut, dataComp, epsilon);
 
-    DevVar<Pixel32uC2> d_dataIn(235);
-    DevVar<Pixel32uC2> d_dataOut(170);
-    DevVar<Pixel8uC2> d_dataComp(20);
+    DevVar<Pixel32uC2> d_dataIn(sizeIn);
+    DevVar<Pixel32uC2> d_dataOut(sizeOut);
+    DevVar<Pixel8uC2> d_dataComp(sizeComp);
 
     d_dataIn << dataIn;
     d_dataOut.Memset(0);
@@ -1043,18 +1143,18 @@ TEST_CASE("Pixel16sC2 CUDA", "[Common]")
 {
     cudaSafeCall(cudaSetDevice(DEFAULT_CUDA_DEVICE_ID));
 
-    std::vector<Pixel16sC2> dataIn(235);
-    std::vector<Pixel16sC2> dataOut(170, Pixel16sC2(0));
-    std::vector<Pixel16sC2> dataOutGPU(170);
-    std::vector<Pixel8uC2> dataComp(20);
-    std::vector<Pixel8uC2> dataCompGPU(20);
-    std::vector<short> epsilon(170, 0);
+    std::vector<Pixel16sC2> dataIn(sizeIn);
+    std::vector<Pixel16sC2> dataOut(sizeOut, Pixel16sC2(0));
+    std::vector<Pixel16sC2> dataOutGPU(sizeOut);
+    std::vector<Pixel8uC2> dataComp(sizeComp);
+    std::vector<Pixel8uC2> dataCompGPU(sizeComp);
+    std::vector<short> epsilon(sizeOut, 0);
 
     fillData(dataIn, dataOut, dataComp, epsilon);
 
-    DevVar<Pixel16sC2> d_dataIn(235);
-    DevVar<Pixel16sC2> d_dataOut(170);
-    DevVar<Pixel8uC2> d_dataComp(20);
+    DevVar<Pixel16sC2> d_dataIn(sizeIn);
+    DevVar<Pixel16sC2> d_dataOut(sizeOut);
+    DevVar<Pixel8uC2> d_dataComp(sizeComp);
 
     d_dataIn << dataIn;
     d_dataOut.Memset(0);
@@ -1098,18 +1198,18 @@ TEST_CASE("Pixel16uC2 CUDA", "[Common]")
 {
     cudaSafeCall(cudaSetDevice(DEFAULT_CUDA_DEVICE_ID));
 
-    std::vector<Pixel16uC2> dataIn(235);
-    std::vector<Pixel16uC2> dataOut(170, Pixel16uC2(0));
-    std::vector<Pixel16uC2> dataOutGPU(170);
-    std::vector<Pixel8uC2> dataComp(20);
-    std::vector<Pixel8uC2> dataCompGPU(20);
-    std::vector<ushort> epsilon(170, 0);
+    std::vector<Pixel16uC2> dataIn(sizeIn);
+    std::vector<Pixel16uC2> dataOut(sizeOut, Pixel16uC2(0));
+    std::vector<Pixel16uC2> dataOutGPU(sizeOut);
+    std::vector<Pixel8uC2> dataComp(sizeComp);
+    std::vector<Pixel8uC2> dataCompGPU(sizeComp);
+    std::vector<ushort> epsilon(sizeOut, 0);
 
     fillData(dataIn, dataOut, dataComp, epsilon);
 
-    DevVar<Pixel16uC2> d_dataIn(235);
-    DevVar<Pixel16uC2> d_dataOut(170);
-    DevVar<Pixel8uC2> d_dataComp(20);
+    DevVar<Pixel16uC2> d_dataIn(sizeIn);
+    DevVar<Pixel16uC2> d_dataOut(sizeOut);
+    DevVar<Pixel8uC2> d_dataComp(sizeComp);
 
     d_dataIn << dataIn;
     d_dataOut.Memset(0);
@@ -1153,18 +1253,18 @@ TEST_CASE("Pixel8sC2 CUDA", "[Common]")
 {
     cudaSafeCall(cudaSetDevice(DEFAULT_CUDA_DEVICE_ID));
 
-    std::vector<Pixel8sC2> dataIn(235);
-    std::vector<Pixel8sC2> dataOut(170, Pixel8sC2(0));
-    std::vector<Pixel8sC2> dataOutGPU(170);
-    std::vector<Pixel8uC2> dataComp(20);
-    std::vector<Pixel8uC2> dataCompGPU(20);
-    std::vector<sbyte> epsilon(170, 0);
+    std::vector<Pixel8sC2> dataIn(sizeIn);
+    std::vector<Pixel8sC2> dataOut(sizeOut, Pixel8sC2(0));
+    std::vector<Pixel8sC2> dataOutGPU(sizeOut);
+    std::vector<Pixel8uC2> dataComp(sizeComp);
+    std::vector<Pixel8uC2> dataCompGPU(sizeComp);
+    std::vector<sbyte> epsilon(sizeOut, 0);
 
     fillData(dataIn, dataOut, dataComp, epsilon);
 
-    DevVar<Pixel8sC2> d_dataIn(235);
-    DevVar<Pixel8sC2> d_dataOut(170);
-    DevVar<Pixel8uC2> d_dataComp(20);
+    DevVar<Pixel8sC2> d_dataIn(sizeIn);
+    DevVar<Pixel8sC2> d_dataOut(sizeOut);
+    DevVar<Pixel8uC2> d_dataComp(sizeComp);
 
     d_dataIn << dataIn;
     d_dataOut.Memset(0);
@@ -1208,18 +1308,18 @@ TEST_CASE("Pixel8uC2 CUDA", "[Common]")
 {
     cudaSafeCall(cudaSetDevice(DEFAULT_CUDA_DEVICE_ID));
 
-    std::vector<Pixel8uC2> dataIn(235);
-    std::vector<Pixel8uC2> dataOut(170, Pixel8uC2(0));
-    std::vector<Pixel8uC2> dataOutGPU(170);
-    std::vector<Pixel8uC2> dataComp(20);
-    std::vector<Pixel8uC2> dataCompGPU(20);
-    std::vector<byte> epsilon(170, 0);
+    std::vector<Pixel8uC2> dataIn(sizeIn);
+    std::vector<Pixel8uC2> dataOut(sizeOut, Pixel8uC2(0));
+    std::vector<Pixel8uC2> dataOutGPU(sizeOut);
+    std::vector<Pixel8uC2> dataComp(sizeComp);
+    std::vector<Pixel8uC2> dataCompGPU(sizeComp);
+    std::vector<byte> epsilon(sizeOut, 0);
 
     fillData(dataIn, dataOut, dataComp, epsilon);
 
-    DevVar<Pixel8uC2> d_dataIn(235);
-    DevVar<Pixel8uC2> d_dataOut(170);
-    DevVar<Pixel8uC2> d_dataComp(20);
+    DevVar<Pixel8uC2> d_dataIn(sizeIn);
+    DevVar<Pixel8uC2> d_dataOut(sizeOut);
+    DevVar<Pixel8uC2> d_dataComp(sizeComp);
 
     d_dataIn << dataIn;
     d_dataOut.Memset(0);
@@ -1263,18 +1363,18 @@ TEST_CASE("Pixel64fcC2 CUDA", "[Common]")
 {
     cudaSafeCall(cudaSetDevice(DEFAULT_CUDA_DEVICE_ID));
 
-    std::vector<Pixel64fcC2> dataIn(235);
-    std::vector<Pixel64fcC2> dataOut(170, Pixel64fcC2(0.0_i));
-    std::vector<Pixel64fcC2> dataOutGPU(170);
-    std::vector<Pixel8uC2> dataComp(20);
-    std::vector<Pixel8uC2> dataCompGPU(20);
-    std::vector<double> epsilon(170, 0.0);
+    std::vector<Pixel64fcC2> dataIn(sizeIn);
+    std::vector<Pixel64fcC2> dataOut(sizeOut, Pixel64fcC2(0.0_i));
+    std::vector<Pixel64fcC2> dataOutGPU(sizeOut);
+    std::vector<Pixel8uC2> dataComp(sizeComp);
+    std::vector<Pixel8uC2> dataCompGPU(sizeComp);
+    std::vector<double> epsilon(sizeOut, 0.0);
 
     fillData(dataIn, dataOut, dataComp, epsilon);
 
-    DevVar<Pixel64fcC2> d_dataIn(235);
-    DevVar<Pixel64fcC2> d_dataOut(170);
-    DevVar<Pixel8uC2> d_dataComp(20);
+    DevVar<Pixel64fcC2> d_dataIn(sizeIn);
+    DevVar<Pixel64fcC2> d_dataOut(sizeOut);
+    DevVar<Pixel8uC2> d_dataComp(sizeComp);
 
     d_dataIn << dataIn;
     d_dataOut.Memset(0);
@@ -1305,18 +1405,18 @@ TEST_CASE("Pixel32fcC2 CUDA", "[Common]")
 {
     cudaSafeCall(cudaSetDevice(DEFAULT_CUDA_DEVICE_ID));
 
-    std::vector<Pixel32fcC2> dataIn(235);
-    std::vector<Pixel32fcC2> dataOut(170, Pixel32fcC2(0.0_i));
-    std::vector<Pixel32fcC2> dataOutGPU(170);
-    std::vector<Pixel8uC2> dataComp(20);
-    std::vector<Pixel8uC2> dataCompGPU(20);
-    std::vector<float> epsilon(170, 0.0f);
+    std::vector<Pixel32fcC2> dataIn(sizeIn);
+    std::vector<Pixel32fcC2> dataOut(sizeOut, Pixel32fcC2(0.0_i));
+    std::vector<Pixel32fcC2> dataOutGPU(sizeOut);
+    std::vector<Pixel8uC2> dataComp(sizeComp);
+    std::vector<Pixel8uC2> dataCompGPU(sizeComp);
+    std::vector<float> epsilon(sizeOut, 0.0f);
 
     fillData(dataIn, dataOut, dataComp, epsilon);
 
-    DevVar<Pixel32fcC2> d_dataIn(235);
-    DevVar<Pixel32fcC2> d_dataOut(170);
-    DevVar<Pixel8uC2> d_dataComp(20);
+    DevVar<Pixel32fcC2> d_dataIn(sizeIn);
+    DevVar<Pixel32fcC2> d_dataOut(sizeOut);
+    DevVar<Pixel8uC2> d_dataComp(sizeComp);
 
     d_dataIn << dataIn;
     d_dataOut.Memset(0);
@@ -1347,18 +1447,18 @@ TEST_CASE("Pixel16bfcC2 CUDA", "[Common]")
 {
     cudaSafeCall(cudaSetDevice(DEFAULT_CUDA_DEVICE_ID));
 
-    std::vector<Pixel16bfcC2> dataIn(235);
-    std::vector<Pixel16bfcC2> dataOut(170, Pixel16bfcC2(0.0_i));
-    std::vector<Pixel16bfcC2> dataOutGPU(170);
-    std::vector<Pixel8uC2> dataComp(20);
-    std::vector<Pixel8uC2> dataCompGPU(20);
-    std::vector<BFloat16> epsilon(170, 0.0_bf);
+    std::vector<Pixel16bfcC2> dataIn(sizeIn);
+    std::vector<Pixel16bfcC2> dataOut(sizeOut, Pixel16bfcC2(0.0_i));
+    std::vector<Pixel16bfcC2> dataOutGPU(sizeOut);
+    std::vector<Pixel8uC2> dataComp(sizeComp);
+    std::vector<Pixel8uC2> dataCompGPU(sizeComp);
+    std::vector<BFloat16> epsilon(sizeOut, 0.0_bf);
 
     fillData(dataIn, dataOut, dataComp, epsilon);
 
-    DevVar<Pixel16bfcC2> d_dataIn(235);
-    DevVar<Pixel16bfcC2> d_dataOut(170);
-    DevVar<Pixel8uC2> d_dataComp(20);
+    DevVar<Pixel16bfcC2> d_dataIn(sizeIn);
+    DevVar<Pixel16bfcC2> d_dataOut(sizeOut);
+    DevVar<Pixel8uC2> d_dataComp(sizeComp);
 
     d_dataIn << dataIn;
     d_dataOut.Memset(0);
@@ -1389,18 +1489,18 @@ TEST_CASE("Pixel16fcC2 CUDA", "[Common]")
 {
     cudaSafeCall(cudaSetDevice(DEFAULT_CUDA_DEVICE_ID));
 
-    std::vector<Pixel16fcC2> dataIn(235);
-    std::vector<Pixel16fcC2> dataOut(170, Pixel16fcC2(0.0_i));
-    std::vector<Pixel16fcC2> dataOutGPU(170);
-    std::vector<Pixel8uC2> dataComp(20);
-    std::vector<Pixel8uC2> dataCompGPU(20);
-    std::vector<HalfFp16> epsilon(170, 0.0_hf);
+    std::vector<Pixel16fcC2> dataIn(sizeIn);
+    std::vector<Pixel16fcC2> dataOut(sizeOut, Pixel16fcC2(0.0_i));
+    std::vector<Pixel16fcC2> dataOutGPU(sizeOut);
+    std::vector<Pixel8uC2> dataComp(sizeComp);
+    std::vector<Pixel8uC2> dataCompGPU(sizeComp);
+    std::vector<HalfFp16> epsilon(sizeOut, 0.0_hf);
 
     fillData(dataIn, dataOut, dataComp, epsilon);
 
-    DevVar<Pixel16fcC2> d_dataIn(235);
-    DevVar<Pixel16fcC2> d_dataOut(170);
-    DevVar<Pixel8uC2> d_dataComp(20);
+    DevVar<Pixel16fcC2> d_dataIn(sizeIn);
+    DevVar<Pixel16fcC2> d_dataOut(sizeOut);
+    DevVar<Pixel8uC2> d_dataComp(sizeComp);
 
     d_dataIn << dataIn;
     d_dataOut.Memset(0);
@@ -1431,18 +1531,18 @@ TEST_CASE("Pixel32scC2 CUDA", "[Common]")
 {
     cudaSafeCall(cudaSetDevice(DEFAULT_CUDA_DEVICE_ID));
 
-    std::vector<Pixel32scC2> dataIn(235);
-    std::vector<Pixel32scC2> dataOut(170, Pixel32scC2(0));
-    std::vector<Pixel32scC2> dataOutGPU(170);
-    std::vector<Pixel8uC2> dataComp(20);
-    std::vector<Pixel8uC2> dataCompGPU(20);
-    std::vector<int> epsilon(170, 0);
+    std::vector<Pixel32scC2> dataIn(sizeIn);
+    std::vector<Pixel32scC2> dataOut(sizeOut, Pixel32scC2(0));
+    std::vector<Pixel32scC2> dataOutGPU(sizeOut);
+    std::vector<Pixel8uC2> dataComp(sizeComp);
+    std::vector<Pixel8uC2> dataCompGPU(sizeComp);
+    std::vector<int> epsilon(sizeOut, 0);
 
     fillData(dataIn, dataOut, dataComp, epsilon);
 
-    DevVar<Pixel32scC2> d_dataIn(235);
-    DevVar<Pixel32scC2> d_dataOut(170);
-    DevVar<Pixel8uC2> d_dataComp(20);
+    DevVar<Pixel32scC2> d_dataIn(sizeIn);
+    DevVar<Pixel32scC2> d_dataOut(sizeOut);
+    DevVar<Pixel8uC2> d_dataComp(sizeComp);
 
     d_dataIn << dataIn;
     d_dataOut.Memset(0);
@@ -1466,18 +1566,18 @@ TEST_CASE("Pixel16scC2 CUDA", "[Common]")
 {
     cudaSafeCall(cudaSetDevice(DEFAULT_CUDA_DEVICE_ID));
 
-    std::vector<Pixel16scC2> dataIn(235);
-    std::vector<Pixel16scC2> dataOut(170, Pixel16scC2(0));
-    std::vector<Pixel16scC2> dataOutGPU(170);
-    std::vector<Pixel8uC2> dataComp(20);
-    std::vector<Pixel8uC2> dataCompGPU(20);
-    std::vector<short> epsilon(170, 0);
+    std::vector<Pixel16scC2> dataIn(sizeIn);
+    std::vector<Pixel16scC2> dataOut(sizeOut, Pixel16scC2(0));
+    std::vector<Pixel16scC2> dataOutGPU(sizeOut);
+    std::vector<Pixel8uC2> dataComp(sizeComp);
+    std::vector<Pixel8uC2> dataCompGPU(sizeComp);
+    std::vector<short> epsilon(sizeOut, 0);
 
     fillData(dataIn, dataOut, dataComp, epsilon);
 
-    DevVar<Pixel16scC2> d_dataIn(235);
-    DevVar<Pixel16scC2> d_dataOut(170);
-    DevVar<Pixel8uC2> d_dataComp(20);
+    DevVar<Pixel16scC2> d_dataIn(sizeIn);
+    DevVar<Pixel16scC2> d_dataOut(sizeOut);
+    DevVar<Pixel8uC2> d_dataComp(sizeComp);
 
     d_dataIn << dataIn;
     d_dataOut.Memset(0);

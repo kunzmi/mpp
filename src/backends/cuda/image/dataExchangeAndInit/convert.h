@@ -20,7 +20,7 @@ void InvokeConvertRound(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t
 
 template <typename SrcT, typename DstT>
 void InvokeConvertScaleRound(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst,
-                             RoundingMode aRoundingMode, float aScaleFactor, const Size2D &aSize,
+                             RoundingMode aRoundingMode, double aScaleFactor, const Size2D &aSize,
                              const mpp::cuda::StreamCtx &aStreamCtx);
 
 } // namespace mpp::image::cuda

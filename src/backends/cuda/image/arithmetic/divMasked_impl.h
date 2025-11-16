@@ -101,9 +101,8 @@ void InvokeDivSrcSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivSrcSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aSrc1, size_t aPitchSrc1,
-                              const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst, size_t aPitchDst,
-                              scalefactor_t<ComputeT> aScaleFactor, mpp::RoundingMode aRoundingMode,
-                              const Size2D &aSize, const StreamCtx &aStreamCtx)
+                              const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst, size_t aPitchDst, double aScaleFactor,
+                              mpp::RoundingMode aRoundingMode, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
@@ -111,60 +110,148 @@ void InvokeDivSrcSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const S
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        switch (aRoundingMode)
+        if constexpr (RealOrComplexFloatingVector<ComputeT>)
         {
-            case mpp::RoundingMode::NearestTiesToEven:
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            switch (aRoundingMode)
             {
-                using divSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                                          RoundingMode::NearestTiesToEven>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcSrcScale>(
-                    aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                case mpp::RoundingMode::NearestTiesToEven:
+                {
+                    using divSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
+                                                              ScalerT, RoundingMode::NearestTiesToEven>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcSrcScale>(
+                        aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::NearestTiesAwayFromZero:
+                {
+                    using divSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
+                                                              ScalerT, RoundingMode::NearestTiesAwayFromZero>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcSrcScale>(
+                        aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardZero:
+                {
+                    using divSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
+                                                              ScalerT, RoundingMode::TowardZero>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcSrcScale>(
+                        aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardNegativeInfinity:
+                {
+                    using divSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
+                                                              ScalerT, RoundingMode::TowardNegativeInfinity>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcSrcScale>(
+                        aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardPositiveInfinity:
+                {
+                    using divSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
+                                                              ScalerT, RoundingMode::TowardPositiveInfinity>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcSrcScale>(
+                        aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                default:
+                    throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
             }
-            break;
-            case mpp::RoundingMode::NearestTiesAwayFromZero:
+        }
+        else
+        {
+            if (aScaleFactor < 1)
             {
-                using divSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                                          RoundingMode::NearestTiesAwayFromZero>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcSrcScale>(
-                    aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                if (aRoundingMode != RoundingMode::NearestTiesToEven)
+                {
+                    throw INVALIDARGUMENT(aRoundingMode,
+                                          "Unsupported rounding mode: "
+                                              << aRoundingMode << ". Only rounding mode "
+                                              << RoundingMode::NearestTiesToEven
+                                              << " is supported for this source data type and scaling factor < 1.");
+                }
+                else
+                {
+                    using ScalerT = Scale<ComputeT, true>;
+                    const ScalerT scaler(aScaleFactor);
+                    using divSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
+                                                              ScalerT, RoundingMode::None>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcSrcScale>(
+                        aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                }
             }
-            break;
-            case mpp::RoundingMode::TowardZero:
+            else
             {
-                using divSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                                          RoundingMode::TowardZero>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcSrcScale>(
-                    aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                switch (aRoundingMode)
+                {
+                    case mpp::RoundingMode::NearestTiesToEven:
+                    {
+                        using OpT            = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::NearestTiesToEven>;
+                        using divSrcSrcScale = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const OpT op(aScaleFactor);
+                        const divSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcSrcScale>(
+                            aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::NearestTiesAwayFromZero:
+                    {
+                        using OpT            = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::NearestTiesAwayFromZero>;
+                        using divSrcSrcScale = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const OpT op(aScaleFactor);
+                        const divSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcSrcScale>(
+                            aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardZero:
+                    {
+                        using OpT            = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardZero>;
+                        using divSrcSrcScale = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const OpT op(aScaleFactor);
+                        const divSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcSrcScale>(
+                            aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardNegativeInfinity:
+                    {
+                        using OpT            = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardNegativeInfinity>;
+                        using divSrcSrcScale = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const OpT op(aScaleFactor);
+                        const divSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcSrcScale>(
+                            aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardPositiveInfinity:
+                    {
+                        using OpT            = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardPositiveInfinity>;
+                        using divSrcSrcScale = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const OpT op(aScaleFactor);
+                        const divSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcSrcScale>(
+                            aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    default:
+                        throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
+                }
             }
-            break;
-            case mpp::RoundingMode::TowardNegativeInfinity:
-            {
-                using divSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                                          RoundingMode::TowardNegativeInfinity>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcSrcScale>(
-                    aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            case mpp::RoundingMode::TowardPositiveInfinity:
-            {
-                using divSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                                          RoundingMode::TowardPositiveInfinity>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcSrcScale>(
-                    aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            default:
-                throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
         }
     }
 }
@@ -176,8 +263,7 @@ void InvokeDivSrcSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const S
     InvokeDivSrcSrcScaleMask<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(        \
         const Pixel8uC1 *aMask, size_t aPitchMask, const typeSrcIsTypeDst *aSrc1, size_t aPitchSrc1,                   \
         const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2, typeSrcIsTypeDst *aDst, size_t aPitchDst,                    \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, mpp::RoundingMode aRoundingMode,     \
-        const Size2D &aSize, const StreamCtx &aStreamCtx);
+        double aScaleFactor, mpp::RoundingMode aRoundingMode, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeDivSrcSrcScaleMask(type)                                                            \
     InstantiateInvokeDivSrcSrcScaleMask_For(Pixel##type##C1);                                                          \
@@ -261,7 +347,7 @@ void InvokeDivSrcCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aS
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivSrcCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aSrc, size_t aPitchSrc,
-                            const SrcT &aConst, DstT *aDst, size_t aPitchDst, scalefactor_t<ComputeT> aScaleFactor,
+                            const SrcT &aConst, DstT *aDst, size_t aPitchDst, double aScaleFactor,
                             mpp::RoundingMode aRoundingMode, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
@@ -270,60 +356,163 @@ void InvokeDivSrcCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const Src
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        switch (aRoundingMode)
+        if constexpr (RealOrComplexFloatingVector<ComputeT>)
         {
-            case mpp::RoundingMode::NearestTiesToEven:
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            switch (aRoundingMode)
             {
-                using divSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                                             RoundingMode::NearestTiesToEven>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcCScale>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                     aSize, aStreamCtx, functor);
+                case mpp::RoundingMode::NearestTiesToEven:
+                {
+                    using divSrcCScale =
+                        SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                RoundingMode::NearestTiesToEven>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcCScale>(
+                        aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::NearestTiesAwayFromZero:
+                {
+                    using divSrcCScale =
+                        SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                RoundingMode::NearestTiesAwayFromZero>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcCScale>(
+                        aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardZero:
+                {
+                    using divSrcCScale =
+                        SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                RoundingMode::TowardZero>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcCScale>(
+                        aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardNegativeInfinity:
+                {
+                    using divSrcCScale =
+                        SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                RoundingMode::TowardNegativeInfinity>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcCScale>(
+                        aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardPositiveInfinity:
+                {
+                    using divSrcCScale =
+                        SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                RoundingMode::TowardPositiveInfinity>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcCScale>(
+                        aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                default:
+                    throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
             }
-            break;
-            case mpp::RoundingMode::NearestTiesAwayFromZero:
+        }
+        else
+        {
+            if (aScaleFactor < 1)
             {
-                using divSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                                             RoundingMode::NearestTiesAwayFromZero>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcCScale>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                     aSize, aStreamCtx, functor);
+                if (aRoundingMode != RoundingMode::NearestTiesToEven)
+                {
+                    throw INVALIDARGUMENT(aRoundingMode,
+                                          "Unsupported rounding mode: "
+                                              << aRoundingMode << ". Only rounding mode "
+                                              << RoundingMode::NearestTiesToEven
+                                              << " is supported for this source data type and scaling factor < 1.");
+                }
+                else
+                {
+                    using ScalerT = Scale<ComputeT, true>;
+                    const ScalerT scaler(aScaleFactor);
+                    using divSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT,
+                                                                 mpp::Div<ComputeT, DstT>, ScalerT, RoundingMode::None>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcCScale>(
+                        aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                }
             }
-            break;
-            case mpp::RoundingMode::TowardZero:
+            else
             {
-                using divSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                                             RoundingMode::TowardZero>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcCScale>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                     aSize, aStreamCtx, functor);
+                switch (aRoundingMode)
+                {
+                    case mpp::RoundingMode::NearestTiesToEven:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::NearestTiesToEven>;
+                        const OpT op(aScaleFactor);
+                        using divSrcCScale =
+                            SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+
+                        const divSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcCScale>(
+                            aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::NearestTiesAwayFromZero:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::NearestTiesAwayFromZero>;
+                        const OpT op(aScaleFactor);
+                        using divSrcCScale =
+                            SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+
+                        const divSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcCScale>(
+                            aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardZero:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardZero>;
+                        const OpT op(aScaleFactor);
+                        using divSrcCScale =
+                            SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+
+                        const divSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcCScale>(
+                            aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardNegativeInfinity:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardNegativeInfinity>;
+                        const OpT op(aScaleFactor);
+                        using divSrcCScale =
+                            SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+
+                        const divSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcCScale>(
+                            aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardPositiveInfinity:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardPositiveInfinity>;
+                        const OpT op(aScaleFactor);
+                        using divSrcCScale =
+                            SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+
+                        const divSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcCScale>(
+                            aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    default:
+                        throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
+                }
             }
-            break;
-            case mpp::RoundingMode::TowardNegativeInfinity:
-            {
-                using divSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                                             RoundingMode::TowardNegativeInfinity>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcCScale>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                     aSize, aStreamCtx, functor);
-            }
-            break;
-            case mpp::RoundingMode::TowardPositiveInfinity:
-            {
-                using divSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                                             RoundingMode::TowardPositiveInfinity>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcCScale>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                     aSize, aStreamCtx, functor);
-            }
-            break;
-            default:
-                throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
         }
     }
 }
@@ -334,9 +523,8 @@ void InvokeDivSrcCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const Src
     template void                                                                                                      \
     InvokeDivSrcCScaleMask<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(          \
         const Pixel8uC1 *aMask, size_t aPitchMask, const typeSrcIsTypeDst *aSrc, size_t aPitchSrc,                     \
-        const typeSrcIsTypeDst &aConst, typeSrcIsTypeDst *aDst, size_t aPitchDst,                                      \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, mpp::RoundingMode aRoundingMode,     \
-        const Size2D &aSize, const StreamCtx &aStreamCtx);
+        const typeSrcIsTypeDst &aConst, typeSrcIsTypeDst *aDst, size_t aPitchDst, double aScaleFactor,                 \
+        mpp::RoundingMode aRoundingMode, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeDivSrcCScaleMask(type)                                                              \
     InstantiateInvokeDivSrcCScaleMask_For(Pixel##type##C1);                                                            \
@@ -402,7 +590,7 @@ void InvokeDivSrcDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT 
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivSrcDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aSrc, size_t aPitchSrc,
-                               const SrcT *aConst, DstT *aDst, size_t aPitchDst, scalefactor_t<ComputeT> aScaleFactor,
+                               const SrcT *aConst, DstT *aDst, size_t aPitchDst, double aScaleFactor,
                                mpp::RoundingMode aRoundingMode, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
@@ -411,64 +599,159 @@ void InvokeDivSrcDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const 
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        switch (aRoundingMode)
+        if constexpr (RealOrComplexFloatingVector<ComputeT>)
         {
-            case mpp::RoundingMode::NearestTiesToEven:
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            switch (aRoundingMode)
             {
-                using divSrcDevCScale =
-                    SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                               RoundingMode::NearestTiesToEven>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcDevCScale>(
-                    aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                case mpp::RoundingMode::NearestTiesToEven:
+                {
+                    using divSrcDevCScale =
+                        SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                   RoundingMode::NearestTiesToEven>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcDevCScale>(
+                        aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::NearestTiesAwayFromZero:
+                {
+                    using divSrcDevCScale =
+                        SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                   RoundingMode::NearestTiesAwayFromZero>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcDevCScale>(
+                        aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardZero:
+                {
+                    using divSrcDevCScale =
+                        SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                   RoundingMode::TowardZero>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcDevCScale>(
+                        aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardNegativeInfinity:
+                {
+                    using divSrcDevCScale =
+                        SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                   RoundingMode::TowardNegativeInfinity>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcDevCScale>(
+                        aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardPositiveInfinity:
+                {
+                    using divSrcDevCScale =
+                        SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                   RoundingMode::TowardPositiveInfinity>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcDevCScale>(
+                        aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                default:
+                    throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
             }
-            break;
-            case mpp::RoundingMode::NearestTiesAwayFromZero:
+        }
+        else
+        {
+            if (aScaleFactor < 1)
             {
-                using divSrcDevCScale =
-                    SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                               RoundingMode::NearestTiesAwayFromZero>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcDevCScale>(
-                    aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                if (aRoundingMode != RoundingMode::NearestTiesToEven)
+                {
+                    throw INVALIDARGUMENT(aRoundingMode,
+                                          "Unsupported rounding mode: "
+                                              << aRoundingMode << ". Only rounding mode "
+                                              << RoundingMode::NearestTiesToEven
+                                              << " is supported for this source data type and scaling factor < 1.");
+                }
+                else
+                {
+                    using ScalerT = Scale<ComputeT, true>;
+                    const ScalerT scaler(aScaleFactor);
+                    using divSrcDevCScale =
+                        SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                   RoundingMode::None>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcDevCScale>(
+                        aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                }
             }
-            break;
-            case mpp::RoundingMode::TowardZero:
+            else
             {
-                using divSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT,
-                                                                   mpp::Div<ComputeT, DstT>, RoundingMode::TowardZero>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcDevCScale>(
-                    aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                switch (aRoundingMode)
+                {
+                    case mpp::RoundingMode::NearestTiesToEven:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::NearestTiesToEven>;
+                        const OpT op(aScaleFactor);
+                        using divSrcDevCScale =
+                            SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divSrcDevCScale functor(aSrc, aPitchSrc, aConst, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcDevCScale>(
+                            aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::NearestTiesAwayFromZero:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::NearestTiesAwayFromZero>;
+                        const OpT op(aScaleFactor);
+                        using divSrcDevCScale =
+                            SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divSrcDevCScale functor(aSrc, aPitchSrc, aConst, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcDevCScale>(
+                            aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardZero:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardZero>;
+                        const OpT op(aScaleFactor);
+                        using divSrcDevCScale =
+                            SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divSrcDevCScale functor(aSrc, aPitchSrc, aConst, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcDevCScale>(
+                            aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardNegativeInfinity:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardNegativeInfinity>;
+                        const OpT op(aScaleFactor);
+                        using divSrcDevCScale =
+                            SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divSrcDevCScale functor(aSrc, aPitchSrc, aConst, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcDevCScale>(
+                            aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardPositiveInfinity:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardPositiveInfinity>;
+                        const OpT op(aScaleFactor);
+                        using divSrcDevCScale =
+                            SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divSrcDevCScale functor(aSrc, aPitchSrc, aConst, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcDevCScale>(
+                            aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    default:
+                        throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
+                }
             }
-            break;
-            case mpp::RoundingMode::TowardNegativeInfinity:
-            {
-                using divSrcDevCScale =
-                    SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                               RoundingMode::TowardNegativeInfinity>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcDevCScale>(
-                    aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            case mpp::RoundingMode::TowardPositiveInfinity:
-            {
-                using divSrcDevCScale =
-                    SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                               RoundingMode::TowardPositiveInfinity>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divSrcDevCScale>(
-                    aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            default:
-                throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
         }
     }
 }
@@ -479,9 +762,8 @@ void InvokeDivSrcDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const 
     template void                                                                                                      \
     InvokeDivSrcDevCScaleMask<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(       \
         const Pixel8uC1 *aMask, size_t aPitchMask, const typeSrcIsTypeDst *aSrc, size_t aPitchSrc,                     \
-        const typeSrcIsTypeDst *aConst, typeSrcIsTypeDst *aDst, size_t aPitchDst,                                      \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, mpp::RoundingMode aRoundingMode,     \
-        const Size2D &aSize, const StreamCtx &aStreamCtx);
+        const typeSrcIsTypeDst *aConst, typeSrcIsTypeDst *aDst, size_t aPitchDst, double aScaleFactor,                 \
+        mpp::RoundingMode aRoundingMode, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeDivSrcDevCScaleMask(type)                                                           \
     InstantiateInvokeDivSrcDevCScaleMask_For(Pixel##type##C1);                                                         \
@@ -562,7 +844,7 @@ void InvokeDivInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aS
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
-                                  const SrcT *aSrc2, size_t aPitchSrc2, scalefactor_t<ComputeT> aScaleFactor,
+                                  const SrcT *aSrc2, size_t aPitchSrc2, double aScaleFactor,
                                   mpp::RoundingMode aRoundingMode, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
@@ -571,64 +853,159 @@ void InvokeDivInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Dst
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        switch (aRoundingMode)
+        if constexpr (RealOrComplexFloatingVector<ComputeT>)
         {
-            case mpp::RoundingMode::NearestTiesToEven:
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            switch (aRoundingMode)
             {
-                using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                           RoundingMode::NearestTiesToEven>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                case mpp::RoundingMode::NearestTiesToEven:
+                {
+                    using divInplaceSrcScale =
+                        InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                               RoundingMode::NearestTiesToEven>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::NearestTiesAwayFromZero:
+                {
+                    using divInplaceSrcScale =
+                        InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                               RoundingMode::NearestTiesAwayFromZero>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardZero:
+                {
+                    using divInplaceSrcScale =
+                        InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                               RoundingMode::TowardZero>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardNegativeInfinity:
+                {
+                    using divInplaceSrcScale =
+                        InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                               RoundingMode::TowardNegativeInfinity>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardPositiveInfinity:
+                {
+                    using divInplaceSrcScale =
+                        InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                               RoundingMode::TowardPositiveInfinity>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                default:
+                    throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
             }
-            break;
-            case mpp::RoundingMode::NearestTiesAwayFromZero:
+        }
+        else
+        {
+            if (aScaleFactor < 1)
             {
-                using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                           RoundingMode::NearestTiesAwayFromZero>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                if (aRoundingMode != RoundingMode::NearestTiesToEven)
+                {
+                    throw INVALIDARGUMENT(aRoundingMode,
+                                          "Unsupported rounding mode: "
+                                              << aRoundingMode << ". Only rounding mode "
+                                              << RoundingMode::NearestTiesToEven
+                                              << " is supported for this source data type and scaling factor < 1.");
+                }
+                else
+                {
+                    using ScalerT = Scale<ComputeT, true>;
+                    const ScalerT scaler(aScaleFactor);
+                    using divInplaceSrcScale =
+                        InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                               RoundingMode::None>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
             }
-            break;
-            case mpp::RoundingMode::TowardZero:
+            else
             {
-                using divInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT,
-                                                                  mpp::Div<ComputeT, DstT>, RoundingMode::TowardZero>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                switch (aRoundingMode)
+                {
+                    case mpp::RoundingMode::NearestTiesToEven:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::NearestTiesToEven>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceSrcScale =
+                            InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::NearestTiesAwayFromZero:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::NearestTiesAwayFromZero>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceSrcScale =
+                            InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardZero:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardZero>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceSrcScale =
+                            InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardNegativeInfinity:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardNegativeInfinity>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceSrcScale =
+                            InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardPositiveInfinity:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardPositiveInfinity>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceSrcScale =
+                            InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    default:
+                        throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
+                }
             }
-            break;
-            case mpp::RoundingMode::TowardNegativeInfinity:
-            {
-                using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                           RoundingMode::TowardNegativeInfinity>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            case mpp::RoundingMode::TowardPositiveInfinity:
-            {
-                using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                           RoundingMode::TowardPositiveInfinity>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            default:
-                throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
         }
     }
 }
@@ -639,8 +1016,7 @@ void InvokeDivInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Dst
     template void                                                                                                      \
     InvokeDivInplaceSrcScaleMask<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(    \
         const Pixel8uC1 *aMask, size_t aPitchMask, typeSrcIsTypeDst *aSrcDst, size_t aPitchSrcDst,                     \
-        const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,                                                              \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, mpp::RoundingMode aRoundingMode,     \
+        const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2, double aScaleFactor, mpp::RoundingMode aRoundingMode,        \
         const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeDivInplaceSrcScaleMask(type)                                                        \
@@ -724,8 +1100,8 @@ void InvokeDivInplaceCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrc
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
-                                const SrcT &aConst, scalefactor_t<ComputeT> aScaleFactor,
-                                mpp::RoundingMode aRoundingMode, const Size2D &aSize, const StreamCtx &aStreamCtx)
+                                const SrcT &aConst, double aScaleFactor, mpp::RoundingMode aRoundingMode,
+                                const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
@@ -733,65 +1109,159 @@ void InvokeDivInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT 
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        switch (aRoundingMode)
+        if constexpr (RealOrComplexFloatingVector<ComputeT>)
         {
-            case mpp::RoundingMode::NearestTiesToEven:
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            switch (aRoundingMode)
             {
-                using divInplaceCScale =
-                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                                RoundingMode::NearestTiesToEven>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                case mpp::RoundingMode::NearestTiesToEven:
+                {
+                    using divInplaceCScale =
+                        InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                    RoundingMode::NearestTiesToEven>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::NearestTiesAwayFromZero:
+                {
+                    using divInplaceCScale =
+                        InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                    RoundingMode::NearestTiesAwayFromZero>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardZero:
+                {
+                    using divInplaceCScale =
+                        InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                    RoundingMode::TowardZero>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardNegativeInfinity:
+                {
+                    using divInplaceCScale =
+                        InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                    RoundingMode::TowardNegativeInfinity>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardPositiveInfinity:
+                {
+                    using divInplaceCScale =
+                        InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                    RoundingMode::TowardPositiveInfinity>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                default:
+                    throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
             }
-            break;
-            case mpp::RoundingMode::NearestTiesAwayFromZero:
+        }
+        else
+        {
+            if (aScaleFactor < 1)
             {
-                using divInplaceCScale =
-                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                                RoundingMode::NearestTiesAwayFromZero>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                if (aRoundingMode != RoundingMode::NearestTiesToEven)
+                {
+                    throw INVALIDARGUMENT(aRoundingMode,
+                                          "Unsupported rounding mode: "
+                                              << aRoundingMode << ". Only rounding mode "
+                                              << RoundingMode::NearestTiesToEven
+                                              << " is supported for this source data type and scaling factor < 1.");
+                }
+                else
+                {
+                    using ScalerT = Scale<ComputeT, true>;
+                    const ScalerT scaler(aScaleFactor);
+                    using divInplaceCScale =
+                        InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                    RoundingMode::None>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
             }
-            break;
-            case mpp::RoundingMode::TowardZero:
+            else
             {
-                using divInplaceCScale =
-                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                                RoundingMode::TowardZero>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                switch (aRoundingMode)
+                {
+                    case mpp::RoundingMode::NearestTiesToEven:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::NearestTiesToEven>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceCScale =
+                            InplaceConstantFunctor<TupelSize, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceCScale functor(static_cast<ComputeT>(aConst), op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::NearestTiesAwayFromZero:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::NearestTiesAwayFromZero>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceCScale =
+                            InplaceConstantFunctor<TupelSize, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceCScale functor(static_cast<ComputeT>(aConst), op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardZero:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardZero>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceCScale =
+                            InplaceConstantFunctor<TupelSize, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceCScale functor(static_cast<ComputeT>(aConst), op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardNegativeInfinity:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardNegativeInfinity>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceCScale =
+                            InplaceConstantFunctor<TupelSize, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceCScale functor(static_cast<ComputeT>(aConst), op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardPositiveInfinity:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardPositiveInfinity>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceCScale =
+                            InplaceConstantFunctor<TupelSize, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceCScale functor(static_cast<ComputeT>(aConst), op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    default:
+                        throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
+                }
             }
-            break;
-            case mpp::RoundingMode::TowardNegativeInfinity:
-            {
-                using divInplaceCScale =
-                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                                RoundingMode::TowardNegativeInfinity>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            case mpp::RoundingMode::TowardPositiveInfinity:
-            {
-                using divInplaceCScale =
-                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                                RoundingMode::TowardPositiveInfinity>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            default:
-                throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
         }
     }
 }
@@ -802,8 +1272,8 @@ void InvokeDivInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT 
     template void                                                                                                      \
     InvokeDivInplaceCScaleMask<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(      \
         const Pixel8uC1 *aMask, size_t aPitchMask, typeSrcIsTypeDst *aSrcDst, size_t aPitchSrcDst,                     \
-        const typeSrcIsTypeDst &aConst, scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor,      \
-        mpp::RoundingMode aRoundingMode, const Size2D &aSize, const StreamCtx &aStreamCtx);
+        const typeSrcIsTypeDst &aConst, double aScaleFactor, mpp::RoundingMode aRoundingMode, const Size2D &aSize,     \
+        const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeDivInplaceCScaleMask(type)                                                          \
     InstantiateInvokeDivInplaceCScaleMask_For(Pixel##type##C1);                                                        \
@@ -867,8 +1337,8 @@ void InvokeDivInplaceDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *a
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
-                                   const SrcT *aConst, scalefactor_t<ComputeT> aScaleFactor,
-                                   mpp::RoundingMode aRoundingMode, const Size2D &aSize, const StreamCtx &aStreamCtx)
+                                   const SrcT *aConst, double aScaleFactor, mpp::RoundingMode aRoundingMode,
+                                   const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
@@ -876,65 +1346,159 @@ void InvokeDivInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        switch (aRoundingMode)
+        if constexpr (RealOrComplexFloatingVector<ComputeT>)
         {
-            case mpp::RoundingMode::NearestTiesToEven:
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            switch (aRoundingMode)
             {
-                using divInplaceDevCScale =
-                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                                   RoundingMode::NearestTiesToEven>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divInplaceDevCScale functor(aConst, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                case mpp::RoundingMode::NearestTiesToEven:
+                {
+                    using divInplaceDevCScale =
+                        InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                       RoundingMode::NearestTiesToEven>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divInplaceDevCScale functor(aConst, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::NearestTiesAwayFromZero:
+                {
+                    using divInplaceDevCScale =
+                        InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                       RoundingMode::NearestTiesAwayFromZero>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divInplaceDevCScale functor(aConst, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardZero:
+                {
+                    using divInplaceDevCScale =
+                        InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                       RoundingMode::TowardZero>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divInplaceDevCScale functor(aConst, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardNegativeInfinity:
+                {
+                    using divInplaceDevCScale =
+                        InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                       RoundingMode::TowardNegativeInfinity>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divInplaceDevCScale functor(aConst, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardPositiveInfinity:
+                {
+                    using divInplaceDevCScale =
+                        InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                       RoundingMode::TowardPositiveInfinity>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divInplaceDevCScale functor(aConst, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                default:
+                    throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
             }
-            break;
-            case mpp::RoundingMode::NearestTiesAwayFromZero:
+        }
+        else
+        {
+            if (aScaleFactor < 1)
             {
-                using divInplaceDevCScale =
-                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                                   RoundingMode::NearestTiesAwayFromZero>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divInplaceDevCScale functor(aConst, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                if (aRoundingMode != RoundingMode::NearestTiesToEven)
+                {
+                    throw INVALIDARGUMENT(aRoundingMode,
+                                          "Unsupported rounding mode: "
+                                              << aRoundingMode << ". Only rounding mode "
+                                              << RoundingMode::NearestTiesToEven
+                                              << " is supported for this source data type and scaling factor < 1.");
+                }
+                else
+                {
+                    using ScalerT = Scale<ComputeT, true>;
+                    const ScalerT scaler(aScaleFactor);
+                    using divInplaceDevCScale =
+                        InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>, ScalerT,
+                                                       RoundingMode::None>;
+                    const mpp::Div<ComputeT, DstT> op;
+                    const divInplaceDevCScale functor(aConst, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
             }
-            break;
-            case mpp::RoundingMode::TowardZero:
+            else
             {
-                using divInplaceDevCScale =
-                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                                   RoundingMode::TowardZero>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divInplaceDevCScale functor(aConst, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                switch (aRoundingMode)
+                {
+                    case mpp::RoundingMode::NearestTiesToEven:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::NearestTiesToEven>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceDevCScale =
+                            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceDevCScale functor(aConst, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::NearestTiesAwayFromZero:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::NearestTiesAwayFromZero>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceDevCScale =
+                            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceDevCScale functor(aConst, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardZero:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardZero>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceDevCScale =
+                            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceDevCScale functor(aConst, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardNegativeInfinity:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardNegativeInfinity>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceDevCScale =
+                            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceDevCScale functor(aConst, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardPositiveInfinity:
+                    {
+                        using OpT = DivIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardPositiveInfinity>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceDevCScale =
+                            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceDevCScale functor(aConst, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    default:
+                        throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
+                }
             }
-            break;
-            case mpp::RoundingMode::TowardNegativeInfinity:
-            {
-                using divInplaceDevCScale =
-                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                                   RoundingMode::TowardNegativeInfinity>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divInplaceDevCScale functor(aConst, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            case mpp::RoundingMode::TowardPositiveInfinity:
-            {
-                using divInplaceDevCScale =
-                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Div<ComputeT, DstT>,
-                                                   RoundingMode::TowardPositiveInfinity>;
-                const mpp::Div<ComputeT, DstT> op;
-                const divInplaceDevCScale functor(aConst, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            default:
-                throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
         }
     }
 }
@@ -945,8 +1509,8 @@ void InvokeDivInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
     template void                                                                                                      \
     InvokeDivInplaceDevCScaleMask<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(   \
         const Pixel8uC1 *aMask, size_t aPitchMask, typeSrcIsTypeDst *aSrcDst, size_t aPitchSrcDst,                     \
-        const typeSrcIsTypeDst *aConst, scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor,      \
-        mpp::RoundingMode aRoundingMode, const Size2D &aSize, const StreamCtx &aStreamCtx);
+        const typeSrcIsTypeDst *aConst, double aScaleFactor, mpp::RoundingMode aRoundingMode, const Size2D &aSize,     \
+        const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeDivInplaceDevCScaleMask(type)                                                       \
     InstantiateInvokeDivInplaceDevCScaleMask_For(Pixel##type##C1);                                                     \
@@ -1027,7 +1591,7 @@ void InvokeDivInvInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT 
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivInvInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
-                                     const SrcT *aSrc2, size_t aPitchSrc2, scalefactor_t<ComputeT> aScaleFactor,
+                                     const SrcT *aSrc2, size_t aPitchSrc2, double aScaleFactor,
                                      mpp::RoundingMode aRoundingMode, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
@@ -1036,65 +1600,159 @@ void InvokeDivInvInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, 
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        switch (aRoundingMode)
+        if constexpr (RealOrComplexFloatingVector<ComputeT>)
         {
-            case mpp::RoundingMode::NearestTiesToEven:
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            switch (aRoundingMode)
             {
-                using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
-                                           RoundingMode::NearestTiesToEven>;
-                const mpp::DivInv<ComputeT, DstT> op;
-                const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                case mpp::RoundingMode::NearestTiesToEven:
+                {
+                    using divInplaceSrcScale =
+                        InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>, ScalerT,
+                                               RoundingMode::NearestTiesToEven>;
+                    const mpp::DivInv<ComputeT, DstT> op;
+                    const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::NearestTiesAwayFromZero:
+                {
+                    using divInplaceSrcScale =
+                        InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>, ScalerT,
+                                               RoundingMode::NearestTiesAwayFromZero>;
+                    const mpp::DivInv<ComputeT, DstT> op;
+                    const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardZero:
+                {
+                    using divInplaceSrcScale =
+                        InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>, ScalerT,
+                                               RoundingMode::TowardZero>;
+                    const mpp::DivInv<ComputeT, DstT> op;
+                    const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardNegativeInfinity:
+                {
+                    using divInplaceSrcScale =
+                        InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>, ScalerT,
+                                               RoundingMode::TowardNegativeInfinity>;
+                    const mpp::DivInv<ComputeT, DstT> op;
+                    const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardPositiveInfinity:
+                {
+                    using divInplaceSrcScale =
+                        InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>, ScalerT,
+                                               RoundingMode::TowardPositiveInfinity>;
+                    const mpp::DivInv<ComputeT, DstT> op;
+                    const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                default:
+                    throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
             }
-            break;
-            case mpp::RoundingMode::NearestTiesAwayFromZero:
+        }
+        else
+        {
+            if (aScaleFactor < 1)
             {
-                using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
-                                           RoundingMode::NearestTiesAwayFromZero>;
-                const mpp::DivInv<ComputeT, DstT> op;
-                const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                if (aRoundingMode != RoundingMode::NearestTiesToEven)
+                {
+                    throw INVALIDARGUMENT(aRoundingMode,
+                                          "Unsupported rounding mode: "
+                                              << aRoundingMode << ". Only rounding mode "
+                                              << RoundingMode::NearestTiesToEven
+                                              << " is supported for this source data type and scaling factor < 1.");
+                }
+                else
+                {
+                    using ScalerT = Scale<ComputeT, true>;
+                    const ScalerT scaler(aScaleFactor);
+                    using divInplaceSrcScale =
+                        InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>, ScalerT,
+                                               RoundingMode::None>;
+                    const mpp::DivInv<ComputeT, DstT> op;
+                    const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
             }
-            break;
-            case mpp::RoundingMode::TowardZero:
+            else
             {
-                using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
-                                           RoundingMode::TowardZero>;
-                const mpp::DivInv<ComputeT, DstT> op;
-                const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                switch (aRoundingMode)
+                {
+                    case mpp::RoundingMode::NearestTiesToEven:
+                    {
+                        using OpT = DivInvIntScaleUpRound<ComputeT, mpp::RoundingMode::NearestTiesToEven>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceSrcScale =
+                            InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::NearestTiesAwayFromZero:
+                    {
+                        using OpT = DivInvIntScaleUpRound<ComputeT, mpp::RoundingMode::NearestTiesAwayFromZero>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceSrcScale =
+                            InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardZero:
+                    {
+                        using OpT = DivInvIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardZero>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceSrcScale =
+                            InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardNegativeInfinity:
+                    {
+                        using OpT = DivInvIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardNegativeInfinity>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceSrcScale =
+                            InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardPositiveInfinity:
+                    {
+                        using OpT = DivInvIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardPositiveInfinity>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceSrcScale =
+                            InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    default:
+                        throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
+                }
             }
-            break;
-            case mpp::RoundingMode::TowardNegativeInfinity:
-            {
-                using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
-                                           RoundingMode::TowardNegativeInfinity>;
-                const mpp::DivInv<ComputeT, DstT> op;
-                const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            case mpp::RoundingMode::TowardPositiveInfinity:
-            {
-                using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
-                                           RoundingMode::TowardPositiveInfinity>;
-                const mpp::DivInv<ComputeT, DstT> op;
-                const divInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceSrcScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            default:
-                throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
         }
     }
 }
@@ -1105,8 +1763,7 @@ void InvokeDivInvInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, 
     template void                                                                                                      \
     InvokeDivInvInplaceSrcScaleMask<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>( \
         const Pixel8uC1 *aMask, size_t aPitchMask, typeSrcIsTypeDst *aSrcDst, size_t aPitchSrcDst,                     \
-        const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,                                                              \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, mpp::RoundingMode aRoundingMode,     \
+        const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2, double aScaleFactor, mpp::RoundingMode aRoundingMode,        \
         const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeDivInvInplaceSrcScaleMask(type)                                                     \
@@ -1190,8 +1847,8 @@ void InvokeDivInvInplaceCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *a
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivInvInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
-                                   const SrcT &aConst, scalefactor_t<ComputeT> aScaleFactor,
-                                   mpp::RoundingMode aRoundingMode, const Size2D &aSize, const StreamCtx &aStreamCtx)
+                                   const SrcT &aConst, double aScaleFactor, mpp::RoundingMode aRoundingMode,
+                                   const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
@@ -1199,65 +1856,159 @@ void InvokeDivInvInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        switch (aRoundingMode)
+        if constexpr (RealOrComplexFloatingVector<ComputeT>)
         {
-            case mpp::RoundingMode::NearestTiesToEven:
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            switch (aRoundingMode)
             {
-                using divInplaceCScale =
-                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
-                                                RoundingMode::NearestTiesToEven>;
-                const mpp::DivInv<ComputeT, DstT> op;
-                const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                case mpp::RoundingMode::NearestTiesToEven:
+                {
+                    using divInplaceCScale =
+                        InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>, ScalerT,
+                                                    RoundingMode::NearestTiesToEven>;
+                    const mpp::DivInv<ComputeT, DstT> op;
+                    const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::NearestTiesAwayFromZero:
+                {
+                    using divInplaceCScale =
+                        InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>, ScalerT,
+                                                    RoundingMode::NearestTiesAwayFromZero>;
+                    const mpp::DivInv<ComputeT, DstT> op;
+                    const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardZero:
+                {
+                    using divInplaceCScale =
+                        InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>, ScalerT,
+                                                    RoundingMode::TowardZero>;
+                    const mpp::DivInv<ComputeT, DstT> op;
+                    const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardNegativeInfinity:
+                {
+                    using divInplaceCScale =
+                        InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>, ScalerT,
+                                                    RoundingMode::TowardNegativeInfinity>;
+                    const mpp::DivInv<ComputeT, DstT> op;
+                    const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardPositiveInfinity:
+                {
+                    using divInplaceCScale =
+                        InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>, ScalerT,
+                                                    RoundingMode::TowardPositiveInfinity>;
+                    const mpp::DivInv<ComputeT, DstT> op;
+                    const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                default:
+                    throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
             }
-            break;
-            case mpp::RoundingMode::NearestTiesAwayFromZero:
+        }
+        else
+        {
+            if (aScaleFactor < 1)
             {
-                using divInplaceCScale =
-                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
-                                                RoundingMode::NearestTiesAwayFromZero>;
-                const mpp::DivInv<ComputeT, DstT> op;
-                const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                if (aRoundingMode != RoundingMode::NearestTiesToEven)
+                {
+                    throw INVALIDARGUMENT(aRoundingMode,
+                                          "Unsupported rounding mode: "
+                                              << aRoundingMode << ". Only rounding mode "
+                                              << RoundingMode::NearestTiesToEven
+                                              << " is supported for this source data type and scaling factor < 1.");
+                }
+                else
+                {
+                    using ScalerT = Scale<ComputeT, true>;
+                    const ScalerT scaler(aScaleFactor);
+                    using divInplaceCScale =
+                        InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>, ScalerT,
+                                                    RoundingMode::None>;
+                    const mpp::DivInv<ComputeT, DstT> op;
+                    const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
             }
-            break;
-            case mpp::RoundingMode::TowardZero:
+            else
             {
-                using divInplaceCScale =
-                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
-                                                RoundingMode::TowardZero>;
-                const mpp::DivInv<ComputeT, DstT> op;
-                const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                switch (aRoundingMode)
+                {
+                    case mpp::RoundingMode::NearestTiesToEven:
+                    {
+                        using OpT = DivInvIntScaleUpRound<ComputeT, mpp::RoundingMode::NearestTiesToEven>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceCScale =
+                            InplaceConstantFunctor<TupelSize, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceCScale functor(static_cast<ComputeT>(aConst), op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::NearestTiesAwayFromZero:
+                    {
+                        using OpT = DivInvIntScaleUpRound<ComputeT, mpp::RoundingMode::NearestTiesAwayFromZero>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceCScale =
+                            InplaceConstantFunctor<TupelSize, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceCScale functor(static_cast<ComputeT>(aConst), op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardZero:
+                    {
+                        using OpT = DivInvIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardZero>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceCScale =
+                            InplaceConstantFunctor<TupelSize, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceCScale functor(static_cast<ComputeT>(aConst), op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardNegativeInfinity:
+                    {
+                        using OpT = DivInvIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardNegativeInfinity>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceCScale =
+                            InplaceConstantFunctor<TupelSize, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceCScale functor(static_cast<ComputeT>(aConst), op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardPositiveInfinity:
+                    {
+                        using OpT = DivInvIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardPositiveInfinity>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceCScale =
+                            InplaceConstantFunctor<TupelSize, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceCScale functor(static_cast<ComputeT>(aConst), op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    default:
+                        throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
+                }
             }
-            break;
-            case mpp::RoundingMode::TowardNegativeInfinity:
-            {
-                using divInplaceCScale =
-                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
-                                                RoundingMode::TowardNegativeInfinity>;
-                const mpp::DivInv<ComputeT, DstT> op;
-                const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            case mpp::RoundingMode::TowardPositiveInfinity:
-            {
-                using divInplaceCScale =
-                    InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
-                                                RoundingMode::TowardPositiveInfinity>;
-                const mpp::DivInv<ComputeT, DstT> op;
-                const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceCScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            default:
-                throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
         }
     }
 }
@@ -1268,8 +2019,8 @@ void InvokeDivInvInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
     template void                                                                                                      \
     InvokeDivInvInplaceCScaleMask<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(   \
         const Pixel8uC1 *aMask, size_t aPitchMask, typeSrcIsTypeDst *aSrcDst, size_t aPitchSrcDst,                     \
-        const typeSrcIsTypeDst &aConst, scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor,      \
-        mpp::RoundingMode aRoundingMode, const Size2D &aSize, const StreamCtx &aStreamCtx);
+        const typeSrcIsTypeDst &aConst, double aScaleFactor, mpp::RoundingMode aRoundingMode, const Size2D &aSize,     \
+        const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeDivInvInplaceCScaleMask(type)                                                       \
     InstantiateInvokeDivInvInplaceCScaleMask_For(Pixel##type##C1);                                                     \
@@ -1333,8 +2084,8 @@ void InvokeDivInvInplaceDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeDivInvInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
-                                      const SrcT *aConst, scalefactor_t<ComputeT> aScaleFactor,
-                                      mpp::RoundingMode aRoundingMode, const Size2D &aSize, const StreamCtx &aStreamCtx)
+                                      const SrcT *aConst, double aScaleFactor, mpp::RoundingMode aRoundingMode,
+                                      const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
@@ -1342,65 +2093,159 @@ void InvokeDivInvInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask,
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        switch (aRoundingMode)
+        if constexpr (RealOrComplexFloatingVector<ComputeT>)
         {
-            case mpp::RoundingMode::NearestTiesToEven:
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            switch (aRoundingMode)
             {
-                using divInplaceDevCScale =
-                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
-                                                   RoundingMode::NearestTiesToEven>;
-                const mpp::DivInv<ComputeT, DstT> op;
-                const divInplaceDevCScale functor(aConst, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                case mpp::RoundingMode::NearestTiesToEven:
+                {
+                    using divInplaceDevCScale =
+                        InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>, ScalerT,
+                                                       RoundingMode::NearestTiesToEven>;
+                    const mpp::DivInv<ComputeT, DstT> op;
+                    const divInplaceDevCScale functor(aConst, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::NearestTiesAwayFromZero:
+                {
+                    using divInplaceDevCScale =
+                        InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>, ScalerT,
+                                                       RoundingMode::NearestTiesAwayFromZero>;
+                    const mpp::DivInv<ComputeT, DstT> op;
+                    const divInplaceDevCScale functor(aConst, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardZero:
+                {
+                    using divInplaceDevCScale =
+                        InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>, ScalerT,
+                                                       RoundingMode::TowardZero>;
+                    const mpp::DivInv<ComputeT, DstT> op;
+                    const divInplaceDevCScale functor(aConst, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardNegativeInfinity:
+                {
+                    using divInplaceDevCScale =
+                        InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>, ScalerT,
+                                                       RoundingMode::TowardNegativeInfinity>;
+                    const mpp::DivInv<ComputeT, DstT> op;
+                    const divInplaceDevCScale functor(aConst, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardPositiveInfinity:
+                {
+                    using divInplaceDevCScale =
+                        InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>, ScalerT,
+                                                       RoundingMode::TowardPositiveInfinity>;
+                    const mpp::DivInv<ComputeT, DstT> op;
+                    const divInplaceDevCScale functor(aConst, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
+                break;
+                default:
+                    throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
             }
-            break;
-            case mpp::RoundingMode::NearestTiesAwayFromZero:
+        }
+        else
+        {
+            if (aScaleFactor < 1)
             {
-                using divInplaceDevCScale =
-                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
-                                                   RoundingMode::NearestTiesAwayFromZero>;
-                const mpp::DivInv<ComputeT, DstT> op;
-                const divInplaceDevCScale functor(aConst, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                if (aRoundingMode != RoundingMode::NearestTiesToEven)
+                {
+                    throw INVALIDARGUMENT(aRoundingMode,
+                                          "Unsupported rounding mode: "
+                                              << aRoundingMode << ". Only rounding mode "
+                                              << RoundingMode::NearestTiesToEven
+                                              << " is supported for this source data type and scaling factor < 1.");
+                }
+                else
+                {
+                    using ScalerT = Scale<ComputeT, true>;
+                    const ScalerT scaler(aScaleFactor);
+                    using divInplaceDevCScale =
+                        InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>, ScalerT,
+                                                       RoundingMode::None>;
+                    const mpp::DivInv<ComputeT, DstT> op;
+                    const divInplaceDevCScale functor(aConst, op, scaler);
+                    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                }
             }
-            break;
-            case mpp::RoundingMode::TowardZero:
+            else
             {
-                using divInplaceDevCScale =
-                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
-                                                   RoundingMode::TowardZero>;
-                const mpp::DivInv<ComputeT, DstT> op;
-                const divInplaceDevCScale functor(aConst, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                switch (aRoundingMode)
+                {
+                    case mpp::RoundingMode::NearestTiesToEven:
+                    {
+                        using OpT = DivInvIntScaleUpRound<ComputeT, mpp::RoundingMode::NearestTiesToEven>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceDevCScale =
+                            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceDevCScale functor(aConst, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::NearestTiesAwayFromZero:
+                    {
+                        using OpT = DivInvIntScaleUpRound<ComputeT, mpp::RoundingMode::NearestTiesAwayFromZero>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceDevCScale =
+                            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceDevCScale functor(aConst, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardZero:
+                    {
+                        using OpT = DivInvIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardZero>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceDevCScale =
+                            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceDevCScale functor(aConst, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardNegativeInfinity:
+                    {
+                        using OpT = DivInvIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardNegativeInfinity>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceDevCScale =
+                            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceDevCScale functor(aConst, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardPositiveInfinity:
+                    {
+                        using OpT = DivInvIntScaleUpRound<ComputeT, mpp::RoundingMode::TowardPositiveInfinity>;
+                        const OpT op(aScaleFactor);
+                        using divInplaceDevCScale =
+                            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, OpT, RoundingMode::None>;
+                        const divInplaceDevCScale functor(aConst, op);
+                        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
+                            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+                    }
+                    break;
+                    default:
+                        throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
+                }
             }
-            break;
-            case mpp::RoundingMode::TowardNegativeInfinity:
-            {
-                using divInplaceDevCScale =
-                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
-                                                   RoundingMode::TowardNegativeInfinity>;
-                const mpp::DivInv<ComputeT, DstT> op;
-                const divInplaceDevCScale functor(aConst, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            case mpp::RoundingMode::TowardPositiveInfinity:
-            {
-                using divInplaceDevCScale =
-                    InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::DivInv<ComputeT, DstT>,
-                                                   RoundingMode::TowardPositiveInfinity>;
-                const mpp::DivInv<ComputeT, DstT> op;
-                const divInplaceDevCScale functor(aConst, op, aScaleFactor);
-                InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, divInplaceDevCScale>(
-                    aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            default:
-                throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
         }
     }
 }
@@ -1411,8 +2256,8 @@ void InvokeDivInvInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask,
     template void InvokeDivInvInplaceDevCScaleMask<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>,     \
                                                    typeSrcIsTypeDst>(                                                  \
         const Pixel8uC1 *aMask, size_t aPitchMask, typeSrcIsTypeDst *aSrcDst, size_t aPitchSrcDst,                     \
-        const typeSrcIsTypeDst *aConst, scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor,      \
-        mpp::RoundingMode aRoundingMode, const Size2D &aSize, const StreamCtx &aStreamCtx);
+        const typeSrcIsTypeDst *aConst, double aScaleFactor, mpp::RoundingMode aRoundingMode, const Size2D &aSize,     \
+        const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeDivInvInplaceDevCScaleMask(type)                                                    \
     InstantiateInvokeDivInvInplaceDevCScaleMask_For(Pixel##type##C1);                                                  \

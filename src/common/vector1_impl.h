@@ -1,10 +1,10 @@
 #pragma once
 #include "defines.h"
 #include "exception.h"
+#include "mpp_defs.h"
 #include "needSaturationClamp.h"
 #include "numberTypes.h"
 #include "numeric_limits.h"
-#include "mpp_defs.h"
 #include "safeCast.h"
 #include "staticCast.h"
 #include "vector_typetraits.h"
@@ -62,7 +62,7 @@ DEVICE_CODE Vector1<T>::Vector1(Vector1<T2> &aVec) noexcept
 /// </summary>
 template <Number T>
 template <Number T2>
-DEVICE_CODE Vector1<T>::Vector1(const Vector1<T2> &aVec, RoundingMode aRoundingMode) noexcept
+DEVICE_CODE Vector1<T>::Vector1(const Vector1<T2> &aVec, RoundingMode aRoundingMode)
     requires((IsBFloat16<T> || IsHalfFp16<T>) && IsFloat<T2>) ||
             (ComplexFloatingPoint<T> && ComplexFloatingPoint<T2> &&
              NonNativeFloatingPoint<complex_basetype_t<remove_vector_t<T>>> &&
@@ -211,6 +211,17 @@ template <Number T> DEVICE_CODE Vector1<T> &Vector1<T>::operator+=(T aOther)
 /// <summary>
 /// Component wise addition
 /// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::operator+=(complex_basetype_t<T> aOther)
+    requires ComplexNumber<T>
+{
+    x += aOther;
+    return *this;
+}
+
+/// <summary>
+/// Component wise addition
+/// </summary>
 template <Number T> DEVICE_CODE Vector1<T> &Vector1<T>::operator+=(const Vector1 &aOther)
 {
     x += aOther.x;
@@ -229,6 +240,17 @@ template <Number T> DEVICE_CODE Vector1<T> Vector1<T>::operator+(const Vector1 &
 /// Component wise subtraction
 /// </summary>
 template <Number T> DEVICE_CODE Vector1<T> &Vector1<T>::operator-=(T aOther)
+{
+    x -= aOther;
+    return *this;
+}
+
+/// <summary>
+/// Component wise subtraction
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::operator-=(complex_basetype_t<T> aOther)
+    requires ComplexNumber<T>
 {
     x -= aOther;
     return *this;
@@ -272,6 +294,17 @@ template <Number T> DEVICE_CODE Vector1<T> &Vector1<T>::operator*=(T aOther)
 /// <summary>
 /// Component wise multiplication
 /// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::operator*=(complex_basetype_t<T> aOther)
+    requires ComplexNumber<T>
+{
+    x *= aOther;
+    return *this;
+}
+
+/// <summary>
+/// Component wise multiplication
+/// </summary>
 template <Number T> DEVICE_CODE Vector1<T> &Vector1<T>::operator*=(const Vector1 &aOther)
 {
     x *= aOther.x;
@@ -290,6 +323,17 @@ template <Number T> DEVICE_CODE Vector1<T> Vector1<T>::operator*(const Vector1 &
 /// Component wise division
 /// </summary>
 template <Number T> DEVICE_CODE Vector1<T> &Vector1<T>::operator/=(T aOther)
+{
+    x /= aOther;
+    return *this;
+}
+
+/// <summary>
+/// Component wise division
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::operator/=(complex_basetype_t<T> aOther)
+    requires ComplexNumber<T>
 {
     x /= aOther;
     return *this;
@@ -319,6 +363,352 @@ template <Number T> DEVICE_CODE Vector1<T> &Vector1<T>::DivInv(const Vector1 &aO
 template <Number T> DEVICE_CODE Vector1<T> Vector1<T>::operator/(const Vector1 &aOther) const
 {
     return Vector1<T>{T(x / aOther.x)};
+}
+
+/// <summary>
+/// Inplace integer division with element wise round()
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivRound(const Vector1 &aOther)
+    requires RealIntegral<T>
+{
+    x = DivRoundTiesAwayFromZero(x, aOther.x);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise round nearest ties to even
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivRoundNearest(const Vector1 &aOther)
+    requires RealIntegral<T>
+{
+    x = DivRoundNearestEven(x, aOther.x);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise round toward zero
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivRoundZero(const Vector1 &aOther)
+    requires RealIntegral<T>
+{
+    x = DivRoundTowardZero(x, aOther.x);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise floor()
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivFloor(const Vector1 &aOther)
+    requires RealIntegral<T>
+{
+    x = DivRoundTowardNegInf(x, aOther.x);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise ceil()
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivCeil(const Vector1 &aOther)
+    requires RealIntegral<T>
+{
+    x = DivRoundTowardPosInf(x, aOther.x);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise round() (inverted inplace div: this = aOther / this)
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivInvRound(const Vector1 &aOther)
+    requires RealIntegral<T>
+{
+    x = DivRoundTiesAwayFromZero(aOther.x, x);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise round nearest ties to even (inverted inplace div: this =
+/// aOther / this)
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivInvRoundNearest(const Vector1 &aOther)
+    requires RealIntegral<T>
+{
+    x = DivRoundNearestEven(aOther.x, x);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise round toward zero (inverted inplace div: this = aOther /
+/// this)
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivInvRoundZero(const Vector1 &aOther)
+    requires RealIntegral<T>
+{
+    x = DivRoundTowardZero(aOther.x, x);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise floor() (inverted inplace div: this = aOther / this)
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivInvFloor(const Vector1 &aOther)
+    requires RealIntegral<T>
+{
+    x = DivRoundTowardNegInf(aOther.x, x);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise ceil() (inverted inplace div: this = aOther / this)
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivInvCeil(const Vector1 &aOther)
+    requires RealIntegral<T>
+{
+    x = DivRoundTowardPosInf(aOther.x, x);
+    return *this;
+}
+
+/// <summary>
+/// Integer division with element wise round()
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> Vector1<T>::DivRound(const Vector1 &aLeft, const Vector1 &aRight)
+    requires RealIntegral<T>
+{
+    return Vector1<T>{DivRoundTiesAwayFromZero(aLeft.x, aRight.x)};
+}
+
+/// <summary>
+/// Integer division with element wise round nearest ties to even
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> Vector1<T>::DivRoundNearest(const Vector1 &aLeft, const Vector1 &aRight)
+    requires RealIntegral<T>
+{
+    return Vector1<T>{DivRoundNearestEven(aLeft.x, aRight.x)};
+}
+
+/// <summary>
+/// Integer division with element wise round toward zero
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> Vector1<T>::DivRoundZero(const Vector1 &aLeft, const Vector1 &aRight)
+    requires RealIntegral<T>
+{
+    return Vector1<T>{DivRoundTowardZero(aLeft.x, aRight.x)};
+}
+
+/// <summary>
+/// Integer division with element wise floor()
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> Vector1<T>::DivFloor(const Vector1 &aLeft, const Vector1 &aRight)
+    requires RealIntegral<T>
+{
+    return Vector1<T>{DivRoundTowardNegInf(aLeft.x, aRight.x)};
+}
+
+/// <summary>
+/// Integer division with element wise ceil()
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> Vector1<T>::DivCeil(const Vector1 &aLeft, const Vector1 &aRight)
+    requires RealIntegral<T>
+{
+    return Vector1<T>{DivRoundTowardPosInf(aLeft.x, aRight.x)};
+}
+
+/// <summary>
+/// Inplace integer division with element wise round nearest ties to even (for scaling operations)
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivScaleRoundNearest(T aScale)
+    requires RealIntegral<T>
+{
+    x = DivScaleRoundNearestEven(x, aScale);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise round()
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivRound(const Vector1 &aOther)
+    requires ComplexIntegral<T>
+{
+    x.DivRound(aOther.x);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise round nearest ties to even
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivRoundNearest(const Vector1 &aOther)
+    requires ComplexIntegral<T>
+{
+    x.DivRoundNearest(aOther.x);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise round toward zero
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivRoundZero(const Vector1 &aOther)
+    requires ComplexIntegral<T>
+{
+    x.DivRoundZero(aOther.x);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise floor()
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivFloor(const Vector1 &aOther)
+    requires ComplexIntegral<T>
+{
+    x.DivFloor(aOther.x);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise ceil()
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivCeil(const Vector1 &aOther)
+    requires ComplexIntegral<T>
+{
+    x.DivCeil(aOther.x);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise round() (inverted inplace div: this = aOther / this)
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivInvRound(const Vector1 &aOther)
+    requires ComplexIntegral<T>
+{
+    x.DivInvRound(aOther.x);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise round nearest ties to even (inverted inplace div: this =
+/// aOther / this)
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivInvRoundNearest(const Vector1 &aOther)
+    requires ComplexIntegral<T>
+{
+    x.DivInvRoundNearest(aOther.x);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise round toward zero (inverted inplace div: this = aOther /
+/// this)
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivInvRoundZero(const Vector1 &aOther)
+    requires ComplexIntegral<T>
+{
+    x.DivInvRoundZero(aOther.x);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise floor() (inverted inplace div: this = aOther / this)
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivInvFloor(const Vector1 &aOther)
+    requires ComplexIntegral<T>
+{
+    x.DivInvFloor(aOther.x);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise ceil() (inverted inplace div: this = aOther / this)
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivInvCeil(const Vector1 &aOther)
+    requires ComplexIntegral<T>
+{
+    x.DivInvCeil(aOther.x);
+    return *this;
+}
+
+/// <summary>
+/// Integer division with element wise round()
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> Vector1<T>::DivRound(const Vector1 &aLeft, const Vector1 &aRight)
+    requires ComplexIntegral<T>
+{
+    return Vector1<T>{T::DivRound(aLeft.x, aRight.x)};
+}
+
+/// <summary>
+/// Integer division with element wise round nearest ties to even
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> Vector1<T>::DivRoundNearest(const Vector1 &aLeft, const Vector1 &aRight)
+    requires ComplexIntegral<T>
+{
+    return Vector1<T>{T::DivRoundNearest(aLeft.x, aRight.x)};
+}
+
+/// <summary>
+/// Integer division with element wise round toward zero
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> Vector1<T>::DivRoundZero(const Vector1 &aLeft, const Vector1 &aRight)
+    requires ComplexIntegral<T>
+{
+    return Vector1<T>{T::DivRoundZero(aLeft.x, aRight.x)};
+}
+
+/// <summary>
+/// Integer division with element wise floor()
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> Vector1<T>::DivFloor(const Vector1 &aLeft, const Vector1 &aRight)
+    requires ComplexIntegral<T>
+{
+    return Vector1<T>{T::DivFloor(aLeft.x, aRight.x)};
+}
+
+/// <summary>
+/// Integer division with element wise ceil()
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> Vector1<T>::DivCeil(const Vector1 &aLeft, const Vector1 &aRight)
+    requires ComplexIntegral<T>
+{
+    return Vector1<T>{T::DivCeil(aLeft.x, aRight.x)};
+}
+
+/// <summary>
+/// Inplace integer division with element wise round nearest ties to even (for scaling operations)
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivScaleRoundNearest(complex_basetype_t<T> aScale)
+    requires ComplexIntegral<T>
+{
+    x.DivScaleRoundNearest(aScale);
+    return *this;
 }
 
 /// <summary>
@@ -905,7 +1295,7 @@ DEVICE_CODE Vector1<T> Vector1<T>::Abs(const Vector1<T> &aVec)
 /// </summary>
 template <Number T>
 DEVICE_CODE Vector1<T> &Vector1<T>::AbsDiff(const Vector1<T> &aOther)
-    requires HostCode<T> && NativeFloatingPoint<T>
+    requires HostCode<T> && RealSignedNumber<T> && NativeNumber<T>
 {
     x = std::abs(x - aOther.x);
     return *this;
@@ -916,7 +1306,7 @@ DEVICE_CODE Vector1<T> &Vector1<T>::AbsDiff(const Vector1<T> &aOther)
 /// </summary>
 template <Number T>
 DEVICE_CODE Vector1<T> Vector1<T>::AbsDiff(const Vector1<T> &aLeft, const Vector1<T> &aRight)
-    requires HostCode<T> && NativeFloatingPoint<T>
+    requires HostCode<T> && RealSignedNumber<T> && NativeNumber<T>
 {
     Vector1<T> ret; // NOLINT
     ret.x = std::abs(aLeft.x - aRight.x);
@@ -928,7 +1318,7 @@ DEVICE_CODE Vector1<T> Vector1<T>::AbsDiff(const Vector1<T> &aLeft, const Vector
 /// </summary>
 template <Number T>
 DEVICE_CODE Vector1<T> &Vector1<T>::AbsDiff(const Vector1<T> &aOther)
-    requires DeviceCode<T> && NativeFloatingPoint<T>
+    requires DeviceCode<T> && RealSignedNumber<T> && NativeNumber<T>
 {
     x = abs(x - aOther.x);
     return *this;
@@ -939,7 +1329,7 @@ DEVICE_CODE Vector1<T> &Vector1<T>::AbsDiff(const Vector1<T> &aOther)
 /// </summary>
 template <Number T>
 DEVICE_CODE Vector1<T> Vector1<T>::AbsDiff(const Vector1<T> &aLeft, const Vector1<T> &aRight)
-    requires DeviceCode<T> && NativeFloatingPoint<T>
+    requires DeviceCode<T> && RealSignedNumber<T> && NativeNumber<T>
 {
     Vector1<T> ret;
     ret.x = abs(aLeft.x - aRight.x);

@@ -2,8 +2,8 @@
 #include "simd_types.h"
 #include <common/defines.h>
 #include <common/tupel.h>
-#include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vectorTypes.h>
 #include <concepts>
 #include <cuda_bf16.h>
 #include <cuda_fp16.h>

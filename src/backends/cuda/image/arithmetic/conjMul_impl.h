@@ -47,10 +47,10 @@ void InvokeConjMulSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT
+// using default_ext_int_compute_type_for_t for computeT
 #define InstantiateInvokeConjMulSrcSrc_For(typeSrcIsTypeDst)                                                           \
     template void                                                                                                      \
-    InvokeConjMulSrcSrc<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(             \
+    InvokeConjMulSrcSrc<typeSrcIsTypeDst, default_ext_int_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(     \
         const typeSrcIsTypeDst *aSrc1, size_t aPitchSrc1, const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,            \
         typeSrcIsTypeDst *aDst, size_t aPitchDst, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
@@ -86,10 +86,10 @@ void InvokeConjMulInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSr
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT including SIMD activation if possible
+// using default_ext_int_compute_type_for_t for computeT including SIMD activation if possible
 #define InstantiateInvokeConjMulInplaceSrc_For(typeSrcIsTypeDst)                                                       \
     template void                                                                                                      \
-    InvokeConjMulInplaceSrc<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(         \
+    InvokeConjMulInplaceSrc<typeSrcIsTypeDst, default_ext_int_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>( \
         typeSrcIsTypeDst * aSrcDst, size_t aPitchSrcDst, const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,             \
         const Size2D &aSize, const StreamCtx &aStreamCtx);
 

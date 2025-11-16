@@ -1,3 +1,4 @@
+#include "conversionRelations.h"
 #include "imageView.h"
 #include "imageView_arithmetic_impl.h"                     //NOLINT(misc-include-cleaner)
 #include "imageView_dataExchangeAndInit_impl.h"            //NOLINT(misc-include-cleaner)
@@ -11,29 +12,22 @@
 #include "imageView_statistics_impl.h"                     //NOLINT(misc-include-cleaner)
 #include "imageView_thresholdAndCompare_impl.h"            //NOLINT(misc-include-cleaner)
 #include <backends/simple_cpu/image/forEachPixel.h>
+#include <backends/simple_cpu/image/forEachPixel_impl.h>              //NOLINT(misc-include-cleaner)
 #include <backends/simple_cpu/image/forEachPixelMasked.h>
 #include <backends/simple_cpu/image/forEachPixelMasked_impl.h> //NOLINT(misc-include-cleaner)
 #include <backends/simple_cpu/image/forEachPixelPlanar.h>
 #include <backends/simple_cpu/image/forEachPixelPlanar_impl.h> //NOLINT(misc-include-cleaner)
 #include <backends/simple_cpu/image/forEachPixelSingleChannel.h>
 #include <backends/simple_cpu/image/forEachPixelSingleChannel_impl.h> //NOLINT(misc-include-cleaner)
-#include <backends/simple_cpu/image/forEachPixel_impl.h>              //NOLINT(misc-include-cleaner)
 #include <backends/simple_cpu/image/reduction.h>
+#include <backends/simple_cpu/image/reduction_impl.h>       //NOLINT(misc-include-cleaner)
 #include <backends/simple_cpu/image/reductionMasked.h>
 #include <backends/simple_cpu/image/reductionMasked_impl.h> //NOLINT(misc-include-cleaner)
-#include <backends/simple_cpu/image/reduction_impl.h>       //NOLINT(misc-include-cleaner)
 #include <common/image/pixelTypes.h>
 #include <common/mpp_defs.h> //NOLINT(misc-include-cleaner)
 
 namespace mpp::image::cpuSimple
 {
-
-using Image32fC1View  = ImageView<Pixel32fC1>;
-using Image32fC2View  = ImageView<Pixel32fC2>;
-using Image32fC3View  = ImageView<Pixel32fC3>;
-using Image32fC4View  = ImageView<Pixel32fC4>;
-using Image32fC4AView = ImageView<Pixel32fC4A>;
-
 template class ImageView<Pixel8uC1>;
 template class ImageView<Pixel8uC2>;
 template class ImageView<Pixel8uC3>;
@@ -86,6 +80,12 @@ template class ImageView<Pixel16fC3>;
 template class ImageView<Pixel16fC4>;
 template class ImageView<Pixel16fC4A>;
 
+template class ImageView<Pixel16bfC1>;
+template class ImageView<Pixel16bfC2>;
+template class ImageView<Pixel16bfC3>;
+template class ImageView<Pixel16bfC4>;
+template class ImageView<Pixel16bfC4A>;
+
 template class ImageView<Pixel32fC1>;
 template class ImageView<Pixel32fC2>;
 template class ImageView<Pixel32fC3>;
@@ -103,16 +103,149 @@ template class ImageView<Pixel64fC3>;
 template class ImageView<Pixel64fC4>;
 template class ImageView<Pixel64fC4A>;
 
-template ImageView<Pixel16uC1> &ImageView<Pixel8uC1>::Convert<Pixel16uC1>(ImageView<Pixel16uC1> &aDst) const;
-template ImageView<Pixel32sC1> &ImageView<Pixel8uC1>::Convert<Pixel32sC1>(ImageView<Pixel32sC1> &aDst) const;
-template ImageView<Pixel32fC1> &ImageView<Pixel8uC1>::Convert<Pixel32fC1>(ImageView<Pixel32fC1> &aDst) const;
-template ImageView<Pixel64fC1> &ImageView<Pixel8uC1>::Convert<Pixel64fC1>(ImageView<Pixel64fC1> &aDst) const;
-template ImageView<Pixel32fC3> &ImageView<Pixel8uC3>::Convert<Pixel32fC3>(ImageView<Pixel32fC3> &aDst) const;
-template ImageView<Pixel8uC3> &ImageView<Pixel32fC3>::Convert<Pixel8uC3>(ImageView<Pixel8uC3> &aDst,
-                                                                         RoundingMode aRoundingMode) const;
-template ImageView<Pixel8uC3> &ImageView<Pixel32fC3>::Convert<Pixel8uC3>(ImageView<Pixel8uC3> &aDst,
-                                                                         RoundingMode aRoundingMode,
-                                                                         int aScaleFactor) const;
+ForAllChannelsConvertWithAlpha(8u, 16s);
+ForAllChannelsConvertWithAlpha(8u, 16u);
+ForAllChannelsConvertWithAlpha(8u, 32s);
+ForAllChannelsConvertWithAlpha(8u, 32u);
+ForAllChannelsConvertWithAlpha(8u, 16f);
+ForAllChannelsConvertWithAlpha(8u, 16bf);
+ForAllChannelsConvertWithAlpha(8u, 32f);
+ForAllChannelsConvertWithAlpha(8u, 64f);
+
+ForAllChannelsConvertWithAlpha(8s, 8u);
+ForAllChannelsConvertWithAlpha(8s, 16u);
+ForAllChannelsConvertWithAlpha(8s, 16s);
+ForAllChannelsConvertWithAlpha(8s, 32u);
+ForAllChannelsConvertWithAlpha(8s, 32s);
+ForAllChannelsConvertWithAlpha(8s, 16f);
+ForAllChannelsConvertWithAlpha(8s, 16bf);
+ForAllChannelsConvertWithAlpha(8s, 32f);
+ForAllChannelsConvertWithAlpha(8s, 64f);
+
+ForAllChannelsConvertWithAlpha(16u, 8u);
+ForAllChannelsConvertWithAlpha(16u, 32s);
+ForAllChannelsConvertWithAlpha(16u, 32u);
+ForAllChannelsConvertWithAlpha(16u, 16f);
+ForAllChannelsConvertWithAlpha(16u, 16bf);
+ForAllChannelsConvertWithAlpha(16u, 32f);
+ForAllChannelsConvertWithAlpha(16u, 64f);
+
+ForAllChannelsConvertWithAlpha(16s, 8u);
+ForAllChannelsConvertWithAlpha(16s, 16u);
+ForAllChannelsConvertWithAlpha(16s, 32s);
+ForAllChannelsConvertWithAlpha(16s, 32u);
+ForAllChannelsConvertWithAlpha(16s, 16f);
+ForAllChannelsConvertWithAlpha(16s, 16bf);
+ForAllChannelsConvertWithAlpha(16s, 32f);
+ForAllChannelsConvertWithAlpha(16s, 64f);
+
+ForAllChannelsConvertWithAlpha(32u, 8u);
+ForAllChannelsConvertWithAlpha(32u, 16u);
+ForAllChannelsConvertWithAlpha(32u, 16bf);
+ForAllChannelsConvertWithAlpha(32u, 16f);
+ForAllChannelsConvertWithAlpha(32u, 32f);
+ForAllChannelsConvertWithAlpha(32u, 64f);
+
+ForAllChannelsConvertWithAlpha(32s, 8u);
+ForAllChannelsConvertWithAlpha(32s, 8s);
+ForAllChannelsConvertWithAlpha(32s, 16u);
+ForAllChannelsConvertWithAlpha(32s, 16s);
+ForAllChannelsConvertWithAlpha(32s, 32u);
+ForAllChannelsConvertWithAlpha(32s, 16bf);
+ForAllChannelsConvertWithAlpha(32s, 16f);
+ForAllChannelsConvertWithAlpha(32s, 32f);
+ForAllChannelsConvertWithAlpha(32s, 64f);
+
+ForAllChannelsConvertWithAlpha(32f, 16f);
+ForAllChannelsConvertWithAlpha(32f, 16bf);
+ForAllChannelsConvertWithAlpha(32f, 64f);
+
+ForAllChannelsConvertWithAlpha(64f, 16f);
+ForAllChannelsConvertWithAlpha(64f, 16bf);
+ForAllChannelsConvertWithAlpha(64f, 32f);
+
+ForAllChannelsConvertNoAlpha(16sc, 32sc);
+ForAllChannelsConvertNoAlpha(16sc, 32fc);
+ForAllChannelsConvertNoAlpha(16sc, 64fc);
+
+ForAllChannelsConvertNoAlpha(32sc, 32fc);
+ForAllChannelsConvertNoAlpha(32sc, 64fc);
+
+ForAllChannelsConvertRoundWithAlpha(32f, 8u);
+ForAllChannelsConvertRoundWithAlpha(32f, 8s);
+ForAllChannelsConvertRoundWithAlpha(32f, 16u);
+ForAllChannelsConvertRoundWithAlpha(32f, 16s);
+ForAllChannelsConvertRoundWithAlpha(32f, 16bf);
+ForAllChannelsConvertRoundWithAlpha(32f, 16f);
+
+ForAllChannelsConvertRoundWithAlpha(16f, 8u);
+ForAllChannelsConvertRoundWithAlpha(16f, 8s);
+ForAllChannelsConvertRoundWithAlpha(16f, 16u);
+ForAllChannelsConvertRoundWithAlpha(16f, 16s);
+
+ForAllChannelsConvertRoundWithAlpha(16bf, 8u);
+ForAllChannelsConvertRoundWithAlpha(16bf, 8s);
+ForAllChannelsConvertRoundWithAlpha(16bf, 16u);
+ForAllChannelsConvertRoundWithAlpha(16bf, 16s);
+
+ForAllChannelsConvertRoundNoAlpha(32fc, 16sc);
+ForAllChannelsConvertRoundNoAlpha(32fc, 32sc);
+
+ForAllChannelsConvertRoundWithAlpha(64f, 8u);
+ForAllChannelsConvertRoundWithAlpha(64f, 8s);
+ForAllChannelsConvertRoundWithAlpha(64f, 16u);
+ForAllChannelsConvertRoundWithAlpha(64f, 16s);
+ForAllChannelsConvertRoundWithAlpha(64f, 32u);
+ForAllChannelsConvertRoundWithAlpha(64f, 32s);
+
+ForAllChannelsConvertRoundScaleWithAlpha(8u, 8s);
+
+ForAllChannelsConvertRoundScaleWithAlpha(16u, 8s);
+ForAllChannelsConvertRoundScaleWithAlpha(16u, 8u);
+ForAllChannelsConvertRoundScaleWithAlpha(16u, 16s);
+
+ForAllChannelsConvertRoundScaleWithAlpha(16s, 8s);
+
+ForAllChannelsConvertRoundScaleWithAlpha(32u, 8s);
+ForAllChannelsConvertRoundScaleWithAlpha(32u, 8u);
+ForAllChannelsConvertRoundScaleWithAlpha(32u, 16s);
+ForAllChannelsConvertRoundScaleWithAlpha(32u, 16u);
+ForAllChannelsConvertRoundScaleWithAlpha(32u, 32s);
+
+ForAllChannelsConvertRoundScaleWithAlpha(32s, 8s);
+ForAllChannelsConvertRoundScaleWithAlpha(32s, 8u);
+ForAllChannelsConvertRoundScaleWithAlpha(32s, 16s);
+ForAllChannelsConvertRoundScaleWithAlpha(32s, 16u);
+
+ForAllChannelsConvertRoundScaleWithAlpha(32f, 8s);
+ForAllChannelsConvertRoundScaleWithAlpha(32f, 8u);
+ForAllChannelsConvertRoundScaleWithAlpha(32f, 16s);
+ForAllChannelsConvertRoundScaleWithAlpha(32f, 16u);
+ForAllChannelsConvertRoundScaleWithAlpha(32f, 32s);
+ForAllChannelsConvertRoundScaleWithAlpha(32f, 32u);
+
+ForAllChannelsConvertRoundScaleWithAlpha(64f, 8s);
+ForAllChannelsConvertRoundScaleWithAlpha(64f, 8u);
+ForAllChannelsConvertRoundScaleWithAlpha(64f, 16s);
+ForAllChannelsConvertRoundScaleWithAlpha(64f, 16u);
+ForAllChannelsConvertRoundScaleWithAlpha(64f, 32s);
+ForAllChannelsConvertRoundScaleWithAlpha(64f, 32u);
+
+ForAllChannelsConvertRoundScaleNoAlpha(32fc, 16sc);
+ForAllChannelsConvertRoundScaleNoAlpha(32fc, 32sc);
+
+ForAllChannelsConvertRoundScaleNoAlpha(32sc, 16sc);
+
+// template ImageView<Pixel16uC1> &ImageView<Pixel8uC1>::Convert<Pixel16uC1>(ImageView<Pixel16uC1> &aDst) const;
+// template ImageView<Pixel32sC1> &ImageView<Pixel8uC1>::Convert<Pixel32sC1>(ImageView<Pixel32sC1> &aDst) const;
+// template ImageView<Pixel32fC1> &ImageView<Pixel8uC1>::Convert<Pixel32fC1>(ImageView<Pixel32fC1> &aDst) const;
+// template ImageView<Pixel64fC1> &ImageView<Pixel8uC1>::Convert<Pixel64fC1>(ImageView<Pixel64fC1> &aDst) const;
+// template ImageView<Pixel32fC3> &ImageView<Pixel8uC3>::Convert<Pixel32fC3>(ImageView<Pixel32fC3> &aDst) const;
+// template ImageView<Pixel8uC3> &ImageView<Pixel32fC3>::Convert<Pixel8uC3>(ImageView<Pixel8uC3> &aDst,
+//                                                                          RoundingMode aRoundingMode) const;
+// template ImageView<Pixel8uC3> &ImageView<Pixel32fC3>::Convert<Pixel8uC3>(ImageView<Pixel8uC3> &aDst,
+//                                                                          RoundingMode aRoundingMode,
+//                                                                          int aScaleFactor) const;
 
 template ImageView<Pixel8uC2> &ImageView<Pixel8uC2>::Copy<Pixel8uC2>(Channel aSrcChannel, ImageView<Pixel8uC2> &aDst,
                                                                      Channel aDstChannel) const;
@@ -210,6 +343,33 @@ template ImageView<Pixel32scC4> &ImageView<Pixel32scC1>::Dup<Pixel32scC4>(ImageV
 template ImageView<Pixel32fcC2> &ImageView<Pixel32fcC1>::Dup<Pixel32fcC2>(ImageView<Pixel32fcC2> &aDst) const;
 template ImageView<Pixel32fcC3> &ImageView<Pixel32fcC1>::Dup<Pixel32fcC3>(ImageView<Pixel32fcC3> &aDst) const;
 template ImageView<Pixel32fcC4> &ImageView<Pixel32fcC1>::Dup<Pixel32fcC4>(ImageView<Pixel32fcC4> &aDst) const;
+
+template ImageView<Pixel16uC1> &ImageView<Pixel8uC1>::Scale<Pixel16uC1>(ImageView<Pixel16uC1> &aDst) const;
+template ImageView<Pixel16sC1> &ImageView<Pixel8uC1>::Scale<Pixel16sC1>(ImageView<Pixel16sC1> &aDst) const;
+template ImageView<Pixel32uC1> &ImageView<Pixel8uC1>::Scale<Pixel32uC1>(ImageView<Pixel32uC1> &aDst) const;
+template ImageView<Pixel32sC1> &ImageView<Pixel8uC1>::Scale<Pixel32sC1>(ImageView<Pixel32sC1> &aDst) const;
+template ImageView<Pixel16uC1> &ImageView<Pixel8uC1>::Scale<Pixel16uC1>(ImageView<Pixel16uC1> &aDst, byte, byte) const;
+template ImageView<Pixel16sC1> &ImageView<Pixel8uC1>::Scale<Pixel16sC1>(ImageView<Pixel16sC1> &aDst, byte, byte) const;
+template ImageView<Pixel32uC1> &ImageView<Pixel8uC1>::Scale<Pixel32uC1>(ImageView<Pixel32uC1> &aDst, byte, byte) const;
+template ImageView<Pixel32sC1> &ImageView<Pixel8uC1>::Scale<Pixel32sC1>(ImageView<Pixel32sC1> &aDst, byte, byte) const;
+template ImageView<Pixel16uC1> &ImageView<Pixel8uC1>::Scale<Pixel16uC1>(ImageView<Pixel16uC1> &aDst, ushort,
+                                                                        ushort) const;
+template ImageView<Pixel16sC1> &ImageView<Pixel8uC1>::Scale<Pixel16sC1>(ImageView<Pixel16sC1> &aDst, short,
+                                                                        short) const;
+template ImageView<Pixel32uC1> &ImageView<Pixel8uC1>::Scale<Pixel32uC1>(ImageView<Pixel32uC1> &aDst, uint, uint) const;
+template ImageView<Pixel32sC1> &ImageView<Pixel8uC1>::Scale<Pixel32sC1>(ImageView<Pixel32sC1> &aDst, int, int) const;
+template ImageView<Pixel32fC1> &ImageView<Pixel8uC1>::Scale<Pixel32fC1>(ImageView<Pixel32fC1> &aDst, float,
+                                                                        float) const;
+template ImageView<Pixel16uC1> &ImageView<Pixel8uC1>::Scale<Pixel16uC1>(ImageView<Pixel16uC1> &aDst, byte, byte, ushort,
+                                                                        ushort) const;
+template ImageView<Pixel16sC1> &ImageView<Pixel8uC1>::Scale<Pixel16sC1>(ImageView<Pixel16sC1> &aDst, byte, byte, short,
+                                                                        short) const;
+template ImageView<Pixel32uC1> &ImageView<Pixel8uC1>::Scale<Pixel32uC1>(ImageView<Pixel32uC1> &aDst, byte, byte, uint,
+                                                                        uint) const;
+template ImageView<Pixel32sC1> &ImageView<Pixel8uC1>::Scale<Pixel32sC1>(ImageView<Pixel32sC1> &aDst, byte, byte, int,
+                                                                        int) const;
+template ImageView<Pixel32fC1> &ImageView<Pixel8uC1>::Scale<Pixel32fC1>(ImageView<Pixel32fC1> &aDst, byte, byte, float,
+                                                                        float) const;
 
 template ImageView<Pixel8uC4> &ImageView<Pixel8uC3>::SwapChannel<Pixel8uC4>(
     ImageView<Pixel8uC4> &aDst, const ChannelList<vector_active_size_v<Pixel8uC4>> &aDstChannels,

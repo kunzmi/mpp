@@ -13,9 +13,9 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
 #include <common/image/roiException.h>
+#include <common/mpp_defs.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
-#include <common/mpp_defs.h>
 #include <common/utilities.h>
 #include <common/vector_typetraits.h>
 #include <concepts>
@@ -45,7 +45,7 @@ ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aDst.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeAddSrcSrcScale(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
                          scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -71,7 +71,7 @@ ImageView<T> &ImageView<T>::Add(const T &aConst, ImageView<T> &aDst, int aScaleF
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeAddSrcCScale(PointerRoi(), Pitch(), aConst, aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat, SizeRoi(),
                        aStreamCtx);
@@ -98,7 +98,7 @@ ImageView<T> &ImageView<T>::Add(const mpp::cuda::DevVarView<T> &aConst, ImageVie
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeAddSrcDevCScale(PointerRoi(), Pitch(), aConst.Pointer(), aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat,
                           SizeRoi(), aStreamCtx);
@@ -123,7 +123,7 @@ ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, int aScaleFactor, con
 {
     checkSameSize(ROI(), aSrc2.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeAddInplaceSrcScale(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), scaleFactorFloat, SizeRoi(),
                              aStreamCtx);
@@ -144,7 +144,7 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::Add(const T &aConst, int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeAddInplaceCScale(PointerRoi(), Pitch(), aConst, scaleFactorFloat, SizeRoi(), aStreamCtx);
 
@@ -165,7 +165,7 @@ ImageView<T> &ImageView<T>::Add(const mpp::cuda::DevVarView<T> &aConst, int aSca
                                 const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeAddInplaceDevCScale(PointerRoi(), Pitch(), aConst.Pointer(), scaleFactorFloat, SizeRoi(), aStreamCtx);
 
@@ -196,7 +196,7 @@ ImageView<T> &ImageView<T>::AddMasked(const ImageView<T> &aSrc2, ImageView<T> &a
     checkSameSize(ROI(), aDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeAddSrcSrcScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aSrc2.PointerRoi(),
                              aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -226,7 +226,7 @@ ImageView<T> &ImageView<T>::AddMasked(const T &aConst, ImageView<T> &aDst, const
     checkSameSize(ROI(), aDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeAddSrcCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst, aDst.PointerRoi(),
                            aDst.Pitch(), scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -257,7 +257,7 @@ ImageView<T> &ImageView<T>::AddMasked(const mpp::cuda::DevVarView<T> &aConst, Im
     checkSameSize(ROI(), aDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeAddSrcDevCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst.Pointer(),
                               aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -287,7 +287,7 @@ ImageView<T> &ImageView<T>::AddMasked(const ImageView<T> &aSrc2, const ImageView
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeAddInplaceSrcScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aSrc2.PointerRoi(),
                                  aSrc2.Pitch(), scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -314,7 +314,7 @@ ImageView<T> &ImageView<T>::AddMasked(const T &aConst, const ImageView<Pixel8uC1
 {
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeAddInplaceCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst, scaleFactorFloat,
                                SizeRoi(), aStreamCtx);
@@ -342,7 +342,7 @@ ImageView<T> &ImageView<T>::AddMasked(const mpp::cuda::DevVarView<T> &aConst, co
 {
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeAddInplaceDevCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst.Pointer(),
                                   scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -374,7 +374,7 @@ ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aDst.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeSubSrcSrcScale(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
                          scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -400,7 +400,7 @@ ImageView<T> &ImageView<T>::Sub(const T &aConst, ImageView<T> &aDst, int aScaleF
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeSubSrcCScale(PointerRoi(), Pitch(), aConst, aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat, SizeRoi(),
                        aStreamCtx);
@@ -427,7 +427,7 @@ ImageView<T> &ImageView<T>::Sub(const mpp::cuda::DevVarView<T> &aConst, ImageVie
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeSubSrcDevCScale(PointerRoi(), Pitch(), aConst.Pointer(), aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat,
                           SizeRoi(), aStreamCtx);
@@ -452,7 +452,7 @@ ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, int aScaleFactor, con
 {
     checkSameSize(ROI(), aSrc2.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeSubInplaceSrcScale(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), scaleFactorFloat, SizeRoi(),
                              aStreamCtx);
@@ -473,7 +473,7 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::Sub(const T &aConst, int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeSubInplaceCScale(PointerRoi(), Pitch(), aConst, scaleFactorFloat, SizeRoi(), aStreamCtx);
 
@@ -494,7 +494,7 @@ ImageView<T> &ImageView<T>::Sub(const mpp::cuda::DevVarView<T> &aConst, int aSca
                                 const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeSubInplaceDevCScale(PointerRoi(), Pitch(), aConst.Pointer(), scaleFactorFloat, SizeRoi(), aStreamCtx);
 
@@ -518,7 +518,7 @@ ImageView<T> &ImageView<T>::SubInv(const ImageView<T> &aSrc2, int aScaleFactor, 
 {
     checkSameSize(ROI(), aSrc2.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeSubInvInplaceSrcScale(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), scaleFactorFloat, SizeRoi(),
                                 aStreamCtx);
@@ -539,7 +539,7 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::SubInv(const T &aConst, int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeSubInvInplaceCScale(PointerRoi(), Pitch(), aConst, scaleFactorFloat, SizeRoi(), aStreamCtx);
 
@@ -560,7 +560,7 @@ ImageView<T> &ImageView<T>::SubInv(const mpp::cuda::DevVarView<T> &aConst, int a
                                    const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeSubInvInplaceDevCScale(PointerRoi(), Pitch(), aConst.Pointer(), scaleFactorFloat, SizeRoi(), aStreamCtx);
 
@@ -591,7 +591,7 @@ ImageView<T> &ImageView<T>::SubMasked(const ImageView<T> &aSrc2, ImageView<T> &a
     checkSameSize(ROI(), aDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeSubSrcSrcScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aSrc2.PointerRoi(),
                              aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -621,7 +621,7 @@ ImageView<T> &ImageView<T>::SubMasked(const T &aConst, ImageView<T> &aDst, const
     checkSameSize(ROI(), aDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeSubSrcCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst, aDst.PointerRoi(),
                            aDst.Pitch(), scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -652,7 +652,7 @@ ImageView<T> &ImageView<T>::SubMasked(const mpp::cuda::DevVarView<T> &aConst, Im
     checkSameSize(ROI(), aDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeSubSrcDevCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst.Pointer(),
                               aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -682,7 +682,7 @@ ImageView<T> &ImageView<T>::SubMasked(const ImageView<T> &aSrc2, const ImageView
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeSubInplaceSrcScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aSrc2.PointerRoi(),
                                  aSrc2.Pitch(), scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -709,7 +709,7 @@ ImageView<T> &ImageView<T>::SubMasked(const T &aConst, const ImageView<Pixel8uC1
 {
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeSubInplaceCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst, scaleFactorFloat,
                                SizeRoi(), aStreamCtx);
@@ -737,7 +737,7 @@ ImageView<T> &ImageView<T>::SubMasked(const mpp::cuda::DevVarView<T> &aConst, co
 {
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeSubInplaceDevCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst.Pointer(),
                                   scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -767,7 +767,7 @@ ImageView<T> &ImageView<T>::SubInvMasked(const ImageView<T> &aSrc2, const ImageV
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeSubInvInplaceSrcScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aSrc2.PointerRoi(),
                                     aSrc2.Pitch(), scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -794,7 +794,7 @@ ImageView<T> &ImageView<T>::SubInvMasked(const T &aConst, const ImageView<Pixel8
 {
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeSubInvInplaceCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst, scaleFactorFloat,
                                   SizeRoi(), aStreamCtx);
@@ -822,7 +822,7 @@ ImageView<T> &ImageView<T>::SubInvMasked(const mpp::cuda::DevVarView<T> &aConst,
 {
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeSubInvInplaceDevCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst.Pointer(),
                                      scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -855,7 +855,7 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aDst.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeMulSrcSrcScale(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
                          scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -881,7 +881,7 @@ ImageView<T> &ImageView<T>::Mul(const T &aConst, ImageView<T> &aDst, int aScaleF
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeMulSrcCScale(PointerRoi(), Pitch(), aConst, aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat, SizeRoi(),
                        aStreamCtx);
@@ -908,7 +908,7 @@ ImageView<T> &ImageView<T>::Mul(const mpp::cuda::DevVarView<T> &aConst, ImageVie
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeMulSrcDevCScale(PointerRoi(), Pitch(), aConst.Pointer(), aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat,
                           SizeRoi(), aStreamCtx);
@@ -933,7 +933,7 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, int aScaleFactor, con
 {
     checkSameSize(ROI(), aSrc2.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeMulInplaceSrcScale(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), scaleFactorFloat, SizeRoi(),
                              aStreamCtx);
@@ -954,7 +954,7 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::Mul(const T &aConst, int aScaleFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeMulInplaceCScale(PointerRoi(), Pitch(), aConst, scaleFactorFloat, SizeRoi(), aStreamCtx);
 
@@ -975,7 +975,7 @@ ImageView<T> &ImageView<T>::Mul(const mpp::cuda::DevVarView<T> &aConst, int aSca
                                 const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeMulInplaceDevCScale(PointerRoi(), Pitch(), aConst.Pointer(), scaleFactorFloat, SizeRoi(), aStreamCtx);
 
@@ -1006,7 +1006,7 @@ ImageView<T> &ImageView<T>::MulMasked(const ImageView<T> &aSrc2, ImageView<T> &a
     checkSameSize(ROI(), aDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeMulSrcSrcScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aSrc2.PointerRoi(),
                              aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -1036,7 +1036,7 @@ ImageView<T> &ImageView<T>::MulMasked(const T &aConst, ImageView<T> &aDst, const
     checkSameSize(ROI(), aDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeMulSrcCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst, aDst.PointerRoi(),
                            aDst.Pitch(), scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -1067,7 +1067,7 @@ ImageView<T> &ImageView<T>::MulMasked(const mpp::cuda::DevVarView<T> &aConst, Im
     checkSameSize(ROI(), aDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeMulSrcDevCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst.Pointer(),
                               aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -1097,7 +1097,7 @@ ImageView<T> &ImageView<T>::MulMasked(const ImageView<T> &aSrc2, const ImageView
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeMulInplaceSrcScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aSrc2.PointerRoi(),
                                  aSrc2.Pitch(), scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -1124,7 +1124,7 @@ ImageView<T> &ImageView<T>::MulMasked(const T &aConst, const ImageView<Pixel8uC1
 {
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeMulInplaceCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst, scaleFactorFloat,
                                SizeRoi(), aStreamCtx);
@@ -1152,7 +1152,7 @@ ImageView<T> &ImageView<T>::MulMasked(const mpp::cuda::DevVarView<T> &aConst, co
 {
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeMulInplaceDevCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst.Pointer(),
                                   scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -1171,7 +1171,7 @@ ImageView<T> &ImageView<T>::MulScale(const ImageView<T> &aSrc2, ImageView<T> &aD
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aDst.ROI());
 
-    const float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
+    const double scaleFactorFloat = 1.0 / static_cast<double>(numeric_limits<remove_vector_t<T>>::max());
 
     InvokeMulSrcSrcScale(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
                          scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -1185,7 +1185,7 @@ ImageView<T> &ImageView<T>::MulScale(const T &aConst, ImageView<T> &aDst, const 
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    const float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
+    const double scaleFactorFloat = 1.0 / static_cast<double>(numeric_limits<remove_vector_t<T>>::max());
 
     InvokeMulSrcCScale(PointerRoi(), Pitch(), aConst, aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat, SizeRoi(),
                        aStreamCtx);
@@ -1200,7 +1200,7 @@ ImageView<T> &ImageView<T>::MulScale(const mpp::cuda::DevVarView<T> &aConst, Ima
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    const float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
+    const double scaleFactorFloat = 1.0 / static_cast<double>(numeric_limits<remove_vector_t<T>>::max());
 
     InvokeMulSrcDevCScale(PointerRoi(), Pitch(), aConst.Pointer(), aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat,
                           SizeRoi(), aStreamCtx);
@@ -1214,7 +1214,7 @@ ImageView<T> &ImageView<T>::MulScale(const ImageView<T> &aSrc2, const mpp::cuda:
 {
     checkSameSize(ROI(), aSrc2.ROI());
 
-    const float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
+    const double scaleFactorFloat = 1.0 / static_cast<double>(numeric_limits<remove_vector_t<T>>::max());
 
     InvokeMulInplaceSrcScale(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), scaleFactorFloat, SizeRoi(),
                              aStreamCtx);
@@ -1226,7 +1226,7 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::MulScale(const T &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>
 {
-    const float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
+    const double scaleFactorFloat = 1.0 / static_cast<double>(numeric_limits<remove_vector_t<T>>::max());
 
     InvokeMulInplaceCScale(PointerRoi(), Pitch(), aConst, scaleFactorFloat, SizeRoi(), aStreamCtx);
 
@@ -1237,7 +1237,7 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::MulScale(const mpp::cuda::DevVarView<T> &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, ushort>
 {
-    const float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
+    const double scaleFactorFloat = 1.0 / static_cast<double>(numeric_limits<remove_vector_t<T>>::max());
 
     InvokeMulInplaceDevCScale(PointerRoi(), Pitch(), aConst.Pointer(), scaleFactorFloat, SizeRoi(), aStreamCtx);
 
@@ -1254,7 +1254,7 @@ ImageView<T> &ImageView<T>::MulScaleMasked(const ImageView<T> &aSrc2, ImageView<
     checkSameSize(ROI(), aDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
+    const double scaleFactorFloat = 1.0 / static_cast<double>(numeric_limits<remove_vector_t<T>>::max());
 
     InvokeMulSrcSrcScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aSrc2.PointerRoi(),
                              aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -1270,7 +1270,7 @@ ImageView<T> &ImageView<T>::MulScaleMasked(const T &aConst, ImageView<T> &aDst, 
     checkSameSize(ROI(), aDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
+    const double scaleFactorFloat = 1.0 / static_cast<double>(numeric_limits<remove_vector_t<T>>::max());
 
     InvokeMulSrcCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst, aDst.PointerRoi(),
                            aDst.Pitch(), scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -1287,7 +1287,7 @@ ImageView<T> &ImageView<T>::MulScaleMasked(const mpp::cuda::DevVarView<T> &aCons
     checkSameSize(ROI(), aDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
+    const double scaleFactorFloat = 1.0 / static_cast<double>(numeric_limits<remove_vector_t<T>>::max());
 
     InvokeMulSrcDevCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst.Pointer(),
                               aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -1303,7 +1303,7 @@ ImageView<T> &ImageView<T>::MulScaleMasked(const ImageView<T> &aSrc2, const Imag
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
+    const double scaleFactorFloat = 1.0 / static_cast<double>(numeric_limits<remove_vector_t<T>>::max());
 
     InvokeMulInplaceSrcScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aSrc2.PointerRoi(),
                                  aSrc2.Pitch(), scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -1318,7 +1318,7 @@ ImageView<T> &ImageView<T>::MulScaleMasked(const T &aConst, const ImageView<Pixe
 {
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
+    const double scaleFactorFloat = 1.0 / static_cast<double>(numeric_limits<remove_vector_t<T>>::max());
 
     InvokeMulInplaceCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst, scaleFactorFloat,
                                SizeRoi(), aStreamCtx);
@@ -1333,7 +1333,7 @@ ImageView<T> &ImageView<T>::MulScaleMasked(const mpp::cuda::DevVarView<T> &aCons
 {
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
+    const double scaleFactorFloat = 1.0 / static_cast<double>(numeric_limits<remove_vector_t<T>>::max());
 
     InvokeMulInplaceDevCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst.Pointer(),
                                   scaleFactorFloat, SizeRoi(), aStreamCtx);
@@ -1365,7 +1365,7 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aDst.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeDivSrcSrcScale(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
                          scaleFactorFloat, aRoundingMode, SizeRoi(), aStreamCtx);
@@ -1391,7 +1391,7 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, int aScaleF
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeDivSrcCScale(PointerRoi(), Pitch(), aConst, aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat, aRoundingMode,
                        SizeRoi(), aStreamCtx);
@@ -1418,7 +1418,7 @@ ImageView<T> &ImageView<T>::Div(const mpp::cuda::DevVarView<T> &aConst, ImageVie
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeDivSrcDevCScale(PointerRoi(), Pitch(), aConst.Pointer(), aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat,
                           aRoundingMode, SizeRoi(), aStreamCtx);
@@ -1444,7 +1444,7 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, int aScaleFactor, Rou
 {
     checkSameSize(ROI(), aSrc2.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeDivInplaceSrcScale(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), scaleFactorFloat, aRoundingMode,
                              SizeRoi(), aStreamCtx);
@@ -1466,7 +1466,7 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, int aScaleFactor, RoundingMode 
                                 const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeDivInplaceCScale(PointerRoi(), Pitch(), aConst, scaleFactorFloat, aRoundingMode, SizeRoi(), aStreamCtx);
 
@@ -1487,7 +1487,7 @@ ImageView<T> &ImageView<T>::Div(const mpp::cuda::DevVarView<T> &aConst, int aSca
                                 const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeDivInplaceDevCScale(PointerRoi(), Pitch(), aConst.Pointer(), scaleFactorFloat, aRoundingMode, SizeRoi(),
                               aStreamCtx);
@@ -1513,7 +1513,7 @@ ImageView<T> &ImageView<T>::DivInv(const ImageView<T> &aSrc2, int aScaleFactor, 
 {
     checkSameSize(ROI(), aSrc2.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeDivInvInplaceSrcScale(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), scaleFactorFloat,
                                 aRoundingMode, SizeRoi(), aStreamCtx);
@@ -1535,7 +1535,7 @@ ImageView<T> &ImageView<T>::DivInv(const T &aConst, int aScaleFactor, RoundingMo
                                    const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeDivInvInplaceCScale(PointerRoi(), Pitch(), aConst, scaleFactorFloat, aRoundingMode, SizeRoi(), aStreamCtx);
 
@@ -1556,7 +1556,7 @@ ImageView<T> &ImageView<T>::DivInv(const mpp::cuda::DevVarView<T> &aConst, int a
                                    const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealOrComplexIntVector<T>
 {
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeDivInvInplaceDevCScale(PointerRoi(), Pitch(), aConst.Pointer(), scaleFactorFloat, aRoundingMode, SizeRoi(),
                                  aStreamCtx);
@@ -1589,7 +1589,7 @@ ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, ImageView<T> &a
     checkSameSize(ROI(), aDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeDivSrcSrcScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aSrc2.PointerRoi(),
                              aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat, aRoundingMode, SizeRoi(),
@@ -1621,7 +1621,7 @@ ImageView<T> &ImageView<T>::DivMasked(const T &aConst, ImageView<T> &aDst, const
     checkSameSize(ROI(), aDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeDivSrcCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst, aDst.PointerRoi(),
                            aDst.Pitch(), scaleFactorFloat, aRoundingMode, SizeRoi(), aStreamCtx);
@@ -1652,7 +1652,7 @@ ImageView<T> &ImageView<T>::DivMasked(const mpp::cuda::DevVarView<T> &aConst, Im
     checkSameSize(ROI(), aDst.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeDivSrcDevCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst.Pointer(),
                               aDst.PointerRoi(), aDst.Pitch(), scaleFactorFloat, aRoundingMode, SizeRoi(), aStreamCtx);
@@ -1682,7 +1682,7 @@ ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, const ImageView
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeDivInplaceSrcScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aSrc2.PointerRoi(),
                                  aSrc2.Pitch(), scaleFactorFloat, aRoundingMode, SizeRoi(), aStreamCtx);
@@ -1709,7 +1709,7 @@ ImageView<T> &ImageView<T>::DivMasked(const T &aConst, const ImageView<Pixel8uC1
 {
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeDivInplaceCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst, scaleFactorFloat,
                                aRoundingMode, SizeRoi(), aStreamCtx);
@@ -1738,7 +1738,7 @@ ImageView<T> &ImageView<T>::DivMasked(const mpp::cuda::DevVarView<T> &aConst, co
 {
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeDivInplaceDevCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst.Pointer(),
                                   scaleFactorFloat, aRoundingMode, SizeRoi(), aStreamCtx);
@@ -1768,7 +1768,7 @@ ImageView<T> &ImageView<T>::DivInvMasked(const ImageView<T> &aSrc2, const ImageV
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeDivInvInplaceSrcScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aSrc2.PointerRoi(),
                                     aSrc2.Pitch(), scaleFactorFloat, aRoundingMode, SizeRoi(), aStreamCtx);
@@ -1795,7 +1795,7 @@ ImageView<T> &ImageView<T>::DivInvMasked(const T &aConst, const ImageView<Pixel8
 {
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeDivInvInplaceCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst, scaleFactorFloat,
                                   aRoundingMode, SizeRoi(), aStreamCtx);
@@ -1824,7 +1824,7 @@ ImageView<T> &ImageView<T>::DivInvMasked(const mpp::cuda::DevVarView<T> &aConst,
 {
     checkSameSize(ROI(), aMask.ROI());
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
     InvokeDivInvInplaceDevCScaleMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aConst.Pointer(),
                                      scaleFactorFloat, aRoundingMode, SizeRoi(), aStreamCtx);
@@ -2447,7 +2447,7 @@ ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, ImageView<T> 
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    const float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
+    const double scaleFactorFloat = 1.0 / static_cast<double>(numeric_limits<remove_vector_t<T>>::max());
 
     const T alphaVec(aAlpha);
 
@@ -2472,7 +2472,7 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::AlphaPremul(remove_vector_t<T> aAlpha, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealIntVector<T> && (!FourChannelAlpha<T>)
 {
-    const float scaleFactorFloat = 1.0f / static_cast<float>(numeric_limits<remove_vector_t<T>>::max());
+    const double scaleFactorFloat = 1.0 / static_cast<double>(numeric_limits<remove_vector_t<T>>::max());
 
     const T alphaVec(aAlpha);
 
@@ -2652,7 +2652,9 @@ template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &ImageView<T>::MakeComplex(
     ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst,
     const mpp::cuda::StreamCtx &aStreamCtx) const
-    requires RealSignedVector<T> && (!FourChannelAlpha<T>)
+    requires RealSignedVector<T> && (!FourChannelAlpha<T>) &&
+             (std::same_as<short, remove_vector_t<T>> || std::same_as<int, remove_vector_t<T>> ||
+              std::same_as<float, remove_vector_t<T>>)
 {
     checkSameSize(ROI(), aDst.ROI());
 
@@ -2666,7 +2668,9 @@ ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>
     const ImageView<T> &aSrcImag,
     ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst,
     const mpp::cuda::StreamCtx &aStreamCtx) const
-    requires RealSignedVector<T> && (!FourChannelAlpha<T>)
+    requires RealSignedVector<T> && (!FourChannelAlpha<T>) &&
+             (std::same_as<short, remove_vector_t<T>> || std::same_as<int, remove_vector_t<T>> ||
+              std::same_as<float, remove_vector_t<T>>)
 {
     checkSameSize(ROI(), aSrcImag.ROI());
     checkSameSize(ROI(), aDst.ROI());

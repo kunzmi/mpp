@@ -45,11 +45,16 @@ template <typename mppT, typename nppT> class GeometricTransformBase
         mpp.SetRoi(aRoi);
         npp.SetRoi(aRoi);
 
+        // Who ever runs first, be it NPP or MPP, will be penalized with some outliers, likely due to screen updates...
+        // So run twice and forget the first results.
         mpp.WarmUp();
         rt_mpp = mpp.Run();
 
         npp.WarmUp();
         rt_npp = npp.Run();
+
+        mpp.WarmUp();
+        rt_mpp = mpp.Run();
     }
 
     template <typename ImgT, PixelType resT> TestResult GetResult()

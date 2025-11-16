@@ -405,10 +405,11 @@ void InvokeFixedSizeFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, siz
         const Size2D &aAllowedReadRoiSize, const Vector2<int> &aOffsetToActualRoi, const Size2D &aSize,                \
         const StreamCtx &aStreamCtx);
 
-#define ForAllChannelsNoAlpha(typeSrc, typeDst) Instantiate_For(Pixel##typeSrc##C1, Pixel##typeDst##C1);
-//Instantiate_For(Pixel##typeSrc##C2, Pixel##typeDst##C2);                                                           \
-    //Instantiate_For(Pixel##typeSrc##C3, Pixel##typeDst##C3);                                                           \
-    //Instantiate_For(Pixel##typeSrc##C4, Pixel##typeDst##C4);
+#define ForAllChannelsNoAlpha(typeSrc, typeDst)                                                                        \
+    Instantiate_For(Pixel##typeSrc##C1, Pixel##typeDst##C1);                                                           \
+    Instantiate_For(Pixel##typeSrc##C2, Pixel##typeDst##C2);                                                           \
+    Instantiate_For(Pixel##typeSrc##C3, Pixel##typeDst##C3);                                                           \
+    Instantiate_For(Pixel##typeSrc##C4, Pixel##typeDst##C4);
 
 #define ForAllChannelsWithAlpha(typeSrc, typeDst)                                                                      \
     Instantiate_For(Pixel##typeSrc##C1, Pixel##typeDst##C1);                                                           \

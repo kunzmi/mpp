@@ -46,10 +46,10 @@ void InvokeAlphaPremulSrc(const SrcT *aSrc, size_t aPitchSrc, DstT *aDst, size_t
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT
+// using default_floating_compute_type_for_t for computeT
 #define InstantiateInvokeAlphaPremulSrc_For(typeSrcIsTypeDst)                                                          \
     template void                                                                                                      \
-    InvokeAlphaPremulSrc<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(            \
+    InvokeAlphaPremulSrc<typeSrcIsTypeDst, default_floating_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(   \
         const typeSrcIsTypeDst *aSrc, size_t aPitchSrc, typeSrcIsTypeDst *aDst, size_t aPitchDst, const Size2D &aSize, \
         const mpp::cuda::StreamCtx &aStreamCtx);
 
@@ -80,9 +80,9 @@ void InvokeAlphaPremulInplace(SrcDstT *aSrcDst, size_t aPitchSrcDst, const Size2
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT
+// using default_floating_compute_type_for_t for computeT
 #define InstantiateInvokeAlphaPremulInplace_For(typeSrcIsTypeDst)                                                      \
-    template void InvokeAlphaPremulInplace<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>>(            \
+    template void InvokeAlphaPremulInplace<typeSrcIsTypeDst, default_floating_compute_type_for_t<typeSrcIsTypeDst>>(   \
         typeSrcIsTypeDst * aDst, size_t aPitchDst, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #pragma endregion
@@ -109,10 +109,10 @@ void InvokeAlphaPremulACSrc(const SrcT *aSrc, size_t aPitchSrc, DstT *aDst, size
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT
+// using default_floating_compute_type_for_t for computeT
 #define InstantiateInvokeAlphaPremulACSrc_For(typeSrcIsTypeDst)                                                        \
     template void                                                                                                      \
-    InvokeAlphaPremulACSrc<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(          \
+    InvokeAlphaPremulACSrc<typeSrcIsTypeDst, default_floating_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>( \
         const typeSrcIsTypeDst *aSrc, size_t aPitchSrc, typeSrcIsTypeDst *aDst, size_t aPitchDst,                      \
         remove_vector_t<typeSrcIsTypeDst> aAlpha, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
 
@@ -143,9 +143,9 @@ void InvokeAlphaPremulACInplace(SrcDstT *aSrcDst, size_t aPitchSrcDst, remove_ve
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT
+// using default_floating_compute_type_for_t for computeT
 #define InstantiateInvokeAlphaPremulACInplace_For(typeSrcIsTypeDst)                                                    \
-    template void InvokeAlphaPremulACInplace<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>>(          \
+    template void InvokeAlphaPremulACInplace<typeSrcIsTypeDst, default_floating_compute_type_for_t<typeSrcIsTypeDst>>( \
         typeSrcIsTypeDst * aDst, size_t aPitchDst, remove_vector_t<typeSrcIsTypeDst> aAlpha, const Size2D &aSize,      \
         const StreamCtx &aStreamCtx);
 

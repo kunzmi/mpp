@@ -158,7 +158,7 @@ void InvokeConvertRound(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t
 
 template <typename SrcT, typename DstT>
 void InvokeConvertScaleRound(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst,
-                             RoundingMode aRoundingMode, float aScaleFactor, const Size2D &aSize,
+                             RoundingMode aRoundingMode, double aScaleFactor, const Size2D &aSize,
                              const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
@@ -167,40 +167,48 @@ void InvokeConvertScaleRound(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, s
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
+        // ComputeT is either float or double, so Scaler is always operating on floating point:
+        using ComputeT = convert_scale_compute_type_t<SrcT>;
+        using ScalerT  = Scale<ComputeT, false>;
+        const ScalerT scaler(aScaleFactor);
+
         switch (aRoundingMode)
         {
             case mpp::RoundingMode::NearestTiesToEven:
             {
-                using convert = ConvertScaleFunctor<TupelSize, SrcT, DstT, RoundingMode::NearestTiesToEven>;
-                const convert functor(aSrc1, aPitchSrc1, aScaleFactor);
+                using convert = ConvertScaleFunctor<TupelSize, SrcT, DstT, ScalerT, RoundingMode::NearestTiesToEven>;
+                const convert functor(aSrc1, aPitchSrc1, scaler);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx, functor);
             }
             break;
             case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
-                using convert = ConvertScaleFunctor<TupelSize, SrcT, DstT, RoundingMode::NearestTiesAwayFromZero>;
-                const convert functor(aSrc1, aPitchSrc1, aScaleFactor);
+                using convert =
+                    ConvertScaleFunctor<TupelSize, SrcT, DstT, ScalerT, RoundingMode::NearestTiesAwayFromZero>;
+                const convert functor(aSrc1, aPitchSrc1, scaler);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx, functor);
             }
             break;
             case mpp::RoundingMode::TowardZero:
             {
-                using convert = ConvertScaleFunctor<TupelSize, SrcT, DstT, RoundingMode::TowardZero>;
-                const convert functor(aSrc1, aPitchSrc1, aScaleFactor);
+                using convert = ConvertScaleFunctor<TupelSize, SrcT, DstT, ScalerT, RoundingMode::TowardZero>;
+                const convert functor(aSrc1, aPitchSrc1, scaler);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx, functor);
             }
             break;
             case mpp::RoundingMode::TowardNegativeInfinity:
             {
-                using convert = ConvertScaleFunctor<TupelSize, SrcT, DstT, RoundingMode::TowardNegativeInfinity>;
-                const convert functor(aSrc1, aPitchSrc1, aScaleFactor);
+                using convert =
+                    ConvertScaleFunctor<TupelSize, SrcT, DstT, ScalerT, RoundingMode::TowardNegativeInfinity>;
+                const convert functor(aSrc1, aPitchSrc1, scaler);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx, functor);
             }
             break;
             case mpp::RoundingMode::TowardPositiveInfinity:
             {
-                using convert = ConvertScaleFunctor<TupelSize, SrcT, DstT, RoundingMode::TowardPositiveInfinity>;
-                const convert functor(aSrc1, aPitchSrc1, aScaleFactor);
+                using convert =
+                    ConvertScaleFunctor<TupelSize, SrcT, DstT, ScalerT, RoundingMode::TowardPositiveInfinity>;
+                const convert functor(aSrc1, aPitchSrc1, scaler);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx, functor);
             }
             break;
@@ -214,7 +222,7 @@ void InvokeConvertScaleRound(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, s
 #define InstantiateInvokeConvertScaleRound_For(typeSrc, typeDst)                                                       \
     template void InvokeConvertScaleRound<typeSrc, typeDst>(                                                           \
         const typeSrc *aSrc1, size_t aPitchSrc1, typeDst *aDst, size_t aPitchDst, RoundingMode aRoundingMode,          \
-        float aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx);
+        double aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeConvertScaleRound(typeSrc, typeDst)                                                 \
     InstantiateInvokeConvertScaleRound_For(Pixel##typeSrc##C1, Pixel##typeDst##C1);                                    \

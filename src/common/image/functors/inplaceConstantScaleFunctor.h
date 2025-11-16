@@ -5,8 +5,8 @@
 #include <common/defines.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
-#include <common/numberTypes.h>
 #include <common/mpp_defs.h>
+#include <common/numberTypes.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
 #include <common/vector_typetraits.h>
@@ -27,13 +27,13 @@ namespace mpp::image
 /// <typeparam name="operation"></typeparam>
 /// <typeparam name="tupelSize"></typeparam>
 /// <typeparam name="roundingMode"></typeparam>
-template <size_t tupelSize, typename ComputeT, typename DstT, typename operation,
+template <size_t tupelSize, typename ComputeT, typename DstT, typename operation, typename scaleOp,
           RoundingMode roundingMode = RoundingMode::NearestTiesAwayFromZero>
 struct InplaceConstantScaleFunctor : public ImageFunctor<true>
 {
     ComputeT Constant;
 
-    scalefactor_t<ComputeT> ScaleFactor;
+    scaleOp Scaler;
 
     [[no_unique_address]] operation Op;
 
@@ -44,8 +44,8 @@ struct InplaceConstantScaleFunctor : public ImageFunctor<true>
     {
     }
 
-    InplaceConstantScaleFunctor(ComputeT aConstant, operation aOp, scalefactor_t<ComputeT> aScaleFactor)
-        : Constant(aConstant), ScaleFactor(aScaleFactor), Op(aOp)
+    InplaceConstantScaleFunctor(ComputeT aConstant, operation aOp, scaleOp aScaler)
+        : Constant(aConstant), Scaler(aScaler), Op(aOp)
     {
     }
 #pragma endregion
@@ -55,19 +55,10 @@ struct InplaceConstantScaleFunctor : public ImageFunctor<true>
     /// Returns true if the value has been successfully set
     /// </summary>
     DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
-        requires RealOrComplexIntegral<pixel_basetype_t<DstT>> && //
-                 RealOrComplexFloatingPoint<pixel_basetype_t<ComputeT>>
     {
         ComputeT temp(aDst);
         Op(Constant, temp);
-        if constexpr (ComplexVector<ComputeT>)
-        {
-            temp = temp * ScaleFactor;
-        }
-        else
-        {
-            temp *= ScaleFactor;
-        }
+        Scaler(temp);
         round(temp);
         // DstT constructor will clamp temp to value range of DstT
         aDst = static_cast<DstT>(temp);
@@ -77,22 +68,13 @@ struct InplaceConstantScaleFunctor : public ImageFunctor<true>
 
 #pragma region run sequential on pixel tupel
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
-        requires RealOrComplexIntegral<pixel_basetype_t<DstT>> && //
-                 RealOrComplexFloatingPoint<pixel_basetype_t<ComputeT>>
     {
 #pragma unroll
         for (size_t i = 0; i < tupelSize; i++)
         {
             ComputeT temp(aDst.value[i]);
             Op(Constant, temp);
-            if constexpr (ComplexVector<ComputeT>)
-            {
-                temp = temp * ScaleFactor;
-            }
-            else
-            {
-                temp *= ScaleFactor;
-            }
+            Scaler(temp);
             round(temp);
             // DstT constructor will clamp temp to value range of DstT
             aDst.value[i] = static_cast<DstT>(temp);

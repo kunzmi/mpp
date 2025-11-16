@@ -35,6 +35,14 @@ template <typename T> struct numeric_limits
     {
         return max();
     }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCount() noexcept
+    {
+        return sizeof(T) * 8;
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCountMinus1() noexcept
+    {
+        return sizeof(T) * 8 - 1;
+    }
 };
 
 // unsigned integer types
@@ -60,6 +68,14 @@ template <> struct numeric_limits<byte>
     {
         return max();
     }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCount() noexcept
+    {
+        return sizeof(byte) * 8;
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCountMinus1() noexcept
+    {
+        return sizeof(byte) * 8 - 1;
+    }
 };
 
 template <> struct numeric_limits<ushort>
@@ -83,6 +99,14 @@ template <> struct numeric_limits<ushort>
     [[nodiscard]] static constexpr DEVICE_CODE ushort maxExact() noexcept
     {
         return max();
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCount() noexcept
+    {
+        return sizeof(ushort) * 8;
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCountMinus1() noexcept
+    {
+        return sizeof(ushort) * 8 - 1;
     }
 };
 
@@ -108,6 +132,14 @@ template <> struct numeric_limits<uint>
     {
         return max();
     }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCount() noexcept
+    {
+        return sizeof(uint) * 8;
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCountMinus1() noexcept
+    {
+        return sizeof(uint) * 8 - 1;
+    }
 };
 
 template <> struct numeric_limits<ulong64>
@@ -131,6 +163,14 @@ template <> struct numeric_limits<ulong64>
     [[nodiscard]] static constexpr DEVICE_CODE ulong64 maxExact() noexcept
     {
         return max();
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCount() noexcept
+    {
+        return sizeof(ulong64) * 8;
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCountMinus1() noexcept
+    {
+        return sizeof(ulong64) * 8 - 1;
     }
 };
 
@@ -157,6 +197,14 @@ template <> struct numeric_limits<sbyte>
     {
         return max();
     }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCount() noexcept
+    {
+        return sizeof(sbyte) * 8;
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCountMinus1() noexcept
+    {
+        return sizeof(sbyte) * 8 - 1;
+    }
 };
 
 template <> struct numeric_limits<short>
@@ -180,6 +228,14 @@ template <> struct numeric_limits<short>
     [[nodiscard]] static constexpr DEVICE_CODE short maxExact() noexcept
     {
         return max();
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCount() noexcept
+    {
+        return sizeof(short) * 8;
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCountMinus1() noexcept
+    {
+        return sizeof(short) * 8 - 1;
     }
 };
 
@@ -205,6 +261,14 @@ template <> struct numeric_limits<int>
     {
         return max();
     }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCount() noexcept
+    {
+        return sizeof(int) * 8;
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCountMinus1() noexcept
+    {
+        return sizeof(int) * 8 - 1;
+    }
 };
 
 template <> struct numeric_limits<long64>
@@ -228,6 +292,14 @@ template <> struct numeric_limits<long64>
     [[nodiscard]] static constexpr DEVICE_CODE long64 maxExact() noexcept
     {
         return max();
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCount() noexcept
+    {
+        return sizeof(long64) * 8;
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCountMinus1() noexcept
+    {
+        return sizeof(long64) * 8 - 1;
     }
 };
 
@@ -258,13 +330,28 @@ template <> struct numeric_limits<float>
     }
     [[nodiscard]] static constexpr DEVICE_CODE float infinity() noexcept
     {
+        // std::numeric_limits<float>::infinity() is not awailable on Cuda without warnings
+        // INFINITY macro also creates warnings
+#ifdef IS_CUDA_COMPILER
+#pragma nv_diag_suppress 221
         return INFINITY;
-        // std::numeric_limits<float>::infinity();
+#endif
+#ifdef IS_HOST_COMPILER
+        return std::numeric_limits<float>::infinity();
+#endif
     }
     [[nodiscard]] static DEVICE_CODE float quiet_NaN() noexcept
     {
         return NAN;
         // std::numeric_limits<float>::quiet_NaN();
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCount() noexcept
+    {
+        return sizeof(float) * 8;
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCountMinus1() noexcept
+    {
+        return sizeof(float) * 8 - 1;
     }
 };
 
@@ -294,13 +381,29 @@ template <> struct numeric_limits<double>
     }
     [[nodiscard]] static constexpr DEVICE_CODE double infinity() noexcept
     {
+        // std::numeric_limits<double>::infinity() is not awailable on Cuda without warnings
+        // INFINITY macro also creates warnings
+
+#ifdef IS_CUDA_COMPILER
+#pragma nv_diag_suppress 221
         return INFINITY;
-        // std::numeric_limits<double>::infinity();
+#endif
+#ifdef IS_HOST_COMPILER
+        return std::numeric_limits<double>::infinity();
+#endif
     }
     [[nodiscard]] static DEVICE_CODE double quiet_NaN() noexcept
     {
         return NAN;
         // return std::numeric_limits<double>::quiet_NaN();
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCount() noexcept
+    {
+        return sizeof(double) * 8;
+    }
+    [[nodiscard]] static constexpr DEVICE_CODE int bitCountMinus1() noexcept
+    {
+        return sizeof(double) * 8 - 1;
     }
 };
 

@@ -14,6 +14,7 @@ ForAllChannelsWithAlphaInvokeConvert(16u, 16bf);
 ForAllChannelsWithAlphaInvokeConvert(16u, 16f);
 ForAllChannelsWithAlphaInvokeConvert(16u, 32f);
 ForAllChannelsWithAlphaInvokeConvert(16u, 64f);
+ForAllChannelsWithAlphaInvokeConvertScaleRound(16u, 8u);
 ForAllChannelsWithAlphaInvokeConvertScaleRound(16u, 8s);
 ForAllChannelsWithAlphaInvokeConvertScaleRound(16u, 16s);
 

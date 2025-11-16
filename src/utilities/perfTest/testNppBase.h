@@ -17,13 +17,9 @@ using namespace mpp::image;
 class TestNppBase : public TestBase
 {
   public:
-    TestNppBase(size_t aIterations, size_t aRepeats) : TestBase(aIterations, aRepeats)
+    TestNppBase(size_t aIterations, size_t aRepeats)
+        : TestBase(aIterations, aRepeats), ctx(image::npp::ImageView<Pixel8uC1>::GetStreamContext())
     {
-        NppStatus status = nppGetStreamContext(&ctx);
-        if (status != NPP_SUCCESS)
-        {
-            throw NPPEXCEPTION("Failed to get context.");
-        }
     }
     virtual ~TestNppBase() = default;
 

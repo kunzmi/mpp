@@ -1,8 +1,6 @@
-#include "pixel32sC1.h"
 #include "arithmetic.h"
-#include "filtering.h"
 #include "geometricTransforms.h"
-#include "statistics.h"
+#include "pixel32sC1.h"
 #include "testBase.h"
 #include <backends/npp/image/image32s.h>
 #include <backends/npp/image/image32sC1View.h>   //NOLINT
@@ -10,13 +8,11 @@
 #include <backends/simple_cpu/image/imageView.h> //NOLINT
 #include <common/image/affineTransformation.h>
 #include <common/image/border.h>
-#include <common/image/filterArea.h>
 #include <common/image/matrix.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
 #include <common/mpp_defs.h>
 #include <common/vectorTypes.h>
-#include <common/vector_typetraits.h>
 #include <cstddef>
 #include <vector>
 
@@ -32,7 +28,6 @@ void runPixel32sC1(size_t aIterations, size_t aRepeats, int aWidth, int aHeight,
 {
     using mppT       = Pixel32sC1;
     using nppT       = nv::Image32sC1;
-    using resFloatT  = Pixel32fC1;
     using resDoubleT = Pixel64fC1;
 
     Roi roi(0, 0, aWidth, aHeight);

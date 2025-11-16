@@ -1,8 +1,8 @@
-#include "vector2.h"      //NOLINT(misc-include-cleaner)
 #include "bfloat16.h"     //NOLINT(misc-include-cleaner)
 #include "complex.h"      //NOLINT
 #include "defines.h"      //NOLINT(misc-include-cleaner)
 #include "half_fp16.h"    //NOLINT(misc-include-cleaner)
+#include "vector2.h"      //NOLINT(misc-include-cleaner)
 #include "vector2_impl.h" //NOLINT(misc-include-cleaner)
 #include <iostream>
 
@@ -56,6 +56,7 @@ template struct Vector2<double>;
 template struct Vector2<Complex<sbyte>>;
 template struct Vector2<Complex<short>>;
 template struct Vector2<Complex<int>>;
+template struct Vector2<Complex<long64>>;
 template struct Vector2<Complex<BFloat16>>;
 template struct Vector2<Complex<HalfFp16>>;
 template struct Vector2<Complex<float>>;
@@ -168,6 +169,7 @@ template Vector2<BFloat16>::Vector2(const Vector2<ulong64> &) noexcept;
 template Vector2<BFloat16>::Vector2(const Vector2<HalfFp16> &) noexcept;
 template Vector2<BFloat16>::Vector2(const Vector2<float> &) noexcept;
 template Vector2<BFloat16>::Vector2(const Vector2<double> &) noexcept;
+template Vector2<BFloat16>::Vector2(const Vector2<float> &, RoundingMode);
 
 template Vector2<HalfFp16>::Vector2(const Vector2<sbyte> &) noexcept;
 template Vector2<HalfFp16>::Vector2(const Vector2<byte> &) noexcept;
@@ -180,6 +182,7 @@ template Vector2<HalfFp16>::Vector2(const Vector2<ulong64> &) noexcept;
 template Vector2<HalfFp16>::Vector2(const Vector2<BFloat16> &) noexcept;
 template Vector2<HalfFp16>::Vector2(const Vector2<float> &) noexcept;
 template Vector2<HalfFp16>::Vector2(const Vector2<double> &) noexcept;
+template Vector2<HalfFp16>::Vector2(const Vector2<float> &, RoundingMode);
 
 template Vector2<float>::Vector2(const Vector2<sbyte> &) noexcept;
 template Vector2<float>::Vector2(const Vector2<byte> &) noexcept;
@@ -207,6 +210,7 @@ template Vector2<double>::Vector2(const Vector2<float> &) noexcept;
 
 template Vector2<Complex<sbyte>>::Vector2(const Vector2<Complex<short>> &) noexcept;
 template Vector2<Complex<sbyte>>::Vector2(const Vector2<Complex<int>> &) noexcept;
+template Vector2<Complex<sbyte>>::Vector2(const Vector2<Complex<long64>> &) noexcept;
 template Vector2<Complex<sbyte>>::Vector2(const Vector2<Complex<BFloat16>> &) noexcept;
 template Vector2<Complex<sbyte>>::Vector2(const Vector2<Complex<HalfFp16>> &) noexcept;
 template Vector2<Complex<sbyte>>::Vector2(const Vector2<Complex<float>> &) noexcept;
@@ -215,6 +219,7 @@ template Vector2<Complex<sbyte>>::Vector2(const Vector2<sbyte> &) noexcept;
 
 template Vector2<Complex<short>>::Vector2(const Vector2<Complex<sbyte>> &) noexcept;
 template Vector2<Complex<short>>::Vector2(const Vector2<Complex<int>> &) noexcept;
+template Vector2<Complex<short>>::Vector2(const Vector2<Complex<long64>> &) noexcept;
 template Vector2<Complex<short>>::Vector2(const Vector2<Complex<BFloat16>> &) noexcept;
 template Vector2<Complex<short>>::Vector2(const Vector2<Complex<HalfFp16>> &) noexcept;
 template Vector2<Complex<short>>::Vector2(const Vector2<Complex<float>> &) noexcept;
@@ -223,31 +228,46 @@ template Vector2<Complex<short>>::Vector2(const Vector2<short> &) noexcept;
 
 template Vector2<Complex<int>>::Vector2(const Vector2<Complex<sbyte>> &) noexcept;
 template Vector2<Complex<int>>::Vector2(const Vector2<Complex<short>> &) noexcept;
+template Vector2<Complex<int>>::Vector2(const Vector2<Complex<long64>> &) noexcept;
 template Vector2<Complex<int>>::Vector2(const Vector2<Complex<BFloat16>> &) noexcept;
 template Vector2<Complex<int>>::Vector2(const Vector2<Complex<HalfFp16>> &) noexcept;
 template Vector2<Complex<int>>::Vector2(const Vector2<Complex<float>> &) noexcept;
 template Vector2<Complex<int>>::Vector2(const Vector2<Complex<double>> &) noexcept;
 template Vector2<Complex<int>>::Vector2(const Vector2<int> &) noexcept;
 
+template Vector2<Complex<long64>>::Vector2(const Vector2<Complex<sbyte>> &) noexcept;
+template Vector2<Complex<long64>>::Vector2(const Vector2<Complex<short>> &) noexcept;
+template Vector2<Complex<long64>>::Vector2(const Vector2<Complex<int>> &) noexcept;
+template Vector2<Complex<long64>>::Vector2(const Vector2<Complex<BFloat16>> &) noexcept;
+template Vector2<Complex<long64>>::Vector2(const Vector2<Complex<HalfFp16>> &) noexcept;
+template Vector2<Complex<long64>>::Vector2(const Vector2<Complex<float>> &) noexcept;
+template Vector2<Complex<long64>>::Vector2(const Vector2<Complex<double>> &) noexcept;
+template Vector2<Complex<long64>>::Vector2(const Vector2<long64> &) noexcept;
+
 template Vector2<Complex<BFloat16>>::Vector2(const Vector2<Complex<sbyte>> &) noexcept;
 template Vector2<Complex<BFloat16>>::Vector2(const Vector2<Complex<short>> &) noexcept;
 template Vector2<Complex<BFloat16>>::Vector2(const Vector2<Complex<int>> &) noexcept;
+template Vector2<Complex<BFloat16>>::Vector2(const Vector2<Complex<long64>> &) noexcept;
 template Vector2<Complex<BFloat16>>::Vector2(const Vector2<Complex<HalfFp16>> &) noexcept;
 template Vector2<Complex<BFloat16>>::Vector2(const Vector2<Complex<float>> &) noexcept;
 template Vector2<Complex<BFloat16>>::Vector2(const Vector2<Complex<double>> &) noexcept;
 template Vector2<Complex<BFloat16>>::Vector2(const Vector2<BFloat16> &) noexcept;
+template Vector2<Complex<BFloat16>>::Vector2(const Vector2<Complex<float>> &, RoundingMode);
 
 template Vector2<Complex<HalfFp16>>::Vector2(const Vector2<Complex<sbyte>> &) noexcept;
 template Vector2<Complex<HalfFp16>>::Vector2(const Vector2<Complex<short>> &) noexcept;
 template Vector2<Complex<HalfFp16>>::Vector2(const Vector2<Complex<int>> &) noexcept;
+template Vector2<Complex<HalfFp16>>::Vector2(const Vector2<Complex<long64>> &) noexcept;
 template Vector2<Complex<HalfFp16>>::Vector2(const Vector2<Complex<BFloat16>> &) noexcept;
 template Vector2<Complex<HalfFp16>>::Vector2(const Vector2<Complex<float>> &) noexcept;
 template Vector2<Complex<HalfFp16>>::Vector2(const Vector2<Complex<double>> &) noexcept;
 template Vector2<Complex<HalfFp16>>::Vector2(const Vector2<HalfFp16> &) noexcept;
+template Vector2<Complex<HalfFp16>>::Vector2(const Vector2<Complex<float>> &, RoundingMode);
 
 template Vector2<Complex<float>>::Vector2(const Vector2<Complex<sbyte>> &) noexcept;
 template Vector2<Complex<float>>::Vector2(const Vector2<Complex<short>> &) noexcept;
 template Vector2<Complex<float>>::Vector2(const Vector2<Complex<int>> &) noexcept;
+template Vector2<Complex<float>>::Vector2(const Vector2<Complex<long64>> &) noexcept;
 template Vector2<Complex<float>>::Vector2(const Vector2<Complex<BFloat16>> &) noexcept;
 template Vector2<Complex<float>>::Vector2(const Vector2<Complex<HalfFp16>> &) noexcept;
 template Vector2<Complex<float>>::Vector2(const Vector2<Complex<double>> &) noexcept;
@@ -256,6 +276,7 @@ template Vector2<Complex<float>>::Vector2(const Vector2<float> &) noexcept;
 template Vector2<Complex<double>>::Vector2(const Vector2<Complex<sbyte>> &) noexcept;
 template Vector2<Complex<double>>::Vector2(const Vector2<Complex<short>> &) noexcept;
 template Vector2<Complex<double>>::Vector2(const Vector2<Complex<int>> &) noexcept;
+template Vector2<Complex<double>>::Vector2(const Vector2<Complex<long64>> &) noexcept;
 template Vector2<Complex<double>>::Vector2(const Vector2<Complex<BFloat16>> &) noexcept;
 template Vector2<Complex<double>>::Vector2(const Vector2<Complex<HalfFp16>> &) noexcept;
 template Vector2<Complex<double>>::Vector2(const Vector2<Complex<float>> &) noexcept;
@@ -407,6 +428,7 @@ template Vector2<double>::Vector2(Vector2<float> &) noexcept;
 
 template Vector2<Complex<sbyte>>::Vector2(Vector2<Complex<short>> &) noexcept;
 template Vector2<Complex<sbyte>>::Vector2(Vector2<Complex<int>> &) noexcept;
+template Vector2<Complex<sbyte>>::Vector2(Vector2<Complex<long64>> &) noexcept;
 template Vector2<Complex<sbyte>>::Vector2(Vector2<Complex<BFloat16>> &) noexcept;
 template Vector2<Complex<sbyte>>::Vector2(Vector2<Complex<HalfFp16>> &) noexcept;
 template Vector2<Complex<sbyte>>::Vector2(Vector2<Complex<float>> &) noexcept;
@@ -414,6 +436,7 @@ template Vector2<Complex<sbyte>>::Vector2(Vector2<Complex<double>> &) noexcept;
 
 template Vector2<Complex<short>>::Vector2(Vector2<Complex<sbyte>> &) noexcept;
 template Vector2<Complex<short>>::Vector2(Vector2<Complex<int>> &) noexcept;
+template Vector2<Complex<short>>::Vector2(Vector2<Complex<long64>> &) noexcept;
 template Vector2<Complex<short>>::Vector2(Vector2<Complex<BFloat16>> &) noexcept;
 template Vector2<Complex<short>>::Vector2(Vector2<Complex<HalfFp16>> &) noexcept;
 template Vector2<Complex<short>>::Vector2(Vector2<Complex<float>> &) noexcept;
@@ -421,14 +444,24 @@ template Vector2<Complex<short>>::Vector2(Vector2<Complex<double>> &) noexcept;
 
 template Vector2<Complex<int>>::Vector2(Vector2<Complex<sbyte>> &) noexcept;
 template Vector2<Complex<int>>::Vector2(Vector2<Complex<short>> &) noexcept;
+template Vector2<Complex<int>>::Vector2(Vector2<Complex<long64>> &) noexcept;
 template Vector2<Complex<int>>::Vector2(Vector2<Complex<BFloat16>> &) noexcept;
 template Vector2<Complex<int>>::Vector2(Vector2<Complex<HalfFp16>> &) noexcept;
 template Vector2<Complex<int>>::Vector2(Vector2<Complex<float>> &) noexcept;
 template Vector2<Complex<int>>::Vector2(Vector2<Complex<double>> &) noexcept;
 
+template Vector2<Complex<long64>>::Vector2(Vector2<Complex<sbyte>> &) noexcept;
+template Vector2<Complex<long64>>::Vector2(Vector2<Complex<short>> &) noexcept;
+template Vector2<Complex<long64>>::Vector2(Vector2<Complex<int>> &) noexcept;
+template Vector2<Complex<long64>>::Vector2(Vector2<Complex<BFloat16>> &) noexcept;
+template Vector2<Complex<long64>>::Vector2(Vector2<Complex<HalfFp16>> &) noexcept;
+template Vector2<Complex<long64>>::Vector2(Vector2<Complex<float>> &) noexcept;
+template Vector2<Complex<long64>>::Vector2(Vector2<Complex<double>> &) noexcept;
+
 template Vector2<Complex<BFloat16>>::Vector2(Vector2<Complex<sbyte>> &) noexcept;
 template Vector2<Complex<BFloat16>>::Vector2(Vector2<Complex<short>> &) noexcept;
 template Vector2<Complex<BFloat16>>::Vector2(Vector2<Complex<int>> &) noexcept;
+template Vector2<Complex<BFloat16>>::Vector2(Vector2<Complex<long64>> &) noexcept;
 template Vector2<Complex<BFloat16>>::Vector2(Vector2<Complex<HalfFp16>> &) noexcept;
 template Vector2<Complex<BFloat16>>::Vector2(Vector2<Complex<float>> &) noexcept;
 template Vector2<Complex<BFloat16>>::Vector2(Vector2<Complex<double>> &) noexcept;
@@ -436,6 +469,7 @@ template Vector2<Complex<BFloat16>>::Vector2(Vector2<Complex<double>> &) noexcep
 template Vector2<Complex<HalfFp16>>::Vector2(Vector2<Complex<sbyte>> &) noexcept;
 template Vector2<Complex<HalfFp16>>::Vector2(Vector2<Complex<short>> &) noexcept;
 template Vector2<Complex<HalfFp16>>::Vector2(Vector2<Complex<int>> &) noexcept;
+template Vector2<Complex<HalfFp16>>::Vector2(Vector2<Complex<long64>> &) noexcept;
 template Vector2<Complex<HalfFp16>>::Vector2(Vector2<Complex<BFloat16>> &) noexcept;
 template Vector2<Complex<HalfFp16>>::Vector2(Vector2<Complex<float>> &) noexcept;
 template Vector2<Complex<HalfFp16>>::Vector2(Vector2<Complex<double>> &) noexcept;
@@ -443,6 +477,7 @@ template Vector2<Complex<HalfFp16>>::Vector2(Vector2<Complex<double>> &) noexcep
 template Vector2<Complex<float>>::Vector2(Vector2<Complex<sbyte>> &) noexcept;
 template Vector2<Complex<float>>::Vector2(Vector2<Complex<short>> &) noexcept;
 template Vector2<Complex<float>>::Vector2(Vector2<Complex<int>> &) noexcept;
+template Vector2<Complex<float>>::Vector2(Vector2<Complex<long64>> &) noexcept;
 template Vector2<Complex<float>>::Vector2(Vector2<Complex<BFloat16>> &) noexcept;
 template Vector2<Complex<float>>::Vector2(Vector2<Complex<HalfFp16>> &) noexcept;
 template Vector2<Complex<float>>::Vector2(Vector2<Complex<double>> &) noexcept;
@@ -450,6 +485,7 @@ template Vector2<Complex<float>>::Vector2(Vector2<Complex<double>> &) noexcept;
 template Vector2<Complex<double>>::Vector2(Vector2<Complex<sbyte>> &) noexcept;
 template Vector2<Complex<double>>::Vector2(Vector2<Complex<short>> &) noexcept;
 template Vector2<Complex<double>>::Vector2(Vector2<Complex<int>> &) noexcept;
+template Vector2<Complex<double>>::Vector2(Vector2<Complex<long64>> &) noexcept;
 template Vector2<Complex<double>>::Vector2(Vector2<Complex<BFloat16>> &) noexcept;
 template Vector2<Complex<double>>::Vector2(Vector2<Complex<HalfFp16>> &) noexcept;
 template Vector2<Complex<double>>::Vector2(Vector2<Complex<float>> &) noexcept;
@@ -788,6 +824,11 @@ template std::ostream &operator<<(std::ostream &aOs, const Vector2<Complex<int>>
 template std::wostream &operator<<(std::wostream &aOs, const Vector2<Complex<int>> &aVec);
 template std::istream &operator>>(std::istream &aIs, Vector2<Complex<int>> &aVec);
 template std::wistream &operator>>(std::wistream &aIs, Vector2<Complex<int>> &aVec);
+
+template std::ostream &operator<<(std::ostream &aOs, const Vector2<Complex<long64>> &aVec);
+template std::wostream &operator<<(std::wostream &aOs, const Vector2<Complex<long64>> &aVec);
+template std::istream &operator>>(std::istream &aIs, Vector2<Complex<long64>> &aVec);
+template std::wistream &operator>>(std::wistream &aIs, Vector2<Complex<long64>> &aVec);
 
 template std::ostream &operator<<(std::ostream &aOs, const Vector2<Complex<BFloat16>> &aVec);
 template std::wostream &operator<<(std::wostream &aOs, const Vector2<Complex<BFloat16>> &aVec);

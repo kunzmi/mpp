@@ -7,10 +7,15 @@ using namespace mpp::cuda;
 namespace mpp::image::cuda
 {
 
+ForAllChannelsWithAlphaInvokeConvert(64f, 16bf);
+ForAllChannelsWithAlphaInvokeConvert(64f, 16f);
+ForAllChannelsWithAlphaInvokeConvert(64f, 32f);
 ForAllChannelsWithAlphaInvokeConvertRound(64f, 8u);
 ForAllChannelsWithAlphaInvokeConvertRound(64f, 8s);
 ForAllChannelsWithAlphaInvokeConvertRound(64f, 16u);
 ForAllChannelsWithAlphaInvokeConvertRound(64f, 16s);
+ForAllChannelsWithAlphaInvokeConvertRound(64f, 32u);
+ForAllChannelsWithAlphaInvokeConvertRound(64f, 32s);
 ForAllChannelsWithAlphaInvokeConvertScaleRound(64f, 8u);
 ForAllChannelsWithAlphaInvokeConvertScaleRound(64f, 8s);
 ForAllChannelsWithAlphaInvokeConvertScaleRound(64f, 16u);

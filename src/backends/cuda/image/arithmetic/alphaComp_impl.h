@@ -330,10 +330,10 @@ void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT
+// using default_floating_compute_type_for_t for computeT
 #define Instantiate_For(typeSrcIsTypeDst)                                                                              \
     template void                                                                                                      \
-    InvokeAlphaCompSrcSrc<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(           \
+    InvokeAlphaCompSrcSrc<typeSrcIsTypeDst, default_floating_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(  \
         const typeSrcIsTypeDst *aSrc1, size_t aPitchSrc1, const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,            \
         typeSrcIsTypeDst *aDst, size_t aPitchDst, AlphaCompositionOp aAlphaOp, const Size2D &aSize,                    \
         const mpp::cuda::StreamCtx &aStreamCtx);

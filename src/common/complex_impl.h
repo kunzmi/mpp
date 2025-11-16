@@ -732,6 +732,320 @@ template <RealSignedNumber T> DEVICE_CODE Complex<T> Complex<T>::operator/(const
     T tempImag = imag * aOther.real - real * aOther.imag;
     return {static_cast<T>(tempReal / denom), static_cast<T>(tempImag / denom)};
 }
+
+/// <summary>
+/// Inplace complex integer division with element wise round()
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> &Complex<T>::DivRound(const Complex &aOther)
+    requires RealSignedIntegral<T>
+{
+    T denom = aOther.real * aOther.real + aOther.imag * aOther.imag;
+    if (denom == T(0))
+    {
+        real = static_cast<T>(0);
+        imag = static_cast<T>(0);
+        return *this;
+    }
+    T tempReal = real * aOther.real + imag * aOther.imag;
+    T tempImag = imag * aOther.real - real * aOther.imag;
+    real       = DivRoundTiesAwayFromZero(tempReal, denom);
+    imag       = DivRoundTiesAwayFromZero(tempImag, denom);
+    return *this;
+}
+
+/// <summary>
+/// Inplace complex integer division with element wise round nearest ties to even
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> &Complex<T>::DivRoundNearest(const Complex &aOther)
+    requires RealSignedIntegral<T>
+{
+    T denom = aOther.real * aOther.real + aOther.imag * aOther.imag;
+    if (denom == T(0))
+    {
+        real = static_cast<T>(0);
+        imag = static_cast<T>(0);
+        return *this;
+    }
+    T tempReal = real * aOther.real + imag * aOther.imag;
+    T tempImag = imag * aOther.real - real * aOther.imag;
+    real       = DivRoundNearestEven(tempReal, denom);
+    imag       = DivRoundNearestEven(tempImag, denom);
+    return *this;
+}
+
+/// <summary>
+/// Inplace complex integer division with element wise round toward zero
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> &Complex<T>::DivRoundZero(const Complex &aOther)
+    requires RealSignedIntegral<T>
+{
+    T denom = aOther.real * aOther.real + aOther.imag * aOther.imag;
+    if (denom == T(0))
+    {
+        real = static_cast<T>(0);
+        imag = static_cast<T>(0);
+        return *this;
+    }
+    T tempReal = real * aOther.real + imag * aOther.imag;
+    T tempImag = imag * aOther.real - real * aOther.imag;
+    real       = DivRoundTowardZero(tempReal, denom);
+    imag       = DivRoundTowardZero(tempImag, denom);
+    return *this;
+}
+
+/// <summary>
+/// Inplace complex integer division with element wise floor()
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> &Complex<T>::DivFloor(const Complex &aOther)
+    requires RealSignedIntegral<T>
+{
+    T denom = aOther.real * aOther.real + aOther.imag * aOther.imag;
+    if (denom == T(0))
+    {
+        real = static_cast<T>(0);
+        imag = static_cast<T>(0);
+        return *this;
+    }
+    T tempReal = real * aOther.real + imag * aOther.imag;
+    T tempImag = imag * aOther.real - real * aOther.imag;
+    real       = DivRoundTowardNegInf(tempReal, denom);
+    imag       = DivRoundTowardNegInf(tempImag, denom);
+    return *this;
+}
+
+/// <summary>
+/// Inplace complex integer division with element wise ceil()
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> &Complex<T>::DivCeil(const Complex &aOther)
+    requires RealSignedIntegral<T>
+{
+    T denom = aOther.real * aOther.real + aOther.imag * aOther.imag;
+    if (denom == T(0))
+    {
+        real = static_cast<T>(0);
+        imag = static_cast<T>(0);
+        return *this;
+    }
+    T tempReal = real * aOther.real + imag * aOther.imag;
+    T tempImag = imag * aOther.real - real * aOther.imag;
+    real       = DivRoundTowardPosInf(tempReal, denom);
+    imag       = DivRoundTowardPosInf(tempImag, denom);
+    return *this;
+}
+
+/// <summary>
+/// Inplace complex integer division with element wise round() (inverted inplace div: this = aOther / this)
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> &Complex<T>::DivInvRound(const Complex &aOther)
+    requires RealSignedIntegral<T>
+{
+    T denom = real * real + imag * imag;
+    if (denom == T(0))
+    {
+        real = static_cast<T>(0);
+        imag = static_cast<T>(0);
+        return *this;
+    }
+    T tempReal = aOther.real * real + aOther.imag * imag;
+    T tempImag = aOther.imag * real - aOther.real * imag;
+    real       = DivRoundTiesAwayFromZero(tempReal, denom);
+    imag       = DivRoundTiesAwayFromZero(tempImag, denom);
+    return *this;
+}
+
+/// <summary>
+/// Inplace complex integer division with element wise round nearest ties to even (inverted inplace div: this =
+/// aOther / this)
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> &Complex<T>::DivInvRoundNearest(const Complex &aOther)
+    requires RealSignedIntegral<T>
+{
+    T denom = real * real + imag * imag;
+    if (denom == T(0))
+    {
+        real = static_cast<T>(0);
+        imag = static_cast<T>(0);
+        return *this;
+    }
+    T tempReal = aOther.real * real + aOther.imag * imag;
+    T tempImag = aOther.imag * real - aOther.real * imag;
+    real       = DivRoundNearestEven(tempReal, denom);
+    imag       = DivRoundNearestEven(tempImag, denom);
+    return *this;
+}
+
+/// <summary>
+/// Inplace complex integer division with element wise round toward zero (inverted inplace div: this = aOther /
+/// this)
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> &Complex<T>::DivInvRoundZero(const Complex &aOther)
+    requires RealSignedIntegral<T>
+{
+    T denom = real * real + imag * imag;
+    if (denom == T(0))
+    {
+        real = static_cast<T>(0);
+        imag = static_cast<T>(0);
+        return *this;
+    }
+    T tempReal = aOther.real * real + aOther.imag * imag;
+    T tempImag = aOther.imag * real - aOther.real * imag;
+    real       = DivRoundTowardZero(tempReal, denom);
+    imag       = DivRoundTowardZero(tempImag, denom);
+    return *this;
+}
+
+/// <summary>
+/// Inplace complex integer division with element wise floor() (inverted inplace div: this = aOther / this)
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> &Complex<T>::DivInvFloor(const Complex &aOther)
+    requires RealSignedIntegral<T>
+{
+    T denom = real * real + imag * imag;
+    if (denom == T(0))
+    {
+        real = static_cast<T>(0);
+        imag = static_cast<T>(0);
+        return *this;
+    }
+    T tempReal = aOther.real * real + aOther.imag * imag;
+    T tempImag = aOther.imag * real - aOther.real * imag;
+    real       = DivRoundTowardNegInf(tempReal, denom);
+    imag       = DivRoundTowardNegInf(tempImag, denom);
+    return *this;
+}
+
+/// <summary>
+/// Inplace complex integer division with element wise ceil() (inverted inplace div: this = aOther / this)
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> &Complex<T>::DivInvCeil(const Complex &aOther)
+    requires RealSignedIntegral<T>
+{
+    T denom = real * real + imag * imag;
+    if (denom == T(0))
+    {
+        real = static_cast<T>(0);
+        imag = static_cast<T>(0);
+        return *this;
+    }
+    T tempReal = aOther.real * real + aOther.imag * imag;
+    T tempImag = aOther.imag * real - aOther.real * imag;
+    real       = DivRoundTowardPosInf(tempReal, denom);
+    imag       = DivRoundTowardPosInf(tempImag, denom);
+    return *this;
+}
+
+/// <summary>
+/// Complex integer division with element wise round()
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> Complex<T>::DivRound(const Complex &aLeft, const Complex &aRight)
+    requires RealSignedIntegral<T>
+{
+    T denom = aRight.real * aRight.real + aRight.imag * aRight.imag;
+    if (denom == T(0))
+    {
+        return {static_cast<T>(0), static_cast<T>(0)};
+    }
+    T tempReal = aLeft.real * aRight.real + aLeft.imag * aRight.imag;
+    T tempImag = aLeft.imag * aRight.real - aLeft.real * aRight.imag;
+
+    return {DivRoundTiesAwayFromZero(tempReal, denom), DivRoundTiesAwayFromZero(tempImag, denom)};
+}
+
+/// <summary>
+/// Complex integer division with element wise round nearest ties to even
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> Complex<T>::DivRoundNearest(const Complex &aLeft, const Complex &aRight)
+    requires RealSignedIntegral<T>
+{
+    T denom = aRight.real * aRight.real + aRight.imag * aRight.imag;
+    if (denom == T(0))
+    {
+        return {static_cast<T>(0), static_cast<T>(0)};
+    }
+    T tempReal = aLeft.real * aRight.real + aLeft.imag * aRight.imag;
+    T tempImag = aLeft.imag * aRight.real - aLeft.real * aRight.imag;
+
+    return {DivRoundNearestEven(tempReal, denom), DivRoundNearestEven(tempImag, denom)};
+}
+
+/// <summary>
+/// Complex integer division with element wise round toward zero
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> Complex<T>::DivRoundZero(const Complex &aLeft, const Complex &aRight)
+    requires RealSignedIntegral<T>
+{
+    T denom = aRight.real * aRight.real + aRight.imag * aRight.imag;
+    if (denom == T(0))
+    {
+        return {static_cast<T>(0), static_cast<T>(0)};
+    }
+    T tempReal = aLeft.real * aRight.real + aLeft.imag * aRight.imag;
+    T tempImag = aLeft.imag * aRight.real - aLeft.real * aRight.imag;
+
+    return {DivRoundTowardZero(tempReal, denom), DivRoundTowardZero(tempImag, denom)};
+}
+
+/// <summary>
+/// Complex integer division with element wise floor()
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> Complex<T>::DivFloor(const Complex &aLeft, const Complex &aRight)
+    requires RealSignedIntegral<T>
+{
+    T denom = aRight.real * aRight.real + aRight.imag * aRight.imag;
+    if (denom == T(0))
+    {
+        return {static_cast<T>(0), static_cast<T>(0)};
+    }
+    T tempReal = aLeft.real * aRight.real + aLeft.imag * aRight.imag;
+    T tempImag = aLeft.imag * aRight.real - aLeft.real * aRight.imag;
+
+    return {DivRoundTowardNegInf(tempReal, denom), DivRoundTowardNegInf(tempImag, denom)};
+}
+
+/// <summary>
+/// Complex integer division with element wise ceil()
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> Complex<T>::DivCeil(const Complex &aLeft, const Complex &aRight)
+    requires RealSignedIntegral<T>
+{
+    T denom = aRight.real * aRight.real + aRight.imag * aRight.imag;
+    if (denom == T(0))
+    {
+        return {static_cast<T>(0), static_cast<T>(0)};
+    }
+    T tempReal = aLeft.real * aRight.real + aLeft.imag * aRight.imag;
+    T tempImag = aLeft.imag * aRight.real - aLeft.real * aRight.imag;
+
+    return {DivRoundTowardPosInf(tempReal, denom), DivRoundTowardPosInf(tempImag, denom)};
+}
+
+/// <summary>
+/// Inplace complex integer division with element wise round nearest ties to even (for scaling operations)
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> &Complex<T>::DivScaleRoundNearest(T aScale)
+    requires RealSignedIntegral<T>
+{
+    real = DivScaleRoundNearestEven(real, aScale);
+    imag = DivScaleRoundNearestEven(imag, aScale);
+    return *this;
+}
 #pragma endregion
 
 #pragma region Methods

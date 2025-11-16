@@ -5,8 +5,8 @@
 #include <common/defines.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
-#include <common/numberTypes.h>
 #include <common/mpp_defs.h>
+#include <common/numberTypes.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
 #include <common/vector_typetraits.h>

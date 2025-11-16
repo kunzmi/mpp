@@ -44,7 +44,7 @@ void InvokeImagSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPit
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT
+// using SrcT for computeT
 #define Instantiate_For(typeSrc, typeDst)                                                                              \
     template void InvokeImagSrc<typeSrc, typeSrc, typeDst>(const typeSrc *aSrc1, size_t aPitchSrc1, typeDst *aDst,     \
                                                            size_t aPitchDst, const Size2D &aSize,                      \

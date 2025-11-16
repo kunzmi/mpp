@@ -423,7 +423,105 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
     /// <summary>
     /// Complex division
     /// </summary>
-    DEVICE_CODE [[nodiscard]] Complex operator/(const Complex &aOther) const;
+    DEVICE_CODE Complex operator/(const Complex &aOther) const;
+
+    /// <summary>
+    /// Inplace complex integer division with element wise round()
+    /// </summary>
+    DEVICE_CODE Complex &DivRound(const Complex &aOther)
+        requires RealSignedIntegral<T>;
+
+    /// <summary>
+    /// Inplace complex integer division with element wise round nearest ties to even
+    /// </summary>
+    DEVICE_CODE Complex &DivRoundNearest(const Complex &aOther)
+        requires RealSignedIntegral<T>;
+
+    /// <summary>
+    /// Inplace complex integer division with element wise round toward zero
+    /// </summary>
+    DEVICE_CODE Complex &DivRoundZero(const Complex &aOther)
+        requires RealSignedIntegral<T>;
+
+    /// <summary>
+    /// Inplace complex integer division with element wise floor()
+    /// </summary>
+    DEVICE_CODE Complex &DivFloor(const Complex &aOther)
+        requires RealSignedIntegral<T>;
+
+    /// <summary>
+    /// Inplace complex integer division with element wise ceil()
+    /// </summary>
+    DEVICE_CODE Complex &DivCeil(const Complex &aOther)
+        requires RealSignedIntegral<T>;
+
+    /// <summary>
+    /// Inplace complex integer division with element wise round() (inverted inplace div: this = aOther / this)
+    /// </summary>
+    DEVICE_CODE Complex &DivInvRound(const Complex &aOther)
+        requires RealSignedIntegral<T>;
+
+    /// <summary>
+    /// Inplace complex integer division with element wise round nearest ties to even (inverted inplace div: this =
+    /// aOther / this)
+    /// </summary>
+    DEVICE_CODE Complex &DivInvRoundNearest(const Complex &aOther)
+        requires RealSignedIntegral<T>;
+
+    /// <summary>
+    /// Inplace complex integer division with element wise round toward zero (inverted inplace div: this = aOther /
+    /// this)
+    /// </summary>
+    DEVICE_CODE Complex &DivInvRoundZero(const Complex &aOther)
+        requires RealSignedIntegral<T>;
+
+    /// <summary>
+    /// Inplace complex integer division with element wise floor() (inverted inplace div: this = aOther / this)
+    /// </summary>
+    DEVICE_CODE Complex &DivInvFloor(const Complex &aOther)
+        requires RealSignedIntegral<T>;
+
+    /// <summary>
+    /// Inplace complex integer division with element wise ceil() (inverted inplace div: this = aOther / this)
+    /// </summary>
+    DEVICE_CODE Complex &DivInvCeil(const Complex &aOther)
+        requires RealSignedIntegral<T>;
+
+    /// <summary>
+    /// Complex integer division with element wise round()
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Complex DivRound(const Complex &aLeft, const Complex &aRight)
+        requires RealSignedIntegral<T>;
+
+    /// <summary>
+    /// Complex integer division with element wise round nearest ties to even
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Complex DivRoundNearest(const Complex &aLeft, const Complex &aRight)
+        requires RealSignedIntegral<T>;
+
+    /// <summary>
+    /// Complex integer division with element wise round toward zero
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Complex DivRoundZero(const Complex &aLeft, const Complex &aRight)
+        requires RealSignedIntegral<T>;
+
+    /// <summary>
+    /// Complex integer division with element wise floor()
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Complex DivFloor(const Complex &aLeft, const Complex &aRight)
+        requires RealSignedIntegral<T>;
+
+    /// <summary>
+    /// Complex integer division with element wise ceil()
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] static Complex DivCeil(const Complex &aLeft, const Complex &aRight)
+        requires RealSignedIntegral<T>;
+
+    /// <summary>
+    /// Inplace complex integer division with element wise round nearest ties to even (for scaling operations)
+    /// </summary>
+    DEVICE_CODE Complex &DivScaleRoundNearest(T aScale)
+        requires RealSignedIntegral<T>;
 #pragma endregion
 
 #pragma region Methods

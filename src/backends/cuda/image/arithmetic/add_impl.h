@@ -101,15 +101,14 @@ void InvokeAddSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, si
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAddSrcSrcScale(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst,
-                          size_t aPitchDst, scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize,
-                          const StreamCtx &aStreamCtx)
+                          size_t aPitchDst, double aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
         MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0f)
+        if (aScaleFactor == 1.0)
         {
             InvokeAddSrcSrc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aDst, aPitchDst, aSize, aStreamCtx);
             return;
@@ -117,14 +116,35 @@ void InvokeAddSrcSrcScale(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using addSrcSrcScale =
-            SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Add<ComputeT>, RoundingMode::NearestTiesToEven>;
+        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            using addSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Add<ComputeT>, ScalerT,
+                                                      RoundingMode::NearestTiesToEven>;
 
-        const mpp::Add<ComputeT> op;
+            const mpp::Add<ComputeT> op;
 
-        const addSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
+            const addSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, scaler);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, addSrcSrcScale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, addSrcSrcScale>(aDst, aPitchDst, aSize, aStreamCtx,
+                                                                             functor);
+        }
+        else
+        {
+            // Scaler performs NearestTiesToEven rounding:
+            using ScalerT = Scale<ComputeT, true>;
+            const ScalerT scaler(aScaleFactor);
+            using addSrcSrcScale =
+                SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Add<ComputeT>, ScalerT, RoundingMode::None>;
+
+            const mpp::Add<ComputeT> op;
+
+            const addSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, scaler);
+
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, addSrcSrcScale>(aDst, aPitchDst, aSize, aStreamCtx,
+                                                                             functor);
+        }
     }
 }
 
@@ -134,8 +154,7 @@ void InvokeAddSrcSrcScale(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc
     template void                                                                                                      \
     InvokeAddSrcSrcScale<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(            \
         const typeSrcIsTypeDst *aSrc1, size_t aPitchSrc1, const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,            \
-        typeSrcIsTypeDst *aDst, size_t aPitchDst,                                                                      \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, const Size2D &aSize,                 \
+        typeSrcIsTypeDst *aDst, size_t aPitchDst, double aScaleFactor, const Size2D &aSize,                            \
         const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeAddSrcSrcScale(type)                                                                \
@@ -219,14 +238,14 @@ void InvokeAddSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT 
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAddSrcCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT *aDst, size_t aPitchDst,
-                        scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx)
+                        double aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
         MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0f)
+        if (aScaleFactor == 1.0)
         {
             InvokeAddSrcC(aSrc, aPitchSrc, aConst, aDst, aPitchDst, aSize, aStreamCtx);
             return;
@@ -234,14 +253,33 @@ void InvokeAddSrcCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, 
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using addSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Add<ComputeT>,
-                                                     RoundingMode::NearestTiesToEven>;
+        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            using addSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Add<ComputeT>, ScalerT,
+                                                         RoundingMode::NearestTiesToEven>;
 
-        const mpp::Add<ComputeT> op;
+            const mpp::Add<ComputeT> op;
 
-        const addSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
+            const addSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, scaler);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, addSrcCScale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, addSrcCScale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        }
+        else
+        {
+            // Scaler performs NearestTiesToEven rounding:
+            using ScalerT = Scale<ComputeT, true>;
+            const ScalerT scaler(aScaleFactor);
+            using addSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Add<ComputeT>, ScalerT,
+                                                         RoundingMode::None>;
+
+            const mpp::Add<ComputeT> op;
+
+            const addSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, scaler);
+
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, addSrcCScale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        }
     }
 }
 
@@ -251,8 +289,7 @@ void InvokeAddSrcCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, 
     template void                                                                                                      \
     InvokeAddSrcCScale<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(              \
         const typeSrcIsTypeDst *aSrc, size_t aPitchSrc, const typeSrcIsTypeDst &aConst, typeSrcIsTypeDst *aDst,        \
-        size_t aPitchDst, scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor,                    \
-        const Size2D &aSize, const StreamCtx &aStreamCtx);
+        size_t aPitchDst, double aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeAddSrcCScale(type)                                                                  \
     InstantiateInvokeAddSrcCScale_For(Pixel##type##C1);                                                                \
@@ -316,14 +353,14 @@ void InvokeAddSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst, Ds
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAddSrcDevCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst, DstT *aDst, size_t aPitchDst,
-                           scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx)
+                           double aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
         MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0f)
+        if (aScaleFactor == 1.0)
         {
             InvokeAddSrcDevC(aSrc, aPitchSrc, aConst, aDst, aPitchDst, aSize, aStreamCtx);
             return;
@@ -331,14 +368,35 @@ void InvokeAddSrcDevCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aCons
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using addSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Add<ComputeT>,
-                                                           RoundingMode::NearestTiesToEven>;
+        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            using addSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Add<ComputeT>,
+                                                               ScalerT, RoundingMode::NearestTiesToEven>;
 
-        const mpp::Add<ComputeT> op;
+            const mpp::Add<ComputeT> op;
 
-        const addSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
+            const addSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, scaler);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, addSrcDevCScale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, addSrcDevCScale>(aDst, aPitchDst, aSize, aStreamCtx,
+                                                                              functor);
+        }
+        else
+        {
+            // Scaler performs NearestTiesToEven rounding:
+            using ScalerT = Scale<ComputeT, true>;
+            const ScalerT scaler(aScaleFactor);
+            using addSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Add<ComputeT>,
+                                                               ScalerT, RoundingMode::None>;
+
+            const mpp::Add<ComputeT> op;
+
+            const addSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, scaler);
+
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, addSrcDevCScale>(aDst, aPitchDst, aSize, aStreamCtx,
+                                                                              functor);
+        }
     }
 }
 
@@ -348,8 +406,7 @@ void InvokeAddSrcDevCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aCons
     template void                                                                                                      \
     InvokeAddSrcDevCScale<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(           \
         const typeSrcIsTypeDst *aSrc, size_t aPitchSrc, const typeSrcIsTypeDst *aConst, typeSrcIsTypeDst *aDst,        \
-        size_t aPitchDst, scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor,                    \
-        const Size2D &aSize, const StreamCtx &aStreamCtx);
+        size_t aPitchDst, double aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeAddSrcDevCScale(type)                                                               \
     InstantiateInvokeAddSrcDevCScale_For(Pixel##type##C1);                                                             \
@@ -433,14 +490,14 @@ void InvokeAddInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, 
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAddInplaceSrcScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, size_t aPitchSrc2,
-                              scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx)
+                              double aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
         MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0f)
+        if (aScaleFactor == 1.0)
         {
             InvokeAddInplaceSrc(aSrcDst, aPitchSrcDst, aSrc2, aPitchSrc2, aSize, aStreamCtx);
             return;
@@ -448,15 +505,35 @@ void InvokeAddInplaceSrcScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aS
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using addInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Add<ComputeT>,
-                                                          RoundingMode::NearestTiesToEven>;
+        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            using addInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Add<ComputeT>,
+                                                              ScalerT, RoundingMode::NearestTiesToEven>;
 
-        const mpp::Add<ComputeT> op;
+            const mpp::Add<ComputeT> op;
 
-        const addInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
+            const addInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, addInplaceSrcScale>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
-                                                                             functor);
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, addInplaceSrcScale>(aSrcDst, aPitchSrcDst, aSize,
+                                                                                 aStreamCtx, functor);
+        }
+        else
+        {
+            // Scaler performs NearestTiesToEven rounding:
+            using ScalerT = Scale<ComputeT, true>;
+            const ScalerT scaler(aScaleFactor);
+            using addInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Add<ComputeT>,
+                                                              ScalerT, RoundingMode::None>;
+
+            const mpp::Add<ComputeT> op;
+
+            const addInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
+
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, addInplaceSrcScale>(aSrcDst, aPitchSrcDst, aSize,
+                                                                                 aStreamCtx, functor);
+        }
     }
 }
 
@@ -466,8 +543,7 @@ void InvokeAddInplaceSrcScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aS
     template void                                                                                                      \
     InvokeAddInplaceSrcScale<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(        \
         typeSrcIsTypeDst * aSrcDst, size_t aPitchSrcDst, const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,             \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, const Size2D &aSize,                 \
-        const StreamCtx &aStreamCtx);
+        double aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeAddInplaceSrcScale(type)                                                            \
     InstantiateInvokeAddInplaceSrcScale_For(Pixel##type##C1);                                                          \
@@ -553,15 +629,15 @@ void InvokeAddInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, c
 #pragma endregion
 
 template <typename SrcT, typename ComputeT, typename DstT>
-void InvokeAddInplaceCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst,
-                            scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx)
+void InvokeAddInplaceCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, double aScaleFactor,
+                            const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
         MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0f)
+        if (aScaleFactor == 1.0)
         {
             InvokeAddInplaceC(aSrcDst, aPitchSrcDst, aConst, aSize, aStreamCtx);
             return;
@@ -569,15 +645,37 @@ void InvokeAddInplaceCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aCon
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using addInplaceCScale =
-            InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Add<ComputeT>, RoundingMode::NearestTiesToEven>;
+        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
 
-        const mpp::Add<ComputeT> op;
+            using addInplaceCScale = InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Add<ComputeT>, ScalerT,
+                                                                 RoundingMode::NearestTiesToEven>;
 
-        const addInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
+            const mpp::Add<ComputeT> op;
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, addInplaceCScale>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
-                                                                           functor);
+            const addInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
+
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, addInplaceCScale>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
+                                                                               functor);
+        }
+        else
+        {
+            // Scaler performs NearestTiesToEven rounding:
+            using ScalerT = Scale<ComputeT, true>;
+            const ScalerT scaler(aScaleFactor);
+
+            using addInplaceCScale =
+                InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Add<ComputeT>, ScalerT, RoundingMode::None>;
+
+            const mpp::Add<ComputeT> op;
+
+            const addInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
+
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, addInplaceCScale>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
+                                                                               functor);
+        }
     }
 }
 
@@ -586,9 +684,8 @@ void InvokeAddInplaceCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aCon
 #define InstantiateInvokeAddInplaceCScale_For(typeSrcIsTypeDst)                                                        \
     template void                                                                                                      \
     InvokeAddInplaceCScale<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(          \
-        typeSrcIsTypeDst * aSrcDst, size_t aPitchSrcDst, const typeSrcIsTypeDst &aConst,                               \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, const Size2D &aSize,                 \
-        const StreamCtx &aStreamCtx);
+        typeSrcIsTypeDst * aSrcDst, size_t aPitchSrcDst, const typeSrcIsTypeDst &aConst, double aScaleFactor,          \
+        const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeAddInplaceCScale(type)                                                              \
     InstantiateInvokeAddInplaceCScale_For(Pixel##type##C1);                                                            \
@@ -652,15 +749,15 @@ void InvokeAddInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aConst
 #pragma endregion
 
 template <typename SrcT, typename ComputeT, typename DstT>
-void InvokeAddInplaceDevCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aConst,
-                               scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx)
+void InvokeAddInplaceDevCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aConst, double aScaleFactor,
+                               const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
         MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0f)
+        if (aScaleFactor == 1.0)
         {
             InvokeAddInplaceDevC(aSrcDst, aPitchSrcDst, aConst, aSize, aStreamCtx);
             return;
@@ -668,15 +765,37 @@ void InvokeAddInplaceDevCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *a
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using addInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Add<ComputeT>,
-                                                                   RoundingMode::NearestTiesToEven>;
+        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
 
-        const mpp::Add<ComputeT> op;
+            using addInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Add<ComputeT>,
+                                                                       ScalerT, RoundingMode::NearestTiesToEven>;
 
-        const addInplaceDevCScale functor(aConst, op, aScaleFactor);
+            const mpp::Add<ComputeT> op;
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, addInplaceDevCScale>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
-                                                                              functor);
+            const addInplaceDevCScale functor(aConst, op, scaler);
+
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, addInplaceDevCScale>(aSrcDst, aPitchSrcDst, aSize,
+                                                                                  aStreamCtx, functor);
+        }
+        else
+        {
+            // Scaler performs NearestTiesToEven rounding:
+            using ScalerT = Scale<ComputeT, true>;
+            const ScalerT scaler(aScaleFactor);
+
+            using addInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Add<ComputeT>,
+                                                                       ScalerT, RoundingMode::None>;
+
+            const mpp::Add<ComputeT> op;
+
+            const addInplaceDevCScale functor(aConst, op, scaler);
+
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, addInplaceDevCScale>(aSrcDst, aPitchSrcDst, aSize,
+                                                                                  aStreamCtx, functor);
+        }
     }
 }
 
@@ -685,9 +804,8 @@ void InvokeAddInplaceDevCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *a
 #define InstantiateInvokeAddInplaceDevCScale_For(typeSrcIsTypeDst)                                                     \
     template void                                                                                                      \
     InvokeAddInplaceDevCScale<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(       \
-        typeSrcIsTypeDst * aSrcDst, size_t aPitchSrcDst, const typeSrcIsTypeDst *aConst,                               \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, const Size2D &aSize,                 \
-        const StreamCtx &aStreamCtx);
+        typeSrcIsTypeDst * aSrcDst, size_t aPitchSrcDst, const typeSrcIsTypeDst *aConst, double aScaleFactor,          \
+        const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeAddInplaceDevCScale(type)                                                           \
     InstantiateInvokeAddInplaceDevCScale_For(Pixel##type##C1);                                                         \

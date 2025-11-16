@@ -104,15 +104,15 @@ void InvokeSubSrcSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeSubSrcSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aSrc1, size_t aPitchSrc1,
-                              const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst, size_t aPitchDst,
-                              scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx)
+                              const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst, size_t aPitchDst, double aScaleFactor,
+                              const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
         MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0f)
+        if (aScaleFactor == 1.0)
         {
             InvokeSubSrcSrcMask(aMask, aPitchMask, aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aDst, aPitchDst, aSize,
                                 aStreamCtx);
@@ -121,15 +121,35 @@ void InvokeSubSrcSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const S
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using subSrcSrcScale =
-            SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, RoundingMode::NearestTiesToEven>;
+        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            using subSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT,
+                                                      RoundingMode::NearestTiesToEven>;
 
-        const mpp::Sub<ComputeT> op;
+            const mpp::Sub<ComputeT> op;
 
-        const subSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
+            const subSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, scaler);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcSrcScale>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                               aSize, aStreamCtx, functor);
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcSrcScale>(aMask, aPitchMask, aDst, aPitchDst,
+                                                                                   aSize, aStreamCtx, functor);
+        }
+        else
+        {
+            // Scaler performs NearestTiesToEven rounding:
+            using ScalerT = Scale<ComputeT, true>;
+            const ScalerT scaler(aScaleFactor);
+            using subSrcSrcScale =
+                SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT, RoundingMode::None>;
+
+            const mpp::Sub<ComputeT> op;
+
+            const subSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, scaler);
+
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcSrcScale>(aMask, aPitchMask, aDst, aPitchDst,
+                                                                                   aSize, aStreamCtx, functor);
+        }
     }
 }
 
@@ -140,8 +160,7 @@ void InvokeSubSrcSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const S
     InvokeSubSrcSrcScaleMask<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(        \
         const Pixel8uC1 *aMask, size_t aPitchMask, const typeSrcIsTypeDst *aSrc1, size_t aPitchSrc1,                   \
         const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2, typeSrcIsTypeDst *aDst, size_t aPitchDst,                    \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, const Size2D &aSize,                 \
-        const StreamCtx &aStreamCtx);
+        double aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeSubSrcSrcScaleMask(type)                                                            \
     InstantiateInvokeSubSrcSrcScaleMask_For(Pixel##type##C1);                                                          \
@@ -228,15 +247,15 @@ void InvokeSubSrcCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aS
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeSubSrcCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aSrc, size_t aPitchSrc,
-                            const SrcT &aConst, DstT *aDst, size_t aPitchDst, scalefactor_t<ComputeT> aScaleFactor,
-                            const Size2D &aSize, const StreamCtx &aStreamCtx)
+                            const SrcT &aConst, DstT *aDst, size_t aPitchDst, double aScaleFactor, const Size2D &aSize,
+                            const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
         MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0f)
+        if (aScaleFactor == 1.0)
         {
             InvokeSubSrcCMask(aMask, aPitchMask, aSrc, aPitchSrc, aConst, aDst, aPitchDst, aSize, aStreamCtx);
             return;
@@ -244,15 +263,35 @@ void InvokeSubSrcCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const Src
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using subSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>,
-                                                     RoundingMode::NearestTiesToEven>;
+        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            using subSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT,
+                                                         RoundingMode::NearestTiesToEven>;
 
-        const mpp::Sub<ComputeT> op;
+            const mpp::Sub<ComputeT> op;
 
-        const subSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
+            const subSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, scaler);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcCScale>(aMask, aPitchMask, aDst, aPitchDst, aSize,
-                                                                             aStreamCtx, functor);
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcCScale>(aMask, aPitchMask, aDst, aPitchDst,
+                                                                                 aSize, aStreamCtx, functor);
+        }
+        else
+        {
+            // Scaler performs NearestTiesToEven rounding:
+            using ScalerT = Scale<ComputeT, true>;
+            const ScalerT scaler(aScaleFactor);
+            using subSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT,
+                                                         RoundingMode::None>;
+
+            const mpp::Sub<ComputeT> op;
+
+            const subSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, scaler);
+
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcCScale>(aMask, aPitchMask, aDst, aPitchDst,
+                                                                                 aSize, aStreamCtx, functor);
+        }
     }
 }
 
@@ -262,9 +301,8 @@ void InvokeSubSrcCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const Src
     template void                                                                                                      \
     InvokeSubSrcCScaleMask<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(          \
         const Pixel8uC1 *aMask, size_t aPitchMask, const typeSrcIsTypeDst *aSrc, size_t aPitchSrc,                     \
-        const typeSrcIsTypeDst &aConst, typeSrcIsTypeDst *aDst, size_t aPitchDst,                                      \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, const Size2D &aSize,                 \
-        const StreamCtx &aStreamCtx);
+        const typeSrcIsTypeDst &aConst, typeSrcIsTypeDst *aDst, size_t aPitchDst, double aScaleFactor,                 \
+        const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeSubSrcCScaleMask(type)                                                              \
     InstantiateInvokeSubSrcCScaleMask_For(Pixel##type##C1);                                                            \
@@ -331,7 +369,7 @@ void InvokeSubSrcDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT 
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeSubSrcDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aSrc, size_t aPitchSrc,
-                               const SrcT *aConst, DstT *aDst, size_t aPitchDst, scalefactor_t<ComputeT> aScaleFactor,
+                               const SrcT *aConst, DstT *aDst, size_t aPitchDst, double aScaleFactor,
                                const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
@@ -339,7 +377,7 @@ void InvokeSubSrcDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const 
         MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0f)
+        if (aScaleFactor == 1.0)
         {
             InvokeSubSrcDevCMask(aMask, aPitchMask, aSrc, aPitchSrc, aConst, aDst, aPitchDst, aSize, aStreamCtx);
             return;
@@ -347,15 +385,35 @@ void InvokeSubSrcDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const 
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using subSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>,
-                                                           RoundingMode::NearestTiesToEven>;
+        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            using subSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>,
+                                                               ScalerT, RoundingMode::NearestTiesToEven>;
 
-        const mpp::Sub<ComputeT> op;
+            const mpp::Sub<ComputeT> op;
 
-        const subSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
+            const subSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, scaler);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcDevCScale>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                aSize, aStreamCtx, functor);
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcDevCScale>(aMask, aPitchMask, aDst, aPitchDst,
+                                                                                    aSize, aStreamCtx, functor);
+        }
+        else
+        {
+            // Scaler performs NearestTiesToEven rounding:
+            using ScalerT = Scale<ComputeT, true>;
+            const ScalerT scaler(aScaleFactor);
+            using subSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>,
+                                                               ScalerT, RoundingMode::None>;
+
+            const mpp::Sub<ComputeT> op;
+
+            const subSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, scaler);
+
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcDevCScale>(aMask, aPitchMask, aDst, aPitchDst,
+                                                                                    aSize, aStreamCtx, functor);
+        }
     }
 }
 
@@ -365,9 +423,8 @@ void InvokeSubSrcDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const 
     template void                                                                                                      \
     InvokeSubSrcDevCScaleMask<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(       \
         const Pixel8uC1 *aMask, size_t aPitchMask, const typeSrcIsTypeDst *aSrc, size_t aPitchSrc,                     \
-        const typeSrcIsTypeDst *aConst, typeSrcIsTypeDst *aDst, size_t aPitchDst,                                      \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, const Size2D &aSize,                 \
-        const StreamCtx &aStreamCtx);
+        const typeSrcIsTypeDst *aConst, typeSrcIsTypeDst *aDst, size_t aPitchDst, double aScaleFactor,                 \
+        const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeSubSrcDevCScaleMask(type)                                                           \
     InstantiateInvokeSubSrcDevCScaleMask_For(Pixel##type##C1);                                                         \
@@ -451,15 +508,15 @@ void InvokeSubInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aS
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeSubInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
-                                  const SrcT *aSrc2, size_t aPitchSrc2, scalefactor_t<ComputeT> aScaleFactor,
-                                  const Size2D &aSize, const StreamCtx &aStreamCtx)
+                                  const SrcT *aSrc2, size_t aPitchSrc2, double aScaleFactor, const Size2D &aSize,
+                                  const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
         MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0f)
+        if (aScaleFactor == 1.0)
         {
             InvokeSubInplaceSrcMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSrc2, aPitchSrc2, aSize, aStreamCtx);
             return;
@@ -467,15 +524,35 @@ void InvokeSubInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Dst
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using subInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>,
-                                                          RoundingMode::NearestTiesToEven>;
+        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            using subInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>,
+                                                              ScalerT, RoundingMode::NearestTiesToEven>;
 
-        const mpp::Sub<ComputeT> op;
+            const mpp::Sub<ComputeT> op;
 
-        const subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
+            const subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcScale>(
-            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcScale>(
+                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+        }
+        else
+        {
+            // Scaler performs NearestTiesToEven rounding:
+            using ScalerT = Scale<ComputeT, true>;
+            const ScalerT scaler(aScaleFactor);
+            using subInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>,
+                                                              ScalerT, RoundingMode::None>;
+
+            const mpp::Sub<ComputeT> op;
+
+            const subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
+
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcScale>(
+                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+        }
     }
 }
 
@@ -485,8 +562,7 @@ void InvokeSubInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Dst
     template void                                                                                                      \
     InvokeSubInplaceSrcScaleMask<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(    \
         const Pixel8uC1 *aMask, size_t aPitchMask, typeSrcIsTypeDst *aSrcDst, size_t aPitchSrcDst,                     \
-        const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,                                                              \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, const Size2D &aSize,                 \
+        const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2, double aScaleFactor, const Size2D &aSize,                    \
         const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeSubInplaceSrcScaleMask(type)                                                        \
@@ -574,7 +650,7 @@ void InvokeSubInplaceCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrc
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeSubInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
-                                const SrcT &aConst, scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize,
+                                const SrcT &aConst, double aScaleFactor, const Size2D &aSize,
                                 const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
@@ -582,7 +658,7 @@ void InvokeSubInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT 
         MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0f)
+        if (aScaleFactor == 1.0)
         {
             InvokeSubInplaceCMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aConst, aSize, aStreamCtx);
             return;
@@ -590,15 +666,35 @@ void InvokeSubInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT 
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using subInplaceCScale =
-            InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Sub<ComputeT>, RoundingMode::NearestTiesToEven>;
+        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            using subInplaceCScale = InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT,
+                                                                 RoundingMode::NearestTiesToEven>;
 
-        const mpp::Sub<ComputeT> op;
+            const mpp::Sub<ComputeT> op;
 
-        const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
+            const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCScale>(
-            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCScale>(
+                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+        }
+        else
+        {
+            // Scaler performs NearestTiesToEven rounding:
+            using ScalerT = Scale<ComputeT, true>;
+            const ScalerT scaler(aScaleFactor);
+            using subInplaceCScale =
+                InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT, RoundingMode::None>;
+
+            const mpp::Sub<ComputeT> op;
+
+            const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
+
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCScale>(
+                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+        }
     }
 }
 
@@ -608,8 +704,7 @@ void InvokeSubInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT 
     template void                                                                                                      \
     InvokeSubInplaceCScaleMask<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(      \
         const Pixel8uC1 *aMask, size_t aPitchMask, typeSrcIsTypeDst *aSrcDst, size_t aPitchSrcDst,                     \
-        const typeSrcIsTypeDst &aConst, scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor,      \
-        const Size2D &aSize, const StreamCtx &aStreamCtx);
+        const typeSrcIsTypeDst &aConst, double aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeSubInplaceCScaleMask(type)                                                          \
     InstantiateInvokeSubInplaceCScaleMask_For(Pixel##type##C1);                                                        \
@@ -674,7 +769,7 @@ void InvokeSubInplaceDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *a
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeSubInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
-                                   const SrcT *aConst, scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize,
+                                   const SrcT *aConst, double aScaleFactor, const Size2D &aSize,
                                    const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
@@ -682,7 +777,7 @@ void InvokeSubInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
         MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0f)
+        if (aScaleFactor == 1.0)
         {
             InvokeSubInplaceDevCMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aConst, aSize, aStreamCtx);
             return;
@@ -690,15 +785,35 @@ void InvokeSubInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using subInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Sub<ComputeT>,
-                                                                   RoundingMode::NearestTiesToEven>;
+        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            using subInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Sub<ComputeT>,
+                                                                       ScalerT, RoundingMode::NearestTiesToEven>;
 
-        const mpp::Sub<ComputeT> op;
+            const mpp::Sub<ComputeT> op;
 
-        const subInplaceDevCScale functor(aConst, op, aScaleFactor);
+            const subInplaceDevCScale functor(aConst, op, scaler);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevCScale>(
-            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevCScale>(
+                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+        }
+        else
+        {
+            // Scaler performs NearestTiesToEven rounding:
+            using ScalerT = Scale<ComputeT, true>;
+            const ScalerT scaler(aScaleFactor);
+            using subInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Sub<ComputeT>,
+                                                                       ScalerT, RoundingMode::None>;
+
+            const mpp::Sub<ComputeT> op;
+
+            const subInplaceDevCScale functor(aConst, op, scaler);
+
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevCScale>(
+                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+        }
     }
 }
 
@@ -708,8 +823,7 @@ void InvokeSubInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
     template void                                                                                                      \
     InvokeSubInplaceDevCScaleMask<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(   \
         const Pixel8uC1 *aMask, size_t aPitchMask, typeSrcIsTypeDst *aSrcDst, size_t aPitchSrcDst,                     \
-        const typeSrcIsTypeDst *aConst, scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor,      \
-        const Size2D &aSize, const StreamCtx &aStreamCtx);
+        const typeSrcIsTypeDst *aConst, double aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeSubInplaceDevCScaleMask(type)                                                       \
     InstantiateInvokeSubInplaceDevCScaleMask_For(Pixel##type##C1);                                                     \
@@ -793,15 +907,15 @@ void InvokeSubInvInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT 
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeSubInvInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
-                                     const SrcT *aSrc2, size_t aPitchSrc2, scalefactor_t<ComputeT> aScaleFactor,
-                                     const Size2D &aSize, const StreamCtx &aStreamCtx)
+                                     const SrcT *aSrc2, size_t aPitchSrc2, double aScaleFactor, const Size2D &aSize,
+                                     const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
         MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0f)
+        if (aScaleFactor == 1.0)
         {
             InvokeSubInvInplaceSrcMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSrc2, aPitchSrc2, aSize, aStreamCtx);
             return;
@@ -809,15 +923,35 @@ void InvokeSubInvInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, 
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using subInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::SubInv<ComputeT>,
-                                                          RoundingMode::NearestTiesToEven>;
+        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            using subInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::SubInv<ComputeT>,
+                                                              ScalerT, RoundingMode::NearestTiesToEven>;
 
-        const mpp::SubInv<ComputeT> op;
+            const mpp::SubInv<ComputeT> op;
 
-        const subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
+            const subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcScale>(
-            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcScale>(
+                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+        }
+        else
+        {
+            // Scaler performs NearestTiesToEven rounding:
+            using ScalerT = Scale<ComputeT, true>;
+            const ScalerT scaler(aScaleFactor);
+            using subInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::SubInv<ComputeT>,
+                                                              ScalerT, RoundingMode::None>;
+
+            const mpp::SubInv<ComputeT> op;
+
+            const subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
+
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcScale>(
+                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+        }
     }
 }
 
@@ -827,8 +961,7 @@ void InvokeSubInvInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, 
     template void                                                                                                      \
     InvokeSubInvInplaceSrcScaleMask<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>( \
         const Pixel8uC1 *aMask, size_t aPitchMask, typeSrcIsTypeDst *aSrcDst, size_t aPitchSrcDst,                     \
-        const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,                                                              \
-        scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, const Size2D &aSize,                 \
+        const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2, double aScaleFactor, const Size2D &aSize,                    \
         const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeSubInvInplaceSrcScaleMask(type)                                                     \
@@ -916,7 +1049,7 @@ void InvokeSubInvInplaceCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *a
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeSubInvInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
-                                   const SrcT &aConst, scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize,
+                                   const SrcT &aConst, double aScaleFactor, const Size2D &aSize,
                                    const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
@@ -924,7 +1057,7 @@ void InvokeSubInvInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
         MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0f)
+        if (aScaleFactor == 1.0)
         {
             InvokeSubInvInplaceCMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aConst, aSize, aStreamCtx);
             return;
@@ -932,15 +1065,35 @@ void InvokeSubInvInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using subInplaceCScale = InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::SubInv<ComputeT>,
-                                                             RoundingMode::NearestTiesToEven>;
+        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            using subInplaceCScale = InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::SubInv<ComputeT>,
+                                                                 ScalerT, RoundingMode::NearestTiesToEven>;
 
-        const mpp::SubInv<ComputeT> op;
+            const mpp::SubInv<ComputeT> op;
 
-        const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
+            const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCScale>(
-            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCScale>(
+                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+        }
+        else
+        {
+            // Scaler performs NearestTiesToEven rounding:
+            using ScalerT = Scale<ComputeT, true>;
+            const ScalerT scaler(aScaleFactor);
+            using subInplaceCScale = InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::SubInv<ComputeT>,
+                                                                 ScalerT, RoundingMode::None>;
+
+            const mpp::SubInv<ComputeT> op;
+
+            const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
+
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCScale>(
+                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+        }
     }
 }
 
@@ -950,8 +1103,7 @@ void InvokeSubInvInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
     template void                                                                                                      \
     InvokeSubInvInplaceCScaleMask<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(   \
         const Pixel8uC1 *aMask, size_t aPitchMask, typeSrcIsTypeDst *aSrcDst, size_t aPitchSrcDst,                     \
-        const typeSrcIsTypeDst &aConst, scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor,      \
-        const Size2D &aSize, const StreamCtx &aStreamCtx);
+        const typeSrcIsTypeDst &aConst, double aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeSubInvInplaceCScaleMask(type)                                                       \
     InstantiateInvokeSubInvInplaceCScaleMask_For(Pixel##type##C1);                                                     \
@@ -1016,7 +1168,7 @@ void InvokeSubInvInplaceDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeSubInvInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
-                                      const SrcT *aConst, scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize,
+                                      const SrcT *aConst, double aScaleFactor, const Size2D &aSize,
                                       const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
@@ -1024,7 +1176,7 @@ void InvokeSubInvInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask,
         MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0f)
+        if (aScaleFactor == 1.0)
         {
             InvokeSubInvInplaceDevCMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aConst, aSize, aStreamCtx);
             return;
@@ -1032,15 +1184,35 @@ void InvokeSubInvInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask,
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using subInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::SubInv<ComputeT>,
-                                                                   RoundingMode::NearestTiesToEven>;
+        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            using subInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::SubInv<ComputeT>,
+                                                                       ScalerT, RoundingMode::NearestTiesToEven>;
 
-        const mpp::SubInv<ComputeT> op;
+            const mpp::SubInv<ComputeT> op;
 
-        const subInplaceDevCScale functor(aConst, op, aScaleFactor);
+            const subInplaceDevCScale functor(aConst, op, scaler);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevCScale>(
-            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevCScale>(
+                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+        }
+        else
+        {
+            // Scaler performs NearestTiesToEven rounding:
+            using ScalerT = Scale<ComputeT, true>;
+            const ScalerT scaler(aScaleFactor);
+            using subInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::SubInv<ComputeT>,
+                                                                       ScalerT, RoundingMode::None>;
+
+            const mpp::SubInv<ComputeT> op;
+
+            const subInplaceDevCScale functor(aConst, op, scaler);
+
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevCScale>(
+                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+        }
     }
 }
 
@@ -1050,8 +1222,7 @@ void InvokeSubInvInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask,
     template void InvokeSubInvInplaceDevCScaleMask<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>,     \
                                                    typeSrcIsTypeDst>(                                                  \
         const Pixel8uC1 *aMask, size_t aPitchMask, typeSrcIsTypeDst *aSrcDst, size_t aPitchSrcDst,                     \
-        const typeSrcIsTypeDst *aConst, scalefactor_t<default_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor,      \
-        const Size2D &aSize, const StreamCtx &aStreamCtx);
+        const typeSrcIsTypeDst *aConst, double aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeSubInvInplaceDevCScaleMask(type)                                                    \
     InstantiateInvokeSubInvInplaceDevCScaleMask_For(Pixel##type##C1);                                                  \

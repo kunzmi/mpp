@@ -1,8 +1,8 @@
 #pragma once
 #include <common/defines.h>
 #include <common/image/pixelTypes.h>
-#include <common/numeric_limits.h>
 #include <common/mpp_defs.h>
+#include <common/numeric_limits.h>
 #include <common/vector_typetraits.h>
 #include <common/vectorTypes.h>
 #include <concepts>
@@ -68,7 +68,7 @@ template <AnyVector T> struct Mul
     }
 };
 
-// Conjugate complext multiplication
+// Conjugate complex multiplication
 template <ComplexVector T> struct ConjMul
 {
     // aSrc1 * conj(aSrc2)
@@ -204,6 +204,222 @@ template <AnyVector T, AnyVector DstT> struct DivInv
             }
         }
         aSrcDst.DivInv(src1);
+    }
+};
+
+/// <summary>
+/// Integer division with rounding
+/// </summary>
+template <RealOrComplexIntVector T, RoundingMode roundingMode> struct DivIntRound
+{
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
+    {
+        if constexpr (roundingMode == RoundingMode::NearestTiesAwayFromZero)
+        {
+            aDst = T::DivRound(aSrc1, aSrc2);
+        }
+        else if constexpr (roundingMode == RoundingMode::NearestTiesToEven)
+        {
+            aDst = T::DivRoundNearest(aSrc1, aSrc2);
+        }
+        else if constexpr (roundingMode == RoundingMode::TowardZero)
+        {
+            aDst = T::DivRoundZero(aSrc1, aSrc2);
+        }
+        else if constexpr (roundingMode == RoundingMode::TowardNegativeInfinity)
+        {
+            aDst = T::DivFloor(aSrc1, aSrc2);
+        }
+        else if constexpr (roundingMode == RoundingMode::TowardPositiveInfinity)
+        {
+            aDst = T::DivCeil(aSrc1, aSrc2);
+        }
+        else
+        {
+            static_assert(roundingMode != RoundingMode::NearestTiesAwayFromZero, "Unsupported rounding mode");
+        }
+    }
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
+    {
+        if constexpr (roundingMode == RoundingMode::NearestTiesAwayFromZero)
+        {
+            aSrcDst.DivRound(aSrc1);
+        }
+        else if constexpr (roundingMode == RoundingMode::NearestTiesToEven)
+        {
+            aSrcDst.DivRoundNearest(aSrc1);
+        }
+        else if constexpr (roundingMode == RoundingMode::TowardZero)
+        {
+            aSrcDst.DivRoundZero(aSrc1);
+        }
+        else if constexpr (roundingMode == RoundingMode::TowardNegativeInfinity)
+        {
+            aSrcDst.DivFloor(aSrc1);
+        }
+        else if constexpr (roundingMode == RoundingMode::TowardPositiveInfinity)
+        {
+            aSrcDst.DivCeil(aSrc1);
+        }
+        else
+        {
+            static_assert(roundingMode != RoundingMode::NearestTiesAwayFromZero, "Unsupported rounding mode");
+        }
+    }
+};
+
+/// <summary>
+/// Integer division with rounding
+/// Inverted argument order for inplace div: aSrcDst = aSrc1 / aSrcDst
+/// </summary>
+template <RealOrComplexIntVector T, RoundingMode roundingMode> struct DivInvIntRound
+{
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
+    {
+        if constexpr (roundingMode == RoundingMode::NearestTiesAwayFromZero)
+        {
+            aSrcDst.DivInvRound(aSrc1);
+        }
+        else if constexpr (roundingMode == RoundingMode::NearestTiesToEven)
+        {
+            aSrcDst.DivInvRoundNearest(aSrc1);
+        }
+        else if constexpr (roundingMode == RoundingMode::TowardZero)
+        {
+            aSrcDst.DivInvRoundZero(aSrc1);
+        }
+        else if constexpr (roundingMode == RoundingMode::TowardNegativeInfinity)
+        {
+            aSrcDst.DivInvFloor(aSrc1);
+        }
+        else if constexpr (roundingMode == RoundingMode::TowardPositiveInfinity)
+        {
+            aSrcDst.DivInvCeil(aSrc1);
+        }
+        else
+        {
+            static_assert(roundingMode != RoundingMode::NearestTiesAwayFromZero, "Unsupported rounding mode");
+        }
+    }
+};
+
+/// <summary>
+/// Integer division with rounding. Multiplies by ScaleFactor before division.
+/// </summary>
+template <RealOrComplexIntVector T, RoundingMode roundingMode> struct DivIntScaleUpRound
+{
+    complex_basetype_t<image::pixel_basetype_t<T>> ScaleFactor;
+
+    DivIntScaleUpRound(double aScaleFactor)
+        : ScaleFactor(static_cast<complex_basetype_t<image::pixel_basetype_t<T>>>(aScaleFactor))
+    {
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
+    {
+        if constexpr (roundingMode == RoundingMode::NearestTiesAwayFromZero)
+        {
+            aDst = aSrc1 * ScaleFactor;
+            aDst.DivRound(aSrc2);
+        }
+        else if constexpr (roundingMode == RoundingMode::NearestTiesToEven)
+        {
+            aDst = aSrc1 * ScaleFactor;
+            aDst.DivRoundNearest(aSrc2);
+        }
+        else if constexpr (roundingMode == RoundingMode::TowardZero)
+        {
+            aDst = aSrc1 * ScaleFactor;
+            aDst.DivRoundZero(aSrc2);
+        }
+        else if constexpr (roundingMode == RoundingMode::TowardNegativeInfinity)
+        {
+            aDst = aSrc1 * ScaleFactor;
+            aDst.DivFloor(aSrc2);
+        }
+        else if constexpr (roundingMode == RoundingMode::TowardPositiveInfinity)
+        {
+            aDst = aSrc1 * ScaleFactor;
+            aDst.DivCeil(aSrc2);
+        }
+        else
+        {
+            static_assert(roundingMode != RoundingMode::NearestTiesAwayFromZero, "Unsupported rounding mode");
+        }
+    }
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
+    {
+        if constexpr (roundingMode == RoundingMode::NearestTiesAwayFromZero)
+        {
+            aSrcDst *= ScaleFactor;
+            aSrcDst.DivRound(aSrc1);
+        }
+        else if constexpr (roundingMode == RoundingMode::NearestTiesToEven)
+        {
+            aSrcDst *= ScaleFactor;
+            aSrcDst.DivRoundNearest(aSrc1);
+        }
+        else if constexpr (roundingMode == RoundingMode::TowardZero)
+        {
+            aSrcDst *= ScaleFactor;
+            aSrcDst.DivRoundZero(aSrc1);
+        }
+        else if constexpr (roundingMode == RoundingMode::TowardNegativeInfinity)
+        {
+            aSrcDst *= ScaleFactor;
+            aSrcDst.DivFloor(aSrc1);
+        }
+        else if constexpr (roundingMode == RoundingMode::TowardPositiveInfinity)
+        {
+            aSrcDst *= ScaleFactor;
+            aSrcDst.DivCeil(aSrc1);
+        }
+        else
+        {
+            static_assert(roundingMode != RoundingMode::NearestTiesAwayFromZero, "Unsupported rounding mode");
+        }
+    }
+};
+
+/// <summary>
+/// Integer division with rounding. Multiplies by ScaleFactor before division.
+/// Inverted argument order for inplace div: aSrcDst = aSrc1 / aSrcDst
+/// </summary>
+template <RealOrComplexIntVector T, RoundingMode roundingMode> struct DivInvIntScaleUpRound
+{
+    complex_basetype_t<image::pixel_basetype_t<T>> ScaleFactor;
+
+    DivInvIntScaleUpRound(double aScaleFactor)
+        : ScaleFactor(static_cast<complex_basetype_t<image::pixel_basetype_t<T>>>(aScaleFactor))
+    {
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
+    {
+        if constexpr (roundingMode == RoundingMode::NearestTiesAwayFromZero)
+        {
+            aSrcDst.DivInvRound(aSrc1 * ScaleFactor);
+        }
+        else if constexpr (roundingMode == RoundingMode::NearestTiesToEven)
+        {
+            aSrcDst.DivInvRoundNearest(aSrc1 * ScaleFactor);
+        }
+        else if constexpr (roundingMode == RoundingMode::TowardZero)
+        {
+            aSrcDst.DivInvRoundZero(aSrc1 * ScaleFactor);
+        }
+        else if constexpr (roundingMode == RoundingMode::TowardNegativeInfinity)
+        {
+            aSrcDst.DivInvFloor(aSrc1 * ScaleFactor);
+        }
+        else if constexpr (roundingMode == RoundingMode::TowardPositiveInfinity)
+        {
+            aSrcDst.DivInvCeil(aSrc1 * ScaleFactor);
+        }
+        else
+        {
+            static_assert(roundingMode != RoundingMode::NearestTiesAwayFromZero, "Unsupported rounding mode");
+        }
     }
 };
 

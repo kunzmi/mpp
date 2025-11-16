@@ -2,6 +2,7 @@
 #include <backends/cuda/image/imageView.h>
 #include <backends/npp/image/imageView.h>
 #include <backends/simple_cpu/image/addSquareProductWeightedOutputType.h>
+#include <backends/simple_cpu/image/conversionRelations.h>
 #include <backends/simple_cpu/image/histogramLevelsTypes.h>
 #include <common/arithmetic/binary_operators.h>
 #include <common/bfloat16.h>
@@ -32,14 +33,14 @@
 #include <common/image/roiException.h>
 #include <common/image/size2D.h>
 #include <common/image/sizePitched.h>
-#include <common/numberTypes.h>
 #include <common/mpp_defs.h>
+#include <common/numberTypes.h>
 #include <common/safeCast.h>
 #include <common/statistics/indexMinMax.h>
 #include <common/utilities.h>
+#include <common/vector_typetraits.h>
 #include <common/vector1.h>
 #include <common/vectorTypes.h>
-#include <common/vector_typetraits.h>
 #include <concepts>
 #include <cstddef>
 #include <iterator>
@@ -1038,10 +1039,7 @@ template <PixelType T> class ImageView
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &Convert(ImageView<TTo> &aDst) const
-        requires(!std::same_as<T, TTo>) &&
-                (RealOrComplexIntVector<T> || (std::same_as<complex_basetype_t<remove_vector_t<T>>, float> &&
-                                               (std::same_as<complex_basetype_t<remove_vector_t<TTo>>, BFloat16> ||
-                                                std::same_as<complex_basetype_t<remove_vector_t<TTo>>, HalfFp16>)));
+        requires(!std::same_as<T, TTo>) && ConversionImplemented<T, TTo>;
 
     /// <summary>
     /// Convert Floating point to Integer, float32 to half-float16/bfloat16. Values are clamped to
@@ -1051,15 +1049,16 @@ template <PixelType T> class ImageView
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode) const
-        requires(!std::same_as<T, TTo>) && RealOrComplexFloatingVector<T>;
+        requires(!std::same_as<T, TTo>) && ConversionRoundImplemented<T, TTo> && RealOrComplexFloatingVector<T>;
 
     /// <summary>
     /// Convert with prior floating point scaling. Operation is SrcT -> float -> scale -> DstT
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode, int aScaleFactor) const
-        requires(!std::same_as<T, TTo>) && (!std::same_as<TTo, float>) && (!std::same_as<TTo, double>) &&
-                (!std::same_as<TTo, Complex<float>>) && (!std::same_as<TTo, Complex<double>>);
+        requires(!std::same_as<T, TTo>) && ConversionRoundScaleImplemented<T, TTo> && (!std::same_as<TTo, float>) &&
+                (!std::same_as<TTo, double>) && (!std::same_as<TTo, Complex<float>>) &&
+                (!std::same_as<TTo, Complex<double>>);
 #pragma endregion
 #pragma region Copy
     /// <summary>

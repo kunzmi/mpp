@@ -5,12 +5,12 @@
 #include <common/defines.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
-#include <common/numberTypes.h>
 #include <common/mpp_defs.h>
+#include <common/numberTypes.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
-#include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vectorTypes.h>
 #include <concepts>
 
 // disable warning for pragma unroll when compiling with host compiler:
@@ -26,11 +26,11 @@ namespace mpp::image
 /// <typeparam name="operation"></typeparam>
 /// <typeparam name="tupelSize"></typeparam>
 /// <typeparam name="roundingMode"></typeparam>
-template <size_t tupelSize, typename ComputeT, typename DstT, typename operation,
+template <size_t tupelSize, typename ComputeT, typename DstT, typename operation, typename scaleOp,
           RoundingMode roundingMode = RoundingMode::NearestTiesAwayFromZero>
 struct InplaceScaleFunctor : public ImageFunctor<true>
 {
-    scalefactor_t<ComputeT> ScaleFactor;
+    scaleOp Scaler;
 
     [[no_unique_address]] operation Op;
 
@@ -41,7 +41,7 @@ struct InplaceScaleFunctor : public ImageFunctor<true>
     {
     }
 
-    InplaceScaleFunctor(operation aOp, scalefactor_t<ComputeT> aScaleFactor) : ScaleFactor(aScaleFactor), Op(aOp)
+    InplaceScaleFunctor(operation aOp, scaleOp aScaler) : Scaler(aScaler), Op(aOp)
     {
     }
 #pragma endregion
@@ -56,7 +56,7 @@ struct InplaceScaleFunctor : public ImageFunctor<true>
     {
         ComputeT temp(aDst);
         Op(temp);
-        temp *= ScaleFactor;
+        Scaler(temp);
         round(temp);
         // DstT constructor will clamp temp to value range of DstT
         aDst = static_cast<DstT>(temp);
@@ -74,7 +74,7 @@ struct InplaceScaleFunctor : public ImageFunctor<true>
         {
             ComputeT temp(aDst.value[i]);
             Op(temp);
-            temp *= ScaleFactor;
+            Scaler(temp);
             round(temp);
             // DstT constructor will clamp temp to value range of DstT
             aDst.value[i] = static_cast<DstT>(temp);

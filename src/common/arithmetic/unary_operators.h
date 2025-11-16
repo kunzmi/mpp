@@ -2,8 +2,8 @@
 #include <common/complex.h>
 #include <common/defines.h>
 #include <common/image/pixelTypes.h>
-#include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vectorTypes.h>
 #include <concepts>
 
 namespace mpp
@@ -502,6 +502,59 @@ template <RealVector T> struct MinValMaxVal
         if constexpr (vector_active_size_v<T> > 3)
         {
             aSrcDst.w = aSrcDst.w > MinThreshold.w ? MinVal.w : (aSrcDst.w < MaxThreshold.w ? MaxVal.w : aSrcDst.w);
+        }
+    }
+};
+
+/// <summary>
+/// For Integer type, IsScaleDown must be set to TRUE in case a
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <typeparam name="IsScaleDown"></typeparam>
+template <AnyVector T, bool IsScaleDown = false> struct Scale
+{
+    complex_basetype_t<image::pixel_basetype_t<T>> ScaleVal;
+
+    // aScaleFactor is a factor < 1 for downscaling and > 1 for upscaling
+    Scale(double aScaleFactor)
+    {
+        if constexpr (RealOrComplexFloatingVector<T>)
+        {
+            // for float types we always scale by multiplication
+            ScaleVal = static_cast<complex_basetype_t<image::pixel_basetype_t<T>>>(aScaleFactor);
+        }
+        else
+        {
+            if constexpr (IsScaleDown) // scale down
+            {
+                // assert(aScaleFactor < 1.0);
+                //  for integer types we scale down by division -> inverse of factor
+                ScaleVal = static_cast<complex_basetype_t<image::pixel_basetype_t<T>>>(1.0 / aScaleFactor);
+            }
+            else
+            {
+                // assert(aScaleFactor > 1.0);
+                ScaleVal = static_cast<complex_basetype_t<image::pixel_basetype_t<T>>>(aScaleFactor);
+            }
+        }
+    }
+
+    DEVICE_CODE void operator()(T &aSrcDst) const
+    {
+        if constexpr (RealOrComplexFloatingVector<T>)
+        {
+            aSrcDst *= ScaleVal;
+        }
+        else
+        {
+            if constexpr (IsScaleDown)
+            {
+                aSrcDst.DivScaleRoundNearest(ScaleVal);
+            }
+            else
+            {
+                aSrcDst *= ScaleVal;
+            }
         }
     }
 };

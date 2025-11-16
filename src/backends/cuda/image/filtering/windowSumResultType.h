@@ -24,10 +24,16 @@ struct window_sum_result_type<T>
     using type = same_vector_size_different_type_t<T, Complex<float>>;
 };
 template <typename T>
-    requires(sizeof(complex_basetype_t<remove_vector_t<T>>) >= 8)
+    requires(sizeof(complex_basetype_t<remove_vector_t<T>>) >= 8 && !ComplexVector<T>)
 struct window_sum_result_type<T>
 {
     using type = same_vector_size_different_type_t<T, double>;
+};
+template <typename T>
+    requires(sizeof(complex_basetype_t<remove_vector_t<T>>) >= 8 && ComplexVector<T>)
+struct window_sum_result_type<T>
+{
+    using type = same_vector_size_different_type_t<T, c_double>;
 };
 
 template <typename T> using window_sum_result_type_t = typename window_sum_result_type<T>::type;

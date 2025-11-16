@@ -44,11 +44,16 @@ template <typename mppT, typename nppT> class StatisticsSrcBase
         mpp.AllocBuffer(); // might change with roi...
         npp.AllocBuffer(); // might change with roi...
 
+        // Who ever runs first, be it NPP or MPP, will be penalized with some outliers, likely due to screen updates...
+        // So run twice and forget the first results.
         mpp.WarmUp();
         rt_mpp = mpp.Run();
 
         npp.WarmUp();
         rt_npp = npp.Run();
+
+        mpp.WarmUp();
+        rt_mpp = mpp.Run();
     }
 
     template <PixelType mppT2, PixelType nppT2> TestResult GetResult()

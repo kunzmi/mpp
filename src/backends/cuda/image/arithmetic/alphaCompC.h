@@ -13,7 +13,7 @@
 namespace mpp::image::cuda
 {
 
-template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+template <typename SrcT, typename ComputeT = default_floating_compute_type_for_t<SrcT>, typename DstT>
 void InvokeAlphaCompCSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst,
                             size_t aPitchDst, remove_vector_t<SrcT> aAlpha1, remove_vector_t<SrcT> aAlpha2,
                             AlphaCompositionOp aAlphaOp, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);

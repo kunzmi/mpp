@@ -1,4 +1,5 @@
 #pragma once
+#pragma once
 #include <common/complex.h>
 #include <common/defines.h>
 #include <common/vector_typetraits.h>
@@ -1079,110 +1080,110 @@ template <> struct default_compute_type_for<Pixel16bfcC4>
     using type = Pixel16bfcC4;
 };
 
-// 64u -> 64f
+// 64u -> 64u
 template <> struct default_compute_type_for<Pixel64uC1>
 {
-    using type = Pixel64fC1;
+    using type = Pixel64uC1;
 };
 template <> struct default_compute_type_for<Pixel64uC2>
 {
-    using type = Pixel64fC2;
+    using type = Pixel64uC2;
 };
 template <> struct default_compute_type_for<Pixel64uC3>
 {
-    using type = Pixel64fC3;
+    using type = Pixel64uC3;
 };
 template <> struct default_compute_type_for<Pixel64uC4>
 {
-    using type = Pixel64fC4;
+    using type = Pixel64uC4;
 };
 template <> struct default_compute_type_for<Pixel64uC4A>
 {
-    using type = Pixel64fC4A;
+    using type = Pixel64uC4A;
 };
 
 // 64s -> 64f
 template <> struct default_compute_type_for<Pixel64sC1>
 {
-    using type = Pixel64fC1;
+    using type = Pixel64sC1;
 };
 template <> struct default_compute_type_for<Pixel64sC2>
 {
-    using type = Pixel64fC2;
+    using type = Pixel64sC2;
 };
 template <> struct default_compute_type_for<Pixel64sC3>
 {
-    using type = Pixel64fC3;
+    using type = Pixel64sC3;
 };
 template <> struct default_compute_type_for<Pixel64sC4>
 {
-    using type = Pixel64fC4;
+    using type = Pixel64sC4;
 };
 template <> struct default_compute_type_for<Pixel64sC4A>
 {
-    using type = Pixel64fC4A;
+    using type = Pixel64sC4A;
 };
 
-// 32s -> 64f (this is for sure not the best choice in terms of performance but for "correctness")
+// 32s -> 64s
 template <> struct default_compute_type_for<Pixel32sC1>
 {
-    using type = Pixel64fC1;
+    using type = Pixel64sC1;
 };
 template <> struct default_compute_type_for<Pixel32sC2>
 {
-    using type = Pixel64fC2;
+    using type = Pixel64sC2;
 };
 template <> struct default_compute_type_for<Pixel32sC3>
 {
-    using type = Pixel64fC3;
+    using type = Pixel64sC3;
 };
 template <> struct default_compute_type_for<Pixel32sC4>
 {
-    using type = Pixel64fC4;
+    using type = Pixel64sC4;
 };
 template <> struct default_compute_type_for<Pixel32sC4A>
 {
-    using type = Pixel64fC4A;
+    using type = Pixel64sC4A;
 };
 
-// 32sc -> 32fc
+// 32sc -> 64sc
 template <> struct default_compute_type_for<Pixel32scC1>
 {
-    using type = Pixel32fcC1;
+    using type = Pixel64scC1;
 };
 template <> struct default_compute_type_for<Pixel32scC2>
 {
-    using type = Pixel32fcC2;
+    using type = Pixel64scC2;
 };
 template <> struct default_compute_type_for<Pixel32scC3>
 {
-    using type = Pixel32fcC3;
+    using type = Pixel64scC3;
 };
 template <> struct default_compute_type_for<Pixel32scC4>
 {
-    using type = Pixel32fcC4;
+    using type = Pixel64scC4;
 };
 
-// 32u -> 64f (this is for sure not the best choice in terms of performance but for "correctness")
+// 32u -> 64s (convert to signed to avoid overflow in subtraction)
 template <> struct default_compute_type_for<Pixel32uC1>
 {
-    using type = Pixel64fC1;
+    using type = Pixel64sC1;
 };
 template <> struct default_compute_type_for<Pixel32uC2>
 {
-    using type = Pixel64fC2;
+    using type = Pixel64sC2;
 };
 template <> struct default_compute_type_for<Pixel32uC3>
 {
-    using type = Pixel64fC3;
+    using type = Pixel64sC3;
 };
 template <> struct default_compute_type_for<Pixel32uC4>
 {
-    using type = Pixel64fC4;
+    using type = Pixel64sC4;
 };
 template <> struct default_compute_type_for<Pixel32uC4A>
 {
-    using type = Pixel64fC4A;
+    using type = Pixel64sC4A;
 };
 
 // 16s -> 32f
@@ -1293,37 +1294,188 @@ template <> struct default_compute_type_for<Pixel8uC4A>
 
 template <typename T> using default_compute_type_for_t = typename default_compute_type_for<T>::type;
 
-// some computations like Mul or Exp need a higher bit rate floating point compute type:
-template <typename T> struct default_ext_compute_type_for
+// some computations like Mul need a higher bit rate compute type:
+template <typename T> struct default_ext_int_compute_type_for
 {
     using type = default_compute_type_for_t<T>;
 };
 
-// 32sc -> 64fc
-template <> struct default_ext_compute_type_for<Pixel32scC1>
+// 32u -> 64u
+template <> struct default_ext_int_compute_type_for<Pixel32uC1>
 {
-    using type = Pixel64fcC1;
+    using type = Pixel64uC1;
 };
-template <> struct default_ext_compute_type_for<Pixel32scC2>
+template <> struct default_ext_int_compute_type_for<Pixel32uC2>
 {
-    using type = Pixel64fcC2;
+    using type = Pixel64uC2;
 };
-template <> struct default_ext_compute_type_for<Pixel32scC3>
+template <> struct default_ext_int_compute_type_for<Pixel32uC3>
 {
-    using type = Pixel64fcC3;
+    using type = Pixel64uC3;
 };
-template <> struct default_ext_compute_type_for<Pixel32scC4>
+template <> struct default_ext_int_compute_type_for<Pixel32uC4>
 {
-    using type = Pixel64fcC4;
+    using type = Pixel64uC4;
+};
+template <> struct default_ext_int_compute_type_for<Pixel32uC4A>
+{
+    using type = Pixel64uC4A;
+};
+// 16sc -> 64sc
+template <> struct default_ext_int_compute_type_for<Pixel16scC1>
+{
+    using type = Pixel64scC1;
+};
+template <> struct default_ext_int_compute_type_for<Pixel16scC2>
+{
+    using type = Pixel64scC2;
+};
+template <> struct default_ext_int_compute_type_for<Pixel16scC3>
+{
+    using type = Pixel64scC3;
+};
+template <> struct default_ext_int_compute_type_for<Pixel16scC4>
+{
+    using type = Pixel64scC4;
 };
 
-template <typename T> using default_ext_compute_type_for_t = typename default_ext_compute_type_for<T>::type;
+// 16s -> 32s
+template <> struct default_ext_int_compute_type_for<Pixel16sC1>
+{
+    using type = Pixel32sC1;
+};
+template <> struct default_ext_int_compute_type_for<Pixel16sC2>
+{
+    using type = Pixel32sC2;
+};
+template <> struct default_ext_int_compute_type_for<Pixel16sC3>
+{
+    using type = Pixel32sC3;
+};
+template <> struct default_ext_int_compute_type_for<Pixel16sC4>
+{
+    using type = Pixel32sC4;
+};
+template <> struct default_ext_int_compute_type_for<Pixel16sC4A>
+{
+    using type = Pixel32sC4A;
+};
+
+// 16u -> 32u
+template <> struct default_ext_int_compute_type_for<Pixel16uC1>
+{
+    using type = Pixel32uC1;
+};
+template <> struct default_ext_int_compute_type_for<Pixel16uC2>
+{
+    using type = Pixel32uC2;
+};
+template <> struct default_ext_int_compute_type_for<Pixel16uC3>
+{
+    using type = Pixel32uC3;
+};
+template <> struct default_ext_int_compute_type_for<Pixel16uC4>
+{
+    using type = Pixel32uC4;
+};
+template <> struct default_ext_int_compute_type_for<Pixel16uC4A>
+{
+    using type = Pixel32uC4A;
+};
+
+template <typename T> using default_ext_int_compute_type_for_t = typename default_ext_int_compute_type_for<T>::type;
+
+// some computations require a floating point compute type:
+template <typename T> struct default_floating_compute_type_for
+{
+    using type = default_compute_type_for_t<T>;
+};
+
+// 32u -> 64f
+template <> struct default_floating_compute_type_for<Pixel32uC1>
+{
+    using type = Pixel64fC1;
+};
+template <> struct default_floating_compute_type_for<Pixel32uC2>
+{
+    using type = Pixel64fC2;
+};
+template <> struct default_floating_compute_type_for<Pixel32uC3>
+{
+    using type = Pixel64fC3;
+};
+template <> struct default_floating_compute_type_for<Pixel32uC4>
+{
+    using type = Pixel64fC4;
+};
+template <> struct default_floating_compute_type_for<Pixel32uC4A>
+{
+    using type = Pixel64fC4A;
+};
+
+// 32s -> 64f
+template <> struct default_floating_compute_type_for<Pixel32sC1>
+{
+    using type = Pixel64fC1;
+};
+template <> struct default_floating_compute_type_for<Pixel32sC2>
+{
+    using type = Pixel64fC2;
+};
+template <> struct default_floating_compute_type_for<Pixel32sC3>
+{
+    using type = Pixel64fC3;
+};
+template <> struct default_floating_compute_type_for<Pixel32sC4>
+{
+    using type = Pixel64fC4;
+};
+template <> struct default_floating_compute_type_for<Pixel32sC4A>
+{
+    using type = Pixel64fC4A;
+};
+// 16sc -> 32fc
+template <> struct default_floating_compute_type_for<Pixel16scC1>
+{
+    using type = Pixel32fcC1;
+};
+template <> struct default_floating_compute_type_for<Pixel16scC2>
+{
+    using type = Pixel32fcC2;
+};
+template <> struct default_floating_compute_type_for<Pixel16scC3>
+{
+    using type = Pixel32fcC3;
+};
+template <> struct default_floating_compute_type_for<Pixel16scC4>
+{
+    using type = Pixel32fcC4;
+};
+// 32sc -> 32fc
+template <> struct default_floating_compute_type_for<Pixel32scC1>
+{
+    using type = Pixel32fcC1;
+};
+template <> struct default_floating_compute_type_for<Pixel32scC2>
+{
+    using type = Pixel32fcC2;
+};
+template <> struct default_floating_compute_type_for<Pixel32scC3>
+{
+    using type = Pixel32fcC3;
+};
+template <> struct default_floating_compute_type_for<Pixel32scC4>
+{
+    using type = Pixel32fcC4;
+};
+
+template <typename T> using default_floating_compute_type_for_t = typename default_floating_compute_type_for<T>::type;
 #pragma endregion
 
 #pragma region Compute type for geometry operations
 template <typename T> struct geometry_compute_type_for
 {
-    using type = default_compute_type_for_t<T>;
+    using type = default_floating_compute_type_for_t<T>;
 };
 // 16f
 template <> struct geometry_compute_type_for<Pixel16fC1>

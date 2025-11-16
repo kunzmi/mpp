@@ -5,8 +5,8 @@
 #include <common/defines.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
-#include <common/numberTypes.h>
 #include <common/mpp_defs.h>
+#include <common/numberTypes.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
 #include <common/vector_typetraits.h>
@@ -53,7 +53,7 @@ using convert_scale_compute_type_t = typename convert_scale_compute_type<TVector
 /// <typeparam name="DstT"></typeparam>
 /// <typeparam name="tupelSize"></typeparam>
 /// <typeparam name="roundingMode"></typeparam>
-template <size_t tupelSize, typename SrcT, typename DstT, RoundingMode roundingMode>
+template <size_t tupelSize, typename SrcT, typename DstT, typename scaleOp, RoundingMode roundingMode>
 struct ConvertScaleFunctor : public ImageFunctor<false>
 {
     using ComputeT = convert_scale_compute_type_t<SrcT>;
@@ -61,7 +61,7 @@ struct ConvertScaleFunctor : public ImageFunctor<false>
     const SrcT *RESTRICT Src1;
     size_t SrcPitch1;
 
-    scalefactor_t<ComputeT> ScaleFactor;
+    scaleOp Scaler;
 
     [[no_unique_address]] RoundFunctor<roundingMode, ComputeT> round;
 
@@ -70,8 +70,8 @@ struct ConvertScaleFunctor : public ImageFunctor<false>
     {
     }
 
-    ConvertScaleFunctor(const SrcT *aSrc1, size_t aSrcPitch1, scalefactor_t<ComputeT> aScaleFactor)
-        : Src1(aSrc1), SrcPitch1(aSrcPitch1), ScaleFactor(aScaleFactor)
+    ConvertScaleFunctor(const SrcT *aSrc1, size_t aSrcPitch1, scaleOp aScaler)
+        : Src1(aSrc1), SrcPitch1(aSrcPitch1), Scaler(aScaler)
     {
     }
 #pragma endregion
@@ -84,14 +84,7 @@ struct ConvertScaleFunctor : public ImageFunctor<false>
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         ComputeT temp         = static_cast<ComputeT>(*pixelSrc1);
-        if constexpr (ComplexVector<ComputeT>)
-        {
-            temp = temp * ScaleFactor;
-        }
-        else
-        {
-            temp *= ScaleFactor;
-        }
+        Scaler(temp);
         if constexpr (RealOrComplexFloatingPoint<pixel_basetype_t<ComputeT>> &&
                       RealOrComplexIntegral<pixel_basetype_t<DstT>>)
         {
@@ -115,14 +108,7 @@ struct ConvertScaleFunctor : public ImageFunctor<false>
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         ComputeT temp         = *pixelSrc1;
-        if constexpr (ComplexVector<ComputeT>)
-        {
-            temp = temp * ScaleFactor;
-        }
-        else
-        {
-            temp *= ScaleFactor;
-        }
+        Scaler(temp);
         aDst = DstT(temp, roundingMode);
         return true;
     }
@@ -139,14 +125,7 @@ struct ConvertScaleFunctor : public ImageFunctor<false>
         for (size_t i = 0; i < tupelSize; i++)
         {
             ComputeT temp = static_cast<ComputeT>(tupelSrc1.value[i]);
-            if constexpr (ComplexVector<ComputeT>)
-            {
-                temp = temp * ScaleFactor;
-            }
-            else
-            {
-                temp *= ScaleFactor;
-            }
+            Scaler(temp);
             if constexpr (RealOrComplexFloatingPoint<pixel_basetype_t<SrcT>> &&
                           RealOrComplexIntegral<pixel_basetype_t<DstT>>)
             {
@@ -175,7 +154,7 @@ struct ConvertScaleFunctor : public ImageFunctor<false>
 #pragma unroll
         for (size_t i = 0; i < tupelSize; i++)
         {
-            tupelSrc1.value[i] *= ScaleFactor;
+            Scaler(tupelSrc1.value[i]);
             aDst.value[i] = DstT(tupelSrc1.value[i], roundingMode);
         }
     }

@@ -362,6 +362,26 @@ TEST_CASE("Pixel32sC1", "[Common]")
 
     CHECK(Pixel32sC1::Max(minmax1, minmax2) == Pixel32sC1(10));
     CHECK(Pixel32sC1::Max(minmax2, minmax1) == Pixel32sC1(10));
+
+    CHECK(Pixel32sC1(10).DivRound(Pixel32sC1(3)) == Pixel32sC1(3));
+    CHECK(Pixel32sC1(10).DivRoundNearest(Pixel32sC1(3)) == Pixel32sC1(3));
+    CHECK(Pixel32sC1(10).DivRoundZero(Pixel32sC1(3)) == Pixel32sC1(3));
+    CHECK(Pixel32sC1(10).DivFloor(Pixel32sC1(3)) == Pixel32sC1(3));
+    CHECK(Pixel32sC1(10).DivCeil(Pixel32sC1(3)) == Pixel32sC1(4));
+
+    CHECK(Pixel32sC1(3).DivInvRound(Pixel32sC1(10)) == Pixel32sC1(3));
+    CHECK(Pixel32sC1(3).DivInvRoundNearest(Pixel32sC1(10)) == Pixel32sC1(3));
+    CHECK(Pixel32sC1(3).DivInvRoundZero(Pixel32sC1(10)) == Pixel32sC1(3));
+    CHECK(Pixel32sC1(3).DivInvFloor(Pixel32sC1(10)) == Pixel32sC1(3));
+    CHECK(Pixel32sC1(3).DivInvCeil(Pixel32sC1(10)) == Pixel32sC1(4));
+
+    CHECK(Pixel32sC1::DivRound(Pixel32sC1(10), Pixel32sC1(-3)) == Pixel32sC1(-3));
+    CHECK(Pixel32sC1::DivRoundNearest(Pixel32sC1(10), Pixel32sC1(-3)) == Pixel32sC1(-3));
+    CHECK(Pixel32sC1::DivRoundZero(Pixel32sC1(10), Pixel32sC1(-3)) == Pixel32sC1(-3));
+    CHECK(Pixel32sC1::DivFloor(Pixel32sC1(10), Pixel32sC1(-3)) == Pixel32sC1(-4));
+    CHECK(Pixel32sC1::DivCeil(Pixel32sC1(10), Pixel32sC1(-3)) == Pixel32sC1(-3));
+
+    CHECK(Pixel32sC1(-9).DivScaleRoundNearest(10) == Pixel32sC1(-1));
 }
 
 TEST_CASE("Pixel32sC1_additionalMethods", "[Common]")
@@ -981,6 +1001,20 @@ TEST_CASE("Pixel32fcC1", "[Common]")
     conj2 = Pixel32fcC1::ConjMul(t1, t2);
     CHECK(conj1.x == 50 + 1_i);
     CHECK(conj2.x == 50 + 1_i);
+
+    Pixel32fcC1 a = t1;
+    Pixel32fcC1 s = t1;
+    Pixel32fcC1 m = t1;
+    Pixel32fcC1 d = t1;
+
+    a += 5.0f;
+    s -= 5.0f;
+    m *= 5.0f;
+    d /= 5.0f;
+    CHECK(a == t1 + 5.0f);
+    CHECK(s == t1 - 5.0f);
+    CHECK(m == t1 * 5.0f);
+    CHECK(d == t1 / 5.0f);
 }
 
 TEST_CASE("Pixel32fcC1_additionalMethods", "[Common]")
@@ -1029,4 +1063,44 @@ TEST_CASE("Pixel32fcC1_additionalMethods", "[Common]")
 
     Pixel32scC1 clampInt(clampToInt);
     CHECK(clampInt.x.real == 2147483647);
+}
+
+TEST_CASE("Pixel64sC1", "[Common]")
+{
+    CHECK(Pixel64sC1(10).DivRound(Pixel64sC1(3)) == Pixel64sC1(3));
+    CHECK(Pixel64sC1(10).DivRoundNearest(Pixel64sC1(3)) == Pixel64sC1(3));
+    CHECK(Pixel64sC1(10).DivRoundZero(Pixel64sC1(3)) == Pixel64sC1(3));
+    CHECK(Pixel64sC1(10).DivFloor(Pixel64sC1(3)) == Pixel64sC1(3));
+    CHECK(Pixel64sC1(10).DivCeil(Pixel64sC1(3)) == Pixel64sC1(4));
+
+    CHECK(Pixel64sC1::DivRound(Pixel64sC1(10), Pixel64sC1(-3)) == Pixel64sC1(-3));
+    CHECK(Pixel64sC1::DivRoundNearest(Pixel64sC1(10), Pixel64sC1(-3)) == Pixel64sC1(-3));
+    CHECK(Pixel64sC1::DivRoundZero(Pixel64sC1(10), Pixel64sC1(-3)) == Pixel64sC1(-3));
+    CHECK(Pixel64sC1::DivFloor(Pixel64sC1(10), Pixel64sC1(-3)) == Pixel64sC1(-4));
+    CHECK(Pixel64sC1::DivCeil(Pixel64sC1(10), Pixel64sC1(-3)) == Pixel64sC1(-3));
+
+    CHECK(Pixel64sC1(-9).DivScaleRoundNearest(10) == Pixel64sC1(-1));
+}
+
+TEST_CASE("Pixel64scC1", "[Common]")
+{
+    CHECK(Pixel64scC1(10 - 4_i).DivRound(Pixel64scC1(3 + 2_i)) == Pixel64scC1(2 - 2_i));
+    CHECK(Pixel64scC1(10 - 4_i).DivRoundNearest(Pixel64scC1(3 + 2_i)) == Pixel64scC1(2 - 2_i));
+    CHECK(Pixel64scC1(10 - 4_i).DivRoundZero(Pixel64scC1(3 + 2_i)) == Pixel64scC1(1 - 2_i));
+    CHECK(Pixel64scC1(10 - 4_i).DivFloor(Pixel64scC1(3 + 2_i)) == Pixel64scC1(1 - 3_i));
+    CHECK(Pixel64scC1(10 - 4_i).DivCeil(Pixel64scC1(3 + 2_i)) == Pixel64scC1(2 - 2_i));
+
+    CHECK(Pixel64scC1(3 + 2_i).DivInvRound(Pixel64scC1(10 - 4_i)) == Pixel64scC1(2 - 2_i));
+    CHECK(Pixel64scC1(3 + 2_i).DivInvRoundNearest(Pixel64scC1(10 - 4_i)) == Pixel64scC1(2 - 2_i));
+    CHECK(Pixel64scC1(3 + 2_i).DivInvRoundZero(Pixel64scC1(10 - 4_i)) == Pixel64scC1(1 - 2_i));
+    CHECK(Pixel64scC1(3 + 2_i).DivInvFloor(Pixel64scC1(10 - 4_i)) == Pixel64scC1(1 - 3_i));
+    CHECK(Pixel64scC1(3 + 2_i).DivInvCeil(Pixel64scC1(10 - 4_i)) == Pixel64scC1(2 - 2_i));
+
+    CHECK(Pixel64scC1::DivRound(Pixel64scC1(-10 + 4_i), Pixel64scC1(3 + 2_i)) == Pixel64scC1(-2 + 2_i));
+    CHECK(Pixel64scC1::DivRoundNearest(Pixel64scC1(-10 + 4_i), Pixel64scC1(3 + 2_i)) == Pixel64scC1(-2 + 2_i));
+    CHECK(Pixel64scC1::DivRoundZero(Pixel64scC1(-10 + 4_i), Pixel64scC1(3 + 2_i)) == Pixel64scC1(-1 + 2_i));
+    CHECK(Pixel64scC1::DivFloor(Pixel64scC1(-10 + 4_i), Pixel64scC1(3 + 2_i)) == Pixel64scC1(-2 + 2_i));
+    CHECK(Pixel64scC1::DivCeil(Pixel64scC1(-10 + 4_i), Pixel64scC1(3 + 2_i)) == Pixel64scC1(-1 + 3_i));
+
+    CHECK(Pixel64scC1(-9 + 11_i).DivScaleRoundNearest(10) == Pixel64scC1(-1 + 1_i));
 }

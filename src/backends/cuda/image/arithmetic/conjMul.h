@@ -11,11 +11,11 @@
 namespace mpp::image::cuda
 {
 
-template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+template <typename SrcT, typename ComputeT = default_ext_int_compute_type_for_t<SrcT>, typename DstT>
 void InvokeConjMulSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst,
                          size_t aPitchDst, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
 
-template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+template <typename SrcT, typename ComputeT = default_ext_int_compute_type_for_t<SrcT>, typename DstT>
 void InvokeConjMulInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, size_t aPitchSrc2,
                              const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
 

@@ -1,5 +1,5 @@
-#include "complex.h"      //NOLINT
 #include "bfloat16.h"     //NOLINT(misc-include-cleaner)
+#include "complex.h"      //NOLINT
 #include "complex_impl.h" //NOLINT(misc-include-cleaner)
 #include "defines.h"
 #include "half_fp16.h" //NOLINT(misc-include-cleaner)
@@ -42,6 +42,14 @@ template Complex<int>::Complex(const Complex<float> &) noexcept;
 template Complex<int>::Complex(const Complex<double> &) noexcept;
 template Complex<int>::Complex(const Complex<HalfFp16> &) noexcept;
 template Complex<int>::Complex(const Complex<BFloat16> &) noexcept;
+
+template Complex<long64>::Complex(const Complex<sbyte> &) noexcept;
+template Complex<long64>::Complex(const Complex<short> &) noexcept;
+template Complex<long64>::Complex(const Complex<int> &) noexcept;
+template Complex<long64>::Complex(const Complex<float> &) noexcept;
+template Complex<long64>::Complex(const Complex<double> &) noexcept;
+template Complex<long64>::Complex(const Complex<HalfFp16> &) noexcept;
+template Complex<long64>::Complex(const Complex<BFloat16> &) noexcept;
 
 template Complex<float>::Complex(const Complex<sbyte> &) noexcept;
 template Complex<float>::Complex(const Complex<short> &) noexcept;
@@ -100,6 +108,14 @@ template Complex<int>::Complex(Complex<float> &) noexcept;
 template Complex<int>::Complex(Complex<double> &) noexcept;
 template Complex<int>::Complex(Complex<HalfFp16> &) noexcept;
 template Complex<int>::Complex(Complex<BFloat16> &) noexcept;
+
+template Complex<long64>::Complex(Complex<sbyte> &) noexcept;
+template Complex<long64>::Complex(Complex<short> &) noexcept;
+template Complex<long64>::Complex(Complex<int> &) noexcept;
+template Complex<long64>::Complex(Complex<float> &) noexcept;
+template Complex<long64>::Complex(Complex<double> &) noexcept;
+template Complex<long64>::Complex(Complex<HalfFp16> &) noexcept;
+template Complex<long64>::Complex(Complex<BFloat16> &) noexcept;
 
 template Complex<float>::Complex(Complex<sbyte> &) noexcept;
 template Complex<float>::Complex(Complex<short> &) noexcept;

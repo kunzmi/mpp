@@ -18,9 +18,9 @@
 #include <common/image/roi.h>
 #include <common/image/roiException.h>
 #include <common/image/size2D.h>
+#include <common/mpp_defs.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
-#include <common/mpp_defs.h>
 #include <common/utilities.h>
 #include <common/vector_typetraits.h>
 #include <concepts>
@@ -37,8 +37,9 @@ ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFi
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
-                                        BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
+                                        const T &aConstant, BorderType aBorder,
+                                        const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     return this->FixedFilter(aDst, aFilter, aMaskSize, aConstant, aBorder, ROI(), aStreamCtx);
 }
@@ -56,8 +57,8 @@ ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFi
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
-                                        BorderType aBorder, const Roi &aAllowedReadRoi,
+ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
+                                        const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                                         const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -149,8 +150,8 @@ ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::FixedFilter(
 
 template <PixelType T>
 ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::FixedFilter(
-    ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
-    BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
+    ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
+    const T &aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(has_alternative_filter_output_type_for_v<T>)
 {
     return this->FixedFilter(aDst, aFilter, aMaskSize, aConstant, aBorder, ROI(), aStreamCtx);
@@ -171,8 +172,8 @@ ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::FixedFilter(
 
 template <PixelType T>
 ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::FixedFilter(
-    ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
-    BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
+    ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
+    const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(has_alternative_filter_output_type_for_v<T>)
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -262,7 +263,8 @@ ImageView<T> &ImageView<T>::SeparableFilter(
 template <PixelType T>
 ImageView<T> &ImageView<T>::SeparableFilter(
     ImageView<T> &aDst, const mpp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
-    int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
+    int aFilterSize, int aFilterCenter, const T &aConstant, BorderType aBorder,
+    const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     return this->SeparableFilter(aDst, aFilter, aFilterSize, aFilterCenter, aConstant, aBorder, ROI(), aStreamCtx);
 }
@@ -284,7 +286,7 @@ ImageView<T> &ImageView<T>::SeparableFilter(
 template <PixelType T>
 ImageView<T> &ImageView<T>::SeparableFilter(
     ImageView<T> &aDst, const mpp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
-    int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+    int aFilterSize, int aFilterCenter, const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
     const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -324,7 +326,8 @@ ImageView<T> &ImageView<T>::ColumnFilter(
 template <PixelType T>
 ImageView<T> &ImageView<T>::ColumnFilter(
     ImageView<T> &aDst, const mpp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
-    int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
+    int aFilterSize, int aFilterCenter, const T &aConstant, BorderType aBorder,
+    const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     return this->ColumnFilter(aDst, aFilter, aFilterSize, aFilterCenter, aConstant, aBorder, ROI(), aStreamCtx);
 }
@@ -346,7 +349,7 @@ ImageView<T> &ImageView<T>::ColumnFilter(
 template <PixelType T>
 ImageView<T> &ImageView<T>::ColumnFilter(
     ImageView<T> &aDst, const mpp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
-    int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+    int aFilterSize, int aFilterCenter, const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
     const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -376,7 +379,7 @@ template <PixelType T>
 ImageView<window_sum_result_type_t<T>> &ImageView<T>::ColumnWindowSum(
     ImageView<window_sum_result_type_t<T>> &aDst,
     complex_basetype_t<remove_vector_t<window_sum_result_type_t<T>>> aScalingValue, int aFilterSize, int aFilterCenter,
-    T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
+    const T &aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     return this->ColumnWindowSum(aDst, aScalingValue, aFilterSize, aFilterCenter, aConstant, aBorder, ROI(),
                                  aStreamCtx);
@@ -401,7 +404,7 @@ template <PixelType T>
 ImageView<window_sum_result_type_t<T>> &ImageView<T>::ColumnWindowSum(
     ImageView<window_sum_result_type_t<T>> &aDst,
     complex_basetype_t<remove_vector_t<window_sum_result_type_t<T>>> aScalingValue, int aFilterSize, int aFilterCenter,
-    T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
+    const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
@@ -427,7 +430,8 @@ ImageView<T> &ImageView<T>::RowFilter(
 template <PixelType T>
 ImageView<T> &ImageView<T>::RowFilter(
     ImageView<T> &aDst, const mpp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
-    int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
+    int aFilterSize, int aFilterCenter, const T &aConstant, BorderType aBorder,
+    const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     return this->RowFilter(aDst, aFilter, aFilterSize, aFilterCenter, aConstant, aBorder, ROI(), aStreamCtx);
 }
@@ -448,7 +452,7 @@ ImageView<T> &ImageView<T>::RowFilter(
 template <PixelType T>
 ImageView<T> &ImageView<T>::RowFilter(
     ImageView<T> &aDst, const mpp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
-    int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+    int aFilterSize, int aFilterCenter, const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
     const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -478,7 +482,7 @@ template <PixelType T>
 ImageView<window_sum_result_type_t<T>> &ImageView<T>::RowWindowSum(
     ImageView<window_sum_result_type_t<T>> &aDst,
     complex_basetype_t<remove_vector_t<window_sum_result_type_t<T>>> aScalingValue, int aFilterSize, int aFilterCenter,
-    T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
+    const T &aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     return this->RowWindowSum(aDst, aScalingValue, aFilterSize, aFilterCenter, aConstant, aBorder, ROI(), aStreamCtx);
 }
@@ -502,7 +506,7 @@ template <PixelType T>
 ImageView<window_sum_result_type_t<T>> &ImageView<T>::RowWindowSum(
     ImageView<window_sum_result_type_t<T>> &aDst,
     complex_basetype_t<remove_vector_t<window_sum_result_type_t<T>>> aScalingValue, int aFilterSize, int aFilterCenter,
-    T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
+    const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
@@ -527,7 +531,7 @@ ImageView<T> &ImageView<T>::BoxFilter(ImageView<T> &aDst, const FilterArea &aFil
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::BoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant,
+ImageView<T> &ImageView<T>::BoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, const T &aConstant,
                                       BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     return this->BoxFilter(aDst, aFilterArea, aConstant, aBorder, ROI(), aStreamCtx);
@@ -546,7 +550,7 @@ ImageView<T> &ImageView<T>::BoxFilter(ImageView<T> &aDst, const FilterArea &aFil
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::BoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant,
+ImageView<T> &ImageView<T>::BoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, const T &aConstant,
                                       BorderType aBorder, const Roi &aAllowedReadRoi,
                                       const mpp::cuda::StreamCtx &aStreamCtx) const
 {
@@ -582,7 +586,7 @@ ImageView<same_vector_size_different_type_t<T, float>> &ImageView<T>::BoxFilter(
 
 template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, float>> &ImageView<T>::BoxFilter(
-    ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea, T aConstant,
+    ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea, const T &aConstant,
     BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T>
 {
@@ -605,7 +609,7 @@ ImageView<same_vector_size_different_type_t<T, float>> &ImageView<T>::BoxFilter(
 
 template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, float>> &ImageView<T>::BoxFilter(
-    ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea, T aConstant,
+    ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea, const T &aConstant,
     BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T>
 {
@@ -641,7 +645,7 @@ ImageView<Pixel32fC2> &ImageView<T>::BoxAndSumSquareFilter(ImageView<Pixel32fC2>
 
 template <PixelType T>
 ImageView<Pixel32fC2> &ImageView<T>::BoxAndSumSquareFilter(ImageView<Pixel32fC2> &aDst, const FilterArea &aFilterArea,
-                                                           T aConstant, BorderType aBorder,
+                                                           const T &aConstant, BorderType aBorder,
                                                            const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && SingleChannel<T> && (sizeof(T) < 8)
 {
@@ -664,7 +668,8 @@ ImageView<Pixel32fC2> &ImageView<T>::BoxAndSumSquareFilter(ImageView<Pixel32fC2>
 
 template <PixelType T>
 ImageView<Pixel32fC2> &ImageView<T>::BoxAndSumSquareFilter(ImageView<Pixel32fC2> &aDst, const FilterArea &aFilterArea,
-                                                           T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                                                           const T &aConstant, BorderType aBorder,
+                                                           const Roi &aAllowedReadRoi,
                                                            const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && SingleChannel<T> && (sizeof(T) < 8)
 {
@@ -690,7 +695,7 @@ ImageView<T> &ImageView<T>::MaxFilter(ImageView<T> &aDst, const FilterArea &aFil
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MaxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant,
+ImageView<T> &ImageView<T>::MaxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, const T &aConstant,
                                       BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
@@ -711,7 +716,7 @@ ImageView<T> &ImageView<T>::MaxFilter(ImageView<T> &aDst, const FilterArea &aFil
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MaxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant,
+ImageView<T> &ImageView<T>::MaxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, const T &aConstant,
                                       BorderType aBorder, const Roi &aAllowedReadRoi,
                                       const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
@@ -745,7 +750,7 @@ ImageView<T> &ImageView<T>::MinFilter(ImageView<T> &aDst, const FilterArea &aFil
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MinFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant,
+ImageView<T> &ImageView<T>::MinFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, const T &aConstant,
                                       BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
@@ -766,7 +771,7 @@ ImageView<T> &ImageView<T>::MinFilter(ImageView<T> &aDst, const FilterArea &aFil
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MinFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant,
+ImageView<T> &ImageView<T>::MinFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, const T &aConstant,
                                       BorderType aBorder, const Roi &aAllowedReadRoi,
                                       const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
@@ -805,8 +810,8 @@ ImageView<T> &ImageView<T>::WienerFilter(ImageView<T> &aDst, const FilterArea &a
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::WienerFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
-                                         const filter_compute_type_for_t<T> &aNoise, T aConstant, BorderType aBorder,
-                                         const mpp::cuda::StreamCtx &aStreamCtx) const
+                                         const filter_compute_type_for_t<T> &aNoise, const T &aConstant,
+                                         BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     return this->WienerFilter(aDst, aFilterArea, aNoise, aConstant, aBorder, ROI(), aStreamCtx);
@@ -828,8 +833,9 @@ ImageView<T> &ImageView<T>::WienerFilter(ImageView<T> &aDst, const FilterArea &a
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::WienerFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
-                                         const filter_compute_type_for_t<T> &aNoise, T aConstant, BorderType aBorder,
-                                         const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
+                                         const filter_compute_type_for_t<T> &aNoise, const T &aConstant,
+                                         BorderType aBorder, const Roi &aAllowedReadRoi,
+                                         const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -859,7 +865,7 @@ ImageView<T> &ImageView<T>::ThresholdAdaptiveBoxFilter(ImageView<T> &aDst, const
 template <PixelType T>
 ImageView<T> &ImageView<T>::ThresholdAdaptiveBoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
                                                        const filter_compute_type_for_t<T> &aDelta, const T &aValGT,
-                                                       const T &aValLE, T aConstant, BorderType aBorder,
+                                                       const T &aValLE, const T &aConstant, BorderType aBorder,
                                                        const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
@@ -886,7 +892,7 @@ ImageView<T> &ImageView<T>::ThresholdAdaptiveBoxFilter(ImageView<T> &aDst, const
 template <PixelType T>
 ImageView<T> &ImageView<T>::ThresholdAdaptiveBoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
                                                        const filter_compute_type_for_t<T> &aDelta, const T &aValGT,
-                                                       const T &aValLE, T aConstant, BorderType aBorder,
+                                                       const T &aValLE, const T &aConstant, BorderType aBorder,
                                                        const Roi &aAllowedReadRoi,
                                                        const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
@@ -918,7 +924,7 @@ ImageView<T> &ImageView<T>::Filter(ImageView<T> &aDst,
 template <PixelType T>
 ImageView<T> &ImageView<T>::Filter(ImageView<T> &aDst,
                                    const mpp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
-                                   const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                                   const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder,
                                    const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     return this->Filter(aDst, aFilter, aFilterArea, aConstant, aBorder, ROI(), aStreamCtx);
@@ -941,7 +947,7 @@ ImageView<T> &ImageView<T>::Filter(ImageView<T> &aDst,
 template <PixelType T>
 ImageView<T> &ImageView<T>::Filter(ImageView<T> &aDst,
                                    const mpp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
-                                   const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                                   const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder,
                                    const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -996,7 +1002,7 @@ template <PixelType T>
 ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::Filter(
     ImageView<alternative_filter_output_type_for_t<T>> &aDst,
     const mpp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter, const FilterArea &aFilterArea,
-    T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
+    const T &aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(has_alternative_filter_output_type_for_v<T>)
 {
     return this->Filter(aDst, aFilter, aFilterArea, aConstant, aBorder, ROI(), aStreamCtx);
@@ -1021,7 +1027,7 @@ template <PixelType T>
 ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::Filter(
     ImageView<alternative_filter_output_type_for_t<T>> &aDst,
     const mpp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter, const FilterArea &aFilterArea,
-    T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
+    const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(has_alternative_filter_output_type_for_v<T>)
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -1080,7 +1086,7 @@ ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const Filte
 template <PixelType T>
 ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
                                                  const mpp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff,
-                                                 float aValSquareSigma, T aConstant, BorderType aBorder,
+                                                 float aValSquareSigma, const T &aConstant, BorderType aBorder,
                                                  const mpp::cuda::StreamCtx &aStreamCtx) const
     requires SingleChannel<T> && RealVector<T> &&
              (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>)
@@ -1128,7 +1134,7 @@ ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const Filte
 template <PixelType T>
 ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
                                                  const mpp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff,
-                                                 float aValSquareSigma, T aConstant, BorderType aBorder,
+                                                 float aValSquareSigma, const T &aConstant, BorderType aBorder,
                                                  const Roi &aAllowedReadRoi,
                                                  const mpp::cuda::StreamCtx &aStreamCtx) const
     requires SingleChannel<T> && RealVector<T> &&
@@ -1172,7 +1178,7 @@ ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const Filte
 template <PixelType T>
 ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
                                                  const mpp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff,
-                                                 float aValSquareSigma, mpp::Norm aNorm, T aConstant,
+                                                 float aValSquareSigma, mpp::Norm aNorm, const T &aConstant,
                                                  BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(!SingleChannel<T>) && RealVector<T> &&
             (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>)
@@ -1202,7 +1208,7 @@ ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const Filte
 template <PixelType T>
 ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
                                                  const mpp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff,
-                                                 float aValSquareSigma, mpp::Norm aNorm, T aConstant,
+                                                 float aValSquareSigma, mpp::Norm aNorm, const T &aConstant,
                                                  BorderType aBorder, const Roi &aAllowedReadRoi,
                                                  const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(!SingleChannel<T>) && RealVector<T> &&
@@ -1244,7 +1250,7 @@ template <PixelType T>
 void ImageView<T>::GradientVectorSobel(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
                                        ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                        ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                       T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                                       const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                                        const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>)
 {
@@ -1328,7 +1334,7 @@ template <PixelType T>
 void ImageView<T>::GradientVectorSobel(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
                                        ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                        ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                       T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                                       const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                                        const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
              std::same_as<remove_vector_t<T>, float>)
@@ -1412,7 +1418,7 @@ template <PixelType T>
 void ImageView<T>::GradientVectorScharr(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
                                         ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                         ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                        T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                                        const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                                         const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>)
 {
@@ -1496,7 +1502,7 @@ template <PixelType T>
 void ImageView<T>::GradientVectorScharr(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
                                         ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                         ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                        T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                                        const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                                         const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
              std::same_as<remove_vector_t<T>, float>)
@@ -1580,7 +1586,7 @@ template <PixelType T>
 void ImageView<T>::GradientVectorPrewitt(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
                                          ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                          ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                         T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                                         const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                                          const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>)
 {
@@ -1664,7 +1670,7 @@ template <PixelType T>
 void ImageView<T>::GradientVectorPrewitt(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
                                          ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                          ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                         T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                                         const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                                          const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
              std::same_as<remove_vector_t<T>, float>)
@@ -1742,7 +1748,8 @@ template <PixelType T>
 void ImageView<T>::GradientVectorSobel(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
                                        ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                        ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                       T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
+                                       const T &aConstant, BorderType aBorder,
+                                       const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>)
 {
     return this->GradientVectorSobel(aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance, aNorm, aMaskSize, aConstant,
@@ -1765,7 +1772,8 @@ template <PixelType T>
 void ImageView<T>::GradientVectorSobel(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
                                        ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                        ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                       T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
+                                       const T &aConstant, BorderType aBorder,
+                                       const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
              std::same_as<remove_vector_t<T>, float>)
 {
@@ -1788,7 +1796,8 @@ template <PixelType T>
 void ImageView<T>::GradientVectorScharr(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
                                         ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                         ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                        T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
+                                        const T &aConstant, BorderType aBorder,
+                                        const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>)
 {
     return this->GradientVectorScharr(aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance, aNorm, aMaskSize, aConstant,
@@ -1811,7 +1820,8 @@ template <PixelType T>
 void ImageView<T>::GradientVectorScharr(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
                                         ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                         ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                        T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
+                                        const T &aConstant, BorderType aBorder,
+                                        const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
              std::same_as<remove_vector_t<T>, float>)
 {
@@ -1834,7 +1844,8 @@ template <PixelType T>
 void ImageView<T>::GradientVectorPrewitt(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
                                          ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                          ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                         T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
+                                         const T &aConstant, BorderType aBorder,
+                                         const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>)
 {
     return this->GradientVectorPrewitt(aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance, aNorm, aMaskSize, aConstant,
@@ -1857,7 +1868,8 @@ template <PixelType T>
 void ImageView<T>::GradientVectorPrewitt(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
                                          ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                          ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                         T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
+                                         const T &aConstant, BorderType aBorder,
+                                         const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
              std::same_as<remove_vector_t<T>, float>)
 {
@@ -1884,7 +1896,7 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::UnsharpFilter(
     ImageView<T> &aDst, const mpp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
     int aFilterSize, int aFilterCenter, remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aWeight,
-    remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aThreshold, T aConstant, BorderType aBorder,
+    remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aThreshold, const T &aConstant, BorderType aBorder,
     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
@@ -1913,7 +1925,7 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::UnsharpFilter(
     ImageView<T> &aDst, const mpp::cuda::DevVarView<filtertype_for_t<filter_compute_type_for_t<T>>> &aFilter,
     int aFilterSize, int aFilterCenter, remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aWeight,
-    remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aThreshold, T aConstant, BorderType aBorder,
+    remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aThreshold, const T &aConstant, BorderType aBorder,
     const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
@@ -1952,7 +1964,8 @@ ImageView<Pixel32fC1> &ImageView<T>::HarrisCornerResponse(ImageView<Pixel32fC1> 
 
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::HarrisCornerResponse(ImageView<Pixel32fC1> &aDst, const FilterArea &aAvgWindowSize,
-                                                          float aK, float aScale, T aConstant, BorderType aBorder,
+                                                          float aK, float aScale, const T &aConstant,
+                                                          BorderType aBorder,
                                                           const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<T, Pixel32fC4>
 {
@@ -1976,8 +1989,8 @@ ImageView<Pixel32fC1> &ImageView<T>::HarrisCornerResponse(ImageView<Pixel32fC1> 
 
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::HarrisCornerResponse(ImageView<Pixel32fC1> &aDst, const FilterArea &aAvgWindowSize,
-                                                          float aK, float aScale, T aConstant, BorderType aBorder,
-                                                          const Roi &aAllowedReadRoi,
+                                                          float aK, float aScale, const T &aConstant,
+                                                          BorderType aBorder, const Roi &aAllowedReadRoi,
                                                           const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<T, Pixel32fC4>
 {

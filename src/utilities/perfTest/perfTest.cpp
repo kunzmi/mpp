@@ -5,9 +5,9 @@
 #include <common/version.h>
 #include <cstddef>
 #include <fstream>
-#include <ios>
 #include <iostream>
-#include <numeric>
+#include <sstream>
+#include <string>
 #include <vector>
 
 #include "pixel8uC1.h"
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
             int value = 0;
             std::stringstream ss(argv[i]);
             ss >> value;
-            std::string vals(argv[i]);
+            const std::string vals(argv[i]);
 
             if (i == 1)
             {
@@ -126,28 +126,34 @@ int main(int argc, char *argv[])
 
         runPixel8uC1(iterations, repeats, imgWidth, imgHeight, b, results, testsToRun);
         std::cout << std::endl << std::endl << "----------------------" << std::endl << std::endl << std::endl;
+
         runPixel8uC3(iterations, repeats, imgWidth, imgHeight, b, results, testsToRun);
         std::cout << std::endl << std::endl << "----------------------" << std::endl << std::endl << std::endl;
+
         runPixel8uC4(iterations, repeats, imgWidth, imgHeight, b, results, testsToRun);
         std::cout << std::endl << std::endl << "----------------------" << std::endl << std::endl << std::endl;
 
         runPixel16uC1(iterations, repeats, imgWidth, imgHeight, b, results, testsToRun);
         std::cout << std::endl << std::endl << "----------------------" << std::endl << std::endl << std::endl;
+
         runPixel16uC3(iterations, repeats, imgWidth, imgHeight, b, results, testsToRun);
         std::cout << std::endl << std::endl << "----------------------" << std::endl << std::endl << std::endl;
+
         runPixel16uC4(iterations, repeats, imgWidth, imgHeight, b, results, testsToRun);
         std::cout << std::endl << std::endl << "----------------------" << std::endl << std::endl << std::endl;
 
         runPixel32fC1(iterations, repeats, imgWidth, imgHeight, b, results, testsToRun);
         std::cout << std::endl << std::endl << "----------------------" << std::endl << std::endl << std::endl;
+
         runPixel32fC3(iterations, repeats, imgWidth, imgHeight, b, results, testsToRun);
         std::cout << std::endl << std::endl << "----------------------" << std::endl << std::endl << std::endl;
+
         runPixel32fC4(iterations, repeats, imgWidth, imgHeight, b, results, testsToRun);
         std::cout << std::endl << std::endl << "----------------------" << std::endl << std::endl << std::endl;
         // runPixel8uC1(iterations, repeats, imgWidth, imgHeight, -1);
 
-        // runPixel32sC1(iterations, repeats, imgWidth, imgHeight, b, results, testsToRun);
-        // std::cout << std::endl << std::endl << "----------------------" << std::endl << std::endl << std::endl;
+        runPixel32sC1(iterations, repeats, imgWidth, imgHeight, b, results, testsToRun);
+        std::cout << std::endl << std::endl << "----------------------" << std::endl << std::endl << std::endl;
 
         std::sort(results.begin(), results.end());
 

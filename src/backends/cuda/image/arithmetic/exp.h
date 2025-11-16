@@ -11,11 +11,11 @@
 namespace mpp::image::cuda
 {
 
-template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+template <typename SrcT, typename ComputeT = default_floating_compute_type_for_t<SrcT>, typename DstT>
 void InvokeExpSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                   const mpp::cuda::StreamCtx &aStreamCtx);
 
-template <typename DstT, typename ComputeT = default_compute_type_for_t<DstT>>
+template <typename DstT, typename ComputeT = default_floating_compute_type_for_t<DstT>>
 void InvokeExpInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
 
 } // namespace mpp::image::cuda

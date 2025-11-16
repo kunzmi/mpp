@@ -122,7 +122,7 @@ void InvokeAddSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, si
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
 void InvokeAddSrcSrcScale(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst,
-                          size_t aPitchDst, scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize,
+                          size_t aPitchDst, double aScaleFactor, const Size2D &aSize,
                           const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT, typename ComputeT = add_simd_vector_compute_type_for_t<SrcT>, typename DstT>
@@ -131,8 +131,7 @@ void InvokeAddSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT 
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
 void InvokeAddSrcCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT *aDst, size_t aPitchDst,
-                        scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize,
-                        const mpp::cuda::StreamCtx &aStreamCtx);
+                        double aScaleFactor, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT, typename ComputeT = add_simd_vector_compute_type_for_t<SrcT>, typename DstT>
 void InvokeAddSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst, DstT *aDst, size_t aPitchDst,
@@ -140,8 +139,7 @@ void InvokeAddSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst, Ds
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
 void InvokeAddSrcDevCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst, DstT *aDst, size_t aPitchDst,
-                           scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize,
-                           const mpp::cuda::StreamCtx &aStreamCtx);
+                           double aScaleFactor, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT, typename ComputeT = add_simd_vector_compute_type_for_t<SrcT>, typename DstT>
 void InvokeAddInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, size_t aPitchSrc2, const Size2D &aSize,
@@ -149,26 +147,23 @@ void InvokeAddInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, 
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
 void InvokeAddInplaceSrcScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, size_t aPitchSrc2,
-                              scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize,
-                              const mpp::cuda::StreamCtx &aStreamCtx);
+                              double aScaleFactor, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT, typename ComputeT = add_simd_vector_compute_type_for_t<SrcT>, typename DstT>
 void InvokeAddInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, const Size2D &aSize,
                        const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
-void InvokeAddInplaceCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst,
-                            scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize,
-                            const mpp::cuda::StreamCtx &aStreamCtx);
+void InvokeAddInplaceCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, double aScaleFactor,
+                            const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT, typename ComputeT = add_simd_vector_compute_type_for_t<SrcT>, typename DstT>
 void InvokeAddInplaceDevC(DstT *aSrcDst, size_t aPitchDst, const SrcT *aConst, const Size2D &aSize,
                           const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
-void InvokeAddInplaceDevCScale(DstT *aSrcDst, size_t aPitchDst, const SrcT *aConst,
-                               scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize,
-                               const mpp::cuda::StreamCtx &aStreamCtx);
+void InvokeAddInplaceDevCScale(DstT *aSrcDst, size_t aPitchDst, const SrcT *aConst, double aScaleFactor,
+                               const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
 
 } // namespace mpp::image::cuda
 #endif // MPP_ENABLE_CUDA_BACKEND

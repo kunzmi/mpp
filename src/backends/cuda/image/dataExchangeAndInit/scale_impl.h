@@ -43,11 +43,12 @@ void InvokeScale(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitch
 #pragma region Instantiate
 
 #define Instantiate_For(typeSrc, typeDst)                                                                              \
-    template void InvokeScale<typeSrc, default_compute_type_for_t<typeSrc>, typeDst>(                                  \
+    template void InvokeScale<typeSrc, default_floating_compute_type_for_t<typeSrc>, typeDst>(                         \
         const typeSrc *aSrc1, size_t aPitchSrc1, typeDst *aDst, size_t aPitchDst,                                      \
-        scalefactor_t<default_compute_type_for_t<typeSrc>> aScaleFactor,                                               \
-        scalefactor_t<default_compute_type_for_t<typeSrc>> aSrcMin,                                                    \
-        scalefactor_t<default_compute_type_for_t<typeSrc>> aDstMin, const Size2D &aSize, const StreamCtx &aStreamCtx);
+        scalefactor_t<default_floating_compute_type_for_t<typeSrc>> aScaleFactor,                                      \
+        scalefactor_t<default_floating_compute_type_for_t<typeSrc>> aSrcMin,                                           \
+        scalefactor_t<default_floating_compute_type_for_t<typeSrc>> aDstMin, const Size2D &aSize,                      \
+        const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlpha(typeSrc, typeDst)                                                                        \
     Instantiate_For(Pixel##typeSrc##C1, Pixel##typeDst##C1);                                                           \

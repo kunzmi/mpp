@@ -77,10 +77,10 @@ void InvokeMulSrcSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *
 }
 
 #pragma region Instantiate
-// using default_ext_compute_type_for_t for computeT including SIMD activation if possible
+// using default_ext_int_compute_type_for_t for computeT including SIMD activation if possible
 #define InstantiateInvokeMulSrcSrcMask_For(typeSrcIsTypeDst)                                                           \
     template void                                                                                                      \
-    InvokeMulSrcSrcMask<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(         \
+    InvokeMulSrcSrcMask<typeSrcIsTypeDst, default_ext_int_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(     \
         const Pixel8uC1 *aMask, size_t aPitchMask, const typeSrcIsTypeDst *aSrc1, size_t aPitchSrc1,                   \
         const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2, typeSrcIsTypeDst *aDst, size_t aPitchDst,                    \
         const Size2D &aSize, const StreamCtx &aStreamCtx);
@@ -102,15 +102,15 @@ void InvokeMulSrcSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMulSrcSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aSrc1, size_t aPitchSrc1,
-                              const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst, size_t aPitchDst,
-                              scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx)
+                              const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst, size_t aPitchDst, double aScaleFactor,
+                              const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
         MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0f)
+        if (aScaleFactor == 1.0)
         {
             InvokeMulSrcSrcMask(aMask, aPitchMask, aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aDst, aPitchDst, aSize,
                                 aStreamCtx);
@@ -119,27 +119,46 @@ void InvokeMulSrcSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const S
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using mulSrcSrcScale =
-            SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
+        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            using mulSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT,
+                                                      RoundingMode::NearestTiesToEven>;
 
-        const mpp::Mul<ComputeT> op;
+            const mpp::Mul<ComputeT> op;
 
-        const mulSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, aScaleFactor);
+            const mulSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, scaler);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcSrcScale>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                               aSize, aStreamCtx, functor);
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcSrcScale>(aMask, aPitchMask, aDst, aPitchDst,
+                                                                                   aSize, aStreamCtx, functor);
+        }
+        else
+        {
+            // Scaler performs NearestTiesToEven rounding:
+            using ScalerT = Scale<ComputeT, true>;
+            const ScalerT scaler(aScaleFactor);
+            using mulSrcSrcScale =
+                SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT, RoundingMode::None>;
+
+            const mpp::Mul<ComputeT> op;
+
+            const mulSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, scaler);
+
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcSrcScale>(aMask, aPitchMask, aDst, aPitchDst,
+                                                                                   aSize, aStreamCtx, functor);
+        }
     }
 }
 
 #pragma region Instantiate
-// using default_ext_compute_type_for_t for computeT without SIMD
+// using default_ext_int_compute_type_for_t for computeT without SIMD
 #define InstantiateInvokeMulSrcSrcScaleMask_For(typeSrcIsTypeDst)                                                      \
-    template void                                                                                                      \
-    InvokeMulSrcSrcScaleMask<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(    \
+    template void InvokeMulSrcSrcScaleMask<typeSrcIsTypeDst, default_ext_int_compute_type_for_t<typeSrcIsTypeDst>,     \
+                                           typeSrcIsTypeDst>(                                                          \
         const Pixel8uC1 *aMask, size_t aPitchMask, const typeSrcIsTypeDst *aSrc1, size_t aPitchSrc1,                   \
         const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2, typeSrcIsTypeDst *aDst, size_t aPitchDst,                    \
-        scalefactor_t<default_ext_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, const Size2D &aSize,             \
-        const StreamCtx &aStreamCtx);
+        double aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeMulSrcSrcScaleMask(type)                                                            \
     InstantiateInvokeMulSrcSrcScaleMask_For(Pixel##type##C1);                                                          \
@@ -200,10 +219,10 @@ void InvokeMulSrcCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aS
 }
 
 #pragma region Instantiate
-// using default_ext_compute_type_for_t for computeT including SIMD activation if possible
+// using default_ext_int_compute_type_for_t for computeT including SIMD activation if possible
 #define InstantiateInvokeMulSrcCMask_For(typeSrcIsTypeDst)                                                             \
     template void                                                                                                      \
-    InvokeMulSrcCMask<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(           \
+    InvokeMulSrcCMask<typeSrcIsTypeDst, default_ext_int_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(       \
         const Pixel8uC1 *aMask, size_t aPitchMask, const typeSrcIsTypeDst *aSrc, size_t aPitchSrc,                     \
         const typeSrcIsTypeDst &aConst, typeSrcIsTypeDst *aDst, size_t aPitchDst, const Size2D &aSize,                 \
         const StreamCtx &aStreamCtx);
@@ -225,15 +244,15 @@ void InvokeMulSrcCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aS
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMulSrcCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aSrc, size_t aPitchSrc,
-                            const SrcT &aConst, DstT *aDst, size_t aPitchDst, scalefactor_t<ComputeT> aScaleFactor,
-                            const Size2D &aSize, const StreamCtx &aStreamCtx)
+                            const SrcT &aConst, DstT *aDst, size_t aPitchDst, double aScaleFactor, const Size2D &aSize,
+                            const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
         MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0f)
+        if (aScaleFactor == 1.0)
         {
             InvokeMulSrcCMask(aMask, aPitchMask, aSrc, aPitchSrc, aConst, aDst, aPitchDst, aSize, aStreamCtx);
             return;
@@ -241,27 +260,46 @@ void InvokeMulSrcCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const Src
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using mulSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>,
-                                                     RoundingMode::NearestTiesToEven>;
+        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            using mulSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT,
+                                                         RoundingMode::NearestTiesToEven>;
 
-        const mpp::Mul<ComputeT> op;
+            const mpp::Mul<ComputeT> op;
 
-        const mulSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, aScaleFactor);
+            const mulSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, scaler);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcCScale>(aMask, aPitchMask, aDst, aPitchDst, aSize,
-                                                                             aStreamCtx, functor);
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcCScale>(aMask, aPitchMask, aDst, aPitchDst,
+                                                                                 aSize, aStreamCtx, functor);
+        }
+        else
+        {
+            // Scaler performs NearestTiesToEven rounding:
+            using ScalerT = Scale<ComputeT, true>;
+            const ScalerT scaler(aScaleFactor);
+            using mulSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT,
+                                                         RoundingMode::None>;
+
+            const mpp::Mul<ComputeT> op;
+
+            const mulSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, scaler);
+
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcCScale>(aMask, aPitchMask, aDst, aPitchDst,
+                                                                                 aSize, aStreamCtx, functor);
+        }
     }
 }
 
 #pragma region Instantiate
-// using default_ext_compute_type_for_t for computeT without SIMD
+// using default_ext_int_compute_type_for_t for computeT without SIMD
 #define InstantiateInvokeMulSrcCScaleMask_For(typeSrcIsTypeDst)                                                        \
     template void                                                                                                      \
-    InvokeMulSrcCScaleMask<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(      \
+    InvokeMulSrcCScaleMask<typeSrcIsTypeDst, default_ext_int_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(  \
         const Pixel8uC1 *aMask, size_t aPitchMask, const typeSrcIsTypeDst *aSrc, size_t aPitchSrc,                     \
-        const typeSrcIsTypeDst &aConst, typeSrcIsTypeDst *aDst, size_t aPitchDst,                                      \
-        scalefactor_t<default_ext_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, const Size2D &aSize,             \
-        const StreamCtx &aStreamCtx);
+        const typeSrcIsTypeDst &aConst, typeSrcIsTypeDst *aDst, size_t aPitchDst, double aScaleFactor,                 \
+        const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeMulSrcCScaleMask(type)                                                              \
     InstantiateInvokeMulSrcCScaleMask_For(Pixel##type##C1);                                                            \
@@ -303,10 +341,10 @@ void InvokeMulSrcDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT 
 }
 
 #pragma region Instantiate
-// using default_ext_compute_type_for_t for computeT including SIMD activation if possible
+// using default_ext_int_compute_type_for_t for computeT including SIMD activation if possible
 #define InstantiateInvokeMulSrcDevCMask_For(typeSrcIsTypeDst)                                                          \
     template void                                                                                                      \
-    InvokeMulSrcDevCMask<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(        \
+    InvokeMulSrcDevCMask<typeSrcIsTypeDst, default_ext_int_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(    \
         const Pixel8uC1 *aMask, size_t aPitchMask, const typeSrcIsTypeDst *aSrc, size_t aPitchSrc,                     \
         const typeSrcIsTypeDst *aConst, typeSrcIsTypeDst *aDst, size_t aPitchDst, const Size2D &aSize,                 \
         const StreamCtx &aStreamCtx);
@@ -328,7 +366,7 @@ void InvokeMulSrcDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT 
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMulSrcDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aSrc, size_t aPitchSrc,
-                               const SrcT *aConst, DstT *aDst, size_t aPitchDst, scalefactor_t<ComputeT> aScaleFactor,
+                               const SrcT *aConst, DstT *aDst, size_t aPitchDst, double aScaleFactor,
                                const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
@@ -336,7 +374,7 @@ void InvokeMulSrcDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const 
         MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0f)
+        if (aScaleFactor == 1.0)
         {
             InvokeMulSrcDevCMask(aMask, aPitchMask, aSrc, aPitchSrc, aConst, aDst, aPitchDst, aSize, aStreamCtx);
             return;
@@ -344,27 +382,46 @@ void InvokeMulSrcDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const 
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using mulSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>,
-                                                           RoundingMode::NearestTiesToEven>;
+        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            using mulSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>,
+                                                               ScalerT, RoundingMode::NearestTiesToEven>;
 
-        const mpp::Mul<ComputeT> op;
+            const mpp::Mul<ComputeT> op;
 
-        const mulSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, aScaleFactor);
+            const mulSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, scaler);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcDevCScale>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                aSize, aStreamCtx, functor);
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcDevCScale>(aMask, aPitchMask, aDst, aPitchDst,
+                                                                                    aSize, aStreamCtx, functor);
+        }
+        else
+        {
+            // Scaler performs NearestTiesToEven rounding:
+            using ScalerT = Scale<ComputeT, true>;
+            const ScalerT scaler(aScaleFactor);
+            using mulSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>,
+                                                               ScalerT, RoundingMode::None>;
+
+            const mpp::Mul<ComputeT> op;
+
+            const mulSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, scaler);
+
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcDevCScale>(aMask, aPitchMask, aDst, aPitchDst,
+                                                                                    aSize, aStreamCtx, functor);
+        }
     }
 }
 
 #pragma region Instantiate
-// using default_ext_compute_type_for_t for computeT without SIMD
+// using default_ext_int_compute_type_for_t for computeT without SIMD
 #define InstantiateInvokeMulSrcDevCScaleMask_For(typeSrcIsTypeDst)                                                     \
-    template void                                                                                                      \
-    InvokeMulSrcDevCScaleMask<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(   \
+    template void InvokeMulSrcDevCScaleMask<typeSrcIsTypeDst, default_ext_int_compute_type_for_t<typeSrcIsTypeDst>,    \
+                                            typeSrcIsTypeDst>(                                                         \
         const Pixel8uC1 *aMask, size_t aPitchMask, const typeSrcIsTypeDst *aSrc, size_t aPitchSrc,                     \
-        const typeSrcIsTypeDst *aConst, typeSrcIsTypeDst *aDst, size_t aPitchDst,                                      \
-        scalefactor_t<default_ext_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, const Size2D &aSize,             \
-        const StreamCtx &aStreamCtx);
+        const typeSrcIsTypeDst *aConst, typeSrcIsTypeDst *aDst, size_t aPitchDst, double aScaleFactor,                 \
+        const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeMulSrcDevCScaleMask(type)                                                           \
     InstantiateInvokeMulSrcDevCScaleMask_For(Pixel##type##C1);                                                         \
@@ -423,10 +480,10 @@ void InvokeMulInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aS
 }
 
 #pragma region Instantiate
-// using default_ext_compute_type_for_t for computeT including SIMD activation if possible
+// using default_ext_int_compute_type_for_t for computeT including SIMD activation if possible
 #define InstantiateInvokeMulInplaceSrcMask_For(typeSrcIsTypeDst)                                                       \
     template void                                                                                                      \
-    InvokeMulInplaceSrcMask<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(     \
+    InvokeMulInplaceSrcMask<typeSrcIsTypeDst, default_ext_int_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>( \
         const Pixel8uC1 *aMask, size_t aPitchMask, typeSrcIsTypeDst *aSrcDst, size_t aPitchSrcDst,                     \
         const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
@@ -447,15 +504,15 @@ void InvokeMulInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aS
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMulInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
-                                  const SrcT *aSrc2, size_t aPitchSrc2, scalefactor_t<ComputeT> aScaleFactor,
-                                  const Size2D &aSize, const StreamCtx &aStreamCtx)
+                                  const SrcT *aSrc2, size_t aPitchSrc2, double aScaleFactor, const Size2D &aSize,
+                                  const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
     {
         MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0f)
+        if (aScaleFactor == 1.0)
         {
             InvokeMulInplaceSrcMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSrc2, aPitchSrc2, aSize, aStreamCtx);
             return;
@@ -463,26 +520,45 @@ void InvokeMulInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Dst
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using mulInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>,
-                                                          RoundingMode::NearestTiesToEven>;
+        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            using mulInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>,
+                                                              ScalerT, RoundingMode::NearestTiesToEven>;
 
-        const mpp::Mul<ComputeT> op;
+            const mpp::Mul<ComputeT> op;
 
-        const mulInplaceSrcScale functor(aSrc2, aPitchSrc2, op, aScaleFactor);
+            const mulInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceSrcScale>(
-            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceSrcScale>(
+                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+        }
+        else
+        {
+            // Scaler performs NearestTiesToEven rounding:
+            using ScalerT = Scale<ComputeT, true>;
+            const ScalerT scaler(aScaleFactor);
+            using mulInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>,
+                                                              ScalerT, RoundingMode::None>;
+
+            const mpp::Mul<ComputeT> op;
+
+            const mulInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
+
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceSrcScale>(
+                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+        }
     }
 }
 
 #pragma region Instantiate
-// using default_ext_compute_type_for_t for computeT without SIMD
+// using default_ext_int_compute_type_for_t for computeT without SIMD
 #define InstantiateInvokeMulInplaceSrcScaleMask_For(typeSrcIsTypeDst)                                                  \
-    template void InvokeMulInplaceSrcScaleMask<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>,     \
+    template void InvokeMulInplaceSrcScaleMask<typeSrcIsTypeDst, default_ext_int_compute_type_for_t<typeSrcIsTypeDst>, \
                                                typeSrcIsTypeDst>(                                                      \
         const Pixel8uC1 *aMask, size_t aPitchMask, typeSrcIsTypeDst *aSrcDst, size_t aPitchSrcDst,                     \
-        const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,                                                              \
-        scalefactor_t<default_ext_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor, const Size2D &aSize,             \
+        const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2, double aScaleFactor, const Size2D &aSize,                    \
         const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeMulInplaceSrcScaleMask(type)                                                        \
@@ -544,10 +620,10 @@ void InvokeMulInplaceCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrc
 }
 
 #pragma region Instantiate
-// using default_ext_compute_type_for_t for computeT including SIMD activation if possible
+// using default_ext_int_compute_type_for_t for computeT including SIMD activation if possible
 #define InstantiateInvokeMulInplaceCMask_For(typeSrcIsTypeDst)                                                         \
     template void                                                                                                      \
-    InvokeMulInplaceCMask<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(       \
+    InvokeMulInplaceCMask<typeSrcIsTypeDst, default_ext_int_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(   \
         const Pixel8uC1 *aMask, size_t aPitchMask, typeSrcIsTypeDst *aSrcDst, size_t aPitchSrcDst,                     \
         const typeSrcIsTypeDst &aConst, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
@@ -568,7 +644,7 @@ void InvokeMulInplaceCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrc
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMulInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
-                                const SrcT &aConst, scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize,
+                                const SrcT &aConst, double aScaleFactor, const Size2D &aSize,
                                 const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
@@ -576,7 +652,7 @@ void InvokeMulInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT 
         MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0f)
+        if (aScaleFactor == 1.0)
         {
             InvokeMulInplaceCMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aConst, aSize, aStreamCtx);
             return;
@@ -584,26 +660,45 @@ void InvokeMulInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT 
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using mulInplaceCScale =
-            InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::NearestTiesToEven>;
+        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            using mulInplaceCScale = InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT,
+                                                                 RoundingMode::NearestTiesToEven>;
 
-        const mpp::Mul<ComputeT> op;
+            const mpp::Mul<ComputeT> op;
 
-        const mulInplaceCScale functor(static_cast<ComputeT>(aConst), op, aScaleFactor);
+            const mulInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceCScale>(
-            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceCScale>(
+                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+        }
+        else
+        {
+            // Scaler performs NearestTiesToEven rounding:
+            using ScalerT = Scale<ComputeT, true>;
+            const ScalerT scaler(aScaleFactor);
+            using mulInplaceCScale =
+                InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT, RoundingMode::None>;
+
+            const mpp::Mul<ComputeT> op;
+
+            const mulInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
+
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceCScale>(
+                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+        }
     }
 }
 
 #pragma region Instantiate
-// using default_ext_compute_type_for_t for computeT without SIMD
+// using default_ext_int_compute_type_for_t for computeT without SIMD
 #define InstantiateInvokeMulInplaceCScaleMask_For(typeSrcIsTypeDst)                                                    \
-    template void                                                                                                      \
-    InvokeMulInplaceCScaleMask<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(  \
+    template void InvokeMulInplaceCScaleMask<typeSrcIsTypeDst, default_ext_int_compute_type_for_t<typeSrcIsTypeDst>,   \
+                                             typeSrcIsTypeDst>(                                                        \
         const Pixel8uC1 *aMask, size_t aPitchMask, typeSrcIsTypeDst *aSrcDst, size_t aPitchSrcDst,                     \
-        const typeSrcIsTypeDst &aConst, scalefactor_t<default_ext_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor,  \
-        const Size2D &aSize, const StreamCtx &aStreamCtx);
+        const typeSrcIsTypeDst &aConst, double aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeMulInplaceCScaleMask(type)                                                          \
     InstantiateInvokeMulInplaceCScaleMask_For(Pixel##type##C1);                                                        \
@@ -644,10 +739,10 @@ void InvokeMulInplaceDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *a
 }
 
 #pragma region Instantiate
-// using default_ext_compute_type_for_t for computeT including SIMD activation if possible
+// using default_ext_int_compute_type_for_t for computeT including SIMD activation if possible
 #define InstantiateInvokeMulInplaceDevCMask_For(typeSrcIsTypeDst)                                                      \
-    template void                                                                                                      \
-    InvokeMulInplaceDevCMask<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(    \
+    template void InvokeMulInplaceDevCMask<typeSrcIsTypeDst, default_ext_int_compute_type_for_t<typeSrcIsTypeDst>,     \
+                                           typeSrcIsTypeDst>(                                                          \
         const Pixel8uC1 *aMask, size_t aPitchMask, typeSrcIsTypeDst *aSrcDst, size_t aPitchSrcDst,                     \
         const typeSrcIsTypeDst *aConst, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
@@ -668,7 +763,7 @@ void InvokeMulInplaceDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *a
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMulInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
-                                   const SrcT *aConst, scalefactor_t<ComputeT> aScaleFactor, const Size2D &aSize,
+                                   const SrcT *aConst, double aScaleFactor, const Size2D &aSize,
                                    const StreamCtx &aStreamCtx)
 {
     if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
@@ -676,7 +771,7 @@ void InvokeMulInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
         MPP_CUDA_REGISTER_TEMPALTE;
 
         // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0f)
+        if (aScaleFactor == 1.0)
         {
             InvokeMulInplaceDevCMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aConst, aSize, aStreamCtx);
             return;
@@ -684,26 +779,45 @@ void InvokeMulInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using mulInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>,
-                                                                   RoundingMode::NearestTiesToEven>;
+        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            using mulInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>,
+                                                                       ScalerT, RoundingMode::NearestTiesToEven>;
 
-        const mpp::Mul<ComputeT> op;
+            const mpp::Mul<ComputeT> op;
 
-        const mulInplaceDevCScale functor(aConst, op, aScaleFactor);
+            const mulInplaceDevCScale functor(aConst, op, scaler);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceDevCScale>(
-            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceDevCScale>(
+                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+        }
+        else
+        {
+            // Scaler performs NearestTiesToEven rounding:
+            using ScalerT = Scale<ComputeT, true>;
+            const ScalerT scaler(aScaleFactor);
+            using mulInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>,
+                                                                       ScalerT, RoundingMode::None>;
+
+            const mpp::Mul<ComputeT> op;
+
+            const mulInplaceDevCScale functor(aConst, op, scaler);
+
+            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceDevCScale>(
+                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+        }
     }
 }
 
 #pragma region Instantiate
-// using default_ext_compute_type_for_t for computeT without SIMD
+// using default_ext_int_compute_type_for_t for computeT without SIMD
 #define InstantiateInvokeMulInplaceDevCScaleMask_For(typeSrcIsTypeDst)                                                 \
-    template void InvokeMulInplaceDevCScaleMask<typeSrcIsTypeDst, default_ext_compute_type_for_t<typeSrcIsTypeDst>,    \
-                                                typeSrcIsTypeDst>(                                                     \
+    template void InvokeMulInplaceDevCScaleMask<                                                                       \
+        typeSrcIsTypeDst, default_ext_int_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(                     \
         const Pixel8uC1 *aMask, size_t aPitchMask, typeSrcIsTypeDst *aSrcDst, size_t aPitchSrcDst,                     \
-        const typeSrcIsTypeDst *aConst, scalefactor_t<default_ext_compute_type_for_t<typeSrcIsTypeDst>> aScaleFactor,  \
-        const Size2D &aSize, const StreamCtx &aStreamCtx);
+        const typeSrcIsTypeDst *aConst, double aScaleFactor, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeMulInplaceDevCScaleMask(type)                                                       \
     InstantiateInvokeMulInplaceDevCScaleMask_For(Pixel##type##C1);                                                     \

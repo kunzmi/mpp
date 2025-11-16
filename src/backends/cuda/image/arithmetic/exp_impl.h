@@ -63,9 +63,10 @@ void InvokeExpSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitc
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT including SIMD activation if possible
+// using default_floating_compute_type_for_t for computeT including SIMD activation if possible
 #define InstantiateInvokeExpSrc_For(typeSrcIsTypeDst)                                                                  \
-    template void InvokeExpSrc<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(      \
+    template void                                                                                                      \
+    InvokeExpSrc<typeSrcIsTypeDst, default_floating_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(           \
         const typeSrcIsTypeDst *aSrc1, size_t aPitchSrc1, typeSrcIsTypeDst *aDst, size_t aPitchDst,                    \
         const Size2D &aSize, const StreamCtx &aStreamCtx);
 
@@ -123,9 +124,9 @@ void InvokeExpInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, c
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT including SIMD activation if possible
+// using default_floating_compute_type_for_t for computeT including SIMD activation if possible
 #define InstantiateInvokeExpInplace_For(typeSrcIsTypeDst)                                                              \
-    template void InvokeExpInplace<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>>(                    \
+    template void InvokeExpInplace<typeSrcIsTypeDst, default_floating_compute_type_for_t<typeSrcIsTypeDst>>(           \
         typeSrcIsTypeDst * aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeExpInplace(type)                                                                    \

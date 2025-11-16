@@ -18,8 +18,8 @@ void InvokeDivSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, si
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
 void InvokeDivSrcSrcScale(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst,
-                          size_t aPitchDst, scalefactor_t<ComputeT> aScaleFactor, mpp::RoundingMode aRoundingMode,
-                          const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
+                          size_t aPitchDst, double aScaleFactor, mpp::RoundingMode aRoundingMode, const Size2D &aSize,
+                          const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
 void InvokeDivSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT *aDst, size_t aPitchDst,
@@ -27,7 +27,7 @@ void InvokeDivSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT 
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
 void InvokeDivSrcCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT *aDst, size_t aPitchDst,
-                        scalefactor_t<ComputeT> aScaleFactor, mpp::RoundingMode aRoundingMode, const Size2D &aSize,
+                        double aScaleFactor, mpp::RoundingMode aRoundingMode, const Size2D &aSize,
                         const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
@@ -36,7 +36,7 @@ void InvokeDivSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst, Ds
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
 void InvokeDivSrcDevCScale(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst, DstT *aDst, size_t aPitchDst,
-                           scalefactor_t<ComputeT> aScaleFactor, mpp::RoundingMode aRoundingMode, const Size2D &aSize,
+                           double aScaleFactor, mpp::RoundingMode aRoundingMode, const Size2D &aSize,
                            const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
@@ -45,16 +45,16 @@ void InvokeDivInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, 
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
 void InvokeDivInplaceSrcScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, size_t aPitchSrc2,
-                              scalefactor_t<ComputeT> aScaleFactor, mpp::RoundingMode aRoundingMode,
-                              const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
+                              double aScaleFactor, mpp::RoundingMode aRoundingMode, const Size2D &aSize,
+                              const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
 void InvokeDivInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, const Size2D &aSize,
                        const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
-void InvokeDivInplaceCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst,
-                            scalefactor_t<ComputeT> aScaleFactor, mpp::RoundingMode aRoundingMode, const Size2D &aSize,
+void InvokeDivInplaceCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, double aScaleFactor,
+                            mpp::RoundingMode aRoundingMode, const Size2D &aSize,
                             const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
@@ -62,9 +62,9 @@ void InvokeDivInplaceDevC(DstT *aSrcDst, size_t aPitchDst, const SrcT *aConst, c
                           const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
-void InvokeDivInplaceDevCScale(DstT *aSrcDst, size_t aPitchDst, const SrcT *aConst,
-                               scalefactor_t<ComputeT> aScaleFactor, mpp::RoundingMode aRoundingMode,
-                               const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
+void InvokeDivInplaceDevCScale(DstT *aSrcDst, size_t aPitchDst, const SrcT *aConst, double aScaleFactor,
+                               mpp::RoundingMode aRoundingMode, const Size2D &aSize,
+                               const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
 void InvokeDivInvInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, size_t aPitchSrc2,
@@ -72,26 +72,26 @@ void InvokeDivInvInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
 void InvokeDivInvInplaceSrcScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, size_t aPitchSrc2,
-                                 scalefactor_t<ComputeT> aScaleFactor, mpp::RoundingMode aRoundingMode,
-                                 const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
+                                 double aScaleFactor, mpp::RoundingMode aRoundingMode, const Size2D &aSize,
+                                 const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
 void InvokeDivInvInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, const Size2D &aSize,
                           const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
-void InvokeDivInvInplaceCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst,
-                               scalefactor_t<ComputeT> aScaleFactor, mpp::RoundingMode aRoundingMode,
-                               const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
+void InvokeDivInvInplaceCScale(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, double aScaleFactor,
+                               mpp::RoundingMode aRoundingMode, const Size2D &aSize,
+                               const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
 void InvokeDivInvInplaceDevC(DstT *aSrcDst, size_t aPitchDst, const SrcT *aConst, const Size2D &aSize,
                              const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
-void InvokeDivInvInplaceDevCScale(DstT *aSrcDst, size_t aPitchDst, const SrcT *aConst,
-                                  scalefactor_t<ComputeT> aScaleFactor, mpp::RoundingMode aRoundingMode,
-                                  const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
+void InvokeDivInvInplaceDevCScale(DstT *aSrcDst, size_t aPitchDst, const SrcT *aConst, double aScaleFactor,
+                                  mpp::RoundingMode aRoundingMode, const Size2D &aSize,
+                                  const mpp::cuda::StreamCtx &aStreamCtx);
 
 } // namespace mpp::image::cuda
 #endif // MPP_ENABLE_CUDA_BACKEND

@@ -11,9 +11,10 @@
 namespace mpp::image::cuda
 {
 
-template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
+template <typename SrcT, typename ComputeT = default_floating_compute_type_for_t<SrcT>, typename DstT>
 void InvokeAlphaCompSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst,
-                           size_t aPitchDst, AlphaCompositionOp aAlphaOp, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
+                           size_t aPitchDst, AlphaCompositionOp aAlphaOp, const Size2D &aSize,
+                           const mpp::cuda::StreamCtx &aStreamCtx);
 
 } // namespace mpp::image::cuda
 #endif // MPP_ENABLE_CUDA_BACKEND

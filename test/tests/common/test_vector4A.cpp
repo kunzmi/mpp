@@ -1,6 +1,7 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <cmath>
+#include <common/complex.h>
 #include <common/defines.h>
 #include <common/exception.h>
 #include <common/half_fp16.h>
@@ -502,6 +503,26 @@ TEST_CASE("Pixel32sC4A", "[Common]")
     minmax2 = Pixel32sC4A(-20, 10, 40);
     CHECK(minmax2.Min() == -20);
     CHECK(minmax1.Max() == 20);
+
+    CHECK(Pixel32sC4A(10, 11, -13).DivRound(Pixel32sC4A(3, 4, 4)) == Pixel32sC4A(3, 3, -3));
+    CHECK(Pixel32sC4A(10, 11, -13).DivRoundNearest(Pixel32sC4A(3, 4, 4)) == Pixel32sC4A(3, 3, -3));
+    CHECK(Pixel32sC4A(10, 11, -13).DivRoundZero(Pixel32sC4A(3, 4, 4)) == Pixel32sC4A(3, 2, -3));
+    CHECK(Pixel32sC4A(10, 11, -13).DivFloor(Pixel32sC4A(3, 4, 4)) == Pixel32sC4A(3, 2, -4));
+    CHECK(Pixel32sC4A(10, 11, -13).DivCeil(Pixel32sC4A(3, 4, 4)) == Pixel32sC4A(4, 3, -3));
+
+    CHECK(Pixel32sC4A(3, 4, 4).DivInvRound(Pixel32sC4A(10, 11, -13)) == Pixel32sC4A(3, 3, -3));
+    CHECK(Pixel32sC4A(3, 4, 4).DivInvRoundNearest(Pixel32sC4A(10, 11, -13)) == Pixel32sC4A(3, 3, -3));
+    CHECK(Pixel32sC4A(3, 4, 4).DivInvRoundZero(Pixel32sC4A(10, 11, -13)) == Pixel32sC4A(3, 2, -3));
+    CHECK(Pixel32sC4A(3, 4, 4).DivInvFloor(Pixel32sC4A(10, 11, -13)) == Pixel32sC4A(3, 2, -4));
+    CHECK(Pixel32sC4A(3, 4, 4).DivInvCeil(Pixel32sC4A(10, 11, -13)) == Pixel32sC4A(4, 3, -3));
+
+    CHECK(Pixel32sC4A::DivRound(Pixel32sC4A(10, 11, 13), Pixel32sC4A(-3, -4, 4)) == Pixel32sC4A(-3, -3, 3));
+    CHECK(Pixel32sC4A::DivRoundNearest(Pixel32sC4A(10, 11, 13), Pixel32sC4A(-3, -4, 4)) == Pixel32sC4A(-3, -3, 3));
+    CHECK(Pixel32sC4A::DivRoundZero(Pixel32sC4A(10, 11, 13), Pixel32sC4A(-3, -4, 4)) == Pixel32sC4A(-3, -2, 3));
+    CHECK(Pixel32sC4A::DivFloor(Pixel32sC4A(10, 11, 13), Pixel32sC4A(-3, -4, 4)) == Pixel32sC4A(-4, -3, 3));
+    CHECK(Pixel32sC4A::DivCeil(Pixel32sC4A(10, 11, 13), Pixel32sC4A(-3, -4, 4)) == Pixel32sC4A(-3, -2, 4));
+
+    CHECK(Pixel32sC4A(-9, 15, -15).DivScaleRoundNearest(10) == Pixel32sC4A(-1, 2, -2));
 }
 
 TEST_CASE("Pixel32sC4A_additionalMethods", "[Common]")
@@ -1157,4 +1178,21 @@ TEST_CASE("Pixel16fC4A_additionalMethods", "[Common]")
     CHECK(fromFromFloat.x == -INFINITY);
     CHECK(fromFromFloat.y == INFINITY);
     CHECK(fromFromFloat.z == -32768);
+}
+
+TEST_CASE("Pixel64sC4A", "[Common]")
+{
+    CHECK(Pixel64sC4A(10, 11, -13).DivRound(Pixel64sC4A(3, 4, 4)) == Pixel64sC4A(3, 3, -3));
+    CHECK(Pixel64sC4A(10, 11, -13).DivRoundNearest(Pixel64sC4A(3, 4, 4)) == Pixel64sC4A(3, 3, -3));
+    CHECK(Pixel64sC4A(10, 11, -13).DivRoundZero(Pixel64sC4A(3, 4, 4)) == Pixel64sC4A(3, 2, -3));
+    CHECK(Pixel64sC4A(10, 11, -13).DivFloor(Pixel64sC4A(3, 4, 4)) == Pixel64sC4A(3, 2, -4));
+    CHECK(Pixel64sC4A(10, 11, -13).DivCeil(Pixel64sC4A(3, 4, 4)) == Pixel64sC4A(4, 3, -3));
+
+    CHECK(Pixel64sC4A::DivRound(Pixel64sC4A(10, 11, 13), Pixel64sC4A(-3, -4, 4)) == Pixel64sC4A(-3, -3, 3));
+    CHECK(Pixel64sC4A::DivRoundNearest(Pixel64sC4A(10, 11, 13), Pixel64sC4A(-3, -4, 4)) == Pixel64sC4A(-3, -3, 3));
+    CHECK(Pixel64sC4A::DivRoundZero(Pixel64sC4A(10, 11, 13), Pixel64sC4A(-3, -4, 4)) == Pixel64sC4A(-3, -2, 3));
+    CHECK(Pixel64sC4A::DivFloor(Pixel64sC4A(10, 11, 13), Pixel64sC4A(-3, -4, 4)) == Pixel64sC4A(-4, -3, 3));
+    CHECK(Pixel64sC4A::DivCeil(Pixel64sC4A(10, 11, 13), Pixel64sC4A(-3, -4, 4)) == Pixel64sC4A(-3, -2, 4));
+
+    CHECK(Pixel64sC4A(-9, 15, -15).DivScaleRoundNearest(10) == Pixel64sC4A(-1, 2, -2));
 }

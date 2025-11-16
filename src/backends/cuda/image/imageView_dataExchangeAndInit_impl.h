@@ -2,6 +2,7 @@
 #include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
 #if MPP_ENABLE_CUDA_BACKEND
 
+#include "dataExchangeAndInit/conversionRelations.h"
 #include "imageView.h"
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/devVarView.h>
@@ -17,9 +18,9 @@
 #include <common/image/roi.h>
 #include <common/image/roiException.h>
 #include <common/image/size2D.h>
+#include <common/mpp_defs.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
-#include <common/mpp_defs.h>
 #include <common/utilities.h>
 #include <common/vector_typetraits.h>
 #include <concepts>
@@ -30,10 +31,7 @@ namespace mpp::image::cuda
 template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
-    requires(!std::same_as<T, TTo>) &&
-            (RealOrComplexIntVector<T> || (std::same_as<complex_basetype_t<remove_vector_t<T>>, float> &&
-                                           (std::same_as<complex_basetype_t<remove_vector_t<TTo>>, BFloat16> ||
-                                            std::same_as<complex_basetype_t<remove_vector_t<TTo>>, HalfFp16>)))
+    requires(!std::same_as<T, TTo>) && ConversionImplemented<T, TTo>
 {
     checkSameSize(ROI(), aDst.ROI());
 
@@ -46,7 +44,7 @@ template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode,
                                       const mpp::cuda::StreamCtx &aStreamCtx) const
-    requires(!std::same_as<T, TTo>) && RealOrComplexFloatingVector<T>
+    requires(!std::same_as<T, TTo>) && ConversionRoundImplemented<T, TTo>
 {
     checkSameSize(ROI(), aDst.ROI());
 
@@ -59,13 +57,14 @@ template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode, int aScaleFactor,
                                       const mpp::cuda::StreamCtx &aStreamCtx) const
-    requires(!std::same_as<T, TTo>) && (!std::same_as<TTo, float>) && (!std::same_as<TTo, double>) &&
-            (!std::same_as<TTo, Complex<float>>) && (!std::same_as<TTo, Complex<double>>)
+    requires(!std::same_as<T, TTo>) && ConversionRoundScaleImplemented<T, TTo> && (!std::same_as<TTo, float>) &&
+            (!std::same_as<TTo, double>) && (!std::same_as<TTo, Complex<float>>) &&
+            (!std::same_as<TTo, Complex<double>>)
 {
     checkSameSize(ROI(), aDst.ROI());
 
     if constexpr (std::same_as<complex_basetype_t<T>, float> &&
-                  (std::same_as<complex_basetype_t<T>, HalfFp16> || std::same_as<complex_basetype_t<T>, BFloat16>))
+                  (std::same_as<complex_basetype_t<TTo>, HalfFp16> || std::same_as<complex_basetype_t<TTo>, BFloat16>))
     {
         if (aRoundingMode == RoundingMode::NearestTiesAwayFromZero)
         {
@@ -78,7 +77,7 @@ ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundi
         }
     }
 
-    const float scaleFactorFloat = GetScaleFactor(aScaleFactor);
+    const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
     InvokeConvertScaleRound(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aRoundingMode, scaleFactorFloat,
                             SizeRoi(), aStreamCtx);
     return aDst;
@@ -346,7 +345,7 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, const mpp::cuda::Strea
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    using scaleType            = scalefactor_t<default_compute_type_for_t<T>>;
+    using scaleType            = scalefactor_t<default_floating_compute_type_for_t<T>>;
     constexpr scaleType srcMin = static_cast<scaleType>(numeric_limits<T>::lowest());
     constexpr scaleType srcMax = static_cast<scaleType>(numeric_limits<T>::max());
     constexpr scaleType dstMin = static_cast<scaleType>(numeric_limits<TTo>::lowest());
@@ -366,7 +365,7 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDs
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    using scaleType            = scalefactor_t<default_compute_type_for_t<T>>;
+    using scaleType            = scalefactor_t<default_floating_compute_type_for_t<T>>;
     constexpr scaleType srcMin = static_cast<scaleType>(numeric_limits<T>::lowest());
     constexpr scaleType srcMax = static_cast<scaleType>(numeric_limits<T>::max());
     const scaleType dstMin     = static_cast<scaleType>(aDstMin);
@@ -386,7 +385,7 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcM
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    using scaleType            = scalefactor_t<default_compute_type_for_t<T>>;
+    using scaleType            = scalefactor_t<default_floating_compute_type_for_t<T>>;
     const scaleType srcMin     = static_cast<scaleType>(aSrcMin);
     const scaleType srcMax     = static_cast<scaleType>(aSrcMax);
     constexpr scaleType dstMin = static_cast<scaleType>(numeric_limits<TTo>::lowest());
@@ -407,7 +406,7 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcM
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    using scaleType        = scalefactor_t<default_compute_type_for_t<T>>;
+    using scaleType        = scalefactor_t<default_floating_compute_type_for_t<T>>;
     const scaleType srcMin = static_cast<scaleType>(aSrcMin);
     const scaleType srcMax = static_cast<scaleType>(aSrcMax);
     const scaleType dstMin = static_cast<scaleType>(aDstMin);

@@ -1,12 +1,12 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
-#include <common/Vector2.h>
-#include <common/Vector2_impl.h>
 #include <common/bfloat16.h>
 #include <common/complex.h>
 #include <common/defines.h>
 #include <common/half_fp16.h>
 #include <common/safeCast.h>
+#include <common/Vector2.h>
+#include <common/Vector2_impl.h>
 #include <complex>
 #include <cstddef>
 #include <cstdint>
@@ -388,6 +388,97 @@ TEST_CASE("Complex<int>", "[Common]")
     Complex<int> fromLiteralFloat3 = 10 + 20.0_i;
     CHECK(fromLiteralFloat3.real == 10);
     CHECK(fromLiteralFloat3.imag == 20);
+
+    c_int divIntA     = 40 - 50_i;
+    c_int divIntB     = 9 + 3_i;
+    c_float divFloatA = divIntA;
+    c_float divFloatB = divIntB;
+    c_float divFloatC;
+    c_int divIntC;
+
+    divFloatC = (divFloatA / divFloatB).Round();
+    divIntC   = c_int::DivRound(divIntA, divIntB);
+    CHECK(divFloatC == divIntC);
+
+    divFloatC = (divFloatA / divFloatB).RoundNearest();
+    divIntC   = c_int::DivRoundNearest(divIntA, divIntB);
+    CHECK(divFloatC == divIntC);
+
+    divFloatC = (divFloatA / divFloatB).RoundZero();
+    divIntC   = c_int::DivRoundZero(divIntA, divIntB);
+    CHECK(divFloatC == divIntC);
+
+    divFloatC = (divFloatA / divFloatB).Floor();
+    divIntC   = c_int::DivFloor(divIntA, divIntB);
+    CHECK(divFloatC == divIntC);
+
+    divFloatC = (divFloatA / divFloatB).Ceil();
+    divIntC   = c_int::DivCeil(divIntA, divIntB);
+    CHECK(divFloatC == divIntC);
+
+    divFloatC = divFloatA;
+    divIntC   = divIntA;
+    divFloatC /= divFloatB;
+    divIntC.DivRound(divIntB);
+    CHECK(divFloatC.Round() == divIntC);
+
+    divFloatC = divFloatA;
+    divIntC   = divIntA;
+    divFloatC /= divFloatB;
+    divIntC.DivRoundNearest(divIntB);
+    CHECK(divFloatC.RoundNearest() == divIntC);
+
+    divFloatC = divFloatA;
+    divIntC   = divIntA;
+    divFloatC /= divFloatB;
+    divIntC.DivRoundZero(divIntB);
+    CHECK(divFloatC.RoundZero() == divIntC);
+
+    divFloatC = divFloatA;
+    divIntC   = divIntA;
+    divFloatC /= divFloatB;
+    divIntC.DivFloor(divIntB);
+    CHECK(divFloatC.Floor() == divIntC);
+
+    divFloatC = divFloatA;
+    divIntC   = divIntA;
+    divFloatC /= divFloatB;
+    divIntC.DivCeil(divIntB);
+    CHECK(divFloatC.Ceil() == divIntC);
+
+    divIntA   = 4 - 5_i;
+    divFloatA = divIntA;
+    divFloatC = divFloatA;
+    divIntC   = divIntA;
+    divFloatC.DivInv(divFloatB);
+    divIntC.DivInvRound(divIntB);
+    CHECK(divFloatC.Round() == divIntC);
+
+    divFloatC = divFloatA;
+    divIntC   = divIntA;
+    divFloatC.DivInv(divFloatB);
+    divIntC.DivInvRoundNearest(divIntB);
+    CHECK(divFloatC.RoundNearest() == divIntC);
+
+    divFloatC = divFloatA;
+    divIntC   = divIntA;
+    divFloatC.DivInv(divFloatB);
+    divIntC.DivInvRoundZero(divIntB);
+    CHECK(divFloatC.RoundZero() == divIntC);
+
+    divFloatC = divFloatA;
+    divIntC   = divIntA;
+    divFloatC.DivInv(divFloatB);
+    divIntC.DivInvFloor(divIntB);
+    CHECK(divFloatC.Floor() == divIntC);
+
+    divFloatC = divFloatA;
+    divIntC   = divIntA;
+    divFloatC.DivInv(divFloatB);
+    divIntC.DivInvCeil(divIntB);
+    CHECK(divFloatC.Ceil() == divIntC);
+
+    CHECK((3 - 5_i).DivScaleRoundNearest(2) == 2 - 2_i);
 }
 
 TEST_CASE("Complex<short>", "[Common]")

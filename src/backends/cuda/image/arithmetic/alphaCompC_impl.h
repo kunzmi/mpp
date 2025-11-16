@@ -171,10 +171,10 @@ void InvokeAlphaCompCSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aS
 }
 
 #pragma region Instantiate
-// using default_compute_type_for_t for computeT
+// using default_floating_compute_type_for_t for computeT
 #define Instantiate_For(typeSrcIsTypeDst)                                                                              \
     template void                                                                                                      \
-    InvokeAlphaCompCSrcSrc<typeSrcIsTypeDst, default_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>(          \
+    InvokeAlphaCompCSrcSrc<typeSrcIsTypeDst, default_floating_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>( \
         const typeSrcIsTypeDst *aSrc1, size_t aPitchSrc1, const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,            \
         typeSrcIsTypeDst *aDst, size_t aPitchDst, remove_vector_t<typeSrcIsTypeDst> aAlpha1,                           \
         remove_vector_t<typeSrcIsTypeDst> aAlpha2, AlphaCompositionOp aAlphaOp, const Size2D &aSize,                   \

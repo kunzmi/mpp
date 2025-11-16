@@ -494,6 +494,26 @@ TEST_CASE("Pixel32sC3", "[Common]")
 
     CHECK(minmax2.Min() == -20);
     CHECK(minmax1.Max() == 20);
+
+    CHECK(Pixel32sC3(10, 11, -13).DivRound(Pixel32sC3(3, 4, 4)) == Pixel32sC3(3, 3, -3));
+    CHECK(Pixel32sC3(10, 11, -13).DivRoundNearest(Pixel32sC3(3, 4, 4)) == Pixel32sC3(3, 3, -3));
+    CHECK(Pixel32sC3(10, 11, -13).DivRoundZero(Pixel32sC3(3, 4, 4)) == Pixel32sC3(3, 2, -3));
+    CHECK(Pixel32sC3(10, 11, -13).DivFloor(Pixel32sC3(3, 4, 4)) == Pixel32sC3(3, 2, -4));
+    CHECK(Pixel32sC3(10, 11, -13).DivCeil(Pixel32sC3(3, 4, 4)) == Pixel32sC3(4, 3, -3));
+
+    CHECK(Pixel32sC3(3, 4, 4).DivInvRound(Pixel32sC3(10, 11, -13)) == Pixel32sC3(3, 3, -3));
+    CHECK(Pixel32sC3(3, 4, 4).DivInvRoundNearest(Pixel32sC3(10, 11, -13)) == Pixel32sC3(3, 3, -3));
+    CHECK(Pixel32sC3(3, 4, 4).DivInvRoundZero(Pixel32sC3(10, 11, -13)) == Pixel32sC3(3, 2, -3));
+    CHECK(Pixel32sC3(3, 4, 4).DivInvFloor(Pixel32sC3(10, 11, -13)) == Pixel32sC3(3, 2, -4));
+    CHECK(Pixel32sC3(3, 4, 4).DivInvCeil(Pixel32sC3(10, 11, -13)) == Pixel32sC3(4, 3, -3));
+
+    CHECK(Pixel32sC3::DivRound(Pixel32sC3(10, 11, 13), Pixel32sC3(-3, -4, 4)) == Pixel32sC3(-3, -3, 3));
+    CHECK(Pixel32sC3::DivRoundNearest(Pixel32sC3(10, 11, 13), Pixel32sC3(-3, -4, 4)) == Pixel32sC3(-3, -3, 3));
+    CHECK(Pixel32sC3::DivRoundZero(Pixel32sC3(10, 11, 13), Pixel32sC3(-3, -4, 4)) == Pixel32sC3(-3, -2, 3));
+    CHECK(Pixel32sC3::DivFloor(Pixel32sC3(10, 11, 13), Pixel32sC3(-3, -4, 4)) == Pixel32sC3(-4, -3, 3));
+    CHECK(Pixel32sC3::DivCeil(Pixel32sC3(10, 11, 13), Pixel32sC3(-3, -4, 4)) == Pixel32sC3(-3, -2, 4));
+
+    CHECK(Pixel32sC3(-9, 15, -15).DivScaleRoundNearest(10) == Pixel32sC3(-1, 2, -2));
 }
 
 TEST_CASE("Pixel32sC3_additionalMethods", "[Common]")
@@ -1337,6 +1357,20 @@ TEST_CASE("Pixel32fcC3", "[Common]")
     CHECK(conj2.x == 50 + 1_i);
     CHECK(conj2.y == -14 + 97_i);
     CHECK(conj2.z == 27 + 121_i);
+
+    Pixel32fcC3 a = t1;
+    Pixel32fcC3 s = t1;
+    Pixel32fcC3 m = t1;
+    Pixel32fcC3 d = t1;
+
+    a += 5.0f;
+    s -= 5.0f;
+    m *= 5.0f;
+    d /= 5.0f;
+    CHECK(a == t1 + 5.0f);
+    CHECK(s == t1 - 5.0f);
+    CHECK(m == t1 * 5.0f);
+    CHECK(d == t1 / 5.0f);
 }
 
 TEST_CASE("Pixel32fcC3_additionalMethods", "[Common]")
@@ -1411,4 +1445,59 @@ TEST_CASE("Pixel32fcC3_additionalMethods", "[Common]")
     CHECK(clampInt.x.real == 2147483647);
     CHECK(clampInt.y.real == -2147483648);
     CHECK(clampInt.z.real == -2147483648);
+}
+
+TEST_CASE("Pixel64sC3", "[Common]")
+{
+    CHECK(Pixel64sC3(10, 11, -13).DivRound(Pixel64sC3(3, 4, 4)) == Pixel64sC3(3, 3, -3));
+    CHECK(Pixel64sC3(10, 11, -13).DivRoundNearest(Pixel64sC3(3, 4, 4)) == Pixel64sC3(3, 3, -3));
+    CHECK(Pixel64sC3(10, 11, -13).DivRoundZero(Pixel64sC3(3, 4, 4)) == Pixel64sC3(3, 2, -3));
+    CHECK(Pixel64sC3(10, 11, -13).DivFloor(Pixel64sC3(3, 4, 4)) == Pixel64sC3(3, 2, -4));
+    CHECK(Pixel64sC3(10, 11, -13).DivCeil(Pixel64sC3(3, 4, 4)) == Pixel64sC3(4, 3, -3));
+
+    CHECK(Pixel64sC3::DivRound(Pixel64sC3(10, 11, 13), Pixel64sC3(-3, -4, 4)) == Pixel64sC3(-3, -3, 3));
+    CHECK(Pixel64sC3::DivRoundNearest(Pixel64sC3(10, 11, 13), Pixel64sC3(-3, -4, 4)) == Pixel64sC3(-3, -3, 3));
+    CHECK(Pixel64sC3::DivRoundZero(Pixel64sC3(10, 11, 13), Pixel64sC3(-3, -4, 4)) == Pixel64sC3(-3, -2, 3));
+    CHECK(Pixel64sC3::DivFloor(Pixel64sC3(10, 11, 13), Pixel64sC3(-3, -4, 4)) == Pixel64sC3(-4, -3, 3));
+    CHECK(Pixel64sC3::DivCeil(Pixel64sC3(10, 11, 13), Pixel64sC3(-3, -4, 4)) == Pixel64sC3(-3, -2, 4));
+
+    CHECK(Pixel64sC3(-9, 15, -15).DivScaleRoundNearest(10) == Pixel64sC3(-1, 2, -2));
+}
+
+TEST_CASE("Pixel64scC3", "[Common]")
+{
+    CHECK(Pixel64scC3(10 - 4_i, 11 + 4_i, -13 - 4_i).DivRound(Pixel64scC3(3 + 2_i, 4 + 2_i, 4 - 2_i)) ==
+          Pixel64scC3(2 - 2_i, 3, -2 - 2_i));
+    CHECK(Pixel64scC3(10 - 4_i, 11 + 4_i, -13 - 4_i).DivRoundNearest(Pixel64scC3(3 + 2_i, 4 + 2_i, 4 - 2_i)) ==
+          Pixel64scC3(2 - 2_i, 3, -2 - 2_i));
+    CHECK(Pixel64scC3(10 - 4_i, 11 + 4_i, -13 - 4_i).DivRoundZero(Pixel64scC3(3 + 2_i, 4 + 2_i, 4 - 2_i)) ==
+          Pixel64scC3(1 - 2_i, 2, -2 - 2_i));
+    CHECK(Pixel64scC3(10 - 4_i, 11 + 4_i, -13 - 4_i).DivFloor(Pixel64scC3(3 + 2_i, 4 + 2_i, 4 - 2_i)) ==
+          Pixel64scC3(1 - 3_i, 2 - 1_i, -3 - 3_i));
+    CHECK(Pixel64scC3(10 - 4_i, 11 + 4_i, -13 - 4_i).DivCeil(Pixel64scC3(3 + 2_i, 4 + 2_i, 4 - 2_i)) ==
+          Pixel64scC3(2 - 2_i, 3, -2 - 2_i));
+
+    CHECK(Pixel64scC3(3 + 2_i, 4 + 2_i, 4 - 2_i).DivInvRound(Pixel64scC3(10 - 4_i, 11 + 4_i, -13 - 4_i)) ==
+          Pixel64scC3(2 - 2_i, 3, -2 - 2_i));
+    CHECK(Pixel64scC3(3 + 2_i, 4 + 2_i, 4 - 2_i).DivInvRoundNearest(Pixel64scC3(10 - 4_i, 11 + 4_i, -13 - 4_i)) ==
+          Pixel64scC3(2 - 2_i, 3, -2 - 2_i));
+    CHECK(Pixel64scC3(3 + 2_i, 4 + 2_i, 4 - 2_i).DivInvRoundZero(Pixel64scC3(10 - 4_i, 11 + 4_i, -13 - 4_i)) ==
+          Pixel64scC3(1 - 2_i, 2, -2 - 2_i));
+    CHECK(Pixel64scC3(3 + 2_i, 4 + 2_i, 4 - 2_i).DivInvFloor(Pixel64scC3(10 - 4_i, 11 + 4_i, -13 - 4_i)) ==
+          Pixel64scC3(1 - 3_i, 2 - 1_i, -3 - 3_i));
+    CHECK(Pixel64scC3(3 + 2_i, 4 + 2_i, 4 - 2_i).DivInvCeil(Pixel64scC3(10 - 4_i, 11 + 4_i, -13 - 4_i)) ==
+          Pixel64scC3(2 - 2_i, 3, -2 - 2_i));
+
+    CHECK(Pixel64scC3::DivRound(Pixel64scC3(-10 + 4_i, -11 - 4_i, +13 + 4_i), Pixel64scC3(3 + 2_i, 4 + 2_i, 4 - 2_i)) ==
+          Pixel64scC3(-2 + 2_i, -3, 2 + 2_i));
+    CHECK(Pixel64scC3::DivRoundNearest(Pixel64scC3(-10 + 4_i, -11 - 4_i, +13 + 4_i),
+                                       Pixel64scC3(3 + 2_i, 4 + 2_i, 4 - 2_i)) == Pixel64scC3(-2 + 2_i, -3, 2 + 2_i));
+    CHECK(Pixel64scC3::DivRoundZero(Pixel64scC3(-10 + 4_i, -11 - 4_i, +13 + 4_i),
+                                    Pixel64scC3(3 + 2_i, 4 + 2_i, 4 - 2_i)) == Pixel64scC3(-1 + 2_i, -2, 2 + 2_i));
+    CHECK(Pixel64scC3::DivFloor(Pixel64scC3(-10 + 4_i, -11 - 4_i, +13 + 4_i), Pixel64scC3(3 + 2_i, 4 + 2_i, 4 - 2_i)) ==
+          Pixel64scC3(-2 + 2_i, -3, 2 + 2_i));
+    CHECK(Pixel64scC3::DivCeil(Pixel64scC3(-10 + 4_i, -11 - 4_i, +13 + 4_i), Pixel64scC3(3 + 2_i, 4 + 2_i, 4 - 2_i)) ==
+          Pixel64scC3(-1 + 3_i, -2 + 1_i, 3 + 3_i));
+
+    CHECK(Pixel64scC3(-9 + 11_i, 15 - 5_i, -15 + 5_i).DivScaleRoundNearest(10) == Pixel64scC3(-1 + 1_i, 2, -2));
 }

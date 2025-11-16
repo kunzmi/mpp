@@ -18,9 +18,9 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
 #include <common/image/roiException.h>
+#include <common/mpp_defs.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
-#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/scratchBuffer.h>
 #include <common/scratchBufferException.h>
@@ -3543,7 +3543,7 @@ size_t ImageView<T>::IntegralBufferSize(ImageView<same_vector_size_different_typ
 template <PixelType T>
 size_t ImageView<T>::IntegralBufferSize(ImageView<same_vector_size_different_type_t<T, float>> & /*aDst*/,
                                         const mpp::cuda::StreamCtx & /*aStreamCtx*/) const
-    requires RealVector<T> && NoAlpha<T> && (!std::same_as<double, remove_vector<T>>)
+    requires RealVector<T> && NoAlpha<T> && (!std::same_as<double, remove_vector_t<T>>)
 {
     using DstT = same_vector_size_different_type_t<T, float>;
 
@@ -3606,7 +3606,7 @@ template <PixelType T>
 size_t ImageView<T>::SqrIntegralBufferSize(ImageView<same_vector_size_different_type_t<T, float>> & /*aDst*/,
                                            ImageView<same_vector_size_different_type_t<T, double>> & /*aSqr*/,
                                            const mpp::cuda::StreamCtx & /*aStreamCtx*/) const
-    requires RealVector<T> && NoAlpha<T> && (!std::same_as<double, remove_vector<T>>)
+    requires RealVector<T> && NoAlpha<T> && (!std::same_as<double, remove_vector_t<T>>)
 {
     using DstT    = same_vector_size_different_type_t<T, float>;
     using DstSqrT = same_vector_size_different_type_t<T, double>;
@@ -3663,7 +3663,7 @@ ImageView<same_vector_size_different_type_t<T, float>> &ImageView<T>::Integral(
     ImageView<same_vector_size_different_type_t<T, float>> &aDst,
     const same_vector_size_different_type_t<T, float> &aVal, mpp::cuda::DevVarView<byte> &aBuffer,
     const mpp::cuda::StreamCtx &aStreamCtx) const
-    requires RealVector<T> && NoAlpha<T> && (!std::same_as<double, remove_vector<T>>)
+    requires RealVector<T> && NoAlpha<T> && (!std::same_as<double, remove_vector_t<T>>)
 {
     if (SizeRoi() != aDst.SizeRoi() - 1)
     {
@@ -3814,7 +3814,7 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, fl
                                const same_vector_size_different_type_t<T, float> &aVal,
                                const same_vector_size_different_type_t<T, double> &aValSqr,
                                mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
-    requires RealVector<T> && NoAlpha<T> && (!std::same_as<double, remove_vector<T>>)
+    requires RealVector<T> && NoAlpha<T> && (!std::same_as<double, remove_vector_t<T>>)
 {
     if (SizeRoi() != aDst.SizeRoi() - 1)
     {
@@ -4196,7 +4196,8 @@ ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelation(const ImageView<T> &aTempl
 
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelation(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
-                                                      T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                                                      const T &aConstant, BorderType aBorder,
+                                                      const Roi &aAllowedReadRoi,
                                                       const mpp::cuda::StreamCtx &aStreamCtx) const
     requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
 {
@@ -4229,7 +4230,7 @@ ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationNormalized(const ImageView<
 
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationNormalized(const ImageView<T> &aTemplate,
-                                                                ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                                ImageView<Pixel32fC1> &aDst, const T &aConstant,
                                                                 BorderType aBorder, const Roi &aAllowedReadRoi,
                                                                 const mpp::cuda::StreamCtx &aStreamCtx) const
     requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
@@ -4263,7 +4264,7 @@ ImageView<Pixel32fC1> &ImageView<T>::SquareDistanceNormalized(const ImageView<T>
 
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::SquareDistanceNormalized(const ImageView<T> &aTemplate,
-                                                              ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                              ImageView<Pixel32fC1> &aDst, const T &aConstant,
                                                               BorderType aBorder, const Roi &aAllowedReadRoi,
                                                               const mpp::cuda::StreamCtx &aStreamCtx) const
     requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
@@ -4302,7 +4303,7 @@ template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationCoefficient(const ImageView<Pixel32fC2> &aSrcBoxFiltered,
                                                                  const ImageView<T> &aTemplate,
                                                                  const mpp::cuda::DevVarView<Pixel64fC1> &aMeanTemplate,
-                                                                 ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                                 ImageView<Pixel32fC1> &aDst, const T &aConstant,
                                                                  BorderType aBorder, const Roi &aAllowedReadRoi,
                                                                  const mpp::cuda::StreamCtx &aStreamCtx) const
     requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
@@ -4330,7 +4331,7 @@ ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelation(const ImageView<T> &aTempl
 
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelation(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
-                                                      T aConstant, BorderType aBorder,
+                                                      const T &aConstant, BorderType aBorder,
                                                       const mpp::cuda::StreamCtx &aStreamCtx) const
     requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
 {
@@ -4349,7 +4350,7 @@ ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationNormalized(const ImageView<
 
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationNormalized(const ImageView<T> &aTemplate,
-                                                                ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                                ImageView<Pixel32fC1> &aDst, const T &aConstant,
                                                                 BorderType aBorder,
 
                                                                 const mpp::cuda::StreamCtx &aStreamCtx) const
@@ -4370,7 +4371,7 @@ ImageView<Pixel32fC1> &ImageView<T>::SquareDistanceNormalized(const ImageView<T>
 
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::SquareDistanceNormalized(const ImageView<T> &aTemplate,
-                                                              ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                              ImageView<Pixel32fC1> &aDst, const T &aConstant,
                                                               BorderType aBorder,
                                                               const mpp::cuda::StreamCtx &aStreamCtx) const
     requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
@@ -4395,7 +4396,7 @@ template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationCoefficient(const ImageView<Pixel32fC2> &aSrcBoxFiltered,
                                                                  const ImageView<T> &aTemplate,
                                                                  const mpp::cuda::DevVarView<Pixel64fC1> &aMeanTemplate,
-                                                                 ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                                 ImageView<Pixel32fC1> &aDst, const T &aConstant,
                                                                  BorderType aBorder,
                                                                  const mpp::cuda::StreamCtx &aStreamCtx) const
     requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)

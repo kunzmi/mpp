@@ -62,6 +62,7 @@ addCatchTest(test_halffp16_cuda.cpp "common;common_test_halffp16_cuda_kernel;bac
 addCatchTest(test_safeCast.cpp "common" "SafeCast")
 addCatchTest(test_scratchBuffer.cpp "common" "ScratchBuffer")
 addCatchTest(test_tupel.cpp "common" "Tupel")
+addCatchTest(test_utilities.cpp "" "Utilities")
 addCatchTest(test_typecast.cpp "common" "Typecast")
 addCatchTest(test_typecast_cuda.cpp "common;common_test_typecast_cuda_kernel;backends.cuda" "TypecastCuda")
 addCatchTest(test_vector1.cpp "common" "Vector1")

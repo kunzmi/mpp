@@ -17,9 +17,9 @@
 #include <common/image/roi.h>
 #include <common/image/roiException.h>
 #include <common/image/size2D.h>
+#include <common/mpp_defs.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
-#include <common/mpp_defs.h>
 #include <common/utilities.h>
 #include <common/vector_typetraits.h>
 #include <concepts>
@@ -37,7 +37,7 @@ ImageView<T> &ImageView<T>::WarpAffine(ImageView<T> &aDst, const AffineTransform
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::WarpAffine(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
-                                       InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                       InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                        const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     return this->WarpAffineBack(aDst, aAffine.Inverse(), aInterpolation, aConstant, aBorder, ROI(), aStreamCtx);
@@ -57,7 +57,7 @@ ImageView<T> &ImageView<T>::WarpAffine(ImageView<T> &aDst, const AffineTransform
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::WarpAffine(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
-                                       InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                       InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                        const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     return this->WarpAffineBack(aDst, aAffine.Inverse(), aInterpolation, aConstant, aBorder, aAllowedReadRoi,
@@ -83,7 +83,7 @@ void ImageView<T>::WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc
                               ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                               const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                              T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
+                              const T &aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
     requires TwoChannel<T>
 {
     ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aDst1, aDst2, aAffine.Inverse(), aInterpolation, aConstant, aBorder,
@@ -114,7 +114,7 @@ void ImageView<T>::WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc
                               ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                               const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                              T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                              const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                               const mpp::cuda::StreamCtx &aStreamCtx)
     requires TwoChannel<T>
 {
@@ -145,7 +145,7 @@ void ImageView<T>::WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc
                               ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst3,
                               const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                              T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
+                              const T &aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
     requires ThreeChannel<T>
 {
     ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, aAffine.Inverse(), aInterpolation, aConstant,
@@ -177,8 +177,8 @@ void ImageView<T>::WarpAffine(
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
     ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-    const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
-    const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
+    const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, const T &aConstant,
+    BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires ThreeChannel<T>
 {
     ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, aAffine.Inverse(), aInterpolation, aConstant,
@@ -205,8 +205,8 @@ void ImageView<T>::WarpAffine(
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
     ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
     ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-    const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
-    const mpp::cuda::StreamCtx &aStreamCtx)
+    const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, const T &aConstant,
+    BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T>
 {
     ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aSrc3, aSrc4, aDst1, aDst2, aDst3, aDst4, aAffine.Inverse(),
@@ -238,8 +238,8 @@ void ImageView<T>::WarpAffine(
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
     ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
     ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-    const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
-    const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
+    const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, const T &aConstant,
+    BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T>
 {
     ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aSrc3, aSrc4, aDst1, aDst2, aDst3, aDst4, aAffine.Inverse(),
@@ -256,7 +256,7 @@ ImageView<T> &ImageView<T>::WarpAffineBack(ImageView<T> &aDst, const AffineTrans
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::WarpAffineBack(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
-                                           InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                           InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                            const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     return this->WarpAffineBack(aDst, aAffine, aInterpolation, aConstant, aBorder, ROI(), aStreamCtx);
@@ -277,7 +277,7 @@ ImageView<T> &ImageView<T>::WarpAffineBack(ImageView<T> &aDst, const AffineTrans
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::WarpAffineBack(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
-                                           InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                           InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                            const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -309,7 +309,7 @@ void ImageView<T>::WarpAffineBack(const ImageView<Vector1<remove_vector_t<T>>> &
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                   const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                                  T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
+                                  const T &aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
     requires TwoChannel<T>
 {
     ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aDst1, aDst2, aAffine, aInterpolation, aConstant, aBorder, aSrc1.ROI(),
@@ -341,7 +341,7 @@ void ImageView<T>::WarpAffineBack(const ImageView<Vector1<remove_vector_t<T>>> &
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                   const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                                  T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                                  const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                                   const mpp::cuda::StreamCtx &aStreamCtx)
     requires TwoChannel<T>
 {
@@ -391,7 +391,7 @@ void ImageView<T>::WarpAffineBack(const ImageView<Vector1<remove_vector_t<T>>> &
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst3,
                                   const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                                  T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
+                                  const T &aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
     requires ThreeChannel<T>
 {
     ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, aAffine, aInterpolation, aConstant, aBorder,
@@ -421,8 +421,8 @@ void ImageView<T>::WarpAffineBack(
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
     ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-    const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
-    const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
+    const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, const T &aConstant,
+    BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires ThreeChannel<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI())
@@ -472,8 +472,8 @@ void ImageView<T>::WarpAffineBack(
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
     ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
     ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-    const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
-    const mpp::cuda::StreamCtx &aStreamCtx)
+    const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, const T &aConstant,
+    BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T>
 {
     ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aSrc3, aSrc4, aDst1, aDst2, aDst3, aDst4, aAffine, aInterpolation,
@@ -505,8 +505,8 @@ void ImageView<T>::WarpAffineBack(
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
     ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
     ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-    const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
-    const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
+    const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, const T &aConstant,
+    BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI() || aSrc1.ROI() != aSrc4.ROI())
@@ -553,7 +553,7 @@ ImageView<T> &ImageView<T>::WarpPerspective(ImageView<T> &aDst, const Perspectiv
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::WarpPerspective(ImageView<T> &aDst, const PerspectiveTransformation<double> &aPerspective,
-                                            InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                            InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                             const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     return this->WarpPerspectiveBack(aDst, aPerspective.Inverse(), aInterpolation, aConstant, aBorder, ROI(),
@@ -576,7 +576,7 @@ ImageView<T> &ImageView<T>::WarpPerspective(ImageView<T> &aDst, const Perspectiv
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::WarpPerspective(ImageView<T> &aDst, const PerspectiveTransformation<double> &aPerspective,
-                                            InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                            InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                             const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     return this->WarpPerspectiveBack(aDst, aPerspective.Inverse(), aInterpolation, aConstant, aBorder, aAllowedReadRoi,
@@ -603,7 +603,7 @@ void ImageView<T>::WarpPerspective(const ImageView<Vector1<remove_vector_t<T>>> 
                                    ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                    const PerspectiveTransformation<double> &aPerspective,
-                                   InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                   InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                    const mpp::cuda::StreamCtx &aStreamCtx)
     requires TwoChannel<T>
 {
@@ -636,7 +636,7 @@ void ImageView<T>::WarpPerspective(const ImageView<Vector1<remove_vector_t<T>>> 
                                    ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                    const PerspectiveTransformation<double> &aPerspective,
-                                   InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                   InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                    const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires TwoChannel<T>
 {
@@ -662,7 +662,7 @@ void ImageView<T>::WarpPerspective(
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
     ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, const T &aConstant,
     BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
     requires ThreeChannel<T>
 {
@@ -693,7 +693,7 @@ void ImageView<T>::WarpPerspective(
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
     ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, const T &aConstant,
     BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires ThreeChannel<T>
 {
@@ -726,7 +726,7 @@ void ImageView<T>::WarpPerspective(
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
     ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
     ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, const T &aConstant,
     BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T>
 {
@@ -759,7 +759,7 @@ void ImageView<T>::WarpPerspective(
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
     ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
     ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, const T &aConstant,
     BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T>
 {
@@ -779,8 +779,8 @@ ImageView<T> &ImageView<T>::WarpPerspectiveBack(ImageView<T> &aDst,
 template <PixelType T>
 ImageView<T> &ImageView<T>::WarpPerspectiveBack(ImageView<T> &aDst,
                                                 const PerspectiveTransformation<double> &aPerspective,
-                                                InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
-                                                const mpp::cuda::StreamCtx &aStreamCtx) const
+                                                InterpolationMode aInterpolation, const T &aConstant,
+                                                BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     return this->WarpPerspectiveBack(aDst, aPerspective, aInterpolation, aConstant, aBorder, ROI(), aStreamCtx);
 }
@@ -803,8 +803,8 @@ ImageView<T> &ImageView<T>::WarpPerspectiveBack(ImageView<T> &aDst,
 template <PixelType T>
 ImageView<T> &ImageView<T>::WarpPerspectiveBack(ImageView<T> &aDst,
                                                 const PerspectiveTransformation<double> &aPerspective,
-                                                InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
-                                                const Roi &aAllowedReadRoi,
+                                                InterpolationMode aInterpolation, const T &aConstant,
+                                                BorderType aBorder, const Roi &aAllowedReadRoi,
                                                 const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -839,7 +839,7 @@ void ImageView<T>::WarpPerspectiveBack(const ImageView<Vector1<remove_vector_t<T
                                        ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                        ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                        const PerspectiveTransformation<double> &aPerspective,
-                                       InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                       InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                        const mpp::cuda::StreamCtx &aStreamCtx)
     requires TwoChannel<T>
 {
@@ -872,7 +872,7 @@ void ImageView<T>::WarpPerspectiveBack(const ImageView<Vector1<remove_vector_t<T
                                        ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                        ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                        const PerspectiveTransformation<double> &aPerspective,
-                                       InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                       InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                        const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires TwoChannel<T>
 {
@@ -917,7 +917,7 @@ void ImageView<T>::WarpPerspectiveBack(
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
     ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, const T &aConstant,
     BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
     requires ThreeChannel<T>
 {
@@ -948,7 +948,7 @@ void ImageView<T>::WarpPerspectiveBack(
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
     ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, const T &aConstant,
     BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires ThreeChannel<T>
 {
@@ -999,7 +999,7 @@ void ImageView<T>::WarpPerspectiveBack(
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
     ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
     ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, const T &aConstant,
     BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T>
 {
@@ -1032,7 +1032,7 @@ void ImageView<T>::WarpPerspectiveBack(
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
     ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
     ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, const T &aConstant,
     BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T>
 {
@@ -1122,7 +1122,7 @@ void ImageView<T>::Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Rotate(ImageView<T> &aDst, double aAngleInDeg, const Vector2<double> &aShift,
-                                   InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                   InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                    const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     return this->Rotate(aDst, aAngleInDeg, aShift, aInterpolation, aConstant, aBorder, ROI(), aStreamCtx);
@@ -1133,7 +1133,7 @@ void ImageView<T>::Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                          T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
+                          const T &aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
     requires TwoChannel<T>
 {
     ImageView<T>::Rotate(aSrc1, aSrc2, aDst1, aDst2, aAngleInDeg, aShift, aInterpolation, aConstant, aBorder,
@@ -1146,7 +1146,7 @@ void ImageView<T>::Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, double aAngleInDeg,
-                          const Vector2<double> &aShift, InterpolationMode aInterpolation, T aConstant,
+                          const Vector2<double> &aShift, InterpolationMode aInterpolation, const T &aConstant,
                           BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
     requires ThreeChannel<T>
 {
@@ -1162,7 +1162,7 @@ void ImageView<T>::Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                           double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                          T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
+                          const T &aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T>
 {
     ImageView<T>::Rotate(aSrc1, aSrc2, aSrc3, aSrc4, aDst1, aDst2, aDst3, aDst4, aAngleInDeg, aShift, aInterpolation,
@@ -1240,7 +1240,7 @@ void ImageView<T>::Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Rotate(ImageView<T> &aDst, double aAngleInDeg, const Vector2<double> &aShift,
-                                   InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                   InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                    const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     // The rotation and shift are given from source to destination, with shift applied after rotation. As we compute
@@ -1256,7 +1256,7 @@ void ImageView<T>::Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                          T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                          const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                           const mpp::cuda::StreamCtx &aStreamCtx)
     requires TwoChannel<T>
 {
@@ -1275,7 +1275,7 @@ void ImageView<T>::Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, double aAngleInDeg,
-                          const Vector2<double> &aShift, InterpolationMode aInterpolation, T aConstant,
+                          const Vector2<double> &aShift, InterpolationMode aInterpolation, const T &aConstant,
                           BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires ThreeChannel<T>
 {
@@ -1296,7 +1296,7 @@ void ImageView<T>::Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                           double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                          T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                          const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                           const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T>
 {
@@ -1446,7 +1446,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Resize(ImageView<T> &aDst, const Vector2<double> &aScale, const Vector2<double> &aShift,
-                                   InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                   InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                    const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     return this->Resize(aDst, aScale, aShift, aInterpolation, aConstant, aBorder, ROI(), aStreamCtx);
@@ -1457,7 +1457,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           const Vector2<double> &aScale, const Vector2<double> &aShift,
-                          InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                          InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                           const mpp::cuda::StreamCtx &aStreamCtx)
     requires TwoChannel<T>
 {
@@ -1471,7 +1471,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Vector2<double> &aScale,
-                          const Vector2<double> &aShift, InterpolationMode aInterpolation, T aConstant,
+                          const Vector2<double> &aShift, InterpolationMode aInterpolation, const T &aConstant,
                           BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
     requires ThreeChannel<T>
 {
@@ -1487,7 +1487,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                           const Vector2<double> &aScale, const Vector2<double> &aShift,
-                          InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                          InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                           const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T>
 {
@@ -1568,7 +1568,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Resize(ImageView<T> &aDst, const Vector2<double> &aScale, const Vector2<double> &aShift,
-                                   InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                   InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                    const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -1600,8 +1600,8 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           const Vector2<double> &aScale, const Vector2<double> &aShift,
-                          InterpolationMode aInterpolation, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
-                          const mpp::cuda::StreamCtx &aStreamCtx)
+                          InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
+                          const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires TwoChannel<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI())
@@ -1646,7 +1646,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Vector2<double> &aScale,
-                          const Vector2<double> &aShift, InterpolationMode aInterpolation, T aConstant,
+                          const Vector2<double> &aShift, InterpolationMode aInterpolation, const T &aConstant,
                           BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires ThreeChannel<T>
 {
@@ -1698,8 +1698,8 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                           const Vector2<double> &aScale, const Vector2<double> &aShift,
-                          InterpolationMode aInterpolation, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
-                          const mpp::cuda::StreamCtx &aStreamCtx)
+                          InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
+                          const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI() || aSrc1.ROI() != aSrc4.ROI())
@@ -1817,7 +1817,7 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
 }
 template <PixelType T>
 ImageView<T> &ImageView<T>::Remap(ImageView<T> &aDst, const ImageView<Pixel32fC2> &aCoordinateMap,
-                                  InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                  InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                   const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     return this->Remap(aDst, aCoordinateMap, aInterpolation, aConstant, aBorder, ROI(), aStreamCtx);
@@ -1827,8 +1827,8 @@ template <PixelType T>
 void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                         const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, T aConstant,
-                         BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
+                         const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation,
+                         const T &aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
     requires TwoChannel<T>
 {
     ImageView<T>::Remap(aSrc1, aSrc2, aDst1, aDst2, aCoordinateMap, aInterpolation, aConstant, aBorder, aSrc1.ROI(),
@@ -1841,7 +1841,7 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst3, const ImageView<Pixel32fC2> &aCoordinateMap,
-                         InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                         InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                          const mpp::cuda::StreamCtx &aStreamCtx)
     requires ThreeChannel<T>
 {
@@ -1856,8 +1856,8 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-                         const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, T aConstant,
-                         BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
+                         const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation,
+                         const T &aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T>
 {
     ImageView<T>::Remap(aSrc1, aSrc2, aSrc3, aSrc4, aDst1, aDst2, aDst3, aDst4, aCoordinateMap, aInterpolation,
@@ -1935,7 +1935,7 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Remap(ImageView<T> &aDst, const ImageView<Pixel32fC2> &aCoordinateMap,
-                                  InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                  InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                   const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     checkSameSize(aDst.SizeRoi(), aCoordinateMap.SizeRoi());
@@ -1956,8 +1956,9 @@ template <PixelType T>
 void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                         const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, T aConstant,
-                         BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
+                         const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation,
+                         const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                         const mpp::cuda::StreamCtx &aStreamCtx)
     requires TwoChannel<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI())
@@ -1991,8 +1992,8 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst3, const ImageView<Pixel32fC2> &aCoordinateMap,
-                         InterpolationMode aInterpolation, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
-                         const mpp::cuda::StreamCtx &aStreamCtx)
+                         InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
+                         const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires ThreeChannel<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI())
@@ -2030,8 +2031,9 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-                         const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation, T aConstant,
-                         BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
+                         const ImageView<Pixel32fC2> &aCoordinateMap, InterpolationMode aInterpolation,
+                         const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                         const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI() || aSrc1.ROI() != aSrc4.ROI())
@@ -2119,7 +2121,7 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
 template <PixelType T>
 ImageView<T> &ImageView<T>::Remap(ImageView<T> &aDst, const ImageView<Pixel32fC1> &aCoordinateMapX,
                                   const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation,
-                                  T aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
+                                  const T &aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     return this->Remap(aDst, aCoordinateMapX, aCoordinateMapY, aInterpolation, aConstant, aBorder, ROI(), aStreamCtx);
 }
@@ -2129,7 +2131,7 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                          const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
-                         InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                         InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                          const mpp::cuda::StreamCtx &aStreamCtx)
     requires TwoChannel<T>
 {
@@ -2143,8 +2145,8 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst3, const ImageView<Pixel32fC1> &aCoordinateMapX,
-                         const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation, T aConstant,
-                         BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
+                         const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation,
+                         const T &aConstant, BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx)
     requires ThreeChannel<T>
 {
     ImageView<T>::Remap(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, aCoordinateMapX, aCoordinateMapY, aInterpolation,
@@ -2159,7 +2161,7 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                          const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
-                         InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                         InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                          const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T>
 {
@@ -2243,7 +2245,7 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
 template <PixelType T>
 ImageView<T> &ImageView<T>::Remap(ImageView<T> &aDst, const ImageView<Pixel32fC1> &aCoordinateMapX,
                                   const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation,
-                                  T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                                  const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                                   const mpp::cuda::StreamCtx &aStreamCtx) const
 {
     checkSameSize(aDst.SizeRoi(), aCoordinateMapX.SizeRoi());
@@ -2266,8 +2268,8 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                          const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
-                         InterpolationMode aInterpolation, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
-                         const mpp::cuda::StreamCtx &aStreamCtx)
+                         InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
+                         const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires TwoChannel<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI())
@@ -2302,8 +2304,9 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst3, const ImageView<Pixel32fC1> &aCoordinateMapX,
-                         const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation, T aConstant,
-                         BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
+                         const ImageView<Pixel32fC1> &aCoordinateMapY, InterpolationMode aInterpolation,
+                         const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
+                         const mpp::cuda::StreamCtx &aStreamCtx)
     requires ThreeChannel<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI())
@@ -2344,8 +2347,8 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                          ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                          const ImageView<Pixel32fC1> &aCoordinateMapX, const ImageView<Pixel32fC1> &aCoordinateMapY,
-                         InterpolationMode aInterpolation, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
-                         const mpp::cuda::StreamCtx &aStreamCtx)
+                         InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
+                         const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI() || aSrc1.ROI() != aSrc4.ROI())

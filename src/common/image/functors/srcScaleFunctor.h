@@ -5,12 +5,12 @@
 #include <common/defines.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
-#include <common/numberTypes.h>
 #include <common/mpp_defs.h>
+#include <common/numberTypes.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
-#include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vectorTypes.h>
 #include <concepts>
 
 // disable warning for pragma unroll when compiling with host compiler:
@@ -27,14 +27,14 @@ namespace mpp::image
 /// <typeparam name="operation"></typeparam>
 /// <typeparam name="tupelSize"></typeparam>
 /// <typeparam name="roundingMode"></typeparam>
-template <size_t tupelSize, typename SrcT, typename ComputeT, typename DstT, typename operation,
+template <size_t tupelSize, typename SrcT, typename ComputeT, typename DstT, typename operation, typename scaleOp,
           RoundingMode roundingMode = RoundingMode::NearestTiesAwayFromZero>
 struct SrcScaleFunctor : public ImageFunctor<false>
 {
     const SrcT *RESTRICT Src1;
     size_t SrcPitch1;
 
-    scalefactor_t<ComputeT> ScaleFactor;
+    scaleOp Scaler;
 
     [[no_unique_address]] operation Op;
 
@@ -45,8 +45,8 @@ struct SrcScaleFunctor : public ImageFunctor<false>
     {
     }
 
-    SrcScaleFunctor(const SrcT *aSrc1, size_t aSrcPitch1, operation aOp, scalefactor_t<ComputeT> aScaleFactor)
-        : Src1(aSrc1), SrcPitch1(aSrcPitch1), ScaleFactor(aScaleFactor), Op(aOp)
+    SrcScaleFunctor(const SrcT *aSrc1, size_t aSrcPitch1, operation aOp, scaleOp aScaler)
+        : Src1(aSrc1), SrcPitch1(aSrcPitch1), Scaler(aScaler), Op(aOp)
     {
     }
 #pragma endregion
@@ -62,7 +62,7 @@ struct SrcScaleFunctor : public ImageFunctor<false>
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         ComputeT temp;
         Op(static_cast<ComputeT>(*pixelSrc1), temp);
-        temp *= ScaleFactor;
+        Scaler(temp);
         round(temp);
         // DstT constructor will clamp temp to value range of DstT
         aDst = static_cast<DstT>(temp);
@@ -84,7 +84,7 @@ struct SrcScaleFunctor : public ImageFunctor<false>
         {
             ComputeT temp;
             Op(static_cast<ComputeT>(tupelSrc1.value[i]), temp);
-            temp *= ScaleFactor;
+            Scaler(temp);
             round(temp);
             // DstT constructor will clamp temp to value range of DstT
             aDst.value[i] = static_cast<DstT>(temp);
