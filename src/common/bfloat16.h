@@ -527,6 +527,40 @@ DEVICE_CODE inline bool isinf(BFloat16 aVal)
 }
 #endif
 
+template <RealNumber T> DEVICE_CODE BFloat16 operator+(const BFloat16 &aLeft, T aRight)
+{
+    return BFloat16{static_cast<float>(aLeft) + aRight};
+}
+template <RealNumber T> DEVICE_CODE BFloat16 operator+(T aLeft, const BFloat16 &aRight)
+{
+    return BFloat16{aLeft + static_cast<float>(aRight)};
+}
+template <RealNumber T> DEVICE_CODE BFloat16 operator-(const BFloat16 &aLeft, T aRight)
+{
+    return BFloat16{static_cast<float>(aLeft) - aRight};
+}
+template <RealNumber T> DEVICE_CODE BFloat16 operator-(T aLeft, const BFloat16 &aRight)
+{
+    return BFloat16{aLeft - static_cast<float>(aRight)};
+}
+
+template <RealNumber T> DEVICE_CODE BFloat16 operator*(const BFloat16 &aLeft, T aRight)
+{
+    return BFloat16{static_cast<float>(aLeft) * aRight};
+}
+template <RealNumber T> DEVICE_CODE BFloat16 operator*(T aLeft, const BFloat16 &aRight)
+{
+    return BFloat16{aLeft * static_cast<float>(aRight)};
+}
+template <RealNumber T> DEVICE_CODE BFloat16 operator/(const BFloat16 &aLeft, T aRight)
+{
+    return BFloat16{static_cast<float>(aLeft) / aRight};
+}
+template <RealNumber T> DEVICE_CODE BFloat16 operator/(T aLeft, const BFloat16 &aRight)
+{
+    return BFloat16{aLeft / static_cast<float>(aRight)};
+}
+
 // 16 bit BFloat floating point types
 template <> struct numeric_limits<BFloat16>
 {

@@ -518,9 +518,33 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
         requires RealSignedIntegral<T>;
 
     /// <summary>
+    /// Inplace complex integer division with element wise round() (for scaling operations)
+    /// </summary>
+    DEVICE_CODE Complex &DivScaleRound(T aScale)
+        requires RealSignedIntegral<T>;
+
+    /// <summary>
     /// Inplace complex integer division with element wise round nearest ties to even (for scaling operations)
     /// </summary>
     DEVICE_CODE Complex &DivScaleRoundNearest(T aScale)
+        requires RealSignedIntegral<T>;
+
+    /// <summary>
+    /// Inplace complex integer division with element wise round toward zero (for scaling operations)
+    /// </summary>
+    DEVICE_CODE Complex &DivScaleRoundZero(T aScale)
+        requires RealSignedIntegral<T>;
+
+    /// <summary>
+    /// Inplace complex integer division with element wise floor (for scaling operations)
+    /// </summary>
+    DEVICE_CODE Complex &DivScaleFloor(T aScale)
+        requires RealSignedIntegral<T>;
+
+    /// <summary>
+    /// Inplace complex integer division with element wise ceil() (for scaling operations)
+    /// </summary>
+    DEVICE_CODE Complex &DivScaleCeil(T aScale)
         requires RealSignedIntegral<T>;
 #pragma endregion
 

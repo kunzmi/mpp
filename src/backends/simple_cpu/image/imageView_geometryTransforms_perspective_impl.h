@@ -20,14 +20,14 @@
 #include <common/image/roiException.h>
 #include <common/image/size2D.h>
 #include <common/image/sizePitched.h>
+#include <common/mpp_defs.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
-#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/utilities.h>
+#include <common/vector_typetraits.h>
 #include <common/vector1.h>
 #include <common/vectorTypes.h>
-#include <common/vector_typetraits.h>
 #include <concepts>
 #include <cstddef>
 #include <type_traits>
@@ -360,6 +360,14 @@ ImageView<T> &ImageView<T>::WarpPerspectiveBack(ImageView<T> &aDst,
             runOverInterpolation(bc);
         }
         break;
+        case mpp::BorderType::SmoothEdge:
+        {
+            using BCType = BorderControl<T, BorderType::SmoothEdge, true, false, false, false>;
+            const BCType bc(allowedPtr, Pitch(), aAllowedReadRoi.Size(), roiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
         default:
             throw INVALIDARGUMENT(aBorder, aBorder << " is not a supported border type mode for WarpPerspective.");
             break;
@@ -593,6 +601,14 @@ void ImageView<T>::WarpPerspectiveBack(const ImageView<Vector1<remove_vector_t<T
         case mpp::BorderType::Wrap:
         {
             using BCType = BorderControl<PixelT, BorderType::Wrap, false, false, false, true>;
+            const BCType bc(allowedPtr1, aSrc1.Pitch(), allowedPtr2, aSrc2.Pitch(), aAllowedReadRoi.Size(), roiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::SmoothEdge:
+        {
+            using BCType = BorderControl<PixelT, BorderType::SmoothEdge, true, false, false, true>;
             const BCType bc(allowedPtr1, aSrc1.Pitch(), allowedPtr2, aSrc2.Pitch(), aAllowedReadRoi.Size(), roiOffset);
 
             runOverInterpolation(bc);
@@ -843,6 +859,15 @@ void ImageView<T>::WarpPerspectiveBack(
             runOverInterpolation(bc);
         }
         break;
+        case mpp::BorderType::SmoothEdge:
+        {
+            using BCType = BorderControl<PixelT, BorderType::SmoothEdge, true, false, false, true>;
+            const BCType bc(allowedPtr1, aSrc1.Pitch(), allowedPtr2, aSrc2.Pitch(), allowedPtr3, aSrc3.Pitch(),
+                            aAllowedReadRoi.Size(), roiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
         default:
             throw INVALIDARGUMENT(aBorder, aBorder << " is not a supported border type mode for WarpPerspective.");
             break;
@@ -1087,6 +1112,15 @@ void ImageView<T>::WarpPerspectiveBack(
         case mpp::BorderType::Wrap:
         {
             using BCType = BorderControl<PixelT, BorderType::Wrap, false, false, false, true>;
+            const BCType bc(allowedPtr1, aSrc1.Pitch(), allowedPtr2, aSrc2.Pitch(), allowedPtr3, aSrc3.Pitch(),
+                            allowedPtr4, aSrc4.Pitch(), aAllowedReadRoi.Size(), roiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::SmoothEdge:
+        {
+            using BCType = BorderControl<PixelT, BorderType::SmoothEdge, true, false, false, true>;
             const BCType bc(allowedPtr1, aSrc1.Pitch(), allowedPtr2, aSrc2.Pitch(), allowedPtr3, aSrc3.Pitch(),
                             allowedPtr4, aSrc4.Pitch(), aAllowedReadRoi.Size(), roiOffset);
 

@@ -234,6 +234,14 @@ void InvokeRemapSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aPi
                 runOverInterpolation(bc);
             }
             break;
+            case mpp::BorderType::SmoothEdge:
+            {
+                using BCType = BorderControl<SrcT, BorderType::SmoothEdge, true, false, false, false>;
+                const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+                runOverInterpolation(bc);
+            }
+            break;
             default:
                 throw INVALIDARGUMENT(aBorder, aBorder << " is not a supported border type mode for Remap.");
                 break;
@@ -466,6 +474,14 @@ void InvokeRemapSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, size_t aPi
             case mpp::BorderType::Wrap:
             {
                 using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
+                const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+                runOverInterpolation(bc);
+            }
+            break;
+            case mpp::BorderType::SmoothEdge:
+            {
+                using BCType = BorderControl<SrcT, BorderType::SmoothEdge, true, false, false, false>;
                 const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
 
                 runOverInterpolation(bc);
@@ -711,6 +727,14 @@ void InvokeRemapSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchSr
                 runOverInterpolation(bc);
             }
             break;
+            case mpp::BorderType::SmoothEdge:
+            {
+                using BCType = BorderControl<SrcT, BorderType::SmoothEdge, true, false, false, true>;
+                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+                runOverInterpolation(bc);
+            }
+            break;
             default:
                 throw INVALIDARGUMENT(aBorder, aBorder << " is not a supported border type mode for Remap.");
                 break;
@@ -939,6 +963,14 @@ void InvokeRemapSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchSr
             case mpp::BorderType::Wrap:
             {
                 using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, true>;
+                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+                runOverInterpolation(bc);
+            }
+            break;
+            case mpp::BorderType::SmoothEdge:
+            {
+                using BCType = BorderControl<SrcT, BorderType::SmoothEdge, true, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
 
                 runOverInterpolation(bc);
@@ -1182,6 +1214,15 @@ void InvokeRemapSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchSr
                 runOverInterpolation(bc);
             }
             break;
+            case mpp::BorderType::SmoothEdge:
+            {
+                using BCType = BorderControl<SrcT, BorderType::SmoothEdge, true, false, false, true>;
+                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
+                                aAllowedReadRoiOffset);
+
+                runOverInterpolation(bc);
+            }
+            break;
             default:
                 throw INVALIDARGUMENT(aBorder, aBorder << " is not a supported border type mode for Remap.");
                 break;
@@ -1417,6 +1458,15 @@ void InvokeRemapSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchSr
             case mpp::BorderType::Wrap:
             {
                 using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, true>;
+                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
+                                aAllowedReadRoiOffset);
+
+                runOverInterpolation(bc);
+            }
+            break;
+            case mpp::BorderType::SmoothEdge:
+            {
+                using BCType = BorderControl<SrcT, BorderType::SmoothEdge, true, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
                                 aAllowedReadRoiOffset);
 
@@ -1674,6 +1724,15 @@ void InvokeRemapSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchSr
                 runOverInterpolation(bc);
             }
             break;
+            case mpp::BorderType::SmoothEdge:
+            {
+                using BCType = BorderControl<SrcT, BorderType::SmoothEdge, true, false, false, true>;
+                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
+                                aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+                runOverInterpolation(bc);
+            }
+            break;
             default:
                 throw INVALIDARGUMENT(aBorder, aBorder << " is not a supported border type mode for Remap.");
                 break;
@@ -1922,6 +1981,15 @@ void InvokeRemapSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_t aPitchSr
             case mpp::BorderType::Wrap:
             {
                 using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, true>;
+                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
+                                aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+                runOverInterpolation(bc);
+            }
+            break;
+            case mpp::BorderType::SmoothEdge:
+            {
+                using BCType = BorderControl<SrcT, BorderType::SmoothEdge, true, false, false, true>;
                 const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
                                 aAllowedReadRoiSize, aAllowedReadRoiOffset);
 

@@ -13,6 +13,8 @@ ForAllChannelsWithAlphaInvokeConvertRound(16bf, 8u);
 ForAllChannelsWithAlphaInvokeConvertRound(16bf, 8s);
 ForAllChannelsWithAlphaInvokeConvertRound(16bf, 16u);
 ForAllChannelsWithAlphaInvokeConvertRound(16bf, 16s);
+ForAllChannelsWithAlphaInvokeConvertRound(16bf, 32u);
+ForAllChannelsWithAlphaInvokeConvertRound(16bf, 32s);
 
 } // namespace mpp::image::cuda
 #endif // MPP_ENABLE_CUDA_BACKEND

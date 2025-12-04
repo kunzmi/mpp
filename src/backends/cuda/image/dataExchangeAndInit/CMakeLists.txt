@@ -135,6 +135,7 @@ add_library(backends.cuda.image.dataExchangeAndInit
 	16sc/copyMasked.cu
 	16sc/copySubpix.cu	
 	16sc/dup.cu
+	16sc/scale.cu
 	16sc/set.cu
 	16sc/setChannel.cu
 	16sc/setMasked.cu
@@ -147,6 +148,7 @@ add_library(backends.cuda.image.dataExchangeAndInit
 	32sc/copyMasked.cu
 	32sc/copySubpix.cu	
 	32sc/dup.cu
+	32sc/scale.cu
 	32sc/set.cu
 	32sc/setChannel.cu
 	32sc/setMasked.cu
@@ -159,6 +161,7 @@ add_library(backends.cuda.image.dataExchangeAndInit
 	32fc/copyMasked.cu
 	32fc/copySubpix.cu	
 	32fc/dup.cu
+	32fc/scale.cu
 	32fc/set.cu
 	32fc/setChannel.cu
 	32fc/setMasked.cu

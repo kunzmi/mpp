@@ -79,7 +79,7 @@ ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -134,7 +134,7 @@ ImageView<T> &ImageView<T>::Add(const T &aConst, ImageView<T> &aDst, int aScaleF
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -192,7 +192,7 @@ ImageView<T> &ImageView<T>::Add(const ImageView<T> &aSrc2, int aScaleFactor)
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -246,7 +246,7 @@ ImageView<T> &ImageView<T>::Add(const T &aConst, int aScaleFactor)
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -310,7 +310,7 @@ ImageView<T> &ImageView<T>::AddMasked(const ImageView<T> &aSrc2, ImageView<T> &a
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -369,7 +369,7 @@ ImageView<T> &ImageView<T>::AddMasked(const T &aConst, ImageView<T> &aDst, const
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -427,7 +427,7 @@ ImageView<T> &ImageView<T>::AddMasked(const ImageView<T> &aSrc2, const ImageView
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -481,7 +481,7 @@ ImageView<T> &ImageView<T>::AddMasked(const T &aConst, const ImageView<Pixel8uC1
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -545,7 +545,7 @@ ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -602,7 +602,7 @@ ImageView<T> &ImageView<T>::Sub(const T &aConst, ImageView<T> &aDst, int aScaleF
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -660,7 +660,7 @@ ImageView<T> &ImageView<T>::Sub(const ImageView<T> &aSrc2, int aScaleFactor)
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -712,7 +712,7 @@ ImageView<T> &ImageView<T>::Sub(const T &aConst, int aScaleFactor)
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -770,7 +770,7 @@ ImageView<T> &ImageView<T>::SubInv(const ImageView<T> &aSrc2, int aScaleFactor)
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -824,7 +824,7 @@ ImageView<T> &ImageView<T>::SubInv(const T &aConst, int aScaleFactor)
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -886,7 +886,7 @@ ImageView<T> &ImageView<T>::SubMasked(const ImageView<T> &aSrc2, ImageView<T> &a
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -942,7 +942,7 @@ ImageView<T> &ImageView<T>::SubMasked(const T &aConst, ImageView<T> &aDst, const
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -998,7 +998,7 @@ ImageView<T> &ImageView<T>::SubMasked(const ImageView<T> &aSrc2, const ImageView
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -1050,7 +1050,7 @@ ImageView<T> &ImageView<T>::SubMasked(const T &aConst, const ImageView<Pixel8uC1
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -1108,7 +1108,7 @@ ImageView<T> &ImageView<T>::SubInvMasked(const ImageView<T> &aSrc2, const ImageV
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -1160,7 +1160,7 @@ ImageView<T> &ImageView<T>::SubInvMasked(const T &aConst, const ImageView<Pixel8
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -1235,7 +1235,7 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
     {
         using ComputeT = default_ext_int_compute_type_for_t<T>;
 
-        if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+        if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
         {
             using ScalerT = mpp::Scale<ComputeT, false>;
             const ScalerT scaler(scaleFactorFloat);
@@ -1292,7 +1292,7 @@ ImageView<T> &ImageView<T>::Mul(const T &aConst, ImageView<T> &aDst, int aScaleF
 
     using ComputeT = default_ext_int_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -1348,7 +1348,7 @@ ImageView<T> &ImageView<T>::Mul(const ImageView<T> &aSrc2, int aScaleFactor)
 
     using ComputeT = default_ext_int_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -1402,7 +1402,7 @@ ImageView<T> &ImageView<T>::Mul(const T &aConst, int aScaleFactor)
 
     using ComputeT = default_ext_int_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -1464,7 +1464,7 @@ ImageView<T> &ImageView<T>::MulMasked(const ImageView<T> &aSrc2, ImageView<T> &a
 
     using ComputeT = default_ext_int_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -1520,7 +1520,7 @@ ImageView<T> &ImageView<T>::MulMasked(const T &aConst, ImageView<T> &aDst, const
 
     using ComputeT = default_ext_int_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -1576,7 +1576,7 @@ ImageView<T> &ImageView<T>::MulMasked(const ImageView<T> &aSrc2, const ImageView
 
     using ComputeT = default_ext_int_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -1628,7 +1628,7 @@ ImageView<T> &ImageView<T>::MulMasked(const T &aConst, const ImageView<Pixel8uC1
 
     using ComputeT = default_ext_int_compute_type_for_t<T>;
 
-    if (scaleFactorFloat > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    if (scaleFactorFloat >= 1.0 || RealOrComplexFloatingVector<ComputeT>)
     {
         using ScalerT = mpp::Scale<ComputeT, false>;
         const ScalerT scaler(scaleFactorFloat);
@@ -1964,9 +1964,9 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst) c
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divSrcSrc = SrcSrcFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, RoundingMode::None>;
+    using divSrcSrc = SrcSrcFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, RoundingMode::None>;
 
-    const mpp::Div<ComputeT, T> op;
+    const mpp::Div<ComputeT> op;
     const divSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
     forEachPixel(aDst, functor);
@@ -1993,18 +1993,18 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
         {
             case mpp::RoundingMode::NearestTiesToEven:
             {
-                using divSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
-                                                          RoundingMode::NearestTiesToEven>;
-                const mpp::Div<ComputeT, T> op;
+                using divSrcSrcScale =
+                    SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT, RoundingMode::NearestTiesToEven>;
+                const mpp::Div<ComputeT> op;
                 const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aDst, functor);
             }
             break;
             case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
-                using divSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                           RoundingMode::NearestTiesAwayFromZero>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aDst, functor);
             }
@@ -2012,26 +2012,26 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
             case mpp::RoundingMode::TowardZero:
             {
                 using divSrcSrcScale =
-                    SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT, RoundingMode::TowardZero>;
-                const mpp::Div<ComputeT, T> op;
+                    SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT, RoundingMode::TowardZero>;
+                const mpp::Div<ComputeT> op;
                 const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aDst, functor);
             }
             break;
             case mpp::RoundingMode::TowardNegativeInfinity:
             {
-                using divSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                           RoundingMode::TowardNegativeInfinity>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aDst, functor);
             }
             break;
             case mpp::RoundingMode::TowardPositiveInfinity:
             {
-                using divSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                           RoundingMode::TowardPositiveInfinity>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aDst, functor);
             }
@@ -2049,8 +2049,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, ImageView<T> &aDst, i
                 using ScalerT = mpp::Scale<ComputeT, true>;
                 const ScalerT scaler(scaleFactorFloat);
                 using divSrcSrcScale =
-                    SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT, RoundingMode::None>;
-                const mpp::Div<ComputeT, T> op;
+                    SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT, RoundingMode::None>;
+                const mpp::Div<ComputeT> op;
                 const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aDst, functor);
             }
@@ -2128,9 +2128,9 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst) const
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divSrcC = SrcConstantFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, RoundingMode::None>;
+    using divSrcC = SrcConstantFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, RoundingMode::None>;
 
-    const mpp::Div<ComputeT, T> op;
+    const mpp::Div<ComputeT> op;
     const divSrcC functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op);
 
     forEachPixel(aDst, functor);
@@ -2155,45 +2155,45 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, int aScaleF
         {
             case mpp::RoundingMode::NearestTiesToEven:
             {
-                using divSrcCScale = SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divSrcCScale = SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                              RoundingMode::NearestTiesToEven>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aDst, functor);
             }
             break;
             case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
-                using divSrcCScale = SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divSrcCScale = SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                              RoundingMode::NearestTiesAwayFromZero>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aDst, functor);
             }
             break;
             case mpp::RoundingMode::TowardZero:
             {
-                using divSrcCScale = SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
-                                                             RoundingMode::TowardZero>;
-                const mpp::Div<ComputeT, T> op;
+                using divSrcCScale =
+                    SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT, RoundingMode::TowardZero>;
+                const mpp::Div<ComputeT> op;
                 const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aDst, functor);
             }
             break;
             case mpp::RoundingMode::TowardNegativeInfinity:
             {
-                using divSrcCScale = SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divSrcCScale = SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                              RoundingMode::TowardNegativeInfinity>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aDst, functor);
             }
             break;
             case mpp::RoundingMode::TowardPositiveInfinity:
             {
-                using divSrcCScale = SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divSrcCScale = SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                              RoundingMode::TowardPositiveInfinity>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aDst, functor);
             }
@@ -2211,8 +2211,8 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, ImageView<T> &aDst, int aScaleF
                 using ScalerT = mpp::Scale<ComputeT, true>;
                 const ScalerT scaler(scaleFactorFloat);
                 using divSrcCScale =
-                    SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT, RoundingMode::None>;
-                const mpp::Div<ComputeT, T> op;
+                    SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT, RoundingMode::None>;
+                const mpp::Div<ComputeT> op;
                 const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aDst, functor);
             }
@@ -2294,9 +2294,9 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2)
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, RoundingMode::None>;
+    using divInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, RoundingMode::None>;
 
-    const mpp::Div<ComputeT, T> op;
+    const mpp::Div<ComputeT> op;
     const divInplaceSrc functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
     forEachPixel(*this, functor);
@@ -2321,18 +2321,18 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, int aScaleFactor, Rou
         {
             case mpp::RoundingMode::NearestTiesToEven:
             {
-                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                                   RoundingMode::NearestTiesToEven>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(*this, functor);
             }
             break;
             case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
-                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                                   RoundingMode::NearestTiesAwayFromZero>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(*this, functor);
             }
@@ -2340,26 +2340,26 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, int aScaleFactor, Rou
             case mpp::RoundingMode::TowardZero:
             {
                 using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT, RoundingMode::TowardZero>;
-                const mpp::Div<ComputeT, T> op;
+                    InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT, RoundingMode::TowardZero>;
+                const mpp::Div<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(*this, functor);
             }
             break;
             case mpp::RoundingMode::TowardNegativeInfinity:
             {
-                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                                   RoundingMode::TowardNegativeInfinity>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(*this, functor);
             }
             break;
             case mpp::RoundingMode::TowardPositiveInfinity:
             {
-                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                                   RoundingMode::TowardPositiveInfinity>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(*this, functor);
             }
@@ -2377,8 +2377,8 @@ ImageView<T> &ImageView<T>::Div(const ImageView<T> &aSrc2, int aScaleFactor, Rou
                 using ScalerT = mpp::Scale<ComputeT, true>;
                 const ScalerT scaler(scaleFactorFloat);
                 using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT, RoundingMode::None>;
-                const mpp::Div<ComputeT, T> op;
+                    InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT, RoundingMode::None>;
+                const mpp::Div<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(*this, functor);
             }
@@ -2453,9 +2453,9 @@ ImageView<T> &ImageView<T>::Div(const T &aConst)
 {
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divInplaceC = InplaceConstantFunctor<1, ComputeT, T, mpp::Div<ComputeT, T>, RoundingMode::None>;
+    using divInplaceC = InplaceConstantFunctor<1, ComputeT, T, mpp::Div<ComputeT>, RoundingMode::None>;
 
-    const mpp::Div<ComputeT, T> op;
+    const mpp::Div<ComputeT> op;
     const divInplaceC functor(static_cast<ComputeT>(aConst), op);
 
     forEachPixel(*this, functor);
@@ -2478,45 +2478,45 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, int aScaleFactor, RoundingMode 
         {
             case mpp::RoundingMode::NearestTiesToEven:
             {
-                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                                      RoundingMode::NearestTiesToEven>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(*this, functor);
             }
             break;
             case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
-                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                                      RoundingMode::NearestTiesAwayFromZero>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(*this, functor);
             }
             break;
             case mpp::RoundingMode::TowardZero:
             {
-                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
-                                                                     RoundingMode::TowardZero>;
-                const mpp::Div<ComputeT, T> op;
+                using divInplaceCScale =
+                    InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT>, ScalerT, RoundingMode::TowardZero>;
+                const mpp::Div<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(*this, functor);
             }
             break;
             case mpp::RoundingMode::TowardNegativeInfinity:
             {
-                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                                      RoundingMode::TowardNegativeInfinity>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(*this, functor);
             }
             break;
             case mpp::RoundingMode::TowardPositiveInfinity:
             {
-                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                                      RoundingMode::TowardPositiveInfinity>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(*this, functor);
             }
@@ -2534,8 +2534,8 @@ ImageView<T> &ImageView<T>::Div(const T &aConst, int aScaleFactor, RoundingMode 
                 using ScalerT = mpp::Scale<ComputeT, true>;
                 const ScalerT scaler(scaleFactorFloat);
                 using divInplaceCScale =
-                    InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT, RoundingMode::None>;
-                const mpp::Div<ComputeT, T> op;
+                    InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT>, ScalerT, RoundingMode::None>;
+                const mpp::Div<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(*this, functor);
             }
@@ -2613,9 +2613,9 @@ ImageView<T> &ImageView<T>::DivInv(const ImageView<T> &aSrc2)
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT, T>, RoundingMode::None>;
+    using divInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT>, RoundingMode::None>;
 
-    const mpp::DivInv<ComputeT, T> op;
+    const mpp::DivInv<ComputeT> op;
     const divInplaceSrc functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
     forEachPixel(*this, functor);
@@ -2640,45 +2640,45 @@ ImageView<T> &ImageView<T>::DivInv(const ImageView<T> &aSrc2, int aScaleFactor, 
         {
             case mpp::RoundingMode::NearestTiesToEven:
             {
-                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT,
+                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT,
                                                                   RoundingMode::NearestTiesToEven>;
-                const mpp::DivInv<ComputeT, T> op;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(*this, functor);
             }
             break;
             case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
-                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT,
+                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT,
                                                                   RoundingMode::NearestTiesAwayFromZero>;
-                const mpp::DivInv<ComputeT, T> op;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(*this, functor);
             }
             break;
             case mpp::RoundingMode::TowardZero:
             {
-                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT,
-                                                                  RoundingMode::TowardZero>;
-                const mpp::DivInv<ComputeT, T> op;
+                using divInplaceSrcScale =
+                    InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT, RoundingMode::TowardZero>;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(*this, functor);
             }
             break;
             case mpp::RoundingMode::TowardNegativeInfinity:
             {
-                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT,
+                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT,
                                                                   RoundingMode::TowardNegativeInfinity>;
-                const mpp::DivInv<ComputeT, T> op;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(*this, functor);
             }
             break;
             case mpp::RoundingMode::TowardPositiveInfinity:
             {
-                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT,
+                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT,
                                                                   RoundingMode::TowardPositiveInfinity>;
-                const mpp::DivInv<ComputeT, T> op;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(*this, functor);
             }
@@ -2696,8 +2696,8 @@ ImageView<T> &ImageView<T>::DivInv(const ImageView<T> &aSrc2, int aScaleFactor, 
                 using ScalerT = mpp::Scale<ComputeT, true>;
                 const ScalerT scaler(scaleFactorFloat);
                 using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT, RoundingMode::None>;
-                const mpp::DivInv<ComputeT, T> op;
+                    InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT, RoundingMode::None>;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(*this, functor);
             }
@@ -2773,9 +2773,9 @@ ImageView<T> &ImageView<T>::DivInv(const T &aConst)
 {
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divInplaceC = InplaceConstantFunctor<1, ComputeT, T, mpp::DivInv<ComputeT, T>, RoundingMode::None>;
+    using divInplaceC = InplaceConstantFunctor<1, ComputeT, T, mpp::DivInv<ComputeT>, RoundingMode::None>;
 
-    const mpp::DivInv<ComputeT, T> op;
+    const mpp::DivInv<ComputeT> op;
     const divInplaceC functor(static_cast<ComputeT>(aConst), op);
 
     forEachPixel(*this, functor);
@@ -2798,45 +2798,45 @@ ImageView<T> &ImageView<T>::DivInv(const T &aConst, int aScaleFactor, RoundingMo
         {
             case mpp::RoundingMode::NearestTiesToEven:
             {
-                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT,
+                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT,
                                                                      RoundingMode::NearestTiesToEven>;
-                const mpp::DivInv<ComputeT, T> op;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(*this, functor);
             }
             break;
             case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
-                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT,
+                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT,
                                                                      RoundingMode::NearestTiesAwayFromZero>;
-                const mpp::DivInv<ComputeT, T> op;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(*this, functor);
             }
             break;
             case mpp::RoundingMode::TowardZero:
             {
-                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT,
+                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT,
                                                                      RoundingMode::TowardZero>;
-                const mpp::DivInv<ComputeT, T> op;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(*this, functor);
             }
             break;
             case mpp::RoundingMode::TowardNegativeInfinity:
             {
-                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT,
+                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT,
                                                                      RoundingMode::TowardNegativeInfinity>;
-                const mpp::DivInv<ComputeT, T> op;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(*this, functor);
             }
             break;
             case mpp::RoundingMode::TowardPositiveInfinity:
             {
-                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT,
+                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT,
                                                                      RoundingMode::TowardPositiveInfinity>;
-                const mpp::DivInv<ComputeT, T> op;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(*this, functor);
             }
@@ -2854,8 +2854,8 @@ ImageView<T> &ImageView<T>::DivInv(const T &aConst, int aScaleFactor, RoundingMo
                 using ScalerT = mpp::Scale<ComputeT, true>;
                 const ScalerT scaler(scaleFactorFloat);
                 using divInplaceCScale =
-                    InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT, RoundingMode::None>;
-                const mpp::DivInv<ComputeT, T> op;
+                    InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT, RoundingMode::None>;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(*this, functor);
             }
@@ -2934,9 +2934,9 @@ ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, ImageView<T> &a
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divSrcSrc = SrcSrcFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, RoundingMode::None>;
+    using divSrcSrc = SrcSrcFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, RoundingMode::None>;
 
-    const mpp::Div<ComputeT, T> op;
+    const mpp::Div<ComputeT> op;
     const divSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
     forEachPixel(aMask, aDst, functor);
@@ -2963,18 +2963,18 @@ ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, ImageView<T> &a
         {
             case mpp::RoundingMode::NearestTiesToEven:
             {
-                using divSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
-                                                          RoundingMode::NearestTiesToEven>;
-                const mpp::Div<ComputeT, T> op;
+                using divSrcSrcScale =
+                    SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT, RoundingMode::NearestTiesToEven>;
+                const mpp::Div<ComputeT> op;
                 const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aMask, aDst, functor);
             }
             break;
             case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
-                using divSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                           RoundingMode::NearestTiesAwayFromZero>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aMask, aDst, functor);
             }
@@ -2982,26 +2982,26 @@ ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, ImageView<T> &a
             case mpp::RoundingMode::TowardZero:
             {
                 using divSrcSrcScale =
-                    SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT, RoundingMode::TowardZero>;
-                const mpp::Div<ComputeT, T> op;
+                    SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT, RoundingMode::TowardZero>;
+                const mpp::Div<ComputeT> op;
                 const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aMask, aDst, functor);
             }
             break;
             case mpp::RoundingMode::TowardNegativeInfinity:
             {
-                using divSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                           RoundingMode::TowardNegativeInfinity>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aMask, aDst, functor);
             }
             break;
             case mpp::RoundingMode::TowardPositiveInfinity:
             {
-                using divSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divSrcSrcScale = SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                           RoundingMode::TowardPositiveInfinity>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aMask, aDst, functor);
             }
@@ -3019,8 +3019,8 @@ ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, ImageView<T> &a
                 using ScalerT = mpp::Scale<ComputeT, true>;
                 const ScalerT scaler(scaleFactorFloat);
                 using divSrcSrcScale =
-                    SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT, RoundingMode::None>;
-                const mpp::Div<ComputeT, T> op;
+                    SrcSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT, RoundingMode::None>;
+                const mpp::Div<ComputeT> op;
                 const divSrcSrcScale functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aMask, aDst, functor);
             }
@@ -3097,9 +3097,9 @@ ImageView<T> &ImageView<T>::DivMasked(const T &aConst, ImageView<T> &aDst, const
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divSrcC = SrcConstantFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, RoundingMode::None>;
+    using divSrcC = SrcConstantFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, RoundingMode::None>;
 
-    const mpp::Div<ComputeT, T> op;
+    const mpp::Div<ComputeT> op;
     const divSrcC functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op);
 
     forEachPixel(aMask, aDst, functor);
@@ -3125,45 +3125,45 @@ ImageView<T> &ImageView<T>::DivMasked(const T &aConst, ImageView<T> &aDst, const
         {
             case mpp::RoundingMode::NearestTiesToEven:
             {
-                using divSrcCScale = SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divSrcCScale = SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                              RoundingMode::NearestTiesToEven>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aMask, aDst, functor);
             }
             break;
             case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
-                using divSrcCScale = SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divSrcCScale = SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                              RoundingMode::NearestTiesAwayFromZero>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aMask, aDst, functor);
             }
             break;
             case mpp::RoundingMode::TowardZero:
             {
-                using divSrcCScale = SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
-                                                             RoundingMode::TowardZero>;
-                const mpp::Div<ComputeT, T> op;
+                using divSrcCScale =
+                    SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT, RoundingMode::TowardZero>;
+                const mpp::Div<ComputeT> op;
                 const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aMask, aDst, functor);
             }
             break;
             case mpp::RoundingMode::TowardNegativeInfinity:
             {
-                using divSrcCScale = SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divSrcCScale = SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                              RoundingMode::TowardNegativeInfinity>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aMask, aDst, functor);
             }
             break;
             case mpp::RoundingMode::TowardPositiveInfinity:
             {
-                using divSrcCScale = SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divSrcCScale = SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                              RoundingMode::TowardPositiveInfinity>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aMask, aDst, functor);
             }
@@ -3181,8 +3181,8 @@ ImageView<T> &ImageView<T>::DivMasked(const T &aConst, ImageView<T> &aDst, const
                 using ScalerT = mpp::Scale<ComputeT, true>;
                 const ScalerT scaler(scaleFactorFloat);
                 using divSrcCScale =
-                    SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT, RoundingMode::None>;
-                const mpp::Div<ComputeT, T> op;
+                    SrcConstantScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT, RoundingMode::None>;
+                const mpp::Div<ComputeT> op;
                 const divSrcCScale functor(PointerRoi(), Pitch(), static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aMask, aDst, functor);
             }
@@ -3264,9 +3264,9 @@ ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, const ImageView
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, RoundingMode::None>;
+    using divInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, RoundingMode::None>;
 
-    const mpp::Div<ComputeT, T> op;
+    const mpp::Div<ComputeT> op;
     const divInplaceSrc functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
     forEachPixel(aMask, *this, functor);
@@ -3292,18 +3292,18 @@ ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, const ImageView
         {
             case mpp::RoundingMode::NearestTiesToEven:
             {
-                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                                   RoundingMode::NearestTiesToEven>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
             break;
             case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
-                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                                   RoundingMode::NearestTiesAwayFromZero>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
@@ -3311,26 +3311,26 @@ ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, const ImageView
             case mpp::RoundingMode::TowardZero:
             {
                 using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT, RoundingMode::TowardZero>;
-                const mpp::Div<ComputeT, T> op;
+                    InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT, RoundingMode::TowardZero>;
+                const mpp::Div<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
             break;
             case mpp::RoundingMode::TowardNegativeInfinity:
             {
-                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                                   RoundingMode::TowardNegativeInfinity>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
             break;
             case mpp::RoundingMode::TowardPositiveInfinity:
             {
-                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                                   RoundingMode::TowardPositiveInfinity>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
@@ -3348,8 +3348,8 @@ ImageView<T> &ImageView<T>::DivMasked(const ImageView<T> &aSrc2, const ImageView
                 using ScalerT = mpp::Scale<ComputeT, true>;
                 const ScalerT scaler(scaleFactorFloat);
                 using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT, RoundingMode::None>;
-                const mpp::Div<ComputeT, T> op;
+                    InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::Div<ComputeT>, ScalerT, RoundingMode::None>;
+                const mpp::Div<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
@@ -3424,9 +3424,9 @@ ImageView<T> &ImageView<T>::DivMasked(const T &aConst, const ImageView<Pixel8uC1
 {
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divInplaceC = InplaceConstantFunctor<1, ComputeT, T, mpp::Div<ComputeT, T>, RoundingMode::None>;
+    using divInplaceC = InplaceConstantFunctor<1, ComputeT, T, mpp::Div<ComputeT>, RoundingMode::None>;
 
-    const mpp::Div<ComputeT, T> op;
+    const mpp::Div<ComputeT> op;
     const divInplaceC functor(static_cast<ComputeT>(aConst), op);
 
     forEachPixel(aMask, *this, functor);
@@ -3450,45 +3450,45 @@ ImageView<T> &ImageView<T>::DivMasked(const T &aConst, const ImageView<Pixel8uC1
         {
             case mpp::RoundingMode::NearestTiesToEven:
             {
-                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                                      RoundingMode::NearestTiesToEven>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
             break;
             case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
-                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                                      RoundingMode::NearestTiesAwayFromZero>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
             break;
             case mpp::RoundingMode::TowardZero:
             {
-                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
-                                                                     RoundingMode::TowardZero>;
-                const mpp::Div<ComputeT, T> op;
+                using divInplaceCScale =
+                    InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT>, ScalerT, RoundingMode::TowardZero>;
+                const mpp::Div<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
             break;
             case mpp::RoundingMode::TowardNegativeInfinity:
             {
-                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                                      RoundingMode::TowardNegativeInfinity>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
             break;
             case mpp::RoundingMode::TowardPositiveInfinity:
             {
-                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT,
+                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT>, ScalerT,
                                                                      RoundingMode::TowardPositiveInfinity>;
-                const mpp::Div<ComputeT, T> op;
+                const mpp::Div<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
@@ -3506,8 +3506,8 @@ ImageView<T> &ImageView<T>::DivMasked(const T &aConst, const ImageView<Pixel8uC1
                 using ScalerT = mpp::Scale<ComputeT, true>;
                 const ScalerT scaler(scaleFactorFloat);
                 using divInplaceCScale =
-                    InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT, T>, ScalerT, RoundingMode::None>;
-                const mpp::Div<ComputeT, T> op;
+                    InplaceConstantScaleFunctor<1, ComputeT, T, mpp::Div<ComputeT>, ScalerT, RoundingMode::None>;
+                const mpp::Div<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
@@ -3584,9 +3584,9 @@ ImageView<T> &ImageView<T>::DivInvMasked(const ImageView<T> &aSrc2, const ImageV
 
     using ComputeT = default_compute_type_for_t<T>;
 
-    using divInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT, T>, RoundingMode::None>;
+    using divInplaceSrc = InplaceSrcFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT>, RoundingMode::None>;
 
-    const mpp::DivInv<ComputeT, T> op;
+    const mpp::DivInv<ComputeT> op;
     const divInplaceSrc functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
     forEachPixel(aMask, *this, functor);
@@ -3612,45 +3612,45 @@ ImageView<T> &ImageView<T>::DivInvMasked(const ImageView<T> &aSrc2, const ImageV
         {
             case mpp::RoundingMode::NearestTiesToEven:
             {
-                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT,
+                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT,
                                                                   RoundingMode::NearestTiesToEven>;
-                const mpp::DivInv<ComputeT, T> op;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
             break;
             case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
-                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT,
+                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT,
                                                                   RoundingMode::NearestTiesAwayFromZero>;
-                const mpp::DivInv<ComputeT, T> op;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
             break;
             case mpp::RoundingMode::TowardZero:
             {
-                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT,
-                                                                  RoundingMode::TowardZero>;
-                const mpp::DivInv<ComputeT, T> op;
+                using divInplaceSrcScale =
+                    InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT, RoundingMode::TowardZero>;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
             break;
             case mpp::RoundingMode::TowardNegativeInfinity:
             {
-                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT,
+                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT,
                                                                   RoundingMode::TowardNegativeInfinity>;
-                const mpp::DivInv<ComputeT, T> op;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
             break;
             case mpp::RoundingMode::TowardPositiveInfinity:
             {
-                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT,
+                using divInplaceSrcScale = InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT,
                                                                   RoundingMode::TowardPositiveInfinity>;
-                const mpp::DivInv<ComputeT, T> op;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
@@ -3668,8 +3668,8 @@ ImageView<T> &ImageView<T>::DivInvMasked(const ImageView<T> &aSrc2, const ImageV
                 using ScalerT = mpp::Scale<ComputeT, true>;
                 const ScalerT scaler(scaleFactorFloat);
                 using divInplaceSrcScale =
-                    InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT, RoundingMode::None>;
-                const mpp::DivInv<ComputeT, T> op;
+                    InplaceSrcScaleFunctor<1, T, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT, RoundingMode::None>;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceSrcScale functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
@@ -3745,9 +3745,9 @@ ImageView<T> &ImageView<T>::DivInvMasked(const T &aConst, const ImageView<Pixel8
     using ComputeT = default_compute_type_for_t<T>;
 
     // set to roundingmode NONE, because Div cannot produce non-integers in computations with ints:
-    using divInplaceC = InplaceConstantFunctor<1, ComputeT, T, mpp::DivInv<ComputeT, T>, RoundingMode::None>;
+    using divInplaceC = InplaceConstantFunctor<1, ComputeT, T, mpp::DivInv<ComputeT>, RoundingMode::None>;
 
-    const mpp::DivInv<ComputeT, T> op;
+    const mpp::DivInv<ComputeT> op;
     const divInplaceC functor(static_cast<ComputeT>(aConst), op);
 
     forEachPixel(aMask, *this, functor);
@@ -3771,45 +3771,45 @@ ImageView<T> &ImageView<T>::DivInvMasked(const T &aConst, const ImageView<Pixel8
         {
             case mpp::RoundingMode::NearestTiesToEven:
             {
-                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT,
+                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT,
                                                                      RoundingMode::NearestTiesToEven>;
-                const mpp::DivInv<ComputeT, T> op;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
             break;
             case mpp::RoundingMode::NearestTiesAwayFromZero:
             {
-                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT,
+                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT,
                                                                      RoundingMode::NearestTiesAwayFromZero>;
-                const mpp::DivInv<ComputeT, T> op;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
             break;
             case mpp::RoundingMode::TowardZero:
             {
-                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT,
+                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT,
                                                                      RoundingMode::TowardZero>;
-                const mpp::DivInv<ComputeT, T> op;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
             break;
             case mpp::RoundingMode::TowardNegativeInfinity:
             {
-                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT,
+                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT,
                                                                      RoundingMode::TowardNegativeInfinity>;
-                const mpp::DivInv<ComputeT, T> op;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
             break;
             case mpp::RoundingMode::TowardPositiveInfinity:
             {
-                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT,
+                using divInplaceCScale = InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT,
                                                                      RoundingMode::TowardPositiveInfinity>;
-                const mpp::DivInv<ComputeT, T> op;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }
@@ -3827,8 +3827,8 @@ ImageView<T> &ImageView<T>::DivInvMasked(const T &aConst, const ImageView<Pixel8
                 using ScalerT = mpp::Scale<ComputeT, true>;
                 const ScalerT scaler(scaleFactorFloat);
                 using divInplaceCScale =
-                    InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT, T>, ScalerT, RoundingMode::None>;
-                const mpp::DivInv<ComputeT, T> op;
+                    InplaceConstantScaleFunctor<1, ComputeT, T, mpp::DivInv<ComputeT>, ScalerT, RoundingMode::None>;
+                const mpp::DivInv<ComputeT> op;
                 const divInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
                 forEachPixel(aMask, *this, functor);
             }

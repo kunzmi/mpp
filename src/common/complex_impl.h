@@ -1036,6 +1036,18 @@ DEVICE_CODE Complex<T> Complex<T>::DivCeil(const Complex &aLeft, const Complex &
 }
 
 /// <summary>
+/// Inplace complex integer division with element wise round() (for scaling operations)
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> &Complex<T>::DivScaleRound(T aScale)
+    requires RealSignedIntegral<T>
+{
+    real = DivScaleRoundTiesAwayFromZero(real, aScale);
+    imag = DivScaleRoundTiesAwayFromZero(imag, aScale);
+    return *this;
+}
+
+/// <summary>
 /// Inplace complex integer division with element wise round nearest ties to even (for scaling operations)
 /// </summary>
 template <RealSignedNumber T>
@@ -1044,6 +1056,42 @@ DEVICE_CODE Complex<T> &Complex<T>::DivScaleRoundNearest(T aScale)
 {
     real = DivScaleRoundNearestEven(real, aScale);
     imag = DivScaleRoundNearestEven(imag, aScale);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise round toward zero (for scaling operations)
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> &Complex<T>::DivScaleRoundZero(T aScale)
+    requires RealSignedIntegral<T>
+{
+    real = DivScaleRoundTowardZero(real, aScale);
+    imag = DivScaleRoundTowardZero(imag, aScale);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise floor (for scaling operations)
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> &Complex<T>::DivScaleFloor(T aScale)
+    requires RealSignedIntegral<T>
+{
+    real = DivScaleRoundTowardNegInf(real, aScale);
+    imag = DivScaleRoundTowardNegInf(imag, aScale);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise ceil() (for scaling operations)
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> &Complex<T>::DivScaleCeil(T aScale)
+    requires RealSignedIntegral<T>
+{
+    real = DivScaleRoundTowardPosInf(real, aScale);
+    imag = DivScaleRoundTowardPosInf(imag, aScale);
     return *this;
 }
 #pragma endregion

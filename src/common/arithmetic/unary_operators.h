@@ -507,11 +507,12 @@ template <RealVector T> struct MinValMaxVal
 };
 
 /// <summary>
-/// For Integer type, IsScaleDown must be set to TRUE in case a
+/// For Integer type, IsScaleDown must be set to TRUE in case aScaleFactor &lt; 1.0
 /// </summary>
 /// <typeparam name="T"></typeparam>
 /// <typeparam name="IsScaleDown"></typeparam>
-template <AnyVector T, bool IsScaleDown = false> struct Scale
+template <AnyVector T, bool IsScaleDown = false, RoundingMode roundingMode = RoundingMode::NearestTiesToEven>
+struct Scale
 {
     complex_basetype_t<image::pixel_basetype_t<T>> ScaleVal;
 
@@ -527,13 +528,13 @@ template <AnyVector T, bool IsScaleDown = false> struct Scale
         {
             if constexpr (IsScaleDown) // scale down
             {
-                // assert(aScaleFactor < 1.0);
+                assert(aScaleFactor < 1.0);
                 //  for integer types we scale down by division -> inverse of factor
                 ScaleVal = static_cast<complex_basetype_t<image::pixel_basetype_t<T>>>(1.0 / aScaleFactor);
             }
             else
             {
-                // assert(aScaleFactor > 1.0);
+                assert(aScaleFactor >= 1.0);
                 ScaleVal = static_cast<complex_basetype_t<image::pixel_basetype_t<T>>>(aScaleFactor);
             }
         }
@@ -549,7 +550,30 @@ template <AnyVector T, bool IsScaleDown = false> struct Scale
         {
             if constexpr (IsScaleDown)
             {
-                aSrcDst.DivScaleRoundNearest(ScaleVal);
+                if constexpr (roundingMode == RoundingMode::NearestTiesAwayFromZero)
+                {
+                    aSrcDst.DivScaleRound(ScaleVal);
+                }
+                else if constexpr (roundingMode == RoundingMode::NearestTiesToEven)
+                {
+                    aSrcDst.DivScaleRoundNearest(ScaleVal);
+                }
+                else if constexpr (roundingMode == RoundingMode::TowardZero)
+                {
+                    aSrcDst.DivScaleRoundZero(ScaleVal);
+                }
+                else if constexpr (roundingMode == RoundingMode::TowardNegativeInfinity)
+                {
+                    aSrcDst.DivScaleFloor(ScaleVal);
+                }
+                else if constexpr (roundingMode == RoundingMode::TowardPositiveInfinity)
+                {
+                    aSrcDst.DivScaleCeil(ScaleVal);
+                }
+                else
+                {
+                    static_assert(roundingMode != RoundingMode::NearestTiesAwayFromZero, "Unsupported rounding mode.");
+                }
             }
             else
             {

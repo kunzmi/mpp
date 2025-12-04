@@ -14,6 +14,8 @@ ForAllChannelsWithAlphaInvokeConvertRound(32f, 8u);
 ForAllChannelsWithAlphaInvokeConvertRound(32f, 8s);
 ForAllChannelsWithAlphaInvokeConvertRound(32f, 16u);
 ForAllChannelsWithAlphaInvokeConvertRound(32f, 16s);
+ForAllChannelsWithAlphaInvokeConvertRound(32f, 32u);
+ForAllChannelsWithAlphaInvokeConvertRound(32f, 32s);
 ForAllChannelsWithAlphaInvokeConvertRound(32f, 16f);
 ForAllChannelsWithAlphaInvokeConvertRound(32f, 16bf);
 ForAllChannelsWithAlphaInvokeConvertScaleRound(32f, 8u);

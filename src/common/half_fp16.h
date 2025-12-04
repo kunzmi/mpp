@@ -455,6 +455,39 @@ std::istream &operator>>(std::istream &aIs, mpp::HalfFp16 &aHalf);
 std::wistream &operator>>(std::wistream &aIs, mpp::HalfFp16 &aHalf);
 #endif
 
+template <RealNumber T> DEVICE_CODE HalfFp16 operator+(const HalfFp16 &aLeft, T aRight)
+{
+    return HalfFp16{aLeft + static_cast<HalfFp16>(aRight)};
+}
+template <RealNumber T> DEVICE_CODE HalfFp16 operator+(T aLeft, const HalfFp16 &aRight)
+{
+    return HalfFp16{static_cast<HalfFp16>(aLeft) + aRight};
+}
+template <RealNumber T> DEVICE_CODE HalfFp16 operator-(const HalfFp16 &aLeft, T aRight)
+{
+    return HalfFp16{aLeft - static_cast<HalfFp16>(aRight)};
+}
+template <RealNumber T> DEVICE_CODE HalfFp16 operator-(T aLeft, const HalfFp16 &aRight)
+{
+    return HalfFp16{static_cast<HalfFp16>(aLeft) - aRight};
+}
+template <RealNumber T> DEVICE_CODE HalfFp16 operator*(const HalfFp16 &aLeft, T aRight)
+{
+    return HalfFp16{aLeft * static_cast<HalfFp16>(aRight)};
+}
+template <RealNumber T> DEVICE_CODE HalfFp16 operator*(T aLeft, const HalfFp16 &aRight)
+{
+    return HalfFp16{static_cast<HalfFp16>(aLeft) * aRight};
+}
+template <RealNumber T> DEVICE_CODE HalfFp16 operator/(const HalfFp16 &aLeft, T aRight)
+{
+    return HalfFp16{aLeft / static_cast<HalfFp16>(aRight)};
+}
+template <RealNumber T> DEVICE_CODE HalfFp16 operator/(T aLeft, const HalfFp16 &aRight)
+{
+    return HalfFp16{static_cast<HalfFp16>(aLeft) / aRight};
+}
+
 // 16 bit half precision floating point types
 template <> struct numeric_limits<HalfFp16>
 {

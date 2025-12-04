@@ -4,6 +4,9 @@
 #include "needSaturationClamp.h"
 #include "numberTypes.h"
 #include "vector_typetraits.h"
+#include <common/bfloat16.h>
+#include <common/complex.h>
+#include <common/half_fp16.h>
 #include <concepts>
 #include <iostream>
 #include <type_traits>
@@ -357,9 +360,33 @@ template <Number T> struct alignas(sizeof(T)) Vector1
         requires RealIntegral<T>;
 
     /// <summary>
+    /// Inplace integer division with element wise round() (for scaling operations)
+    /// </summary>
+    DEVICE_CODE Vector1 &DivScaleRound(T aScale)
+        requires RealIntegral<T>;
+
+    /// <summary>
     /// Inplace integer division with element wise round nearest ties to even (for scaling operations)
     /// </summary>
     DEVICE_CODE Vector1 &DivScaleRoundNearest(T aScale)
+        requires RealIntegral<T>;
+
+    /// <summary>
+    /// Inplace integer division with element wise round toward zero (for scaling operations)
+    /// </summary>
+    DEVICE_CODE Vector1 &DivScaleRoundZero(T aScale)
+        requires RealIntegral<T>;
+
+    /// <summary>
+    /// Inplace integer division with element wise floor (for scaling operations)
+    /// </summary>
+    DEVICE_CODE Vector1 &DivScaleFloor(T aScale)
+        requires RealIntegral<T>;
+
+    /// <summary>
+    /// Inplace integer division with element wise ceil() (for scaling operations)
+    /// </summary>
+    DEVICE_CODE Vector1 &DivScaleCeil(T aScale)
         requires RealIntegral<T>;
 
     /// <summary>
@@ -455,9 +482,33 @@ template <Number T> struct alignas(sizeof(T)) Vector1
         requires ComplexIntegral<T>;
 
     /// <summary>
+    /// Inplace integer division with element wise round() (for scaling operations)
+    /// </summary>
+    DEVICE_CODE Vector1 &DivScaleRound(complex_basetype_t<T> aScale)
+        requires ComplexIntegral<T>;
+
+    /// <summary>
     /// Inplace integer division with element wise round nearest ties to even (for scaling operations)
     /// </summary>
     DEVICE_CODE Vector1 &DivScaleRoundNearest(complex_basetype_t<T> aScale)
+        requires ComplexIntegral<T>;
+
+    /// <summary>
+    /// Inplace integer division with element wise round toward zero (for scaling operations)
+    /// </summary>
+    DEVICE_CODE Vector1 &DivScaleRoundZero(complex_basetype_t<T> aScale)
+        requires ComplexIntegral<T>;
+
+    /// <summary>
+    /// Inplace integer division with element wise floor (for scaling operations)
+    /// </summary>
+    DEVICE_CODE Vector1 &DivScaleFloor(complex_basetype_t<T> aScale)
+        requires ComplexIntegral<T>;
+
+    /// <summary>
+    /// Inplace integer division with element wise ceil() (for scaling operations)
+    /// </summary>
+    DEVICE_CODE Vector1 &DivScaleCeil(complex_basetype_t<T> aScale)
         requires ComplexIntegral<T>;
 
     /// <summary>

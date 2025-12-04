@@ -8,6 +8,7 @@ namespace mpp::image::cuda
 {
 
 ForAllChannelsWithAlphaInvokeConvert(16s, 8u);
+ForAllChannelsWithAlphaInvokeConvert(16s, 8s);
 ForAllChannelsWithAlphaInvokeConvert(16s, 16u);
 ForAllChannelsWithAlphaInvokeConvert(16s, 32u);
 ForAllChannelsWithAlphaInvokeConvert(16s, 32s);

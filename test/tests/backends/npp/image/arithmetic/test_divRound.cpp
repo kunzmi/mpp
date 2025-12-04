@@ -28,6 +28,79 @@ namespace nv  = mpp::image::npp;
 
 constexpr int size = 256;
 
+// If result type is byte (unsigned char), then NPP handles seperatly the case that src1 == 0 and src2 == 0. Any
+// number devided by 0 in floating point results in INF, but 0 / 0 gets NAN. Usually this would flush to 0 while
+// casting to integer, but NPP returns 255...
+// Turns out that IPP behaves normally, so MPP also avoids all these "if pixel is 0"s just for 8u data type and we fix
+// the result images for comparison:
+void fixZeroDivision(cpu::Image<Pixel8uC1> &aSrc1, cpu::Image<Pixel8uC1> &aSrc2, cpu::Image<Pixel8uC1> &aDst)
+{
+    auto iter2   = aSrc2.begin();
+    auto iterDst = aDst.begin();
+
+    for (auto &iter1 : aSrc1)
+    {
+        if (iter1.Value() == 0 && iter2.Value() == 0 && iterDst.Value() == 255)
+        {
+            iterDst.Value() = 0;
+        }
+        iter2++;
+        iterDst++;
+    }
+}
+
+void fixZeroDivision(cpu::Image<Pixel8uC3> &aSrc1, cpu::Image<Pixel8uC3> &aSrc2, cpu::Image<Pixel8uC3> &aDst)
+{
+    auto iter2   = aSrc2.begin();
+    auto iterDst = aDst.begin();
+
+    for (auto &iter1 : aSrc1)
+    {
+        if (iter1.Value().x == 0 && iter2.Value().x == 0 && iterDst.Value().x == 255)
+        {
+            iterDst.Value().x = 0;
+        }
+        if (iter1.Value().y == 0 && iter2.Value().y == 0 && iterDst.Value().y == 255)
+        {
+            iterDst.Value().y = 0;
+        }
+        if (iter1.Value().z == 0 && iter2.Value().z == 0 && iterDst.Value().z == 255)
+        {
+            iterDst.Value().z = 0;
+        }
+        iter2++;
+        iterDst++;
+    }
+}
+
+void fixZeroDivision(cpu::Image<Pixel8uC4> &aSrc1, cpu::Image<Pixel8uC4> &aSrc2, cpu::Image<Pixel8uC4> &aDst)
+{
+    auto iter2   = aSrc2.begin();
+    auto iterDst = aDst.begin();
+
+    for (auto &iter1 : aSrc1)
+    {
+        if (iter1.Value().x == 0 && iter2.Value().x == 0 && iterDst.Value().x == 255)
+        {
+            iterDst.Value().x = 0;
+        }
+        if (iter1.Value().y == 0 && iter2.Value().y == 0 && iterDst.Value().y == 255)
+        {
+            iterDst.Value().y = 0;
+        }
+        if (iter1.Value().z == 0 && iter2.Value().z == 0 && iterDst.Value().z == 255)
+        {
+            iterDst.Value().z = 0;
+        }
+        if (iter1.Value().w == 0 && iter2.Value().w == 0 && iterDst.Value().w == 255)
+        {
+            iterDst.Value().w = 0;
+        }
+        iter2++;
+        iterDst++;
+    }
+}
+
 TEST_CASE("8uC1", "[NPP.Arithmetic.DivRound]")
 {
     const uint seed         = Catch::getSeed();
@@ -51,6 +124,7 @@ TEST_CASE("8uC1", "[NPP.Arithmetic.DivRound]")
     npp_src2.Div_Round(npp_src1, npp_dst, NppRoundMode::NPP_ROUND_TOWARD_ZERO, 0, nppCtx);
 
     npp_res << npp_dst;
+    fixZeroDivision(cpu_src1, cpu_src2, npp_res);
 
     CHECK(cpu_dst.IsIdentical(npp_res));
 
@@ -58,6 +132,7 @@ TEST_CASE("8uC1", "[NPP.Arithmetic.DivRound]")
     npp_src2.Div_Round(npp_src1, npp_dst, NppRoundMode::NPP_ROUND_TOWARD_ZERO, -2, nppCtx);
 
     npp_res << npp_dst;
+    fixZeroDivision(cpu_src1, cpu_src2, npp_res);
 
     CHECK(cpu_dst.IsIdentical(npp_res));
 
@@ -65,6 +140,7 @@ TEST_CASE("8uC1", "[NPP.Arithmetic.DivRound]")
     npp_src2.Div_Round(npp_src1, npp_dst, NppRoundMode::NPP_ROUND_NEAREST_TIES_TO_EVEN, 0, nppCtx);
 
     npp_res << npp_dst;
+    fixZeroDivision(cpu_src1, cpu_src2, npp_res);
 
     CHECK(cpu_dst.IsIdentical(npp_res));
 
@@ -72,6 +148,7 @@ TEST_CASE("8uC1", "[NPP.Arithmetic.DivRound]")
     npp_dst.Div_Round(npp_src2, NppRoundMode::NPP_ROUND_NEAREST_TIES_TO_EVEN, -2, nppCtx);
 
     npp_res << npp_dst;
+    fixZeroDivision(cpu_src1, cpu_src2, npp_res);
 
     CHECK(cpu_dst.IsIdentical(npp_res));
 
@@ -79,6 +156,7 @@ TEST_CASE("8uC1", "[NPP.Arithmetic.DivRound]")
     npp_src2.Div_Round(npp_src1, npp_dst, NppRoundMode::NPP_ROUND_NEAREST_TIES_AWAY_FROM_ZERO, 0, nppCtx);
 
     npp_res << npp_dst;
+    fixZeroDivision(cpu_src1, cpu_src2, npp_res);
 
     CHECK(cpu_dst.IsIdentical(npp_res));
 
@@ -86,6 +164,7 @@ TEST_CASE("8uC1", "[NPP.Arithmetic.DivRound]")
     npp_dst.Div_Round(npp_src2, NppRoundMode::NPP_ROUND_NEAREST_TIES_AWAY_FROM_ZERO, -2, nppCtx);
 
     npp_res << npp_dst;
+    fixZeroDivision(cpu_src1, cpu_src2, npp_res);
 
     CHECK(cpu_dst.IsIdentical(npp_res));
 }
@@ -113,6 +192,7 @@ TEST_CASE("8uC3", "[NPP.Arithmetic.DivRound]")
     npp_src2.Div_Round(npp_src1, npp_dst, NppRoundMode::NPP_ROUND_TOWARD_ZERO, 0, nppCtx);
 
     npp_res << npp_dst;
+    fixZeroDivision(cpu_src1, cpu_src2, npp_res);
 
     CHECK(cpu_dst.IsIdentical(npp_res));
 
@@ -120,6 +200,7 @@ TEST_CASE("8uC3", "[NPP.Arithmetic.DivRound]")
     npp_src2.Div_Round(npp_src1, npp_dst, NppRoundMode::NPP_ROUND_TOWARD_ZERO, -2, nppCtx);
 
     npp_res << npp_dst;
+    fixZeroDivision(cpu_src1, cpu_src2, npp_res);
 
     CHECK(cpu_dst.IsIdentical(npp_res));
 
@@ -127,6 +208,7 @@ TEST_CASE("8uC3", "[NPP.Arithmetic.DivRound]")
     npp_src2.Div_Round(npp_src1, npp_dst, NppRoundMode::NPP_ROUND_NEAREST_TIES_TO_EVEN, 0, nppCtx);
 
     npp_res << npp_dst;
+    fixZeroDivision(cpu_src1, cpu_src2, npp_res);
 
     CHECK(cpu_dst.IsIdentical(npp_res));
 
@@ -134,6 +216,7 @@ TEST_CASE("8uC3", "[NPP.Arithmetic.DivRound]")
     npp_dst.Div_Round(npp_src2, NppRoundMode::NPP_ROUND_NEAREST_TIES_TO_EVEN, -2, nppCtx);
 
     npp_res << npp_dst;
+    fixZeroDivision(cpu_src1, cpu_src2, npp_res);
 
     CHECK(cpu_dst.IsIdentical(npp_res));
 
@@ -141,6 +224,7 @@ TEST_CASE("8uC3", "[NPP.Arithmetic.DivRound]")
     npp_src2.Div_Round(npp_src1, npp_dst, NppRoundMode::NPP_ROUND_NEAREST_TIES_AWAY_FROM_ZERO, 0, nppCtx);
 
     npp_res << npp_dst;
+    fixZeroDivision(cpu_src1, cpu_src2, npp_res);
 
     CHECK(cpu_dst.IsIdentical(npp_res));
 
@@ -148,6 +232,7 @@ TEST_CASE("8uC3", "[NPP.Arithmetic.DivRound]")
     npp_dst.Div_Round(npp_src2, NppRoundMode::NPP_ROUND_NEAREST_TIES_AWAY_FROM_ZERO, -2, nppCtx);
 
     npp_res << npp_dst;
+    fixZeroDivision(cpu_src1, cpu_src2, npp_res);
 
     CHECK(cpu_dst.IsIdentical(npp_res));
 }
@@ -175,6 +260,7 @@ TEST_CASE("8uC4", "[NPP.Arithmetic.DivRound]")
     npp_src2.Div_Round(npp_src1, npp_dst, NppRoundMode::NPP_ROUND_TOWARD_ZERO, 0, nppCtx);
 
     npp_res << npp_dst;
+    fixZeroDivision(cpu_src1, cpu_src2, npp_res);
 
     CHECK(cpu_dst.IsIdentical(npp_res));
 
@@ -182,6 +268,7 @@ TEST_CASE("8uC4", "[NPP.Arithmetic.DivRound]")
     npp_src2.Div_Round(npp_src1, npp_dst, NppRoundMode::NPP_ROUND_TOWARD_ZERO, -2, nppCtx);
 
     npp_res << npp_dst;
+    fixZeroDivision(cpu_src1, cpu_src2, npp_res);
 
     CHECK(cpu_dst.IsIdentical(npp_res));
 
@@ -189,6 +276,7 @@ TEST_CASE("8uC4", "[NPP.Arithmetic.DivRound]")
     npp_src2.Div_Round(npp_src1, npp_dst, NppRoundMode::NPP_ROUND_NEAREST_TIES_TO_EVEN, 0, nppCtx);
 
     npp_res << npp_dst;
+    fixZeroDivision(cpu_src1, cpu_src2, npp_res);
 
     CHECK(cpu_dst.IsIdentical(npp_res));
 
@@ -196,6 +284,7 @@ TEST_CASE("8uC4", "[NPP.Arithmetic.DivRound]")
     npp_dst.Div_Round(npp_src2, NppRoundMode::NPP_ROUND_NEAREST_TIES_TO_EVEN, -2, nppCtx);
 
     npp_res << npp_dst;
+    fixZeroDivision(cpu_src1, cpu_src2, npp_res);
 
     CHECK(cpu_dst.IsIdentical(npp_res));
 
@@ -203,6 +292,7 @@ TEST_CASE("8uC4", "[NPP.Arithmetic.DivRound]")
     npp_src2.Div_Round(npp_src1, npp_dst, NppRoundMode::NPP_ROUND_NEAREST_TIES_AWAY_FROM_ZERO, 0, nppCtx);
 
     npp_res << npp_dst;
+    fixZeroDivision(cpu_src1, cpu_src2, npp_res);
 
     CHECK(cpu_dst.IsIdentical(npp_res));
 
@@ -210,6 +300,7 @@ TEST_CASE("8uC4", "[NPP.Arithmetic.DivRound]")
     npp_dst.Div_Round(npp_src2, NppRoundMode::NPP_ROUND_NEAREST_TIES_AWAY_FROM_ZERO, -2, nppCtx);
 
     npp_res << npp_dst;
+    fixZeroDivision(cpu_src1, cpu_src2, npp_res);
 
     CHECK(cpu_dst.IsIdentical(npp_res));
 }

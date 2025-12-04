@@ -79,6 +79,7 @@ struct BorderControl
     // indicates if border control is supposed to only handle out of ROI pixels for interpolation or also for accessing
     // out of ROI pixels in general (e.g. geometric transforms):
     static constexpr bool only_for_interpolation = onlyForInterpolation;
+    static constexpr BorderType border_type      = borderType;
 
     // pointing to first pixel in allowedAccessRoi
     const BorderControlDataSource<PixelT, planar> DataSource;
@@ -163,7 +164,7 @@ struct BorderControl
         {
             // nothing to do...
         }
-        else if constexpr (borderType == BorderType::Replicate)
+        else if constexpr (borderType == BorderType::Replicate || borderType == BorderType::SmoothEdge)
         {
 #ifdef IS_HOST_COMPILER
             aPixelX = std::max(std::min(aPixelX, LastValidPixel.x), 0);

@@ -167,53 +167,138 @@ void InvokeConvertScaleRound(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, s
 
         constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        // ComputeT is either float or double, so Scaler is always operating on floating point:
-        using ComputeT = convert_scale_compute_type_t<SrcT>;
-        using ScalerT  = Scale<ComputeT, false>;
-        const ScalerT scaler(aScaleFactor);
+        using ComputeT = compute_type_convertScaleRound_for_t<SrcT, DstT>;
 
-        switch (aRoundingMode)
+        if constexpr (RealOrComplexIntVector<ComputeT>)
         {
-            case mpp::RoundingMode::NearestTiesToEven:
+            if (aScaleFactor >= 1.0)
             {
-                using convert = ConvertScaleFunctor<TupelSize, SrcT, DstT, ScalerT, RoundingMode::NearestTiesToEven>;
-                const convert functor(aSrc1, aPitchSrc1, scaler);
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            case mpp::RoundingMode::NearestTiesAwayFromZero:
-            {
+                // integer to integer conversion with intgere scaling, so no rounding:
+                using ScalerT = mpp::Scale<ComputeT, false>;
+                const ScalerT scaler(aScaleFactor);
                 using convert =
-                    ConvertScaleFunctor<TupelSize, SrcT, DstT, ScalerT, RoundingMode::NearestTiesAwayFromZero>;
+                    ConvertScaleFunctor<TupelSize, SrcT, ComputeT, DstT, ScalerT, RoundingMode::NearestTiesToEven>;
                 const convert functor(aSrc1, aPitchSrc1, scaler);
                 InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx, functor);
             }
-            break;
-            case mpp::RoundingMode::TowardZero:
+            else
             {
-                using convert = ConvertScaleFunctor<TupelSize, SrcT, DstT, ScalerT, RoundingMode::TowardZero>;
-                const convert functor(aSrc1, aPitchSrc1, scaler);
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+                switch (aRoundingMode)
+                {
+                    case mpp::RoundingMode::NearestTiesToEven:
+                    {
+                        using ScalerT = mpp::Scale<ComputeT, true, mpp::RoundingMode::NearestTiesToEven>;
+                        const ScalerT scaler(aScaleFactor);
+                        using convert =
+                            ConvertScaleFunctor<TupelSize, SrcT, ComputeT, DstT, ScalerT, mpp::RoundingMode::None>;
+                        const convert functor(aSrc1, aPitchSrc1, scaler);
+                        InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx,
+                                                                                  functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::NearestTiesAwayFromZero:
+                    {
+                        using ScalerT = mpp::Scale<ComputeT, true, mpp::RoundingMode::NearestTiesAwayFromZero>;
+                        const ScalerT scaler(aScaleFactor);
+                        using convert =
+                            ConvertScaleFunctor<TupelSize, SrcT, ComputeT, DstT, ScalerT, mpp::RoundingMode::None>;
+                        const convert functor(aSrc1, aPitchSrc1, scaler);
+                        InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx,
+                                                                                  functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardZero:
+                    {
+                        using ScalerT = mpp::Scale<ComputeT, true, mpp::RoundingMode::TowardZero>;
+                        const ScalerT scaler(aScaleFactor);
+                        using convert =
+                            ConvertScaleFunctor<TupelSize, SrcT, ComputeT, DstT, ScalerT, mpp::RoundingMode::None>;
+                        const convert functor(aSrc1, aPitchSrc1, scaler);
+                        InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx,
+                                                                                  functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardNegativeInfinity:
+                    {
+                        using ScalerT = mpp::Scale<ComputeT, true, mpp::RoundingMode::TowardNegativeInfinity>;
+                        const ScalerT scaler(aScaleFactor);
+                        using convert =
+                            ConvertScaleFunctor<TupelSize, SrcT, ComputeT, DstT, ScalerT, mpp::RoundingMode::None>;
+                        const convert functor(aSrc1, aPitchSrc1, scaler);
+                        InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx,
+                                                                                  functor);
+                    }
+                    break;
+                    case mpp::RoundingMode::TowardPositiveInfinity:
+                    {
+                        using ScalerT = mpp::Scale<ComputeT, true, mpp::RoundingMode::TowardPositiveInfinity>;
+                        const ScalerT scaler(aScaleFactor);
+                        using convert =
+                            ConvertScaleFunctor<TupelSize, SrcT, ComputeT, DstT, ScalerT, mpp::RoundingMode::None>;
+                        const convert functor(aSrc1, aPitchSrc1, scaler);
+                        InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx,
+                                                                                  functor);
+                    }
+                    break;
+                    default:
+                        throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
+                }
             }
-            break;
-            case mpp::RoundingMode::TowardNegativeInfinity:
+        }
+        else
+        {
+            using ScalerT = Scale<ComputeT, false>;
+            const ScalerT scaler(aScaleFactor);
+            switch (aRoundingMode)
             {
-                using convert =
-                    ConvertScaleFunctor<TupelSize, SrcT, DstT, ScalerT, RoundingMode::TowardNegativeInfinity>;
-                const convert functor(aSrc1, aPitchSrc1, scaler);
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            case mpp::RoundingMode::TowardPositiveInfinity:
-            {
-                using convert =
-                    ConvertScaleFunctor<TupelSize, SrcT, DstT, ScalerT, RoundingMode::TowardPositiveInfinity>;
-                const convert functor(aSrc1, aPitchSrc1, scaler);
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            default:
+                case mpp::RoundingMode::NearestTiesToEven:
+                {
+                    using convert =
+                        ConvertScaleFunctor<TupelSize, SrcT, ComputeT, DstT, ScalerT, RoundingMode::NearestTiesToEven>;
+                    const convert functor(aSrc1, aPitchSrc1, scaler);
+                    InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx,
+                                                                              functor);
+                }
                 break;
+                case mpp::RoundingMode::NearestTiesAwayFromZero:
+                {
+                    using convert = ConvertScaleFunctor<TupelSize, SrcT, ComputeT, DstT, ScalerT,
+                                                        RoundingMode::NearestTiesAwayFromZero>;
+                    const convert functor(aSrc1, aPitchSrc1, scaler);
+                    InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx,
+                                                                              functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardZero:
+                {
+                    using convert =
+                        ConvertScaleFunctor<TupelSize, SrcT, ComputeT, DstT, ScalerT, RoundingMode::TowardZero>;
+                    const convert functor(aSrc1, aPitchSrc1, scaler);
+                    InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx,
+                                                                              functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardNegativeInfinity:
+                {
+                    using convert = ConvertScaleFunctor<TupelSize, SrcT, ComputeT, DstT, ScalerT,
+                                                        RoundingMode::TowardNegativeInfinity>;
+                    const convert functor(aSrc1, aPitchSrc1, scaler);
+                    InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx,
+                                                                              functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardPositiveInfinity:
+                {
+                    using convert = ConvertScaleFunctor<TupelSize, SrcT, ComputeT, DstT, ScalerT,
+                                                        RoundingMode::TowardPositiveInfinity>;
+                    const convert functor(aSrc1, aPitchSrc1, scaler);
+                    InvokeForEachPixelKernelDefault<DstT, TupelSize, convert>(aDst, aPitchDst, aSize, aStreamCtx,
+                                                                              functor);
+                }
+                break;
+                default:
+                    break;
+            }
         }
     }
 }

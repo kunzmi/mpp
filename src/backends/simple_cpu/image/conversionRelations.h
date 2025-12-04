@@ -42,6 +42,9 @@ template <> struct conversionImplemented<sbyte, double> : std::true_type
 {
 };
 // 8u
+template <> struct conversionImplemented<byte, sbyte> : std::true_type
+{
+};
 template <> struct conversionImplemented<byte, ushort> : std::true_type
 {
 };
@@ -70,6 +73,9 @@ template <> struct conversionImplemented<byte, double> : std::true_type
 template <> struct conversionImplemented<short, byte> : std::true_type
 {
 };
+template <> struct conversionImplemented<short, sbyte> : std::true_type
+{
+};
 template <> struct conversionImplemented<short, ushort> : std::true_type
 {
 };
@@ -93,6 +99,12 @@ template <> struct conversionImplemented<short, double> : std::true_type
 };
 // 16u
 template <> struct conversionImplemented<ushort, byte> : std::true_type
+{
+};
+template <> struct conversionImplemented<ushort, sbyte> : std::true_type
+{
+};
+template <> struct conversionImplemented<ushort, short> : std::true_type
 {
 };
 template <> struct conversionImplemented<ushort, uint> : std::true_type
@@ -145,7 +157,16 @@ template <> struct conversionImplemented<int, double> : std::true_type
 template <> struct conversionImplemented<uint, byte> : std::true_type
 {
 };
+template <> struct conversionImplemented<uint, sbyte> : std::true_type
+{
+};
 template <> struct conversionImplemented<uint, ushort> : std::true_type
+{
+};
+template <> struct conversionImplemented<uint, short> : std::true_type
+{
+};
+template <> struct conversionImplemented<uint, int> : std::true_type
 {
 };
 template <> struct conversionImplemented<uint, HalfFp16> : std::true_type
@@ -181,14 +202,11 @@ template <> struct conversionImplemented<c_short, c_int> : std::true_type
 template <> struct conversionImplemented<c_short, c_float> : std::true_type
 {
 };
-template <> struct conversionImplemented<c_short, c_double> : std::true_type
-{
-};
 // 32sc
-template <> struct conversionImplemented<c_int, c_float> : std::true_type
+template <> struct conversionImplemented<c_int, c_short> : std::true_type
 {
 };
-template <> struct conversionImplemented<c_int, c_double> : std::true_type
+template <> struct conversionImplemented<c_int, c_float> : std::true_type
 {
 };
 // 32f
@@ -235,6 +253,12 @@ template <> struct conversionRoundImplemented<HalfFp16, short> : std::true_type
 template <> struct conversionRoundImplemented<HalfFp16, ushort> : std::true_type
 {
 };
+template <> struct conversionRoundImplemented<HalfFp16, int> : std::true_type
+{
+};
+template <> struct conversionRoundImplemented<HalfFp16, uint> : std::true_type
+{
+};
 // 16bf
 template <> struct conversionRoundImplemented<BFloat16, sbyte> : std::true_type
 {
@@ -246,6 +270,12 @@ template <> struct conversionRoundImplemented<BFloat16, short> : std::true_type
 {
 };
 template <> struct conversionRoundImplemented<BFloat16, ushort> : std::true_type
+{
+};
+template <> struct conversionRoundImplemented<BFloat16, int> : std::true_type
+{
+};
+template <> struct conversionRoundImplemented<BFloat16, uint> : std::true_type
 {
 };
 // 32fc
@@ -266,6 +296,12 @@ template <> struct conversionRoundImplemented<float, short> : std::true_type
 {
 };
 template <> struct conversionRoundImplemented<float, ushort> : std::true_type
+{
+};
+template <> struct conversionRoundImplemented<float, int> : std::true_type
+{
+};
+template <> struct conversionRoundImplemented<float, uint> : std::true_type
 {
 };
 template <> struct conversionRoundImplemented<float, HalfFp16> : std::true_type
@@ -407,63 +443,4 @@ constexpr inline bool conversionRoundScaleImplemented_v =
 
 template <typename TFrom, typename TTo>
 concept ConversionRoundScaleImplemented = (conversionRoundScaleImplemented_v<TFrom, TTo>);
-
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define InstantiateConvert_For(typeSrc, typeDst)                                                                       \
-    template ImageView<typeDst> &ImageView<typeSrc>::Convert<typeDst>(ImageView<typeDst> & aDst) const;
-
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define InstantiateConvertRound_For(typeSrc, typeDst)                                                                  \
-    template ImageView<typeDst> &ImageView<typeSrc>::Convert<typeDst>(ImageView<typeDst> & aDst,                       \
-                                                                      RoundingMode aRoundingMode) const;
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define InstantiateConvertRoundScale_For(typeSrc, typeDst)                                                             \
-    template ImageView<typeDst> &ImageView<typeSrc>::Convert<typeDst>(                                                 \
-        ImageView<typeDst> & aDst, RoundingMode aRoundingMode, int aScaleFactor) const;
-
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define ForAllChannelsConvertWithAlpha(typeSrc, typeDst)                                                               \
-    InstantiateConvert_For(Pixel##typeSrc##C1, Pixel##typeDst##C1);                                                    \
-    InstantiateConvert_For(Pixel##typeSrc##C2, Pixel##typeDst##C2);                                                    \
-    InstantiateConvert_For(Pixel##typeSrc##C3, Pixel##typeDst##C3);                                                    \
-    InstantiateConvert_For(Pixel##typeSrc##C4, Pixel##typeDst##C4);                                                    \
-    InstantiateConvert_For(Pixel##typeSrc##C4A, Pixel##typeDst##C4A);
-
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define ForAllChannelsConvertNoAlpha(typeSrc, typeDst)                                                                 \
-    InstantiateConvert_For(Pixel##typeSrc##C1, Pixel##typeDst##C1);                                                    \
-    InstantiateConvert_For(Pixel##typeSrc##C2, Pixel##typeDst##C2);                                                    \
-    InstantiateConvert_For(Pixel##typeSrc##C3, Pixel##typeDst##C3);                                                    \
-    InstantiateConvert_For(Pixel##typeSrc##C4, Pixel##typeDst##C4);
-
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define ForAllChannelsConvertRoundWithAlpha(typeSrc, typeDst)                                                          \
-    InstantiateConvertRound_For(Pixel##typeSrc##C1, Pixel##typeDst##C1);                                               \
-    InstantiateConvertRound_For(Pixel##typeSrc##C2, Pixel##typeDst##C2);                                               \
-    InstantiateConvertRound_For(Pixel##typeSrc##C3, Pixel##typeDst##C3);                                               \
-    InstantiateConvertRound_For(Pixel##typeSrc##C4, Pixel##typeDst##C4);                                               \
-    InstantiateConvertRound_For(Pixel##typeSrc##C4A, Pixel##typeDst##C4A);
-
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define ForAllChannelsConvertRoundNoAlpha(typeSrc, typeDst)                                                            \
-    InstantiateConvertRound_For(Pixel##typeSrc##C1, Pixel##typeDst##C1);                                               \
-    InstantiateConvertRound_For(Pixel##typeSrc##C2, Pixel##typeDst##C2);                                               \
-    InstantiateConvertRound_For(Pixel##typeSrc##C3, Pixel##typeDst##C3);                                               \
-    InstantiateConvertRound_For(Pixel##typeSrc##C4, Pixel##typeDst##C4);
-
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define ForAllChannelsConvertRoundScaleWithAlpha(typeSrc, typeDst)                                                     \
-    InstantiateConvertRoundScale_For(Pixel##typeSrc##C1, Pixel##typeDst##C1);                                          \
-    InstantiateConvertRoundScale_For(Pixel##typeSrc##C2, Pixel##typeDst##C2);                                          \
-    InstantiateConvertRoundScale_For(Pixel##typeSrc##C3, Pixel##typeDst##C3);                                          \
-    InstantiateConvertRoundScale_For(Pixel##typeSrc##C4, Pixel##typeDst##C4);                                          \
-    InstantiateConvertRoundScale_For(Pixel##typeSrc##C4A, Pixel##typeDst##C4A);
-
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define ForAllChannelsConvertRoundScaleNoAlpha(typeSrc, typeDst)                                                       \
-    InstantiateConvertRoundScale_For(Pixel##typeSrc##C1, Pixel##typeDst##C1);                                          \
-    InstantiateConvertRoundScale_For(Pixel##typeSrc##C2, Pixel##typeDst##C2);                                          \
-    InstantiateConvertRoundScale_For(Pixel##typeSrc##C3, Pixel##typeDst##C3);                                          \
-    InstantiateConvertRoundScale_For(Pixel##typeSrc##C4, Pixel##typeDst##C4);
-
 } // namespace mpp::image::cpuSimple

@@ -723,7 +723,7 @@ inline std::wostream &operator<<(std::wostream &aOs, const CompareOp &aCompareOp
 enum class BorderType // NOLINT(performance-enum-size)
 {
     /// <summary>
-    /// Undefined image border type
+    /// Undefined image border type.
     /// </summary>
     None,
     /// <summary>
@@ -750,7 +750,15 @@ enum class BorderType // NOLINT(performance-enum-size)
     /// For a 4-pixel image | 0 1 2 3 | borders are treated as in:<para/>
     /// 1 2 3 | 0 1 2 3 | 0 1 2
     /// </summary>
-    Wrap
+    Wrap,
+    /// <summary>
+    /// In SmoothEdge border type, all pixels that fall outside the input image ROI are ignored and the destination
+    /// pixel is not written. Except for the one pixel line sourrounding the input ROI, here the image pixels are
+    /// extrapolated in order to obtain "a smooth edge". It is not exactly the same algorithm as in IPP, but similar.
+    /// Note: In NPP and IPP, SmoothEdge is a flag for interpolation mode, but a member in BorderType seems more
+    /// reasonable...
+    /// </summary>
+    SmoothEdge
 };
 
 template <BorderType T> struct border_type_name
@@ -781,6 +789,10 @@ template <> struct border_type_name<BorderType::Wrap>
 {
     static constexpr char value[] = "Wrap";
 };
+template <> struct border_type_name<BorderType::SmoothEdge>
+{
+    static constexpr char value[] = "SmoothEdge";
+};
 
 inline std::ostream &operator<<(std::ostream &aOs, const BorderType &aBorderType)
 {
@@ -803,6 +815,9 @@ inline std::ostream &operator<<(std::ostream &aOs, const BorderType &aBorderType
             break;
         case mpp::BorderType::Wrap:
             aOs << border_type_name<BorderType::Wrap>::value;
+            break;
+        case mpp::BorderType::SmoothEdge:
+            aOs << border_type_name<BorderType::SmoothEdge>::value;
             break;
         default:
             aOs << "Unknown";
@@ -832,6 +847,9 @@ inline std::wostream &operator<<(std::wostream &aOs, const BorderType &aBorderTy
             break;
         case mpp::BorderType::Wrap:
             aOs << border_type_name<BorderType::Wrap>::value;
+            break;
+        case mpp::BorderType::SmoothEdge:
+            aOs << border_type_name<BorderType::SmoothEdge>::value;
             break;
         default:
             aOs << "Unknown";
@@ -964,11 +982,7 @@ enum class InterpolationMode // NOLINT(performance-enum-size)
     /// source image.
     /// Note: This is the same as Lanczos in NPP.
     /// </summary>
-    Lanczos3Lobed = 10,
-    /// <summary>
-    /// For future versions of MPP, currently not implemented...
-    /// </summary>
-    SmoothEdge = 0x8000000
+    Lanczos3Lobed = 10
 };
 
 template <InterpolationMode T> struct interpolation_mode_name
@@ -1019,15 +1033,10 @@ template <> struct interpolation_mode_name<InterpolationMode::Lanczos3Lobed>
 {
     static constexpr char value[] = "Lanczos3Lobed";
 };
-template <> struct interpolation_mode_name<InterpolationMode::SmoothEdge>
-{
-    static constexpr char value[] = "SmoothEdge";
-};
 
 inline std::ostream &operator<<(std::ostream &aOs, const InterpolationMode &aInterpolationMode)
 {
-    switch (static_cast<InterpolationMode>(static_cast<uint>(aInterpolationMode) &
-                                           (static_cast<uint>(InterpolationMode::SmoothEdge) - 1)))
+    switch (aInterpolationMode)
     {
         case mpp::InterpolationMode::Undefined:
             aOs << interpolation_mode_name<InterpolationMode::Undefined>::value;
@@ -1065,18 +1074,13 @@ inline std::ostream &operator<<(std::ostream &aOs, const InterpolationMode &aInt
         default:
             aOs << "Unknown";
             break;
-    }
-    if ((static_cast<uint>(aInterpolationMode) & static_cast<uint>(InterpolationMode::SmoothEdge)) != 0)
-    {
-        aOs << " | SmoothEdge";
     }
     return aOs;
 }
 
 inline std::wostream &operator<<(std::wostream &aOs, const InterpolationMode &aInterpolationMode)
 {
-    switch (static_cast<InterpolationMode>(static_cast<uint>(aInterpolationMode) &
-                                           (static_cast<uint>(InterpolationMode::SmoothEdge) - 1)))
+    switch (aInterpolationMode)
     {
         case mpp::InterpolationMode::Undefined:
             aOs << interpolation_mode_name<InterpolationMode::Undefined>::value;
@@ -1114,10 +1118,6 @@ inline std::wostream &operator<<(std::wostream &aOs, const InterpolationMode &aI
         default:
             aOs << "Unknown";
             break;
-    }
-    if ((static_cast<uint>(aInterpolationMode) & static_cast<uint>(InterpolationMode::SmoothEdge)) != 0)
-    {
-        aOs << " | SmoothEdge";
     }
     return aOs;
 }

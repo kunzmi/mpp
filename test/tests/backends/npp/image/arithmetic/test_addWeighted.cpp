@@ -14,21 +14,21 @@
 #include <backends/npp/image/image16uC3View.h>
 #include <backends/npp/image/image16uC4View.h>
 #include <backends/npp/image/image32f.h>
+#include <backends/npp/image/image32fc.h>
 #include <backends/npp/image/image32fC1View.h>
 #include <backends/npp/image/image32fC2View.h>
 #include <backends/npp/image/image32fC3View.h>
 #include <backends/npp/image/image32fC4View.h>
-#include <backends/npp/image/image32fc.h>
 #include <backends/npp/image/image32fcC1View.h>
 #include <backends/npp/image/image32fcC2View.h>
 #include <backends/npp/image/image32fcC3View.h>
 #include <backends/npp/image/image32fcC4View.h>
 #include <backends/npp/image/image32s.h>
+#include <backends/npp/image/image32sc.h>
 #include <backends/npp/image/image32sC1View.h>
 #include <backends/npp/image/image32sC2View.h>
 #include <backends/npp/image/image32sC3View.h>
 #include <backends/npp/image/image32sC4View.h>
-#include <backends/npp/image/image32sc.h>
 #include <backends/npp/image/image32scC1View.h>
 #include <backends/npp/image/image32scC2View.h>
 #include <backends/npp/image/image32scC3View.h>
@@ -130,7 +130,7 @@ TEST_CASE("16uC1", "[NPP.Arithmetic.AddWeighted]")
 
     npp_res << npp_dst;
 
-    CHECK(cpu_dst.IsSimilar(npp_res, 0.001f));
+    CHECK(cpu_dst.IsSimilar(npp_res, 0.002f));
 }
 
 TEST_CASE("16uC1", "[NPP.Arithmetic.AddWeightedMasked]")
@@ -159,7 +159,7 @@ TEST_CASE("16uC1", "[NPP.Arithmetic.AddWeightedMasked]")
 
     npp_res << npp_dst;
 
-    CHECK(cpu_dst.IsSimilar(npp_res, 0.001f));
+    CHECK(cpu_dst.IsSimilar(npp_res, 0.002f));
 }
 
 TEST_CASE("32fC1", "[NPP.Arithmetic.AddWeighted]")

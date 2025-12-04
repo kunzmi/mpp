@@ -5,18 +5,20 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
 #include <common/image/size2D.h>
-#include <common/numberTypes.h>
 #include <common/mpp_defs.h>
+#include <common/numberTypes.h>
 #include <common/utilities.h>
-#include <common/vector2.h>
 #include <common/vector_typetraits.h>
+#include <common/vector2.h>
 #include <concepts>
 
 #ifdef IS_HOST_COMPILER
 #include <utility>
 #define STD std::
+#define ROUNDNEAREST std::nearbyint
 #else
 #define STD
+#define ROUNDNEAREST rint
 #endif
 #include <numbers>
 
@@ -69,8 +71,9 @@ template <typename CoordT> struct CubicTwoParams<CoordT, InterpolationMode::Cubi
 
 template <typename PixelT, typename BorderControlT, typename CoordT, InterpolationMode Interpol> struct Interpolator
 {
-    using coordinate_type = CoordT;
-    using pixel_type      = PixelT;
+    using coordinate_type     = CoordT;
+    using pixel_type          = PixelT;
+    using border_control_type = BorderControlT;
 
     const BorderControlT borderControl;
     const SuperSamplingParameter<Interpol, CoordT> SuperParams;
@@ -122,8 +125,10 @@ template <typename PixelT, typename BorderControlT, typename CoordT, Interpolati
             // use floor and +0.5 instead of round: a) negative coordinates are correct, b) we save 2 instructions
             const CoordT x0 = STD floor(aPixelX + static_cast<CoordT>(0.5));
             const CoordT y0 = STD floor(aPixelY + static_cast<CoordT>(0.5));
-            const int ix0   = static_cast<int>(x0);
-            const int iy0   = static_cast<int>(y0);
+            // const CoordT x0 = ROUNDNEAREST(aPixelX + static_cast<CoordT>(0.5));
+            // const CoordT y0 = ROUNDNEAREST(aPixelY + static_cast<CoordT>(0.5));
+            const int ix0 = static_cast<int>(x0);
+            const int iy0 = static_cast<int>(y0);
 
             return borderControl(ix0, iy0);
         }

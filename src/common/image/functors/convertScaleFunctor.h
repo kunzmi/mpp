@@ -18,32 +18,6 @@
 
 namespace mpp::image
 {
-template <RealOrComplexVector TVector> struct convert_scale_compute_type
-{
-};
-template <RealVector TVector> struct convert_scale_compute_type<TVector>
-{
-    using type = same_vector_size_different_type<TVector, float>::type;
-};
-template <ComplexVector TVector> struct convert_scale_compute_type<TVector>
-{
-    using type = same_vector_size_different_type<TVector, Complex<float>>::type;
-};
-template <RealVector TVector>
-    requires(std::same_as<remove_vector_t<TVector>, double>)
-struct convert_scale_compute_type<TVector>
-{
-    using type = same_vector_size_different_type<TVector, double>::type;
-};
-template <RealVector TVector>
-    requires(std::same_as<remove_vector_t<TVector>, Complex<double>>)
-struct convert_scale_compute_type<TVector>
-{
-    using type = same_vector_size_different_type<TVector, Complex<double>>::type;
-};
-
-template <RealOrComplexVector TVector>
-using convert_scale_compute_type_t = typename convert_scale_compute_type<TVector>::type;
 
 /// <summary>
 /// Converts a src pixel of type SrcT to float, then scales by scaleFactor and then converts to a dst pixel of type DstT
@@ -53,11 +27,10 @@ using convert_scale_compute_type_t = typename convert_scale_compute_type<TVector
 /// <typeparam name="DstT"></typeparam>
 /// <typeparam name="tupelSize"></typeparam>
 /// <typeparam name="roundingMode"></typeparam>
-template <size_t tupelSize, typename SrcT, typename DstT, typename scaleOp, RoundingMode roundingMode>
+template <size_t tupelSize, typename SrcT, typename ComputeT, typename DstT, typename scaleOp,
+          RoundingMode roundingMode>
 struct ConvertScaleFunctor : public ImageFunctor<false>
 {
-    using ComputeT = convert_scale_compute_type_t<SrcT>;
-
     const SrcT *RESTRICT Src1;
     size_t SrcPitch1;
 

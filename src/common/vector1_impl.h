@@ -528,6 +528,17 @@ DEVICE_CODE Vector1<T> Vector1<T>::DivCeil(const Vector1 &aLeft, const Vector1 &
 }
 
 /// <summary>
+/// Inplace integer division with element wise round() (for scaling operations)
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivScaleRound(T aScale)
+    requires RealIntegral<T>
+{
+    x = DivScaleRoundTiesAwayFromZero(x, aScale);
+    return *this;
+}
+
+/// <summary>
 /// Inplace integer division with element wise round nearest ties to even (for scaling operations)
 /// </summary>
 template <Number T>
@@ -535,6 +546,39 @@ DEVICE_CODE Vector1<T> &Vector1<T>::DivScaleRoundNearest(T aScale)
     requires RealIntegral<T>
 {
     x = DivScaleRoundNearestEven(x, aScale);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise round toward zero (for scaling operations)
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivScaleRoundZero(T aScale)
+    requires RealIntegral<T>
+{
+    x = DivScaleRoundTowardZero(x, aScale);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise floor (for scaling operations)
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivScaleFloor(T aScale)
+    requires RealIntegral<T>
+{
+    x = DivScaleRoundTowardNegInf(x, aScale);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise ceil() (for scaling operations)
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivScaleCeil(T aScale)
+    requires RealIntegral<T>
+{
+    x = DivScaleRoundTowardPosInf(x, aScale);
     return *this;
 }
 
@@ -701,6 +745,17 @@ DEVICE_CODE Vector1<T> Vector1<T>::DivCeil(const Vector1 &aLeft, const Vector1 &
 }
 
 /// <summary>
+/// Inplace integer division with element wise round() (for scaling operations)
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivScaleRound(complex_basetype_t<T> aScale)
+    requires ComplexIntegral<T>
+{
+    x.DivScaleRound(aScale);
+    return *this;
+}
+
+/// <summary>
 /// Inplace integer division with element wise round nearest ties to even (for scaling operations)
 /// </summary>
 template <Number T>
@@ -708,6 +763,39 @@ DEVICE_CODE Vector1<T> &Vector1<T>::DivScaleRoundNearest(complex_basetype_t<T> a
     requires ComplexIntegral<T>
 {
     x.DivScaleRoundNearest(aScale);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise round toward zero (for scaling operations)
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivScaleRoundZero(complex_basetype_t<T> aScale)
+    requires ComplexIntegral<T>
+{
+    x.DivScaleRoundZero(aScale);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise floor (for scaling operations)
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivScaleFloor(complex_basetype_t<T> aScale)
+    requires ComplexIntegral<T>
+{
+    x.DivScaleFloor(aScale);
+    return *this;
+}
+
+/// <summary>
+/// Inplace integer division with element wise ceil() (for scaling operations)
+/// </summary>
+template <Number T>
+DEVICE_CODE Vector1<T> &Vector1<T>::DivScaleCeil(complex_basetype_t<T> aScale)
+    requires ComplexIntegral<T>
+{
+    x.DivScaleCeil(aScale);
     return *this;
 }
 

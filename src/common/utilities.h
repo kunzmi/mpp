@@ -520,6 +520,70 @@ DEVICE_CODE T DivScaleRoundNearestEven(T aSrc0, T aSrc1)
     return res * sign;
 }
 
+// Div round for scaling --> aSrc1 is always positive and > 0, we can skip some checks
+template <Number T>
+    requires RealSignedIntegral<T>
+DEVICE_CODE T DivScaleRoundTiesAwayFromZero(T aSrc0, T aSrc1)
+{
+    T sign = GetSign(aSrc0);
+
+#ifdef IS_CUDA_COMPILER
+    aSrc0 = abs(aSrc0);
+#endif
+#ifdef IS_HOST_COMPILER
+    aSrc0 = std::abs(aSrc0);
+#endif
+
+    const T src1_half = aSrc1 / 2;
+    return (aSrc0 + src1_half) / aSrc1 * sign;
+}
+
+// Div round for scaling --> aSrc1 is always positive and > 0, we can skip some checks
+template <Number T>
+    requires RealSignedIntegral<T>
+DEVICE_CODE T DivScaleRoundTowardZero(T aSrc0, T aSrc1)
+{
+    return aSrc0 / aSrc1;
+}
+
+// Div round for scaling --> aSrc1 is always positive and > 0, we can skip some checks
+template <Number T>
+    requires RealSignedIntegral<T>
+DEVICE_CODE T DivScaleRoundTowardNegInf(T aSrc0, T aSrc1)
+{
+    const T sign  = GetSign(aSrc0);
+    const T sign2 = aSrc0 >> mpp::numeric_limits<T>::bitCountMinus1();
+
+#ifdef IS_CUDA_COMPILER
+    aSrc0 = abs(aSrc0);
+#endif
+#ifdef IS_HOST_COMPILER
+    aSrc0 = std::abs(aSrc0);
+#endif
+
+    const T src1Minus = (aSrc1 - 1) * sign2;
+    return (aSrc0 - src1Minus) / aSrc1 * sign;
+}
+
+// Div round for scaling --> aSrc1 is always positive and > 0, we can skip some checks
+template <Number T>
+    requires RealSignedIntegral<T>
+DEVICE_CODE T DivScaleRoundTowardPosInf(T aSrc0, T aSrc1)
+{
+    T sign  = GetSign(aSrc0);
+    T sign2 = 1 + (aSrc0 >> mpp::numeric_limits<T>::bitCountMinus1());
+
+#ifdef IS_CUDA_COMPILER
+    aSrc0 = abs(aSrc0);
+#endif
+#ifdef IS_HOST_COMPILER
+    aSrc0 = std::abs(aSrc0);
+#endif
+
+    T src1Plus = (aSrc1 - 1) * sign2;
+    return (aSrc0 + src1Plus) / aSrc1 * sign;
+}
+
 template <Number T>
     requires RealUnsignedIntegral<T>
 DEVICE_CODE T DivScaleRoundNearestEven(T aSrc0, T aSrc1)
@@ -531,6 +595,36 @@ DEVICE_CODE T DivScaleRoundNearestEven(T aSrc0, T aSrc1)
     const T isMultiple = roundup * aSrc1 == offset;
     const T res        = (aSrc1 | (roundup ^ isMultiple)) & roundup;
     return res;
+}
+
+template <Number T>
+    requires RealUnsignedIntegral<T>
+DEVICE_CODE T DivScaleRoundTiesAwayFromZero(T aSrc0, T aSrc1)
+{
+    const T src1_half = aSrc1 / 2;
+    return (aSrc0 + src1_half) / aSrc1;
+}
+
+template <Number T>
+    requires RealUnsignedIntegral<T>
+DEVICE_CODE T DivScaleRoundTowardZero(T aSrc0, T aSrc1)
+{
+    return aSrc0 / aSrc1;
+}
+
+template <Number T>
+    requires RealUnsignedIntegral<T>
+DEVICE_CODE T DivScaleRoundTowardNegInf(T aSrc0, T aSrc1)
+{
+    return DivRoundTowardZero(aSrc0, aSrc1);
+}
+
+template <Number T>
+    requires RealUnsignedIntegral<T>
+DEVICE_CODE T DivScaleRoundTowardPosInf(T aSrc0, T aSrc1)
+{
+    T src1Minus = (aSrc1 - 1);
+    return (aSrc0 + src1Minus) / aSrc1;
 }
 
 } // namespace mpp

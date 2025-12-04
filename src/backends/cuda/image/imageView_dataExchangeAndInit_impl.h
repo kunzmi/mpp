@@ -3,6 +3,8 @@
 #if MPP_ENABLE_CUDA_BACKEND
 
 #include "dataExchangeAndInit/conversionRelations.h"
+#include "dataExchangeAndInit/scale.h"
+#include "dataExchangeAndInit/scaleRelations.h"
 #include "imageView.h"
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/devVarView.h>
@@ -31,7 +33,7 @@ namespace mpp::image::cuda
 template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
-    requires(!std::same_as<T, TTo>) && ConversionImplemented<T, TTo>
+    requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && ConversionImplemented<T, TTo>
 {
     checkSameSize(ROI(), aDst.ROI());
 
@@ -44,7 +46,7 @@ template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode,
                                       const mpp::cuda::StreamCtx &aStreamCtx) const
-    requires(!std::same_as<T, TTo>) && ConversionRoundImplemented<T, TTo>
+    requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && ConversionRoundImplemented<T, TTo>
 {
     checkSameSize(ROI(), aDst.ROI());
 
@@ -57,8 +59,9 @@ template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode, int aScaleFactor,
                                       const mpp::cuda::StreamCtx &aStreamCtx) const
-    requires(!std::same_as<T, TTo>) && ConversionRoundScaleImplemented<T, TTo> && (!std::same_as<TTo, float>) &&
-            (!std::same_as<TTo, double>) && (!std::same_as<TTo, Complex<float>>) &&
+    requires(!std::same_as<T, TTo>) &&
+            (vector_size_v<T> == vector_size_v<TTo>) && ConversionRoundScaleImplemented<T, TTo> &&
+            (!std::same_as<TTo, float>) && (!std::same_as<TTo, double>) && (!std::same_as<TTo, Complex<float>>) &&
             (!std::same_as<TTo, Complex<double>>)
 {
     checkSameSize(ROI(), aDst.ROI());
@@ -340,19 +343,37 @@ ImageView<TTo> &ImageView<T>::Dup(ImageView<TTo> &aDst, const mpp::cuda::StreamC
 // NOLINTBEGIN(bugprone-easily-swappable-parameters)
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
-    requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<T> && RealOrComplexIntVector<TTo>
+ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, RoundingMode aRoundingMode,
+                                    const mpp::cuda::StreamCtx &aStreamCtx) const
+    requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<T> &&
+            RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    using scaleType            = scalefactor_t<default_floating_compute_type_for_t<T>>;
-    constexpr scaleType srcMin = static_cast<scaleType>(numeric_limits<T>::lowest());
-    constexpr scaleType srcMax = static_cast<scaleType>(numeric_limits<T>::max());
-    constexpr scaleType dstMin = static_cast<scaleType>(numeric_limits<TTo>::lowest());
-    constexpr scaleType dstMax = static_cast<scaleType>(numeric_limits<TTo>::max());
-    constexpr scaleType factor = (dstMax - dstMin) / (srcMax - srcMin);
+    // When converting sbyte with ComputeT == long64, ClangTidy thinks we mess things up, but the cast is correct
+    // NOLINTBEGIN(bugprone-signed-char-misuse,cert-str34-c)
+    using ComputeT             = compute_type_scale_for_t<T, TTo>;
+    using scaleType            = scalefactor_t<ComputeT>;
+    constexpr scaleType srcMin = static_cast<scaleType>(numeric_limits<scalefactor_t<T>>::lowest());
+    constexpr scaleType srcMax = static_cast<scaleType>(numeric_limits<scalefactor_t<T>>::max());
+    constexpr scaleType dstMin = static_cast<scaleType>(numeric_limits<scalefactor_t<TTo>>::lowest());
+    constexpr scaleType dstMax = static_cast<scaleType>(numeric_limits<scalefactor_t<TTo>>::max());
+    // NOLINTEND(bugprone-signed-char-misuse,cert-str34-c)
 
-    InvokeScale(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), factor, srcMin, dstMin, SizeRoi(), aStreamCtx);
+    if constexpr (use_int_division_for_scale_v<T, TTo>)
+    {
+        constexpr scaleType srcRange = srcMax - srcMin;
+        constexpr scaleType dstRange = dstMax - dstMin;
+
+        InvokeScale<T, ComputeT, TTo>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), srcRange, dstRange,
+                                      srcMin, dstMin, aRoundingMode, SizeRoi(), aStreamCtx);
+    }
+    else
+    {
+        constexpr scaleType factor = (dstMax - dstMin) / (srcMax - srcMin);
+        InvokeScale<T, ComputeT, TTo>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), factor, srcMin, dstMin,
+                                      aRoundingMode, SizeRoi(), aStreamCtx);
+    }
 
     return aDst;
 }
@@ -361,18 +382,60 @@ template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax,
                                     const mpp::cuda::StreamCtx &aStreamCtx) const
-    requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<T>
+    requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<T> &&
+            RealOrComplexFloatingVector<TTo> && ScaleImplemented<T, TTo>
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    using scaleType            = scalefactor_t<default_floating_compute_type_for_t<T>>;
-    constexpr scaleType srcMin = static_cast<scaleType>(numeric_limits<T>::lowest());
-    constexpr scaleType srcMax = static_cast<scaleType>(numeric_limits<T>::max());
+    // When converting sbyte with ComputeT == long64, ClangTidy thinks we mess things up, but the cast is correct
+    // NOLINTBEGIN(bugprone-signed-char-misuse,cert-str34-c)
+    using ComputeT             = compute_type_scale_for_t<T, TTo>;
+    using scaleType            = scalefactor_t<ComputeT>;
+    constexpr scaleType srcMin = static_cast<scaleType>(numeric_limits<scalefactor_t<T>>::lowest());
+    constexpr scaleType srcMax = static_cast<scaleType>(numeric_limits<scalefactor_t<T>>::max());
     const scaleType dstMin     = static_cast<scaleType>(aDstMin);
     const scaleType dstMax     = static_cast<scaleType>(aDstMax);
     const scaleType factor     = (dstMax - dstMin) / (srcMax - srcMin);
+    // NOLINTEND(bugprone-signed-char-misuse,cert-str34-c)
 
-    InvokeScale(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), factor, srcMin, dstMin, SizeRoi(), aStreamCtx);
+    InvokeScale<T, ComputeT, TTo>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), factor, srcMin, dstMin,
+                                  SizeRoi(), aStreamCtx);
+
+    return aDst;
+}
+
+template <PixelType T>
+template <PixelType TTo>
+ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax,
+                                    RoundingMode aRoundingMode, const mpp::cuda::StreamCtx &aStreamCtx) const
+    requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<T> &&
+            RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    // When converting sbyte with ComputeT == long64, ClangTidy thinks we mess things up, but the cast is correct
+    // NOLINTBEGIN(bugprone-signed-char-misuse,cert-str34-c)
+    using ComputeT             = compute_type_scale_for_t<T, TTo>;
+    using scaleType            = scalefactor_t<ComputeT>;
+    constexpr scaleType srcMin = static_cast<scaleType>(numeric_limits<scalefactor_t<T>>::lowest());
+    constexpr scaleType srcMax = static_cast<scaleType>(numeric_limits<scalefactor_t<T>>::max());
+    const scaleType dstMin     = static_cast<scaleType>(aDstMin);
+    const scaleType dstMax     = static_cast<scaleType>(aDstMax);
+    // NOLINTEND(bugprone-signed-char-misuse,cert-str34-c)
+
+    if constexpr (use_int_division_for_scale_v<T, TTo>)
+    {
+        constexpr scaleType srcRange = srcMax - srcMin;
+        const scaleType dstRange     = dstMax - dstMin;
+        InvokeScale<T, ComputeT, TTo>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), srcRange, dstRange,
+                                      srcMin, dstMin, aRoundingMode, SizeRoi(), aStreamCtx);
+    }
+    else
+    {
+        const scaleType factor = (dstMax - dstMin) / (srcMax - srcMin);
+        InvokeScale<T, ComputeT, TTo>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), factor, srcMin, dstMin,
+                                      aRoundingMode, SizeRoi(), aStreamCtx);
+    }
 
     return aDst;
 }
@@ -380,19 +443,60 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDs
 template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
-                                    const mpp::cuda::StreamCtx &aStreamCtx) const
-    requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<TTo>
+                                    RoundingMode aRoundingMode, const mpp::cuda::StreamCtx &aStreamCtx) const
+    requires(!std::same_as<T, TTo>) &&
+            (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    using scaleType            = scalefactor_t<default_floating_compute_type_for_t<T>>;
-    const scaleType srcMin     = static_cast<scaleType>(aSrcMin);
-    const scaleType srcMax     = static_cast<scaleType>(aSrcMax);
-    constexpr scaleType dstMin = static_cast<scaleType>(numeric_limits<TTo>::lowest());
-    constexpr scaleType dstMax = static_cast<scaleType>(numeric_limits<TTo>::max());
-    const scaleType factor     = (dstMax - dstMin) / (srcMax - srcMin);
+    // When converting sbyte with ComputeT == long64, ClangTidy thinks we mess things up, but the cast is correct
+    // NOLINTBEGIN(bugprone-signed-char-misuse,cert-str34-c)
+    using ComputeT         = compute_type_scale_for_t<T, TTo>;
+    using scaleType        = scalefactor_t<ComputeT>;
+    const scaleType srcMin = static_cast<scaleType>(aSrcMin);
+    const scaleType srcMax = static_cast<scaleType>(aSrcMax);
+    // NOLINTEND(bugprone-signed-char-misuse,cert-str34-c)
 
-    InvokeScale(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), factor, srcMin, dstMin, SizeRoi(), aStreamCtx);
+    if constexpr (std::same_as<scalefactor_t<T>, HalfFp16> || std::same_as<scalefactor_t<T>, BFloat16>)
+    {
+        const scaleType dstMin = static_cast<scaleType>(numeric_limits<scalefactor_t<TTo>>::lowest());
+        const scaleType dstMax = static_cast<scaleType>(numeric_limits<scalefactor_t<TTo>>::max());
+
+        if constexpr (use_int_division_for_scale_v<T, TTo>)
+        {
+            const scaleType srcRange = srcMax - srcMin;
+            const scaleType dstRange = dstMax - dstMin;
+            InvokeScale<T, ComputeT, TTo>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), srcRange, dstRange,
+                                          srcMin, dstMin, aRoundingMode, SizeRoi(), aStreamCtx);
+        }
+        else
+        {
+            const scaleType factor = (dstMax - dstMin) / (srcMax - srcMin);
+            InvokeScale<T, ComputeT, TTo>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), factor, srcMin,
+                                          dstMin, aRoundingMode, SizeRoi(), aStreamCtx);
+        }
+    }
+    else
+    {
+        // NOLINTBEGIN(bugprone-signed-char-misuse,cert-str34-c)
+        constexpr scaleType dstMin = static_cast<scaleType>(numeric_limits<scalefactor_t<TTo>>::lowest());
+        constexpr scaleType dstMax = static_cast<scaleType>(numeric_limits<scalefactor_t<TTo>>::max());
+        // NOLINTEND(bugprone-signed-char-misuse,cert-str34-c)
+
+        if constexpr (use_int_division_for_scale_v<T, TTo>)
+        {
+            const scaleType srcRange     = srcMax - srcMin;
+            constexpr scaleType dstRange = dstMax - dstMin;
+            InvokeScale<T, ComputeT, TTo>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), srcRange, dstRange,
+                                          srcMin, dstMin, aRoundingMode, SizeRoi(), aStreamCtx);
+        }
+        else
+        {
+            const scaleType factor = (dstMax - dstMin) / (srcMax - srcMin);
+            InvokeScale<T, ComputeT, TTo>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), factor, srcMin,
+                                          dstMin, aRoundingMode, SizeRoi(), aStreamCtx);
+        }
+    }
 
     return aDst;
 }
@@ -402,18 +506,61 @@ template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
                                     scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax,
                                     const mpp::cuda::StreamCtx &aStreamCtx) const
-    requires(!std::same_as<T, TTo>)
+    requires(!std::same_as<T, TTo>) &&
+            (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexFloatingVector<TTo> && ScaleImplemented<T, TTo>
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    using scaleType        = scalefactor_t<default_floating_compute_type_for_t<T>>;
+    // When converting sbyte with ComputeT == long64, ClangTidy thinks we mess things up, but the cast is correct
+    // NOLINTBEGIN(bugprone-signed-char-misuse,cert-str34-c)
+    using ComputeT         = compute_type_scale_for_t<T, TTo>;
+    using scaleType        = scalefactor_t<ComputeT>;
     const scaleType srcMin = static_cast<scaleType>(aSrcMin);
     const scaleType srcMax = static_cast<scaleType>(aSrcMax);
     const scaleType dstMin = static_cast<scaleType>(aDstMin);
     const scaleType dstMax = static_cast<scaleType>(aDstMax);
     const scaleType factor = (dstMax - dstMin) / (srcMax - srcMin);
+    // NOLINTEND(bugprone-signed-char-misuse,cert-str34-c)
 
-    InvokeScale(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), factor, srcMin, dstMin, SizeRoi(), aStreamCtx);
+    InvokeScale<T, ComputeT, TTo>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), factor, srcMin, dstMin,
+                                  SizeRoi(), aStreamCtx);
+
+    return aDst;
+}
+
+template <PixelType T>
+template <PixelType TTo>
+ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
+                                    scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax, RoundingMode aRoundingMode,
+                                    const mpp::cuda::StreamCtx &aStreamCtx) const
+    requires(!std::same_as<T, TTo>) &&
+            (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    // When converting sbyte with ComputeT == long64, ClangTidy thinks we mess things up, but the cast is correct
+    // NOLINTBEGIN(bugprone-signed-char-misuse,cert-str34-c)
+    using ComputeT         = compute_type_scale_for_t<T, TTo>;
+    using scaleType        = scalefactor_t<ComputeT>;
+    const scaleType srcMin = static_cast<scaleType>(aSrcMin);
+    const scaleType srcMax = static_cast<scaleType>(aSrcMax);
+    const scaleType dstMin = static_cast<scaleType>(aDstMin);
+    const scaleType dstMax = static_cast<scaleType>(aDstMax);
+    // NOLINTEND(bugprone-signed-char-misuse,cert-str34-c)
+
+    if constexpr (use_int_division_for_scale_v<T, TTo>)
+    {
+        const scaleType srcRange = srcMax - srcMin;
+        const scaleType dstRange = dstMax - dstMin;
+        InvokeScale<T, ComputeT, TTo>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), srcRange, dstRange,
+                                      srcMin, dstMin, aRoundingMode, SizeRoi(), aStreamCtx);
+    }
+    else
+    {
+        const scaleType factor = (dstMax - dstMin) / (srcMax - srcMin);
+        InvokeScale<T, ComputeT, TTo>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), factor, srcMin, dstMin,
+                                      aRoundingMode, SizeRoi(), aStreamCtx);
+    }
 
     return aDst;
 }

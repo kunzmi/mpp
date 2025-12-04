@@ -42,6 +42,9 @@ template <> struct conversionImplemented<sbyte, double> : std::true_type
 {
 };
 // 8u
+template <> struct conversionImplemented<byte, sbyte> : std::true_type
+{
+};
 template <> struct conversionImplemented<byte, ushort> : std::true_type
 {
 };
@@ -70,6 +73,9 @@ template <> struct conversionImplemented<byte, double> : std::true_type
 template <> struct conversionImplemented<short, byte> : std::true_type
 {
 };
+template <> struct conversionImplemented<short, sbyte> : std::true_type
+{
+};
 template <> struct conversionImplemented<short, ushort> : std::true_type
 {
 };
@@ -93,6 +99,12 @@ template <> struct conversionImplemented<short, double> : std::true_type
 };
 // 16u
 template <> struct conversionImplemented<ushort, byte> : std::true_type
+{
+};
+template <> struct conversionImplemented<ushort, sbyte> : std::true_type
+{
+};
+template <> struct conversionImplemented<ushort, short> : std::true_type
 {
 };
 template <> struct conversionImplemented<ushort, uint> : std::true_type
@@ -145,7 +157,16 @@ template <> struct conversionImplemented<int, double> : std::true_type
 template <> struct conversionImplemented<uint, byte> : std::true_type
 {
 };
+template <> struct conversionImplemented<uint, sbyte> : std::true_type
+{
+};
 template <> struct conversionImplemented<uint, ushort> : std::true_type
+{
+};
+template <> struct conversionImplemented<uint, short> : std::true_type
+{
+};
+template <> struct conversionImplemented<uint, int> : std::true_type
 {
 };
 template <> struct conversionImplemented<uint, HalfFp16> : std::true_type
@@ -181,14 +202,11 @@ template <> struct conversionImplemented<c_short, c_int> : std::true_type
 template <> struct conversionImplemented<c_short, c_float> : std::true_type
 {
 };
-template <> struct conversionImplemented<c_short, c_double> : std::true_type
-{
-};
 // 32sc
-template <> struct conversionImplemented<c_int, c_float> : std::true_type
+template <> struct conversionImplemented<c_int, c_short> : std::true_type
 {
 };
-template <> struct conversionImplemented<c_int, c_double> : std::true_type
+template <> struct conversionImplemented<c_int, c_float> : std::true_type
 {
 };
 // 32f
@@ -235,6 +253,12 @@ template <> struct conversionRoundImplemented<HalfFp16, short> : std::true_type
 template <> struct conversionRoundImplemented<HalfFp16, ushort> : std::true_type
 {
 };
+template <> struct conversionRoundImplemented<HalfFp16, int> : std::true_type
+{
+};
+template <> struct conversionRoundImplemented<HalfFp16, uint> : std::true_type
+{
+};
 // 16bf
 template <> struct conversionRoundImplemented<BFloat16, sbyte> : std::true_type
 {
@@ -246,6 +270,12 @@ template <> struct conversionRoundImplemented<BFloat16, short> : std::true_type
 {
 };
 template <> struct conversionRoundImplemented<BFloat16, ushort> : std::true_type
+{
+};
+template <> struct conversionRoundImplemented<BFloat16, int> : std::true_type
+{
+};
+template <> struct conversionRoundImplemented<BFloat16, uint> : std::true_type
 {
 };
 // 32fc
@@ -266,6 +296,12 @@ template <> struct conversionRoundImplemented<float, short> : std::true_type
 {
 };
 template <> struct conversionRoundImplemented<float, ushort> : std::true_type
+{
+};
+template <> struct conversionRoundImplemented<float, int> : std::true_type
+{
+};
+template <> struct conversionRoundImplemented<float, uint> : std::true_type
 {
 };
 template <> struct conversionRoundImplemented<float, HalfFp16> : std::true_type

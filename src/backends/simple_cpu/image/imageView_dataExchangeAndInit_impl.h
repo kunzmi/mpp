@@ -1,10 +1,13 @@
 #pragma once
 #include "conversionRelations.h"
+#include "scaleRelations.h"
+#include <backends/simple_cpu/image/convertScaleRoundComputeType.h>
 #include <backends/simple_cpu/image/forEachPixel.h>
 #include <backends/simple_cpu/image/forEachPixelMasked.h>
 #include <backends/simple_cpu/image/forEachPixelPlanar.h>
 #include <backends/simple_cpu/image/forEachPixelSingleChannel.h>
 #include <backends/simple_cpu/image/imageView.h>
+#include <backends/simple_cpu/image/scaleComputeType.h>
 #include <backends/simple_cpu/operator_random.h>
 #include <common/bfloat16.h>
 #include <common/complex.h>
@@ -65,7 +68,7 @@ namespace mpp::image::cpuSimple
 template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst) const
-    requires(!std::same_as<T, TTo>) && ConversionImplemented<T, TTo>
+    requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && ConversionImplemented<T, TTo>
 {
     checkSameSize(ROI(), aDst.ROI());
 
@@ -80,7 +83,8 @@ ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst) const
 template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode) const
-    requires(!std::same_as<T, TTo>) && ConversionRoundImplemented<T, TTo> && RealOrComplexFloatingVector<T>
+    requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && ConversionRoundImplemented<T, TTo> &&
+            RealOrComplexFloatingVector<T>
 {
     checkSameSize(ROI(), aDst.ROI());
     if constexpr (std::same_as<remove_vector_t<T>, float> && std::same_as<remove_vector_t<TTo>, BFloat16>)
@@ -196,58 +200,128 @@ ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundi
 template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode, int aScaleFactor) const
-    requires(!std::same_as<T, TTo>) && ConversionRoundScaleImplemented<T, TTo> && (!std::same_as<TTo, float>) &&
-            (!std::same_as<TTo, double>) && (!std::same_as<TTo, Complex<float>>) &&
+    requires(!std::same_as<T, TTo>) &&
+            (vector_size_v<T> == vector_size_v<TTo>) && ConversionRoundScaleImplemented<T, TTo> &&
+            (!std::same_as<TTo, float>) && (!std::same_as<TTo, double>) && (!std::same_as<TTo, Complex<float>>) &&
             (!std::same_as<TTo, Complex<double>>)
 {
     checkSameSize(ROI(), aDst.ROI());
 
     const double scaleFactorFloat = GetScaleFactor(aScaleFactor);
 
-    // ComputeT is either float or double, so Scaler is always operating on floating point:
-    using ComputeT = convert_scale_compute_type_t<T>;
-    using ScalerT  = mpp::Scale<ComputeT, false>;
-    const ScalerT scaler(scaleFactorFloat);
+    using ComputeT = compute_type_convertScaleRound_for_t<T, TTo>;
 
-    switch (aRoundingMode)
+    if constexpr (RealOrComplexIntVector<ComputeT>)
     {
-        case mpp::RoundingMode::NearestTiesToEven:
+        if (scaleFactorFloat >= 1.0)
         {
-            using convert = ConvertScaleFunctor<1, T, TTo, ScalerT, RoundingMode::NearestTiesToEven>;
+            // integer to integer conversion with intgere scaling, so no rounding:
+            using ScalerT = mpp::Scale<ComputeT, false>;
+            const ScalerT scaler(scaleFactorFloat);
+            using convert = ConvertScaleFunctor<1, T, ComputeT, TTo, ScalerT, RoundingMode::None>;
             const convert functor(PointerRoi(), Pitch(), scaler);
             forEachPixel(aDst, functor);
         }
-        break;
-        case mpp::RoundingMode::NearestTiesAwayFromZero:
+        else
         {
-            using convert = ConvertScaleFunctor<1, T, TTo, ScalerT, RoundingMode::NearestTiesAwayFromZero>;
-            const convert functor(PointerRoi(), Pitch(), scaler);
-            forEachPixel(aDst, functor);
+            switch (aRoundingMode)
+            {
+                case mpp::RoundingMode::NearestTiesToEven:
+                {
+                    using ScalerT = mpp::Scale<ComputeT, true, mpp::RoundingMode::NearestTiesToEven>;
+                    const ScalerT scaler(scaleFactorFloat);
+                    using convert = ConvertScaleFunctor<1, T, ComputeT, TTo, ScalerT, RoundingMode::None>;
+                    const convert functor(PointerRoi(), Pitch(), scaler);
+                    forEachPixel(aDst, functor);
+                }
+                break;
+                case mpp::RoundingMode::NearestTiesAwayFromZero:
+                {
+                    using ScalerT = mpp::Scale<ComputeT, true, mpp::RoundingMode::NearestTiesAwayFromZero>;
+                    const ScalerT scaler(scaleFactorFloat);
+                    using convert = ConvertScaleFunctor<1, T, ComputeT, TTo, ScalerT, RoundingMode::None>;
+                    const convert functor(PointerRoi(), Pitch(), scaler);
+                    forEachPixel(aDst, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardZero:
+                {
+                    using ScalerT = mpp::Scale<ComputeT, true, mpp::RoundingMode::TowardZero>;
+                    const ScalerT scaler(scaleFactorFloat);
+                    using convert = ConvertScaleFunctor<1, T, ComputeT, TTo, ScalerT, RoundingMode::None>;
+                    const convert functor(PointerRoi(), Pitch(), scaler);
+                    forEachPixel(aDst, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardNegativeInfinity:
+                {
+                    using ScalerT = mpp::Scale<ComputeT, true, mpp::RoundingMode::TowardNegativeInfinity>;
+                    const ScalerT scaler(scaleFactorFloat);
+                    using convert = ConvertScaleFunctor<1, T, ComputeT, TTo, ScalerT, RoundingMode::None>;
+                    const convert functor(PointerRoi(), Pitch(), scaler);
+                    forEachPixel(aDst, functor);
+                }
+                break;
+                case mpp::RoundingMode::TowardPositiveInfinity:
+                {
+                    using ScalerT = mpp::Scale<ComputeT, true, mpp::RoundingMode::TowardPositiveInfinity>;
+                    const ScalerT scaler(scaleFactorFloat);
+                    using convert = ConvertScaleFunctor<1, T, ComputeT, TTo, ScalerT, RoundingMode::None>;
+                    const convert functor(PointerRoi(), Pitch(), scaler);
+                    forEachPixel(aDst, functor);
+                }
+                break;
+                default:
+                    throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
+            }
         }
-        break;
-        case mpp::RoundingMode::TowardZero:
+    }
+    else
+    {
+
+        using ScalerT = mpp::Scale<ComputeT, false>;
+        const ScalerT scaler(scaleFactorFloat);
+        switch (aRoundingMode)
         {
-            using convert = ConvertScaleFunctor<1, T, TTo, ScalerT, RoundingMode::TowardZero>;
-            const convert functor(PointerRoi(), Pitch(), scaler);
-            forEachPixel(aDst, functor);
+            case mpp::RoundingMode::NearestTiesToEven:
+            {
+                using convert = ConvertScaleFunctor<1, T, ComputeT, TTo, ScalerT, RoundingMode::NearestTiesToEven>;
+                const convert functor(PointerRoi(), Pitch(), scaler);
+                forEachPixel(aDst, functor);
+            }
+            break;
+            case mpp::RoundingMode::NearestTiesAwayFromZero:
+            {
+                using convert =
+                    ConvertScaleFunctor<1, T, ComputeT, TTo, ScalerT, RoundingMode::NearestTiesAwayFromZero>;
+                const convert functor(PointerRoi(), Pitch(), scaler);
+                forEachPixel(aDst, functor);
+            }
+            break;
+            case mpp::RoundingMode::TowardZero:
+            {
+                using convert = ConvertScaleFunctor<1, T, ComputeT, TTo, ScalerT, RoundingMode::TowardZero>;
+                const convert functor(PointerRoi(), Pitch(), scaler);
+                forEachPixel(aDst, functor);
+            }
+            break;
+            case mpp::RoundingMode::TowardNegativeInfinity:
+            {
+                using convert = ConvertScaleFunctor<1, T, ComputeT, TTo, ScalerT, RoundingMode::TowardNegativeInfinity>;
+                const convert functor(PointerRoi(), Pitch(), scaler);
+                forEachPixel(aDst, functor);
+            }
+            break;
+            case mpp::RoundingMode::TowardPositiveInfinity:
+            {
+                using convert = ConvertScaleFunctor<1, T, ComputeT, TTo, ScalerT, RoundingMode::TowardPositiveInfinity>;
+                const convert functor(PointerRoi(), Pitch(), scaler);
+                forEachPixel(aDst, functor);
+            }
+            break;
+            default:
+                throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
         }
-        break;
-        case mpp::RoundingMode::TowardNegativeInfinity:
-        {
-            using convert = ConvertScaleFunctor<1, T, TTo, ScalerT, RoundingMode::TowardNegativeInfinity>;
-            const convert functor(PointerRoi(), Pitch(), scaler);
-            forEachPixel(aDst, functor);
-        }
-        break;
-        case mpp::RoundingMode::TowardPositiveInfinity:
-        {
-            using convert = ConvertScaleFunctor<1, T, TTo, ScalerT, RoundingMode::TowardPositiveInfinity>;
-            const convert functor(PointerRoi(), Pitch(), scaler);
-            forEachPixel(aDst, functor);
-        }
-        break;
-        default:
-            throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
     }
 
     return aDst;
@@ -526,67 +600,68 @@ ImageView<TTo> &ImageView<T>::Dup(ImageView<TTo> &aDst) const
 // NOLINTBEGIN(bugprone-easily-swappable-parameters)
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst) const
-    requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<T> && RealOrComplexIntVector<TTo>
+ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, RoundingMode aRoundingMode) const
+    requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<T> &&
+            RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>
 {
-    checkSameSize(ROI(), aDst.ROI());
-
-    using ComputeT             = default_floating_compute_type_for_t<T>;
-    using scaleType            = scalefactor_t<default_floating_compute_type_for_t<T>>;
-    constexpr scaleType srcMin = static_cast<scaleType>(numeric_limits<remove_vector_t<T>>::lowest());
-    constexpr scaleType srcMax = static_cast<scaleType>(numeric_limits<remove_vector_t<T>>::max());
-    constexpr scaleType dstMin = static_cast<scaleType>(numeric_limits<remove_vector_t<TTo>>::lowest());
-    constexpr scaleType dstMax = static_cast<scaleType>(numeric_limits<remove_vector_t<TTo>>::max());
-    constexpr scaleType factor = (dstMax - dstMin) / (srcMax - srcMin);
-
-    using scale = ScaleConversionFunctor<1, T, ComputeT, TTo, RoundingMode::NearestTiesAwayFromZero>;
-
-    const scale functor(PointerRoi(), Pitch(), factor, srcMin, dstMin);
-
-    forEachPixel(aDst, functor);
-    return aDst;
+    return Scale(aDst, numeric_limits<scalefactor_t<T>>::lowest(), numeric_limits<scalefactor_t<T>>::max(),
+                 numeric_limits<scalefactor_t<TTo>>::lowest(), numeric_limits<scalefactor_t<TTo>>::max(),
+                 aRoundingMode);
 }
 
 template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax) const
-    requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<T>
+    requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<T> &&
+            RealOrComplexFloatingVector<TTo> && ScaleImplemented<T, TTo>
 {
-    checkSameSize(ROI(), aDst.ROI());
-
-    using ComputeT             = default_floating_compute_type_for_t<T>;
-    using scaleType            = scalefactor_t<default_floating_compute_type_for_t<T>>;
-    constexpr scaleType srcMin = static_cast<scaleType>(numeric_limits<remove_vector_t<T>>::lowest());
-    constexpr scaleType srcMax = static_cast<scaleType>(numeric_limits<remove_vector_t<T>>::max());
-    const scaleType dstMin     = static_cast<scaleType>(aDstMin);
-    const scaleType dstMax     = static_cast<scaleType>(aDstMax);
-    const scaleType factor     = (dstMax - dstMin) / (srcMax - srcMin);
-
-    using scale = ScaleConversionFunctor<1, T, ComputeT, TTo, RoundingMode::NearestTiesAwayFromZero>;
-
-    const scale functor(PointerRoi(), Pitch(), factor, srcMin, dstMin);
-
-    forEachPixel(aDst, functor);
-
-    return aDst;
+    return Scale(aDst, numeric_limits<scalefactor_t<T>>::lowest(), numeric_limits<scalefactor_t<T>>::max(), aDstMin,
+                 aDstMax);
 }
 
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax) const
-    requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<TTo>
+ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax,
+                                    RoundingMode aRoundingMode) const
+    requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<T> &&
+            RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>
+{
+    return Scale(aDst, numeric_limits<scalefactor_t<T>>::lowest(), numeric_limits<scalefactor_t<T>>::max(), aDstMin,
+                 aDstMax, aRoundingMode);
+}
+
+template <PixelType T>
+template <PixelType TTo>
+ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
+                                    RoundingMode aRoundingMode) const
+    requires(!std::same_as<T, TTo>) &&
+            (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>
+{
+    return Scale(aDst, aSrcMin, aSrcMax, numeric_limits<scalefactor_t<TTo>>::lowest(),
+                 numeric_limits<scalefactor_t<TTo>>::max(), aRoundingMode);
+}
+
+template <PixelType T>
+template <PixelType TTo>
+ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
+                                    scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax) const
+    requires(!std::same_as<T, TTo>) &&
+            (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexFloatingVector<TTo> && ScaleImplemented<T, TTo>
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    using ComputeT             = default_floating_compute_type_for_t<T>;
-    using scaleType            = scalefactor_t<default_floating_compute_type_for_t<T>>;
-    const scaleType srcMin     = static_cast<scaleType>(aSrcMin);
-    const scaleType srcMax     = static_cast<scaleType>(aSrcMax);
-    constexpr scaleType dstMin = static_cast<scaleType>(numeric_limits<remove_vector_t<TTo>>::lowest());
-    constexpr scaleType dstMax = static_cast<scaleType>(numeric_limits<remove_vector_t<TTo>>::max());
-    const scaleType factor     = (dstMax - dstMin) / (srcMax - srcMin);
+    static_assert(!use_int_division_for_scale_v<T, TTo>,
+                  "No integer divison should be used for floating point destination type.");
 
-    using scale = ScaleConversionFunctor<1, T, ComputeT, TTo, RoundingMode::NearestTiesAwayFromZero>;
+    using ComputeT         = compute_type_scale_for_t<T, TTo>;
+    using scaleType        = scalefactor_t<ComputeT>;
+    const scaleType srcMin = static_cast<scaleType>(aSrcMin);
+    const scaleType srcMax = static_cast<scaleType>(aSrcMax);
+    const scaleType dstMin = static_cast<scaleType>(aDstMin);
+    const scaleType dstMax = static_cast<scaleType>(aDstMax);
+    const scaleType factor = (dstMax - dstMin) / (srcMax - srcMin);
+
+    using scale = ScaleConversionFunctor<1, T, ComputeT, TTo, RoundingMode::NearestTiesToEven>;
 
     const scale functor(PointerRoi(), Pitch(), factor, srcMin, dstMin);
 
@@ -598,24 +673,112 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcM
 template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
-                                    scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax) const
-    requires(!std::same_as<T, TTo>)
+                                    scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax,
+                                    RoundingMode aRoundingMode) const
+    requires(!std::same_as<T, TTo>) &&
+            (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    using ComputeT         = default_floating_compute_type_for_t<T>;
-    using scaleType        = scalefactor_t<default_floating_compute_type_for_t<T>>;
-    const scaleType srcMin = static_cast<scaleType>(aSrcMin);
-    const scaleType srcMax = static_cast<scaleType>(aSrcMax);
-    const scaleType dstMin = static_cast<scaleType>(aDstMin);
-    const scaleType dstMax = static_cast<scaleType>(aDstMax);
-    const scaleType factor = (dstMax - dstMin) / (srcMax - srcMin);
+    // When converting sbyte with ComputeT == long64, ClangTidy thinks we mess things up, but the cast is correct
+    using ComputeT         = compute_type_scale_for_t<T, TTo>;
+    using scaleType        = scalefactor_t<ComputeT>;
+    const scaleType srcMin = static_cast<scaleType>(aSrcMin); // NOLINT(bugprone-signed-char-misuse,cert-str34-c)
+    const scaleType srcMax = static_cast<scaleType>(aSrcMax); // NOLINT(bugprone-signed-char-misuse,cert-str34-c)
+    const scaleType dstMin = static_cast<scaleType>(aDstMin); // NOLINT(bugprone-signed-char-misuse,cert-str34-c)
+    const scaleType dstMax = static_cast<scaleType>(aDstMax); // NOLINT(bugprone-signed-char-misuse,cert-str34-c)
 
-    using scale = ScaleConversionFunctor<1, T, ComputeT, TTo, RoundingMode::NearestTiesAwayFromZero>;
+    if constexpr (use_int_division_for_scale_v<T, TTo>)
+    {
+        const scaleType srcRange = srcMax - srcMin;
+        const scaleType dstRange = dstMax - dstMin;
 
-    const scale functor(PointerRoi(), Pitch(), factor, srcMin, dstMin);
+        switch (aRoundingMode)
+        {
+            case mpp::RoundingMode::NearestTiesToEven:
+            {
+                using scale = ScaleConversionFunctor<1, T, ComputeT, TTo, RoundingMode::NearestTiesToEven>;
+                const scale functor(PointerRoi(), Pitch(), srcMin, dstMin, srcRange, dstRange);
+                forEachPixel(aDst, functor);
+            }
+            break;
+            case mpp::RoundingMode::NearestTiesAwayFromZero:
+            {
+                using scale = ScaleConversionFunctor<1, T, ComputeT, TTo, RoundingMode::NearestTiesAwayFromZero>;
+                const scale functor(PointerRoi(), Pitch(), srcMin, dstMin, srcRange, dstRange);
+                forEachPixel(aDst, functor);
+            }
+            break;
+            case mpp::RoundingMode::TowardZero:
+            {
+                using scale = ScaleConversionFunctor<1, T, ComputeT, TTo, RoundingMode::TowardZero>;
+                const scale functor(PointerRoi(), Pitch(), srcMin, dstMin, srcRange, dstRange);
+                forEachPixel(aDst, functor);
+            }
+            break;
+            case mpp::RoundingMode::TowardNegativeInfinity:
+            {
+                using scale = ScaleConversionFunctor<1, T, ComputeT, TTo, RoundingMode::TowardNegativeInfinity>;
+                const scale functor(PointerRoi(), Pitch(), srcMin, dstMin, srcRange, dstRange);
+                forEachPixel(aDst, functor);
+            }
+            break;
+            case mpp::RoundingMode::TowardPositiveInfinity:
+            {
+                using scale = ScaleConversionFunctor<1, T, ComputeT, TTo, RoundingMode::TowardPositiveInfinity>;
+                const scale functor(PointerRoi(), Pitch(), srcMin, dstMin, srcRange, dstRange);
+                forEachPixel(aDst, functor);
+            }
+            break;
+            default:
+                throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
+        }
+    }
+    else
+    {
+        const scaleType factor = (dstMax - dstMin) / (srcMax - srcMin);
 
-    forEachPixel(aDst, functor);
+        switch (aRoundingMode)
+        {
+            case mpp::RoundingMode::NearestTiesToEven:
+            {
+                using scale = ScaleConversionFunctor<1, T, ComputeT, TTo, RoundingMode::NearestTiesToEven>;
+                const scale functor(PointerRoi(), Pitch(), factor, srcMin, dstMin);
+                forEachPixel(aDst, functor);
+            }
+            break;
+            case mpp::RoundingMode::NearestTiesAwayFromZero:
+            {
+                using scale = ScaleConversionFunctor<1, T, ComputeT, TTo, RoundingMode::NearestTiesAwayFromZero>;
+                const scale functor(PointerRoi(), Pitch(), factor, srcMin, dstMin);
+                forEachPixel(aDst, functor);
+            }
+            break;
+            case mpp::RoundingMode::TowardZero:
+            {
+                using scale = ScaleConversionFunctor<1, T, ComputeT, TTo, RoundingMode::TowardZero>;
+                const scale functor(PointerRoi(), Pitch(), factor, srcMin, dstMin);
+                forEachPixel(aDst, functor);
+            }
+            break;
+            case mpp::RoundingMode::TowardNegativeInfinity:
+            {
+                using scale = ScaleConversionFunctor<1, T, ComputeT, TTo, RoundingMode::TowardNegativeInfinity>;
+                const scale functor(PointerRoi(), Pitch(), factor, srcMin, dstMin);
+                forEachPixel(aDst, functor);
+            }
+            break;
+            case mpp::RoundingMode::TowardPositiveInfinity:
+            {
+                using scale = ScaleConversionFunctor<1, T, ComputeT, TTo, RoundingMode::TowardPositiveInfinity>;
+                const scale functor(PointerRoi(), Pitch(), factor, srcMin, dstMin);
+                forEachPixel(aDst, functor);
+            }
+            break;
+            default:
+                throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
+        }
+    }
 
     return aDst;
 }

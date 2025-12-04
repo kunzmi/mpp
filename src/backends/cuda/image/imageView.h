@@ -3,6 +3,7 @@
 #if MPP_ENABLE_CUDA_BACKEND
 
 #include "dataExchangeAndInit/conversionRelations.h"
+#include "dataExchangeAndInit/scaleRelations.h"
 #include "morphology/morphologyComputeT.h"
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/devVarView.h>
@@ -509,7 +510,7 @@ template <PixelType T> class ImageView
     template <PixelType TTo>
     ImageView<TTo> &Convert(ImageView<TTo> &aDst,
                             const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
-        requires(!std::same_as<T, TTo>) && ConversionImplemented<T, TTo>;
+        requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && ConversionImplemented<T, TTo>;
 
     /// <summary>
     /// Convert Floating point to Integer, float32 to half-float16/bfloat16. Values are clamped to
@@ -519,7 +520,8 @@ template <PixelType T> class ImageView
     template <PixelType TTo>
     ImageView<TTo> &Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode,
                             const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
-        requires(!std::same_as<T, TTo>) && ConversionRoundImplemented<T, TTo>;
+        requires(!std::same_as<T, TTo>) &&
+                (vector_size_v<T> == vector_size_v<TTo>) && ConversionRoundImplemented<T, TTo>;
 
     /// <summary>
     /// Convert with prior floating point scaling. Operation is SrcT -&gt; float -&gt; scale -&gt; DstT
@@ -527,8 +529,9 @@ template <PixelType T> class ImageView
     template <PixelType TTo>
     ImageView<TTo> &Convert(ImageView<TTo> &aDst, RoundingMode aRoundingMode, int aScaleFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
-        requires(!std::same_as<T, TTo>) && ConversionRoundScaleImplemented<T, TTo> && (!std::same_as<TTo, float>) &&
-                (!std::same_as<TTo, double>) && (!std::same_as<TTo, Complex<float>>) &&
+        requires(!std::same_as<T, TTo>) &&
+                (vector_size_v<T> == vector_size_v<TTo>) && ConversionRoundScaleImplemented<T, TTo> &&
+                (!std::same_as<TTo, float>) && (!std::same_as<TTo, double>) && (!std::same_as<TTo, Complex<float>>) &&
                 (!std::same_as<TTo, Complex<double>>);
 #pragma endregion
 #pragma region Copy
@@ -671,17 +674,18 @@ template <PixelType T> class ImageView
 #pragma endregion
 #pragma region Scale
     /// <summary>
-    /// Convert witch scaling the pixel value from input type value range to ouput type value range using the
+    /// Convert with scaling the pixel value from input type value range to ouput type value range using the
     /// equation:<para/> dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
     /// whith scaleFactor = (dstMaxRangeValue - dstMinRangeValue) / (srcMaxRangeValue - srcMinRangeValue).
     /// </summary>
     template <PixelType TTo>
-    ImageView<TTo> &Scale(ImageView<TTo> &aDst,
+    ImageView<TTo> &Scale(ImageView<TTo> &aDst, RoundingMode aRoundingMode,
                           const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
-        requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<T> && RealOrComplexIntVector<TTo>;
+        requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<T> &&
+                RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>;
 
     /// <summary>
-    /// Convert witch scaling the pixel value from input type value range to provided ouput value range using the
+    /// Convert with scaling the pixel value from input type value range to provided ouput value range using the
     /// equation:<para/> dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
     /// whith scaleFactor = (dstMaxRangeValue - dstMinRangeValue) / (srcMaxRangeValue - srcMinRangeValue). Values
     /// smaller or larger the output range are clamped to min or max value if necessary for integer output types.
@@ -689,21 +693,37 @@ template <PixelType T> class ImageView
     template <PixelType TTo>
     ImageView<TTo> &Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax,
                           const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
-        requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<T>;
+        requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<T> &&
+                RealOrComplexFloatingVector<TTo> && ScaleImplemented<T, TTo>;
 
     /// <summary>
-    /// Convert witch scaling the pixel value from input type value range to provided ouput value range using the
+    /// Convert with scaling the pixel value from input type value range to provided ouput value range using the
+    /// equation:<para/> dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
+    /// whith scaleFactor = (dstMaxRangeValue - dstMinRangeValue) / (srcMaxRangeValue - srcMinRangeValue). Values
+    /// smaller or larger the output range are clamped to min or max value if necessary for integer output types.
+    /// </summary>
+    template <PixelType TTo>
+    ImageView<TTo> &Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax,
+                          RoundingMode aRoundingMode,
+                          const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
+        requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<T> &&
+                RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>;
+
+    /// <summary>
+    /// Convert with scaling the pixel value from input type value range to provided ouput value range using the
     /// equation:<para/> dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
     /// whith scaleFactor = (dstMaxRangeValue - dstMinRangeValue) / (srcMaxRangeValue - srcMinRangeValue). Values
     /// smaller or larger the output range are clamped to min or max value if necessary.
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
+                          RoundingMode aRoundingMode,
                           const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
-        requires(!std::same_as<T, TTo>) && RealOrComplexIntVector<TTo>;
+        requires(!std::same_as<T, TTo>) &&
+                (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>;
 
     /// <summary>
-    /// Convert witch scaling the pixel value from input type value range to provided ouput value range using the
+    /// Convert with scaling the pixel value from input type value range to provided ouput value range using the
     /// equation:<para/> dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
     /// whith scaleFactor = (dstMaxRangeValue - dstMinRangeValue) / (srcMaxRangeValue - srcMinRangeValue). Values
     /// smaller or larger the output range are clamped to min or max value if necessary for integer output types.
@@ -712,7 +732,22 @@ template <PixelType T> class ImageView
     ImageView<TTo> &Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
                           scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax,
                           const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
-        requires(!std::same_as<T, TTo>);
+        requires(!std::same_as<T, TTo>) &&
+                (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexFloatingVector<TTo> && ScaleImplemented<T, TTo>
+    ;
+
+    /// <summary>
+    /// Convert with scaling the pixel value from input type value range to provided ouput value range using the
+    /// equation:<para/> dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
+    /// whith scaleFactor = (dstMaxRangeValue - dstMinRangeValue) / (srcMaxRangeValue - srcMinRangeValue). Values
+    /// smaller or larger the output range are clamped to min or max value if necessary for integer output types.
+    /// </summary>
+    template <PixelType TTo>
+    ImageView<TTo> &Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
+                          scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax, RoundingMode aRoundingMode,
+                          const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
+        requires(!std::same_as<T, TTo>) &&
+                (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>;
 
 #pragma endregion
 #pragma region Set

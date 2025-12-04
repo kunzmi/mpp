@@ -8,8 +8,8 @@ namespace mpp::image::cuda
 {
 
 ForAllChannelsNoAlphaInvokeConvertScaleRound(32sc, 16sc);
+ForAllChannelsNoAlphaInvokeConvert(32sc, 16sc);
 ForAllChannelsNoAlphaInvokeConvert(32sc, 32fc);
-ForAllChannelsNoAlphaInvokeConvert(32sc, 64fc);
 
 } // namespace mpp::image::cuda
 #endif // MPP_ENABLE_CUDA_BACKEND

@@ -1,4 +1,3 @@
-#include "conversionRelations.h"
 #include "imageView.h"
 #include "imageView_arithmetic_impl.h"                     //NOLINT(misc-include-cleaner)
 #include "imageView_dataExchangeAndInit_impl.h"            //NOLINT(misc-include-cleaner)
@@ -11,6 +10,11 @@
 #include "imageView_morphology_impl.h"                     //NOLINT(misc-include-cleaner)
 #include "imageView_statistics_impl.h"                     //NOLINT(misc-include-cleaner)
 #include "imageView_thresholdAndCompare_impl.h"            //NOLINT(misc-include-cleaner)
+#include "instantiateConversion.h"
+#include "instantiateCopy.h"
+#include "instantiateDup.h"
+#include "instantiateScale.h"
+#include "instantiateSwapChannel.h"
 #include <backends/simple_cpu/image/forEachPixel.h>
 #include <backends/simple_cpu/image/forEachPixel_impl.h>              //NOLINT(misc-include-cleaner)
 #include <backends/simple_cpu/image/forEachPixelMasked.h>
@@ -103,6 +107,7 @@ template class ImageView<Pixel64fC3>;
 template class ImageView<Pixel64fC4>;
 template class ImageView<Pixel64fC4A>;
 
+ForAllChannelsConvertWithAlpha(8u, 8s);
 ForAllChannelsConvertWithAlpha(8u, 16s);
 ForAllChannelsConvertWithAlpha(8u, 16u);
 ForAllChannelsConvertWithAlpha(8u, 32s);
@@ -123,6 +128,8 @@ ForAllChannelsConvertWithAlpha(8s, 32f);
 ForAllChannelsConvertWithAlpha(8s, 64f);
 
 ForAllChannelsConvertWithAlpha(16u, 8u);
+ForAllChannelsConvertWithAlpha(16u, 8s);
+ForAllChannelsConvertWithAlpha(16u, 16s);
 ForAllChannelsConvertWithAlpha(16u, 32s);
 ForAllChannelsConvertWithAlpha(16u, 32u);
 ForAllChannelsConvertWithAlpha(16u, 16f);
@@ -131,6 +138,7 @@ ForAllChannelsConvertWithAlpha(16u, 32f);
 ForAllChannelsConvertWithAlpha(16u, 64f);
 
 ForAllChannelsConvertWithAlpha(16s, 8u);
+ForAllChannelsConvertWithAlpha(16s, 8s);
 ForAllChannelsConvertWithAlpha(16s, 16u);
 ForAllChannelsConvertWithAlpha(16s, 32s);
 ForAllChannelsConvertWithAlpha(16s, 32u);
@@ -140,7 +148,10 @@ ForAllChannelsConvertWithAlpha(16s, 32f);
 ForAllChannelsConvertWithAlpha(16s, 64f);
 
 ForAllChannelsConvertWithAlpha(32u, 8u);
+ForAllChannelsConvertWithAlpha(32u, 8s);
 ForAllChannelsConvertWithAlpha(32u, 16u);
+ForAllChannelsConvertWithAlpha(32u, 16s);
+ForAllChannelsConvertWithAlpha(32u, 32s);
 ForAllChannelsConvertWithAlpha(32u, 16bf);
 ForAllChannelsConvertWithAlpha(32u, 16f);
 ForAllChannelsConvertWithAlpha(32u, 32f);
@@ -166,15 +177,16 @@ ForAllChannelsConvertWithAlpha(64f, 32f);
 
 ForAllChannelsConvertNoAlpha(16sc, 32sc);
 ForAllChannelsConvertNoAlpha(16sc, 32fc);
-ForAllChannelsConvertNoAlpha(16sc, 64fc);
 
+ForAllChannelsConvertNoAlpha(32sc, 16sc);
 ForAllChannelsConvertNoAlpha(32sc, 32fc);
-ForAllChannelsConvertNoAlpha(32sc, 64fc);
 
 ForAllChannelsConvertRoundWithAlpha(32f, 8u);
 ForAllChannelsConvertRoundWithAlpha(32f, 8s);
 ForAllChannelsConvertRoundWithAlpha(32f, 16u);
 ForAllChannelsConvertRoundWithAlpha(32f, 16s);
+ForAllChannelsConvertRoundWithAlpha(32f, 32u);
+ForAllChannelsConvertRoundWithAlpha(32f, 32s);
 ForAllChannelsConvertRoundWithAlpha(32f, 16bf);
 ForAllChannelsConvertRoundWithAlpha(32f, 16f);
 
@@ -182,11 +194,15 @@ ForAllChannelsConvertRoundWithAlpha(16f, 8u);
 ForAllChannelsConvertRoundWithAlpha(16f, 8s);
 ForAllChannelsConvertRoundWithAlpha(16f, 16u);
 ForAllChannelsConvertRoundWithAlpha(16f, 16s);
+ForAllChannelsConvertRoundWithAlpha(16f, 32u);
+ForAllChannelsConvertRoundWithAlpha(16f, 32s);
 
 ForAllChannelsConvertRoundWithAlpha(16bf, 8u);
 ForAllChannelsConvertRoundWithAlpha(16bf, 8s);
 ForAllChannelsConvertRoundWithAlpha(16bf, 16u);
 ForAllChannelsConvertRoundWithAlpha(16bf, 16s);
+ForAllChannelsConvertRoundWithAlpha(16bf, 32u);
+ForAllChannelsConvertRoundWithAlpha(16bf, 32s);
 
 ForAllChannelsConvertRoundNoAlpha(32fc, 16sc);
 ForAllChannelsConvertRoundNoAlpha(32fc, 32sc);
@@ -236,269 +252,326 @@ ForAllChannelsConvertRoundScaleNoAlpha(32fc, 32sc);
 
 ForAllChannelsConvertRoundScaleNoAlpha(32sc, 16sc);
 
-// template ImageView<Pixel16uC1> &ImageView<Pixel8uC1>::Convert<Pixel16uC1>(ImageView<Pixel16uC1> &aDst) const;
-// template ImageView<Pixel32sC1> &ImageView<Pixel8uC1>::Convert<Pixel32sC1>(ImageView<Pixel32sC1> &aDst) const;
-// template ImageView<Pixel32fC1> &ImageView<Pixel8uC1>::Convert<Pixel32fC1>(ImageView<Pixel32fC1> &aDst) const;
-// template ImageView<Pixel64fC1> &ImageView<Pixel8uC1>::Convert<Pixel64fC1>(ImageView<Pixel64fC1> &aDst) const;
-// template ImageView<Pixel32fC3> &ImageView<Pixel8uC3>::Convert<Pixel32fC3>(ImageView<Pixel32fC3> &aDst) const;
-// template ImageView<Pixel8uC3> &ImageView<Pixel32fC3>::Convert<Pixel8uC3>(ImageView<Pixel8uC3> &aDst,
-//                                                                          RoundingMode aRoundingMode) const;
-// template ImageView<Pixel8uC3> &ImageView<Pixel32fC3>::Convert<Pixel8uC3>(ImageView<Pixel8uC3> &aDst,
-//                                                                          RoundingMode aRoundingMode,
-//                                                                          int aScaleFactor) const;
+InstantiateCopy_For(8u);
+InstantiateCopy_For(8s);
+InstantiateCopy_For(16u);
+InstantiateCopy_For(16s);
+InstantiateCopy_For(32u);
+InstantiateCopy_For(32s);
+InstantiateCopy_For(16f);
+InstantiateCopy_For(16bf);
+InstantiateCopy_For(32f);
+InstantiateCopy_For(64f);
+InstantiateCopy_For(16sc);
+InstantiateCopy_For(32sc);
+InstantiateCopy_For(32fc);
 
-template ImageView<Pixel8uC2> &ImageView<Pixel8uC2>::Copy<Pixel8uC2>(Channel aSrcChannel, ImageView<Pixel8uC2> &aDst,
-                                                                     Channel aDstChannel) const;
-template ImageView<Pixel8uC3> &ImageView<Pixel8uC2>::Copy<Pixel8uC3>(Channel aSrcChannel, ImageView<Pixel8uC3> &aDst,
-                                                                     Channel aDstChannel) const;
-template ImageView<Pixel8uC4> &ImageView<Pixel8uC2>::Copy<Pixel8uC4>(Channel aSrcChannel, ImageView<Pixel8uC4> &aDst,
-                                                                     Channel aDstChannel) const;
+InstantiateSwapChannel_For(8u);
+InstantiateSwapChannel_For(8s);
+InstantiateSwapChannel_For(16u);
+InstantiateSwapChannel_For(16s);
+InstantiateSwapChannel_For(32u);
+InstantiateSwapChannel_For(32s);
+InstantiateSwapChannel_For(16f);
+InstantiateSwapChannel_For(16bf);
+InstantiateSwapChannel_For(32f);
+InstantiateSwapChannel_For(64f);
+InstantiateSwapChannel_For(16sc);
+InstantiateSwapChannel_For(32sc);
+InstantiateSwapChannel_For(32fc);
 
-template ImageView<Pixel8uC2> &ImageView<Pixel8uC3>::Copy<Pixel8uC2>(Channel aSrcChannel, ImageView<Pixel8uC2> &aDst,
-                                                                     Channel aDstChannel) const;
-template ImageView<Pixel8uC3> &ImageView<Pixel8uC3>::Copy<Pixel8uC3>(Channel aSrcChannel, ImageView<Pixel8uC3> &aDst,
-                                                                     Channel aDstChannel) const;
-template ImageView<Pixel8uC4> &ImageView<Pixel8uC3>::Copy<Pixel8uC4>(Channel aSrcChannel, ImageView<Pixel8uC4> &aDst,
-                                                                     Channel aDstChannel) const;
+InstantiateDup_For(8u);
+InstantiateDup_For(8s);
+InstantiateDup_For(16u);
+InstantiateDup_For(16s);
+InstantiateDup_For(32u);
+InstantiateDup_For(32s);
+InstantiateDup_For(16f);
+InstantiateDup_For(16bf);
+InstantiateDup_For(32f);
+InstantiateDup_For(64f);
+InstantiateDupNoAlpha_For(16sc);
+InstantiateDupNoAlpha_For(32sc);
+InstantiateDupNoAlpha_For(32fc);
 
-template ImageView<Pixel8uC2> &ImageView<Pixel8uC4>::Copy<Pixel8uC2>(Channel aSrcChannel, ImageView<Pixel8uC2> &aDst,
-                                                                     Channel aDstChannel) const;
-template ImageView<Pixel8uC3> &ImageView<Pixel8uC4>::Copy<Pixel8uC3>(Channel aSrcChannel, ImageView<Pixel8uC3> &aDst,
-                                                                     Channel aDstChannel) const;
-template ImageView<Pixel8uC4> &ImageView<Pixel8uC4>::Copy<Pixel8uC4>(Channel aSrcChannel, ImageView<Pixel8uC4> &aDst,
-                                                                     Channel aDstChannel) const;
+ForAllChannelsScaleIntToIntWithAlpha(8s, 8u);
+ForAllChannelsScaleIntToIntWithAlpha(8s, 16s);
+ForAllChannelsScaleIntToIntWithAlpha(8s, 16u);
+ForAllChannelsScaleIntToIntWithAlpha(8s, 32s);
+ForAllChannelsScaleIntToIntWithAlpha(8s, 32u);
 
-template ImageView<Pixel8uC2> &ImageView<Pixel8uC1>::Copy<Pixel8uC2>(ImageView<Pixel8uC2> &aDst,
-                                                                     Channel aDstChannel) const;
-template ImageView<Pixel8uC3> &ImageView<Pixel8uC1>::Copy<Pixel8uC3>(ImageView<Pixel8uC3> &aDst,
-                                                                     Channel aDstChannel) const;
-template ImageView<Pixel8uC4> &ImageView<Pixel8uC1>::Copy<Pixel8uC4>(ImageView<Pixel8uC4> &aDst,
-                                                                     Channel aDstChannel) const;
+ForAllChannelsScaleIntToIntWithAlpha(8u, 8s);
+ForAllChannelsScaleIntToIntWithAlpha(8u, 16s);
+ForAllChannelsScaleIntToIntWithAlpha(8u, 16u);
+ForAllChannelsScaleIntToIntWithAlpha(8u, 32s);
+ForAllChannelsScaleIntToIntWithAlpha(8u, 32u);
 
-template ImageView<Pixel8uC1> &ImageView<Pixel8uC2>::Copy<Pixel8uC1>(Channel aSrcChannel,
-                                                                     ImageView<Pixel8uC1> &aDst) const;
-template ImageView<Pixel8uC1> &ImageView<Pixel8uC3>::Copy<Pixel8uC1>(Channel aSrcChannel,
-                                                                     ImageView<Pixel8uC1> &aDst) const;
-template ImageView<Pixel8uC1> &ImageView<Pixel8uC4>::Copy<Pixel8uC1>(Channel aSrcChannel,
-                                                                     ImageView<Pixel8uC1> &aDst) const;
+ForAllChannelsScaleIntToIntWithAlpha(16s, 8u);
+ForAllChannelsScaleIntToIntWithAlpha(16s, 8s);
+ForAllChannelsScaleIntToIntWithAlpha(16s, 16u);
+ForAllChannelsScaleIntToIntWithAlpha(16s, 32s);
+ForAllChannelsScaleIntToIntWithAlpha(16s, 32u);
 
-template ImageView<Pixel8uC2> &ImageView<Pixel8uC1>::Dup<Pixel8uC2>(ImageView<Pixel8uC2> &aDst) const;
-template ImageView<Pixel8uC3> &ImageView<Pixel8uC1>::Dup<Pixel8uC3>(ImageView<Pixel8uC3> &aDst) const;
-template ImageView<Pixel8uC4> &ImageView<Pixel8uC1>::Dup<Pixel8uC4>(ImageView<Pixel8uC4> &aDst) const;
-template ImageView<Pixel8uC4A> &ImageView<Pixel8uC1>::Dup<Pixel8uC4A>(ImageView<Pixel8uC4A> &aDst) const;
+ForAllChannelsScaleIntToIntWithAlpha(16u, 8s);
+ForAllChannelsScaleIntToIntWithAlpha(16u, 8u);
+ForAllChannelsScaleIntToIntWithAlpha(16u, 16s);
+ForAllChannelsScaleIntToIntWithAlpha(16u, 32s);
+ForAllChannelsScaleIntToIntWithAlpha(16u, 32u);
 
-template ImageView<Pixel8sC2> &ImageView<Pixel8sC1>::Dup<Pixel8sC2>(ImageView<Pixel8sC2> &aDst) const;
-template ImageView<Pixel8sC3> &ImageView<Pixel8sC1>::Dup<Pixel8sC3>(ImageView<Pixel8sC3> &aDst) const;
-template ImageView<Pixel8sC4> &ImageView<Pixel8sC1>::Dup<Pixel8sC4>(ImageView<Pixel8sC4> &aDst) const;
-template ImageView<Pixel8sC4A> &ImageView<Pixel8sC1>::Dup<Pixel8sC4A>(ImageView<Pixel8sC4A> &aDst) const;
+ForAllChannelsScaleIntToIntWithAlpha(32s, 8u);
+ForAllChannelsScaleIntToIntWithAlpha(32s, 8s);
+ForAllChannelsScaleIntToIntWithAlpha(32s, 16u);
+ForAllChannelsScaleIntToIntWithAlpha(32s, 16s);
+ForAllChannelsScaleIntToIntWithAlpha(32s, 32u);
 
-template ImageView<Pixel16uC2> &ImageView<Pixel16uC1>::Dup<Pixel16uC2>(ImageView<Pixel16uC2> &aDst) const;
-template ImageView<Pixel16uC3> &ImageView<Pixel16uC1>::Dup<Pixel16uC3>(ImageView<Pixel16uC3> &aDst) const;
-template ImageView<Pixel16uC4> &ImageView<Pixel16uC1>::Dup<Pixel16uC4>(ImageView<Pixel16uC4> &aDst) const;
-template ImageView<Pixel16uC4A> &ImageView<Pixel16uC1>::Dup<Pixel16uC4A>(ImageView<Pixel16uC4A> &aDst) const;
+ForAllChannelsScaleIntToIntWithAlpha(32u, 8s);
+ForAllChannelsScaleIntToIntWithAlpha(32u, 8u);
+ForAllChannelsScaleIntToIntWithAlpha(32u, 16s);
+ForAllChannelsScaleIntToIntWithAlpha(32u, 16u);
+ForAllChannelsScaleIntToIntWithAlpha(32u, 32s);
 
-template ImageView<Pixel16sC2> &ImageView<Pixel16sC1>::Dup<Pixel16sC2>(ImageView<Pixel16sC2> &aDst) const;
-template ImageView<Pixel16sC3> &ImageView<Pixel16sC1>::Dup<Pixel16sC3>(ImageView<Pixel16sC3> &aDst) const;
-template ImageView<Pixel16sC4> &ImageView<Pixel16sC1>::Dup<Pixel16sC4>(ImageView<Pixel16sC4> &aDst) const;
-template ImageView<Pixel16sC4A> &ImageView<Pixel16sC1>::Dup<Pixel16sC4A>(ImageView<Pixel16sC4A> &aDst) const;
+ForAllChannelsScaleIntToIntNoAlpha(16sc, 32sc);
+ForAllChannelsScaleIntToIntNoAlpha(32sc, 16sc);
 
-template ImageView<Pixel32uC2> &ImageView<Pixel32uC1>::Dup<Pixel32uC2>(ImageView<Pixel32uC2> &aDst) const;
-template ImageView<Pixel32uC3> &ImageView<Pixel32uC1>::Dup<Pixel32uC3>(ImageView<Pixel32uC3> &aDst) const;
-template ImageView<Pixel32uC4> &ImageView<Pixel32uC1>::Dup<Pixel32uC4>(ImageView<Pixel32uC4> &aDst) const;
-template ImageView<Pixel32uC4A> &ImageView<Pixel32uC1>::Dup<Pixel32uC4A>(ImageView<Pixel32uC4A> &aDst) const;
+ForAllChannelsScaleIntToAnyRoundWithAlpha(8s, 8u);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(8s, 16s);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(8s, 16u);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(8s, 32s);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(8s, 32u);
+ForAllChannelsScaleIntToAnyWithAlpha(8s, 16f);
+ForAllChannelsScaleIntToAnyWithAlpha(8s, 16bf);
+ForAllChannelsScaleIntToAnyWithAlpha(8s, 32f);
+ForAllChannelsScaleIntToAnyWithAlpha(8s, 64f);
 
-template ImageView<Pixel32sC2> &ImageView<Pixel32sC1>::Dup<Pixel32sC2>(ImageView<Pixel32sC2> &aDst) const;
-template ImageView<Pixel32sC3> &ImageView<Pixel32sC1>::Dup<Pixel32sC3>(ImageView<Pixel32sC3> &aDst) const;
-template ImageView<Pixel32sC4> &ImageView<Pixel32sC1>::Dup<Pixel32sC4>(ImageView<Pixel32sC4> &aDst) const;
-template ImageView<Pixel32sC4A> &ImageView<Pixel32sC1>::Dup<Pixel32sC4A>(ImageView<Pixel32sC4A> &aDst) const;
+ForAllChannelsScaleIntToAnyRoundWithAlpha(8u, 8s);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(8u, 16s);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(8u, 16u);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(8u, 32s);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(8u, 32u);
+ForAllChannelsScaleIntToAnyWithAlpha(8u, 16f);
+ForAllChannelsScaleIntToAnyWithAlpha(8u, 16bf);
+ForAllChannelsScaleIntToAnyWithAlpha(8u, 32f);
+ForAllChannelsScaleIntToAnyWithAlpha(8u, 64f);
 
-template ImageView<Pixel16fC2> &ImageView<Pixel16fC1>::Dup<Pixel16fC2>(ImageView<Pixel16fC2> &aDst) const;
-template ImageView<Pixel16fC3> &ImageView<Pixel16fC1>::Dup<Pixel16fC3>(ImageView<Pixel16fC3> &aDst) const;
-template ImageView<Pixel16fC4> &ImageView<Pixel16fC1>::Dup<Pixel16fC4>(ImageView<Pixel16fC4> &aDst) const;
-template ImageView<Pixel16fC4A> &ImageView<Pixel16fC1>::Dup<Pixel16fC4A>(ImageView<Pixel16fC4A> &aDst) const;
+ForAllChannelsScaleIntToAnyRoundWithAlpha(16s, 8u);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(16s, 8s);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(16s, 16u);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(16s, 32s);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(16s, 32u);
+ForAllChannelsScaleIntToAnyWithAlpha(16s, 16f);
+ForAllChannelsScaleIntToAnyWithAlpha(16s, 16bf);
+ForAllChannelsScaleIntToAnyWithAlpha(16s, 32f);
+ForAllChannelsScaleIntToAnyWithAlpha(16s, 64f);
 
-template ImageView<Pixel16bfC2> &ImageView<Pixel16bfC1>::Dup<Pixel16bfC2>(ImageView<Pixel16bfC2> &aDst) const;
-template ImageView<Pixel16bfC3> &ImageView<Pixel16bfC1>::Dup<Pixel16bfC3>(ImageView<Pixel16bfC3> &aDst) const;
-template ImageView<Pixel16bfC4> &ImageView<Pixel16bfC1>::Dup<Pixel16bfC4>(ImageView<Pixel16bfC4> &aDst) const;
-template ImageView<Pixel16bfC4A> &ImageView<Pixel16bfC1>::Dup<Pixel16bfC4A>(ImageView<Pixel16bfC4A> &aDst) const;
+ForAllChannelsScaleIntToAnyRoundWithAlpha(16u, 8s);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(16u, 8u);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(16u, 16s);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(16u, 32s);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(16u, 32u);
+ForAllChannelsScaleIntToAnyWithAlpha(16u, 16f);
+ForAllChannelsScaleIntToAnyWithAlpha(16u, 16bf);
+ForAllChannelsScaleIntToAnyWithAlpha(16u, 32f);
+ForAllChannelsScaleIntToAnyWithAlpha(16u, 64f);
 
-template ImageView<Pixel32fC2> &ImageView<Pixel32fC1>::Dup<Pixel32fC2>(ImageView<Pixel32fC2> &aDst) const;
-template ImageView<Pixel32fC3> &ImageView<Pixel32fC1>::Dup<Pixel32fC3>(ImageView<Pixel32fC3> &aDst) const;
-template ImageView<Pixel32fC4> &ImageView<Pixel32fC1>::Dup<Pixel32fC4>(ImageView<Pixel32fC4> &aDst) const;
-template ImageView<Pixel32fC4A> &ImageView<Pixel32fC1>::Dup<Pixel32fC4A>(ImageView<Pixel32fC4A> &aDst) const;
+ForAllChannelsScaleIntToAnyRoundWithAlpha(32s, 8u);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(32s, 8s);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(32s, 16u);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(32s, 16s);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(32s, 32u);
+ForAllChannelsScaleIntToAnyWithAlpha(32s, 16f);
+ForAllChannelsScaleIntToAnyWithAlpha(32s, 16bf);
+ForAllChannelsScaleIntToAnyWithAlpha(32s, 32f);
+ForAllChannelsScaleIntToAnyWithAlpha(32s, 64f);
 
-template ImageView<Pixel64fC2> &ImageView<Pixel64fC1>::Dup<Pixel64fC2>(ImageView<Pixel64fC2> &aDst) const;
-template ImageView<Pixel64fC3> &ImageView<Pixel64fC1>::Dup<Pixel64fC3>(ImageView<Pixel64fC3> &aDst) const;
-template ImageView<Pixel64fC4> &ImageView<Pixel64fC1>::Dup<Pixel64fC4>(ImageView<Pixel64fC4> &aDst) const;
-template ImageView<Pixel64fC4A> &ImageView<Pixel64fC1>::Dup<Pixel64fC4A>(ImageView<Pixel64fC4A> &aDst) const;
+ForAllChannelsScaleIntToAnyRoundWithAlpha(32u, 8s);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(32u, 8u);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(32u, 16s);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(32u, 16u);
+ForAllChannelsScaleIntToAnyRoundWithAlpha(32u, 32s);
+ForAllChannelsScaleIntToAnyWithAlpha(32u, 16f);
+ForAllChannelsScaleIntToAnyWithAlpha(32u, 16bf);
+ForAllChannelsScaleIntToAnyWithAlpha(32u, 32f);
+ForAllChannelsScaleIntToAnyWithAlpha(32u, 64f);
 
-template ImageView<Pixel16scC2> &ImageView<Pixel16scC1>::Dup<Pixel16scC2>(ImageView<Pixel16scC2> &aDst) const;
-template ImageView<Pixel16scC3> &ImageView<Pixel16scC1>::Dup<Pixel16scC3>(ImageView<Pixel16scC3> &aDst) const;
-template ImageView<Pixel16scC4> &ImageView<Pixel16scC1>::Dup<Pixel16scC4>(ImageView<Pixel16scC4> &aDst) const;
+ForAllChannelsScaleIntToAnyRoundNoAlpha(16sc, 32sc);
+ForAllChannelsScaleIntToAnyNoAlpha(16sc, 32fc);
+ForAllChannelsScaleIntToAnyRoundNoAlpha(32sc, 16sc);
+ForAllChannelsScaleIntToAnyNoAlpha(32sc, 32fc);
 
-template ImageView<Pixel32scC2> &ImageView<Pixel32scC1>::Dup<Pixel32scC2>(ImageView<Pixel32scC2> &aDst) const;
-template ImageView<Pixel32scC3> &ImageView<Pixel32scC1>::Dup<Pixel32scC3>(ImageView<Pixel32scC3> &aDst) const;
-template ImageView<Pixel32scC4> &ImageView<Pixel32scC1>::Dup<Pixel32scC4>(ImageView<Pixel32scC4> &aDst) const;
+ForAllChannelsScaleAnyToIntWithAlpha(8s, 8u);
+ForAllChannelsScaleAnyToIntWithAlpha(8s, 16s);
+ForAllChannelsScaleAnyToIntWithAlpha(8s, 16u);
+ForAllChannelsScaleAnyToIntWithAlpha(8s, 32s);
+ForAllChannelsScaleAnyToIntWithAlpha(8s, 32u);
 
-template ImageView<Pixel32fcC2> &ImageView<Pixel32fcC1>::Dup<Pixel32fcC2>(ImageView<Pixel32fcC2> &aDst) const;
-template ImageView<Pixel32fcC3> &ImageView<Pixel32fcC1>::Dup<Pixel32fcC3>(ImageView<Pixel32fcC3> &aDst) const;
-template ImageView<Pixel32fcC4> &ImageView<Pixel32fcC1>::Dup<Pixel32fcC4>(ImageView<Pixel32fcC4> &aDst) const;
+ForAllChannelsScaleAnyToIntWithAlpha(8u, 8s);
+ForAllChannelsScaleAnyToIntWithAlpha(8u, 16s);
+ForAllChannelsScaleAnyToIntWithAlpha(8u, 16u);
+ForAllChannelsScaleAnyToIntWithAlpha(8u, 32s);
+ForAllChannelsScaleAnyToIntWithAlpha(8u, 32u);
 
-template ImageView<Pixel16uC1> &ImageView<Pixel8uC1>::Scale<Pixel16uC1>(ImageView<Pixel16uC1> &aDst) const;
-template ImageView<Pixel16sC1> &ImageView<Pixel8uC1>::Scale<Pixel16sC1>(ImageView<Pixel16sC1> &aDst) const;
-template ImageView<Pixel32uC1> &ImageView<Pixel8uC1>::Scale<Pixel32uC1>(ImageView<Pixel32uC1> &aDst) const;
-template ImageView<Pixel32sC1> &ImageView<Pixel8uC1>::Scale<Pixel32sC1>(ImageView<Pixel32sC1> &aDst) const;
-template ImageView<Pixel16uC1> &ImageView<Pixel8uC1>::Scale<Pixel16uC1>(ImageView<Pixel16uC1> &aDst, byte, byte) const;
-template ImageView<Pixel16sC1> &ImageView<Pixel8uC1>::Scale<Pixel16sC1>(ImageView<Pixel16sC1> &aDst, byte, byte) const;
-template ImageView<Pixel32uC1> &ImageView<Pixel8uC1>::Scale<Pixel32uC1>(ImageView<Pixel32uC1> &aDst, byte, byte) const;
-template ImageView<Pixel32sC1> &ImageView<Pixel8uC1>::Scale<Pixel32sC1>(ImageView<Pixel32sC1> &aDst, byte, byte) const;
-template ImageView<Pixel16uC1> &ImageView<Pixel8uC1>::Scale<Pixel16uC1>(ImageView<Pixel16uC1> &aDst, ushort,
-                                                                        ushort) const;
-template ImageView<Pixel16sC1> &ImageView<Pixel8uC1>::Scale<Pixel16sC1>(ImageView<Pixel16sC1> &aDst, short,
-                                                                        short) const;
-template ImageView<Pixel32uC1> &ImageView<Pixel8uC1>::Scale<Pixel32uC1>(ImageView<Pixel32uC1> &aDst, uint, uint) const;
-template ImageView<Pixel32sC1> &ImageView<Pixel8uC1>::Scale<Pixel32sC1>(ImageView<Pixel32sC1> &aDst, int, int) const;
-template ImageView<Pixel32fC1> &ImageView<Pixel8uC1>::Scale<Pixel32fC1>(ImageView<Pixel32fC1> &aDst, float,
-                                                                        float) const;
-template ImageView<Pixel16uC1> &ImageView<Pixel8uC1>::Scale<Pixel16uC1>(ImageView<Pixel16uC1> &aDst, byte, byte, ushort,
-                                                                        ushort) const;
-template ImageView<Pixel16sC1> &ImageView<Pixel8uC1>::Scale<Pixel16sC1>(ImageView<Pixel16sC1> &aDst, byte, byte, short,
-                                                                        short) const;
-template ImageView<Pixel32uC1> &ImageView<Pixel8uC1>::Scale<Pixel32uC1>(ImageView<Pixel32uC1> &aDst, byte, byte, uint,
-                                                                        uint) const;
-template ImageView<Pixel32sC1> &ImageView<Pixel8uC1>::Scale<Pixel32sC1>(ImageView<Pixel32sC1> &aDst, byte, byte, int,
-                                                                        int) const;
-template ImageView<Pixel32fC1> &ImageView<Pixel8uC1>::Scale<Pixel32fC1>(ImageView<Pixel32fC1> &aDst, byte, byte, float,
-                                                                        float) const;
+ForAllChannelsScaleAnyToIntWithAlpha(16s, 8u);
+ForAllChannelsScaleAnyToIntWithAlpha(16s, 8s);
+ForAllChannelsScaleAnyToIntWithAlpha(16s, 16u);
+ForAllChannelsScaleAnyToIntWithAlpha(16s, 32s);
+ForAllChannelsScaleAnyToIntWithAlpha(16s, 32u);
 
-template ImageView<Pixel8uC4> &ImageView<Pixel8uC3>::SwapChannel<Pixel8uC4>(
-    ImageView<Pixel8uC4> &aDst, const ChannelList<vector_active_size_v<Pixel8uC4>> &aDstChannels,
-    remove_vector_t<Pixel8uC3> aValue) const;
-template ImageView<Pixel8uC3> &ImageView<Pixel8uC4>::SwapChannel<Pixel8uC3>(
-    ImageView<Pixel8uC3> &aDst, const ChannelList<vector_active_size_v<Pixel8uC3>> &aDstChannels) const;
-template ImageView<Pixel8uC3> &ImageView<Pixel8uC3>::SwapChannel<Pixel8uC3>(
-    ImageView<Pixel8uC3> &aDst, const ChannelList<vector_active_size_v<Pixel8uC3>> &aDstChannels) const;
-template ImageView<Pixel8uC4> &ImageView<Pixel8uC4>::SwapChannel<Pixel8uC4>(
-    ImageView<Pixel8uC4> &aDst, const ChannelList<vector_active_size_v<Pixel8uC4>> &aDstChannels) const;
+ForAllChannelsScaleAnyToIntWithAlpha(16u, 8s);
+ForAllChannelsScaleAnyToIntWithAlpha(16u, 8u);
+ForAllChannelsScaleAnyToIntWithAlpha(16u, 16s);
+ForAllChannelsScaleAnyToIntWithAlpha(16u, 32s);
+ForAllChannelsScaleAnyToIntWithAlpha(16u, 32u);
 
-template ImageView<Pixel8sC4> &ImageView<Pixel8sC3>::SwapChannel<Pixel8sC4>(
-    ImageView<Pixel8sC4> &aDst, const ChannelList<vector_active_size_v<Pixel8sC4>> &aDstChannels,
-    remove_vector_t<Pixel8sC3> aValue) const;
-template ImageView<Pixel8sC3> &ImageView<Pixel8sC4>::SwapChannel<Pixel8sC3>(
-    ImageView<Pixel8sC3> &aDst, const ChannelList<vector_active_size_v<Pixel8sC3>> &aDstChannels) const;
-template ImageView<Pixel8sC3> &ImageView<Pixel8sC3>::SwapChannel<Pixel8sC3>(
-    ImageView<Pixel8sC3> &aDst, const ChannelList<vector_active_size_v<Pixel8sC3>> &aDstChannels) const;
-template ImageView<Pixel8sC4> &ImageView<Pixel8sC4>::SwapChannel<Pixel8sC4>(
-    ImageView<Pixel8sC4> &aDst, const ChannelList<vector_active_size_v<Pixel8sC4>> &aDstChannels) const;
+ForAllChannelsScaleAnyToIntWithAlpha(32s, 8u);
+ForAllChannelsScaleAnyToIntWithAlpha(32s, 8s);
+ForAllChannelsScaleAnyToIntWithAlpha(32s, 16u);
+ForAllChannelsScaleAnyToIntWithAlpha(32s, 16s);
+ForAllChannelsScaleAnyToIntWithAlpha(32s, 32u);
 
-template ImageView<Pixel16uC4> &ImageView<Pixel16uC3>::SwapChannel<Pixel16uC4>(
-    ImageView<Pixel16uC4> &aDst, const ChannelList<vector_active_size_v<Pixel16uC4>> &aDstChannels,
-    remove_vector_t<Pixel16uC3> aValue) const;
-template ImageView<Pixel16uC3> &ImageView<Pixel16uC4>::SwapChannel<Pixel16uC3>(
-    ImageView<Pixel16uC3> &aDst, const ChannelList<vector_active_size_v<Pixel16uC3>> &aDstChannels) const;
-template ImageView<Pixel16uC3> &ImageView<Pixel16uC3>::SwapChannel<Pixel16uC3>(
-    ImageView<Pixel16uC3> &aDst, const ChannelList<vector_active_size_v<Pixel16uC3>> &aDstChannels) const;
-template ImageView<Pixel16uC4> &ImageView<Pixel16uC4>::SwapChannel<Pixel16uC4>(
-    ImageView<Pixel16uC4> &aDst, const ChannelList<vector_active_size_v<Pixel16uC4>> &aDstChannels) const;
+ForAllChannelsScaleAnyToIntWithAlpha(32u, 8s);
+ForAllChannelsScaleAnyToIntWithAlpha(32u, 8u);
+ForAllChannelsScaleAnyToIntWithAlpha(32u, 16s);
+ForAllChannelsScaleAnyToIntWithAlpha(32u, 16u);
+ForAllChannelsScaleAnyToIntWithAlpha(32u, 32s);
 
-template ImageView<Pixel16sC4> &ImageView<Pixel16sC3>::SwapChannel<Pixel16sC4>(
-    ImageView<Pixel16sC4> &aDst, const ChannelList<vector_active_size_v<Pixel16sC4>> &aDstChannels,
-    remove_vector_t<Pixel16sC3> aValue) const;
-template ImageView<Pixel16sC3> &ImageView<Pixel16sC4>::SwapChannel<Pixel16sC3>(
-    ImageView<Pixel16sC3> &aDst, const ChannelList<vector_active_size_v<Pixel16sC3>> &aDstChannels) const;
-template ImageView<Pixel16sC3> &ImageView<Pixel16sC3>::SwapChannel<Pixel16sC3>(
-    ImageView<Pixel16sC3> &aDst, const ChannelList<vector_active_size_v<Pixel16sC3>> &aDstChannels) const;
-template ImageView<Pixel16sC4> &ImageView<Pixel16sC4>::SwapChannel<Pixel16sC4>(
-    ImageView<Pixel16sC4> &aDst, const ChannelList<vector_active_size_v<Pixel16sC4>> &aDstChannels) const;
+ForAllChannelsScaleAnyToIntWithAlpha(16f, 8s);
+ForAllChannelsScaleAnyToIntWithAlpha(16f, 8u);
+ForAllChannelsScaleAnyToIntWithAlpha(16f, 16s);
+ForAllChannelsScaleAnyToIntWithAlpha(16f, 16u);
+ForAllChannelsScaleAnyToIntWithAlpha(16f, 32s);
+ForAllChannelsScaleAnyToIntWithAlpha(16f, 32u);
 
-template ImageView<Pixel32uC4> &ImageView<Pixel32uC3>::SwapChannel<Pixel32uC4>(
-    ImageView<Pixel32uC4> &aDst, const ChannelList<vector_active_size_v<Pixel32uC4>> &aDstChannels,
-    remove_vector_t<Pixel32uC3> aValue) const;
-template ImageView<Pixel32uC3> &ImageView<Pixel32uC4>::SwapChannel<Pixel32uC3>(
-    ImageView<Pixel32uC3> &aDst, const ChannelList<vector_active_size_v<Pixel32uC3>> &aDstChannels) const;
-template ImageView<Pixel32uC3> &ImageView<Pixel32uC3>::SwapChannel<Pixel32uC3>(
-    ImageView<Pixel32uC3> &aDst, const ChannelList<vector_active_size_v<Pixel32uC3>> &aDstChannels) const;
-template ImageView<Pixel32uC4> &ImageView<Pixel32uC4>::SwapChannel<Pixel32uC4>(
-    ImageView<Pixel32uC4> &aDst, const ChannelList<vector_active_size_v<Pixel32uC4>> &aDstChannels) const;
+ForAllChannelsScaleAnyToIntWithAlpha(16bf, 8s);
+ForAllChannelsScaleAnyToIntWithAlpha(16bf, 8u);
+ForAllChannelsScaleAnyToIntWithAlpha(16bf, 16s);
+ForAllChannelsScaleAnyToIntWithAlpha(16bf, 16u);
+ForAllChannelsScaleAnyToIntWithAlpha(16bf, 32s);
+ForAllChannelsScaleAnyToIntWithAlpha(16bf, 32u);
 
-template ImageView<Pixel32sC4> &ImageView<Pixel32sC3>::SwapChannel<Pixel32sC4>(
-    ImageView<Pixel32sC4> &aDst, const ChannelList<vector_active_size_v<Pixel32sC4>> &aDstChannels,
-    remove_vector_t<Pixel32sC3> aValue) const;
-template ImageView<Pixel32sC3> &ImageView<Pixel32sC4>::SwapChannel<Pixel32sC3>(
-    ImageView<Pixel32sC3> &aDst, const ChannelList<vector_active_size_v<Pixel32sC3>> &aDstChannels) const;
-template ImageView<Pixel32sC3> &ImageView<Pixel32sC3>::SwapChannel<Pixel32sC3>(
-    ImageView<Pixel32sC3> &aDst, const ChannelList<vector_active_size_v<Pixel32sC3>> &aDstChannels) const;
-template ImageView<Pixel32sC4> &ImageView<Pixel32sC4>::SwapChannel<Pixel32sC4>(
-    ImageView<Pixel32sC4> &aDst, const ChannelList<vector_active_size_v<Pixel32sC4>> &aDstChannels) const;
+ForAllChannelsScaleAnyToIntWithAlpha(32f, 8s);
+ForAllChannelsScaleAnyToIntWithAlpha(32f, 8u);
+ForAllChannelsScaleAnyToIntWithAlpha(32f, 16s);
+ForAllChannelsScaleAnyToIntWithAlpha(32f, 16u);
+ForAllChannelsScaleAnyToIntWithAlpha(32f, 32s);
+ForAllChannelsScaleAnyToIntWithAlpha(32f, 32u);
 
-template ImageView<Pixel16fC4> &ImageView<Pixel16fC3>::SwapChannel<Pixel16fC4>(
-    ImageView<Pixel16fC4> &aDst, const ChannelList<vector_active_size_v<Pixel16fC4>> &aDstChannels,
-    remove_vector_t<Pixel16fC3> aValue) const;
-template ImageView<Pixel16fC3> &ImageView<Pixel16fC4>::SwapChannel<Pixel16fC3>(
-    ImageView<Pixel16fC3> &aDst, const ChannelList<vector_active_size_v<Pixel16fC3>> &aDstChannels) const;
-template ImageView<Pixel16fC3> &ImageView<Pixel16fC3>::SwapChannel<Pixel16fC3>(
-    ImageView<Pixel16fC3> &aDst, const ChannelList<vector_active_size_v<Pixel16fC3>> &aDstChannels) const;
-template ImageView<Pixel16fC4> &ImageView<Pixel16fC4>::SwapChannel<Pixel16fC4>(
-    ImageView<Pixel16fC4> &aDst, const ChannelList<vector_active_size_v<Pixel16fC4>> &aDstChannels) const;
+ForAllChannelsScaleAnyToIntWithAlpha(64f, 8s);
+ForAllChannelsScaleAnyToIntWithAlpha(64f, 8u);
+ForAllChannelsScaleAnyToIntWithAlpha(64f, 16s);
+ForAllChannelsScaleAnyToIntWithAlpha(64f, 16u);
+ForAllChannelsScaleAnyToIntWithAlpha(64f, 32s);
+ForAllChannelsScaleAnyToIntWithAlpha(64f, 32u);
 
-template ImageView<Pixel16bfC4> &ImageView<Pixel16bfC3>::SwapChannel<Pixel16bfC4>(
-    ImageView<Pixel16bfC4> &aDst, const ChannelList<vector_active_size_v<Pixel16bfC4>> &aDstChannels,
-    remove_vector_t<Pixel16bfC3> aValue) const;
-template ImageView<Pixel16bfC3> &ImageView<Pixel16bfC4>::SwapChannel<Pixel16bfC3>(
-    ImageView<Pixel16bfC3> &aDst, const ChannelList<vector_active_size_v<Pixel16bfC3>> &aDstChannels) const;
-template ImageView<Pixel16bfC3> &ImageView<Pixel16bfC3>::SwapChannel<Pixel16bfC3>(
-    ImageView<Pixel16bfC3> &aDst, const ChannelList<vector_active_size_v<Pixel16bfC3>> &aDstChannels) const;
-template ImageView<Pixel16bfC4> &ImageView<Pixel16bfC4>::SwapChannel<Pixel16bfC4>(
-    ImageView<Pixel16bfC4> &aDst, const ChannelList<vector_active_size_v<Pixel16bfC4>> &aDstChannels) const;
+ForAllChannelsScaleAnyToIntNoAlpha(16sc, 32sc);
+ForAllChannelsScaleAnyToIntNoAlpha(32sc, 16sc);
+ForAllChannelsScaleAnyToIntNoAlpha(32fc, 16sc);
+ForAllChannelsScaleAnyToIntNoAlpha(32fc, 32sc);
 
-template ImageView<Pixel32fC4> &ImageView<Pixel32fC3>::SwapChannel<Pixel32fC4>(
-    ImageView<Pixel32fC4> &aDst, const ChannelList<vector_active_size_v<Pixel32fC4>> &aDstChannels,
-    remove_vector_t<Pixel32fC3> aValue) const;
-template ImageView<Pixel32fC3> &ImageView<Pixel32fC4>::SwapChannel<Pixel32fC3>(
-    ImageView<Pixel32fC3> &aDst, const ChannelList<vector_active_size_v<Pixel32fC3>> &aDstChannels) const;
-template ImageView<Pixel32fC3> &ImageView<Pixel32fC3>::SwapChannel<Pixel32fC3>(
-    ImageView<Pixel32fC3> &aDst, const ChannelList<vector_active_size_v<Pixel32fC3>> &aDstChannels) const;
-template ImageView<Pixel32fC4> &ImageView<Pixel32fC4>::SwapChannel<Pixel32fC4>(
-    ImageView<Pixel32fC4> &aDst, const ChannelList<vector_active_size_v<Pixel32fC4>> &aDstChannels) const;
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(8s, 8u);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(8s, 16s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(8s, 16u);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(8s, 32s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(8s, 32u);
+ForAllChannelsScaleAnyToAnyWithAlpha(8s, 16f);
+ForAllChannelsScaleAnyToAnyWithAlpha(8s, 16bf);
+ForAllChannelsScaleAnyToAnyWithAlpha(8s, 32f);
+ForAllChannelsScaleAnyToAnyWithAlpha(8s, 64f);
 
-template ImageView<Pixel64fC4> &ImageView<Pixel64fC3>::SwapChannel<Pixel64fC4>(
-    ImageView<Pixel64fC4> &aDst, const ChannelList<vector_active_size_v<Pixel64fC4>> &aDstChannels,
-    remove_vector_t<Pixel64fC3> aValue) const;
-template ImageView<Pixel64fC3> &ImageView<Pixel64fC4>::SwapChannel<Pixel64fC3>(
-    ImageView<Pixel64fC3> &aDst, const ChannelList<vector_active_size_v<Pixel64fC3>> &aDstChannels) const;
-template ImageView<Pixel64fC3> &ImageView<Pixel64fC3>::SwapChannel<Pixel64fC3>(
-    ImageView<Pixel64fC3> &aDst, const ChannelList<vector_active_size_v<Pixel64fC3>> &aDstChannels) const;
-template ImageView<Pixel64fC4> &ImageView<Pixel64fC4>::SwapChannel<Pixel64fC4>(
-    ImageView<Pixel64fC4> &aDst, const ChannelList<vector_active_size_v<Pixel64fC4>> &aDstChannels) const;
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(8u, 8s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(8u, 16s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(8u, 16u);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(8u, 32s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(8u, 32u);
+ForAllChannelsScaleAnyToAnyWithAlpha(8u, 16f);
+ForAllChannelsScaleAnyToAnyWithAlpha(8u, 16bf);
+ForAllChannelsScaleAnyToAnyWithAlpha(8u, 32f);
+ForAllChannelsScaleAnyToAnyWithAlpha(8u, 64f);
 
-template ImageView<Pixel16scC4> &ImageView<Pixel16scC3>::SwapChannel<Pixel16scC4>(
-    ImageView<Pixel16scC4> &aDst, const ChannelList<vector_active_size_v<Pixel16scC4>> &aDstChannels,
-    remove_vector_t<Pixel16scC3> aValue) const;
-template ImageView<Pixel16scC3> &ImageView<Pixel16scC4>::SwapChannel<Pixel16scC3>(
-    ImageView<Pixel16scC3> &aDst, const ChannelList<vector_active_size_v<Pixel16scC3>> &aDstChannels) const;
-template ImageView<Pixel16scC3> &ImageView<Pixel16scC3>::SwapChannel<Pixel16scC3>(
-    ImageView<Pixel16scC3> &aDst, const ChannelList<vector_active_size_v<Pixel16scC3>> &aDstChannels) const;
-template ImageView<Pixel16scC4> &ImageView<Pixel16scC4>::SwapChannel<Pixel16scC4>(
-    ImageView<Pixel16scC4> &aDst, const ChannelList<vector_active_size_v<Pixel16scC4>> &aDstChannels) const;
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16s, 8u);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16s, 8s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16s, 16u);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16s, 32s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16s, 32u);
+ForAllChannelsScaleAnyToAnyWithAlpha(16s, 16f);
+ForAllChannelsScaleAnyToAnyWithAlpha(16s, 16bf);
+ForAllChannelsScaleAnyToAnyWithAlpha(16s, 32f);
+ForAllChannelsScaleAnyToAnyWithAlpha(16s, 64f);
 
-template ImageView<Pixel32scC4> &ImageView<Pixel32scC3>::SwapChannel<Pixel32scC4>(
-    ImageView<Pixel32scC4> &aDst, const ChannelList<vector_active_size_v<Pixel32scC4>> &aDstChannels,
-    remove_vector_t<Pixel32scC3> aValue) const;
-template ImageView<Pixel32scC3> &ImageView<Pixel32scC4>::SwapChannel<Pixel32scC3>(
-    ImageView<Pixel32scC3> &aDst, const ChannelList<vector_active_size_v<Pixel32scC3>> &aDstChannels) const;
-template ImageView<Pixel32scC3> &ImageView<Pixel32scC3>::SwapChannel<Pixel32scC3>(
-    ImageView<Pixel32scC3> &aDst, const ChannelList<vector_active_size_v<Pixel32scC3>> &aDstChannels) const;
-template ImageView<Pixel32scC4> &ImageView<Pixel32scC4>::SwapChannel<Pixel32scC4>(
-    ImageView<Pixel32scC4> &aDst, const ChannelList<vector_active_size_v<Pixel32scC4>> &aDstChannels) const;
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16u, 8s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16u, 8u);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16u, 16s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16u, 32s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16u, 32u);
+ForAllChannelsScaleAnyToAnyWithAlpha(16u, 16f);
+ForAllChannelsScaleAnyToAnyWithAlpha(16u, 16bf);
+ForAllChannelsScaleAnyToAnyWithAlpha(16u, 32f);
+ForAllChannelsScaleAnyToAnyWithAlpha(16u, 64f);
 
-template ImageView<Pixel32fcC4> &ImageView<Pixel32fcC3>::SwapChannel<Pixel32fcC4>(
-    ImageView<Pixel32fcC4> &aDst, const ChannelList<vector_active_size_v<Pixel32fcC4>> &aDstChannels,
-    remove_vector_t<Pixel32fcC3> aValue) const;
-template ImageView<Pixel32fcC3> &ImageView<Pixel32fcC4>::SwapChannel<Pixel32fcC3>(
-    ImageView<Pixel32fcC3> &aDst, const ChannelList<vector_active_size_v<Pixel32fcC3>> &aDstChannels) const;
-template ImageView<Pixel32fcC3> &ImageView<Pixel32fcC3>::SwapChannel<Pixel32fcC3>(
-    ImageView<Pixel32fcC3> &aDst, const ChannelList<vector_active_size_v<Pixel32fcC3>> &aDstChannels) const;
-template ImageView<Pixel32fcC4> &ImageView<Pixel32fcC4>::SwapChannel<Pixel32fcC4>(
-    ImageView<Pixel32fcC4> &aDst, const ChannelList<vector_active_size_v<Pixel32fcC4>> &aDstChannels) const;
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(32s, 8u);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(32s, 8s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(32s, 16u);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(32s, 16s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(32s, 32u);
+ForAllChannelsScaleAnyToAnyWithAlpha(32s, 16f);
+ForAllChannelsScaleAnyToAnyWithAlpha(32s, 16bf);
+ForAllChannelsScaleAnyToAnyWithAlpha(32s, 32f);
+ForAllChannelsScaleAnyToAnyWithAlpha(32s, 64f);
+
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(32u, 8s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(32u, 8u);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(32u, 16s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(32u, 16u);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(32u, 32s);
+ForAllChannelsScaleAnyToAnyWithAlpha(32u, 16f);
+ForAllChannelsScaleAnyToAnyWithAlpha(32u, 16bf);
+ForAllChannelsScaleAnyToAnyWithAlpha(32u, 32f);
+ForAllChannelsScaleAnyToAnyWithAlpha(32u, 64f);
+
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16f, 8s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16f, 8u);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16f, 16s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16f, 16u);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16f, 32s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16f, 32u);
+ForAllChannelsScaleAnyToAnyWithAlpha(16f, 16bf);
+ForAllChannelsScaleAnyToAnyWithAlpha(16f, 32f);
+ForAllChannelsScaleAnyToAnyWithAlpha(16f, 64f);
+
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16bf, 8s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16bf, 8u);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16bf, 16s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16bf, 16u);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16bf, 32s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(16bf, 32u);
+ForAllChannelsScaleAnyToAnyWithAlpha(16bf, 16f);
+ForAllChannelsScaleAnyToAnyWithAlpha(16bf, 32f);
+ForAllChannelsScaleAnyToAnyWithAlpha(16bf, 64f);
+
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(32f, 8s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(32f, 8u);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(32f, 16s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(32f, 16u);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(32f, 32s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(32f, 32u);
+ForAllChannelsScaleAnyToAnyWithAlpha(32f, 16f);
+ForAllChannelsScaleAnyToAnyWithAlpha(32f, 16bf);
+ForAllChannelsScaleAnyToAnyWithAlpha(32f, 64f);
+
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(64f, 8s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(64f, 8u);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(64f, 16s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(64f, 16u);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(64f, 32s);
+ForAllChannelsScaleAnyToAnyRoundWithAlpha(64f, 32u);
+ForAllChannelsScaleAnyToAnyWithAlpha(64f, 16f);
+ForAllChannelsScaleAnyToAnyWithAlpha(64f, 16bf);
+ForAllChannelsScaleAnyToAnyWithAlpha(64f, 32f);
+
+ForAllChannelsScaleAnyToAnyRoundNoAlpha(16sc, 32sc);
+ForAllChannelsScaleAnyToAnyNoAlpha(16sc, 32fc);
+ForAllChannelsScaleAnyToAnyRoundNoAlpha(32sc, 16sc);
+ForAllChannelsScaleAnyToAnyNoAlpha(32sc, 32fc);
+ForAllChannelsScaleAnyToAnyRoundNoAlpha(32fc, 16sc);
+ForAllChannelsScaleAnyToAnyRoundNoAlpha(32fc, 32sc);
 
 } // namespace mpp::image::cpuSimple

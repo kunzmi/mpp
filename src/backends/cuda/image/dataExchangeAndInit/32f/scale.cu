@@ -7,15 +7,15 @@ using namespace mpp::cuda;
 namespace mpp::image::cuda
 {
 
-ForAllChannelsWithAlpha(32f, 8s);
-ForAllChannelsWithAlpha(32f, 8u);
-ForAllChannelsWithAlpha(32f, 16s);
-ForAllChannelsWithAlpha(32f, 16u);
-ForAllChannelsWithAlpha(32f, 32u);
-ForAllChannelsWithAlpha(32f, 32s);
-ForAllChannelsWithAlpha(32f, 64f);
-ForAllChannelsWithAlpha(32f, 16f);
-ForAllChannelsWithAlpha(32f, 16bf);
+ForAllChannelsWithAlphaIntRound(32f, 8s);
+ForAllChannelsWithAlphaIntRound(32f, 8u);
+ForAllChannelsWithAlphaIntRound(32f, 16s);
+ForAllChannelsWithAlphaIntRound(32f, 16u);
+ForAllChannelsWithAlphaIntRound(32f, 32u);
+ForAllChannelsWithAlphaIntRound(32f, 32s);
+ForAllChannelsWithAlphaFloat(32f, 64f);
+ForAllChannelsWithAlphaFloat(32f, 16f);
+ForAllChannelsWithAlphaFloat(32f, 16bf);
 
 } // namespace mpp::image::cuda
 #endif // MPP_ENABLE_CUDA_BACKEND
