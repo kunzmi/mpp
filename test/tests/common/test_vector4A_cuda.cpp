@@ -833,6 +833,12 @@ void fillData(std::vector<Vector4A<T>> &aDataIn, std::vector<Vector4A<T>> &aData
         }
         if constexpr (RealIntegral<T>)
         {
+            // no integer division by 0 (scaling is not protected):
+            if (aDataIn[counterIn + 1].x <= T(0))
+            {
+                aDataIn[counterIn + 1].x = T(2);
+            }
+
             aDataOut[counterOut] = aDataIn[counterIn];
             aDataOut[counterOut].DivScaleRoundNearest(aDataIn[counterIn + 1].x);
             counterOut += 1;
@@ -859,6 +865,11 @@ void fillData(std::vector<Vector4A<T>> &aDataIn, std::vector<Vector4A<T>> &aData
         }
         if constexpr (ComplexIntegral<T>)
         {
+            // no integer division by 0 (scaling is not protected):
+            if (aDataIn[counterIn + 1].x.real <= complex_basetype_t<T>(0))
+            {
+                aDataIn[counterIn + 1].x.real = complex_basetype_t<T>(2);
+            }
             aDataOut[counterOut] = aDataIn[counterIn];
             aDataOut[counterOut].DivScaleRoundNearest(aDataIn[counterIn + 1].x.real);
             counterOut += 1;
