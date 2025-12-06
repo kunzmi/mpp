@@ -5,6 +5,7 @@
 #include <common/half_fp16.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
+#include <common/utilities.h>
 #include <complex>
 #include <concepts>
 #include <iostream>
@@ -1014,4 +1015,17 @@ template <> struct make_complex<double>
 };
 
 template <typename T> using make_complex_t = typename make_complex<T>::type;
+
+template <RealFloatingPoint T> DEVICE_CODE inline bool isnan(const Complex<T> &aVal)
+{
+    return isnan(aVal.real) || isnan(aVal.imag);
+}
+template <RealFloatingPoint T> DEVICE_CODE inline bool isinf(const Complex<T> &aVal)
+{
+    return isinf(aVal.real) || isinf(aVal.imag);
+}
+template <RealFloatingPoint T> DEVICE_CODE inline bool isfinite(const Complex<T> &aVal)
+{
+    return isfinite(aVal.real) && isfinite(aVal.imag);
+}
 } // namespace mpp

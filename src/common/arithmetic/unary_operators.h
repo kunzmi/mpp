@@ -582,4 +582,539 @@ struct Scale
         }
     }
 };
+
+template <RealOrComplexFloatingVector T, bool AnyChannel> struct IsFinite
+{
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(vector_active_size_v<T> == 1)
+    {
+        aDst = static_cast<byte>(static_cast<int>(isfinite(aSrc1.x)) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == false && vector_active_size_v<T> == 2)
+    {
+        const bool res = isfinite(aSrc1.x) && isfinite(aSrc1.y);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 2)
+    {
+        const bool res = isfinite(aSrc1.x) || isfinite(aSrc1.y);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector2<byte> &aDst) const
+        requires(vector_active_size_v<T> == 2)
+    {
+        aDst.x = static_cast<byte>(static_cast<int>(isfinite(aSrc1.x)) * TRUE_VALUE);
+        aDst.y = static_cast<byte>(static_cast<int>(isfinite(aSrc1.y)) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == false && vector_active_size_v<T> == 3)
+    {
+        const bool res = isfinite(aSrc1.x) && isfinite(aSrc1.y) && isfinite(aSrc1.z);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 3)
+    {
+        const bool res = isfinite(aSrc1.x) || isfinite(aSrc1.y) || isfinite(aSrc1.z);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, same_vector_size_different_type_t<T, byte> &aDst) const
+        requires(vector_active_size_v<T> == 3)
+    {
+        aDst.x = static_cast<byte>(static_cast<int>(isfinite(aSrc1.x)) * TRUE_VALUE);
+        aDst.y = static_cast<byte>(static_cast<int>(isfinite(aSrc1.y)) * TRUE_VALUE);
+        aDst.z = static_cast<byte>(static_cast<int>(isfinite(aSrc1.z)) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == false && vector_active_size_v<T> == 4)
+    {
+        const bool res = isfinite(aSrc1.x) && isfinite(aSrc1.y) && isfinite(aSrc1.z) && isfinite(aSrc1.w);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 4)
+    {
+        const bool res = isfinite(aSrc1.x) || isfinite(aSrc1.y) || isfinite(aSrc1.z) || isfinite(aSrc1.w);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector4<byte> &aDst) const
+        requires(vector_active_size_v<T> == 4)
+    {
+        aDst.x = static_cast<byte>(static_cast<int>(isfinite(aSrc1.x)) * TRUE_VALUE);
+        aDst.y = static_cast<byte>(static_cast<int>(isfinite(aSrc1.y)) * TRUE_VALUE);
+        aDst.z = static_cast<byte>(static_cast<int>(isfinite(aSrc1.z)) * TRUE_VALUE);
+        aDst.w = static_cast<byte>(static_cast<int>(isfinite(aSrc1.w)) * TRUE_VALUE);
+    }
+};
+
+template <RealOrComplexFloatingVector T, bool AnyChannel> struct IsNaN
+{
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(vector_active_size_v<T> == 1)
+    {
+        aDst = static_cast<byte>(static_cast<int>(isnan(aSrc1.x)) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == false && vector_active_size_v<T> == 2)
+    {
+        const bool res = isnan(aSrc1.x) && isnan(aSrc1.y);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 2)
+    {
+        const bool res = isnan(aSrc1.x) || isnan(aSrc1.y);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector2<byte> &aDst) const
+        requires(vector_active_size_v<T> == 2)
+    {
+        aDst.x = static_cast<byte>(static_cast<int>(isnan(aSrc1.x)) * TRUE_VALUE);
+        aDst.y = static_cast<byte>(static_cast<int>(isnan(aSrc1.y)) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == false && vector_active_size_v<T> == 3)
+    {
+        const bool res = isnan(aSrc1.x) && isnan(aSrc1.y) && isnan(aSrc1.z);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 3)
+    {
+        const bool res = isnan(aSrc1.x) || isnan(aSrc1.y) || isnan(aSrc1.z);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, same_vector_size_different_type_t<T, byte> &aDst) const
+        requires(vector_active_size_v<T> == 3)
+    {
+        aDst.x = static_cast<byte>(static_cast<int>(isnan(aSrc1.x)) * TRUE_VALUE);
+        aDst.y = static_cast<byte>(static_cast<int>(isnan(aSrc1.y)) * TRUE_VALUE);
+        aDst.z = static_cast<byte>(static_cast<int>(isnan(aSrc1.z)) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == false && vector_active_size_v<T> == 4)
+    {
+        const bool res = isnan(aSrc1.x) && isnan(aSrc1.y) && isnan(aSrc1.z) && isnan(aSrc1.w);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 4)
+    {
+        const bool res = isnan(aSrc1.x) || isnan(aSrc1.y) || isnan(aSrc1.z) || isnan(aSrc1.w);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector4<byte> &aDst) const
+        requires(vector_active_size_v<T> == 4)
+    {
+        aDst.x = static_cast<byte>(static_cast<int>(isnan(aSrc1.x)) * TRUE_VALUE);
+        aDst.y = static_cast<byte>(static_cast<int>(isnan(aSrc1.y)) * TRUE_VALUE);
+        aDst.z = static_cast<byte>(static_cast<int>(isnan(aSrc1.z)) * TRUE_VALUE);
+        aDst.w = static_cast<byte>(static_cast<int>(isnan(aSrc1.w)) * TRUE_VALUE);
+    }
+};
+
+template <RealOrComplexFloatingVector T, bool AnyChannel> struct IsInf
+{
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(vector_active_size_v<T> == 1)
+    {
+        aDst = static_cast<byte>(static_cast<int>(isinf(aSrc1.x)) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == false && vector_active_size_v<T> == 2)
+    {
+        const bool res = isinf(aSrc1.x) && isinf(aSrc1.y);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 2)
+    {
+        const bool res = isinf(aSrc1.x) || isinf(aSrc1.y);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector2<byte> &aDst) const
+        requires(vector_active_size_v<T> == 2)
+    {
+        aDst.x = static_cast<byte>(static_cast<int>(isinf(aSrc1.x)) * TRUE_VALUE);
+        aDst.y = static_cast<byte>(static_cast<int>(isinf(aSrc1.y)) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == false && vector_active_size_v<T> == 3)
+    {
+        const bool res = isinf(aSrc1.x) && isinf(aSrc1.y) && isinf(aSrc1.z);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 3)
+    {
+        const bool res = isinf(aSrc1.x) || isinf(aSrc1.y) || isinf(aSrc1.z);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, same_vector_size_different_type_t<T, byte> &aDst) const
+        requires(vector_active_size_v<T> == 3)
+    {
+        aDst.x = static_cast<byte>(static_cast<int>(isinf(aSrc1.x)) * TRUE_VALUE);
+        aDst.y = static_cast<byte>(static_cast<int>(isinf(aSrc1.y)) * TRUE_VALUE);
+        aDst.z = static_cast<byte>(static_cast<int>(isinf(aSrc1.z)) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == false && vector_active_size_v<T> == 4)
+    {
+        const bool res = isinf(aSrc1.x) && isinf(aSrc1.y) && isinf(aSrc1.z) && isinf(aSrc1.w);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 4)
+    {
+        const bool res = isinf(aSrc1.x) || isinf(aSrc1.y) || isinf(aSrc1.z) || isinf(aSrc1.w);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector4<byte> &aDst) const
+        requires(vector_active_size_v<T> == 4)
+    {
+        aDst.x = static_cast<byte>(static_cast<int>(isinf(aSrc1.x)) * TRUE_VALUE);
+        aDst.y = static_cast<byte>(static_cast<int>(isinf(aSrc1.y)) * TRUE_VALUE);
+        aDst.z = static_cast<byte>(static_cast<int>(isinf(aSrc1.z)) * TRUE_VALUE);
+        aDst.w = static_cast<byte>(static_cast<int>(isinf(aSrc1.w)) * TRUE_VALUE);
+    }
+};
+
+template <RealOrComplexFloatingVector T, bool AnyChannel> struct IsInfOrNaN
+{
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(vector_active_size_v<T> == 1)
+    {
+        aDst = static_cast<byte>(static_cast<int>(isinf(aSrc1.x) || isnan(aSrc1.x)) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == false && vector_active_size_v<T> == 2)
+    {
+        const bool res = (isinf(aSrc1.x) || isnan(aSrc1.x)) && (isinf(aSrc1.y) || isnan(aSrc1.y));
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 2)
+    {
+        const bool res = (isinf(aSrc1.x) || isnan(aSrc1.x)) || (isinf(aSrc1.y) || isnan(aSrc1.y));
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector2<byte> &aDst) const
+        requires(vector_active_size_v<T> == 2)
+    {
+        aDst.x = static_cast<byte>(static_cast<int>(isinf(aSrc1.x) || isnan(aSrc1.x)) * TRUE_VALUE);
+        aDst.y = static_cast<byte>(static_cast<int>(isinf(aSrc1.y) || isnan(aSrc1.y)) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == false && vector_active_size_v<T> == 3)
+    {
+        const bool res = (isinf(aSrc1.x) || isnan(aSrc1.x)) && (isinf(aSrc1.y) || isnan(aSrc1.y)) &&
+                         (isinf(aSrc1.z) || isnan(aSrc1.z));
+        aDst = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 3)
+    {
+        const bool res = (isinf(aSrc1.x) || isnan(aSrc1.x)) || (isinf(aSrc1.y) || isnan(aSrc1.y)) ||
+                         (isinf(aSrc1.z) || isnan(aSrc1.z));
+        aDst = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, same_vector_size_different_type_t<T, byte> &aDst) const
+        requires(vector_active_size_v<T> == 3)
+    {
+        aDst.x = static_cast<byte>(static_cast<int>(isinf(aSrc1.x) || isnan(aSrc1.x)) * TRUE_VALUE);
+        aDst.y = static_cast<byte>(static_cast<int>(isinf(aSrc1.y) || isnan(aSrc1.y)) * TRUE_VALUE);
+        aDst.z = static_cast<byte>(static_cast<int>(isinf(aSrc1.z) || isnan(aSrc1.z)) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == false && vector_active_size_v<T> == 4)
+    {
+        const bool res = (isinf(aSrc1.x) || isnan(aSrc1.x)) && (isinf(aSrc1.y) || isnan(aSrc1.y)) &&
+                         (isinf(aSrc1.z) || isnan(aSrc1.z)) && (isinf(aSrc1.w) || isnan(aSrc1.w));
+        aDst = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 4)
+    {
+        const bool res = (isinf(aSrc1.x) || isnan(aSrc1.x)) || (isinf(aSrc1.y) || isnan(aSrc1.y)) ||
+                         (isinf(aSrc1.z) || isnan(aSrc1.z)) || (isinf(aSrc1.w) || isnan(aSrc1.w));
+        aDst = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector4<byte> &aDst) const
+        requires(vector_active_size_v<T> == 4)
+    {
+        aDst.x = static_cast<byte>(static_cast<int>(isinf(aSrc1.x) || isnan(aSrc1.x)) * TRUE_VALUE);
+        aDst.y = static_cast<byte>(static_cast<int>(isinf(aSrc1.y) || isnan(aSrc1.y)) * TRUE_VALUE);
+        aDst.z = static_cast<byte>(static_cast<int>(isinf(aSrc1.z) || isnan(aSrc1.z)) * TRUE_VALUE);
+        aDst.w = static_cast<byte>(static_cast<int>(isinf(aSrc1.w) || isnan(aSrc1.w)) * TRUE_VALUE);
+    }
+};
+
+template <RealFloatingVector T, bool AnyChannel> struct IsPositiveInf
+{
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(vector_active_size_v<T> == 1)
+    {
+        aDst = static_cast<byte>(static_cast<int>(isinf(aSrc1.x) && aSrc1.x > 0) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == false && vector_active_size_v<T> == 2)
+    {
+        const bool res = (isinf(aSrc1.x) && aSrc1.x > 0) && (isinf(aSrc1.y) && aSrc1.y > 0);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 2)
+    {
+        const bool res = (isinf(aSrc1.x) && aSrc1.x > 0) || (isinf(aSrc1.y) && aSrc1.y > 0);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector2<byte> &aDst) const
+        requires(vector_active_size_v<T> == 2)
+    {
+        aDst.x = static_cast<byte>(static_cast<int>(isinf(aSrc1.x) && aSrc1.x > 0) * TRUE_VALUE);
+        aDst.y = static_cast<byte>(static_cast<int>(isinf(aSrc1.y) && aSrc1.y > 0) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == false && vector_active_size_v<T> == 3)
+    {
+        const bool res =
+            (isinf(aSrc1.x) && aSrc1.x > 0) && (isinf(aSrc1.y) && aSrc1.y > 0) && (isinf(aSrc1.z) && aSrc1.z > 0);
+        aDst = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 3)
+    {
+        const bool res =
+            (isinf(aSrc1.x) && aSrc1.x > 0) || (isinf(aSrc1.y) && aSrc1.y > 0) || (isinf(aSrc1.z) && aSrc1.z > 0);
+        aDst = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, same_vector_size_different_type_t<T, byte> &aDst) const
+        requires(vector_active_size_v<T> == 3)
+    {
+        aDst.x = static_cast<byte>(static_cast<int>(isinf(aSrc1.x) && aSrc1.x > 0) * TRUE_VALUE);
+        aDst.y = static_cast<byte>(static_cast<int>(isinf(aSrc1.y) && aSrc1.y > 0) * TRUE_VALUE);
+        aDst.z = static_cast<byte>(static_cast<int>(isinf(aSrc1.z) && aSrc1.z > 0) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == false && vector_active_size_v<T> == 4)
+    {
+        const bool res = (isinf(aSrc1.x) && aSrc1.x > 0) && (isinf(aSrc1.y) && aSrc1.y > 0) &&
+                         (isinf(aSrc1.z) && aSrc1.z > 0) && (isinf(aSrc1.w) && aSrc1.w > 0);
+        aDst = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 4)
+    {
+        const bool res = (isinf(aSrc1.x) && aSrc1.x > 0) || (isinf(aSrc1.y) && aSrc1.y > 0) ||
+                         (isinf(aSrc1.z) && aSrc1.z > 0) || (isinf(aSrc1.w) && aSrc1.w > 0);
+        aDst = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector4<byte> &aDst) const
+        requires(vector_active_size_v<T> == 4)
+    {
+        aDst.x = static_cast<byte>(static_cast<int>(isinf(aSrc1.x) && aSrc1.x > 0) * TRUE_VALUE);
+        aDst.y = static_cast<byte>(static_cast<int>(isinf(aSrc1.y) && aSrc1.y > 0) * TRUE_VALUE);
+        aDst.z = static_cast<byte>(static_cast<int>(isinf(aSrc1.z) && aSrc1.z > 0) * TRUE_VALUE);
+        aDst.w = static_cast<byte>(static_cast<int>(isinf(aSrc1.w) && aSrc1.w > 0) * TRUE_VALUE);
+    }
+};
+
+template <RealFloatingVector T, bool AnyChannel> struct IsNegativeInf
+{
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(vector_active_size_v<T> == 1)
+    {
+        aDst = static_cast<byte>(static_cast<int>(isinf(aSrc1.x) && aSrc1.x < 0) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == false && vector_active_size_v<T> == 2)
+    {
+        const bool res = (isinf(aSrc1.x) && aSrc1.x < 0) && (isinf(aSrc1.y) && aSrc1.y < 0);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 2)
+    {
+        const bool res = (isinf(aSrc1.x) && aSrc1.x < 0) || (isinf(aSrc1.y) && aSrc1.y < 0);
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector2<byte> &aDst) const
+        requires(vector_active_size_v<T> == 2)
+    {
+        aDst.x = static_cast<byte>(static_cast<int>(isinf(aSrc1.x) && aSrc1.x < 0) * TRUE_VALUE);
+        aDst.y = static_cast<byte>(static_cast<int>(isinf(aSrc1.y) && aSrc1.y < 0) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == false && vector_active_size_v<T> == 3)
+    {
+        const bool res =
+            (isinf(aSrc1.x) && aSrc1.x < 0) && (isinf(aSrc1.y) && aSrc1.y < 0) && (isinf(aSrc1.z) && aSrc1.z < 0);
+        aDst = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 3)
+    {
+        const bool res =
+            (isinf(aSrc1.x) && aSrc1.x < 0) || (isinf(aSrc1.y) && aSrc1.y < 0) || (isinf(aSrc1.z) && aSrc1.z < 0);
+        aDst = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, same_vector_size_different_type_t<T, byte> &aDst) const
+        requires(vector_active_size_v<T> == 3)
+    {
+        aDst.x = static_cast<byte>(static_cast<int>(isinf(aSrc1.x) && aSrc1.x < 0) * TRUE_VALUE);
+        aDst.y = static_cast<byte>(static_cast<int>(isinf(aSrc1.y) && aSrc1.y < 0) * TRUE_VALUE);
+        aDst.z = static_cast<byte>(static_cast<int>(isinf(aSrc1.z) && aSrc1.z < 0) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == false && vector_active_size_v<T> == 4)
+    {
+        const bool res = (isinf(aSrc1.x) && aSrc1.x < 0) && (isinf(aSrc1.y) && aSrc1.y < 0) &&
+                         (isinf(aSrc1.z) && aSrc1.z < 0) && (isinf(aSrc1.w) && aSrc1.w < 0);
+        aDst = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 4)
+    {
+        const bool res = (isinf(aSrc1.x) && aSrc1.x < 0) || (isinf(aSrc1.y) && aSrc1.y < 0) ||
+                         (isinf(aSrc1.z) && aSrc1.z < 0) || (isinf(aSrc1.w) && aSrc1.w < 0);
+        aDst = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, Vector4<byte> &aDst) const
+        requires(vector_active_size_v<T> == 4)
+    {
+        aDst.x = static_cast<byte>(static_cast<int>(isinf(aSrc1.x) && aSrc1.x < 0) * TRUE_VALUE);
+        aDst.y = static_cast<byte>(static_cast<int>(isinf(aSrc1.y) && aSrc1.y < 0) * TRUE_VALUE);
+        aDst.z = static_cast<byte>(static_cast<int>(isinf(aSrc1.z) && aSrc1.z < 0) * TRUE_VALUE);
+        aDst.w = static_cast<byte>(static_cast<int>(isinf(aSrc1.w) && aSrc1.w < 0) * TRUE_VALUE);
+    }
+};
+
+template <RealFloatingVector T, typename ComperatorT, RealIntVector CompareT> struct ReplaceIfUnary
+{
+    ComperatorT comperator{};
+    T Value;
+
+    ReplaceIfUnary(const T &aValue) : Value(aValue)
+    {
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, T &aDst) const
+        requires(vector_active_size_v<CompareT> == 1)
+    {
+        aDst = comperator(aSrc1).x ? Value : aSrc1;
+    }
+    DEVICE_CODE void operator()(T &aSrcDst) const
+        requires(vector_active_size_v<T> == 1)
+    {
+        aSrcDst = comperator(aSrcDst).x ? Value : aSrcDst;
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, T &aDst) const
+        requires(vector_active_size_v<CompareT> == 2)
+    {
+        const Vector2<byte> comp = comperator(aSrc1);
+        aDst.x                   = comp.x ? Value.x : aSrc1.x;
+        aDst.y                   = comp.y ? Value.y : aSrc1.y;
+    }
+    DEVICE_CODE void operator()(T &aSrcDst) const
+        requires(vector_active_size_v<T> == 2)
+    {
+        const Vector2<byte> comp = comperator(aSrcDst);
+        aSrcDst.x                = comp.x ? Value.x : aSrcDst.x;
+        aSrcDst.y                = comp.y ? Value.y : aSrcDst.y;
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, T &aDst) const
+        requires(vector_active_size_v<CompareT> == 3)
+    {
+        const auto comp = comperator(aSrc1);
+        aDst.x          = comp.x ? Value.x : aSrc1.x;
+        aDst.y          = comp.y ? Value.y : aSrc1.y;
+        aDst.z          = comp.z ? Value.z : aSrc1.z;
+    }
+    DEVICE_CODE void operator()(T &aSrcDst) const
+        requires(vector_active_size_v<T> == 3)
+    {
+        const auto comp = comperator(aSrcDst);
+        aSrcDst.x       = comp.x ? Value.x : aSrcDst.x;
+        aSrcDst.y       = comp.y ? Value.y : aSrcDst.y;
+        aSrcDst.z       = comp.z ? Value.z : aSrcDst.z;
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, T &aDst) const
+        requires(vector_active_size_v<CompareT> == 4)
+    {
+        const Vector4<byte> comp = comperator(aSrc1);
+        aDst.x                   = comp.x ? Value.x : aSrc1.x;
+        aDst.y                   = comp.y ? Value.y : aSrc1.y;
+        aDst.z                   = comp.z ? Value.z : aSrc1.z;
+        aDst.w                   = comp.w ? Value.w : aSrc1.w;
+    }
+    DEVICE_CODE void operator()(T &aSrcDst) const
+        requires(vector_active_size_v<T> == 4)
+    {
+        const Vector4<byte> comp = comperator(aSrcDst);
+        aSrcDst.x                = comp.x ? Value.x : aSrcDst.x;
+        aSrcDst.y                = comp.y ? Value.y : aSrcDst.y;
+        aSrcDst.z                = comp.z ? Value.z : aSrcDst.z;
+        aSrcDst.w                = comp.w ? Value.w : aSrcDst.w;
+    }
+};
+
 } // namespace mpp

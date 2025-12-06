@@ -38,6 +38,7 @@ class alignas(2) BFloat16
 
     friend bool DEVICE_CODE isnan(BFloat16 aVal);
     friend bool DEVICE_CODE isinf(BFloat16 aVal);
+    friend bool DEVICE_CODE isfinite(BFloat16 aVal);
 
   public:
     BFloat16() noexcept = default;
@@ -514,6 +515,10 @@ DEVICE_CODE inline bool isinf(BFloat16 aVal)
 {
     return __hisinf(aVal.value);
 }
+DEVICE_CODE inline bool isfinite(BFloat16 aVal)
+{
+    return !(__hisinf(aVal.value) || __hisnan(aVal.value));
+}
 #endif
 
 #ifdef IS_HOST_COMPILER
@@ -524,6 +529,10 @@ DEVICE_CODE inline bool isnan(BFloat16 aVal)
 DEVICE_CODE inline bool isinf(BFloat16 aVal)
 {
     return std::isinf(static_cast<float>(aVal));
+}
+DEVICE_CODE inline bool isfinite(BFloat16 aVal)
+{
+    return std::isfinite(static_cast<float>(aVal));
 }
 #endif
 

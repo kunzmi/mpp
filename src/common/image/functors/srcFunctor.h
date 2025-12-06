@@ -29,7 +29,7 @@ namespace mpp::image
 /// <typeparam name="roundingMode"></typeparam>
 template <size_t tupelSize, typename SrcT, typename ComputeT, typename DstT, typename operation,
           RoundingMode roundingMode = RoundingMode::NearestTiesAwayFromZero, typename ComputeT_SIMD = voidType,
-          typename operation_SIMD = voidType>
+          typename operation_SIMD = voidType, bool SrcIsSameAsCompute = false>
 struct SrcFunctor : public ImageFunctor<false>
 {
     const SrcT *RESTRICT Src1;
@@ -63,7 +63,7 @@ struct SrcFunctor : public ImageFunctor<false>
     /// Returns true if the value has been successfully set
     /// </summary>
     DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
-        requires std::same_as<ComputeT, DstT>
+        requires std::same_as<ComputeT, DstT> || (SrcIsSameAsCompute)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         Op(static_cast<ComputeT>(*pixelSrc1), aDst);
@@ -73,7 +73,7 @@ struct SrcFunctor : public ImageFunctor<false>
     // for copy sub-channel and dup (SrcT == ComputeT)
     DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
         requires std::same_as<remove_vector_t<ComputeT>, remove_vector_t<DstT>> &&
-                 (vector_size_v<ComputeT> != vector_size_v<DstT>)
+                 (vector_size_v<ComputeT> != vector_size_v<DstT>) && (!SrcIsSameAsCompute)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         Op(*pixelSrc1, aDst);
@@ -85,7 +85,8 @@ struct SrcFunctor : public ImageFunctor<false>
     /// </summary>
     DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
         requires(!std::same_as<ComputeT, DstT>) && (!(ComplexVector<ComputeT> && RealVector<DstT>)) &&
-                (!(RealVector<ComputeT> && ComplexVector<DstT>)) && (vector_size_v<ComputeT> == vector_size_v<DstT>)
+                (!(RealVector<ComputeT> && ComplexVector<DstT>)) && (vector_size_v<ComputeT> == vector_size_v<DstT>) &&
+                (!SrcIsSameAsCompute)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         ComputeT temp;
@@ -100,7 +101,8 @@ struct SrcFunctor : public ImageFunctor<false>
     /// Returns true if the value has been successfully set
     /// </summary>
     DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
-        requires(!std::same_as<ComputeT, DstT>) && ((ComplexVector<ComputeT> && RealVector<DstT>))
+        requires(!std::same_as<ComputeT, DstT>) && ((ComplexVector<ComputeT> && RealVector<DstT>)) &&
+                (!SrcIsSameAsCompute)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         same_vector_size_different_type_t<ComputeT, complex_basetype_t<remove_vector_t<ComputeT>>> temp;
@@ -116,7 +118,8 @@ struct SrcFunctor : public ImageFunctor<false>
 
     // Needed for the conversion real->Complex
     DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
-        requires(!std::same_as<ComputeT, DstT>) && ((RealVector<ComputeT> && ComplexVector<DstT>))
+        requires(!std::same_as<ComputeT, DstT>) && ((RealVector<ComputeT> && ComplexVector<DstT>)) &&
+                (!SrcIsSameAsCompute)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         Op(*pixelSrc1, aDst);
@@ -139,8 +142,9 @@ struct SrcFunctor : public ImageFunctor<false>
 
 #pragma region run sequential on pixel tupel
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
-        requires std::same_as<ComputeT, DstT> && //
-                 std::same_as<ComputeT_SIMD, voidType>
+        requires(std::same_as<ComputeT, DstT> && //
+                 std::same_as<ComputeT_SIMD, voidType>) ||
+                (SrcIsSameAsCompute)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
 
@@ -157,7 +161,7 @@ struct SrcFunctor : public ImageFunctor<false>
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires std::same_as<remove_vector_t<ComputeT>, remove_vector_t<DstT>> && //
                  (vector_size_v<ComputeT> != vector_size_v<DstT>) &&               //
-                 std::same_as<ComputeT_SIMD, voidType>
+                 std::same_as<ComputeT_SIMD, voidType> && (!SrcIsSameAsCompute)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
 
@@ -173,7 +177,8 @@ struct SrcFunctor : public ImageFunctor<false>
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires(!std::same_as<ComputeT, DstT>) && //
                 std::same_as<ComputeT_SIMD, voidType> && (!(ComplexVector<ComputeT> && RealVector<DstT>)) &&
-                (!(RealVector<ComputeT> && ComplexVector<DstT>)) && (vector_size_v<ComputeT> == vector_size_v<DstT>)
+                (!(RealVector<ComputeT> && ComplexVector<DstT>)) && (vector_size_v<ComputeT> == vector_size_v<DstT>) &&
+                (!SrcIsSameAsCompute)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
 
@@ -192,7 +197,8 @@ struct SrcFunctor : public ImageFunctor<false>
 
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires(!std::same_as<ComputeT, DstT>) && //
-                std::same_as<ComputeT_SIMD, voidType> && ((ComplexVector<ComputeT> && RealVector<DstT>))
+                std::same_as<ComputeT_SIMD, voidType> && ((ComplexVector<ComputeT> && RealVector<DstT>)) &&
+                (!SrcIsSameAsCompute)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
 
@@ -215,7 +221,8 @@ struct SrcFunctor : public ImageFunctor<false>
     // Needed for the conversion real->Complex
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
         requires(!std::same_as<ComputeT, DstT>) && //
-                std::same_as<ComputeT_SIMD, voidType> && ((RealVector<ComputeT> && ComplexVector<DstT>))
+                std::same_as<ComputeT_SIMD, voidType> && ((RealVector<ComputeT> && ComplexVector<DstT>)) &&
+                (!SrcIsSameAsCompute)
     {
         const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
 

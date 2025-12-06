@@ -16,9 +16,9 @@
 #include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
 #include <common/image/roiException.h>
+#include <common/mpp_defs.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
-#include <common/mpp_defs.h>
 #include <common/utilities.h>
 #include <common/vector_typetraits.h>
 #include <concepts>
@@ -33,8 +33,8 @@ ImageView<Pixel8uC1> &ImageView<T>::Compare(const ImageView<T> &aSrc2, CompareOp
     checkSameSize(ROI(), aSrc2.ROI());
     checkSameSize(ROI(), aDst.ROI());
 
-    InvokeCompareSrcSrc(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
-                        aCompare, SizeRoi(), aStreamCtx);
+    InvokeCompareSrcSrc<T, T, Pixel8uC1>(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aDst.PointerRoi(),
+                                         aDst.Pitch(), aCompare, SizeRoi(), aStreamCtx);
     return aDst;
 }
 
@@ -44,7 +44,8 @@ ImageView<Pixel8uC1> &ImageView<T>::Compare(const T &aConst, CompareOp aCompare,
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    InvokeCompareSrcC(PointerRoi(), Pitch(), aConst, aDst.PointerRoi(), aDst.Pitch(), aCompare, SizeRoi(), aStreamCtx);
+    InvokeCompareSrcC<T, T, Pixel8uC1>(PointerRoi(), Pitch(), aConst, aDst.PointerRoi(), aDst.Pitch(), aCompare,
+                                       SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -55,8 +56,77 @@ ImageView<Pixel8uC1> &ImageView<T>::Compare(const mpp::cuda::DevVarView<T> &aCon
 {
     checkSameSize(ROI(), aDst.ROI());
 
-    InvokeCompareSrcDevC(PointerRoi(), Pitch(), aConst.Pointer(), aDst.PointerRoi(), aDst.Pitch(), aCompare, SizeRoi(),
-                         aStreamCtx);
+    InvokeCompareSrcDevC<T, T, Pixel8uC1>(PointerRoi(), Pitch(), aConst.Pointer(), aDst.PointerRoi(), aDst.Pitch(),
+                                          aCompare, SizeRoi(), aStreamCtx);
+
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<Pixel8uC1> &ImageView<T>::Compare(CompareOp aCompare, ImageView<Pixel8uC1> &aDst,
+                                            const mpp::cuda::StreamCtx &aStreamCtx) const
+    requires RealOrComplexFloatingVector<T>
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    InvokeCompareSrc<T, T, Pixel8uC1>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aCompare, SizeRoi(),
+                                      aStreamCtx);
+
+    return aDst;
+}
+template <PixelType T>
+ImageView<same_vector_size_different_type_t<T, byte>> &ImageView<T>::Compare(
+    const ImageView<T> &aSrc2, CompareOp aCompare, ImageView<same_vector_size_different_type_t<T, byte>> &aDst,
+    const mpp::cuda::StreamCtx &aStreamCtx) const
+    requires(vector_size_v<T> > 1)
+{
+    checkSameSize(ROI(), aSrc2.ROI());
+    checkSameSize(ROI(), aDst.ROI());
+
+    InvokeCompareSrcSrc<T, T, same_vector_size_different_type_t<T, byte>>(
+        PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aCompare, SizeRoi(),
+        aStreamCtx);
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<same_vector_size_different_type_t<T, byte>> &ImageView<T>::Compare(
+    const T &aConst, CompareOp aCompare, ImageView<same_vector_size_different_type_t<T, byte>> &aDst,
+    const mpp::cuda::StreamCtx &aStreamCtx) const
+    requires(vector_size_v<T> > 1)
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    InvokeCompareSrcC<T, T, same_vector_size_different_type_t<T, byte>>(
+        PointerRoi(), Pitch(), aConst, aDst.PointerRoi(), aDst.Pitch(), aCompare, SizeRoi(), aStreamCtx);
+
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<same_vector_size_different_type_t<T, byte>> &ImageView<T>::Compare(
+    const mpp::cuda::DevVarView<T> &aConst, CompareOp aCompare,
+    ImageView<same_vector_size_different_type_t<T, byte>> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
+    requires(vector_size_v<T> > 1)
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    InvokeCompareSrcDevC<T, T, same_vector_size_different_type_t<T, byte>>(
+        PointerRoi(), Pitch(), aConst.Pointer(), aDst.PointerRoi(), aDst.Pitch(), aCompare, SizeRoi(), aStreamCtx);
+
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<same_vector_size_different_type_t<T, byte>> &ImageView<T>::Compare(
+    CompareOp aCompare, ImageView<same_vector_size_different_type_t<T, byte>> &aDst,
+    const mpp::cuda::StreamCtx &aStreamCtx) const
+    requires RealOrComplexFloatingVector<T> && (vector_size_v<T> > 1)
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    InvokeCompareSrc<T, T, same_vector_size_different_type_t<T, byte>>(PointerRoi(), Pitch(), aDst.PointerRoi(),
+                                                                       aDst.Pitch(), aCompare, SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -356,6 +426,94 @@ ImageView<T> &ImageView<T>::ThresholdLTGT(const T &aThresholdLT, const T &aValue
 {
     InvokeThresholdLTValGTValInplaceC(PointerRoi(), Pitch(), aThresholdLT, aValueLT, aThresholdGT, aValueGT, SizeRoi(),
                                       aStreamCtx);
+    return *this;
+}
+#pragma endregion
+#pragma region ReplaceIf
+
+template <PixelType T>
+ImageView<T> &ImageView<T>::ReplaceIf(const ImageView<T> &aSrc2, CompareOp aCompare, const T &aValue,
+                                      ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
+{
+    checkSameSize(ROI(), aSrc2.ROI());
+    checkSameSize(ROI(), aDst.ROI());
+
+    InvokeReplaceIfSrcSrc(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aValue, aDst.PointerRoi(),
+                          aDst.Pitch(), aCompare, SizeRoi(), aStreamCtx);
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<T> &ImageView<T>::ReplaceIf(const T &aConst, CompareOp aCompare, const T &aValue, ImageView<T> &aDst,
+                                      const mpp::cuda::StreamCtx &aStreamCtx) const
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    InvokeReplaceIfSrcC(PointerRoi(), Pitch(), aConst, aValue, aDst.PointerRoi(), aDst.Pitch(), aCompare, SizeRoi(),
+                        aStreamCtx);
+
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<T> &ImageView<T>::ReplaceIf(const mpp::cuda::DevVarView<T> &aConst, CompareOp aCompare, const T &aValue,
+                                      ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    InvokeReplaceIfSrcDevC(PointerRoi(), Pitch(), aConst.Pointer(), aValue, aDst.PointerRoi(), aDst.Pitch(), aCompare,
+                           SizeRoi(), aStreamCtx);
+
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<T> &ImageView<T>::ReplaceIf(CompareOp aCompare, const T &aValue, ImageView<T> &aDst,
+                                      const mpp::cuda::StreamCtx &aStreamCtx) const
+    requires RealOrComplexFloatingVector<T>
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    InvokeReplaceIfSrc(PointerRoi(), Pitch(), aValue, aDst.PointerRoi(), aDst.Pitch(), aCompare, SizeRoi(), aStreamCtx);
+
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<T> &ImageView<T>::ReplaceIf(const ImageView<T> &aSrc2, CompareOp aCompare, const T &aValue,
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
+{
+    checkSameSize(ROI(), aSrc2.ROI());
+
+    InvokeReplaceIfInplaceSrcSrc(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aValue, aCompare, SizeRoi(),
+                                 aStreamCtx);
+    return *this;
+}
+
+template <PixelType T>
+ImageView<T> &ImageView<T>::ReplaceIf(const T &aConst, CompareOp aCompare, const T &aValue,
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
+{
+    InvokeReplaceIfInplaceSrcC(PointerRoi(), Pitch(), aConst, aValue, aCompare, SizeRoi(), aStreamCtx);
+
+    return *this;
+}
+
+template <PixelType T>
+ImageView<T> &ImageView<T>::ReplaceIf(const mpp::cuda::DevVarView<T> &aConst, CompareOp aCompare, const T &aValue,
+                                      const mpp::cuda::StreamCtx &aStreamCtx)
+{
+    InvokeReplaceIfInplaceSrcDevC(PointerRoi(), Pitch(), aConst.Pointer(), aValue, aCompare, SizeRoi(), aStreamCtx);
+
+    return *this;
+}
+
+template <PixelType T>
+ImageView<T> &ImageView<T>::ReplaceIf(CompareOp aCompare, const T &aValue, const mpp::cuda::StreamCtx &aStreamCtx)
+    requires RealOrComplexFloatingVector<T>
+{
+    InvokeReplaceIfInplaceSrc(PointerRoi(), Pitch(), aValue, aCompare, SizeRoi(), aStreamCtx);
+
     return *this;
 }
 #pragma endregion

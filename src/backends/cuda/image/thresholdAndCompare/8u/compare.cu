@@ -11,5 +11,9 @@ ForAllChannelsWithAlphaInvokeCompareSrcSrc(8u);
 ForAllChannelsWithAlphaInvokeCompareSrcC(8u);
 ForAllChannelsWithAlphaInvokeCompareSrcDevC(8u);
 
+ForAllChannelsWithAlphaInvokeCompareSrcSrcAnyChannel(8u);
+ForAllChannelsWithAlphaInvokeCompareSrcCAnyChannel(8u);
+ForAllChannelsWithAlphaInvokeCompareSrcDevCAnyChannel(8u);
+
 } // namespace mpp::image::cuda
 #endif // MPP_ENABLE_CUDA_BACKEND

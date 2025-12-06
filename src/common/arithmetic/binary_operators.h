@@ -440,57 +440,189 @@ template <RealOrComplexFloatingVector T> struct EqEps
     }
 };
 
-template <AnyVector T> struct Eq
+template <AnyVector T, bool AnyChannel> struct Eq
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == false || vector_active_size_v<T> == 1)
     {
         aDst = static_cast<byte>(static_cast<int>(aSrc1 == aSrc2) * TRUE_VALUE);
     }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 2)
+    {
+        const bool res = aSrc1.x == aSrc2.x || aSrc1.y == aSrc2.y;
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 3)
+    {
+        const bool res = aSrc1.x == aSrc2.x || aSrc1.y == aSrc2.y || aSrc1.z == aSrc2.z;
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 4)
+    {
+        const bool res = aSrc1.x == aSrc2.x || aSrc1.y == aSrc2.y || aSrc1.z == aSrc2.z || aSrc1.w == aSrc2.w;
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
 };
 
-template <RealVector T> struct Ge
+template <RealVector T, bool AnyChannel> struct Ge
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == false || vector_active_size_v<T> == 1)
     {
         aDst = static_cast<byte>(static_cast<int>(aSrc1 >= aSrc2) * TRUE_VALUE);
     }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 2)
+    {
+        const bool res = aSrc1.x >= aSrc2.x || aSrc1.y >= aSrc2.y;
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 3)
+    {
+        const bool res = aSrc1.x >= aSrc2.x || aSrc1.y >= aSrc2.y || aSrc1.z >= aSrc2.z;
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 4)
+    {
+        const bool res = aSrc1.x >= aSrc2.x || aSrc1.y >= aSrc2.y || aSrc1.z >= aSrc2.z || aSrc1.w >= aSrc2.w;
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
 };
 
-template <RealVector T> struct Gt
+template <RealVector T, bool AnyChannel> struct Gt
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == false || vector_active_size_v<T> == 1)
     {
         aDst = static_cast<byte>(static_cast<int>(aSrc1 > aSrc2) * TRUE_VALUE);
     }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 2)
+    {
+        const bool res = aSrc1.x > aSrc2.x || aSrc1.y > aSrc2.y;
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 3)
+    {
+        const bool res = aSrc1.x > aSrc2.x || aSrc1.y > aSrc2.y || aSrc1.z > aSrc2.z;
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 4)
+    {
+        const bool res = aSrc1.x > aSrc2.x || aSrc1.y > aSrc2.y || aSrc1.z > aSrc2.z || aSrc1.w > aSrc2.w;
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
 };
 
-template <RealVector T> struct Le
+template <RealVector T, bool AnyChannel> struct Le
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == false || vector_active_size_v<T> == 1)
     {
         aDst = static_cast<byte>(static_cast<int>(aSrc1 <= aSrc2) * TRUE_VALUE);
     }
-};
 
-template <RealVector T> struct Lt
-{
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 2)
     {
-        aDst = static_cast<byte>(static_cast<int>(aSrc1 < aSrc2) * TRUE_VALUE);
+        const bool res = aSrc1.x <= aSrc2.x || aSrc1.y <= aSrc2.y;
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 3)
+    {
+        const bool res = aSrc1.x <= aSrc2.x || aSrc1.y <= aSrc2.y || aSrc1.z <= aSrc2.z;
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 4)
+    {
+        const bool res = aSrc1.x <= aSrc2.x || aSrc1.y <= aSrc2.y || aSrc1.z <= aSrc2.z || aSrc1.w <= aSrc2.w;
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
     }
 };
 
-template <AnyVector T> struct NEq
+template <RealVector T, bool AnyChannel> struct Lt
 {
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == false || vector_active_size_v<T> == 1)
+    {
+        aDst = static_cast<byte>(static_cast<int>(aSrc1 < aSrc2) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 2)
+    {
+        const bool res = aSrc1.x < aSrc2.x || aSrc1.y < aSrc2.y;
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 3)
+    {
+        const bool res = aSrc1.x < aSrc2.x || aSrc1.y < aSrc2.y || aSrc1.z < aSrc2.z;
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 4)
+    {
+        const bool res = aSrc1.x < aSrc2.x || aSrc1.y < aSrc2.y || aSrc1.z < aSrc2.z || aSrc1.w < aSrc2.w;
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+};
+
+template <AnyVector T, bool AnyChannel> struct NEq
+{
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == false || vector_active_size_v<T> == 1)
     {
         aDst = static_cast<byte>(static_cast<int>(aSrc1 != aSrc2) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 2)
+    {
+        const bool res = aSrc1.x != aSrc2.x || aSrc1.y != aSrc2.y;
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 3)
+    {
+        const bool res = aSrc1.x != aSrc2.x || aSrc1.y != aSrc2.y || aSrc1.z != aSrc2.z;
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, Vector1<byte> &aDst) const
+        requires(AnyChannel == true && vector_active_size_v<T> == 4)
+    {
+        const bool res = aSrc1.x != aSrc2.x || aSrc1.y != aSrc2.y || aSrc1.z != aSrc2.z || aSrc1.w != aSrc2.w;
+        aDst           = static_cast<byte>(static_cast<int>(res) * TRUE_VALUE);
     }
 };
 
 template <AnyVector T> struct CompareEq
 {
-    void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst) const
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst) const
     {
         aDst = T::CompareEQ(aSrc1, aSrc2);
     }
@@ -533,6 +665,122 @@ template <AnyVector T> struct CompareNEq
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, same_vector_size_different_type_t<T, byte> &aDst) const
     {
         aDst = T::CompareNEQ(aSrc1, aSrc2);
+    }
+};
+
+template <AnyVector T, typename ComperatorT, RealIntVector CompareT> struct ReplaceIf
+{
+    ComperatorT comperator{};
+    T Value;
+
+    ReplaceIf(const T &aValue) : Value(aValue)
+    {
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
+        requires(vector_active_size_v<CompareT> == 1)
+    {
+        CompareT comp;
+        comperator(aSrc1, aSrc2, comp);
+        aDst = comp.x ? Value : aSrc1;
+    }
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
+        requires(vector_active_size_v<CompareT> == 1)
+    {
+        CompareT comp;
+        comperator(aSrcDst, aSrc1, comp);
+        aSrcDst = comp.x ? Value : aSrcDst;
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
+        requires(vector_active_size_v<CompareT> > 1)
+    {
+        CompareT comp;
+        comperator(aSrc1, aSrc2, comp);
+        aDst.x = comp.x ? Value.x : aSrc1.x;
+        aDst.y = comp.y ? Value.y : aSrc1.y;
+        if constexpr (vector_active_size_v<CompareT> > 2)
+        {
+            aDst.z = comp.z ? Value.z : aSrc1.z;
+        }
+        if constexpr (vector_active_size_v<CompareT> > 3)
+        {
+            aDst.w = comp.w ? Value.w : aSrc1.w;
+        }
+    }
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
+        requires(vector_active_size_v<CompareT> > 1)
+    {
+        CompareT comp;
+        comperator(aSrcDst, aSrc1, comp);
+        aSrcDst.x = comp.x ? Value.x : aSrcDst.x;
+        aSrcDst.y = comp.y ? Value.y : aSrcDst.y;
+        if constexpr (vector_active_size_v<CompareT> > 2)
+        {
+            aSrcDst.z = comp.z ? Value.z : aSrcDst.z;
+        }
+        if constexpr (vector_active_size_v<CompareT> > 3)
+        {
+            aSrcDst.w = comp.w ? Value.w : aSrcDst.w;
+        }
+    }
+};
+
+template <AnyVector T, typename ComperatorT, RealIntVector CompareT> struct ReplaceIfFP
+{
+    ComperatorT comperator{};
+    T Value;
+
+    ReplaceIfFP(const T &aValue) : Value(aValue)
+    {
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, T &aDst) const
+        requires(vector_active_size_v<CompareT> == 1)
+    {
+        CompareT comp;
+        comperator(aSrc1, comp);
+        aDst = comp.x ? Value : aSrc1;
+    }
+    DEVICE_CODE void operator()(T &aSrcDst) const
+        requires(vector_active_size_v<CompareT> == 1)
+    {
+        CompareT comp;
+        comperator(aSrcDst, comp);
+        aSrcDst = comp.x ? Value : aSrcDst;
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, T &aDst) const
+        requires(vector_active_size_v<CompareT> > 1)
+    {
+        CompareT comp;
+        comperator(aSrc1, comp);
+        aDst.x = comp.x ? Value.x : aSrc1.x;
+        aDst.y = comp.y ? Value.y : aSrc1.y;
+        if constexpr (vector_active_size_v<CompareT> > 2)
+        {
+            aDst.z = comp.z ? Value.z : aSrc1.z;
+        }
+        if constexpr (vector_active_size_v<CompareT> > 3)
+        {
+            aDst.w = comp.w ? Value.w : aSrc1.w;
+        }
+    }
+    DEVICE_CODE void operator()(T &aSrcDst) const
+        requires(vector_active_size_v<CompareT> > 1)
+    {
+        CompareT comp;
+        comperator(aSrcDst, comp);
+        aSrcDst.x = comp.x ? Value.x : aSrcDst.x;
+        aSrcDst.y = comp.y ? Value.y : aSrcDst.y;
+        if constexpr (vector_active_size_v<CompareT> > 2)
+        {
+            aSrcDst.z = comp.z ? Value.z : aSrcDst.z;
+        }
+        if constexpr (vector_active_size_v<CompareT> > 3)
+        {
+            aSrcDst.w = comp.w ? Value.w : aSrcDst.w;
+        }
     }
 };
 

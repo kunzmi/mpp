@@ -192,6 +192,15 @@ DEVICE_CODE inline bool isinf(float aFloat)
     return std::isinf(aFloat);
 #endif
 }
+DEVICE_CODE inline bool isfinite(float aFloat)
+{
+#ifdef IS_CUDA_COMPILER
+    return ::isfinite(aFloat);
+#endif
+#ifdef IS_HOST_COMPILER
+    return std::isfinite(aFloat);
+#endif
+}
 
 DEVICE_CODE inline bool isnan(double aFloat)
 {
@@ -209,6 +218,15 @@ DEVICE_CODE inline bool isinf(double aFloat)
 #endif
 #ifdef IS_HOST_COMPILER
     return std::isinf(aFloat);
+#endif
+}
+DEVICE_CODE inline bool isfinite(double aFloat)
+{
+#ifdef IS_CUDA_COMPILER
+    return ::isfinite(aFloat);
+#endif
+#ifdef IS_HOST_COMPILER
+    return std::isfinite(aFloat);
 #endif
 }
 

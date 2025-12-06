@@ -9626,23 +9626,83 @@ template <PixelType T> class ImageView
 #pragma region Threshold and Compare
 #pragma region Compare
     /// <summary>
-    /// aDst pixel is set to 255 if all color channels in this and aSrc2 fulfill aCompare, 0 otherwise.
+    /// aDst pixel is set to 255 if this and aSrc2 fulfill aCompare, 0 otherwise.<para/>
+    /// The flag CompareOp::AnyChannel controls how the comparison is performed for multi channel images:<para/>
+    /// CompareOp::Eq is true only if all channels in a pixel are equal whereas <para/>
+    /// CompareOp::Eq | CompareOp::AnyChannel is true if any of the channels in a pixel is equal.
     /// </summary>
     ImageView<Pixel8uC1> &Compare(const ImageView<T> &aSrc2, CompareOp aCompare, ImageView<Pixel8uC1> &aDst,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
-    /// aDst pixel is set to 255 if all color channels in this and aConst fulfill aCompare, 0 otherwise.
+    /// aDst pixel is set to 255 if this and aConst fulfill aCompare, 0 otherwise.<para/>
+    /// The flag CompareOp::AnyChannel controls how the comparison is performed for multi channel images:<para/>
+    /// CompareOp::Eq is true only if all channels in a pixel are equal whereas <para/>
+    /// CompareOp::Eq | CompareOp::AnyChannel is true if any of the channels in a pixel is equal.
     /// </summary>
     ImageView<Pixel8uC1> &Compare(const T &aConst, CompareOp aCompare, ImageView<Pixel8uC1> &aDst,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
-    /// aDst pixel is set to 255 if all color channels in this and aConst fulfill aCompare, 0 otherwise.
+    /// aDst pixel is set to 255 if this and aConst fulfill aCompare, 0 otherwise.<para/>
+    /// The flag CompareOp::AnyChannel controls how the comparison is performed for multi channel images:<para/>
+    /// CompareOp::Eq is true only if all channels in a pixel are equal whereas <para/>
+    /// CompareOp::Eq | CompareOp::AnyChannel is true if any of the channels in a pixel is equal.
     /// </summary>
     ImageView<Pixel8uC1> &Compare(const mpp::cuda::DevVarView<T> &aConst, CompareOp aCompare,
                                   ImageView<Pixel8uC1> &aDst,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// aDst pixel is set to 255 if this fulfills aCompare (for floating point checks, e.g. isinf()), 0
+    /// otherwise.<para/> The flag CompareOp::AnyChannel controls how the comparison is performed for multi channel
+    /// images:<para/> CompareOp::Eq is true only if all channels in a pixel are equal whereas <para/> CompareOp::Eq |
+    /// CompareOp::AnyChannel is true if any of the channels in a pixel is equal.
+    /// </summary>
+    ImageView<Pixel8uC1> &Compare(CompareOp aCompare, ImageView<Pixel8uC1> &aDst,
+                                  const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
+        requires RealOrComplexFloatingVector<T>;
+
+    /// <summary>
+    /// aDst pixel is set to 255 if this and aSrc2 fulfill aCompare, 0 otherwise.<para/>
+    /// The comparison is performed for each channel individually and the flag CompareOp::PerChannel must be set for
+    /// aCompare.
+    /// </summary>
+    ImageView<same_vector_size_different_type_t<T, byte>> &Compare(
+        const ImageView<T> &aSrc2, CompareOp aCompare, ImageView<same_vector_size_different_type_t<T, byte>> &aDst,
+        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_size_v<T> > 1);
+
+    /// <summary>
+    /// aDst pixel is set to 255 if this and aConst fulfill aCompare, 0 otherwise.<para/>
+    /// The comparison is performed for each channel individually and the flag CompareOp::PerChannel must be set for
+    /// aCompare.
+    /// </summary>
+    ImageView<same_vector_size_different_type_t<T, byte>> &Compare(
+        const T &aConst, CompareOp aCompare, ImageView<same_vector_size_different_type_t<T, byte>> &aDst,
+        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_size_v<T> > 1);
+
+    /// <summary>
+    /// aDst pixel is set to 255 if this and aConst fulfill aCompare, 0 otherwise.<para/>
+    /// The comparison is performed for each channel individually and the flag CompareOp::PerChannel must be set for
+    /// aCompare.
+    /// </summary>
+    ImageView<same_vector_size_different_type_t<T, byte>> &Compare(
+        const mpp::cuda::DevVarView<T> &aConst, CompareOp aCompare,
+        ImageView<same_vector_size_different_type_t<T, byte>> &aDst,
+        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
+        requires(vector_size_v<T> > 1);
+
+    /// <summary>
+    /// aDst pixel is set to 255 if this fulfills aCompare (for floating point checks, e.g. isinf()), 0
+    /// otherwise.<para/> The comparison is performed for each channel individually and the flag CompareOp::PerChannel
+    /// must be set for aCompare.
+    /// </summary>
+    ImageView<same_vector_size_different_type_t<T, byte>> &Compare(
+        CompareOp aCompare, ImageView<same_vector_size_different_type_t<T, byte>> &aDst,
+        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
+        requires RealOrComplexFloatingVector<T> && (vector_size_v<T> > 1);
 
     /// <summary>
     /// aDst pixel is set to 255 if all color channels for abs(this - aSrc2) are &lt;= aEpsilon, 0 otherwise.
@@ -9813,6 +9873,101 @@ template <PixelType T> class ImageView
     ImageView<T> &ThresholdLTGT(const T &aThresholdLT, const T &aValueLT, const T &aThresholdGT, const T &aValueGT,
                                 const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires RealVector<T>;
+#pragma endregion
+#pragma region ReplaceIf
+
+    /// <summary>
+    /// aDst pixel is set to aValue if this and aSrc2 fulfill aCompare, this otherwise.<para/>
+    /// The flag CompareOp::AnyChannel controls how the comparison is performed for multi channel images:<para/>
+    /// CompareOp::Eq is true only if all channels in a pixel are equal whereas <para/>
+    /// CompareOp::Eq | CompareOp::AnyChannel is true if any of the channels in a pixel is equal.<para/>
+    /// Without the CompareOp::PerChannel flag, a pixel is compared for all channels and replaced by all channels. With
+    /// the CompareOp::PerChannel flag, each channel is compared and replaced seperately.
+    /// </summary>
+    ImageView<T> &ReplaceIf(const ImageView<T> &aSrc2, CompareOp aCompare, const T &aValue, ImageView<T> &aDst,
+                            const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// aDst pixel is set to aValue if this and aConst fulfill aCompare, this otherwise.<para/>
+    /// The flag CompareOp::AnyChannel controls how the comparison is performed for multi channel images:<para/>
+    /// CompareOp::Eq is true only if all channels in a pixel are equal whereas <para/>
+    /// CompareOp::Eq | CompareOp::AnyChannel is true if any of the channels in a pixel is equal.<para/>
+    /// Without the CompareOp::PerChannel flag, a pixel is compared for all channels and replaced by all channels. With
+    /// the CompareOp::PerChannel flag, each channel is compared and replaced seperately.
+    /// </summary>
+    ImageView<T> &ReplaceIf(const T &aConst, CompareOp aCompare, const T &aValue, ImageView<T> &aDst,
+                            const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// aDst pixel is set to aValue if this and aConst fulfill aCompare, this otherwise.<para/>
+    /// The flag CompareOp::AnyChannel controls how the comparison is performed for multi channel images:<para/>
+    /// CompareOp::Eq is true only if all channels in a pixel are equal whereas <para/>
+    /// CompareOp::Eq | CompareOp::AnyChannel is true if any of the channels in a pixel is equal.<para/>
+    /// Without the CompareOp::PerChannel flag, a pixel is compared for all channels and replaced by all channels. With
+    /// the CompareOp::PerChannel flag, each channel is compared and replaced seperately.
+    /// </summary>
+    ImageView<T> &ReplaceIf(const mpp::cuda::DevVarView<T> &aConst, CompareOp aCompare, const T &aValue,
+                            ImageView<T> &aDst,
+                            const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const;
+
+    /// <summary>
+    /// aDst pixel is set to aValue if this fulfills aCompare (for floating point checks, e.g. isinf()), this
+    /// otherwise.<para/>
+    /// The flag CompareOp::AnyChannel controls how the comparison is performed for multi channel images:<para/>
+    /// CompareOp::Eq is true only if all channels in a pixel are equal whereas <para/>
+    /// CompareOp::Eq | CompareOp::AnyChannel is true if any of the channels in a pixel is equal.<para/>
+    /// Without the CompareOp::PerChannel flag, a pixel is compared for all channels and replaced by all channels. With
+    /// the CompareOp::PerChannel flag, each channel is compared and replaced seperately.
+    /// </summary>
+    ImageView<T> &ReplaceIf(CompareOp aCompare, const T &aValue, ImageView<T> &aDst,
+                            const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
+        requires RealOrComplexFloatingVector<T>;
+
+    /// <summary>
+    /// A pixel is set to aValue if this and aSrc2 fulfill aCompare, this otherwise (inplace operation).<para/>
+    /// The flag CompareOp::AnyChannel controls how the comparison is performed for multi channel images:<para/>
+    /// CompareOp::Eq is true only if all channels in a pixel are equal whereas <para/>
+    /// CompareOp::Eq | CompareOp::AnyChannel is true if any of the channels in a pixel is equal.<para/>
+    /// Without the CompareOp::PerChannel flag, a pixel is compared for all channels and replaced by all channels. With
+    /// the CompareOp::PerChannel flag, each channel is compared and replaced seperately.
+    /// </summary>
+    ImageView<T> &ReplaceIf(const ImageView<T> &aSrc2, CompareOp aCompare, const T &aValue,
+                            const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get());
+
+    /// <summary>
+    /// A pixel is set to aValue if this and aConst fulfill aCompare, this otherwise (inplace operation).<para/>
+    /// The flag CompareOp::AnyChannel controls how the comparison is performed for multi channel images:<para/>
+    /// CompareOp::Eq is true only if all channels in a pixel are equal whereas <para/>
+    /// CompareOp::Eq | CompareOp::AnyChannel is true if any of the channels in a pixel is equal.<para/>
+    /// Without the CompareOp::PerChannel flag, a pixel is compared for all channels and replaced by all channels. With
+    /// the CompareOp::PerChannel flag, each channel is compared and replaced seperately.
+    /// </summary>
+    ImageView<T> &ReplaceIf(const T &aConst, CompareOp aCompare, const T &aValue,
+                            const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get());
+
+    /// <summary>
+    /// A pixel is set to aValue if this and aConst fulfill aCompare, this otherwise (inplace operation).<para/>
+    /// The flag CompareOp::AnyChannel controls how the comparison is performed for multi channel images:<para/>
+    /// CompareOp::Eq is true only if all channels in a pixel are equal whereas <para/>
+    /// CompareOp::Eq | CompareOp::AnyChannel is true if any of the channels in a pixel is equal.<para/>
+    /// Without the CompareOp::PerChannel flag, a pixel is compared for all channels and replaced by all channels. With
+    /// the CompareOp::PerChannel flag, each channel is compared and replaced seperately.
+    /// </summary>
+    ImageView<T> &ReplaceIf(const mpp::cuda::DevVarView<T> &aConst, CompareOp aCompare, const T &aValue,
+                            const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get());
+
+    /// <summary>
+    /// A pixel is set to aValue if this fulfills aCompare (for floating point checks, e.g. isinf()), this
+    /// otherwise (inplace operation).<para/>
+    /// The flag CompareOp::AnyChannel controls how the comparison is performed for multi channel images:<para/>
+    /// CompareOp::Eq is true only if all channels in a pixel are equal whereas <para/>
+    /// CompareOp::Eq | CompareOp::AnyChannel is true if any of the channels in a pixel is equal.<para/>
+    /// Without the CompareOp::PerChannel flag, a pixel is compared for all channels and replaced by all channels. With
+    /// the CompareOp::PerChannel flag, each channel is compared and replaced seperately.
+    /// </summary>
+    ImageView<T> &ReplaceIf(CompareOp aCompare, const T &aValue,
+                            const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
+        requires RealOrComplexFloatingVector<T>;
 #pragma endregion
 #pragma endregion
 };

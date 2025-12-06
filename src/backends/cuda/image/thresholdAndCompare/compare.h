@@ -10,18 +10,22 @@
 
 namespace mpp::image::cuda
 {
-template <typename SrcT, typename ComputeT = SrcT, typename DstT>
+template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeCompareSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst,
                          size_t aPitchDst, CompareOp aCompare, const Size2D &aSize,
                          const mpp::cuda::StreamCtx &aStreamCtx);
 
-template <typename SrcT, typename ComputeT = SrcT, typename DstT>
+template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeCompareSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT *aDst, size_t aPitchDst,
                        CompareOp aCompare, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
 
-template <typename SrcT, typename ComputeT = SrcT, typename DstT>
+template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeCompareSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst, DstT *aDst, size_t aPitchDst,
                           CompareOp aCompare, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
+
+template <typename SrcT, typename ComputeT, typename DstT>
+void InvokeCompareSrc(const SrcT *aSrc, size_t aPitchSrc, DstT *aDst, size_t aPitchDst, CompareOp aCompare,
+                      const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
 
 } // namespace mpp::image::cuda
 #endif // MPP_ENABLE_CUDA_BACKEND

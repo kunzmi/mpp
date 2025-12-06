@@ -84,6 +84,7 @@ class alignas(2) HalfFp16
 #endif
     friend bool DEVICE_CODE isnan(HalfFp16 aVal);
     friend bool DEVICE_CODE isinf(HalfFp16 aVal);
+    friend bool DEVICE_CODE isfinite(HalfFp16 aVal);
 
 #ifdef IS_CUDA_COMPILER
     DEVICE_CODE operator __half() const;
@@ -437,6 +438,10 @@ DEVICE_CODE inline bool isinf(HalfFp16 aVal)
 {
     return __hisinf(aVal.value);
 }
+DEVICE_CODE inline bool isfinite(HalfFp16 aVal)
+{
+    return !(__hisinf(aVal.value) || __hisnan(aVal.value));
+}
 #endif
 
 #ifdef IS_HOST_COMPILER
@@ -447,6 +452,10 @@ DEVICE_CODE inline bool isnan(HalfFp16 aVal) // NOLINT(performance-unnecessary-v
 DEVICE_CODE inline bool isinf(HalfFp16 aVal) // NOLINT(performance-unnecessary-value-param)
 {
     return half_float::isinf(aVal.value);
+}
+DEVICE_CODE inline bool isfinite(HalfFp16 aVal) // NOLINT(performance-unnecessary-value-param)
+{
+    return half_float::isfinite(aVal.value);
 }
 
 std::ostream &operator<<(std::ostream &aOs, const mpp::HalfFp16 &aHalf);

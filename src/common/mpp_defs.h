@@ -141,8 +141,12 @@ inline std::ostream &operator<<(std::ostream &aOs, const RoundingMode &aRounding
             aOs << rouding_mode_name<RoundingMode::None>::value;
             break;
         default:
-            aOs << "Unknown";
-            break;
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aRoundingMode);
+            aOs.flags(f);
+        }
+        break;
     }
     return aOs;
 }
@@ -170,8 +174,12 @@ inline std::wostream &operator<<(std::wostream &aOs, const RoundingMode &aRoundi
             aOs << rouding_mode_name<RoundingMode::None>::value;
             break;
         default:
-            aOs << "Unknown";
-            break;
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aRoundingMode);
+            aOs.flags(f);
+        }
+        break;
     }
     return aOs;
 }
@@ -363,8 +371,12 @@ inline std::ostream &operator<<(std::ostream &aOs, const AlphaCompositionOp &aAl
             aOs << alpha_composition_name<AlphaCompositionOp::PlusPremul>::value;
             break;
         default:
-            aOs << "Unknown";
-            break;
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aAlphaComposition);
+            aOs.flags(f);
+        }
+        break;
     }
     return aOs;
 }
@@ -410,8 +422,12 @@ inline std::wostream &operator<<(std::wostream &aOs, const AlphaCompositionOp &a
             aOs << alpha_composition_name<AlphaCompositionOp::PlusPremul>::value;
             break;
         default:
-            aOs << "Unknown";
-            break;
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aAlphaComposition);
+            aOs.flags(f);
+        }
+        break;
     }
     return aOs;
 }
@@ -487,8 +503,12 @@ inline std::ostream &operator<<(std::ostream &aOs, const BayerGridPosition &aBay
             aOs << bayer_grid_position_name<BayerGridPosition::GRBG>::value;
             break;
         default:
-            aOs << "Unknown";
-            break;
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aBayerGridPosition);
+            aOs.flags(f);
+        }
+        break;
     }
     return aOs;
 }
@@ -510,8 +530,12 @@ inline std::wostream &operator<<(std::wostream &aOs, const BayerGridPosition &aB
             aOs << bayer_grid_position_name<BayerGridPosition::GRBG>::value;
             break;
         default:
-            aOs << "Unknown";
-            break;
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aBayerGridPosition);
+            aOs.flags(f);
+        }
+        break;
     }
     return aOs;
 }
@@ -568,8 +592,12 @@ inline std::ostream &operator<<(std::ostream &aOs, const MirrorAxis &aMirrorAxis
             aOs << mirror_axis_name<MirrorAxis::Both>::value;
             break;
         default:
-            aOs << "Unknown";
-            break;
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aMirrorAxis);
+            aOs.flags(f);
+        }
+        break;
     }
     return aOs;
 }
@@ -588,8 +616,12 @@ inline std::wostream &operator<<(std::wostream &aOs, const MirrorAxis &aMirrorAx
             aOs << mirror_axis_name<MirrorAxis::Both>::value;
             break;
         default:
-            aOs << "Unknown";
-            break;
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aMirrorAxis);
+            aOs.flags(f);
+        }
+        break;
     }
     return aOs;
 }
@@ -599,33 +631,92 @@ inline std::wostream &operator<<(std::wostream &aOs, const MirrorAxis &aMirrorAx
 /// <summary>
 /// Pixel comparison control values
 /// </summary>
-enum class CompareOp // NOLINT(performance-enum-size)
+enum class CompareOp : uint // NOLINT(performance-enum-size)
 {
     /// <summary>
     /// Returns true if the pixel value is &lt; than the value to compare with.
     /// </summary>
-    Less,
+    Less = 1u,
     /// <summary>
     /// Returns true if the pixel value is &lt;= than the value to compare with.
     /// </summary>
-    LessEq,
+    LessEq = 1u << 1u,
     /// <summary>
     /// Returns true if the pixel value is == than the value to compare with.
     /// </summary>
-    Eq,
+    Eq = 1u << 2u,
     /// <summary>
     /// Returns true if the pixel value is &gt; than the value to compare with.
     /// </summary>
-    Greater,
+    Greater = 1u << 3u,
     /// <summary>
     /// Returns true if the pixel value is &gt;= than the value to compare with.
     /// </summary>
-    GreaterEq,
+    GreaterEq = 1u << 4u,
     /// <summary>
     /// Returns true if the pixel value is != than the value to compare with.
     /// </summary>
-    NEq
+    NEq = 1u << 5u,
+    /// <summary>
+    /// Returns true if the pixel value is finite (only for floating point).
+    /// </summary>
+    IsFinite = 1u << 6u,
+    /// <summary>
+    /// Returns true if the pixel value is NaN (only for floating point).
+    /// </summary>
+    IsNaN = 1u << 7u,
+    /// <summary>
+    /// Returns true if the pixel value is infinite (only for floating point).
+    /// </summary>
+    IsInf = 1u << 8u,
+    /// <summary>
+    /// Returns true if the pixel value is infinite or NaN (i.e. not finite) (only for floating point).
+    /// </summary>
+    IsInfOrNaN = 1u << 9u,
+    /// <summary>
+    /// Returns true if the pixel value is positive infinite (only for floating point).
+    /// </summary>
+    IsPositiveInf = 1u << 10u,
+    /// <summary>
+    /// Returns true if the pixel value is negative infinite (only for floating point).
+    /// </summary>
+    IsNegativeInf = 1u << 11u,
+    /// <summary>
+    /// If PerChannel flag is set, the comparison is performed per channel independently.
+    /// </summary>
+    PerChannel = 1u << 26u,
+    /// <summary>
+    /// If AnyChannel flag is set, the comparison returns true if any of the pixel channel comparisons is true. If not
+    /// set, all pixel channel comparisons must be true.
+    /// </summary>
+    AnyChannel = 1u << 27u
 };
+
+constexpr CompareOp operator|(CompareOp aLeft, CompareOp aRight) noexcept
+{
+    return static_cast<CompareOp>(static_cast<uint>(aLeft) | static_cast<uint>(aRight));
+}
+
+constexpr CompareOp operator&(CompareOp aLeft, CompareOp aRight) noexcept
+{
+    return static_cast<CompareOp>(static_cast<uint>(aLeft) & static_cast<uint>(aRight));
+}
+
+constexpr bool CompareOp_IsPerChannel(CompareOp aCompareOp)
+{
+    return (static_cast<uint>(aCompareOp) & static_cast<uint>(CompareOp::PerChannel)) != 0;
+}
+
+constexpr bool CompareOp_IsAnyChannel(CompareOp aCompareOp)
+{
+    return (static_cast<uint>(aCompareOp) & static_cast<uint>(CompareOp::AnyChannel)) != 0;
+}
+
+constexpr CompareOp CompareOp_NoFlags(CompareOp aCompareOp)
+{
+    // 0xFFFF is smaller than the first flag and includes all bits of non-flag values.
+    return static_cast<CompareOp>(static_cast<uint>(aCompareOp) & 0xFFFFu);
+}
 
 template <CompareOp T> struct compare_op_name
 {
@@ -655,10 +746,42 @@ template <> struct compare_op_name<CompareOp::NEq>
 {
     static constexpr char value[] = "NEq";
 };
+template <> struct compare_op_name<CompareOp::IsFinite>
+{
+    static constexpr char value[] = "IsFinite";
+};
+template <> struct compare_op_name<CompareOp::IsNaN>
+{
+    static constexpr char value[] = "IsNaN";
+};
+template <> struct compare_op_name<CompareOp::IsInf>
+{
+    static constexpr char value[] = "IsInf";
+};
+template <> struct compare_op_name<CompareOp::IsInfOrNaN>
+{
+    static constexpr char value[] = "IsInfOrNaN";
+};
+template <> struct compare_op_name<CompareOp::IsPositiveInf>
+{
+    static constexpr char value[] = "IsPositiveInf";
+};
+template <> struct compare_op_name<CompareOp::IsNegativeInf>
+{
+    static constexpr char value[] = "IsNegativeInf";
+};
+template <> struct compare_op_name<CompareOp::PerChannel>
+{
+    static constexpr char value[] = "PerChannel";
+};
+template <> struct compare_op_name<CompareOp::AnyChannel>
+{
+    static constexpr char value[] = "AnyChannel";
+};
 
 inline std::ostream &operator<<(std::ostream &aOs, const CompareOp &aCompareOp)
 {
-    switch (aCompareOp)
+    switch (CompareOp_NoFlags(aCompareOp))
     {
         case mpp::CompareOp::Less:
             aOs << compare_op_name<CompareOp::Less>::value;
@@ -678,16 +801,46 @@ inline std::ostream &operator<<(std::ostream &aOs, const CompareOp &aCompareOp)
         case mpp::CompareOp::NEq:
             aOs << compare_op_name<CompareOp::NEq>::value;
             break;
-        default:
-            aOs << "Unknown";
+        case mpp::CompareOp::IsFinite:
+            aOs << compare_op_name<CompareOp::IsFinite>::value;
             break;
+        case mpp::CompareOp::IsNaN:
+            aOs << compare_op_name<CompareOp::IsNaN>::value;
+            break;
+        case mpp::CompareOp::IsInf:
+            aOs << compare_op_name<CompareOp::IsInf>::value;
+            break;
+        case mpp::CompareOp::IsInfOrNaN:
+            aOs << compare_op_name<CompareOp::IsInfOrNaN>::value;
+            break;
+        case mpp::CompareOp::IsPositiveInf:
+            aOs << compare_op_name<CompareOp::IsPositiveInf>::value;
+            break;
+        case mpp::CompareOp::IsNegativeInf:
+            aOs << compare_op_name<CompareOp::IsNegativeInf>::value;
+            break;
+        default:
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aCompareOp);
+            aOs.flags(f);
+        }
+        break;
+    }
+    if (CompareOp_IsAnyChannel(aCompareOp))
+    {
+        aOs << " | " << compare_op_name<CompareOp::AnyChannel>::value;
+    }
+    if (CompareOp_IsPerChannel(aCompareOp))
+    {
+        aOs << " | " << compare_op_name<CompareOp::PerChannel>::value;
     }
     return aOs;
 }
 
 inline std::wostream &operator<<(std::wostream &aOs, const CompareOp &aCompareOp)
 {
-    switch (aCompareOp)
+    switch (CompareOp_NoFlags(aCompareOp))
     {
         case mpp::CompareOp::Less:
             aOs << compare_op_name<CompareOp::Less>::value;
@@ -707,9 +860,39 @@ inline std::wostream &operator<<(std::wostream &aOs, const CompareOp &aCompareOp
         case mpp::CompareOp::NEq:
             aOs << compare_op_name<CompareOp::NEq>::value;
             break;
-        default:
-            aOs << "Unknown";
+        case mpp::CompareOp::IsFinite:
+            aOs << compare_op_name<CompareOp::IsFinite>::value;
             break;
+        case mpp::CompareOp::IsNaN:
+            aOs << compare_op_name<CompareOp::IsNaN>::value;
+            break;
+        case mpp::CompareOp::IsInf:
+            aOs << compare_op_name<CompareOp::IsInf>::value;
+            break;
+        case mpp::CompareOp::IsInfOrNaN:
+            aOs << compare_op_name<CompareOp::IsInfOrNaN>::value;
+            break;
+        case mpp::CompareOp::IsPositiveInf:
+            aOs << compare_op_name<CompareOp::IsPositiveInf>::value;
+            break;
+        case mpp::CompareOp::IsNegativeInf:
+            aOs << compare_op_name<CompareOp::IsNegativeInf>::value;
+            break;
+        default:
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aCompareOp);
+            aOs.flags(f);
+        }
+        break;
+    }
+    if (CompareOp_IsAnyChannel(aCompareOp))
+    {
+        aOs << " | " << compare_op_name<CompareOp::AnyChannel>::value;
+    }
+    if (CompareOp_IsPerChannel(aCompareOp))
+    {
+        aOs << " | " << compare_op_name<CompareOp::PerChannel>::value;
     }
     return aOs;
 }
@@ -820,8 +1003,12 @@ inline std::ostream &operator<<(std::ostream &aOs, const BorderType &aBorderType
             aOs << border_type_name<BorderType::SmoothEdge>::value;
             break;
         default:
-            aOs << "Unknown";
-            break;
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aBorderType);
+            aOs.flags(f);
+        }
+        break;
     }
     return aOs;
 }
@@ -852,8 +1039,12 @@ inline std::wostream &operator<<(std::wostream &aOs, const BorderType &aBorderTy
             aOs << border_type_name<BorderType::SmoothEdge>::value;
             break;
         default:
-            aOs << "Unknown";
-            break;
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aBorderType);
+            aOs.flags(f);
+        }
+        break;
     }
     return aOs;
 }
@@ -902,8 +1093,12 @@ inline std::ostream &operator<<(std::ostream &aOs, const HistorgamEvenMode &aHis
             aOs << historgam_even_mode_name<HistorgamEvenMode::NPP>::value;
             break;
         default:
-            aOs << "Unknown";
-            break;
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aHistorgamEvenMode);
+            aOs.flags(f);
+        }
+        break;
     }
     return aOs;
 }
@@ -919,8 +1114,12 @@ inline std::wostream &operator<<(std::wostream &aOs, const HistorgamEvenMode &aH
             aOs << historgam_even_mode_name<HistorgamEvenMode::NPP>::value;
             break;
         default:
-            aOs << "Unknown";
-            break;
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aHistorgamEvenMode);
+            aOs.flags(f);
+        }
+        break;
     }
     return aOs;
 }
@@ -1072,8 +1271,12 @@ inline std::ostream &operator<<(std::ostream &aOs, const InterpolationMode &aInt
             aOs << interpolation_mode_name<InterpolationMode::Lanczos3Lobed>::value;
             break;
         default:
-            aOs << "Unknown";
-            break;
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aInterpolationMode);
+            aOs.flags(f);
+        }
+        break;
     }
     return aOs;
 }
@@ -1116,8 +1319,12 @@ inline std::wostream &operator<<(std::wostream &aOs, const InterpolationMode &aI
             aOs << interpolation_mode_name<InterpolationMode::Lanczos3Lobed>::value;
             break;
         default:
-            aOs << "Unknown";
-            break;
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aInterpolationMode);
+            aOs.flags(f);
+        }
+        break;
     }
     return aOs;
 }
@@ -1262,8 +1469,12 @@ inline std::ostream &operator<<(std::ostream &aOs, const MaskSize &aMaskSize)
             aOs << mask_size_name<MaskSize::Mask_15x15>::value;
             break;
         default:
-            aOs << "Unknown";
-            break;
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aMaskSize);
+            aOs.flags(f);
+        }
+        break;
     }
     return aOs;
 }
@@ -1306,8 +1517,12 @@ inline std::wostream &operator<<(std::wostream &aOs, const MaskSize &aMaskSize)
             aOs << mask_size_name<MaskSize::Mask_15x15>::value;
             break;
         default:
-            aOs << "Unknown";
-            break;
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aMaskSize);
+            aOs.flags(f);
+        }
+        break;
     }
     return aOs;
 }
@@ -1638,8 +1853,12 @@ inline std::ostream &operator<<(std::ostream &aOs, const FixedFilter &aFixedFilt
             aOs << fixed_filter_name<FixedFilter::SobelVertSecond>::value;
             break;
         default:
-            aOs << "Unknown";
-            break;
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aFixedFilter);
+            aOs.flags(f);
+        }
+        break;
     }
     return aOs;
 }
@@ -1694,8 +1913,12 @@ inline std::wostream &operator<<(std::wostream &aOs, const FixedFilter &aFixedFi
             aOs << fixed_filter_name<FixedFilter::SobelVertSecond>::value;
             break;
         default:
-            aOs << "Unknown";
-            break;
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aFixedFilter);
+            aOs.flags(f);
+        }
+        break;
     }
     return aOs;
 }
@@ -1752,8 +1975,12 @@ inline std::ostream &operator<<(std::ostream &aOs, const Norm &aNorm)
             aOs << norm_name<Norm::L2>::value;
             break;
         default:
-            aOs << "Unknown";
-            break;
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aNorm);
+            aOs.flags(f);
+        }
+        break;
     }
     return aOs;
 }
@@ -1772,8 +1999,12 @@ inline std::wostream &operator<<(std::wostream &aOs, const Norm &aNorm)
             aOs << norm_name<Norm::L2>::value;
             break;
         default:
-            aOs << "Unknown";
-            break;
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aNorm);
+            aOs.flags(f);
+        }
+        break;
     }
     return aOs;
 }
