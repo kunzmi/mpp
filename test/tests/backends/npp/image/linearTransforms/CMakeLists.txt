@@ -1,2 +1,2 @@
-addCatchTest(test_magnitude.cpp "common;backends.cuda;backends.npp;backends.npp.image;backends.simple_cpu;CUDA::cudart" "NPP_LinearTransforms_Magnitude")
-addCatchTest(test_magnitudeSqr.cpp "common;backends.cuda;backends.npp;backends.npp.image;backends.simple_cpu;CUDA::cudart" "NPP_LinearTransforms_MagnitudeSqr")
+addCatchTest(test_magnitude.cpp "common;backends.cuda;backends.npp;backends.simple_cpu" "NPP_LinearTransforms_Magnitude")
+addCatchTest(test_magnitudeSqr.cpp "common;backends.cuda;backends.npp;backends.simple_cpu" "NPP_LinearTransforms_MagnitudeSqr")

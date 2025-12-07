@@ -1,5 +1,6 @@
 #pragma once
 #include "defines.h"
+#include "dllexport_common.h"
 #include "mpp_defs.h"
 #include "needSaturationClamp.h"
 #include "numberTypes.h"
@@ -24,7 +25,7 @@ template <Number T> struct Vector4;
 /// A four T component vector. Operations are performed on the first three channels, W is treated as additional Alpha
 /// channel and remains unused. Can replace CUDA's vector4 types
 /// </summary>
-template <Number T> struct alignas(4 * sizeof(T)) Vector4A
+template <Number T> struct alignas(4 * sizeof(T)) MPPEXPORT_COMMON Vector4A
 {
     T x; // NOLINT
     T y; // NOLINT
@@ -2489,29 +2490,29 @@ DEVICE_CODE Vector4A<T> operator/(T2 aLeft, const Vector4A<T> &aRight)
                        static_cast<T>(aLeft / aRight.z)};
 }
 
-template <HostCode T2> std::ostream &operator<<(std::ostream &aOs, const Vector4A<T2> &aVec);
+template <HostCode T2> MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector4A<T2> &aVec);
 
-template <HostCode T2> std::wostream &operator<<(std::wostream &aOs, const Vector4A<T2> &aVec);
+template <HostCode T2> MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector4A<T2> &aVec);
 
 // byte and sbyte are treated as characters and not numbers:
 template <HostCode T2>
-std::ostream &operator<<(std::ostream &aOs, const Vector4A<T2> &aVec)
+MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector4A<T2> &aVec)
     requires ByteSizeType<T2>;
 
 template <HostCode T2>
-std::wostream &operator<<(std::wostream &aOs, const Vector4A<T2> &aVec)
+MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector4A<T2> &aVec)
     requires ByteSizeType<T2>;
 
-template <HostCode T2> std::istream &operator>>(std::istream &aIs, Vector4A<T2> &aVec);
+template <HostCode T2> MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector4A<T2> &aVec);
 
-template <HostCode T2> std::wistream &operator>>(std::wistream &aIs, Vector4A<T2> &aVec);
+template <HostCode T2> MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector4A<T2> &aVec);
 
 template <HostCode T2>
-std::istream &operator>>(std::istream &aIs, Vector4A<T2> &aVec)
+MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector4A<T2> &aVec)
     requires ByteSizeType<T2>;
 
 template <HostCode T2>
-std::wistream &operator>>(std::wistream &aIs, Vector4A<T2> &aVec)
+MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector4A<T2> &aVec)
     requires ByteSizeType<T2>;
 
 } // namespace mpp

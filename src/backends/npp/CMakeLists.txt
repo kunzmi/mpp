@@ -1,8 +1,11 @@
 if (MPP_ENABLE_NPP_BACKEND)
 
-add_library(backends.npp 
+add_subdirectory(image)
+add_library(backends.npp SHARED
 	nppException.cpp
 	)
+
+target_compile_definitions(backends.npp PUBLIC -DMPP_NPP)  
 	
 target_include_directories(backends.npp  PUBLIC 
 						   ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
@@ -14,9 +17,9 @@ target_link_libraries(backends.npp PRIVATE
 						)
 target_link_libraries(backends.npp PUBLIC  
 						backends.cuda  # for device variable and cuda stuff
-
+						backends.npp.image
 						common
-						common.image 
+						#common.image 
 						
 						CUDA::nppc
 						CUDA::nppial
@@ -31,5 +34,4 @@ target_link_libraries(backends.npp PUBLIC
 						CUDA::npps
 						)
 
-add_subdirectory(image)
 endif() # MPP_ENABLE_NPP_BACKEND

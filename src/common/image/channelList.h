@@ -1,4 +1,5 @@
 #pragma once
+#include "../dllexport_common.h"
 #include "channel.h"
 #include <array>
 #include <common/defines.h>
@@ -15,7 +16,7 @@ namespace mpp::image
 /// <summary>
 /// A list of Channel objects, mainly to allow multiple implicit constructors for a short channel list
 /// </summary>
-template <size_t listSize> class ChannelList
+template <size_t listSize> class MPPEXPORT_COMMON ChannelList
 {
   public:
     ChannelList(std::initializer_list<Channel> aInitList)

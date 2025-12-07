@@ -1,4 +1,5 @@
 #pragma once
+#include "../dllexport_common.h"
 #include <common/defines.h>
 #include <common/image/quad.h>
 #include <common/safeCast.h>
@@ -15,7 +16,7 @@ namespace mpp::image
 /// <summary>
 /// A Bound represents the minimum and maximum extent of a Quad.
 /// </summary>
-template <RealFloatingPoint T> struct Bound
+template <RealFloatingPoint T> struct MPPEXPORT_COMMON Bound
 {
     Vector2<T> Min;
     Vector2<T> Max;

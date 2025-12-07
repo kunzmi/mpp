@@ -1,4 +1,5 @@
 #pragma once
+#include "../dllexport_common.h"
 #include <common/defines.h>
 #include <common/exception.h>
 #include <common/image/roi.h>
@@ -11,7 +12,7 @@ namespace mpp::image
 /// <summary>
 /// RoiException is thrown when an operation exceeds the dimension of a given ROI.
 /// </summary>
-class RoiException : public MPPException
+class MPPEXPORT_COMMON RoiException : public MPPException
 {
   public:
     RoiException(const Roi &aRoi, const std::filesystem::path &aCodeFileName, int aLineNumber,
@@ -22,7 +23,7 @@ class RoiException : public MPPException
                  const std::string &aFunctionName);
     ~RoiException() noexcept override = default;
 
-    RoiException(RoiException &&)                 = default;
+    RoiException(RoiException &&) noexcept        = default;
     RoiException(const RoiException &)            = default;
     RoiException &operator=(const RoiException &) = delete;
     RoiException &operator=(RoiException &&)      = delete;

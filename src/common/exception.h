@@ -1,4 +1,5 @@
 #pragma once
+#include "dllexport_common.h"
 #include <filesystem>
 #include <sstream>
 #include <stdexcept>
@@ -13,7 +14,7 @@ namespace mpp
 /// <summary>
 /// Exception base class for all exceptions thrown in MPP.
 /// </summary>
-class MPPException : public std::exception
+class MPPEXPORT_COMMON MPPException : public std::exception
 {
   private:
     std::string mWhat;
@@ -26,10 +27,11 @@ class MPPException : public std::exception
   public:
     MPPException() noexcept = default;
     explicit MPPException(std::string aMessage);
-    ~MPPException() noexcept override = default;
+    ~MPPException() noexcept override;
 
-    MPPException(MPPException &&)                 = default;
-    MPPException(const MPPException &)            = default;
+    // we have some linking issues with derived exceptions in DLL if we use the default constructors:
+    MPPException(MPPException &&aOther) noexcept;
+    MPPException(const MPPException &aOther);
     MPPException &operator=(const MPPException &) = delete;
     MPPException &operator=(MPPException &&)      = delete;
 
@@ -47,14 +49,14 @@ class MPPException : public std::exception
 /// <summary>
 /// Exception is a general exception.
 /// </summary>
-class Exception : public MPPException
+class MPPEXPORT_COMMON Exception : public MPPException
 {
   public:
     Exception(const std::string &aMessage, const std::filesystem::path &aCodeFileName, int aLineNumber,
               const std::string &aFunctionName);
     ~Exception() noexcept override = default;
 
-    Exception(Exception &&)                 = default;
+    Exception(Exception &&) noexcept        = default;
     Exception(const Exception &)            = default;
     Exception &operator=(const Exception &) = delete;
     Exception &operator=(Exception &&)      = delete;
@@ -63,7 +65,7 @@ class Exception : public MPPException
 /// <summary>
 /// InvalidArgumentException is thrown if an argument is not in an acceptable value range.
 /// </summary>
-class InvalidArgumentException : public MPPException
+class MPPEXPORT_COMMON InvalidArgumentException : public MPPException
 {
   public:
     InvalidArgumentException(const std::string &aArgumentName, const std::string &aMessage,
@@ -71,7 +73,7 @@ class InvalidArgumentException : public MPPException
                              const std::string &aFunctionName);
     ~InvalidArgumentException() noexcept override = default;
 
-    InvalidArgumentException(InvalidArgumentException &&)                 = default;
+    InvalidArgumentException(InvalidArgumentException &&) noexcept        = default;
     InvalidArgumentException(const InvalidArgumentException &)            = default;
     InvalidArgumentException &operator=(const InvalidArgumentException &) = delete;
     InvalidArgumentException &operator=(InvalidArgumentException &&)      = delete;

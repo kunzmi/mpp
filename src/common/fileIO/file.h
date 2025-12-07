@@ -1,7 +1,8 @@
 #pragma once
-#include "common/defines.h"
+#include "dllexport_fileio.h"
 #include "fileIOException.h"
 #include <algorithm>
+#include <common/defines.h>
 #include <execution>
 #include <filesystem>
 
@@ -35,7 +36,7 @@ constexpr const char *GetFileTypeName(FileType aFileType)
 /// <summary>
 /// Base class for file reader and writer which provides a file name and endian-swap methods.
 /// </summary>
-class File
+class MPPEXPORT_COMMON_FILEIO File
 {
   private:
     std::filesystem::path mFileName;

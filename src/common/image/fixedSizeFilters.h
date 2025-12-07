@@ -1,8 +1,9 @@
 #pragma once
+#include "../dllexport_common.h"
 #include <common/defines.h>
 #include <common/image/pixelTypes.h>
-#include <common/numberTypes.h>
 #include <common/mpp_defs.h>
+#include <common/numberTypes.h>
 #include <numbers>
 
 namespace mpp::image

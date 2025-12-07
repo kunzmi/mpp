@@ -1099,6 +1099,7 @@ template <PixelType T>
 void ImageView<T>::PrecomputeBilateralGaussFilter(mpp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff,
                                                   const FilterArea &aFilterArea, float aPosSquareSigma,
                                                   const mpp::cuda::StreamCtx &aStreamCtx) const
+    requires RealVector<T> && (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>)
 {
     if (!aFilterArea.CheckIfValid())
     {

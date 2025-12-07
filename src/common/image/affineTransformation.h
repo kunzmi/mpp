@@ -1,4 +1,5 @@
 #pragma once
+#include "../dllexport_common.h"
 #include <common/defines.h>
 #include <common/image/quad.h>
 #include <common/image/roi.h>
@@ -18,7 +19,7 @@ namespace mpp::image
 /// The last row of the matrix is assumend to be [0 0 1] and is not explicitly stored.<para/>
 /// Inner storage order is row major order.
 /// </summary>
-template <RealFloatingPoint T> class AffineTransformation
+template <RealFloatingPoint T> class MPPEXPORT_COMMON AffineTransformation
 {
   private:
     static constexpr int const mCols = 3;
@@ -222,7 +223,7 @@ template <RealFloatingPoint T> class AffineTransformation
         return aOs;
         // NOLINTEND
     }
-    friend std::istream &operator>>(std::istream &aIs, AffineTransformation<T> &aMat)
+    friend MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, AffineTransformation<T> &aMat)
     {
         for (size_t i = 0; i < to_size_t(AffineTransformation<T>::mSize); i++)
         {
@@ -230,7 +231,7 @@ template <RealFloatingPoint T> class AffineTransformation
         }
         return aIs;
     }
-    friend std::wistream &operator>>(std::wistream &aIs, AffineTransformation<T> &aMat)
+    friend MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, AffineTransformation<T> &aMat)
     {
         for (size_t i = 0; i < to_size_t(AffineTransformation<T>::mSize); i++)
         {
@@ -281,36 +282,47 @@ template <RealFloatingPoint T> class AffineTransformation
     [[nodiscard]] static AffineTransformation GetShear(const Vector2<T> &aShear) noexcept;
 };
 
-template <RealFloatingPoint T> AffineTransformation<T> operator+(const AffineTransformation<T> &aLeft, T aRight);
-template <RealFloatingPoint T> AffineTransformation<T> operator+(T aLeft, const AffineTransformation<T> &aRight);
-template <RealFloatingPoint T> AffineTransformation<T> operator-(const AffineTransformation<T> &aLeft, T aRight);
-template <RealFloatingPoint T> AffineTransformation<T> operator-(T aLeft, const AffineTransformation<T> &aRight);
+template <RealFloatingPoint T>
+AffineTransformation<T> MPPEXPORT_COMMON operator+(const AffineTransformation<T> &aLeft, T aRight);
+template <RealFloatingPoint T>
+AffineTransformation<T> MPPEXPORT_COMMON operator+(T aLeft, const AffineTransformation<T> &aRight);
+template <RealFloatingPoint T>
+AffineTransformation<T> MPPEXPORT_COMMON operator-(const AffineTransformation<T> &aLeft, T aRight);
+template <RealFloatingPoint T>
+AffineTransformation<T> MPPEXPORT_COMMON operator-(T aLeft, const AffineTransformation<T> &aRight);
 
-template <RealFloatingPoint T> AffineTransformation<T> operator*(const AffineTransformation<T> &aLeft, T aRight);
-template <RealFloatingPoint T> AffineTransformation<T> operator*(T aLeft, const AffineTransformation<T> &aRight);
-template <RealFloatingPoint T> AffineTransformation<T> operator/(const AffineTransformation<T> &aLeft, T aRight);
+template <RealFloatingPoint T>
+AffineTransformation<T> MPPEXPORT_COMMON operator*(const AffineTransformation<T> &aLeft, T aRight);
+template <RealFloatingPoint T>
+AffineTransformation<T> MPPEXPORT_COMMON operator*(T aLeft, const AffineTransformation<T> &aRight);
+template <RealFloatingPoint T>
+AffineTransformation<T> MPPEXPORT_COMMON operator/(const AffineTransformation<T> &aLeft, T aRight);
 
 /// <summary>
 /// Matrix - vector multiplication <para/>
 /// assuming vector is column vector
 /// </summary>
-template <RealFloatingPoint T> Vector3<T> operator*(const AffineTransformation<T> &aLeft, const Vector3<T> &aRight);
+template <RealFloatingPoint T>
+Vector3<T> MPPEXPORT_COMMON operator*(const AffineTransformation<T> &aLeft, const Vector3<T> &aRight);
 
 /// <summary>
 /// Vector-Matrix multiplication <para/>
 /// assuming vector is row vector
 /// </summary>
-template <RealFloatingPoint T> Vector3<T> operator*(const Vector3<T> &aLeft, const AffineTransformation<T> &aRight);
+template <RealFloatingPoint T>
+Vector3<T> MPPEXPORT_COMMON operator*(const Vector3<T> &aLeft, const AffineTransformation<T> &aRight);
 
 /// <summary>
 /// Transform every point in a Quad
 /// </summary>
-template <RealFloatingPoint T> Quad<T> operator*(const AffineTransformation<T> &aLeft, const Quad<T> &aRight);
+template <RealFloatingPoint T>
+Quad<T> MPPEXPORT_COMMON operator*(const AffineTransformation<T> &aLeft, const Quad<T> &aRight);
 
 /// <summary>
 /// Transform every corner point of a ROI
 /// </summary>
-template <RealFloatingPoint T> Quad<T> operator*(const AffineTransformation<T> &aLeft, const Roi &aRight);
+template <RealFloatingPoint T>
+Quad<T> MPPEXPORT_COMMON operator*(const AffineTransformation<T> &aLeft, const Roi &aRight);
 
 /// <summary>
 /// affine matrix - vector multiplication <para/>

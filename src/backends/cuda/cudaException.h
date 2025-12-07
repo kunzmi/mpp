@@ -2,6 +2,7 @@
 #include <common/moduleEnabler.h>
 #if MPP_ENABLE_CUDA_CORE
 
+#include "dllexport_cudacore.h"
 #include <common/defines.h>
 #include <common/exception.h>
 #include <cuda_runtime_api.h>
@@ -14,7 +15,7 @@ namespace mpp::cuda
 /// <summary>
 /// CudaException is thrown when a CUDA API call via cudaSafeCall does not return cudaSuccess.
 /// </summary>
-class CudaException : public MPPException
+class MPPEXPORT_CUDACORE CudaException : public MPPException
 {
   private:
     static const char *ConvertErrorCodeToMessage(cudaError_t aErrorCode);
@@ -37,7 +38,7 @@ class CudaException : public MPPException
 /// <summary>
 /// CudaUnsupported is thrown when we try to execute a kernel on an unsupported hardware version.
 /// </summary>
-class CudaUnsupportedException : public MPPException
+class MPPEXPORT_CUDACORE CudaUnsupportedException : public MPPException
 {
   private:
     std::string mKernelName;

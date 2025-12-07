@@ -1,6 +1,7 @@
 #pragma once
-#include "common/defines.h"
+#include "../dllexport_fileio.h"
 #include "tiffImageFileDirectory.h"
+#include <common/defines.h>
 #include <common/fileIO/pseudoFileReader.h>
 #include <common/image/size2D.h>
 #include <common/vector3.h>
@@ -10,7 +11,7 @@
 
 namespace mpp::fileIO::bigTiffTag
 {
-struct BigTiffTag
+struct MPPEXPORT_COMMON_FILEIO BigTiffTag
 {
     ushort TagID;
     tiffTag::TiffType Type;
@@ -27,7 +28,7 @@ struct BigTiffTag
     } Offset;
 };
 
-class BigImageFileDirectoryEntry : public PseudoFileReader
+class MPPEXPORT_COMMON_FILEIO BigImageFileDirectoryEntry : public PseudoFileReader
 {
   protected:
     BigTiffTag mTag; // NOLINT -> should be private
@@ -46,7 +47,7 @@ class BigImageFileDirectoryEntry : public PseudoFileReader
     }
 };
 
-template <typename T> class BigIFDEntry : public BigImageFileDirectoryEntry
+template <typename T> class MPPEXPORT_COMMON_FILEIO BigIFDEntry : public BigImageFileDirectoryEntry
 {
   protected:
     std::vector<T> mValue; // NOLINT -> should be private
@@ -66,7 +67,7 @@ template <> class BigIFDEntry<std::string> : public BigImageFileDirectoryEntry
     [[nodiscard]] const std::string &Value() const;
 };
 
-class BigImageFileDirectory
+class MPPEXPORT_COMMON_FILEIO BigImageFileDirectory
 {
   private:
     TIFFFile &mTifffile; // NOLINT --> avoid reference
@@ -91,7 +92,7 @@ class BigImageFileDirectory
     }
 };
 
-class BigIFDImageLength : public BigImageFileDirectoryEntry
+class MPPEXPORT_COMMON_FILEIO BigIFDImageLength : public BigImageFileDirectoryEntry
 {
     uint mValue;
 
@@ -104,7 +105,7 @@ class BigIFDImageLength : public BigImageFileDirectoryEntry
     [[nodiscard]] uint Value() const;
 };
 
-class BigIFDImageWidth : public BigImageFileDirectoryEntry
+class MPPEXPORT_COMMON_FILEIO BigIFDImageWidth : public BigImageFileDirectoryEntry
 {
     uint mValue;
 
@@ -117,7 +118,7 @@ class BigIFDImageWidth : public BigImageFileDirectoryEntry
     [[nodiscard]] uint Value() const;
 };
 
-class BigIFDRowsPerStrip : public BigImageFileDirectoryEntry
+class MPPEXPORT_COMMON_FILEIO BigIFDRowsPerStrip : public BigImageFileDirectoryEntry
 {
     uint mValue;
 
@@ -130,7 +131,7 @@ class BigIFDRowsPerStrip : public BigImageFileDirectoryEntry
     [[nodiscard]] uint Value() const;
 };
 
-class BigIFDStripByteCounts : public BigImageFileDirectoryEntry
+class MPPEXPORT_COMMON_FILEIO BigIFDStripByteCounts : public BigImageFileDirectoryEntry
 {
     std::vector<ulong64> mValue;
 
@@ -143,7 +144,7 @@ class BigIFDStripByteCounts : public BigImageFileDirectoryEntry
     [[nodiscard]] const std::vector<ulong64> &Value() const;
 };
 
-class BigIFDStripOffsets : public BigImageFileDirectoryEntry
+class MPPEXPORT_COMMON_FILEIO BigIFDStripOffsets : public BigImageFileDirectoryEntry
 {
     std::vector<ulong64> mValue;
 
@@ -156,7 +157,7 @@ class BigIFDStripOffsets : public BigImageFileDirectoryEntry
     [[nodiscard]] const std::vector<ulong64> &Value() const;
 };
 
-class BigIFDArtist : public BigIFDEntry<std::string>
+class MPPEXPORT_COMMON_FILEIO BigIFDArtist : public BigIFDEntry<std::string>
 {
   public:
     static constexpr ushort TagID   = 315;
@@ -165,7 +166,7 @@ class BigIFDArtist : public BigIFDEntry<std::string>
     BigIFDArtist(TIFFFile &aFile, ushort aTagID);
 };
 
-class BigIFDCopyright : public BigIFDEntry<std::string>
+class MPPEXPORT_COMMON_FILEIO BigIFDCopyright : public BigIFDEntry<std::string>
 {
   public:
     static constexpr ushort TagID   = 33432;
@@ -174,7 +175,7 @@ class BigIFDCopyright : public BigIFDEntry<std::string>
     BigIFDCopyright(TIFFFile &aFile, ushort aTagID);
 };
 
-class BigIFDDateTime : public BigIFDEntry<std::string>
+class MPPEXPORT_COMMON_FILEIO BigIFDDateTime : public BigIFDEntry<std::string>
 {
   public:
     static constexpr ushort TagID   = 306;
@@ -183,7 +184,7 @@ class BigIFDDateTime : public BigIFDEntry<std::string>
     BigIFDDateTime(TIFFFile &aFile, ushort aTagID);
 };
 
-class BigIFDHostComputer : public BigIFDEntry<std::string>
+class MPPEXPORT_COMMON_FILEIO BigIFDHostComputer : public BigIFDEntry<std::string>
 {
   public:
     static constexpr ushort TagID   = 316;
@@ -192,7 +193,7 @@ class BigIFDHostComputer : public BigIFDEntry<std::string>
     BigIFDHostComputer(TIFFFile &aFile, ushort aTagID);
 };
 
-class BigIFDImageDescription : public BigIFDEntry<std::string>
+class MPPEXPORT_COMMON_FILEIO BigIFDImageDescription : public BigIFDEntry<std::string>
 {
   public:
     static constexpr ushort TagID   = 270;
@@ -201,7 +202,7 @@ class BigIFDImageDescription : public BigIFDEntry<std::string>
     BigIFDImageDescription(TIFFFile &aFile, ushort aTagID);
 };
 
-class BigIFDModel : public BigIFDEntry<std::string>
+class MPPEXPORT_COMMON_FILEIO BigIFDModel : public BigIFDEntry<std::string>
 {
   public:
     static constexpr ushort TagID   = 272;
@@ -210,7 +211,7 @@ class BigIFDModel : public BigIFDEntry<std::string>
     BigIFDModel(TIFFFile &aFile, ushort aTagID);
 };
 
-class BigIFDMake : public BigIFDEntry<std::string>
+class MPPEXPORT_COMMON_FILEIO BigIFDMake : public BigIFDEntry<std::string>
 {
   public:
     static constexpr ushort TagID   = 271;
@@ -219,7 +220,7 @@ class BigIFDMake : public BigIFDEntry<std::string>
     BigIFDMake(TIFFFile &aFile, ushort aTagID);
 };
 
-class BigIFDSoftware : public BigIFDEntry<std::string>
+class MPPEXPORT_COMMON_FILEIO BigIFDSoftware : public BigIFDEntry<std::string>
 {
   public:
     static constexpr ushort TagID   = 305;
@@ -228,7 +229,7 @@ class BigIFDSoftware : public BigIFDEntry<std::string>
     BigIFDSoftware(TIFFFile &aFile, ushort aTagID);
 };
 
-class BigIFDBitsPerSample : public BigIFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO BigIFDBitsPerSample : public BigIFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 258;
@@ -239,7 +240,7 @@ class BigIFDBitsPerSample : public BigIFDEntry<ushort>
     [[nodiscard]] ushort Value(size_t aIdx) const;
 };
 
-class BigIFDCellLength : public BigIFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO BigIFDCellLength : public BigIFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 265;
@@ -250,7 +251,7 @@ class BigIFDCellLength : public BigIFDEntry<ushort>
     [[nodiscard]] ushort Value() const;
 };
 
-class BigIFDCellWidth : public BigIFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO BigIFDCellWidth : public BigIFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 264;
@@ -261,7 +262,7 @@ class BigIFDCellWidth : public BigIFDEntry<ushort>
     [[nodiscard]] ushort Value() const;
 };
 
-class BigIFDColorMap : public BigIFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO BigIFDColorMap : public BigIFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 320;
@@ -272,7 +273,7 @@ class BigIFDColorMap : public BigIFDEntry<ushort>
     [[nodiscard]] ushort Value() const;
 };
 
-class BigIFDCompression : public BigIFDEntry<tiffTag::TIFFCompression>
+class MPPEXPORT_COMMON_FILEIO BigIFDCompression : public BigIFDEntry<tiffTag::TIFFCompression>
 {
   public:
     static constexpr ushort TagID   = 259;
@@ -283,7 +284,7 @@ class BigIFDCompression : public BigIFDEntry<tiffTag::TIFFCompression>
     [[nodiscard]] tiffTag::TIFFCompression Value() const;
 };
 
-class BigIFDExtraSamples : public BigIFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO BigIFDExtraSamples : public BigIFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 338;
@@ -294,7 +295,7 @@ class BigIFDExtraSamples : public BigIFDEntry<ushort>
     [[nodiscard]] ushort Value() const;
 };
 
-class BigIFDDifferencingPredictor : public BigIFDEntry<tiffTag::TIFFDifferencingPredictor>
+class MPPEXPORT_COMMON_FILEIO BigIFDDifferencingPredictor : public BigIFDEntry<tiffTag::TIFFDifferencingPredictor>
 {
   public:
     static constexpr ushort TagID   = 317;
@@ -305,7 +306,7 @@ class BigIFDDifferencingPredictor : public BigIFDEntry<tiffTag::TIFFDifferencing
     [[nodiscard]] tiffTag::TIFFDifferencingPredictor Value() const;
 };
 
-class BigIFDFillOrder : public BigIFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO BigIFDFillOrder : public BigIFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 226;
@@ -316,7 +317,7 @@ class BigIFDFillOrder : public BigIFDEntry<ushort>
     [[nodiscard]] ushort Value() const;
 };
 
-class BigIFDFreeByteCounts : public BigIFDEntry<uint>
+class MPPEXPORT_COMMON_FILEIO BigIFDFreeByteCounts : public BigIFDEntry<uint>
 {
   public:
     static constexpr ushort TagID   = 289;
@@ -327,7 +328,7 @@ class BigIFDFreeByteCounts : public BigIFDEntry<uint>
     [[nodiscard]] uint Value() const;
 };
 
-class BigIFDFreeOffsets : public BigIFDEntry<uint>
+class MPPEXPORT_COMMON_FILEIO BigIFDFreeOffsets : public BigIFDEntry<uint>
 {
   public:
     static constexpr ushort TagID   = 288;
@@ -338,7 +339,7 @@ class BigIFDFreeOffsets : public BigIFDEntry<uint>
     [[nodiscard]] uint Value() const;
 };
 
-class BigIFDGrayResponseCurve : public BigIFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO BigIFDGrayResponseCurve : public BigIFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 291;
@@ -349,7 +350,7 @@ class BigIFDGrayResponseCurve : public BigIFDEntry<ushort>
     [[nodiscard]] const std::vector<ushort> &Value() const;
 };
 
-class BigIFDGrayResponseUnit : public BigIFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO BigIFDGrayResponseUnit : public BigIFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 290;
@@ -360,7 +361,7 @@ class BigIFDGrayResponseUnit : public BigIFDEntry<ushort>
     [[nodiscard]] ushort Value() const;
 };
 
-class BigIFDMaxSampleValue : public BigIFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO BigIFDMaxSampleValue : public BigIFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 281;
@@ -371,7 +372,7 @@ class BigIFDMaxSampleValue : public BigIFDEntry<ushort>
     [[nodiscard]] ushort Value() const;
 };
 
-class BigIFDMinSampleValue : public BigIFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO BigIFDMinSampleValue : public BigIFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 280;
@@ -382,7 +383,7 @@ class BigIFDMinSampleValue : public BigIFDEntry<ushort>
     [[nodiscard]] ushort Value() const;
 };
 
-class BigIFDNewSubfileType : public BigIFDEntry<uint>
+class MPPEXPORT_COMMON_FILEIO BigIFDNewSubfileType : public BigIFDEntry<uint>
 {
   public:
     static constexpr ushort TagID   = 254;
@@ -393,7 +394,7 @@ class BigIFDNewSubfileType : public BigIFDEntry<uint>
     [[nodiscard]] uint Value() const;
 };
 
-class BigIFDOrientation : public BigIFDEntry<tiffTag::TiffOrientation>
+class MPPEXPORT_COMMON_FILEIO BigIFDOrientation : public BigIFDEntry<tiffTag::TiffOrientation>
 {
   public:
     static constexpr ushort TagID   = 274;
@@ -404,7 +405,8 @@ class BigIFDOrientation : public BigIFDEntry<tiffTag::TiffOrientation>
     [[nodiscard]] tiffTag::TiffOrientation Value() const;
 };
 
-class BigIFDPhotometricInterpretation : public BigIFDEntry<tiffTag::TIFFPhotometricInterpretation>
+class MPPEXPORT_COMMON_FILEIO BigIFDPhotometricInterpretation
+    : public BigIFDEntry<tiffTag::TIFFPhotometricInterpretation>
 {
   public:
     static constexpr ushort TagID   = 262;
@@ -415,7 +417,7 @@ class BigIFDPhotometricInterpretation : public BigIFDEntry<tiffTag::TIFFPhotomet
     [[nodiscard]] tiffTag::TIFFPhotometricInterpretation Value() const;
 };
 
-class BigIFDPlanarConfiguration : public BigIFDEntry<tiffTag::TIFFPlanarConfigurartion>
+class MPPEXPORT_COMMON_FILEIO BigIFDPlanarConfiguration : public BigIFDEntry<tiffTag::TIFFPlanarConfigurartion>
 {
   public:
     static constexpr ushort TagID   = 284;
@@ -426,7 +428,7 @@ class BigIFDPlanarConfiguration : public BigIFDEntry<tiffTag::TIFFPlanarConfigur
     [[nodiscard]] tiffTag::TIFFPlanarConfigurartion Value() const;
 };
 
-class BigIFDResolutionUnit : public BigIFDEntry<tiffTag::TIFFResolutionUnit>
+class MPPEXPORT_COMMON_FILEIO BigIFDResolutionUnit : public BigIFDEntry<tiffTag::TIFFResolutionUnit>
 {
   public:
     static constexpr ushort TagID   = 296;
@@ -437,7 +439,7 @@ class BigIFDResolutionUnit : public BigIFDEntry<tiffTag::TIFFResolutionUnit>
     [[nodiscard]] tiffTag::TIFFResolutionUnit Value() const;
 };
 
-class BigIFDSamplesPerPixel : public BigIFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO BigIFDSamplesPerPixel : public BigIFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 277;
@@ -448,7 +450,7 @@ class BigIFDSamplesPerPixel : public BigIFDEntry<ushort>
     [[nodiscard]] ushort Value() const;
 };
 
-class BigIFDSampleFormat : public BigIFDEntry<tiffTag::TIFFSampleFormat>
+class MPPEXPORT_COMMON_FILEIO BigIFDSampleFormat : public BigIFDEntry<tiffTag::TIFFSampleFormat>
 {
   public:
     static constexpr ushort TagID   = 339;
@@ -459,7 +461,7 @@ class BigIFDSampleFormat : public BigIFDEntry<tiffTag::TIFFSampleFormat>
     [[nodiscard]] tiffTag::TIFFSampleFormat Value() const;
 };
 
-class BigIFDSubfileType : public BigIFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO BigIFDSubfileType : public BigIFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 255;
@@ -470,7 +472,7 @@ class BigIFDSubfileType : public BigIFDEntry<ushort>
     [[nodiscard]] ushort Value() const;
 };
 
-class BigIFDThreshholding : public BigIFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO BigIFDThreshholding : public BigIFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 263;
@@ -481,7 +483,7 @@ class BigIFDThreshholding : public BigIFDEntry<ushort>
     [[nodiscard]] ushort Value() const;
 };
 
-class BigIFDXResolution : public BigIFDEntry<tiffTag::Rational>
+class MPPEXPORT_COMMON_FILEIO BigIFDXResolution : public BigIFDEntry<tiffTag::Rational>
 {
   public:
     static constexpr ushort TagID   = 282;
@@ -492,7 +494,7 @@ class BigIFDXResolution : public BigIFDEntry<tiffTag::Rational>
     [[nodiscard]] tiffTag::Rational Value() const;
 };
 
-class BigIFDYResolution : public BigIFDEntry<tiffTag::Rational>
+class MPPEXPORT_COMMON_FILEIO BigIFDYResolution : public BigIFDEntry<tiffTag::Rational>
 {
   public:
     static constexpr ushort TagID   = 283;

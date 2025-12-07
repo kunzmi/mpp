@@ -56,28 +56,28 @@ TEST_CASE("DivRoundUShort", "[Common]")
         double f_ru   = std::ceil(input[i] / input2[i]);
         ComputeT i_ru = DivRoundTowardPosInf(n, d);
 
-        // handle NAN
-        if (isinf(f_rn))
+        // handle INF
+        if (std::isinf(f_rn))
         {
             f_rn = static_cast<double>(signbit(f_rn) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_az))
+        if (std::isinf(f_az))
         {
             f_az = static_cast<double>(signbit(f_az) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_rz))
+        if (std::isinf(f_rz))
         {
             f_rz = static_cast<double>(signbit(f_rz) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_rd))
+        if (std::isinf(f_rd))
         {
             f_rd = static_cast<double>(signbit(f_rd) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_ru))
+        if (std::isinf(f_ru))
         {
             f_ru = static_cast<double>(signbit(f_ru) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
@@ -138,28 +138,28 @@ TEST_CASE("DivRoundShort", "[Common]")
         double f_ru   = std::ceil(input[i] / input2[i]);
         ComputeT i_ru = DivRoundTowardPosInf(n, d);
 
-        // handle NAN
-        if (isinf(f_rn))
+        // handle INF
+        if (std::isinf(f_rn))
         {
             f_rn = static_cast<double>(signbit(f_rn) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_az))
+        if (std::isinf(f_az))
         {
             f_az = static_cast<double>(signbit(f_az) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_rz))
+        if (std::isinf(f_rz))
         {
             f_rz = static_cast<double>(signbit(f_rz) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_rd))
+        if (std::isinf(f_rd))
         {
             f_rd = static_cast<double>(signbit(f_rd) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_ru))
+        if (std::isinf(f_ru))
         {
             f_ru = static_cast<double>(signbit(f_ru) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
@@ -220,28 +220,28 @@ TEST_CASE("DivRoundUInt", "[Common]")
         double f_ru   = std::ceil(input[i] / input2[i]);
         ComputeT i_ru = DivRoundTowardPosInf(n, d);
 
-        // handle NAN
-        if (isinf(f_rn))
+        // handle INF
+        if (std::isinf(f_rn))
         {
             f_rn = static_cast<double>(signbit(f_rn) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_az))
+        if (std::isinf(f_az))
         {
             f_az = static_cast<double>(signbit(f_az) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_rz))
+        if (std::isinf(f_rz))
         {
             f_rz = static_cast<double>(signbit(f_rz) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_rd))
+        if (std::isinf(f_rd))
         {
             f_rd = static_cast<double>(signbit(f_rd) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_ru))
+        if (std::isinf(f_ru))
         {
             f_ru = static_cast<double>(signbit(f_ru) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
@@ -302,28 +302,28 @@ TEST_CASE("DivRoundInt", "[Common]")
         double f_ru   = std::ceil(input[i] / input2[i]);
         ComputeT i_ru = DivRoundTowardPosInf(n, d);
 
-        // handle NAN
-        if (isinf(f_rn))
+        // handle INF
+        if (std::isinf(f_rn))
         {
             f_rn = static_cast<double>(signbit(f_rn) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_az))
+        if (std::isinf(f_az))
         {
             f_az = static_cast<double>(signbit(f_az) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_rz))
+        if (std::isinf(f_rz))
         {
             f_rz = static_cast<double>(signbit(f_rz) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_rd))
+        if (std::isinf(f_rd))
         {
             f_rd = static_cast<double>(signbit(f_rd) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_ru))
+        if (std::isinf(f_ru))
         {
             f_ru = static_cast<double>(signbit(f_ru) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
@@ -384,28 +384,28 @@ TEST_CASE("DivRoundULong", "[Common]")
         double f_ru   = std::ceil(input[i] / input2[i]);
         ComputeT i_ru = DivRoundTowardPosInf(n, d);
 
-        // handle NAN
-        if (isinf(f_rn))
+        // handle INF
+        if (std::isinf(f_rn))
         {
             f_rn = static_cast<double>(signbit(f_rn) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_az))
+        if (std::isinf(f_az))
         {
             f_az = static_cast<double>(signbit(f_az) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_rz))
+        if (std::isinf(f_rz))
         {
             f_rz = static_cast<double>(signbit(f_rz) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_rd))
+        if (std::isinf(f_rd))
         {
             f_rd = static_cast<double>(signbit(f_rd) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_ru))
+        if (std::isinf(f_ru))
         {
             f_ru = static_cast<double>(signbit(f_ru) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
@@ -466,28 +466,28 @@ TEST_CASE("DivRoundLong", "[Common]")
         double f_ru   = std::ceil(input[i] / input2[i]);
         ComputeT i_ru = DivRoundTowardPosInf(n, d);
 
-        // handle NAN
-        if (isinf(f_rn))
+        // handle INF
+        if (std::isinf(f_rn))
         {
             f_rn = static_cast<double>(signbit(f_rn) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_az))
+        if (std::isinf(f_az))
         {
             f_az = static_cast<double>(signbit(f_az) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_rz))
+        if (std::isinf(f_rz))
         {
             f_rz = static_cast<double>(signbit(f_rz) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_rd))
+        if (std::isinf(f_rd))
         {
             f_rd = static_cast<double>(signbit(f_rd) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());
         }
-        if (isinf(f_ru))
+        if (std::isinf(f_ru))
         {
             f_ru = static_cast<double>(signbit(f_ru) ? mpp::numeric_limits<ComputeT>::lowest()
                                                      : mpp::numeric_limits<ComputeT>::max());

@@ -21,12 +21,12 @@ target_include_directories(perfTest PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTOR
 target_link_libraries(perfTest PUBLIC  
 						common
 						common.fileIO
-						common.image
 						backends.cuda	
-						backends.cuda.image
-						backends.cuda.image.statistics 
+						backends.cuda.image8u
+						backends.cuda.image16u
+						backends.cuda.image32s
+						backends.cuda.image32f
 						backends.npp
-						backends.npp.image
 						backends.simple_cpu
 )
 

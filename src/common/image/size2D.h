@@ -1,4 +1,5 @@
 #pragma once
+#include "../dllexport_common.h"
 #include <common/defines.h>
 #include <common/vector2.h>
 #include <istream>
@@ -10,16 +11,16 @@ namespace mpp::image
 /// A specialized type to describe image size in 2D (number of pixels in X and Y)
 /// Note: in device code, only the vector2<int> device code is available.
 /// </summary>
-class Size2D : public Vector2<int>
+class MPPEXPORT_COMMON Size2D : public Vector2<int>
 {
   public:
-    struct Index
+    struct MPPEXPORT_COMMON Index
     {
         size_t Flat{0};
         Vector2<int> Pixel{0, 0};
     };
 
-    struct iterator
+    struct MPPEXPORT_COMMON iterator
     {
       private:
         Index mValue;
@@ -199,26 +200,26 @@ class Size2D : public Vector2<int>
     [[nodiscard]] iterator end() const;
 };
 
-Size2D operator+(const Size2D &aLeft, const Vector2<int> &aRight);
-Size2D operator+(const Size2D &aLeft, const Size2D &aRight);
-Size2D operator+(const Size2D &aLeft, int aRight);
-Size2D operator+(int aLeft, const Size2D &aRight);
-Size2D operator-(const Size2D &aLeft, const Vector2<int> &aRight);
-Size2D operator-(const Size2D &aLeft, const Size2D &aRight);
-Size2D operator-(const Size2D &aLeft, int aRight);
-Size2D operator-(int aLeft, const Size2D &aRight);
+MPPEXPORT_COMMON Size2D operator+(const Size2D &aLeft, const Vector2<int> &aRight);
+MPPEXPORT_COMMON Size2D operator+(const Size2D &aLeft, const Size2D &aRight);
+MPPEXPORT_COMMON Size2D operator+(const Size2D &aLeft, int aRight);
+MPPEXPORT_COMMON Size2D operator+(int aLeft, const Size2D &aRight);
+MPPEXPORT_COMMON Size2D operator-(const Size2D &aLeft, const Vector2<int> &aRight);
+MPPEXPORT_COMMON Size2D operator-(const Size2D &aLeft, const Size2D &aRight);
+MPPEXPORT_COMMON Size2D operator-(const Size2D &aLeft, int aRight);
+MPPEXPORT_COMMON Size2D operator-(int aLeft, const Size2D &aRight);
 
-Size2D operator*(const Size2D &aLeft, const Vector2<int> &aRight);
-Size2D operator*(const Size2D &aLeft, const Size2D &aRight);
-Size2D operator*(const Size2D &aLeft, int aRight);
-Size2D operator*(int aLeft, const Size2D &aRight);
-Size2D operator/(const Size2D &aLeft, const Vector2<int> &aRight);
-Size2D operator/(const Size2D &aLeft, const Size2D &aRight);
-Size2D operator/(const Size2D &aLeft, int aRight);
-Size2D operator/(int aLeft, const Size2D &aRight);
+MPPEXPORT_COMMON Size2D operator*(const Size2D &aLeft, const Vector2<int> &aRight);
+MPPEXPORT_COMMON Size2D operator*(const Size2D &aLeft, const Size2D &aRight);
+MPPEXPORT_COMMON Size2D operator*(const Size2D &aLeft, int aRight);
+MPPEXPORT_COMMON Size2D operator*(int aLeft, const Size2D &aRight);
+MPPEXPORT_COMMON Size2D operator/(const Size2D &aLeft, const Vector2<int> &aRight);
+MPPEXPORT_COMMON Size2D operator/(const Size2D &aLeft, const Size2D &aRight);
+MPPEXPORT_COMMON Size2D operator/(const Size2D &aLeft, int aRight);
+MPPEXPORT_COMMON Size2D operator/(int aLeft, const Size2D &aRight);
 
-std::ostream &operator<<(std::ostream &aOs, const Size2D &aSize);
-std::wostream &operator<<(std::wostream &aOs, const Size2D &aSize);
-std::istream &operator>>(std::istream &aIs, Size2D &aSize);
-std::wistream &operator>>(std::wistream &aIs, Size2D &aSize);
+MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Size2D &aSize);
+MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Size2D &aSize);
+MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Size2D &aSize);
+MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Size2D &aSize);
 } // namespace mpp::image

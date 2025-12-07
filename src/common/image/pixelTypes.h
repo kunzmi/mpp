@@ -1,5 +1,5 @@
 #pragma once
-#pragma once
+#include "../dllexport_common.h"
 #include <common/complex.h>
 #include <common/defines.h>
 #include <common/vector_typetraits.h>
@@ -10,8 +10,8 @@
 namespace mpp
 {
 // forward declaration:
-class HalfFp16;
-class BFloat16;
+class MPPEXPORT_COMMON HalfFp16;
+class MPPEXPORT_COMMON BFloat16;
 } // namespace mpp
 
 namespace mpp::image
@@ -242,8 +242,8 @@ enum class PixelTypeEnum : byte
     PTE8uC4A
 };
 
-std::ostream &operator<<(std::ostream &aOs, const PixelTypeEnum &aPixelType);
-std::wostream &operator<<(std::wostream &aOs, const PixelTypeEnum &aPixelType);
+MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const PixelTypeEnum &aPixelType);
+MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const PixelTypeEnum &aPixelType);
 
 constexpr size_t GetChannelCount(PixelTypeEnum aPixelType)
 {

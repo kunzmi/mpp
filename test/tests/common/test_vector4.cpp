@@ -1240,8 +1240,7 @@ TEST_CASE("Pixel16fC4", "[Common]")
 TEST_CASE("Pixel16fC4_additionalMethods", "[Common]")
 {
     Pixel16fC4 roundA(HalfFp16(0.4f), HalfFp16(0.5f), HalfFp16(0.6f), HalfFp16(1.5f));
-    Pixel16fC4 roundB(HalfFp16(1.9f), HalfFp16(-1.5f), HalfFp16(-2.5f),
-                      HalfFp16(numeric_limits<HalfFp16>::maxExact() - 0.5f));
+    Pixel16fC4 roundB(HalfFp16(1.9f), HalfFp16(-1.5f), HalfFp16(-2.5f), numeric_limits<HalfFp16>::maxExact() - 0.5f);
     Pixel16fC4 round2A = Pixel16fC4::Round(roundA);
     Pixel16fC4 round2B = Pixel16fC4::Round(roundB);
     roundA.Round();
@@ -1258,8 +1257,7 @@ TEST_CASE("Pixel16fC4_additionalMethods", "[Common]")
     CHECK(roundB.w == 2048.0f); // this will always be exact integer as the -0.5f cannot be stored in float
 
     Pixel16fC4 floorA(HalfFp16(0.4f), HalfFp16(0.5f), HalfFp16(0.6f), HalfFp16(1.5f));
-    Pixel16fC4 floorB(HalfFp16(1.9f), HalfFp16(-1.5f), HalfFp16(-2.5f),
-                      HalfFp16(numeric_limits<HalfFp16>::maxExact() - 0.5f));
+    Pixel16fC4 floorB(HalfFp16(1.9f), HalfFp16(-1.5f), HalfFp16(-2.5f), numeric_limits<HalfFp16>::maxExact() - 0.5f);
     Pixel16fC4 floor2A = Pixel16fC4::Floor(floorA);
     Pixel16fC4 floor2B = Pixel16fC4::Floor(floorB);
     floorA.Floor();
@@ -1276,8 +1274,7 @@ TEST_CASE("Pixel16fC4_additionalMethods", "[Common]")
     CHECK(floorB.w == 2048.0f); // this will always be exact integer as the -0.5f cannot be stored in float
 
     Pixel16fC4 ceilA(HalfFp16(0.4f), HalfFp16(0.5f), HalfFp16(0.6f), HalfFp16(1.5f));
-    Pixel16fC4 ceilB(HalfFp16(1.9f), HalfFp16(-1.5f), HalfFp16(-2.5f),
-                     HalfFp16(numeric_limits<HalfFp16>::maxExact() - 0.5f));
+    Pixel16fC4 ceilB(HalfFp16(1.9f), HalfFp16(-1.5f), HalfFp16(-2.5f), numeric_limits<HalfFp16>::maxExact() - 0.5f);
     Pixel16fC4 ceil2A = Pixel16fC4::Ceil(ceilA);
     Pixel16fC4 ceil2B = Pixel16fC4::Ceil(ceilB);
     ceilA.Ceil();
@@ -1294,8 +1291,7 @@ TEST_CASE("Pixel16fC4_additionalMethods", "[Common]")
     CHECK(ceilB.w == 2048.0f); // this will always be exact integer as the -0.5f cannot be stored in float
 
     Pixel16fC4 zeroA(HalfFp16(0.4f), HalfFp16(0.5f), HalfFp16(0.6f), HalfFp16(1.5f));
-    Pixel16fC4 zeroB(HalfFp16(1.9f), HalfFp16(-1.5f), HalfFp16(-2.5f),
-                     HalfFp16(numeric_limits<HalfFp16>::maxExact() - 0.5f));
+    Pixel16fC4 zeroB(HalfFp16(1.9f), HalfFp16(-1.5f), HalfFp16(-2.5f), numeric_limits<HalfFp16>::maxExact() - 0.5f);
     Pixel16fC4 zero2A = Pixel16fC4::RoundZero(zeroA);
     Pixel16fC4 zero2B = Pixel16fC4::RoundZero(zeroB);
     zeroA.RoundZero();
@@ -1312,8 +1308,7 @@ TEST_CASE("Pixel16fC4_additionalMethods", "[Common]")
     CHECK(zeroB.w == 2048.0f); // this will always be exact integer as the -0.5f cannot be stored in float
 
     Pixel16fC4 nearestA(HalfFp16(0.4f), HalfFp16(0.5f), HalfFp16(0.6f), HalfFp16(1.5f));
-    Pixel16fC4 nearestB(HalfFp16(1.9f), HalfFp16(-1.5f), HalfFp16(-2.5f),
-                        HalfFp16(numeric_limits<HalfFp16>::maxExact() - 0.5f));
+    Pixel16fC4 nearestB(HalfFp16(1.9f), HalfFp16(-1.5f), HalfFp16(-2.5f), numeric_limits<HalfFp16>::maxExact() - 0.5f);
     Pixel16fC4 nearest2A = Pixel16fC4::RoundNearest(nearestA);
     Pixel16fC4 nearest2B = Pixel16fC4::RoundNearest(nearestB);
     nearestA.RoundNearest();
@@ -1664,8 +1659,7 @@ TEST_CASE("Pixel16bfC4", "[Common]")
 TEST_CASE("Pixel16bfC4_additionalMethods", "[Common]")
 {
     Pixel16bfC4 roundA(BFloat16(0.4f), BFloat16(0.5f), BFloat16(0.6f), BFloat16(1.5f));
-    Pixel16bfC4 roundB(BFloat16(1.9f), BFloat16(-1.5f), BFloat16(-2.5f),
-                       BFloat16(numeric_limits<BFloat16>::maxExact() - 0.5f));
+    Pixel16bfC4 roundB(BFloat16(1.9f), BFloat16(-1.5f), BFloat16(-2.5f), numeric_limits<BFloat16>::maxExact() - 0.5f);
     Pixel16bfC4 round2A = Pixel16bfC4::Round(roundA);
     Pixel16bfC4 round2B = Pixel16bfC4::Round(roundB);
     roundA.Round();
@@ -1682,8 +1676,7 @@ TEST_CASE("Pixel16bfC4_additionalMethods", "[Common]")
     CHECK(roundB.w == 256.0f); // this will always be exact integer as the -0.5f cannot be stored in float
 
     Pixel16bfC4 floorA(BFloat16(0.4f), BFloat16(0.5f), BFloat16(0.6f), BFloat16(1.5f));
-    Pixel16bfC4 floorB(BFloat16(1.9f), BFloat16(-1.5f), BFloat16(-2.5f),
-                       BFloat16(numeric_limits<BFloat16>::maxExact() - 0.5f));
+    Pixel16bfC4 floorB(BFloat16(1.9f), BFloat16(-1.5f), BFloat16(-2.5f), numeric_limits<BFloat16>::maxExact() - 0.5f);
     Pixel16bfC4 floor2A = Pixel16bfC4::Floor(floorA);
     Pixel16bfC4 floor2B = Pixel16bfC4::Floor(floorB);
     floorA.Floor();
@@ -1700,8 +1693,7 @@ TEST_CASE("Pixel16bfC4_additionalMethods", "[Common]")
     CHECK(floorB.w == 256.0f); // this will always be exact integer as the -0.5f cannot be stored in float
 
     Pixel16bfC4 ceilA(BFloat16(0.4f), BFloat16(0.5f), BFloat16(0.6f), BFloat16(1.5f));
-    Pixel16bfC4 ceilB(BFloat16(1.9f), BFloat16(-1.5f), BFloat16(-2.5f),
-                      BFloat16(numeric_limits<BFloat16>::maxExact() - 0.5f));
+    Pixel16bfC4 ceilB(BFloat16(1.9f), BFloat16(-1.5f), BFloat16(-2.5f), numeric_limits<BFloat16>::maxExact() - 0.5f);
     Pixel16bfC4 ceil2A = Pixel16bfC4::Ceil(ceilA);
     Pixel16bfC4 ceil2B = Pixel16bfC4::Ceil(ceilB);
     ceilA.Ceil();
@@ -1718,8 +1710,7 @@ TEST_CASE("Pixel16bfC4_additionalMethods", "[Common]")
     CHECK(ceilB.w == 256.0f); // this will always be exact integer as the -0.5f cannot be stored in float
 
     Pixel16bfC4 zeroA(BFloat16(0.4f), BFloat16(0.5f), BFloat16(0.6f), BFloat16(1.5f));
-    Pixel16bfC4 zeroB(BFloat16(1.9f), BFloat16(-1.5f), BFloat16(-2.5f),
-                      BFloat16(numeric_limits<BFloat16>::maxExact() - 0.5f));
+    Pixel16bfC4 zeroB(BFloat16(1.9f), BFloat16(-1.5f), BFloat16(-2.5f), numeric_limits<BFloat16>::maxExact() - 0.5f);
     Pixel16bfC4 zero2A = Pixel16bfC4::RoundZero(zeroA);
     Pixel16bfC4 zero2B = Pixel16bfC4::RoundZero(zeroB);
     zeroA.RoundZero();
@@ -1736,8 +1727,7 @@ TEST_CASE("Pixel16bfC4_additionalMethods", "[Common]")
     CHECK(zeroB.w == 256.0f); // this will always be exact integer as the -0.5f cannot be stored in float
 
     Pixel16bfC4 nearestA(BFloat16(0.4f), BFloat16(0.5f), BFloat16(0.6f), BFloat16(1.5f));
-    Pixel16bfC4 nearestB(BFloat16(1.9f), BFloat16(-1.5f), BFloat16(-2.5f),
-                         BFloat16(numeric_limits<BFloat16>::maxExact() - 0.5f));
+    Pixel16bfC4 nearestB(BFloat16(1.9f), BFloat16(-1.5f), BFloat16(-2.5f), numeric_limits<BFloat16>::maxExact() - 0.5f);
     Pixel16bfC4 nearest2A = Pixel16bfC4::RoundNearest(nearestA);
     Pixel16bfC4 nearest2B = Pixel16bfC4::RoundNearest(nearestB);
     nearestA.RoundNearest();

@@ -1,4 +1,5 @@
 #include "exception.h"
+#include <exception>
 #include <filesystem>
 #include <ostream>
 #include <sstream>
@@ -7,6 +8,21 @@
 
 namespace mpp
 {
+// NOLINTNEXTLINE(hicpp-use-equals-default,modernize-use-equals-default)
+MPPException::~MPPException() noexcept
+{
+}
+
+MPPException::MPPException(MPPException &&aOther) noexcept
+    // NOLINTNEXTLINE(bugprone-use-after-move,hicpp-invalid-access-moved)
+    : std::exception(std::move(aOther)), mWhat(std::move(aOther.mWhat)), mMessage(std::move(aOther.mMessage))
+{
+}
+// NOLINTNEXTLINE(hicpp-use-equals-default,modernize-use-equals-default)
+MPPException::MPPException(const MPPException &aOther)
+    : std::exception(aOther), mWhat(aOther.mWhat), mMessage(aOther.mMessage)
+{
+}
 std::string &MPPException::What()
 {
     return mWhat;

@@ -3,18 +3,19 @@
 #if MPP_ENABLE_CUDA_CORE
 
 #include "cudaException.h"
+#include "dllexport_cudacore.h"
 #include <common/defines.h>
 #include <cuda_runtime_api.h>
 
 namespace mpp::cuda
 {
 // forward declaration:
-class Event;
+class MPPEXPORT_CUDACORE Event;
 
 /// <summary>
 /// A wrapper class for a cudaStream_t.
 /// </summary>
-class Stream
+class MPPEXPORT_CUDACORE Stream
 {
   private:
     cudaStream_t mStream{nullptr};

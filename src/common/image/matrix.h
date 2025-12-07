@@ -1,4 +1,5 @@
 #pragma once
+#include "../dllexport_common.h"
 #include "affineTransformation.h"
 #include "quad.h"
 #include "roi.h"
@@ -31,7 +32,7 @@ namespace mpp::image
 /// A 3x3 matrix for general computation
 /// Inner storage order is row major order
 /// </summary>
-template <RealFloatingPoint T> class Matrix
+template <RealFloatingPoint T> class MPPEXPORT_COMMON Matrix
 {
   private:
     static constexpr int const mCols = 3;
@@ -199,7 +200,7 @@ template <RealFloatingPoint T> class Matrix
     /// </summary>
     Matrix &operator/=(T aOther);
 
-    friend std::ostream &operator<<(std::ostream &aOs, const Matrix &aMat)
+    friend MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Matrix &aMat)
     {
         std::streamsize maxSize = 0;
         for (const auto &elem : aMat.mData)
@@ -217,7 +218,7 @@ template <RealFloatingPoint T> class Matrix
         return aOs;
         // NOLINTEND
     }
-    friend std::wostream &operator<<(std::wostream &aOs, const Matrix &aMat)
+    friend MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Matrix &aMat)
     {
         std::streamsize maxSize = 0;
         for (const auto &elem : aMat.mData)
@@ -235,7 +236,7 @@ template <RealFloatingPoint T> class Matrix
         return aOs;
         // NOLINTEND
     }
-    friend std::istream &operator>>(std::istream &aIs, Matrix &aMat)
+    friend MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Matrix &aMat)
     {
         for (size_t i = 0; i < to_size_t(Matrix::mSize); i++)
         {
@@ -243,7 +244,7 @@ template <RealFloatingPoint T> class Matrix
         }
         return aIs;
     }
-    friend std::wistream &operator>>(std::wistream &aIs, Matrix &aMat)
+    friend MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Matrix &aMat)
     {
         for (size_t i = 0; i < to_size_t(Matrix::mSize); i++)
         {
@@ -278,16 +279,16 @@ template <RealFloatingPoint T> class Matrix
     [[nodiscard]] Vector3<T> Diagonal() const;
 };
 
-template <RealFloatingPoint T> Matrix<T> operator+(const Matrix<T> &aLeft, T aRight);
-template <RealFloatingPoint T> Matrix<T> operator+(T aLeft, const Matrix<T> &aRight);
+template <RealFloatingPoint T> Matrix<T> MPPEXPORT_COMMON operator+(const Matrix<T> &aLeft, T aRight);
+template <RealFloatingPoint T> Matrix<T> MPPEXPORT_COMMON operator+(T aLeft, const Matrix<T> &aRight);
 
-template <RealFloatingPoint T> Matrix<T> operator-(const Matrix<T> &aLeft, T aRight);
-template <RealFloatingPoint T> Matrix<T> operator-(T aLeft, const Matrix<T> &aRight);
+template <RealFloatingPoint T> Matrix<T> MPPEXPORT_COMMON operator-(const Matrix<T> &aLeft, T aRight);
+template <RealFloatingPoint T> Matrix<T> MPPEXPORT_COMMON operator-(T aLeft, const Matrix<T> &aRight);
 
-template <RealFloatingPoint T> Matrix<T> operator*(const Matrix<T> &aLeft, T aRight);
-template <RealFloatingPoint T> Matrix<T> operator*(T aLeft, const Matrix<T> &aRight);
+template <RealFloatingPoint T> Matrix<T> MPPEXPORT_COMMON operator*(const Matrix<T> &aLeft, T aRight);
+template <RealFloatingPoint T> Matrix<T> MPPEXPORT_COMMON operator*(T aLeft, const Matrix<T> &aRight);
 
-template <RealFloatingPoint T> Matrix<T> operator/(const Matrix<T> &aLeft, T aRight);
+template <RealFloatingPoint T> Matrix<T> MPPEXPORT_COMMON operator/(const Matrix<T> &aLeft, T aRight);
 
 /// <summary>
 /// Matrix - vector multiplication <para/>
@@ -314,12 +315,12 @@ template <RealFloatingPoint T> DEVICE_CODE Vector3<T> operator*(const Vector3<T>
 /// <summary>
 /// Transform every point in a Quad
 /// </summary>
-template <RealFloatingPoint T> Quad<T> operator*(const Matrix<T> &aLeft, const Quad<T> &aRight);
+template <RealFloatingPoint T> Quad<T> MPPEXPORT_COMMON operator*(const Matrix<T> &aLeft, const Quad<T> &aRight);
 
 /// <summary>
 /// Transform every corner point of a ROI
 /// </summary>
-template <RealFloatingPoint T> Quad<T> operator*(const Matrix<T> &aLeft, const Roi &aRight);
+template <RealFloatingPoint T> Quad<T> MPPEXPORT_COMMON operator*(const Matrix<T> &aLeft, const Roi &aRight);
 
 /// <summary>
 /// perspective transformation matrix - vector multiplication <para/>

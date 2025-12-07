@@ -1,4 +1,8 @@
-add_library(common 
+
+add_subdirectory(image)
+add_subdirectory(signal)
+
+add_library(common SHARED
 	bfloat16.cpp
 	complex.cpp
 	exception.cpp
@@ -10,16 +14,19 @@ add_library(common
 	vector4.cpp
 	vector4A.cpp
 	)
+target_compile_definitions(common PUBLIC -DMPP_COMMON)  
 
 target_link_libraries(common PRIVATE  
 						project_options
 						project_warnings						
 						)
+target_link_libraries(common PUBLIC  
+						common.image						
+						)
+
 target_include_directories(common  PUBLIC 
 						   ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
 						   ${PROJECT_SOURCE_DIR}/src
 						  )
 					
 add_subdirectory(fileIO)	
-add_subdirectory(image)
-add_subdirectory(signal)

@@ -1,4 +1,5 @@
 #pragma once
+#include "../dllexport_common.h"
 #include <common/defines.h>
 #include <common/image/size2D.h>
 #include <common/safeCast.h>
@@ -11,7 +12,7 @@ namespace mpp::image
 /// <summary>
 /// Combines filter size and center point in one struct for a simplified API
 /// </summary>
-struct alignas(4 * sizeof(int)) FilterArea
+struct alignas(4 * sizeof(int)) MPPEXPORT_COMMON FilterArea
 {
     Size2D Size;
     Vector2<int> Center;

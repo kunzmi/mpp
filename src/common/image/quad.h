@@ -1,4 +1,5 @@
 #pragma once
+#include "../dllexport_common.h"
 #include <common/defines.h>
 #include <common/image/roi.h>
 #include <common/safeCast.h>
@@ -21,7 +22,7 @@ namespace mpp::image
 /// p3 = (X, Y + height - 1)<para/>
 /// With transformed coordinates, the points coorespond to the same ROI corners.
 /// </summary>
-template <RealFloatingPoint T> struct Quad
+template <RealFloatingPoint T> struct MPPEXPORT_COMMON Quad
 {
     Vector2<T> P0;
     Vector2<T> P1;

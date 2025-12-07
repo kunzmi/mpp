@@ -1,4 +1,5 @@
 #pragma once
+#include "dllexport_common.h"
 #include "mpp_defs.h"
 #include <common/defines.h>
 #include <common/numeric_limits.h>
@@ -16,7 +17,7 @@ namespace mpp
 /// devices the bf16 header from Nvidia and on AMD devices the implementation coming with ROCm. But from an external
 /// view, it is always the same mpp::BFloat16 datatype.
 /// </summary>
-class alignas(2) BFloat16
+class alignas(2) MPPEXPORT_COMMON BFloat16
 {
   private:
     static constexpr bool BINARY = true; // additional argument for constructor to switch to binary
@@ -605,9 +606,9 @@ template <> struct numeric_limits<BFloat16>
     }
 };
 
-std::ostream &operator<<(std::ostream &aOs, const BFloat16 &aHalf);
-std::wostream &operator<<(std::wostream &aOs, const BFloat16 &aHalf);
-std::istream &operator>>(std::istream &aIs, BFloat16 &aHalf);
-std::wistream &operator>>(std::wistream &aIs, BFloat16 &aHalf);
+MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const BFloat16 &aHalf);
+MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const BFloat16 &aHalf);
+MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, BFloat16 &aHalf);
+MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, BFloat16 &aHalf);
 
 } // namespace mpp

@@ -1,4 +1,4 @@
-add_library(backends.cuda.image.arithmetic 
+add_library(backends.cuda.image.arithmetic8s OBJECT 
 	8s/abs.cu
 	8s/add.cu
 	8s/addMasked.cu	
@@ -26,8 +26,9 @@ add_library(backends.cuda.image.arithmetic
 	8s/sqrt.cu
 	8s/sub.cu
 	8s/subMasked.cu
-	8s/xor.cu
+	8s/xor.cu)
 	
+add_library(backends.cuda.image.arithmetic8u OBJECT 
 	8u/absDiff.cu
 	8u/add.cu
 	8u/addMasked.cu	
@@ -55,8 +56,9 @@ add_library(backends.cuda.image.arithmetic
 	8u/sqrt.cu
 	8u/sub.cu
 	8u/subMasked.cu
-	8u/xor.cu
+	8u/xor.cu)
 	
+add_library(backends.cuda.image.arithmetic16s OBJECT 
 	16s/abs.cu
 	16s/add.cu
 	16s/addMasked.cu	
@@ -85,8 +87,9 @@ add_library(backends.cuda.image.arithmetic
 	16s/sqrt.cu
 	16s/sub.cu
 	16s/subMasked.cu
-	16s/xor.cu
+	16s/xor.cu)
 	
+add_library(backends.cuda.image.arithmetic16u OBJECT 
 	16u/absDiff.cu
 	16u/add.cu
 	16u/addMasked.cu	
@@ -114,8 +117,9 @@ add_library(backends.cuda.image.arithmetic
 	16u/sqrt.cu
 	16u/sub.cu
 	16u/subMasked.cu
-	16u/xor.cu
+	16u/xor.cu)
 	
+add_library(backends.cuda.image.arithmetic32s OBJECT 
 	32s/abs.cu
 	32s/add.cu
 	32s/addMasked.cu	
@@ -144,8 +148,9 @@ add_library(backends.cuda.image.arithmetic
 	32s/sqrt.cu
 	32s/sub.cu
 	32s/subMasked.cu
-	32s/xor.cu
+	32s/xor.cu)
 	
+add_library(backends.cuda.image.arithmetic32u OBJECT 
 	32u/absDiff.cu
 	32u/add.cu
 	32u/addMasked.cu	
@@ -173,8 +178,9 @@ add_library(backends.cuda.image.arithmetic
 	32u/sqrt.cu
 	32u/sub.cu
 	32u/subMasked.cu
-	32u/xor.cu
+	32u/xor.cu)
 	
+add_library(backends.cuda.image.arithmetic16f OBJECT 
 	16f/abs.cu
 	16f/absDiff.cu
 	16f/add.cu
@@ -197,8 +203,9 @@ add_library(backends.cuda.image.arithmetic
 	16f/sqr.cu
 	16f/sqrt.cu
 	16f/sub.cu
-	16f/subMasked.cu
+	16f/subMasked.cu)
 	
+add_library(backends.cuda.image.arithmetic16bf OBJECT 
 	16bf/abs.cu
 	16bf/absDiff.cu
 	16bf/add.cu
@@ -221,8 +228,9 @@ add_library(backends.cuda.image.arithmetic
 	16bf/sqr.cu
 	16bf/sqrt.cu
 	16bf/sub.cu
-	16bf/subMasked.cu
+	16bf/subMasked.cu)
 	
+add_library(backends.cuda.image.arithmetic32f OBJECT 
 	32f/abs.cu
 	32f/absDiff.cu
 	32f/add.cu
@@ -246,8 +254,9 @@ add_library(backends.cuda.image.arithmetic
 	32f/sqr.cu
 	32f/sqrt.cu
 	32f/sub.cu
-	32f/subMasked.cu
+	32f/subMasked.cu)
 	
+add_library(backends.cuda.image.arithmetic64f OBJECT 
 	64f/abs.cu
 	64f/absDiff.cu
 	64f/add.cu
@@ -270,8 +279,9 @@ add_library(backends.cuda.image.arithmetic
 	64f/sqr.cu
 	64f/sqrt.cu
 	64f/sub.cu
-	64f/subMasked.cu
+	64f/subMasked.cu)
 	
+add_library(backends.cuda.image.arithmetic16sc OBJECT 
 	16sc/add.cu
 	16sc/addMasked.cu	
 	16sc/addProduct.cu
@@ -293,8 +303,9 @@ add_library(backends.cuda.image.arithmetic
 	16sc/sqr.cu
 	16sc/sqrt.cu
 	16sc/sub.cu
-	16sc/subMasked.cu
+	16sc/subMasked.cu)
 	
+add_library(backends.cuda.image.arithmetic32sc OBJECT 
 	32sc/add.cu
 	32sc/addMasked.cu	
 	32sc/addProduct.cu
@@ -316,9 +327,9 @@ add_library(backends.cuda.image.arithmetic
 	32sc/sqr.cu
 	32sc/sqrt.cu
 	32sc/sub.cu
-	32sc/subMasked.cu
+	32sc/subMasked.cu)
 	
-	
+add_library(backends.cuda.image.arithmetic32fc OBJECT
 	32fc/add.cu
 	32fc/addMasked.cu	
 	32fc/addProduct.cu
@@ -346,15 +357,41 @@ add_library(backends.cuda.image.arithmetic
 	32fc/subMasked.cu
 	)
 	
-target_include_directories(backends.cuda.image.arithmetic  PUBLIC 
-						   ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
-						   ${PROJECT_SOURCE_DIR}/src
-						  )
-target_link_libraries(backends.cuda.image.arithmetic PRIVATE  
-						project_options					
-						)
-target_link_libraries(backends.cuda.image.arithmetic PUBLIC  
-						backends.cuda
-						common
-						common.image
-						)
+target_include_directories(backends.cuda.image.arithmetic8s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.arithmetic8s PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.arithmetic8u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.arithmetic8u PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.arithmetic16s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.arithmetic16s PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.arithmetic16u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.arithmetic16u PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.arithmetic32s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.arithmetic32s PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.arithmetic32u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.arithmetic32u PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.arithmetic16sc PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.arithmetic16sc PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.arithmetic32sc PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.arithmetic32sc PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.arithmetic16bf PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.arithmetic16bf PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.arithmetic16f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.arithmetic16f PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.arithmetic32f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.arithmetic32f PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.arithmetic32fc PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.arithmetic32fc PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.arithmetic64f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.arithmetic64f PRIVATE project_options)

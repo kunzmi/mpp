@@ -4000,6 +4000,7 @@ ImageView<T> &ImageView<T>::MaxEvery(const ImageView<T> &aSrc2, const mpp::cuda:
 template <PixelType T>
 void ImageView<T>::EvenLevels(int *aHPtrLevels, int aLevels, int aLowerLevel, int aUpperLevel,
                               HistorgamEvenMode aHistorgamEvenMode)
+    requires RealVector<T>
 {
     if (aLevels < 2)
     {

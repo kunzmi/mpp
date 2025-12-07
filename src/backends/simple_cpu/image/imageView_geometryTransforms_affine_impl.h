@@ -51,7 +51,7 @@ ImageView<T> &ImageView<T>::WarpAffine(ImageView<T> &aDst, const AffineTransform
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::WarpAffine(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
-                                       InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                       InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                        Roi aAllowedReadRoi) const
 {
     return this->WarpAffineBack(aDst, aAffine.Inverse(), aInterpolation, aConstant, aBorder, aAllowedReadRoi);
@@ -81,7 +81,7 @@ void ImageView<T>::WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc
                               ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                               const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                              T aConstant, BorderType aBorder, Roi aAllowedReadRoi)
+                              const T &aConstant, BorderType aBorder, Roi aAllowedReadRoi)
     requires TwoChannel<T>
 {
     ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aDst1, aDst2, aAffine.Inverse(), aInterpolation, aConstant, aBorder,
@@ -116,7 +116,7 @@ void ImageView<T>::WarpAffine(const ImageView<Vector1<remove_vector_t<T>>> &aSrc
                               ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst3,
                               const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                              T aConstant, BorderType aBorder, Roi aAllowedReadRoi)
+                              const T &aConstant, BorderType aBorder, Roi aAllowedReadRoi)
     requires ThreeChannel<T>
 {
     ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aSrc3, aDst1, aDst2, aDst3, aAffine.Inverse(), aInterpolation, aConstant,
@@ -148,8 +148,8 @@ void ImageView<T>::WarpAffine(
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
     ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
     ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-    const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
-    Roi aAllowedReadRoi)
+    const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, const T &aConstant,
+    BorderType aBorder, Roi aAllowedReadRoi)
     requires FourChannelNoAlpha<T>
 {
     ImageView<T>::WarpAffineBack(aSrc1, aSrc2, aSrc3, aSrc4, aDst1, aDst2, aDst3, aDst4, aAffine.Inverse(),
@@ -171,7 +171,7 @@ ImageView<T> &ImageView<T>::WarpAffineBack(ImageView<T> &aDst, const AffineTrans
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::WarpAffineBack(ImageView<T> &aDst, const AffineTransformation<double> &aAffine,
-                                           InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                           InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                            Roi aAllowedReadRoi) const
 {
     if (aAllowedReadRoi == Roi())
@@ -399,7 +399,7 @@ void ImageView<T>::WarpAffineBack(const ImageView<Vector1<remove_vector_t<T>>> &
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                   const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                                  T aConstant, BorderType aBorder, Roi aAllowedReadRoi)
+                                  const T &aConstant, BorderType aBorder, Roi aAllowedReadRoi)
     requires TwoChannel<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI())
@@ -647,7 +647,7 @@ void ImageView<T>::WarpAffineBack(const ImageView<Vector1<remove_vector_t<T>>> &
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst3,
                                   const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation,
-                                  T aConstant, BorderType aBorder, Roi aAllowedReadRoi)
+                                  const T &aConstant, BorderType aBorder, Roi aAllowedReadRoi)
     requires ThreeChannel<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI())
@@ -901,8 +901,8 @@ void ImageView<T>::WarpAffineBack(
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
     ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
     ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-    const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
-    Roi aAllowedReadRoi)
+    const AffineTransformation<double> &aAffine, InterpolationMode aInterpolation, const T &aConstant,
+    BorderType aBorder, Roi aAllowedReadRoi)
     requires FourChannelNoAlpha<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI() || aSrc1.ROI() != aSrc4.ROI())

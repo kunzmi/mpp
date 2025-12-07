@@ -1,4 +1,5 @@
 #pragma once
+#include "dllexport_fileio.h"
 #include <common/defines.h>
 #include <common/exception.h>
 #include <filesystem>
@@ -10,7 +11,7 @@ namespace mpp::fileIO
 /// <summary>
 /// FileIOException is thrown when a file cannot be accessed as intended.
 /// </summary>
-class FileIOException : public MPPException
+class MPPEXPORT_COMMON_FILEIO FileIOException : public MPPException
 {
   public:
     FileIOException(const std::filesystem::path &aFileName, const std::string &aMessage,

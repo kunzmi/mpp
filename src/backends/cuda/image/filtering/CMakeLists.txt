@@ -1,6 +1,7 @@
-add_library(backends.cuda.image.filtering 
-	precomputeBilateralGaussFilter.cu
+add_library(backends.cuda.image.filteringBilateral OBJECT 
+	precomputeBilateralGaussFilter.cu)
 
+add_library(backends.cuda.image.filtering8s OBJECT 
 	8s/bilateralGaussFilter.cu
 	8s/boxAndBoxSquare.cu
 	8s/boxFilter.cu
@@ -39,12 +40,12 @@ add_library(backends.cuda.image.filtering
 	8s/sobelVertSecond.cu
 	8s/thresholdAdaptiveBoxFilter.cu
 	8s/unsharpFilter.cu
-	8s/wienerFilter.cu
-	
+	8s/wienerFilter.cu)
+
+add_library(backends.cuda.image.filtering8u OBJECT 
 	8u/bilateralGaussFilter.cu
 	8u/boxAndBoxSquare.cu
 	8u/boxFilter.cu
-	8u/cannyEdgeHysteresis.cu
 	8u/columnCoefficientFilter.cu
 	8u/columnWindowSum.cu
 	8u/filter.cu
@@ -80,8 +81,10 @@ add_library(backends.cuda.image.filtering
 	8u/sobelVertSecond.cu
 	8u/thresholdAdaptiveBoxFilter.cu
 	8u/unsharpFilter.cu
-	8u/wienerFilter.cu
-	
+	8u/wienerFilter.cu)
+
+add_library(backends.cuda.image.filtering16s OBJECT 
+	8u/cannyEdgeHysteresis.cu # final step of a chain, only used for 16s and 32f
 	16s/bilateralGaussFilter.cu
 	16s/boxAndBoxSquare.cu
 	16s/boxFilter.cu
@@ -121,8 +124,9 @@ add_library(backends.cuda.image.filtering
 	16s/sobelVertSecond.cu
 	16s/thresholdAdaptiveBoxFilter.cu
 	16s/unsharpFilter.cu
-	16s/wienerFilter.cu
-	
+	16s/wienerFilter.cu)
+
+add_library(backends.cuda.image.filtering16u OBJECT 
 	16u/bilateralGaussFilter.cu
 	16u/boxAndBoxSquare.cu
 	16u/boxFilter.cu
@@ -161,8 +165,9 @@ add_library(backends.cuda.image.filtering
 	16u/sobelVertSecond.cu
 	16u/thresholdAdaptiveBoxFilter.cu
 	16u/unsharpFilter.cu
-	16u/wienerFilter.cu
-	
+	16u/wienerFilter.cu)
+
+add_library(backends.cuda.image.filtering32s OBJECT 
 	32s/bilateralGaussFilter.cu
 	32s/boxAndBoxSquare.cu
 	32s/boxFilter.cu
@@ -198,8 +203,9 @@ add_library(backends.cuda.image.filtering
 	32s/sobelVertSecond.cu
 	32s/thresholdAdaptiveBoxFilter.cu
 	32s/unsharpFilter.cu
-	32s/wienerFilter.cu
-	
+	32s/wienerFilter.cu)
+
+add_library(backends.cuda.image.filtering32u OBJECT 
 	32u/bilateralGaussFilter.cu
 	32u/boxAndBoxSquare.cu
 	32u/boxFilter.cu
@@ -235,8 +241,9 @@ add_library(backends.cuda.image.filtering
 	32u/sobelVertSecond.cu
 	32u/thresholdAdaptiveBoxFilter.cu
 	32u/unsharpFilter.cu
-	32u/wienerFilter.cu
-	
+	32u/wienerFilter.cu)
+
+add_library(backends.cuda.image.filtering16f OBJECT 
 	16f/bilateralGaussFilter.cu
 	16f/boxAndBoxSquare.cu
 	16f/boxFilter.cu
@@ -275,8 +282,9 @@ add_library(backends.cuda.image.filtering
 	16f/sobelVertSecond.cu
 	16f/thresholdAdaptiveBoxFilter.cu
 	16f/unsharpFilter.cu
-	16f/wienerFilter.cu
-	
+	16f/wienerFilter.cu)
+
+add_library(backends.cuda.image.filtering16bf OBJECT 
 	16bf/bilateralGaussFilter.cu
 	16bf/boxAndBoxSquare.cu
 	16bf/boxFilter.cu
@@ -315,8 +323,10 @@ add_library(backends.cuda.image.filtering
 	16bf/sobelVertSecond.cu
 	16bf/thresholdAdaptiveBoxFilter.cu
 	16bf/unsharpFilter.cu
-	16bf/wienerFilter.cu
-	
+	16bf/wienerFilter.cu)
+
+add_library(backends.cuda.image.filtering32f OBJECT 
+	8u/cannyEdgeHysteresis.cu # final step of a chain, only used for 16s and 32f
 	32f/bilateralGaussFilter.cu
 	32f/boxAndBoxSquare.cu
 	32f/boxFilter.cu
@@ -357,8 +367,9 @@ add_library(backends.cuda.image.filtering
 	32f/sobelVertSecond.cu
 	32f/thresholdAdaptiveBoxFilter.cu
 	32f/unsharpFilter.cu
-	32f/wienerFilter.cu
-	
+	32f/wienerFilter.cu)
+
+add_library(backends.cuda.image.filtering64f OBJECT 
 	64f/bilateralGaussFilter.cu
 	64f/boxAndBoxSquare.cu
 	64f/boxFilter.cu
@@ -394,8 +405,9 @@ add_library(backends.cuda.image.filtering
 	64f/sobelVertSecond.cu
 	64f/thresholdAdaptiveBoxFilter.cu
 	64f/unsharpFilter.cu
-	64f/wienerFilter.cu
-	
+	64f/wienerFilter.cu)
+
+add_library(backends.cuda.image.filtering16sc OBJECT 
 	16sc/boxFilter.cu
 	16sc/columnCoefficientFilter.cu
 	16sc/columnWindowSum.cu
@@ -421,8 +433,9 @@ add_library(backends.cuda.image.filtering
 	16sc/sobelHoriz.cu
 	16sc/sobelHorizSecond.cu
 	16sc/sobelVert.cu
-	16sc/sobelVertSecond.cu
-	
+	16sc/sobelVertSecond.cu)
+
+add_library(backends.cuda.image.filtering32sc OBJECT
 	32sc/boxFilter.cu
 	32sc/columnCoefficientFilter.cu
 	32sc/columnWindowSum.cu
@@ -448,8 +461,9 @@ add_library(backends.cuda.image.filtering
 	32sc/sobelHoriz.cu
 	32sc/sobelHorizSecond.cu
 	32sc/sobelVert.cu
-	32sc/sobelVertSecond.cu
-	
+	32sc/sobelVertSecond.cu)
+
+add_library(backends.cuda.image.filtering32fc OBJECT
 	32fc/boxFilter.cu
 	32fc/columnCoefficientFilter.cu
 	32fc/columnWindowSum.cu
@@ -479,27 +493,57 @@ add_library(backends.cuda.image.filtering
 	
 	)
 	
-	set_source_files_properties(8s/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
-	set_source_files_properties(8u/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
-	set_source_files_properties(16s/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
-	set_source_files_properties(16u/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
-	set_source_files_properties(32s/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
-	set_source_files_properties(32u/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
-	set_source_files_properties(16f/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
-	set_source_files_properties(16bf/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
-	set_source_files_properties(32f/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
-	set_source_files_properties(64f/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
-	set_source_files_properties(precomputeBilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
+set_source_files_properties(8s/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
+set_source_files_properties(8u/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
+set_source_files_properties(16s/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
+set_source_files_properties(16u/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
+set_source_files_properties(32s/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
+set_source_files_properties(32u/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
+set_source_files_properties(16f/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
+set_source_files_properties(16bf/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
+set_source_files_properties(32f/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
+set_source_files_properties(64f/bilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
+set_source_files_properties(precomputeBilateralGaussFilter.cu PROPERTIES COMPILE_FLAGS --use_fast_math)
 
-target_include_directories(backends.cuda.image.filtering  PUBLIC 
-						   ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
-						   ${PROJECT_SOURCE_DIR}/src
-						  )
-target_link_libraries(backends.cuda.image.filtering PRIVATE  
-						project_options					
-						)
-target_link_libraries(backends.cuda.image.filtering PUBLIC  
-						backends.cuda
-						common
-						common.image
-						)
+	
+target_include_directories(backends.cuda.image.filtering8s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.filtering8s PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.filtering8u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.filtering8u PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.filtering16s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.filtering16s PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.filtering16u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.filtering16u PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.filtering32s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.filtering32s PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.filtering32u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.filtering32u PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.filtering16sc PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.filtering16sc PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.filtering32sc PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.filtering32sc PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.filtering16bf PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.filtering16bf PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.filtering16f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.filtering16f PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.filtering32f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.filtering32f PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.filtering32fc PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.filtering32fc PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.filtering64f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.filtering64f PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.filteringBilateral PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.filteringBilateral PRIVATE project_options)

@@ -3,6 +3,7 @@
 #if MPP_ENABLE_NPP_BACKEND
 #include <common/image/pixelTypeEnabler.h>
 
+#include "dllexport_npp.h"
 #include <common/exception.h>
 #include <filesystem>
 #include <nppdefs.h>
@@ -15,7 +16,7 @@ namespace mpp::npp
 /// <summary>
 /// NppException is thrown when a NPP API call via nppSafeCall does not return NPP_SUCCESS.
 /// </summary>
-class NppException : public MPPException
+class MPPEXPORT_NPP NppException : public MPPException
 {
   private:
     static constexpr const char *ConvertErrorCodeToMessage(NppStatus aErrorCode);

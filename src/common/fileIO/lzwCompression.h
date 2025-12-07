@@ -1,4 +1,5 @@
 #pragma once
+#include "dllexport_fileio.h"
 #include <common/defines.h>
 #include <vector>
 

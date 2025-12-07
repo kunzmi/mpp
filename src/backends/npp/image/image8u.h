@@ -3,6 +3,7 @@
 #if MPP_ENABLE_NPP_BACKEND
 #include <common/image/pixelTypeEnabler.h>
 
+#include "../dllexport_npp.h"
 #include "image8uC1View.h"
 #include "image8uC2View.h"
 #include "image8uC3View.h"
@@ -22,7 +23,7 @@
 namespace mpp::image::npp
 {
 
-class Image8uC1 : public Image8uC1View
+class MPPEXPORT_NPP Image8uC1 : public Image8uC1View
 {
   public:
     Image8uC1() = delete;
@@ -38,7 +39,7 @@ class Image8uC1 : public Image8uC1View
     Image8uC1 &operator=(Image8uC1 &&aOther) noexcept;
 };
 
-class Image8uC2 : public Image8uC2View
+class MPPEXPORT_NPP Image8uC2 : public Image8uC2View
 {
   public:
     Image8uC2() = delete;
@@ -54,7 +55,7 @@ class Image8uC2 : public Image8uC2View
     Image8uC2 &operator=(Image8uC2 &&aOther) noexcept;
 };
 
-class Image8uC3 : public Image8uC3View
+class MPPEXPORT_NPP Image8uC3 : public Image8uC3View
 {
   public:
     Image8uC3() = delete;
@@ -70,7 +71,7 @@ class Image8uC3 : public Image8uC3View
     Image8uC3 &operator=(Image8uC3 &&aOther) noexcept;
 };
 
-class Image8uC4 : public Image8uC4View
+class MPPEXPORT_NPP Image8uC4 : public Image8uC4View
 {
   public:
     Image8uC4() = delete;

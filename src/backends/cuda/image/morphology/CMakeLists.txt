@@ -1,4 +1,4 @@
-add_library(backends.cuda.image.morphology 
+add_library(backends.cuda.image.morphology8s OBJECT
 	8s/dilation.cu
 	8s/dilationGray.cu
 	8s/erosion.cu
@@ -12,8 +12,9 @@ add_library(backends.cuda.image.morphology
 	8s/fixedSizeErosionGray.cu
 	8s/fixedSizeMorphologyGradient.cu
 	8s/fixedSizeBlackHat.cu
-	8s/fixedSizeTopHat.cu
+	8s/fixedSizeTopHat.cu)
 	
+add_library(backends.cuda.image.morphology8u OBJECT 
 	8u/dilation.cu
 	8u/dilationGray.cu
 	8u/erosion.cu
@@ -27,8 +28,9 @@ add_library(backends.cuda.image.morphology
 	8u/fixedSizeErosionGray.cu
 	8u/fixedSizeMorphologyGradient.cu
 	8u/fixedSizeBlackHat.cu
-	8u/fixedSizeTopHat.cu
+	8u/fixedSizeTopHat.cu)
 	
+add_library(backends.cuda.image.morphology16s OBJECT 
 	16s/dilation.cu
 	16s/dilationGray.cu
 	16s/erosion.cu
@@ -42,8 +44,9 @@ add_library(backends.cuda.image.morphology
 	16s/fixedSizeErosionGray.cu
 	16s/fixedSizeMorphologyGradient.cu
 	16s/fixedSizeBlackHat.cu
-	16s/fixedSizeTopHat.cu
-
+	16s/fixedSizeTopHat.cu)
+	
+add_library(backends.cuda.image.morphology16u OBJECT 
 	16u/dilation.cu
 	16u/dilationGray.cu
 	16u/erosion.cu
@@ -57,8 +60,9 @@ add_library(backends.cuda.image.morphology
 	16u/fixedSizeErosionGray.cu
 	16u/fixedSizeMorphologyGradient.cu
 	16u/fixedSizeBlackHat.cu
-	16u/fixedSizeTopHat.cu
+	16u/fixedSizeTopHat.cu)
 	
+add_library(backends.cuda.image.morphology32s OBJECT 
 	32s/dilation.cu
 	32s/dilationGray.cu
 	32s/erosion.cu
@@ -72,8 +76,9 @@ add_library(backends.cuda.image.morphology
 	32s/fixedSizeErosionGray.cu
 	32s/fixedSizeMorphologyGradient.cu
 	32s/fixedSizeBlackHat.cu
-	32s/fixedSizeTopHat.cu
+	32s/fixedSizeTopHat.cu)
 	
+add_library(backends.cuda.image.morphology32u OBJECT 
 	32u/dilation.cu
 	32u/dilationGray.cu
 	32u/erosion.cu
@@ -87,8 +92,9 @@ add_library(backends.cuda.image.morphology
 	32u/fixedSizeErosionGray.cu
 	32u/fixedSizeMorphologyGradient.cu
 	32u/fixedSizeBlackHat.cu
-	32u/fixedSizeTopHat.cu
+	32u/fixedSizeTopHat.cu)
 	
+add_library(backends.cuda.image.morphology16f OBJECT 
 	16f/dilation.cu
 	16f/dilationGray.cu
 	16f/erosion.cu
@@ -102,8 +108,9 @@ add_library(backends.cuda.image.morphology
 	16f/fixedSizeErosionGray.cu
 	16f/fixedSizeMorphologyGradient.cu
 	16f/fixedSizeBlackHat.cu
-	16f/fixedSizeTopHat.cu
+	16f/fixedSizeTopHat.cu)
 	
+add_library(backends.cuda.image.morphology16bf OBJECT 
 	16bf/dilation.cu
 	16bf/dilationGray.cu
 	16bf/erosion.cu
@@ -117,8 +124,9 @@ add_library(backends.cuda.image.morphology
 	16bf/fixedSizeErosionGray.cu
 	16bf/fixedSizeMorphologyGradient.cu
 	16bf/fixedSizeBlackHat.cu
-	16bf/fixedSizeTopHat.cu
+	16bf/fixedSizeTopHat.cu)
 	
+add_library(backends.cuda.image.morphology32f OBJECT 
 	32f/dilation.cu
 	32f/dilationGray.cu
 	32f/erosion.cu
@@ -132,8 +140,9 @@ add_library(backends.cuda.image.morphology
 	32f/fixedSizeErosionGray.cu
 	32f/fixedSizeMorphologyGradient.cu
 	32f/fixedSizeBlackHat.cu
-	32f/fixedSizeTopHat.cu
+	32f/fixedSizeTopHat.cu)
 	
+add_library(backends.cuda.image.morphology64f OBJECT 
 	64f/dilation.cu
 	64f/dilationGray.cu
 	64f/erosion.cu
@@ -150,16 +159,34 @@ add_library(backends.cuda.image.morphology
 	64f/fixedSizeTopHat.cu
 	)
 	
+	
+target_include_directories(backends.cuda.image.morphology8s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.morphology8s PRIVATE project_options)
 
-target_include_directories(backends.cuda.image.morphology  PUBLIC 
-						   ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
-						   ${PROJECT_SOURCE_DIR}/src
-						  )
-target_link_libraries(backends.cuda.image.morphology PRIVATE  
-						project_options					
-						)
-target_link_libraries(backends.cuda.image.morphology PUBLIC  
-						backends.cuda
-						common
-						common.image
-						)
+target_include_directories(backends.cuda.image.morphology8u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.morphology8u PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.morphology16s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.morphology16s PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.morphology16u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.morphology16u PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.morphology32s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.morphology32s PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.morphology32u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.morphology32u PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.morphology16bf PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.morphology16bf PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.morphology16f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.morphology16f PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.morphology32f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.morphology32f PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.morphology64f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.morphology64f PRIVATE project_options)
+

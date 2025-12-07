@@ -1,5 +1,6 @@
 #pragma once
-#include "common/defines.h"
+#include "../dllexport_fileio.h"
+#include <common/defines.h>
 #include <common/fileIO/pseudoFileReader.h>
 #include <filesystem>
 #include <memory>
@@ -13,7 +14,7 @@ class TIFFFile;
 namespace tiffTag
 {
 
-class SaveTiffTag
+class MPPEXPORT_COMMON_FILEIO SaveTiffTag
 {
   protected:
   public:
@@ -31,7 +32,7 @@ class SaveTiffTag
     virtual void SavePass2(std::ostream &aStream) = 0;
 };
 
-class Rational
+class MPPEXPORT_COMMON_FILEIO Rational
 {
   public:
     uint nominator{0};   // NOLINT(misc-non-private-member-variables-in-classes)
@@ -52,7 +53,7 @@ class Rational
     [[nodiscard]] double GetValue() const;
 };
 
-class SRational
+class MPPEXPORT_COMMON_FILEIO SRational
 {
   public:
     int nominator{0};   // NOLINT(misc-non-private-member-variables-in-classes)
@@ -98,7 +99,7 @@ enum class TiffType : ushort // NOLINT(performance-enum-size)
 
 size_t GetTiffTypeSizeInBytes(TiffType aType);
 
-struct TiffTag
+struct MPPEXPORT_COMMON_FILEIO TiffTag
 {
     ushort TagID;
     TiffType Type;
@@ -179,7 +180,7 @@ enum class TIFFDifferencingPredictor : ushort // NOLINT(performance-enum-size)
     HorizontalDifferencing = 2
 };
 
-class ImageFileDirectoryEntry : public PseudoFileReader
+class MPPEXPORT_COMMON_FILEIO ImageFileDirectoryEntry : public PseudoFileReader
 {
   protected:
     TiffTag mTag;           // NOLINT -> should be private
@@ -209,7 +210,7 @@ class ImageFileDirectoryEntry : public PseudoFileReader
     }
 };
 
-template <typename T> class IFDEntry : public ImageFileDirectoryEntry
+template <typename T> class MPPEXPORT_COMMON_FILEIO IFDEntry : public ImageFileDirectoryEntry
 {
   protected:
     std::vector<T> mValue; // NOLINT -> should be private
@@ -243,7 +244,7 @@ template <> class IFDEntry<std::string> : public ImageFileDirectoryEntry
     void SavePass2(std::ostream &aStream) override;
 };
 
-class ImageFileDirectory
+class MPPEXPORT_COMMON_FILEIO ImageFileDirectory
 {
   private:
     ushort mEntryCount{0};
@@ -278,7 +279,7 @@ class ImageFileDirectory
     void SaveAsTiff(std::ofstream &aStream, void *aData, size_t aDataSize);
 };
 
-class IFDImageLength : public ImageFileDirectoryEntry
+class MPPEXPORT_COMMON_FILEIO IFDImageLength : public ImageFileDirectoryEntry
 {
     uint mValue;
 
@@ -295,7 +296,7 @@ class IFDImageLength : public ImageFileDirectoryEntry
     void SavePass1(std::ostream &aStream) override;
 };
 
-class IFDImageWidth : public ImageFileDirectoryEntry
+class MPPEXPORT_COMMON_FILEIO IFDImageWidth : public ImageFileDirectoryEntry
 {
     uint mValue;
 
@@ -312,7 +313,7 @@ class IFDImageWidth : public ImageFileDirectoryEntry
     void SavePass1(std::ostream &aStream) override;
 };
 
-class IFDRowsPerStrip : public ImageFileDirectoryEntry
+class MPPEXPORT_COMMON_FILEIO IFDRowsPerStrip : public ImageFileDirectoryEntry
 {
     uint mValue;
 
@@ -329,7 +330,7 @@ class IFDRowsPerStrip : public ImageFileDirectoryEntry
     void SavePass1(std::ostream &aStream) override;
 };
 
-class IFDStripByteCounts : public ImageFileDirectoryEntry
+class MPPEXPORT_COMMON_FILEIO IFDStripByteCounts : public ImageFileDirectoryEntry
 {
     std::vector<uint> mValue;
 
@@ -350,7 +351,7 @@ class IFDStripByteCounts : public ImageFileDirectoryEntry
     void SavePass2(std::ostream &aStream) override;
 };
 
-class IFDStripOffsets : public ImageFileDirectoryEntry
+class MPPEXPORT_COMMON_FILEIO IFDStripOffsets : public ImageFileDirectoryEntry
 {
     std::vector<uint> mValue;
 
@@ -371,7 +372,7 @@ class IFDStripOffsets : public ImageFileDirectoryEntry
     void SaveFinalOffsets(std::ostream &aStream, std::vector<uint> &aFinalOffsets);
 };
 
-class IFDArtist : public IFDEntry<std::string>
+class MPPEXPORT_COMMON_FILEIO IFDArtist : public IFDEntry<std::string>
 {
   public:
     static constexpr ushort TagID   = 315;
@@ -382,7 +383,7 @@ class IFDArtist : public IFDEntry<std::string>
     explicit IFDArtist(const std::string &aValue);
 };
 
-class IFDCopyright : public IFDEntry<std::string>
+class MPPEXPORT_COMMON_FILEIO IFDCopyright : public IFDEntry<std::string>
 {
   public:
     static constexpr ushort TagID   = 33432;
@@ -393,7 +394,7 @@ class IFDCopyright : public IFDEntry<std::string>
     explicit IFDCopyright(const std::string &aValue);
 };
 
-class IFDDateTime : public IFDEntry<std::string>
+class MPPEXPORT_COMMON_FILEIO IFDDateTime : public IFDEntry<std::string>
 {
   public:
     static constexpr ushort TagID   = 306;
@@ -404,7 +405,7 @@ class IFDDateTime : public IFDEntry<std::string>
     explicit IFDDateTime(const std::string &aValue);
 };
 
-class IFDHostComputer : public IFDEntry<std::string>
+class MPPEXPORT_COMMON_FILEIO IFDHostComputer : public IFDEntry<std::string>
 {
   public:
     static constexpr ushort TagID   = 316;
@@ -415,7 +416,7 @@ class IFDHostComputer : public IFDEntry<std::string>
     explicit IFDHostComputer(const std::string &aValue);
 };
 
-class IFDImageDescription : public IFDEntry<std::string>
+class MPPEXPORT_COMMON_FILEIO IFDImageDescription : public IFDEntry<std::string>
 {
   public:
     static constexpr ushort TagID   = 270;
@@ -426,7 +427,7 @@ class IFDImageDescription : public IFDEntry<std::string>
     explicit IFDImageDescription(const std::string &aValue);
 };
 
-class IFDModel : public IFDEntry<std::string>
+class MPPEXPORT_COMMON_FILEIO IFDModel : public IFDEntry<std::string>
 {
   public:
     static constexpr ushort TagID   = 272;
@@ -437,7 +438,7 @@ class IFDModel : public IFDEntry<std::string>
     explicit IFDModel(const std::string &aValue);
 };
 
-class IFDMake : public IFDEntry<std::string>
+class MPPEXPORT_COMMON_FILEIO IFDMake : public IFDEntry<std::string>
 {
   public:
     static constexpr ushort TagID   = 271;
@@ -448,7 +449,7 @@ class IFDMake : public IFDEntry<std::string>
     explicit IFDMake(const std::string &aValue);
 };
 
-class IFDSoftware : public IFDEntry<std::string>
+class MPPEXPORT_COMMON_FILEIO IFDSoftware : public IFDEntry<std::string>
 {
   public:
     static constexpr ushort TagID   = 305;
@@ -459,7 +460,7 @@ class IFDSoftware : public IFDEntry<std::string>
     explicit IFDSoftware(const std::string &aValue);
 };
 
-class IFDBitsPerSample : public IFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO IFDBitsPerSample : public IFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 258;
@@ -474,7 +475,7 @@ class IFDBitsPerSample : public IFDEntry<ushort>
     [[nodiscard]] ushort Value(size_t aIdx) const;
 };
 
-class IFDCellLength : public IFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO IFDCellLength : public IFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 265;
@@ -487,7 +488,7 @@ class IFDCellLength : public IFDEntry<ushort>
     [[nodiscard]] ushort Value() const;
 };
 
-class IFDCellWidth : public IFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO IFDCellWidth : public IFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 264;
@@ -500,7 +501,7 @@ class IFDCellWidth : public IFDEntry<ushort>
     [[nodiscard]] ushort Value() const;
 };
 
-class IFDColorMap : public IFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO IFDColorMap : public IFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 320;
@@ -513,7 +514,7 @@ class IFDColorMap : public IFDEntry<ushort>
     [[nodiscard]] const std::vector<ushort> &Value() const;
 };
 
-class IFDCompression : public IFDEntry<TIFFCompression>
+class MPPEXPORT_COMMON_FILEIO IFDCompression : public IFDEntry<TIFFCompression>
 {
   public:
     static constexpr ushort TagID   = 259;
@@ -526,7 +527,7 @@ class IFDCompression : public IFDEntry<TIFFCompression>
     [[nodiscard]] TIFFCompression Value() const;
 };
 
-class IFDExtraSamples : public IFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO IFDExtraSamples : public IFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 338;
@@ -539,7 +540,7 @@ class IFDExtraSamples : public IFDEntry<ushort>
     [[nodiscard]] ushort Value() const;
 };
 
-class IFDDifferencingPredictor : public IFDEntry<TIFFDifferencingPredictor>
+class MPPEXPORT_COMMON_FILEIO IFDDifferencingPredictor : public IFDEntry<TIFFDifferencingPredictor>
 {
   public:
     static constexpr ushort TagID   = 317;
@@ -552,7 +553,7 @@ class IFDDifferencingPredictor : public IFDEntry<TIFFDifferencingPredictor>
     [[nodiscard]] TIFFDifferencingPredictor Value() const;
 };
 
-class IFDFillOrder : public IFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO IFDFillOrder : public IFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 226;
@@ -565,7 +566,7 @@ class IFDFillOrder : public IFDEntry<ushort>
     [[nodiscard]] ushort Value() const;
 };
 
-class IFDFreeByteCounts : public IFDEntry<uint>
+class MPPEXPORT_COMMON_FILEIO IFDFreeByteCounts : public IFDEntry<uint>
 {
   public:
     static constexpr ushort TagID   = 289;
@@ -578,7 +579,7 @@ class IFDFreeByteCounts : public IFDEntry<uint>
     [[nodiscard]] uint Value() const;
 };
 
-class IFDFreeOffsets : public IFDEntry<uint>
+class MPPEXPORT_COMMON_FILEIO IFDFreeOffsets : public IFDEntry<uint>
 {
   public:
     static constexpr ushort TagID   = 288;
@@ -591,7 +592,7 @@ class IFDFreeOffsets : public IFDEntry<uint>
     [[nodiscard]] uint Value() const;
 };
 
-class IFDGrayResponseCurve : public IFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO IFDGrayResponseCurve : public IFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 291;
@@ -604,7 +605,7 @@ class IFDGrayResponseCurve : public IFDEntry<ushort>
     [[nodiscard]] const std::vector<ushort> &Value() const;
 };
 
-class IFDGrayResponseUnit : public IFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO IFDGrayResponseUnit : public IFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 290;
@@ -617,7 +618,7 @@ class IFDGrayResponseUnit : public IFDEntry<ushort>
     [[nodiscard]] ushort Value() const;
 };
 
-class IFDMaxSampleValue : public IFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO IFDMaxSampleValue : public IFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 281;
@@ -630,7 +631,7 @@ class IFDMaxSampleValue : public IFDEntry<ushort>
     [[nodiscard]] ushort Value() const;
 };
 
-class IFDMinSampleValue : public IFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO IFDMinSampleValue : public IFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 280;
@@ -643,7 +644,7 @@ class IFDMinSampleValue : public IFDEntry<ushort>
     [[nodiscard]] ushort Value() const;
 };
 
-class IFDNewSubfileType : public IFDEntry<uint>
+class MPPEXPORT_COMMON_FILEIO IFDNewSubfileType : public IFDEntry<uint>
 {
   public:
     static constexpr ushort TagID   = 254;
@@ -656,7 +657,7 @@ class IFDNewSubfileType : public IFDEntry<uint>
     [[nodiscard]] uint Value() const;
 };
 
-class IFDOrientation : public IFDEntry<TiffOrientation>
+class MPPEXPORT_COMMON_FILEIO IFDOrientation : public IFDEntry<TiffOrientation>
 {
   public:
     static constexpr ushort TagID   = 274;
@@ -669,7 +670,7 @@ class IFDOrientation : public IFDEntry<TiffOrientation>
     [[nodiscard]] TiffOrientation Value() const;
 };
 
-class IFDPhotometricInterpretation : public IFDEntry<TIFFPhotometricInterpretation>
+class MPPEXPORT_COMMON_FILEIO IFDPhotometricInterpretation : public IFDEntry<TIFFPhotometricInterpretation>
 {
   public:
     static constexpr ushort TagID   = 262;
@@ -682,7 +683,7 @@ class IFDPhotometricInterpretation : public IFDEntry<TIFFPhotometricInterpretati
     [[nodiscard]] TIFFPhotometricInterpretation Value() const;
 };
 
-class IFDPlanarConfiguration : public IFDEntry<TIFFPlanarConfigurartion>
+class MPPEXPORT_COMMON_FILEIO IFDPlanarConfiguration : public IFDEntry<TIFFPlanarConfigurartion>
 {
   public:
     static constexpr ushort TagID   = 284;
@@ -695,7 +696,7 @@ class IFDPlanarConfiguration : public IFDEntry<TIFFPlanarConfigurartion>
     [[nodiscard]] TIFFPlanarConfigurartion Value() const;
 };
 
-class IFDResolutionUnit : public IFDEntry<TIFFResolutionUnit>
+class MPPEXPORT_COMMON_FILEIO IFDResolutionUnit : public IFDEntry<TIFFResolutionUnit>
 {
   public:
     static constexpr ushort TagID   = 296;
@@ -708,7 +709,7 @@ class IFDResolutionUnit : public IFDEntry<TIFFResolutionUnit>
     [[nodiscard]] TIFFResolutionUnit Value() const;
 };
 
-class IFDSamplesPerPixel : public IFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO IFDSamplesPerPixel : public IFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 277;
@@ -721,7 +722,7 @@ class IFDSamplesPerPixel : public IFDEntry<ushort>
     [[nodiscard]] ushort Value() const;
 };
 
-class IFDSampleFormat : public IFDEntry<TIFFSampleFormat>
+class MPPEXPORT_COMMON_FILEIO IFDSampleFormat : public IFDEntry<TIFFSampleFormat>
 {
   public:
     static constexpr ushort TagID   = 339;
@@ -734,7 +735,7 @@ class IFDSampleFormat : public IFDEntry<TIFFSampleFormat>
     [[nodiscard]] TIFFSampleFormat Value() const;
 };
 
-class IFDSubfileType : public IFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO IFDSubfileType : public IFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 255;
@@ -747,7 +748,7 @@ class IFDSubfileType : public IFDEntry<ushort>
     [[nodiscard]] ushort Value() const;
 };
 
-class IFDThreshholding : public IFDEntry<ushort>
+class MPPEXPORT_COMMON_FILEIO IFDThreshholding : public IFDEntry<ushort>
 {
   public:
     static constexpr ushort TagID   = 263;
@@ -760,7 +761,7 @@ class IFDThreshholding : public IFDEntry<ushort>
     [[nodiscard]] ushort Value() const;
 };
 
-class IFDXResolution : public IFDEntry<Rational>
+class MPPEXPORT_COMMON_FILEIO IFDXResolution : public IFDEntry<Rational>
 {
   public:
     static constexpr ushort TagID   = 282;
@@ -773,7 +774,7 @@ class IFDXResolution : public IFDEntry<Rational>
     [[nodiscard]] Rational Value() const;
 };
 
-class IFDYResolution : public IFDEntry<Rational>
+class MPPEXPORT_COMMON_FILEIO IFDYResolution : public IFDEntry<Rational>
 {
   public:
     static constexpr ushort TagID   = 283;

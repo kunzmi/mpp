@@ -3,18 +3,19 @@
 #if MPP_ENABLE_CUDA_CORE
 
 #include "cudaException.h"
+#include "dllexport_cudacore.h"
 #include <common/defines.h>
 #include <cuda_runtime_api.h>
 
 namespace mpp::cuda
 {
 // forward declaration:
-class Stream;
+class MPPEXPORT_CUDACORE Stream;
 
 /// <summary>
 /// A wrapper class for a cudaEvent_t.
 /// </summary>
-class Event
+class MPPEXPORT_CUDACORE Event
 {
   private:
     cudaEvent_t mEvent{nullptr};
@@ -185,6 +186,6 @@ class Event
 /// <summary>
 /// Shortcut for elapsed time, mathematically correct we put aEventEnd on the left side of the -sign
 /// </summary>
-float operator-(const Event &aEventEnd, const Event &aEventStart);
+MPPEXPORT_CUDACORE float operator-(const Event &aEventEnd, const Event &aEventStart);
 } // namespace mpp::cuda
 #endif // MPP_ENABLE_CUDA_CORE

@@ -5,15 +5,16 @@ namespace mpp::image::cpuSimple
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define InstantiateConvert_For(typeSrc, typeDst)                                                                       \
-    template ImageView<typeDst> &ImageView<typeSrc>::Convert<typeDst>(ImageView<typeDst> & aDst) const;
+    template MPPEXPORT_SIMPLECPU ImageView<typeDst> &ImageView<typeSrc>::Convert<typeDst>(ImageView<typeDst> & aDst)   \
+        const;
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define InstantiateConvertRound_For(typeSrc, typeDst)                                                                  \
-    template ImageView<typeDst> &ImageView<typeSrc>::Convert<typeDst>(ImageView<typeDst> & aDst,                       \
-                                                                      RoundingMode aRoundingMode) const;
+    template MPPEXPORT_SIMPLECPU ImageView<typeDst> &ImageView<typeSrc>::Convert<typeDst>(                             \
+        ImageView<typeDst> & aDst, RoundingMode aRoundingMode) const;
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define InstantiateConvertRoundScale_For(typeSrc, typeDst)                                                             \
-    template ImageView<typeDst> &ImageView<typeSrc>::Convert<typeDst>(                                                 \
+    template MPPEXPORT_SIMPLECPU ImageView<typeDst> &ImageView<typeSrc>::Convert<typeDst>(                             \
         ImageView<typeDst> & aDst, RoundingMode aRoundingMode, int aScaleFactor) const;
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)

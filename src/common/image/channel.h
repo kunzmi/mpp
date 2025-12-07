@@ -1,4 +1,5 @@
 #pragma once
+#include "../dllexport_common.h"
 #include "pixelTypes.h"
 #include <common/defines.h>
 #include <common/exception.h>
@@ -86,7 +87,7 @@ enum class XYZ : uint
 /// A generic interface to image color channels, takes as input any integer or defined channel enum, and converts to
 /// Axis1/2/3/4 enum for vector classes. Throws an exception on host code if value exceeds valid range.
 /// </summary>
-class Channel
+class MPPEXPORT_COMMON Channel
 {
   public:
     Channel() = default;

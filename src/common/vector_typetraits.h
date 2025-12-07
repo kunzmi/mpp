@@ -1,4 +1,5 @@
 #pragma once
+#include "dllexport_common.h"
 #include <common/defines.h>
 #include <common/numberTypes.h>
 #include <concepts>

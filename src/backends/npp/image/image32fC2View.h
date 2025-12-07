@@ -5,6 +5,7 @@
 #if MPP_ENABLE_NPP_BACKEND
 #include <common/image/pixelTypeEnabler.h>
 
+#include "../dllexport_npp.h"
 #include "imageView.h"
 #include <backends/cuda/devVarView.h>
 #include <backends/npp/nppException.h>
@@ -17,9 +18,9 @@
 namespace mpp::image::npp
 {
 // forward declaration:
-class Image32fC1View;
+class MPPEXPORT_NPP Image32fC1View;
 
-class Image32fC2View : public ImageView<Pixel32fC2>
+class MPPEXPORT_NPP Image32fC2View : public ImageView<Pixel32fC2>
 {
   protected:
     Image32fC2View() = default;

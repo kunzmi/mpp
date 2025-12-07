@@ -1,7 +1,8 @@
 #pragma once
 
-#include "common/defines.h"
+#include "dllexport_fileio.h"
 #include "fileReader.h"
+#include <common/defines.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <filesystem>
@@ -14,7 +15,7 @@ namespace mpp::fileIO
 /// <summary>
 /// PseudoFileReader implements FileReader to provide reading capabilities from a given stream.
 /// </summary>
-class PseudoFileReader : public FileReader
+class MPPEXPORT_COMMON_FILEIO PseudoFileReader : public FileReader
 {
   protected:
     PseudoFileReader();

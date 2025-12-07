@@ -51,7 +51,7 @@ ImageView<T> &ImageView<T>::WarpPerspective(ImageView<T> &aDst, const Perspectiv
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::WarpPerspective(ImageView<T> &aDst, const PerspectiveTransformation<double> &aPerspective,
-                                            InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                            InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                             Roi aAllowedReadRoi) const
 {
     return this->WarpPerspectiveBack(aDst, aPerspective.Inverse(), aInterpolation, aConstant, aBorder, aAllowedReadRoi);
@@ -81,7 +81,7 @@ void ImageView<T>::WarpPerspective(const ImageView<Vector1<remove_vector_t<T>>> 
                                    ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                    const PerspectiveTransformation<double> &aPerspective,
-                                   InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                   InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                    Roi aAllowedReadRoi)
     requires TwoChannel<T>
 {
@@ -114,7 +114,7 @@ void ImageView<T>::WarpPerspective(
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
     ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, const T &aConstant,
     BorderType aBorder, Roi aAllowedReadRoi)
     requires ThreeChannel<T>
 {
@@ -147,7 +147,7 @@ void ImageView<T>::WarpPerspective(
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
     ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
     ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, const T &aConstant,
     BorderType aBorder, Roi aAllowedReadRoi)
     requires FourChannelNoAlpha<T>
 {
@@ -172,8 +172,8 @@ ImageView<T> &ImageView<T>::WarpPerspectiveBack(ImageView<T> &aDst,
 template <PixelType T>
 ImageView<T> &ImageView<T>::WarpPerspectiveBack(ImageView<T> &aDst,
                                                 const PerspectiveTransformation<double> &aPerspective,
-                                                InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
-                                                Roi aAllowedReadRoi) const
+                                                InterpolationMode aInterpolation, const T &aConstant,
+                                                BorderType aBorder, Roi aAllowedReadRoi) const
 {
     if (aAllowedReadRoi == Roi())
     {
@@ -400,7 +400,7 @@ void ImageView<T>::WarpPerspectiveBack(const ImageView<Vector1<remove_vector_t<T
                                        ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                        ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                                        const PerspectiveTransformation<double> &aPerspective,
-                                       InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                       InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                        Roi aAllowedReadRoi)
     requires TwoChannel<T>
 {
@@ -645,7 +645,7 @@ void ImageView<T>::WarpPerspectiveBack(
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
     ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
-    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, const T &aConstant,
     BorderType aBorder, Roi aAllowedReadRoi)
     requires ThreeChannel<T>
 {
@@ -899,7 +899,7 @@ void ImageView<T>::WarpPerspectiveBack(
     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
     ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
     ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
-    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, T aConstant,
+    const PerspectiveTransformation<double> &aPerspective, InterpolationMode aInterpolation, const T &aConstant,
     BorderType aBorder, Roi aAllowedReadRoi)
     requires FourChannelNoAlpha<T>
 {

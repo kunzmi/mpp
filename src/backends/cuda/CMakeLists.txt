@@ -9,7 +9,9 @@ if(MPP_ENABLE_CUDA_BACKEND)
 	set(filesForbackends.cuda ${filesForbackends.cuda} streamCtx.cpp)
 endif()
 
-add_library(backends.cuda ${filesForbackends.cuda})
+add_library(backends.cuda SHARED ${filesForbackends.cuda})
+
+target_compile_definitions(backends.cuda PUBLIC -DMPP_CUDACORE)  
 	
 target_include_directories(backends.cuda  PUBLIC 
 						   ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
@@ -21,6 +23,7 @@ target_link_libraries(backends.cuda PRIVATE
 						)
 target_link_libraries(backends.cuda PUBLIC  
 						common
+						CUDA::cudart
 						)
 endif()
 

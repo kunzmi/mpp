@@ -1,4 +1,4 @@
-add_library(backends.npp.image 
+add_library(backends.npp.image OBJECT
 	image8s.cpp
 	image8u.cpp
 	image16s.cpp
@@ -60,6 +60,8 @@ add_library(backends.npp.image
 	image64fC3View.cpp
 	image64fC4View.cpp
 	)
+
+target_compile_definitions(backends.npp.image PUBLIC -DMPP_NPP)  
 	
 target_include_directories(backends.npp.image PUBLIC 
 						   ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
@@ -69,6 +71,5 @@ target_link_libraries(backends.npp.image PRIVATE
 						project_options
 						project_warnings						
 						)
-target_link_libraries(backends.npp.image PUBLIC  
-						backends.npp
+target_link_libraries(backends.npp.image PUBLIC 
 						)

@@ -5,35 +5,35 @@ namespace mpp::image::cpuSimple
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define InstantiateScaleIntToInt_For(typeSrc, typeDst)                                                                 \
-    template ImageView<typeDst> &ImageView<typeSrc>::Scale<typeDst>(ImageView<typeDst> & aDst,                         \
-                                                                    RoundingMode aRoundingMode) const;
+    template MPPEXPORT_SIMPLECPU ImageView<typeDst> &ImageView<typeSrc>::Scale<typeDst>(                               \
+        ImageView<typeDst> & aDst, RoundingMode aRoundingMode) const;
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define InstantiateScaleIntToAny_For(typeSrc, typeDst)                                                                 \
-    template ImageView<typeDst> &ImageView<typeSrc>::Scale<typeDst>(                                                   \
+    template MPPEXPORT_SIMPLECPU ImageView<typeDst> &ImageView<typeSrc>::Scale<typeDst>(                               \
         ImageView<typeDst> & aDst, scalefactor_t<typeDst> aDstMin, scalefactor_t<typeDst> aDstMax) const;
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define InstantiateScaleIntToAnyRound_For(typeSrc, typeDst)                                                            \
-    template ImageView<typeDst> &ImageView<typeSrc>::Scale<typeDst>(                                                   \
+    template MPPEXPORT_SIMPLECPU ImageView<typeDst> &ImageView<typeSrc>::Scale<typeDst>(                               \
         ImageView<typeDst> & aDst, scalefactor_t<typeDst> aDstMin, scalefactor_t<typeDst> aDstMax,                     \
         RoundingMode aRoundingMode) const;
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define InstantiateScaleAnyToInt_For(typeSrc, typeDst)                                                                 \
-    template ImageView<typeDst> &ImageView<typeSrc>::Scale<typeDst>(                                                   \
+    template MPPEXPORT_SIMPLECPU ImageView<typeDst> &ImageView<typeSrc>::Scale<typeDst>(                               \
         ImageView<typeDst> & aDst, scalefactor_t<typeSrc> aSrcMin, scalefactor_t<typeSrc> aSrcMax,                     \
         RoundingMode aRoundingMode) const;
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define InstantiateScaleAnyToAny_For(typeSrc, typeDst)                                                                 \
-    template ImageView<typeDst> &ImageView<typeSrc>::Scale<typeDst>(                                                   \
+    template MPPEXPORT_SIMPLECPU ImageView<typeDst> &ImageView<typeSrc>::Scale<typeDst>(                               \
         ImageView<typeDst> & aDst, scalefactor_t<typeSrc> aSrcMin, scalefactor_t<typeSrc> aSrcMax,                     \
         scalefactor_t<typeDst> aDstMin, scalefactor_t<typeDst> aDstMax) const;
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define InstantiateScaleAnyToAnyRound_For(typeSrc, typeDst)                                                            \
-    template ImageView<typeDst> &ImageView<typeSrc>::Scale<typeDst>(                                                   \
+    template MPPEXPORT_SIMPLECPU ImageView<typeDst> &ImageView<typeSrc>::Scale<typeDst>(                               \
         ImageView<typeDst> & aDst, scalefactor_t<typeSrc> aSrcMin, scalefactor_t<typeSrc> aSrcMax,                     \
         scalefactor_t<typeDst> aDstMin, scalefactor_t<typeDst> aDstMax, RoundingMode aRoundingMode) const;
 

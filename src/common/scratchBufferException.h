@@ -1,4 +1,5 @@
 #pragma once
+#include "dllexport_common.h"
 #include <common/defines.h>
 #include <common/exception.h>
 #include <cstddef>
@@ -12,7 +13,7 @@ namespace mpp
 /// <summary>
 /// ScratchBufferException is thrown when a provided scratch buffer is smaller than the required buffer size.
 /// </summary>
-class ScratchBufferException : public MPPException
+class MPPEXPORT_COMMON ScratchBufferException : public MPPException
 {
   public:
     ScratchBufferException(size_t aRequiredSize, size_t aProvidedSize, const std::string &aMessage,

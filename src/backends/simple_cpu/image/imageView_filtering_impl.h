@@ -25,15 +25,15 @@
 #include <common/image/roiException.h>
 #include <common/image/size2D.h>
 #include <common/image/sizePitched.h>
+#include <common/mpp_defs.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
-#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/utilities.h>
+#include <common/vector_typetraits.h>
 #include <common/vector1.h>
 #include <common/vector3.h>
 #include <common/vectorTypes.h>
-#include <common/vector_typetraits.h>
 #include <concepts>
 #include <cstddef>
 #include <type_traits>
@@ -201,8 +201,8 @@ ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFi
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
-                                        BorderType aBorder) const
+ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
+                                        const T &aConstant, BorderType aBorder) const
 {
     return this->FixedFilter(aDst, aFilter, aMaskSize, aConstant, aBorder, ROI());
 }
@@ -219,8 +219,8 @@ ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFi
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
-                                        BorderType aBorder, const Roi &aAllowedReadRoi) const
+ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
+                                        const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
@@ -246,8 +246,8 @@ ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::FixedFilter(
 
 template <PixelType T>
 ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::FixedFilter(
-    ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
-    BorderType aBorder) const
+    ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
+    const T &aConstant, BorderType aBorder) const
     requires(has_alternative_filter_output_type_for_v<T>)
 {
     return this->FixedFilter(aDst, aFilter, aMaskSize, aConstant, aBorder, ROI());
@@ -268,8 +268,8 @@ ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::FixedFilter(
 
 template <PixelType T>
 ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::FixedFilter(
-    ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, T aConstant,
-    BorderType aBorder, const Roi &aAllowedReadRoi) const
+    ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
+    const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires(has_alternative_filter_output_type_for_v<T>)
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -299,7 +299,8 @@ ImageView<T> &ImageView<T>::SeparableFilter(ImageView<T> &aDst,
 template <PixelType T>
 ImageView<T> &ImageView<T>::SeparableFilter(ImageView<T> &aDst,
                                             const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
-                                            int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder) const
+                                            int aFilterSize, int aFilterCenter, const T &aConstant,
+                                            BorderType aBorder) const
 {
     return this->SeparableFilter(aDst, aFilter, aFilterSize, aFilterCenter, aConstant, aBorder, ROI());
 }
@@ -321,7 +322,7 @@ ImageView<T> &ImageView<T>::SeparableFilter(ImageView<T> &aDst,
 template <PixelType T>
 ImageView<T> &ImageView<T>::SeparableFilter(ImageView<T> &aDst,
                                             const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
-                                            int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder,
+                                            int aFilterSize, int aFilterCenter, const T &aConstant, BorderType aBorder,
                                             const Roi &aAllowedReadRoi) const
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -356,7 +357,7 @@ ImageView<T> &ImageView<T>::ColumnFilter(ImageView<T> &aDst,
 template <PixelType T>
 ImageView<T> &ImageView<T>::ColumnFilter(ImageView<T> &aDst,
                                          const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter, int aFilterSize,
-                                         int aFilterCenter, T aConstant, BorderType aBorder) const
+                                         int aFilterCenter, const T &aConstant, BorderType aBorder) const
 {
     return this->ColumnFilter(aDst, aFilter, aFilterSize, aFilterCenter, aConstant, aBorder, ROI());
 }
@@ -377,7 +378,7 @@ ImageView<T> &ImageView<T>::ColumnFilter(ImageView<T> &aDst,
 template <PixelType T>
 ImageView<T> &ImageView<T>::ColumnFilter(ImageView<T> &aDst,
                                          const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter, int aFilterSize,
-                                         int aFilterCenter, T aConstant, BorderType aBorder,
+                                         int aFilterCenter, const T &aConstant, BorderType aBorder,
                                          const Roi &aAllowedReadRoi) const
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -407,7 +408,7 @@ template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, float>> &ImageView<T>::ColumnWindowSum(
     ImageView<same_vector_size_different_type_t<T, float>> &aDst,
     complex_basetype_t<remove_vector_t<same_vector_size_different_type_t<T, float>>> aScalingValue, int aFilterSize,
-    int aFilterCenter, T aConstant, BorderType aBorder) const
+    int aFilterCenter, const T &aConstant, BorderType aBorder) const
     requires RealVector<T>
 {
     return this->ColumnWindowSum(aDst, aScalingValue, aFilterSize, aFilterCenter, aConstant, aBorder, ROI());
@@ -432,7 +433,7 @@ template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, float>> &ImageView<T>::ColumnWindowSum(
     ImageView<same_vector_size_different_type_t<T, float>> &aDst,
     complex_basetype_t<remove_vector_t<same_vector_size_different_type_t<T, float>>> aScalingValue, int aFilterSize,
-    int aFilterCenter, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+    int aFilterCenter, const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires RealVector<T>
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -461,7 +462,7 @@ ImageView<T> &ImageView<T>::RowFilter(ImageView<T> &aDst, const filtertype_for_t
 }
 template <PixelType T>
 ImageView<T> &ImageView<T>::RowFilter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
-                                      int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder) const
+                                      int aFilterSize, int aFilterCenter, const T &aConstant, BorderType aBorder) const
 {
     return this->RowFilter(aDst, aFilter, aFilterSize, aFilterCenter, aConstant, aBorder, ROI());
 }
@@ -480,7 +481,7 @@ ImageView<T> &ImageView<T>::RowFilter(ImageView<T> &aDst, const filtertype_for_t
 }
 template <PixelType T>
 ImageView<T> &ImageView<T>::RowFilter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
-                                      int aFilterSize, int aFilterCenter, T aConstant, BorderType aBorder,
+                                      int aFilterSize, int aFilterCenter, const T &aConstant, BorderType aBorder,
                                       const Roi &aAllowedReadRoi) const
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -510,7 +511,7 @@ template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, float>> &ImageView<T>::RowWindowSum(
     ImageView<same_vector_size_different_type_t<T, float>> &aDst,
     complex_basetype_t<remove_vector_t<same_vector_size_different_type_t<T, float>>> aScalingValue, int aFilterSize,
-    int aFilterCenter, T aConstant, BorderType aBorder) const
+    int aFilterCenter, const T &aConstant, BorderType aBorder) const
     requires RealVector<T>
 {
     return this->RowWindowSum(aDst, aScalingValue, aFilterSize, aFilterCenter, aConstant, aBorder, ROI());
@@ -535,7 +536,7 @@ template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, float>> &ImageView<T>::RowWindowSum(
     ImageView<same_vector_size_different_type_t<T, float>> &aDst,
     complex_basetype_t<remove_vector_t<same_vector_size_different_type_t<T, float>>> aScalingValue, int aFilterSize,
-    int aFilterCenter, T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+    int aFilterCenter, const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires RealVector<T>
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -564,7 +565,7 @@ ImageView<T> &ImageView<T>::BoxFilter(ImageView<T> &aDst, const FilterArea &aFil
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::BoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant,
+ImageView<T> &ImageView<T>::BoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, const T &aConstant,
                                       BorderType aBorder) const
 {
     return this->BoxFilter(aDst, aFilterArea, aConstant, aBorder, ROI());
@@ -583,7 +584,7 @@ ImageView<T> &ImageView<T>::BoxFilter(ImageView<T> &aDst, const FilterArea &aFil
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::BoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant,
+ImageView<T> &ImageView<T>::BoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, const T &aConstant,
                                       BorderType aBorder, const Roi &aAllowedReadRoi) const
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -611,7 +612,7 @@ ImageView<same_vector_size_different_type_t<T, float>> &ImageView<T>::BoxFilter(
 
 template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, float>> &ImageView<T>::BoxFilter(
-    ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea, T aConstant,
+    ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea, const T &aConstant,
     BorderType aBorder) const
     requires RealIntVector<T>
 {
@@ -634,7 +635,7 @@ ImageView<same_vector_size_different_type_t<T, float>> &ImageView<T>::BoxFilter(
 
 template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, float>> &ImageView<T>::BoxFilter(
-    ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea, T aConstant,
+    ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea, const T &aConstant,
     BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires RealIntVector<T>
 {
@@ -662,7 +663,7 @@ ImageView<Pixel32fC2> &ImageView<T>::BoxAndSumSquareFilter(ImageView<Pixel32fC2>
 
 template <PixelType T>
 ImageView<Pixel32fC2> &ImageView<T>::BoxAndSumSquareFilter(ImageView<Pixel32fC2> &aDst, const FilterArea &aFilterArea,
-                                                           T aConstant, BorderType aBorder) const
+                                                           const T &aConstant, BorderType aBorder) const
     requires RealVector<T> && SingleChannel<T> && (sizeof(T) < 8)
 {
     return this->BoxAndSumSquareFilter(aDst, aFilterArea, aConstant, aBorder, ROI());
@@ -683,7 +684,7 @@ ImageView<Pixel32fC2> &ImageView<T>::BoxAndSumSquareFilter(ImageView<Pixel32fC2>
 
 template <PixelType T>
 ImageView<Pixel32fC2> &ImageView<T>::BoxAndSumSquareFilter(ImageView<Pixel32fC2> &aDst, const FilterArea &aFilterArea,
-                                                           T aConstant, BorderType aBorder,
+                                                           const T &aConstant, BorderType aBorder,
                                                            const Roi &aAllowedReadRoi) const
     requires RealVector<T> && SingleChannel<T> && (sizeof(T) < 8)
 {
@@ -714,7 +715,7 @@ ImageView<T> &ImageView<T>::MaxFilter(ImageView<T> &aDst, const FilterArea &aFil
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MaxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant,
+ImageView<T> &ImageView<T>::MaxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, const T &aConstant,
                                       BorderType aBorder) const
     requires RealVector<T>
 {
@@ -735,7 +736,7 @@ ImageView<T> &ImageView<T>::MaxFilter(ImageView<T> &aDst, const FilterArea &aFil
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MaxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant,
+ImageView<T> &ImageView<T>::MaxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, const T &aConstant,
                                       BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires RealVector<T>
 {
@@ -754,7 +755,7 @@ ImageView<T> &ImageView<T>::MinFilter(ImageView<T> &aDst, const FilterArea &aFil
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MinFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant,
+ImageView<T> &ImageView<T>::MinFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, const T &aConstant,
                                       BorderType aBorder) const
     requires RealVector<T>
 {
@@ -775,7 +776,7 @@ ImageView<T> &ImageView<T>::MinFilter(ImageView<T> &aDst, const FilterArea &aFil
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::MinFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant,
+ImageView<T> &ImageView<T>::MinFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, const T &aConstant,
                                       BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires RealVector<T>
 {
@@ -798,7 +799,7 @@ ImageView<T> &ImageView<T>::WienerFilter(ImageView<T> &aDst, const FilterArea &a
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::WienerFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
-                                         const filter_compute_type_for_t<T> &aNoise, T aConstant,
+                                         const filter_compute_type_for_t<T> &aNoise, const T &aConstant,
                                          BorderType aBorder) const
     requires RealVector<T>
 {
@@ -821,8 +822,8 @@ ImageView<T> &ImageView<T>::WienerFilter(ImageView<T> &aDst, const FilterArea &a
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::WienerFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
-                                         const filter_compute_type_for_t<T> &aNoise, T aConstant, BorderType aBorder,
-                                         const Roi &aAllowedReadRoi) const
+                                         const filter_compute_type_for_t<T> &aNoise, const T &aConstant,
+                                         BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires RealVector<T>
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -847,7 +848,7 @@ ImageView<T> &ImageView<T>::ThresholdAdaptiveBoxFilter(ImageView<T> &aDst, const
 template <PixelType T>
 ImageView<T> &ImageView<T>::ThresholdAdaptiveBoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
                                                        const filter_compute_type_for_t<T> &aDelta, const T &aValGT,
-                                                       const T &aValLE, T aConstant, BorderType aBorder) const
+                                                       const T &aValLE, const T &aConstant, BorderType aBorder) const
     requires RealVector<T>
 {
     return this->ThresholdAdaptiveBoxFilter(aDst, aFilterArea, aDelta, aValGT, aValLE, aConstant, aBorder, ROI());
@@ -871,7 +872,7 @@ ImageView<T> &ImageView<T>::ThresholdAdaptiveBoxFilter(ImageView<T> &aDst, const
 template <PixelType T>
 ImageView<T> &ImageView<T>::ThresholdAdaptiveBoxFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
                                                        const filter_compute_type_for_t<T> &aDelta, const T &aValGT,
-                                                       const T &aValLE, T aConstant, BorderType aBorder,
+                                                       const T &aValLE, const T &aConstant, BorderType aBorder,
                                                        const Roi &aAllowedReadRoi) const
     requires RealVector<T>
 {
@@ -895,7 +896,7 @@ ImageView<T> &ImageView<T>::Filter(ImageView<T> &aDst, const filtertype_for_t<fi
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Filter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
-                                   const FilterArea &aFilterArea, T aConstant, BorderType aBorder) const
+                                   const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder) const
 {
     return this->Filter(aDst, aFilter, aFilterArea, aConstant, aBorder, ROI());
 }
@@ -914,7 +915,7 @@ ImageView<T> &ImageView<T>::Filter(ImageView<T> &aDst, const filtertype_for_t<fi
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Filter(ImageView<T> &aDst, const filtertype_for_t<filter_compute_type_for_t<T>> *aFilter,
-                                   const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                                   const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder,
                                    const Roi &aAllowedReadRoi) const
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -943,8 +944,8 @@ ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const Filte
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
-                                                 const float *aPreCompGeomDistCoeff, float aValSquareSigma, T aConstant,
-                                                 BorderType aBorder) const
+                                                 const float *aPreCompGeomDistCoeff, float aValSquareSigma,
+                                                 const T &aConstant, BorderType aBorder) const
     requires SingleChannel<T> && RealVector<T> &&
              (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>)
 {
@@ -955,6 +956,7 @@ ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const Filte
 template <PixelType T>
 void ImageView<T>::PrecomputeBilateralGaussFilter(float *aPreCompGeomDistCoeff, const FilterArea &aFilterArea,
                                                   float aPosSquareSigma) const
+    requires RealVector<T> && (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>)
 {
     if (!aFilterArea.CheckIfValid())
     {
@@ -990,8 +992,9 @@ ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const Filte
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
-                                                 const float *aPreCompGeomDistCoeff, float aValSquareSigma, T aConstant,
-                                                 BorderType aBorder, const Roi &aAllowedReadRoi) const
+                                                 const float *aPreCompGeomDistCoeff, float aValSquareSigma,
+                                                 const T &aConstant, BorderType aBorder,
+                                                 const Roi &aAllowedReadRoi) const
     requires SingleChannel<T> && RealVector<T> &&
              (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>)
 {
@@ -1023,7 +1026,7 @@ ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const Filte
 template <PixelType T>
 ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
                                                  const float *aPreCompGeomDistCoeff, float aValSquareSigma,
-                                                 mpp::Norm aNorm, T aConstant, BorderType aBorder) const
+                                                 mpp::Norm aNorm, const T &aConstant, BorderType aBorder) const
     requires(!SingleChannel<T>) && RealVector<T> &&
             (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>)
 {
@@ -1050,7 +1053,7 @@ ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const Filte
 template <PixelType T>
 ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,
                                                  const float *aPreCompGeomDistCoeff, float aValSquareSigma,
-                                                 mpp::Norm aNorm, T aConstant, BorderType aBorder,
+                                                 mpp::Norm aNorm, const T &aConstant, BorderType aBorder,
                                                  const Roi &aAllowedReadRoi) const
     requires(!SingleChannel<T>) && RealVector<T> &&
             (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>)
@@ -1087,7 +1090,7 @@ template <PixelType T>
 void ImageView<T>::GradientVectorSobel(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
                                        ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                        ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                       T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+                                       const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>)
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -1171,7 +1174,7 @@ template <PixelType T>
 void ImageView<T>::GradientVectorSobel(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
                                        ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                        ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                       T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+                                       const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
              std::same_as<remove_vector_t<T>, float>)
 {
@@ -1255,7 +1258,7 @@ template <PixelType T>
 void ImageView<T>::GradientVectorScharr(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
                                         ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                         ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                        T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+                                        const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>)
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -1339,7 +1342,7 @@ template <PixelType T>
 void ImageView<T>::GradientVectorScharr(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
                                         ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                         ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                        T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+                                        const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
              std::same_as<remove_vector_t<T>, float>)
 {
@@ -1423,7 +1426,7 @@ template <PixelType T>
 void ImageView<T>::GradientVectorPrewitt(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
                                          ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                          ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                         T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+                                         const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>)
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -1507,7 +1510,7 @@ template <PixelType T>
 void ImageView<T>::GradientVectorPrewitt(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
                                          ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                          ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                         T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+                                         const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
              std::same_as<remove_vector_t<T>, float>)
 {
@@ -1586,7 +1589,7 @@ template <PixelType T>
 void ImageView<T>::GradientVectorSobel(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
                                        ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                        ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                       T aConstant, BorderType aBorder) const
+                                       const T &aConstant, BorderType aBorder) const
     requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>)
 {
     return this->GradientVectorSobel(aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance, aNorm, aMaskSize, aConstant,
@@ -1609,7 +1612,7 @@ template <PixelType T>
 void ImageView<T>::GradientVectorSobel(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
                                        ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                        ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                       T aConstant, BorderType aBorder) const
+                                       const T &aConstant, BorderType aBorder) const
     requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
              std::same_as<remove_vector_t<T>, float>)
 {
@@ -1632,7 +1635,7 @@ template <PixelType T>
 void ImageView<T>::GradientVectorScharr(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
                                         ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                         ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                        T aConstant, BorderType aBorder) const
+                                        const T &aConstant, BorderType aBorder) const
     requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>)
 {
     return this->GradientVectorScharr(aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance, aNorm, aMaskSize, aConstant,
@@ -1655,7 +1658,7 @@ template <PixelType T>
 void ImageView<T>::GradientVectorScharr(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
                                         ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                         ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                        T aConstant, BorderType aBorder) const
+                                        const T &aConstant, BorderType aBorder) const
     requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
              std::same_as<remove_vector_t<T>, float>)
 {
@@ -1678,7 +1681,7 @@ template <PixelType T>
 void ImageView<T>::GradientVectorPrewitt(ImageView<Pixel16sC1> &aDstX, ImageView<Pixel16sC1> &aDstY,
                                          ImageView<Pixel16sC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                          ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                         T aConstant, BorderType aBorder) const
+                                         const T &aConstant, BorderType aBorder) const
     requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>)
 {
     return this->GradientVectorPrewitt(aDstX, aDstY, aDstMag, aDstAngle, aDstCovariance, aNorm, aMaskSize, aConstant,
@@ -1701,7 +1704,7 @@ template <PixelType T>
 void ImageView<T>::GradientVectorPrewitt(ImageView<Pixel32fC1> &aDstX, ImageView<Pixel32fC1> &aDstY,
                                          ImageView<Pixel32fC1> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                                          ImageView<Pixel32fC4> &aDstCovariance, Norm aNorm, MaskSize aMaskSize,
-                                         T aConstant, BorderType aBorder) const
+                                         const T &aConstant, BorderType aBorder) const
     requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
              std::same_as<remove_vector_t<T>, float>)
 {
@@ -1730,7 +1733,7 @@ ImageView<T> &ImageView<T>::UnsharpFilter(ImageView<T> &aDst,
                                           int aFilterSize, int aFilterCenter,
                                           remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aWeight,
                                           remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aThreshold,
-                                          T aConstant, BorderType aBorder) const
+                                          const T &aConstant, BorderType aBorder) const
     requires RealVector<T>
 {
     return this->UnsharpFilter(aDst, aFilter, aFilterSize, aFilterCenter, aWeight, aThreshold, aConstant, aBorder,
@@ -1761,7 +1764,7 @@ ImageView<T> &ImageView<T>::UnsharpFilter(ImageView<T> &aDst,
                                           int aFilterSize, int aFilterCenter,
                                           remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aWeight,
                                           remove_vector_t<filtertype_for_t<filter_compute_type_for_t<T>>> aThreshold,
-                                          T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+                                          const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires RealVector<T>
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -1795,7 +1798,8 @@ ImageView<Pixel32fC1> &ImageView<T>::HarrisCornerResponse(ImageView<Pixel32fC1> 
 
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::HarrisCornerResponse(ImageView<Pixel32fC1> &aDst, const FilterArea &aAvgWindowSize,
-                                                          float aK, float aScale, T aConstant, BorderType aBorder) const
+                                                          float aK, float aScale, const T &aConstant,
+                                                          BorderType aBorder) const
     requires std::same_as<T, Pixel32fC4>
 {
     return this->HarrisCornerResponse(aDst, aAvgWindowSize, aK, aScale, aConstant, aBorder, ROI());
@@ -1817,8 +1821,8 @@ ImageView<Pixel32fC1> &ImageView<T>::HarrisCornerResponse(ImageView<Pixel32fC1> 
 
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::HarrisCornerResponse(ImageView<Pixel32fC1> &aDst, const FilterArea &aAvgWindowSize,
-                                                          float aK, float aScale, T aConstant, BorderType aBorder,
-                                                          const Roi &aAllowedReadRoi) const
+                                                          float aK, float aScale, const T &aConstant,
+                                                          BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires std::same_as<T, Pixel32fC4>
 {
     checkSameSize(SizeRoi(), aDst.SizeRoi());

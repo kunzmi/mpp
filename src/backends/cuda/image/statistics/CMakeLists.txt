@@ -1,4 +1,4 @@
-add_library(backends.cuda.image.statistics 
+add_library(backends.cuda.image.statistics8s OBJECT
 	8s/averageError.cu
 	8s/averageErrorMasked.cu
 	8s/averageRelativeError.cu
@@ -61,9 +61,10 @@ add_library(backends.cuda.image.statistics
 	8s/sumMasked.cu
 
 	8s/histogramEven.cu
-	8s/histogramRange.cu
+	8s/histogramRange.cu)
 
 	
+add_library(backends.cuda.image.statistics8u OBJECT
 	8u/averageError.cu
 	8u/averageErrorMasked.cu
 	8u/averageRelativeError.cu
@@ -126,9 +127,10 @@ add_library(backends.cuda.image.statistics
 	8u/sumMasked.cu
 
 	8u/histogramEven.cu
-	8u/histogramRange.cu
+	8u/histogramRange.cu)
 
 	
+add_library(backends.cuda.image.statistics16bf OBJECT
 	16bf/averageError.cu
 	16bf/averageErrorMasked.cu
 	16bf/averageRelativeError.cu
@@ -191,9 +193,10 @@ add_library(backends.cuda.image.statistics
 	16bf/sumMasked.cu
 
 	16bf/histogramEven.cu
-	16bf/histogramRange.cu
+	16bf/histogramRange.cu)
 
 	
+add_library(backends.cuda.image.statistics16f OBJECT
 	16f/averageError.cu
 	16f/averageErrorMasked.cu
 	16f/averageRelativeError.cu
@@ -256,9 +259,10 @@ add_library(backends.cuda.image.statistics
 	16f/sumMasked.cu
 
 	16f/histogramEven.cu
-	16f/histogramRange.cu
+	16f/histogramRange.cu)
 
 	
+add_library(backends.cuda.image.statistics16s OBJECT
 	16s/averageError.cu
 	16s/averageErrorMasked.cu
 	16s/averageRelativeError.cu
@@ -321,9 +325,10 @@ add_library(backends.cuda.image.statistics
 	16s/sumMasked.cu
 
 	16s/histogramEven.cu
-	16s/histogramRange.cu
+	16s/histogramRange.cu)
 
 	
+add_library(backends.cuda.image.statistics16sc OBJECT
 	16sc/averageError.cu
 	16sc/averageErrorMasked.cu
 	16sc/averageRelativeError.cu
@@ -341,9 +346,10 @@ add_library(backends.cuda.image.statistics
 	16sc/normDiffInf.cu
 	16sc/normDiffInfMasked.cu
 	16sc/sum.cu
-	16sc/sumMasked.cu
+	16sc/sumMasked.cu)
 
 	
+add_library(backends.cuda.image.statistics16u OBJECT
 	16u/averageError.cu
 	16u/averageErrorMasked.cu
 	16u/averageRelativeError.cu
@@ -406,9 +412,10 @@ add_library(backends.cuda.image.statistics
 	16u/sumMasked.cu
 
 	16u/histogramEven.cu
-	16u/histogramRange.cu
+	16u/histogramRange.cu)
 
 	
+add_library(backends.cuda.image.statistics32f OBJECT
 	32f/averageError.cu
 	32f/averageErrorMasked.cu
 	32f/averageRelativeError.cu
@@ -472,9 +479,10 @@ add_library(backends.cuda.image.statistics
 	32f/sumMasked.cu
 
 	32f/histogramEven.cu
-	32f/histogramRange.cu
+	32f/histogramRange.cu)
 
 	
+add_library(backends.cuda.image.statistics32fc OBJECT
 	32fc/averageError.cu
 	32fc/averageErrorMasked.cu
 	32fc/averageRelativeError.cu
@@ -492,9 +500,10 @@ add_library(backends.cuda.image.statistics
 	32fc/normDiffInf.cu
 	32fc/normDiffInfMasked.cu
 	32fc/sum.cu
-	32fc/sumMasked.cu
+	32fc/sumMasked.cu)
 
 	
+add_library(backends.cuda.image.statistics32s OBJECT
 	32s/averageError.cu
 	32s/averageErrorMasked.cu
 	32s/averageRelativeError.cu
@@ -558,9 +567,10 @@ add_library(backends.cuda.image.statistics
 	32s/sumMasked.cu
 
 	32s/histogramEven.cu
-	32s/histogramRange.cu
+	32s/histogramRange.cu)
 
 	
+add_library(backends.cuda.image.statistics32sc OBJECT
 	32sc/averageError.cu
 	32sc/averageErrorMasked.cu
 	32sc/averageRelativeError.cu
@@ -578,9 +588,10 @@ add_library(backends.cuda.image.statistics
 	32sc/normDiffInf.cu
 	32sc/normDiffInfMasked.cu
 	32sc/sum.cu
-	32sc/sumMasked.cu
+	32sc/sumMasked.cu)
 
 	
+add_library(backends.cuda.image.statistics32u OBJECT
 	32u/averageError.cu
 	32u/averageErrorMasked.cu
 	32u/averageRelativeError.cu
@@ -643,9 +654,10 @@ add_library(backends.cuda.image.statistics
 	32u/sumMasked.cu
 
 	32u/histogramEven.cu
-	32u/histogramRange.cu
+	32u/histogramRange.cu)
 
 	
+add_library(backends.cuda.image.statistics64f OBJECT
 	64f/averageError.cu
 	64f/averageErrorMasked.cu
 	64f/averageRelativeError.cu
@@ -711,15 +723,41 @@ add_library(backends.cuda.image.statistics
 	64f/histogramRange.cu
 	)
 	
-target_include_directories(backends.cuda.image.statistics  PUBLIC 
-						   ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
-						   ${PROJECT_SOURCE_DIR}/src
-						  )
-target_link_libraries(backends.cuda.image.statistics PRIVATE  
-						project_options					
-						)
-target_link_libraries(backends.cuda.image.statistics PUBLIC  
-						backends.cuda
-						common
-						common.image
-						)
+target_include_directories(backends.cuda.image.statistics8s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.statistics8s PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.statistics8u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.statistics8u PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.statistics16s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.statistics16s PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.statistics16u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.statistics16u PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.statistics32s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.statistics32s PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.statistics32u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.statistics32u PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.statistics16sc PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.statistics16sc PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.statistics32sc PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.statistics32sc PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.statistics16bf PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.statistics16bf PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.statistics16f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.statistics16f PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.statistics32f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.statistics32f PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.statistics32fc PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.statistics32fc PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.statistics64f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.statistics64f PRIVATE project_options)

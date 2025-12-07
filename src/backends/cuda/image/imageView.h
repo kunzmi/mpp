@@ -4,6 +4,7 @@
 
 #include "dataExchangeAndInit/conversionRelations.h"
 #include "dataExchangeAndInit/scaleRelations.h"
+#include "dllexport_cudai.h"
 #include "morphology/morphologyComputeT.h"
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/devVarView.h>
@@ -41,7 +42,7 @@
 namespace mpp::image::cuda
 {
 
-template <PixelType T> class ImageView
+template <PixelType T> class MPPEXPORT_CUDAI ImageView
 {
 #pragma region Constructors
   public:
@@ -2924,7 +2925,8 @@ template <PixelType T> class ImageView
     /// <param name="aStreamCtx"></param>
     void PrecomputeBilateralGaussFilter(
         mpp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff, const FilterArea &aFilterArea, float aPosSquareSigma,
-        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const;
+        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
 
     /// <summary>
     /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
@@ -9370,7 +9372,8 @@ template <PixelType T> class ImageView
     /// <param name="aUpperLevel">Upper boundary value of the greatest level.</param>
     /// <param name="aHistorgamEvenMode">Switch compatibility mode: CUB (default) or NPP.</param>
     void EvenLevels(int *aHPtrLevels, int aLevels, int aLowerLevel, int aUpperLevel,
-                    HistorgamEvenMode aHistorgamEvenMode = HistorgamEvenMode::Default);
+                    HistorgamEvenMode aHistorgamEvenMode = HistorgamEvenMode::Default)
+        requires RealVector<T>;
 
     /// <summary>
     /// Returns the required temporary buffer size for HistogramEven.<para/>

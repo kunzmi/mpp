@@ -1,5 +1,6 @@
 #pragma once
 #include "defines.h"
+#include "dllexport_common.h"
 #include "needSaturationClamp.h"
 #include <common/bfloat16.h>
 #include <common/half_fp16.h>
@@ -31,8 +32,8 @@ namespace mpp
 {
 
 // forward declaration
-template <Number T> struct Vector2;
-template <RealSignedNumber T> struct Complex;
+template <Number T> struct MPPEXPORT_COMMON Vector2;
+template <RealSignedNumber T> struct MPPEXPORT_COMMON Complex;
 
 using c_short    = Complex<short>;
 using c_int      = Complex<int>;
@@ -45,7 +46,7 @@ using c_BFloat16 = Complex<BFloat16>;
 /// <summary>
 /// Our own definition of a complex number, that we can use on device and host
 /// </summary>
-template <RealSignedNumber T> struct alignas(2 * sizeof(T)) Complex
+template <RealSignedNumber T> struct alignas(2 * sizeof(T)) MPPEXPORT_COMMON Complex
 {
     T real; // NOLINT
     T imag; // NOLINT
@@ -975,10 +976,11 @@ inline Complex<BFloat16> operator""_ib(long double aValue)
     return {static_cast<BFloat16>(0.0f), static_cast<BFloat16>(static_cast<float>(aValue))};
 }
 
-template <mpp::HostCode T2> std::ostream &operator<<(std::ostream &aOs, const mpp::Complex<T2> &aVec);
-template <mpp::HostCode T2> std::wostream &operator<<(std::wostream &aOs, const mpp::Complex<T2> &aVec);
-template <mpp::HostCode T2> std::istream &operator>>(std::istream &aIs, mpp::Complex<T2> &aVec);
-template <mpp::HostCode T2> std::wistream &operator>>(std::wistream &aIs, mpp::Complex<T2> &aVec);
+template <mpp::HostCode T2> MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const mpp::Complex<T2> &aVec);
+template <mpp::HostCode T2>
+MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const mpp::Complex<T2> &aVec);
+template <mpp::HostCode T2> MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, mpp::Complex<T2> &aVec);
+template <mpp::HostCode T2> MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, mpp::Complex<T2> &aVec);
 
 template <typename T> struct make_complex
 {

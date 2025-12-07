@@ -1,4 +1,5 @@
 #pragma once
+#include "../dllexport_common.h"
 #include "size2D.h"
 #include <common/defines.h>
 #include <cstddef>
@@ -8,7 +9,7 @@ namespace mpp::image
 /// <summary>
 /// A specialized type to describe size in 2D (number of pixels in X and Y) with pitch information
 /// </summary>
-class SizePitched
+class MPPEXPORT_COMMON SizePitched
 {
   public:
     SizePitched(const Size2D &aSize, size_t aPitch) noexcept;

@@ -1,4 +1,5 @@
 #pragma once
+#include "../dllexport_common.h"
 #include <common/defines.h>
 #include <common/image/border.h>
 #include <common/image/size2D.h>
@@ -14,7 +15,7 @@ namespace mpp::image
 /// we only reference lower X -> higher X according to the coordinate value.
 /// Note: in device code, only the value members are available.
 /// </summary>
-struct alignas(4 * sizeof(int)) Roi
+struct alignas(4 * sizeof(int)) MPPEXPORT_COMMON Roi
 {
     int x{0};      // NOLINT(misc-non-private-member-variables-in-classes)
     int y{0};      // NOLINT(misc-non-private-member-variables-in-classes)
@@ -226,30 +227,30 @@ struct alignas(4 * sizeof(int)) Roi
     [[nodiscard]] Roi Union(const Roi &aOtherRoi) const;
 };
 
-std::ostream &operator<<(std::ostream &aOs, const Roi &aRoi);
-std::wostream &operator<<(std::wostream &aOs, const Roi &aRoi);
-std::istream &operator>>(std::istream &aIs, Roi &aRoi);
-std::wistream &operator>>(std::wistream &aIs, Roi &aRoi);
+MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Roi &aRoi);
+MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Roi &aRoi);
+MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Roi &aRoi);
+MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Roi &aRoi);
 
-Roi operator+(const Roi &aLeft, const Vec2i &aRight);
-Roi operator+(const Roi &aLeft, const Border &aRight);
-Roi operator+(const Border &aLeft, const Roi &aRight);
-// Roi operator+(const Roi &aLeft, const Roi &aRight);
-Roi operator+(const Roi &aLeft, int aRight);
-Roi operator+(int aLeft, const Roi &aRight);
-Roi operator-(const Roi &aLeft, const Vec2i &aRight);
-Roi operator-(const Roi &aLeft, const Border &aRight);
-Border operator-(const Roi &aLeft, const Roi &aRight);
-Roi operator-(const Roi &aLeft, int aRight);
-// Roi operator-(int aLeft, const Roi &aRight);
+MPPEXPORT_COMMON Roi operator+(const Roi &aLeft, const Vec2i &aRight);
+MPPEXPORT_COMMON Roi operator+(const Roi &aLeft, const Border &aRight);
+MPPEXPORT_COMMON Roi operator+(const Border &aLeft, const Roi &aRight);
+// MPPEXPORT_COMMON Roi operator+(const Roi &aLeft, const Roi &aRight);
+MPPEXPORT_COMMON Roi operator+(const Roi &aLeft, int aRight);
+MPPEXPORT_COMMON Roi operator+(int aLeft, const Roi &aRight);
+MPPEXPORT_COMMON Roi operator-(const Roi &aLeft, const Vec2i &aRight);
+MPPEXPORT_COMMON Roi operator-(const Roi &aLeft, const Border &aRight);
+MPPEXPORT_COMMON Border operator-(const Roi &aLeft, const Roi &aRight);
+MPPEXPORT_COMMON Roi operator-(const Roi &aLeft, int aRight);
+// MPPEXPORT_COMMON Roi operator-(int aLeft, const Roi &aRight);
 
-Roi operator*(const Roi &aLeft, const Vec2i &aRight);
-// Roi operator*(const Roi &aLeft, const Roi &aRight);
-Roi operator*(const Roi &aLeft, int aRight);
-Roi operator*(int aLeft, const Roi &aRight);
-Roi operator/(const Roi &aLeft, const Vec2i &aRight);
-// Roi operator/(const Roi &aLeft, const Roi &aRight);
-Roi operator/(const Roi &aLeft, int aRight);
-// Roi operator/(int aLeft, const Roi &aRight);
+MPPEXPORT_COMMON Roi operator*(const Roi &aLeft, const Vec2i &aRight);
+// MPPEXPORT_COMMON Roi operator*(const Roi &aLeft, const Roi &aRight);
+MPPEXPORT_COMMON Roi operator*(const Roi &aLeft, int aRight);
+MPPEXPORT_COMMON Roi operator*(int aLeft, const Roi &aRight);
+MPPEXPORT_COMMON Roi operator/(const Roi &aLeft, const Vec2i &aRight);
+// MPPEXPORT_COMMON Roi operator/(const Roi &aLeft, const Roi &aRight);
+MPPEXPORT_COMMON Roi operator/(const Roi &aLeft, int aRight);
+// MPPEXPORT_COMMON Roi operator/(int aLeft, const Roi &aRight);
 
 } // namespace mpp::image

@@ -1,5 +1,6 @@
-#include "matrix.h"
+#include "../dllexport_common.h"
 #include "affineTransformation.h"
+#include "matrix.h"
 #include "quad.h"
 #include "roi.h"
 #include <algorithm>
@@ -481,8 +482,8 @@ template <RealFloatingPoint T> Quad<T> operator*(const Matrix<T> &aLeft, const R
 template class Matrix<float>;
 template class Matrix<double>;
 
-template Matrix<float>::Matrix(const Matrix<double> &aOther);
-template Matrix<double>::Matrix(const Matrix<float> &aOther);
+template MPPEXPORT_COMMON Matrix<float>::Matrix(const Matrix<double> &aOther);
+template MPPEXPORT_COMMON Matrix<double>::Matrix(const Matrix<float> &aOther);
 
 template Matrix<float> operator+(const Matrix<float> &aLeft, float aRight);
 template Matrix<float> operator+(float aLeft, const Matrix<float> &aRight);

@@ -11,19 +11,19 @@ namespace mpp::image::cuda
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define InstantiateConvert_For(typeSrc, typeDst)                                                                       \
-    template ImageView<typeDst> &ImageView<typeSrc>::Convert<typeDst>(ImageView<typeDst> & aDst,                       \
-                                                                      const mpp::cuda::StreamCtx &aStreamCtx) const;
+    template MPPEXPORT_CUDAI ImageView<typeDst> &ImageView<typeSrc>::Convert<typeDst>(                                 \
+        ImageView<typeDst> & aDst, const mpp::cuda::StreamCtx &aStreamCtx) const;
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define InstantiateConvertRound_For(typeSrc, typeDst)                                                                  \
-    template ImageView<typeDst> &ImageView<typeSrc>::Convert<typeDst>(                                                 \
+    template MPPEXPORT_CUDAI ImageView<typeDst> &ImageView<typeSrc>::Convert<typeDst>(                                 \
         ImageView<typeDst> & aDst, RoundingMode aRoundingMode, const mpp::cuda::StreamCtx &aStreamCtx) const;
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define InstantiateConvertRoundScale_For(typeSrc, typeDst)                                                             \
-    template ImageView<typeDst> &ImageView<typeSrc>::Convert<typeDst>(ImageView<typeDst> & aDst,                       \
-                                                                      RoundingMode aRoundingMode, int aScaleFactor,    \
-                                                                      const mpp::cuda::StreamCtx &aStreamCtx) const;
+    template MPPEXPORT_CUDAI ImageView<typeDst> &ImageView<typeSrc>::Convert<typeDst>(                                 \
+        ImageView<typeDst> & aDst, RoundingMode aRoundingMode, int aScaleFactor,                                       \
+        const mpp::cuda::StreamCtx &aStreamCtx) const;
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define ForAllChannelsConvertWithAlpha(typeSrc, typeDst)                                                               \

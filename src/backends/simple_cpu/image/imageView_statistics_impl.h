@@ -61,9 +61,9 @@
 #include <common/image/roiException.h>
 #include <common/image/size2D.h>
 #include <common/image/sizePitched.h>
+#include <common/mpp_defs.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
-#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/statistics/indexMinMax.h>
 #include <common/statistics/operators.h>
@@ -4620,7 +4620,9 @@ void ImageView<T>::RectStdDev(ImageView<same_vector_size_different_type_t<T, dou
 #pragma region Histogram
 template <PixelType T>
 void ImageView<T>::EvenLevels(hist_even_level_types_for_t<T> *aHPtrLevels, int aLevels,
-                              hist_even_level_types_for_t<T> aLowerLevel, hist_even_level_types_for_t<T> aUpperLevel)
+                              const hist_even_level_types_for_t<T> &aLowerLevel,
+                              const hist_even_level_types_for_t<T> &aUpperLevel)
+    requires RealVector<T>
 {
     if (aLevels < 2)
     {
@@ -4730,7 +4732,8 @@ ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelation(const ImageView<T> &aTempl
 
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelation(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
-                                                      T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+                                                      const T &aConstant, BorderType aBorder,
+                                                      const Roi &aAllowedReadRoi) const
     requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -4756,7 +4759,7 @@ ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationNormalized(const ImageView<
 
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationNormalized(const ImageView<T> &aTemplate,
-                                                                ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                                ImageView<Pixel32fC1> &aDst, const T &aConstant,
                                                                 BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
 {
@@ -4783,7 +4786,7 @@ ImageView<Pixel32fC1> &ImageView<T>::SquareDistanceNormalized(const ImageView<T>
 
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::SquareDistanceNormalized(const ImageView<T> &aTemplate,
-                                                              ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                              ImageView<Pixel32fC1> &aDst, const T &aConstant,
                                                               BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
 {
@@ -4810,7 +4813,7 @@ ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationCoefficient(const ImageView
 
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationCoefficient(const ImageView<T> &aTemplate,
-                                                                 ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                                 ImageView<Pixel32fC1> &aDst, const T &aConstant,
                                                                  BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
 {
@@ -4832,7 +4835,7 @@ ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelation(const ImageView<T> &aTempl
 
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelation(const ImageView<T> &aTemplate, ImageView<Pixel32fC1> &aDst,
-                                                      T aConstant, BorderType aBorder) const
+                                                      const T &aConstant, BorderType aBorder) const
     requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
 {
     return this->CrossCorrelation(aTemplate, aDst, aConstant, aBorder, ROI());
@@ -4848,7 +4851,7 @@ ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationNormalized(const ImageView<
 
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationNormalized(const ImageView<T> &aTemplate,
-                                                                ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                                ImageView<Pixel32fC1> &aDst, const T &aConstant,
                                                                 BorderType aBorder) const
     requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
 {
@@ -4865,7 +4868,7 @@ ImageView<Pixel32fC1> &ImageView<T>::SquareDistanceNormalized(const ImageView<T>
 
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::SquareDistanceNormalized(const ImageView<T> &aTemplate,
-                                                              ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                              ImageView<Pixel32fC1> &aDst, const T &aConstant,
                                                               BorderType aBorder) const
     requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
 {
@@ -4882,7 +4885,7 @@ ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationCoefficient(const ImageView
 
 template <PixelType T>
 ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationCoefficient(const ImageView<T> &aTemplate,
-                                                                 ImageView<Pixel32fC1> &aDst, T aConstant,
+                                                                 ImageView<Pixel32fC1> &aDst, const T &aConstant,
                                                                  BorderType aBorder) const
     requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
 {

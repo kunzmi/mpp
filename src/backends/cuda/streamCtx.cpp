@@ -9,6 +9,13 @@
 
 namespace mpp::cuda
 {
+
+namespace
+{
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
+thread_local StreamCtx tlSingletonCtx{};
+} // namespace
+
 void StreamCtxSingleton::UpdateContext()
 {
     cudaSafeCall(cudaGetDevice(&tlSingletonCtx.DeviceId));
@@ -21,12 +28,8 @@ void StreamCtxSingleton::UpdateContext()
     tlSingletonCtx.MaxThreadsPerBlock          = props.maxThreadsPerBlock;
     tlSingletonCtx.SharedMemPerBlock           = props.sharedMemPerBlock;
     tlSingletonCtx.WarpSize                    = props.warpSize;
-
-    cudaSafeCall(cudaDeviceGetAttribute(&tlSingletonCtx.ComputeCapabilityMajor, cudaDevAttrComputeCapabilityMajor,
-                                        tlSingletonCtx.DeviceId));
-
-    cudaSafeCall(cudaDeviceGetAttribute(&tlSingletonCtx.ComputeCapabilityMinor, cudaDevAttrComputeCapabilityMinor,
-                                        tlSingletonCtx.DeviceId));
+    tlSingletonCtx.ComputeCapabilityMajor      = props.major;
+    tlSingletonCtx.ComputeCapabilityMinor      = props.minor;
 
     // set to NULL default stream:
     tlSingletonCtx.Stream = Stream::Null.Original();
@@ -48,7 +51,7 @@ void StreamCtxSingleton::SetStream(const Stream &aStream)
     cudaSafeCall(cudaStreamGetFlags(tlSingletonCtx.Stream, &tlSingletonCtx.StreamFlags));
 }
 
-thread_local StreamCtx StreamCtxSingleton::tlSingletonCtx = StreamCtx();
+// thread_local StreamCtx StreamCtxSingleton::tlSingletonCtx = StreamCtx();
 
 } // namespace mpp::cuda
 #endif // MPP_ENABLE_CUDA_BACKEND

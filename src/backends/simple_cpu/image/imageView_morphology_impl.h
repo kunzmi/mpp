@@ -23,9 +23,9 @@
 #include <common/image/sizePitched.h>
 #include <common/morphology/operators.h>
 #include <common/morphology/postOperators.h>
+#include <common/mpp_defs.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
-#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/utilities.h>
 #include <common/vector_typetraits.h>
@@ -55,8 +55,8 @@ ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const FilterArea &aFilt
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
-                                     const Roi &aAllowedReadRoi) const
+ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const FilterArea &aFilterArea, const T &aConstant,
+                                     BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires RealVector<T>
 {
     return this->MaxFilter(aDst, aFilterArea, aConstant, aBorder, aAllowedReadRoi);
@@ -76,8 +76,8 @@ ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const FilterArea &aFilte
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
-                                    const Roi &aAllowedReadRoi) const
+ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const FilterArea &aFilterArea, const T &aConstant,
+                                    BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires RealVector<T>
 {
     return this->MinFilter(aDst, aFilterArea, aConstant, aBorder, aAllowedReadRoi);
@@ -91,7 +91,7 @@ ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const FilterArea &aFilt
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant,
+ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const FilterArea &aFilterArea, const T &aConstant,
                                      BorderType aBorder) const
     requires RealVector<T>
 {
@@ -106,7 +106,7 @@ ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const FilterArea &aFilte
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const FilterArea &aFilterArea, T aConstant,
+ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const FilterArea &aFilterArea, const T &aConstant,
                                     BorderType aBorder) const
     requires RealVector<T>
 {
@@ -131,7 +131,7 @@ ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const Pixel8uC1 *aMask, 
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
-                                    T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+                                    const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires RealVector<T>
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -164,7 +164,7 @@ ImageView<T> &ImageView<T>::ErosionGray(ImageView<T> &aDst, const morph_gray_com
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::ErosionGray(ImageView<T> &aDst, const morph_gray_compute_type_t<T> *aMask,
-                                        const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                                        const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder,
                                         const Roi &aAllowedReadRoi) const
     requires RealVector<T>
 {
@@ -192,7 +192,7 @@ ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const Pixel8uC1 *aMask, 
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
-                                    T aConstant, BorderType aBorder) const
+                                    const T &aConstant, BorderType aBorder) const
     requires RealVector<T>
 {
     return this->Erosion(aDst, aMask, aFilterArea, aConstant, aBorder, ROI());
@@ -208,7 +208,7 @@ ImageView<T> &ImageView<T>::ErosionGray(ImageView<T> &aDst, const morph_gray_com
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::ErosionGray(ImageView<T> &aDst, const morph_gray_compute_type_t<T> *aMask,
-                                        const FilterArea &aFilterArea, T aConstant, BorderType aBorder) const
+                                        const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder) const
     requires RealVector<T>
 {
     return this->ErosionGray(aDst, aMask, aFilterArea, aConstant, aBorder, ROI());
@@ -232,7 +232,7 @@ ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const Pixel8uC1 *aMask,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
-                                     T aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
+                                     const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
     requires RealVector<T>
 {
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
@@ -265,7 +265,7 @@ ImageView<T> &ImageView<T>::DilationGray(ImageView<T> &aDst, const morph_gray_co
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::DilationGray(ImageView<T> &aDst, const morph_gray_compute_type_t<T> *aMask,
-                                         const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                                         const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder,
                                          const Roi &aAllowedReadRoi) const
     requires RealVector<T>
 {
@@ -293,7 +293,7 @@ ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const Pixel8uC1 *aMask,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const Pixel8uC1 *aMask, const FilterArea &aFilterArea,
-                                     T aConstant, BorderType aBorder) const
+                                     const T &aConstant, BorderType aBorder) const
     requires RealVector<T>
 {
     return this->Dilation(aDst, aMask, aFilterArea, aConstant, aBorder, ROI());
@@ -309,7 +309,7 @@ ImageView<T> &ImageView<T>::DilationGray(ImageView<T> &aDst, const morph_gray_co
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::DilationGray(ImageView<T> &aDst, const morph_gray_compute_type_t<T> *aMask,
-                                         const FilterArea &aFilterArea, T aConstant, BorderType aBorder) const
+                                         const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder) const
     requires RealVector<T>
 {
     return this->DilationGray(aDst, aMask, aFilterArea, aConstant, aBorder, ROI());
@@ -333,7 +333,7 @@ ImageView<T> &ImageView<T>::Open(ImageView<T> &aTemp, ImageView<T> &aDst, const 
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Open(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask,
-                                 const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                                 const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder,
                                  const Roi &aAllowedReadRoi) const
     requires RealVector<T>
 {
@@ -355,7 +355,7 @@ ImageView<T> &ImageView<T>::Open(ImageView<T> &aTemp, ImageView<T> &aDst, const 
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Open(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask,
-                                 const FilterArea &aFilterArea, T aConstant, BorderType aBorder) const
+                                 const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder) const
     requires RealVector<T>
 {
     return this->Open(aTemp, aDst, aMask, aFilterArea, aConstant, aBorder, ROI());
@@ -378,7 +378,7 @@ ImageView<T> &ImageView<T>::Close(ImageView<T> &aTemp, ImageView<T> &aDst, const
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Close(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask,
-                                  const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                                  const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder,
                                   const Roi &aAllowedReadRoi) const
     requires RealVector<T>
 {
@@ -400,7 +400,7 @@ ImageView<T> &ImageView<T>::Close(ImageView<T> &aTemp, ImageView<T> &aDst, const
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Close(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask,
-                                  const FilterArea &aFilterArea, T aConstant, BorderType aBorder) const
+                                  const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder) const
     requires RealVector<T>
 {
     return this->Close(aTemp, aDst, aMask, aFilterArea, aConstant, aBorder, ROI());
@@ -423,7 +423,7 @@ ImageView<T> &ImageView<T>::TopHat(ImageView<T> &aTemp, ImageView<T> &aDst, cons
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::TopHat(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask,
-                                   const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                                   const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder,
                                    const Roi &aAllowedReadRoi) const
     requires RealVector<T>
 {
@@ -454,7 +454,7 @@ ImageView<T> &ImageView<T>::TopHat(ImageView<T> &aTemp, ImageView<T> &aDst, cons
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::TopHat(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask,
-                                   const FilterArea &aFilterArea, T aConstant, BorderType aBorder) const
+                                   const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder) const
     requires RealVector<T>
 {
     return this->TopHat(aTemp, aDst, aMask, aFilterArea, aConstant, aBorder, ROI());
@@ -478,7 +478,7 @@ ImageView<T> &ImageView<T>::BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst, co
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask,
-                                     const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                                     const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder,
                                      const Roi &aAllowedReadRoi) const
     requires RealVector<T>
 {
@@ -509,7 +509,7 @@ ImageView<T> &ImageView<T>::BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst, co
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst, const Pixel8uC1 *aMask,
-                                     const FilterArea &aFilterArea, T aConstant, BorderType aBorder) const
+                                     const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder) const
     requires RealVector<T>
 {
     return this->BlackHat(aTemp, aDst, aMask, aFilterArea, aConstant, aBorder, ROI());
@@ -533,7 +533,7 @@ ImageView<T> &ImageView<T>::MorphologyGradient(ImageView<T> &aDst, const Pixel8u
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::MorphologyGradient(ImageView<T> &aDst, const Pixel8uC1 *aMask,
-                                               const FilterArea &aFilterArea, T aConstant, BorderType aBorder,
+                                               const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder,
                                                const Roi &aAllowedReadRoi) const
     requires RealVector<T>
 {
@@ -554,7 +554,8 @@ ImageView<T> &ImageView<T>::MorphologyGradient(ImageView<T> &aDst, const Pixel8u
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::MorphologyGradient(ImageView<T> &aDst, const Pixel8uC1 *aMask,
-                                               const FilterArea &aFilterArea, T aConstant, BorderType aBorder) const
+                                               const FilterArea &aFilterArea, const T &aConstant,
+                                               BorderType aBorder) const
     requires RealVector<T>
 {
     return this->MorphologyGradient(aDst, aMask, aFilterArea, aConstant, aBorder, ROI());

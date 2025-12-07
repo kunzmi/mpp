@@ -1,5 +1,5 @@
-#include "convertedFunction.h"
 #include "convertedArgument.h"
+#include "convertedFunction.h"
 #include <algorithm>
 #include <common/safeCast.h>
 #include <cstddef>
@@ -1680,7 +1680,7 @@ std::string ConvertedFunction::GetNeededImageForwardDecl(const std::vector<Conve
     {
         if (!imageTypesOfFunction.contains(imageType))
         {
-            ss << "class " << imageType << ";" << std::endl;
+            ss << "class MPPEXPORT_NPP " << imageType << ";" << std::endl;
         }
     }
     return ss.str();

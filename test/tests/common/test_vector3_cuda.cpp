@@ -42,11 +42,19 @@ Vector3<T> GetRandomValue(std::default_random_engine &aEngine)
 }
 template <typename T>
 Vector3<T> GetRandomValue(std::default_random_engine &aEngine)
-    requires NativeIntegral<T> && (!ByteSizeType<T>) || ComplexIntegral<T>
+    requires NativeIntegral<T> && (!ByteSizeType<T>)
 {
     std::uniform_int_distribution<complex_basetype_t<T>> uniform_dist(numeric_limits<complex_basetype_t<T>>::lowest(),
                                                                       numeric_limits<complex_basetype_t<T>>::max());
     return Vector3<T>(uniform_dist(aEngine), uniform_dist(aEngine), uniform_dist(aEngine));
+}
+template <typename T>
+Vector3<T> GetRandomValue(std::default_random_engine &aEngine)
+    requires ComplexIntegral<T>
+{
+    std::uniform_int_distribution<complex_basetype_t<T>> uniform_dist(-10000, 10000);
+    return Vector3<T>(T(uniform_dist(aEngine), uniform_dist(aEngine)), T(uniform_dist(aEngine), uniform_dist(aEngine)),
+                      T(uniform_dist(aEngine), uniform_dist(aEngine)));
 }
 template <typename T>
 Vector3<T> GetRandomValue(std::default_random_engine &aEngine)
@@ -812,6 +820,55 @@ void fillData(std::vector<Vector3<T>> &aDataIn, std::vector<Vector3<T>> &aDataOu
 
         if constexpr (RealOrComplexIntegral<T>)
         {
+            // make sure that we don't overflow, especially for complex types:
+            for (size_t i = 0; i < 10; i++)
+            {
+                if constexpr (ComplexIntegral<T>)
+                {
+                    constexpr long64 maxVal = 1 << (sizeof(complex_basetype_t<T>) * 3);
+                    while (std::abs(aDataIn[counterIn + i].x.real) > maxVal)
+                    {
+                        aDataIn[counterIn + i].x.real = aDataIn[counterIn + i].x.real / 2;
+                    }
+                    while (std::abs(aDataIn[counterIn + i].x.imag) > maxVal)
+                    {
+                        aDataIn[counterIn + i].x.imag = aDataIn[counterIn + i].x.imag / 2;
+                    }
+                    while (std::abs(aDataIn[counterIn + i].y.real) > maxVal)
+                    {
+                        aDataIn[counterIn + i].y.real = aDataIn[counterIn + i].y.real / 2;
+                    }
+                    while (std::abs(aDataIn[counterIn + i].y.imag) > maxVal)
+                    {
+                        aDataIn[counterIn + i].y.imag = aDataIn[counterIn + i].y.imag / 2;
+                    }
+                    while (std::abs(aDataIn[counterIn + i].z.real) > maxVal)
+                    {
+                        aDataIn[counterIn + i].z.real = aDataIn[counterIn + i].z.real / 2;
+                    }
+                    while (std::abs(aDataIn[counterIn + i].z.imag) > maxVal)
+                    {
+                        aDataIn[counterIn + i].z.imag = aDataIn[counterIn + i].z.imag / 2;
+                    }
+                }
+                else
+                {
+                    constexpr long64 maxVal = 1 << (sizeof(complex_basetype_t<T>) * 6);
+                    while (aDataIn[counterIn + i].x > maxVal || static_cast<long64>(aDataIn[counterIn + i].x) < -maxVal)
+                    {
+                        aDataIn[counterIn + i].x = T(aDataIn[counterIn + i].x / 2);
+                    }
+                    while (aDataIn[counterIn + i].y > maxVal || static_cast<long64>(aDataIn[counterIn + i].y) < -maxVal)
+                    {
+                        aDataIn[counterIn + i].y = T(aDataIn[counterIn + i].y / 2);
+                    }
+                    while (aDataIn[counterIn + i].z > maxVal || static_cast<long64>(aDataIn[counterIn + i].z) < -maxVal)
+                    {
+                        aDataIn[counterIn + i].z = T(aDataIn[counterIn + i].z / 2);
+                    }
+                }
+            }
+
             aDataOut[counterOut] = aDataIn[counterIn];
             aDataOut[counterOut].DivRoundNearest(aDataIn[counterIn + 1]);
             aDataOut[counterOut + 1] = Vector3<T>::DivRoundNearest(aDataIn[counterIn], aDataIn[counterIn + 1]);

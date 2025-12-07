@@ -1,5 +1,6 @@
 #pragma once
 
+#include "dllexport_fileio.h"
 #include <common/defines.h>
 #include <zlib/zlib.h>
 

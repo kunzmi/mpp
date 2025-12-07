@@ -1,4 +1,5 @@
 #pragma once
+#include "../dllexport_common.h"
 #include <common/defines.h>
 #include <common/image/size2D.h>
 #include <common/vectorTypes.h>
@@ -11,7 +12,7 @@ namespace mpp::image
 /// we only reference lower X -&gt; higher X according to the coordinate value.
 /// Note: in device code, only the value members are available.
 /// </summary>
-struct alignas(4 * sizeof(int)) Border
+struct alignas(4 * sizeof(int)) MPPEXPORT_COMMON Border
 {
     int lowerX{0};  // NOLINT(misc-non-private-member-variables-in-classes)
     int lowerY{0};  // NOLINT(misc-non-private-member-variables-in-classes)
@@ -101,27 +102,27 @@ struct alignas(4 * sizeof(int)) Border
     bool operator!=(const Border &aOther) const;
 };
 
-Border operator+(const Border &aLeft, const Vec2i &aRight);
-Border operator+(const Border &aLeft, const Border &aRight);
-Border operator+(const Border &aLeft, int aRight);
-Border operator+(int aLeft, const Border &aRight);
-Border operator-(const Border &aLeft, const Vec2i &aRight);
-Border operator-(const Border &aLeft, const Border &aRight);
-Border operator-(const Border &aLeft, int aRight);
-Border operator-(int aLeft, const Border &aRight);
+Border MPPEXPORT_COMMON operator+(const Border &aLeft, const Vec2i &aRight);
+Border MPPEXPORT_COMMON operator+(const Border &aLeft, const Border &aRight);
+Border MPPEXPORT_COMMON operator+(const Border &aLeft, int aRight);
+Border MPPEXPORT_COMMON operator+(int aLeft, const Border &aRight);
+Border MPPEXPORT_COMMON operator-(const Border &aLeft, const Vec2i &aRight);
+Border MPPEXPORT_COMMON operator-(const Border &aLeft, const Border &aRight);
+Border MPPEXPORT_COMMON operator-(const Border &aLeft, int aRight);
+Border MPPEXPORT_COMMON operator-(int aLeft, const Border &aRight);
 
-Border operator*(const Border &aLeft, const Vec2i &aRight);
-Border operator*(const Border &aLeft, const Border &aRight);
-Border operator*(const Border &aLeft, int aRight);
-Border operator*(int aLeft, const Border &aRight);
-Border operator/(const Border &aLeft, const Vec2i &aRight);
-Border operator/(const Border &aLeft, const Border &aRight);
-Border operator/(const Border &aLeft, int aRight);
-Border operator/(int aLeft, const Border &aRight);
+Border MPPEXPORT_COMMON operator*(const Border &aLeft, const Vec2i &aRight);
+Border MPPEXPORT_COMMON operator*(const Border &aLeft, const Border &aRight);
+Border MPPEXPORT_COMMON operator*(const Border &aLeft, int aRight);
+Border MPPEXPORT_COMMON operator*(int aLeft, const Border &aRight);
+Border MPPEXPORT_COMMON operator/(const Border &aLeft, const Vec2i &aRight);
+Border MPPEXPORT_COMMON operator/(const Border &aLeft, const Border &aRight);
+Border MPPEXPORT_COMMON operator/(const Border &aLeft, int aRight);
+Border MPPEXPORT_COMMON operator/(int aLeft, const Border &aRight);
 
-std::ostream &operator<<(std::ostream &aOs, const Border &aBorder);
-std::wostream &operator<<(std::wostream &aOs, const Border &aBorder);
-std::istream &operator>>(std::istream &aIs, Border &aBorder);
-std::wistream &operator>>(std::wistream &aIs, Border &aBorder);
+MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Border &aBorder);
+MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Border &aBorder);
+MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Border &aBorder);
+MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Border &aBorder);
 
 } // namespace mpp::image

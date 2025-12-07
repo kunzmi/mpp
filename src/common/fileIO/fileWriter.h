@@ -1,11 +1,12 @@
 #pragma once
 
-#include "common/defines.h"
-#include "common/version.h"
+#include "dllexport_fileio.h"
 #include "file.h"
+#include <common/defines.h>
 #include <common/image/pixelTypes.h>
 #include <common/vector2.h>
 #include <common/vector3.h>
+#include <common/version.h>
 #include <filesystem>
 #include <functional>
 #include <memory>
@@ -23,7 +24,7 @@ constexpr size_t FILEWRITER_CHUNK_SIZE = 10ull * 1024ull * 1024ull; // 10MB
 /// <summary>
 /// FileWriter provides endianess independent file write methods.
 /// </summary>
-class FileWriter : public virtual File
+class MPPEXPORT_COMMON_FILEIO FileWriter : public virtual File
 {
   public:
     enum class FileOpenMode // NOLINT

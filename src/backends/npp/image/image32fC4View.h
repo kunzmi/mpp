@@ -5,6 +5,7 @@
 #if MPP_ENABLE_NPP_BACKEND
 #include <common/image/pixelTypeEnabler.h>
 
+#include "../dllexport_npp.h"
 #include "imageView.h"
 #include <backends/cuda/devVarView.h>
 #include <backends/npp/nppException.h>
@@ -17,16 +18,16 @@
 namespace mpp::image::npp
 {
 // forward declaration:
-class Image16fC4View;
-class Image16sC4View;
-class Image16uC4View;
-class Image32fC1View;
-class Image32fC3View;
-class Image8sC4View;
-class Image8uC1View;
-class Image8uC4View;
+class MPPEXPORT_NPP Image16fC4View;
+class MPPEXPORT_NPP Image16sC4View;
+class MPPEXPORT_NPP Image16uC4View;
+class MPPEXPORT_NPP Image32fC1View;
+class MPPEXPORT_NPP Image32fC3View;
+class MPPEXPORT_NPP Image8sC4View;
+class MPPEXPORT_NPP Image8uC1View;
+class MPPEXPORT_NPP Image8uC4View;
 
-class Image32fC4View : public ImageView<Pixel32fC4>
+class MPPEXPORT_NPP Image32fC4View : public ImageView<Pixel32fC4>
 {
   protected:
     Image32fC4View() = default;

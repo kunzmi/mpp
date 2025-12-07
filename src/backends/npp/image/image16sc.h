@@ -3,6 +3,7 @@
 #if MPP_ENABLE_NPP_BACKEND
 #include <common/image/pixelTypeEnabler.h>
 
+#include "../dllexport_npp.h"
 #include "image16scC1View.h"
 #include "image16scC2View.h"
 #include "image16scC3View.h"
@@ -22,7 +23,7 @@
 namespace mpp::image::npp
 {
 
-class Image16scC1 : public Image16scC1View
+class MPPEXPORT_NPP Image16scC1 : public Image16scC1View
 {
   public:
     Image16scC1() = delete;
@@ -38,7 +39,7 @@ class Image16scC1 : public Image16scC1View
     Image16scC1 &operator=(Image16scC1 &&aOther) noexcept;
 };
 
-class Image16scC2 : public Image16scC2View
+class MPPEXPORT_NPP Image16scC2 : public Image16scC2View
 {
   public:
     Image16scC2() = delete;
@@ -54,7 +55,7 @@ class Image16scC2 : public Image16scC2View
     Image16scC2 &operator=(Image16scC2 &&aOther) noexcept;
 };
 
-class Image16scC3 : public Image16scC3View
+class MPPEXPORT_NPP Image16scC3 : public Image16scC3View
 {
   public:
     Image16scC3() = delete;
@@ -70,7 +71,7 @@ class Image16scC3 : public Image16scC3View
     Image16scC3 &operator=(Image16scC3 &&aOther) noexcept;
 };
 
-class Image16scC4 : public Image16scC4View
+class MPPEXPORT_NPP Image16scC4 : public Image16scC4View
 {
   public:
     Image16scC4() = delete;

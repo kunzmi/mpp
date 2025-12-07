@@ -1,7 +1,8 @@
 #pragma once
 
-#include "common/defines.h"
+#include "dllexport_fileio.h"
 #include "file.h"
+#include <common/defines.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/vector3.h>
@@ -18,7 +19,7 @@ constexpr size_t FILEREADER_CHUNK_SIZE = 10ull * 1024ull * 1024ull; // 10MB
 /// <summary>
 /// FileReader provides endianess independent file read methods.
 /// </summary>
-class FileReader : public virtual File
+class MPPEXPORT_COMMON_FILEIO FileReader : public virtual File
 {
   public:
     struct Status

@@ -20,15 +20,15 @@
 #include <common/image/roiException.h>
 #include <common/image/size2D.h>
 #include <common/image/sizePitched.h>
+#include <common/mpp_defs.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
-#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/utilities.h>
+#include <common/vector_typetraits.h>
 #include <common/vector1.h>
 #include <common/vector2.h>
 #include <common/vectorTypes.h>
-#include <common/vector_typetraits.h>
 #include <concepts>
 #include <cstddef>
 #include <type_traits>
@@ -86,7 +86,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Resize(ImageView<T> &aDst, const Vector2<double> &aScale, const Vector2<double> &aShift,
-                                   InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                   InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                    Roi aAllowedReadRoi) const
 {
     if (aAllowedReadRoi == Roi())
@@ -317,7 +317,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           const Vector2<double> &aScale, const Vector2<double> &aShift,
-                          InterpolationMode aInterpolation, T aConstant, BorderType aBorder, Roi aAllowedReadRoi)
+                          InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder, Roi aAllowedReadRoi)
     requires TwoChannel<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI())
@@ -562,7 +562,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Vector2<double> &aScale,
-                          const Vector2<double> &aShift, InterpolationMode aInterpolation, T aConstant,
+                          const Vector2<double> &aShift, InterpolationMode aInterpolation, const T &aConstant,
                           BorderType aBorder, Roi aAllowedReadRoi)
     requires ThreeChannel<T>
 {
@@ -818,7 +818,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                           const Vector2<double> &aScale, const Vector2<double> &aShift,
-                          InterpolationMode aInterpolation, T aConstant, BorderType aBorder, Roi aAllowedReadRoi)
+                          InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder, Roi aAllowedReadRoi)
     requires FourChannelNoAlpha<T>
 {
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI() || aSrc1.ROI() != aSrc4.ROI())

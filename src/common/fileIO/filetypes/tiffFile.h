@@ -1,8 +1,9 @@
 #pragma once
 
+#include "../dllexport_fileio.h"
 #include "bigTiffImageFileDirectory.h"
-#include "common/defines.h"
 #include "tiffImageFileDirectory.h"
+#include <common/defines.h>
 #include <common/fileIO/fileReader.h>
 #include <common/fileIO/fileWriter.h>
 #include <common/fileIO/lzwCompression.h>
@@ -13,14 +14,14 @@
 
 namespace mpp::fileIO
 {
-struct TiffFileHeader
+struct MPPEXPORT_COMMON_FILEIO TiffFileHeader
 {
     ushort BytaOrder;
     ushort ID;
     uint OffsetToIFD;
 };
 
-struct BigTiffFileHeader
+struct MPPEXPORT_COMMON_FILEIO BigTiffFileHeader
 {
     ushort BytaOrder;
     ushort ID;
@@ -29,7 +30,7 @@ struct BigTiffFileHeader
     ulong64 OffsetToIFD;
 };
 
-struct TiffReadElement
+struct MPPEXPORT_COMMON_FILEIO TiffReadElement
 {
     size_t DataSize;
     size_t DataOffset;
@@ -40,7 +41,7 @@ struct TiffReadElement
 /// <summary>
 /// TIFFFile represents a *.tif file, a common image file format
 /// </summary>
-class TIFFFile : public FileReader, public FileWriter
+class MPPEXPORT_COMMON_FILEIO TIFFFile : public FileReader, public FileWriter
 {
   private:
     TiffFileHeader mTiffFileHeader{};

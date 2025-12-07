@@ -1,4 +1,4 @@
-add_library(common.fileIO 
+add_library(common.fileIO SHARED
 	file.cpp
 	fileIOException.cpp
 	fileReader.cpp
@@ -12,8 +12,10 @@ add_library(common.fileIO
 	filetypes/tiffImageFileDirectory.cpp
 	)
 	
+target_compile_definitions(common.fileIO PUBLIC -DMPP_COMMON_FILEIO)  
+	
 target_link_libraries(common.fileIO PUBLIC  
-						common.image
+						common
 						zlib						
 						)
 

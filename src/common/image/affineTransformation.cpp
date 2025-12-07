@@ -1,3 +1,4 @@
+#include "../dllexport_common.h"
 #include "affineTransformation.h"
 #include "quad.h"
 #include "roi.h"
@@ -479,8 +480,8 @@ template <RealFloatingPoint T> Quad<T> operator*(const AffineTransformation<T> &
 template class AffineTransformation<float>;
 template class AffineTransformation<double>;
 
-template AffineTransformation<float>::AffineTransformation(const AffineTransformation<double> &aOther);
-template AffineTransformation<double>::AffineTransformation(const AffineTransformation<float> &aOther);
+template MPPEXPORT_COMMON AffineTransformation<float>::AffineTransformation(const AffineTransformation<double> &aOther);
+template MPPEXPORT_COMMON AffineTransformation<double>::AffineTransformation(const AffineTransformation<float> &aOther);
 
 template AffineTransformation<float> operator+(const AffineTransformation<float> &aLeft, float aRight);
 template AffineTransformation<float> operator+(float aLeft, const AffineTransformation<float> &aRight);

@@ -1,4 +1,4 @@
-add_library(backends.cuda.image.dataExchangeAndInit 
+add_library(backends.cuda.image.dataExchangeAndInit8s OBJECT
 	8s/convert.cu	
 	8s/copy.cu
 	8s/copyBorder.cu
@@ -10,8 +10,9 @@ add_library(backends.cuda.image.dataExchangeAndInit
 	8s/setChannel.cu
 	8s/setMasked.cu
 	8s/swapChannel.cu
-	8s/transpose.cu
+	8s/transpose.cu)
 	
+add_library(backends.cuda.image.dataExchangeAndInit8u OBJECT
 	8u/convert.cu	
 	8u/copy.cu
 	8u/copyBorder.cu
@@ -23,8 +24,9 @@ add_library(backends.cuda.image.dataExchangeAndInit
 	8u/setChannel.cu
 	8u/setMasked.cu
 	8u/swapChannel.cu
-	8u/transpose.cu
+	8u/transpose.cu)
 	
+add_library(backends.cuda.image.dataExchangeAndInit16s OBJECT
 	16s/convert.cu	
 	16s/copy.cu
 	16s/copyBorder.cu
@@ -36,8 +38,9 @@ add_library(backends.cuda.image.dataExchangeAndInit
 	16s/setChannel.cu
 	16s/setMasked.cu
 	16s/swapChannel.cu
-	16s/transpose.cu
+	16s/transpose.cu)
 	
+add_library(backends.cuda.image.dataExchangeAndInit16u OBJECT
 	16u/convert.cu	
 	16u/copy.cu
 	16u/copyBorder.cu
@@ -49,8 +52,9 @@ add_library(backends.cuda.image.dataExchangeAndInit
 	16u/setChannel.cu
 	16u/setMasked.cu
 	16u/swapChannel.cu
-	16u/transpose.cu
+	16u/transpose.cu)
 	
+add_library(backends.cuda.image.dataExchangeAndInit32s OBJECT
 	32s/convert.cu	
 	32s/copy.cu
 	32s/copyBorder.cu
@@ -62,8 +66,9 @@ add_library(backends.cuda.image.dataExchangeAndInit
 	32s/setChannel.cu
 	32s/setMasked.cu
 	32s/swapChannel.cu
-	32s/transpose.cu
+	32s/transpose.cu)
 	
+add_library(backends.cuda.image.dataExchangeAndInit32u OBJECT
 	32u/convert.cu	
 	32u/copy.cu
 	32u/copyBorder.cu
@@ -75,8 +80,9 @@ add_library(backends.cuda.image.dataExchangeAndInit
 	32u/setChannel.cu
 	32u/setMasked.cu
 	32u/swapChannel.cu
-	32u/transpose.cu
+	32u/transpose.cu)
 	
+add_library(backends.cuda.image.dataExchangeAndInit16f OBJECT
 	16f/convert.cu	
 	16f/copy.cu
 	16f/copyBorder.cu
@@ -88,8 +94,9 @@ add_library(backends.cuda.image.dataExchangeAndInit
 	16f/setChannel.cu
 	16f/setMasked.cu
 	16f/swapChannel.cu
-	16f/transpose.cu
+	16f/transpose.cu)
 	
+add_library(backends.cuda.image.dataExchangeAndInit16bf OBJECT
 	16bf/convert.cu	
 	16bf/copy.cu
 	16bf/copyBorder.cu
@@ -101,8 +108,9 @@ add_library(backends.cuda.image.dataExchangeAndInit
 	16bf/setChannel.cu
 	16bf/setMasked.cu
 	16bf/swapChannel.cu
-	16bf/transpose.cu
+	16bf/transpose.cu)
 	
+add_library(backends.cuda.image.dataExchangeAndInit32f OBJECT
 	32f/convert.cu	
 	32f/copy.cu
 	32f/copyBorder.cu
@@ -114,8 +122,9 @@ add_library(backends.cuda.image.dataExchangeAndInit
 	32f/setChannel.cu
 	32f/setMasked.cu
 	32f/swapChannel.cu
-	32f/transpose.cu
+	32f/transpose.cu)
 	
+add_library(backends.cuda.image.dataExchangeAndInit64f OBJECT
 	64f/convert.cu	
 	64f/copy.cu
 	64f/copyBorder.cu
@@ -127,8 +136,9 @@ add_library(backends.cuda.image.dataExchangeAndInit
 	64f/setChannel.cu
 	64f/setMasked.cu
 	64f/swapChannel.cu
-	64f/transpose.cu
+	64f/transpose.cu)
 	
+add_library(backends.cuda.image.dataExchangeAndInit16sc OBJECT
 	16sc/convert.cu	
 	16sc/copy.cu
 	16sc/copyBorder.cu
@@ -140,8 +150,9 @@ add_library(backends.cuda.image.dataExchangeAndInit
 	16sc/setChannel.cu
 	16sc/setMasked.cu
 	16sc/swapChannel.cu
-	16sc/transpose.cu
+	16sc/transpose.cu)
 	
+add_library(backends.cuda.image.dataExchangeAndInit32sc OBJECT
 	32sc/convert.cu	
 	32sc/copy.cu
 	32sc/copyBorder.cu
@@ -153,8 +164,9 @@ add_library(backends.cuda.image.dataExchangeAndInit
 	32sc/setChannel.cu
 	32sc/setMasked.cu
 	32sc/swapChannel.cu
-	32sc/transpose.cu
+	32sc/transpose.cu)
 	
+add_library(backends.cuda.image.dataExchangeAndInit32fc OBJECT
 	32fc/convert.cu	
 	32fc/copy.cu
 	32fc/copyBorder.cu
@@ -166,20 +178,54 @@ add_library(backends.cuda.image.dataExchangeAndInit
 	32fc/setChannel.cu
 	32fc/setMasked.cu
 	32fc/swapChannel.cu
-	32fc/transpose.cu
+	32fc/transpose.cu)
 	
+# Integral and IntegralSqr need the transpose kernel internally, provide them in an own object file 
+add_library(backends.cuda.image.dataExchangeAndInitTranspose OBJECT
 	64s/transpose.cu
-	)
+	32s/transpose.cu
+	64f/transpose.cu
+	32f/transpose.cu
+	)		
 	
-target_include_directories(backends.cuda.image.dataExchangeAndInit  PUBLIC 
-						   ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
-						   ${PROJECT_SOURCE_DIR}/src
-						  )
-target_link_libraries(backends.cuda.image.dataExchangeAndInit PRIVATE  
-						project_options					
-						)
-target_link_libraries(backends.cuda.image.dataExchangeAndInit PUBLIC  
-						backends.cuda
-						common
-						common.image
-						)
+target_include_directories(backends.cuda.image.dataExchangeAndInit8s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.dataExchangeAndInit8s PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.dataExchangeAndInit8u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.dataExchangeAndInit8u PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.dataExchangeAndInit16s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.dataExchangeAndInit16s PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.dataExchangeAndInit16u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.dataExchangeAndInit16u PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.dataExchangeAndInit32s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.dataExchangeAndInit32s PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.dataExchangeAndInit32u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.dataExchangeAndInit32u PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.dataExchangeAndInit16sc PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.dataExchangeAndInit16sc PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.dataExchangeAndInit32sc PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.dataExchangeAndInit32sc PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.dataExchangeAndInit16bf PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.dataExchangeAndInit16bf PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.dataExchangeAndInit16f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.dataExchangeAndInit16f PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.dataExchangeAndInit32f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.dataExchangeAndInit32f PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.dataExchangeAndInit32fc PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.dataExchangeAndInit32fc PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.dataExchangeAndInit64f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.dataExchangeAndInit64f PRIVATE project_options)
+
+target_include_directories(backends.cuda.image.dataExchangeAndInitTranspose PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.dataExchangeAndInitTranspose PRIVATE project_options)

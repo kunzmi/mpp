@@ -2,6 +2,7 @@
 #include <common/moduleEnabler.h>
 #if MPP_ENABLE_CUDA_BACKEND
 
+#include "dllexport_cudacore.h"
 #include <backends/cuda/stream.h>
 #include <common/defines.h>
 #include <cuda_runtime_api.h>
@@ -10,7 +11,7 @@
 namespace mpp::cuda
 {
 
-struct StreamCtx
+struct MPPEXPORT_CUDACORE StreamCtx
 {
     /// <summary>
     /// The cuda stream to use for kernel execution
@@ -64,11 +65,8 @@ struct StreamCtx
     int WarpSize{0};
 };
 
-class StreamCtxSingleton
+class MPPEXPORT_CUDACORE StreamCtxSingleton
 {
-  private:
-    static thread_local StreamCtx tlSingletonCtx;
-
   public:
     /// <summary>
     /// Gets the StreamCtx that is associated with the current CPU thread, i.e. with the current cuda context.

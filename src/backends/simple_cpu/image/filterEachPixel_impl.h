@@ -17,7 +17,7 @@ namespace mpp::image::cpuSimple
 
 template <typename BorderControlT, typename ComputeT, typename DstT, typename FilterT>
 void filterEachPixel(BorderControlT aSrcWithBC, ImageView<DstT> &aDst, const FilterT *aFilter,
-                     const FilterArea &aFilterArea, ComputeT aScale)
+                     const FilterArea &aFilterArea, const ComputeT &aScale)
 {
     for (auto &pixelIterator : aDst)
     {
@@ -55,8 +55,8 @@ void filterEachPixel(BorderControlT aSrcWithBC, ImageView<DstT> &aDst, const Fil
 
 template <typename SrcT, typename ComputeT, typename DstT, typename FilterT>
 void filterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst, const FilterT *aFilter,
-                     const FilterArea &aFilterArea, BorderType aBorderType, SrcT aConstant, const Roi &aAllowedReadRoi,
-                     ComputeT aScale)
+                     const FilterArea &aFilterArea, BorderType aBorderType, const SrcT &aConstant,
+                     const Roi &aAllowedReadRoi, const ComputeT &aScale)
 {
 
     const Vector2<int> roiOffset = aSrc.ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -149,7 +149,7 @@ void minFilterEachPixel(BorderControlT aSrcWithBC, ImageView<DstT> &aDst, const 
 
 template <typename SrcT>
 void minFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, const FilterArea &aFilterArea,
-                        BorderType aBorderType, SrcT aConstant, const Roi &aAllowedReadRoi)
+                        BorderType aBorderType, const SrcT &aConstant, const Roi &aAllowedReadRoi)
 {
 
     const Vector2<int> roiOffset = aSrc.ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -242,7 +242,7 @@ void maxFilterEachPixel(BorderControlT aSrcWithBC, ImageView<DstT> &aDst, const 
 
 template <typename SrcT>
 void maxFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, const FilterArea &aFilterArea,
-                        BorderType aBorderType, SrcT aConstant, const Roi &aAllowedReadRoi)
+                        BorderType aBorderType, const SrcT &aConstant, const Roi &aAllowedReadRoi)
 {
 
     const Vector2<int> roiOffset = aSrc.ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -358,7 +358,7 @@ void wienerFilterEachPixel(BorderControlT aSrcWithBC, ImageView<DstT> &aDst, con
 
 template <typename SrcT>
 void wienerFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, const FilterArea &aFilterArea,
-                           const filter_compute_type_for_t<SrcT> &aNoise, BorderType aBorderType, SrcT aConstant,
+                           const filter_compute_type_for_t<SrcT> &aNoise, BorderType aBorderType, const SrcT &aConstant,
                            const Roi &aAllowedReadRoi)
 {
 
@@ -471,8 +471,8 @@ void thresholdAdaptiveBoxFilterEachPixel(BorderControlT aSrcWithBC, ImageView<Ds
 template <typename SrcT>
 void thresholdAdaptiveBoxFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst,
                                          const FilterArea &aFilterArea, const filter_compute_type_for_t<SrcT> &aDelta,
-                                         const SrcT &aValGT, const SrcT &aValLE, BorderType aBorderType, SrcT aConstant,
-                                         const Roi &aAllowedReadRoi)
+                                         const SrcT &aValGT, const SrcT &aValLE, BorderType aBorderType,
+                                         const SrcT &aConstant, const Roi &aAllowedReadRoi)
 {
 
     const Vector2<int> roiOffset = aSrc.ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -621,7 +621,7 @@ void bilateralFilterEachPixel(BorderControlT aSrcWithBC, ImageView<DstT> &aDst, 
 template <typename SrcT, typename ComputeT, typename DstT, typename FilterT>
 void bilateralFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst, const FilterT *aPreComputedFilter,
                               float aValSquareSigma, const FilterArea &aFilterArea, Norm aNorm, BorderType aBorderType,
-                              SrcT aConstant, const Roi &aAllowedReadRoi)
+                              const SrcT &aConstant, const Roi &aAllowedReadRoi)
 {
 
     const Vector2<int> roiOffset = aSrc.ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -816,7 +816,7 @@ template <typename SrcT, typename ComputeT, typename DstT, typename FilterT>
 void gradientVectorEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDstX, ImageView<DstT> &aDstY,
                              ImageView<DstT> &aDstMag, ImageView<Pixel32fC1> &aDstAngle,
                              ImageView<Pixel32fC4> &aDstCovariance, const FilterT *aFilterX, const FilterT *aFilterY,
-                             const FilterArea &aFilterArea, Norm aNorm, BorderType aBorderType, SrcT aConstant,
+                             const FilterArea &aFilterArea, Norm aNorm, BorderType aBorderType, const SrcT &aConstant,
                              const Roi &aAllowedReadRoi)
 {
 
@@ -943,7 +943,7 @@ void unsharpFilterEachPixel(BorderControlT aSrcWithBC, const ImageView<DstT> &aS
 template <typename SrcT, typename ComputeT, typename DstT, typename FilterT>
 void unsharpFilterEachPixel(const ImageView<SrcT> &aSrc, const ImageView<DstT> &aSrcOrig, ImageView<DstT> &aDst,
                             const FilterT *aFilter, FilterT aWeight, FilterT aThreshold, const FilterArea &aFilterArea,
-                            BorderType aBorderType, SrcT aConstant, const Roi &aAllowedReadRoi)
+                            BorderType aBorderType, const SrcT &aConstant, const Roi &aAllowedReadRoi)
 {
 
     const Vector2<int> roiOffset = aSrc.ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -1217,7 +1217,7 @@ void crossCorrelationEachPixel(BorderControlT aSrcWithBC, ImageView<DstT> &aDst,
 
 template <typename SrcT, typename DstT>
 void crossCorrelationEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst, const ImageView<SrcT> &aTemplate,
-                               const FilterArea &aFilterArea, BorderType aBorderType, SrcT aConstant,
+                               const FilterArea &aFilterArea, BorderType aBorderType, const SrcT &aConstant,
                                const Roi &aAllowedReadRoi)
 {
 
@@ -1321,7 +1321,7 @@ void crossCorrelationNormalizedEachPixel(BorderControlT aSrcWithBC, ImageView<Ds
 template <typename SrcT, typename DstT>
 void crossCorrelationNormalizedEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst,
                                          const ImageView<SrcT> &aTemplate, const FilterArea &aFilterArea,
-                                         BorderType aBorderType, SrcT aConstant, const Roi &aAllowedReadRoi)
+                                         BorderType aBorderType, const SrcT &aConstant, const Roi &aAllowedReadRoi)
 {
 
     const Vector2<int> roiOffset = aSrc.ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -1451,7 +1451,7 @@ void crossCorrelationCoefficientEachPixel(BorderControlT aSrcWithBC, ImageView<D
 template <typename SrcT, typename DstT>
 void crossCorrelationCoefficientEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst,
                                           const ImageView<SrcT> &aTemplate, const FilterArea &aFilterArea,
-                                          BorderType aBorderType, SrcT aConstant, const Roi &aAllowedReadRoi)
+                                          BorderType aBorderType, const SrcT &aConstant, const Roi &aAllowedReadRoi)
 {
 
     const Vector2<int> roiOffset = aSrc.ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -1555,7 +1555,7 @@ void squareDistanceNormalizedEachPixel(BorderControlT aSrcWithBC, ImageView<DstT
 template <typename SrcT, typename DstT>
 void squareDistanceNormalizedEachPixel(const ImageView<SrcT> &aSrc, ImageView<DstT> &aDst,
                                        const ImageView<SrcT> &aTemplate, const FilterArea &aFilterArea,
-                                       BorderType aBorderType, SrcT aConstant, const Roi &aAllowedReadRoi)
+                                       BorderType aBorderType, const SrcT &aConstant, const Roi &aAllowedReadRoi)
 {
 
     const Vector2<int> roiOffset = aSrc.ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -1650,7 +1650,7 @@ void moprhologyEachPixel(BorderControlT aSrcWithBC, ImageView<DstT> &aDst, const
 
 template <typename SrcT, typename FilterT, typename morphOperation, typename postOp>
 void moprhologyEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, const FilterT *aMask,
-                         const FilterArea &aFilterArea, BorderType aBorderType, SrcT aConstant,
+                         const FilterArea &aFilterArea, BorderType aBorderType, const SrcT &aConstant,
                          const Roi &aAllowedReadRoi, morphOperation aMorph, postOp aPostOp)
 {
 
@@ -1756,7 +1756,7 @@ void moprhologyGradientEachPixel(BorderControlT aSrcWithBC, ImageView<DstT> &aDs
 
 template <typename SrcT>
 void moprhologyGradientEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, const Pixel8uC1 *aMask,
-                                 const FilterArea &aFilterArea, BorderType aBorderType, SrcT aConstant,
+                                 const FilterArea &aFilterArea, BorderType aBorderType, const SrcT &aConstant,
                                  const Roi &aAllowedReadRoi)
 {
 

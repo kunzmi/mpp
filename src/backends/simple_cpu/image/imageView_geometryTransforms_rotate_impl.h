@@ -21,9 +21,9 @@
 #include <common/image/roiException.h>
 #include <common/image/size2D.h>
 #include <common/image/sizePitched.h>
+#include <common/mpp_defs.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
-#include <common/mpp_defs.h>
 #include <common/safeCast.h>
 #include <common/utilities.h>
 #include <common/vector_typetraits.h>
@@ -107,7 +107,7 @@ void ImageView<T>::Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
 
 template <PixelType T>
 ImageView<T> &ImageView<T>::Rotate(ImageView<T> &aDst, double aAngleInDeg, const Vector2<double> &aShift,
-                                   InterpolationMode aInterpolation, T aConstant, BorderType aBorder,
+                                   InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                    Roi aAllowedReadRoi) const
 {
     // The rotation and shift are given from source to destination, with shift applied after rotation. As we compute
@@ -123,7 +123,7 @@ void ImageView<T>::Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                          T aConstant, BorderType aBorder, Roi aAllowedReadRoi)
+                          const T &aConstant, BorderType aBorder, Roi aAllowedReadRoi)
     requires TwoChannel<T>
 {
     // The rotation and shift are given from source to destination, with shift applied after rotation. As we compute
@@ -141,7 +141,7 @@ void ImageView<T>::Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, double aAngleInDeg,
-                          const Vector2<double> &aShift, InterpolationMode aInterpolation, T aConstant,
+                          const Vector2<double> &aShift, InterpolationMode aInterpolation, const T &aConstant,
                           BorderType aBorder, Roi aAllowedReadRoi)
     requires ThreeChannel<T>
 {
@@ -162,7 +162,7 @@ void ImageView<T>::Rotate(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                           double aAngleInDeg, const Vector2<double> &aShift, InterpolationMode aInterpolation,
-                          T aConstant, BorderType aBorder, Roi aAllowedReadRoi)
+                          const T &aConstant, BorderType aBorder, Roi aAllowedReadRoi)
     requires FourChannelNoAlpha<T>
 {
     // The rotation and shift are given from source to destination, with shift applied after rotation. As we compute
