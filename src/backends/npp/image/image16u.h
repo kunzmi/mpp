@@ -30,7 +30,7 @@ class MPPEXPORT_NPP Image16uC1 : public Image16uC1View
     Image16uC1(int aWidth, int aHeight);
     explicit Image16uC1(const Size2D &aSize);
 
-    ~Image16uC1();
+    ~Image16uC1() override;
 
     Image16uC1(const Image16uC1 &) = delete;
     Image16uC1(Image16uC1 &&aOther) noexcept;
@@ -46,7 +46,7 @@ class MPPEXPORT_NPP Image16uC2 : public Image16uC2View
     Image16uC2(int aWidth, int aHeight);
     explicit Image16uC2(const Size2D &aSize);
 
-    ~Image16uC2();
+    ~Image16uC2() override;
 
     Image16uC2(const Image16uC2 &) = delete;
     Image16uC2(Image16uC2 &&aOther) noexcept;
@@ -62,7 +62,7 @@ class MPPEXPORT_NPP Image16uC3 : public Image16uC3View
     Image16uC3(int aWidth, int aHeight);
     explicit Image16uC3(const Size2D &aSize);
 
-    ~Image16uC3();
+    ~Image16uC3() override;
 
     Image16uC3(const Image16uC3 &) = delete;
     Image16uC3(Image16uC3 &&aOther) noexcept;
@@ -78,7 +78,7 @@ class MPPEXPORT_NPP Image16uC4 : public Image16uC4View
     Image16uC4(int aWidth, int aHeight);
     explicit Image16uC4(const Size2D &aSize);
 
-    ~Image16uC4();
+    ~Image16uC4() override;
 
     Image16uC4(const Image16uC4 &) = delete;
     Image16uC4(Image16uC4 &&aOther) noexcept;

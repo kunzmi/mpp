@@ -16,20 +16,20 @@ target_link_libraries(backends.simple_cpu PRIVATE
 						)
 target_link_libraries(backends.simple_cpu PUBLIC  
 						common
-						backends.npp
-						backends.cuda.image8u
-						backends.cuda.image8s
-						backends.cuda.image16u
-						backends.cuda.image16s
-						backends.cuda.image32u
-						backends.cuda.image32s
-						backends.cuda.image16f
-						backends.cuda.image16bf
-						backends.cuda.image32f
-						backends.cuda.image64f
-						backends.cuda.image16sc
-						backends.cuda.image32sc
-						backends.cuda.image32fc
+						#backends.npp
+						#backends.cuda.image8u
+						#backends.cuda.image8s
+						#backends.cuda.image16u
+						#backends.cuda.image16s
+						#backends.cuda.image32u
+						#backends.cuda.image32s
+						#backends.cuda.image16f
+						#backends.cuda.image16bf
+						#backends.cuda.image32f
+						#backends.cuda.image64f
+						#backends.cuda.image16sc
+						#backends.cuda.image32sc
+						#backends.cuda.image32fc
 						CUDA::cudart
 						)
 endif()

@@ -33,7 +33,7 @@ template <PixelType T> class Image : public ImageView<T>
         ImageView<T>::PointerRoiRef() = mData.data();
         ImageView<T>::PitchRef()      = sizeof(T) * to_size_t(aSize.x);
     }
-    ~Image()
+    ~Image() override
     {
         ImageView<T>::PointerRef()    = nullptr;
         ImageView<T>::PointerRoiRef() = nullptr;

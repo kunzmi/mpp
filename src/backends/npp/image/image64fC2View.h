@@ -28,7 +28,7 @@ class MPPEXPORT_NPP Image64fC2View : public ImageView<Pixel64fC2>
   public:
     Image64fC2View(Pixel64fC2 *aBasePointer, const SizePitched &aSizeAlloc);
     Image64fC2View(Pixel64fC2 *aBasePointer, const SizePitched &aSizeAlloc, const Roi &aRoi);
-    ~Image64fC2View() = default;
+    ~Image64fC2View() override = default;
 
     Image64fC2View(const Image64fC2View &)     = default;
     Image64fC2View(Image64fC2View &&) noexcept = default;

@@ -28,7 +28,7 @@ class MPPEXPORT_NPP Image16scC2View : public ImageView<Pixel16scC2>
   public:
     Image16scC2View(Pixel16scC2 *aBasePointer, const SizePitched &aSizeAlloc);
     Image16scC2View(Pixel16scC2 *aBasePointer, const SizePitched &aSizeAlloc, const Roi &aRoi);
-    ~Image16scC2View() = default;
+    ~Image16scC2View() override = default;
 
     Image16scC2View(const Image16scC2View &)     = default;
     Image16scC2View(Image16scC2View &&) noexcept = default;

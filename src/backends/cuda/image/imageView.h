@@ -23,6 +23,7 @@
 #include <common/image/filterArea.h>
 #include <common/image/functors/imageFunctors.h>
 #include <common/image/gotoPtr.h>
+#include <common/image/imageViewBase.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
 #include <common/image/roiException.h>
@@ -42,53 +43,16 @@
 namespace mpp::image::cuda
 {
 
-template <PixelType T> class MPPEXPORT_CUDAI ImageView
+template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
 {
 #pragma region Constructors
   public:
-    /// <summary>
-    /// Type size in bytes of one pixel in one channel.
-    /// </summary>
-    static constexpr size_t TypeSize = sizeof(remove_vector_t<T>);
-    /// <summary>
-    /// Size in bytes of one pixel for all image channels
-    /// </summary>
-    static constexpr size_t PixelSizeInBytes = sizeof(T);
-    /// <summary>
-    /// Channel count
-    /// </summary>
-    static constexpr size_t ChannelCount = to_size_t(channel_count_v<T>);
     /// <summary>
     /// Default line-pitch alignment for manually allocated images [bytes]
     /// </summary>
     static constexpr size_t PitchAlignment = 256;
 
   private:
-    /// <summary>
-    /// Base pointer to image data.
-    /// </summary>
-    T *mPtr{nullptr};
-
-    /// <summary>
-    /// Width in bytes of one image line + alignment bytes.
-    /// </summary>
-    size_t mPitch{0};
-
-    /// <summary>
-    /// Base pointer moved to actual ROI.
-    /// </summary>
-    T *mPtrRoi{nullptr};
-
-    /// <summary>
-    /// Size of the allocated image buffer (full ROI).
-    /// </summary>
-    Size2D mSizeAlloc;
-
-    /// <summary>
-    /// ROI.
-    /// </summary>
-    Roi mRoi;
-
     static size_t PadImageWidthToPitch(size_t aWidthInBytes, size_t aPitchAlignment = PitchAlignment)
     {
         if (aWidthInBytes % aPitchAlignment != 0)
@@ -99,6 +63,12 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView
     }
 
   protected:
+    using ImageViewBase<T>::mPtr;
+    using ImageViewBase<T>::mPtrRoi;
+    using ImageViewBase<T>::mSizeAlloc;
+    using ImageViewBase<T>::mPitch;
+    using ImageViewBase<T>::mRoi;
+
     ImageView() = default;
 
     T *&PointerRef()
@@ -122,27 +92,43 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView
         return mRoi;
     }
 
-    explicit ImageView(const Size2D &aSize) : mSizeAlloc(aSize), mRoi(0, 0, aSize)
+    explicit ImageView(const Size2D &aSize) : ImageViewBase<T>(aSize)
     {
     }
 
+    [[nodiscard]] ImageViewBase<T>::MemoryType_enum MemoryType() const override
+    {
+        return ImageViewBase<T>::MemoryType_enum::CudaDefault;
+    }
+
   public:
-    ImageView(T *aBasePointer, const SizePitched &aSizeAlloc) noexcept
-        : mPtr(aBasePointer), mPitch(aSizeAlloc.Pitch()), mPtrRoi(aBasePointer), mSizeAlloc(aSizeAlloc.Size()),
-          mRoi(0, 0, aSizeAlloc.Size())
+    using ImageViewBase<T>::Pointer;
+    using ImageViewBase<T>::PointerRoi;
+    using ImageViewBase<T>::SizeAlloc;
+    using ImageViewBase<T>::Pitch;
+    using ImageViewBase<T>::ROI;
+    using ImageViewBase<T>::Width;
+    using ImageViewBase<T>::WidthInBytes;
+    using ImageViewBase<T>::Height;
+    using ImageViewBase<T>::SizeRoi;
+    using ImageViewBase<T>::WidthRoi;
+    using ImageViewBase<T>::WidthRoiInBytes;
+    using ImageViewBase<T>::HeightRoi;
+    using ImageViewBase<T>::ChannelCount;
+    using ImageViewBase<T>::TypeSize;
+
+    ImageView(T *aBasePointer, const SizePitched &aSizeAlloc) noexcept : ImageViewBase<T>(aBasePointer, aSizeAlloc)
     {
     }
     ImageView(T *aBasePointer, const Size2D &aSize, size_t aPitch) noexcept
-        : mPtr(aBasePointer), mPitch(aPitch), mPtrRoi(aBasePointer), mSizeAlloc(aSize), mRoi(0, 0, aSize)
+        : ImageViewBase<T>(aBasePointer, {aSize, aPitch})
     {
     }
     ImageView(T *aBasePointer, const SizePitched &aSizeAlloc, const Roi &aRoi)
-        : mPtr(aBasePointer), mPitch(aSizeAlloc.Pitch()),
-          mPtrRoi(gotoPtr(aBasePointer, aSizeAlloc.Pitch(), aRoi.x, aRoi.y)), mSizeAlloc(aSizeAlloc.Size()), mRoi(aRoi)
+        : ImageViewBase<T>(aBasePointer, aSizeAlloc, aRoi)
     {
-        checkRoiIsInRoi(aRoi, Roi(0, 0, mSizeAlloc));
     }
-    ~ImageView() = default;
+    ~ImageView() override = default;
 
     ImageView(const ImageView &)     = default;
     ImageView(ImageView &&) noexcept = default;
@@ -172,118 +158,6 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView
 #pragma endregion
 
 #pragma region Basics and Copy to device/host
-    /// <summary>
-    /// Base pointer to image data.
-    /// </summary>
-    [[nodiscard]] T *Pointer()
-    {
-        return mPtr;
-    }
-    /// <summary>
-    /// Base pointer to image data.
-    /// </summary>
-    [[nodiscard]] const T *Pointer() const
-    {
-        return mPtr;
-    }
-    /// <summary>
-    /// Base pointer moved to first pixel of actual ROI.
-    /// </summary>
-    [[nodiscard]] T *PointerRoi()
-    {
-        return mPtrRoi;
-    }
-    /// <summary>
-    /// Base pointer moved to first pixel of actual ROI.
-    /// </summary>
-    [[nodiscard]] const T *PointerRoi() const
-    {
-        return mPtrRoi;
-    }
-    /// <summary>
-    /// Size of the entire allocated image.
-    /// </summary>
-    [[nodiscard]] const Size2D &SizeAlloc() const
-    {
-        return mSizeAlloc;
-    }
-    /// <summary>
-    /// Size of the current image ROI.
-    /// </summary>
-    [[nodiscard]] Size2D SizeRoi() const
-    {
-        return {mRoi.width, mRoi.height};
-    }
-    /// <summary>
-    /// ROI.
-    /// </summary>
-    [[nodiscard]] const Roi &ROI() const
-    {
-        return mRoi;
-    }
-    /// <summary>
-    /// Width of one image line + alignment bytes.
-    /// </summary>
-    [[nodiscard]] size_t Pitch() const
-    {
-        return mPitch;
-    }
-
-    /// <summary>
-    /// Image width in pixels
-    /// </summary>
-    [[nodiscard]] int Width() const
-    {
-        return mSizeAlloc.x;
-    }
-
-    /// <summary>
-    /// Image width in bytes (without padding)
-    /// </summary>
-    [[nodiscard]] size_t WidthInBytes() const
-    {
-        return to_size_t(mSizeAlloc.x) * PixelSizeInBytes;
-    }
-
-    /// <summary>
-    /// Height in pixels
-    /// </summary>
-    [[nodiscard]] int Height() const
-    {
-        return mSizeAlloc.y;
-    }
-
-    /// <summary>
-    /// Roi width in pixels
-    /// </summary>
-    [[nodiscard]] int WidthRoi() const
-    {
-        return mRoi.width;
-    }
-
-    /// <summary>
-    /// Roi width in bytes
-    /// </summary>
-    [[nodiscard]] size_t WidthRoiInBytes() const
-    {
-        return to_size_t(mRoi.width) * PixelSizeInBytes;
-    }
-
-    /// <summary>
-    /// Height in pixels
-    /// </summary>
-    [[nodiscard]] int HeightRoi() const
-    {
-        return mRoi.height;
-    }
-
-    /// <summary>
-    /// Total size in bytes (Pitch * Height)
-    /// </summary>
-    [[nodiscard]] size_t TotalSizeInBytes() const
-    {
-        return mPitch * to_size_t(mSizeAlloc.y);
-    }
 
     /// <summary>
     /// Returns a new ImageView with the new ROI
@@ -304,32 +178,135 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView
     }
 
     /// <summary>
-    /// Defines the ROI on which all following operations take place
+    /// Copy from this view to other view
     /// </summary>
-    void SetRoi(const Roi &aRoi)
+    /// <param name="aDstView">Destination view</param>
+    void CopyTo(ImageViewBase<T> &aDstView) const override
     {
-        checkRoiIsInRoi(aRoi, Roi(0, 0, mSizeAlloc));
+        if (SizeAlloc() != aDstView.SizeAlloc())
+        {
+            throw ROIEXCEPTION("The source image does not have the same size as the destination image. Source size "
+                               << SizeAlloc() << ", Destination size: " << aDstView.SizeAlloc());
+        }
 
-        mPtrRoi = gotoPtr(mPtr, mPitch, aRoi.x, aRoi.y);
-        mRoi    = aRoi;
+        if (aDstView.MemoryType() == ImageViewBase<T>::MemoryType_enum::CudaDefault)
+        {
+            cudaSafeCall(cudaMemcpy2D(aDstView.Pointer(), aDstView.Pitch(), Pointer(), Pitch(), WidthInBytes(),
+                                      to_size_t(Height()), cudaMemcpyDeviceToDevice));
+        }
+        else if (aDstView.MemoryType() == ImageViewBase<T>::MemoryType_enum::HostDefault)
+        {
+            CopyToHost(aDstView.Pointer(), aDstView.Pitch());
+        }
+        else
+        {
+            throw INVALIDARGUMENT(
+                aDstView,
+                "Unknown memory location for destination ImageView. Cannot copy data from CUDA device to there.");
+        }
     }
 
     /// <summary>
-    /// Defines the ROI on which all following operations take place relative to the current ROI
+    /// Copy from other view to this view
     /// </summary>
-    void SetRoi(const Border &aBorder)
+    /// <param name="aSrcView">Source view</param>
+    void CopyFrom(const ImageViewBase<T> &aSrcView) override
     {
-        const Roi newRoi = mRoi + aBorder;
-        SetRoi(newRoi);
+        if (SizeAlloc() != aSrcView.SizeAlloc())
+        {
+            throw ROIEXCEPTION("The source image does not have the same size as the destination image. Source size "
+                               << aSrcView.SizeAlloc() << ", Destination size: " << SizeAlloc());
+        }
+
+        if (aSrcView.MemoryType() == ImageViewBase<T>::MemoryType_enum::CudaDefault)
+        {
+            cudaSafeCall(cudaMemcpy2D(Pointer(), Pitch(), aSrcView.Pointer(), aSrcView.Pitch(), WidthInBytes(),
+                                      to_size_t(Height()), cudaMemcpyDeviceToDevice));
+        }
+        else if (aSrcView.MemoryType() == ImageViewBase<T>::MemoryType_enum::HostDefault)
+        {
+            CopyToDevice(aSrcView.Pointer(), aSrcView.Pitch());
+        }
+        else
+        {
+            throw INVALIDARGUMENT(
+                aSrcView, "Unknown memory location for source ImageView. Cannot copy data from there to CUDA device.");
+        }
     }
 
     /// <summary>
-    /// Resets the ROI to the full image
+    /// Copy from this view to other view
     /// </summary>
-    void ResetRoi()
+    void operator>>(ImageViewBase<T> &aDstView) const
     {
-        mRoi    = Roi(0, 0, mSizeAlloc);
-        mPtrRoi = mPtr;
+        CopyTo(aDstView);
+    }
+
+    /// <summary>
+    /// Copy from other view to this view
+    /// </summary>
+    void operator<<(const ImageViewBase<T> &aSrcView)
+    {
+        CopyFrom(aSrcView);
+    }
+
+    /// <summary>
+    /// Copy from this view to other view only in ROI
+    /// </summary>
+    /// <param name="aDstView">Destination view</param>
+    void CopyToRoi(ImageViewBase<T> &aDstView) const override
+    {
+        if (SizeRoi() != aDstView.SizeRoi())
+        {
+            throw ROIEXCEPTION(
+                "The source image ROI does not have the same size as the destination image ROI. Source ROI size "
+                << SizeRoi() << ", Destination size: " << aDstView.SizeRoi());
+        }
+
+        if (aDstView.MemoryType() == ImageViewBase<T>::MemoryType_enum::CudaDefault)
+        {
+            throw INVALIDARGUMENT(aSrcView, "Device to device copy with ROI is not implemented here.");
+        }
+
+        if (aDstView.MemoryType() == ImageViewBase<T>::MemoryType_enum::HostDefault)
+        {
+            CopyToHostRoi(aDstView.Pointer(), aDstView.Pitch(), aDstView.ROI());
+        }
+        else
+        {
+            throw INVALIDARGUMENT(
+                aDstView,
+                "Unknown memory location for destination ImageView. Cannot copy data from CUDA device to there.");
+        }
+    }
+
+    /// <summary>
+    /// Copy from other view to this view only in ROI
+    /// </summary>
+    /// <param name="aSrcView">Source view</param>
+    void CopyFromRoi(const ImageViewBase<T> &aSrcView) override
+    {
+        if (ImageViewBase<T>::SizeRoi() != aSrcView.SizeRoi())
+        {
+            throw ROIEXCEPTION(
+                "The source image ROI does not have the same size as the destination image ROI. Source ROI size "
+                << aSrcView.SizeRoi() << ", Destination size: " << ImageViewBase<T>::SizeRoi());
+        }
+
+        if (aSrcView.MemoryType() == ImageViewBase<T>::MemoryType_enum::CudaDefault)
+        {
+            throw INVALIDARGUMENT(aSrcView, "Device to device copy with ROI is not implemented here.");
+        }
+
+        if (aSrcView.MemoryType() == ImageViewBase<T>::MemoryType_enum::HostDefault)
+        {
+            CopyToDeviceRoi(aSrcView.Pointer(), aSrcView.Pitch(), aSrcView.ROI());
+        }
+        else
+        {
+            throw INVALIDARGUMENT(
+                aSrcView, "Unknown memory location for source ImageView. Cannot copy data from there to CUDA device.");
+        }
     }
 
     /// <summary>

@@ -36,7 +36,7 @@ class MPPEXPORT_NPP Image8uC4View : public ImageView<Pixel8uC4>
   public:
     Image8uC4View(Pixel8uC4 *aBasePointer, const SizePitched &aSizeAlloc);
     Image8uC4View(Pixel8uC4 *aBasePointer, const SizePitched &aSizeAlloc, const Roi &aRoi);
-    ~Image8uC4View() = default;
+    ~Image8uC4View() override = default;
 
     Image8uC4View(const Image8uC4View &)     = default;
     Image8uC4View(Image8uC4View &&) noexcept = default;

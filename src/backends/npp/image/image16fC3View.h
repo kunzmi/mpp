@@ -29,7 +29,7 @@ class MPPEXPORT_NPP Image16fC3View : public ImageView<Pixel16fC3>
   public:
     Image16fC3View(Pixel16fC3 *aBasePointer, const SizePitched &aSizeAlloc);
     Image16fC3View(Pixel16fC3 *aBasePointer, const SizePitched &aSizeAlloc, const Roi &aRoi);
-    ~Image16fC3View() = default;
+    ~Image16fC3View() override = default;
 
     Image16fC3View(const Image16fC3View &)     = default;
     Image16fC3View(Image16fC3View &&) noexcept = default;

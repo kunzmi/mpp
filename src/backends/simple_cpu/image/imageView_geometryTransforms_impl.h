@@ -2212,7 +2212,7 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
 #pragma region Copy (with border control)
 template <PixelType T>
 ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst, const Vector2<int> &aLowerBorderSize, BorderType aBorder,
-                                 T aConstant) const
+                                 const T &aConstant) const
 {
     constexpr RoundingMode roundingMode = RoundingMode::None;
     using CoordT                        = int;

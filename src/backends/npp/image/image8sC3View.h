@@ -33,7 +33,7 @@ class MPPEXPORT_NPP Image8sC3View : public ImageView<Pixel8sC3>
   public:
     Image8sC3View(Pixel8sC3 *aBasePointer, const SizePitched &aSizeAlloc);
     Image8sC3View(Pixel8sC3 *aBasePointer, const SizePitched &aSizeAlloc, const Roi &aRoi);
-    ~Image8sC3View() = default;
+    ~Image8sC3View() override = default;
 
     Image8sC3View(const Image8sC3View &)     = default;
     Image8sC3View(Image8sC3View &&) noexcept = default;

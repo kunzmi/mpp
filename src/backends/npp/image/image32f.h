@@ -30,7 +30,7 @@ class MPPEXPORT_NPP Image32fC1 : public Image32fC1View
     Image32fC1(int aWidth, int aHeight);
     explicit Image32fC1(const Size2D &aSize);
 
-    ~Image32fC1();
+    ~Image32fC1() override;
 
     Image32fC1(const Image32fC1 &) = delete;
     Image32fC1(Image32fC1 &&aOther) noexcept;
@@ -46,7 +46,7 @@ class MPPEXPORT_NPP Image32fC2 : public Image32fC2View
     Image32fC2(int aWidth, int aHeight);
     explicit Image32fC2(const Size2D &aSize);
 
-    ~Image32fC2();
+    ~Image32fC2() override;
 
     Image32fC2(const Image32fC2 &) = delete;
     Image32fC2(Image32fC2 &&aOther) noexcept;
@@ -62,7 +62,7 @@ class MPPEXPORT_NPP Image32fC3 : public Image32fC3View
     Image32fC3(int aWidth, int aHeight);
     explicit Image32fC3(const Size2D &aSize);
 
-    ~Image32fC3();
+    ~Image32fC3() override;
 
     Image32fC3(const Image32fC3 &) = delete;
     Image32fC3(Image32fC3 &&aOther) noexcept;
@@ -78,7 +78,7 @@ class MPPEXPORT_NPP Image32fC4 : public Image32fC4View
     Image32fC4(int aWidth, int aHeight);
     explicit Image32fC4(const Size2D &aSize);
 
-    ~Image32fC4();
+    ~Image32fC4() override;
 
     Image32fC4(const Image32fC4 &) = delete;
     Image32fC4(Image32fC4 &&aOther) noexcept;

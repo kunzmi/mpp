@@ -30,7 +30,7 @@ class MPPEXPORT_NPP Image8sC1 : public Image8sC1View
     Image8sC1(int aWidth, int aHeight);
     explicit Image8sC1(const Size2D &aSize);
 
-    ~Image8sC1();
+    ~Image8sC1() override;
 
     Image8sC1(const Image8sC1 &) = delete;
     Image8sC1(Image8sC1 &&aOther) noexcept;
@@ -46,7 +46,7 @@ class MPPEXPORT_NPP Image8sC2 : public Image8sC2View
     Image8sC2(int aWidth, int aHeight);
     explicit Image8sC2(const Size2D &aSize);
 
-    ~Image8sC2();
+    ~Image8sC2() override;
 
     Image8sC2(const Image8sC2 &) = delete;
     Image8sC2(Image8sC2 &&aOther) noexcept;
@@ -62,7 +62,7 @@ class MPPEXPORT_NPP Image8sC3 : public Image8sC3View
     Image8sC3(int aWidth, int aHeight);
     explicit Image8sC3(const Size2D &aSize);
 
-    ~Image8sC3();
+    ~Image8sC3() override;
 
     Image8sC3(const Image8sC3 &) = delete;
     Image8sC3(Image8sC3 &&aOther) noexcept;
@@ -78,7 +78,7 @@ class MPPEXPORT_NPP Image8sC4 : public Image8sC4View
     Image8sC4(int aWidth, int aHeight);
     explicit Image8sC4(const Size2D &aSize);
 
-    ~Image8sC4();
+    ~Image8sC4() override;
 
     Image8sC4(const Image8sC4 &) = delete;
     Image8sC4(Image8sC4 &&aOther) noexcept;

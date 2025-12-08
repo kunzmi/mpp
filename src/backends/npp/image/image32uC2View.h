@@ -28,7 +28,7 @@ class MPPEXPORT_NPP Image32uC2View : public ImageView<Pixel32uC2>
   public:
     Image32uC2View(Pixel32uC2 *aBasePointer, const SizePitched &aSizeAlloc);
     Image32uC2View(Pixel32uC2 *aBasePointer, const SizePitched &aSizeAlloc, const Roi &aRoi);
-    ~Image32uC2View() = default;
+    ~Image32uC2View() override = default;
 
     Image32uC2View(const Image32uC2View &)     = default;
     Image32uC2View(Image32uC2View &&) noexcept = default;

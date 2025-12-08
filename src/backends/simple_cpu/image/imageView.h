@@ -53,7 +53,7 @@
 namespace mpp::image::cpuSimple
 {
 
-template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView
+template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBase<T>
 {
 #pragma region Iterator
   public:
@@ -394,86 +394,70 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView
 #pragma endregion
 
 #pragma region Constructors
-    /// <summary>
-    /// Type size in bytes of one pixel in one channel.
-    /// </summary>
-    static constexpr size_t TypeSize = sizeof(remove_vector_t<T>);
-    /// <summary>
-    /// Size in bytes of one pixel for all image channels
-    /// </summary>
-    static constexpr size_t PixelSizeInBytes = sizeof(T);
-    /// <summary>
-    /// Channel count
-    /// </summary>
-    static constexpr size_t ChannelCount = to_size_t(channel_count_v<T>);
-
-  private:
-    /// <summary>
-    /// Base pointer to image data.
-    /// </summary>
-    T *mPtr{nullptr};
-
-    /// <summary>
-    /// Width in bytes of one image line + alignment bytes.
-    /// </summary>
-    size_t mPitch{0};
-
-    /// <summary>
-    /// Base pointer moved to actual ROI.
-    /// </summary>
-    T *mPtrRoi{nullptr};
-
-    /// <summary>
-    /// Size of the allocated image buffer (full ROI).
-    /// </summary>
-    Size2D mSizeAlloc;
-
-    /// <summary>
-    /// ROI.
-    /// </summary>
-    Roi mRoi;
 
   protected:
     ImageView() = default;
 
     T *&PointerRef()
     {
-        return mPtr;
+        return ImageViewBase<T>::mPtr;
     }
     size_t &PitchRef()
     {
-        return mPitch;
+        return ImageViewBase<T>::mPitch;
     }
     T *&PointerRoiRef()
     {
-        return mPtrRoi;
+        return ImageViewBase<T>::mPtrRoi;
     }
     Size2D &SizeAllocRef()
     {
-        return mSizeAlloc;
+        return ImageViewBase<T>::mSizeAlloc;
     }
     Roi &ROIRef()
     {
-        return mRoi;
+        return ImageViewBase<T>::mRoi;
     }
 
-    explicit ImageView(const Size2D &aSize) : mSizeAlloc(aSize), mRoi(0, 0, aSize)
+    explicit ImageView(const Size2D &aSize) : ImageViewBase<T>(aSize)
     {
     }
 
+    [[nodiscard]] ImageViewBase<T>::MemoryType_enum MemoryType() const override
+    {
+        return ImageViewBase<T>::MemoryType_enum::HostDefault;
+    }
+
+    using ImageViewBase<T>::mPtr;
+    using ImageViewBase<T>::mPtrRoi;
+    using ImageViewBase<T>::mSizeAlloc;
+    using ImageViewBase<T>::mPitch;
+    using ImageViewBase<T>::mRoi;
+
   public:
-    ImageView(T *aBasePointer, const SizePitched &aSizeAlloc)
-        : mPtr(aBasePointer), mPitch(aSizeAlloc.Pitch()), mPtrRoi(aBasePointer), mSizeAlloc(aSizeAlloc.Size()),
-          mRoi(0, 0, aSizeAlloc.Size())
+    using ImageViewBase<T>::Pointer;
+    using ImageViewBase<T>::PointerRoi;
+    using ImageViewBase<T>::SizeAlloc;
+    using ImageViewBase<T>::Pitch;
+    using ImageViewBase<T>::ROI;
+    using ImageViewBase<T>::Width;
+    using ImageViewBase<T>::WidthInBytes;
+    using ImageViewBase<T>::Height;
+    using ImageViewBase<T>::SizeRoi;
+    using ImageViewBase<T>::WidthRoi;
+    using ImageViewBase<T>::WidthRoiInBytes;
+    using ImageViewBase<T>::HeightRoi;
+    using ImageViewBase<T>::ChannelCount;
+    using ImageViewBase<T>::TypeSize;
+
+    ImageView(T *aBasePointer, const SizePitched &aSizeAlloc) noexcept : ImageViewBase<T>(aBasePointer, aSizeAlloc)
     {
     }
     ImageView(T *aBasePointer, const SizePitched &aSizeAlloc, const Roi &aRoi)
-        : mPtr(aBasePointer), mPitch(aSizeAlloc.Pitch()),
-          mPtrRoi(gotoPtr(aBasePointer, aSizeAlloc.Pitch(), aRoi.x, aRoi.y)), mSizeAlloc(aSizeAlloc.Size()), mRoi(aRoi)
+        : ImageViewBase<T>(aBasePointer, aSizeAlloc, aRoi)
     {
-        checkRoiIsInRoi(aRoi, Roi(0, 0, mSizeAlloc));
     }
-    ~ImageView() = default;
+    ~ImageView() override = default;
 
     ImageView(const ImageView &)     = default;
     ImageView(ImageView &&) noexcept = default;
@@ -508,122 +492,6 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView
     }
 
     /// <summary>
-    /// Base pointer to image data.
-    /// </summary>
-    [[nodiscard]] T *Pointer()
-    {
-        return mPtr;
-    }
-
-    /// <summary>
-    /// Base pointer to image data.
-    /// </summary>
-    [[nodiscard]] const T *Pointer() const
-    {
-        return mPtr;
-    }
-
-    /// <summary>
-    /// Base pointer moved to actual ROI.
-    /// </summary>
-    [[nodiscard]] T *PointerRoi()
-    {
-        return mPtrRoi;
-    }
-
-    /// <summary>
-    /// Base pointer moved to actual ROI.
-    /// </summary>
-    [[nodiscard]] const T *PointerRoi() const
-    {
-        return mPtrRoi;
-    }
-    /// <summary>
-    /// Size of the entire allocated image.
-    /// </summary>
-    [[nodiscard]] const Size2D &SizeAlloc() const
-    {
-        return mSizeAlloc;
-    }
-    /// <summary>
-    /// Size of the current image ROI.
-    /// </summary>
-    [[nodiscard]] Size2D SizeRoi() const
-    {
-        return {mRoi.width, mRoi.height};
-    }
-    /// <summary>
-    /// ROI.
-    /// </summary>
-    [[nodiscard]] const Roi &ROI() const
-    {
-        return mRoi;
-    }
-    /// <summary>
-    /// Width of one image line + alignment bytes.
-    /// </summary>
-    [[nodiscard]] size_t Pitch() const
-    {
-        return mPitch;
-    }
-
-    /// <summary>
-    /// Image width in pixels
-    /// </summary>
-    [[nodiscard]] int Width() const
-    {
-        return mSizeAlloc.x;
-    }
-
-    /// <summary>
-    /// Image width in bytes (without padding)
-    /// </summary>
-    [[nodiscard]] size_t WidthInBytes() const
-    {
-        return to_size_t(mSizeAlloc.x) * PixelSizeInBytes;
-    }
-
-    /// <summary>
-    /// Height in pixels
-    /// </summary>
-    [[nodiscard]] int Height() const
-    {
-        return mSizeAlloc.y;
-    }
-
-    /// <summary>
-    /// Roi width in pixels
-    /// </summary>
-    [[nodiscard]] int WidthRoi() const
-    {
-        return mRoi.width;
-    }
-
-    /// <summary>
-    /// Roi width in bytes
-    /// </summary>
-    [[nodiscard]] size_t WidthRoiInBytes() const
-    {
-        return to_size_t(mRoi.width) * PixelSizeInBytes;
-    }
-
-    /// <summary>
-    /// Height in pixels
-    /// </summary>
-    [[nodiscard]] int HeightRoi() const
-    {
-        return mRoi.height;
-    }
-
-    /// <summary>
-    /// Total size in bytes (Pitch * Height)
-    /// </summary>
-    [[nodiscard]] size_t TotalSizeInBytes() const
-    {
-        return mPitch * to_size_t(mSizeAlloc.y);
-    }
-
-    /// <summary>
     /// Returns a new ImageView with the new ROI
     /// </summary>
     ImageView GetView(const Roi &aRoi)
@@ -639,35 +507,6 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView
         const Roi newRoi = mRoi + aBorder;
         checkRoiIsInRoi(newRoi, Roi(0, 0, mSizeAlloc));
         return ImageView(mPtr, SizePitched(mSizeAlloc, mPitch), newRoi);
-    }
-
-    /// <summary>
-    /// Defines the ROI on which all following operations take place
-    /// </summary>
-    void SetRoi(const Roi &aRoi)
-    {
-        checkRoiIsInRoi(aRoi, Roi(0, 0, mSizeAlloc));
-
-        mPtrRoi = gotoPtr(mPtr, mPitch, aRoi.x, aRoi.y);
-        mRoi    = aRoi;
-    }
-
-    /// <summary>
-    /// Defines the ROI on which all following operations take place relative to the current ROI
-    /// </summary>
-    void SetRoi(const Border &aBorder)
-    {
-        const Roi newRoi = mRoi + aBorder;
-        SetRoi(newRoi);
-    }
-
-    /// <summary>
-    /// Resets the ROI to the full image
-    /// </summary>
-    void ResetRoi()
-    {
-        mRoi    = Roi(0, 0, mSizeAlloc);
-        mPtrRoi = mPtr;
     }
 
     [[nodiscard]] iterator begin()
@@ -700,141 +539,256 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView
         return const_iterator({mRoi.FirstX(), mRoi.LastY() + 1}, *this);
     }
 
-#if MPP_ENABLE_CUDA_BACKEND
     /// <summary>
-    /// Copy from host to device memory
+    /// Copy from this view to other view
     /// </summary>
-    /// <param name="aDeviceDst">Destination</param>
-    void CopyToDevice(cuda::ImageView<T> &aDeviceDst) const
+    /// <param name="aDstView">Destination view</param>
+    void CopyTo(ImageViewBase<T> &aDstView) const override
     {
-        if (mSizeAlloc != aDeviceDst.SizeAlloc())
+        if (SizeAlloc() != aDstView.SizeAlloc())
         {
             throw ROIEXCEPTION("The source image does not have the same size as the destination image. Source size "
-                               << mSizeAlloc << ", Destination size: " << aDeviceDst.SizeAlloc());
+                               << SizeAlloc() << ", Destination size: " << aDstView.SizeAlloc());
         }
 
-        aDeviceDst.CopyToDevice(mPtr, mPitch);
+        if (aDstView.MemoryType() == ImageViewBase<T>::MemoryType_enum::CudaDefault)
+        {
+            aDstView.CopyFrom(*this);
+        }
+        else
+        {
+            throw INVALIDARGUMENT(
+                aDstView,
+                "Unknown memory location for destination ImageView. Cannot copy data from CUDA device to there.");
+        }
     }
 
     /// <summary>
-    /// Copy from device to host memory
+    /// Copy from other view to this view
     /// </summary>
-    /// <param name="aDeviceSrc">Source</param>
-    void CopyToHost(const cuda::ImageView<T> &aDeviceSrc)
+    /// <param name="aSrcView">Source view</param>
+    void CopyFrom(const ImageViewBase<T> &aSrcView) override
     {
-        if (mSizeAlloc != aDeviceSrc.SizeAlloc())
+        if (SizeAlloc() != aSrcView.SizeAlloc())
         {
             throw ROIEXCEPTION("The source image does not have the same size as the destination image. Source size "
-                               << aDeviceSrc.SizeAlloc() << ", Destination size: " << mSizeAlloc);
+                               << aSrcView.SizeAlloc() << ", Destination size: " << SizeAlloc());
         }
 
-        aDeviceSrc.CopyToHost(mPtr, mPitch);
-    }
-
-    /// <summary>
-    /// Copy from host to device memory
-    /// </summary>
-    void operator>>(cuda::ImageView<T> &aDest) const
-    {
-        CopyToDevice(aDest);
-    }
-
-    /// <summary>
-    /// Copy from device to host memory
-    /// </summary>
-    void operator<<(const cuda::ImageView<T> &aDeviceSrc)
-    {
-        CopyToHost(aDeviceSrc);
-    }
-
-    /// <summary>
-    /// Copy data from host to device memory only in ROI
-    /// </summary>
-    /// <param name="aDeviceDst">Device destination view</param>
-    void CopyToDeviceRoi(cuda::ImageView<T> &aDeviceDst) const
-    {
-        // the callee will move the ptr to the first roi pixel
-        aDeviceDst.CopyToDeviceRoi(mPtr, mPitch, mRoi);
-    }
-
-    /// <summary>
-    /// Copy data from device to device memory
-    /// </summary>
-    /// <param name="aDeviceSrc">Device source view</param>
-    void CopyToHostRoi(const cuda::ImageView<T> &aDeviceSrc)
-    {
-        // the callee will move the ptr to the first roi pixel
-        aDeviceSrc.CopyToHostRoi(mPtr, mPitch, mRoi);
-    }
-#endif // MPP_ENABLE_CUDA_BACKEND
-
-#if MPP_ENABLE_NPP_BACKEND
-    /// <summary>
-    /// Copy from host to device memory
-    /// </summary>
-    /// <param name="aDeviceDst">Destination</param>
-    void CopyToDevice(npp::ImageView<T> &aDeviceDst) const
-    {
-        if (mSizeAlloc != aDeviceDst.SizeAlloc())
+        if (aSrcView.MemoryType() == ImageViewBase<T>::MemoryType_enum::CudaDefault)
         {
-            throw ROIEXCEPTION("The source image does not have the same size as the destination image. Source size "
-                               << mSizeAlloc << ", Destination size: " << aDeviceDst.SizeAlloc());
+            aSrcView.CopyTo(*this);
         }
-
-        aDeviceDst.CopyToDevice(mPtr, mPitch);
-    }
-
-    /// <summary>
-    /// Copy from device to host memory
-    /// </summary>
-    /// <param name="aDeviceSrc">Source</param>
-    void CopyToHost(const npp::ImageView<T> &aDeviceSrc)
-    {
-        if (mSizeAlloc != aDeviceSrc.SizeAlloc())
+        else
         {
-            throw ROIEXCEPTION("The source image does not have the same size as the destination image. Source size "
-                               << aDeviceSrc.SizeAlloc() << ", Destination size: " << mSizeAlloc);
+            throw INVALIDARGUMENT(
+                aSrcView, "Unknown memory location for source ImageView. Cannot copy data from there to CUDA device.");
+        }
+    }
+
+    /// <summary>
+    /// Copy from this view to other view
+    /// </summary>
+    void operator>>(ImageViewBase<T> &aDstView) const
+    {
+        CopyTo(aDstView);
+    }
+
+    /// <summary>
+    /// Copy from other view to this view
+    /// </summary>
+    void operator<<(const ImageViewBase<T> &aSrcView)
+    {
+        CopyFrom(aSrcView);
+    }
+
+    /// <summary>
+    /// Copy from this view to other view only in ROI
+    /// </summary>
+    /// <param name="aDstView">Destination view</param>
+    void CopyToRoi(ImageViewBase<T> &aDstView) const override
+    {
+        if (SizeRoi() != aDstView.SizeRoi())
+        {
+            throw ROIEXCEPTION(
+                "The source image ROI does not have the same size as the destination image ROI. Source ROI size "
+                << SizeRoi() << ", Destination size: " << aDstView.SizeRoi());
         }
 
-        aDeviceSrc.CopyToHost(mPtr, mPitch);
+        if (aDstView.MemoryType() == ImageViewBase<T>::MemoryType_enum::CudaDefault)
+        {
+            aDstView.CopyFromRoi(*this);
+        }
+        else
+        {
+            throw INVALIDARGUMENT(
+                aDstView, "Unknown memory location for destination ImageView. Cannot copy data from host to there.");
+        }
     }
 
     /// <summary>
-    /// Copy from host to device memory
+    /// Copy from other view to this view only in ROI
     /// </summary>
-    void operator>>(npp::ImageView<T> &aDest) const
+    /// <param name="aSrcView">Source view</param>
+    void CopyFromRoi(const ImageViewBase<T> &aSrcView) override
     {
-        CopyToDevice(aDest);
+        if (ImageViewBase<T>::SizeRoi() != aSrcView.SizeRoi())
+        {
+            throw ROIEXCEPTION(
+                "The source image ROI does not have the same size as the destination image ROI. Source ROI size "
+                << aSrcView.SizeRoi() << ", Destination size: " << ImageViewBase<T>::SizeRoi());
+        }
+
+        if (aSrcView.MemoryType() == ImageViewBase<T>::MemoryType_enum::CudaDefault)
+        {
+            aSrcView.CopyToRoi(*this);
+        }
+        else
+        {
+            throw INVALIDARGUMENT(aSrcView,
+                                  "Unknown memory location for source ImageView. Cannot copy data from there to host.");
+        }
     }
 
-    /// <summary>
-    /// Copy from device to host memory
-    /// </summary>
-    void operator<<(const npp::ImageView<T> &aDeviceSrc)
-    {
-        CopyToHost(aDeviceSrc);
-    }
+    // #if MPP_ENABLE_CUDA_BACKEND
+    //     /// <summary>
+    //     /// Copy from host to device memory
+    //     /// </summary>
+    //     /// <param name="aDeviceDst">Destination</param>
+    //     void CopyToDevice(cuda::ImageView<T> &aDeviceDst) const
+    //     {
+    //         if (mSizeAlloc != aDeviceDst.SizeAlloc())
+    //         {
+    //             throw ROIEXCEPTION("The source image does not have the same size as the destination image. Source
+    //             size "
+    //                                << mSizeAlloc << ", Destination size: " << aDeviceDst.SizeAlloc());
+    //         }
+    //
+    //         aDeviceDst.CopyToDevice(mPtr, mPitch);
+    //     }
+    //
+    //     /// <summary>
+    //     /// Copy from device to host memory
+    //     /// </summary>
+    //     /// <param name="aDeviceSrc">Source</param>
+    //     void CopyToHost(const cuda::ImageView<T> &aDeviceSrc)
+    //     {
+    //         if (mSizeAlloc != aDeviceSrc.SizeAlloc())
+    //         {
+    //             throw ROIEXCEPTION("The source image does not have the same size as the destination image. Source
+    //             size "
+    //                                << aDeviceSrc.SizeAlloc() << ", Destination size: " << mSizeAlloc);
+    //         }
+    //
+    //         aDeviceSrc.CopyToHost(mPtr, mPitch);
+    //     }
+    //
+    //     /// <summary>
+    //     /// Copy from host to device memory
+    //     /// </summary>
+    //     void operator>>(cuda::ImageView<T> &aDest) const
+    //     {
+    //         CopyToDevice(aDest);
+    //     }
+    //
+    //     /// <summary>
+    //     /// Copy from device to host memory
+    //     /// </summary>
+    //     void operator<<(const cuda::ImageView<T> &aDeviceSrc)
+    //     {
+    //         CopyToHost(aDeviceSrc);
+    //     }
+    //
+    //     /// <summary>
+    //     /// Copy data from host to device memory only in ROI
+    //     /// </summary>
+    //     /// <param name="aDeviceDst">Device destination view</param>
+    //     void CopyToDeviceRoi(cuda::ImageView<T> &aDeviceDst) const
+    //     {
+    //         // the callee will move the ptr to the first roi pixel
+    //         aDeviceDst.CopyToDeviceRoi(mPtr, mPitch, mRoi);
+    //     }
+    //
+    //     /// <summary>
+    //     /// Copy data from device to device memory
+    //     /// </summary>
+    //     /// <param name="aDeviceSrc">Device source view</param>
+    //     void CopyToHostRoi(const cuda::ImageView<T> &aDeviceSrc)
+    //     {
+    //         // the callee will move the ptr to the first roi pixel
+    //         aDeviceSrc.CopyToHostRoi(mPtr, mPitch, mRoi);
+    //     }
+    // #endif // MPP_ENABLE_CUDA_BACKEND
 
-    /// <summary>
-    /// Copy data from host to device memory only in ROI
-    /// </summary>
-    /// <param name="aDeviceDst">Device destination view</param>
-    void CopyToDeviceRoi(npp::ImageView<T> &aDeviceDst) const
-    {
-        // the callee will move the ptr to the first roi pixel
-        aDeviceDst.CopyToDeviceRoi(mPtr, mPitch, mRoi);
-    }
-
-    /// <summary>
-    /// Copy data from device to device memory
-    /// </summary>
-    /// <param name="aDeviceSrc">Device source view</param>
-    void CopyToHostRoi(const npp::ImageView<T> &aDeviceSrc)
-    {
-        // the callee will move the ptr to the first roi pixel
-        aDeviceSrc.CopyToHostRoi(mPtr, mPitch, mRoi);
-    }
-#endif // MPP_ENABLE_NPP_BACKEND
+    // #if MPP_ENABLE_NPP_BACKEND
+    //     /// <summary>
+    //     /// Copy from host to device memory
+    //     /// </summary>
+    //     /// <param name="aDeviceDst">Destination</param>
+    //     void CopyToDevice(npp::ImageView<T> &aDeviceDst) const
+    //     {
+    //         if (mSizeAlloc != aDeviceDst.SizeAlloc())
+    //         {
+    //             throw ROIEXCEPTION("The source image does not have the same size as the destination image. Source
+    //             size "
+    //                                << mSizeAlloc << ", Destination size: " << aDeviceDst.SizeAlloc());
+    //         }
+    //
+    //         aDeviceDst.CopyToDevice(mPtr, mPitch);
+    //     }
+    //
+    //     /// <summary>
+    //     /// Copy from device to host memory
+    //     /// </summary>
+    //     /// <param name="aDeviceSrc">Source</param>
+    //     void CopyToHost(const npp::ImageView<T> &aDeviceSrc)
+    //     {
+    //         if (mSizeAlloc != aDeviceSrc.SizeAlloc())
+    //         {
+    //             throw ROIEXCEPTION("The source image does not have the same size as the destination image. Source
+    //             size "
+    //                                << aDeviceSrc.SizeAlloc() << ", Destination size: " << mSizeAlloc);
+    //         }
+    //
+    //         aDeviceSrc.CopyToHost(mPtr, mPitch);
+    //     }
+    //
+    //     /// <summary>
+    //     /// Copy from host to device memory
+    //     /// </summary>
+    //     void operator>>(npp::ImageView<T> &aDest) const
+    //     {
+    //         CopyToDevice(aDest);
+    //     }
+    //
+    //     /// <summary>
+    //     /// Copy from device to host memory
+    //     /// </summary>
+    //     void operator<<(const npp::ImageView<T> &aDeviceSrc)
+    //     {
+    //         CopyToHost(aDeviceSrc);
+    //     }
+    //
+    //     /// <summary>
+    //     /// Copy data from host to device memory only in ROI
+    //     /// </summary>
+    //     /// <param name="aDeviceDst">Device destination view</param>
+    //     void CopyToDeviceRoi(npp::ImageView<T> &aDeviceDst) const
+    //     {
+    //         // the callee will move the ptr to the first roi pixel
+    //         aDeviceDst.CopyToDeviceRoi(mPtr, mPitch, mRoi);
+    //     }
+    //
+    //     /// <summary>
+    //     /// Copy data from device to device memory
+    //     /// </summary>
+    //     /// <param name="aDeviceSrc">Device source view</param>
+    //     void CopyToHostRoi(const npp::ImageView<T> &aDeviceSrc)
+    //     {
+    //         // the callee will move the ptr to the first roi pixel
+    //         aDeviceSrc.CopyToHostRoi(mPtr, mPitch, mRoi);
+    //     }
+    // #endif // MPP_ENABLE_NPP_BACKEND
 
     /// <summary>
     /// Returns true, if size and pixel content is identical (inside the ROI). Returns false if ROI size differs.
@@ -1167,7 +1121,7 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView
     /// <param name="aBorder">Border control paramter</param>
     /// <param name="aConstant">Constant value needed in case BorderType::Constant</param>
     ImageView<T> &Copy(ImageView<T> &aDst, const Vector2<int> &aLowerBorderSize, BorderType aBorder,
-                       T aConstant = {0}) const;
+                       const T &aConstant = {0}) const;
 
     /// <summary>
     /// Copy subpix.

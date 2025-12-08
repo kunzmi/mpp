@@ -39,7 +39,7 @@ class MPPEXPORT_NPP Image16uC1View : public ImageView<Pixel16uC1>
   public:
     Image16uC1View(Pixel16uC1 *aBasePointer, const SizePitched &aSizeAlloc);
     Image16uC1View(Pixel16uC1 *aBasePointer, const SizePitched &aSizeAlloc, const Roi &aRoi);
-    ~Image16uC1View() = default;
+    ~Image16uC1View() override = default;
 
     Image16uC1View(const Image16uC1View &)     = default;
     Image16uC1View(Image16uC1View &&) noexcept = default;

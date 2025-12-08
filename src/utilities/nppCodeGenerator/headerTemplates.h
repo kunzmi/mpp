@@ -37,7 +37,7 @@ class MPPEXPORT_NPP Image####View : public ImageView<Pixel####>
   public:
     Image####View(Pixel#### *aBasePointer, const SizePitched &aSizeAlloc);
     Image####View(Pixel#### *aBasePointer, const SizePitched &aSizeAlloc, const Roi &aRoi);
-    ~Image####View() = default;
+    ~Image####View() override = default;
 
     Image####View(const Image####View &)     = default;
     Image####View(Image####View &&) noexcept = default;
