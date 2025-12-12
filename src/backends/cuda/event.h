@@ -10,7 +10,7 @@
 namespace mpp::cuda
 {
 // forward declaration:
-class MPPEXPORT_CUDACORE Stream;
+class MPPEXPORTFWDDECL_CUDACORE Stream;
 
 /// <summary>
 /// A wrapper class for a cudaEvent_t.

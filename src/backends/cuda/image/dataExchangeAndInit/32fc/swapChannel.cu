@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "../swapChannel_impl.h"
 
 using namespace mpp::cuda;
@@ -12,4 +10,3 @@ ForAllChannelsNoAlphaInvokeSwapChannelSrc34(32fc);
 ForAllChannelsNoAlphaInvokeSwapChannelInplace(32fc);
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

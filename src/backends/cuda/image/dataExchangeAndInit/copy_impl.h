@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "copy.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelKernel.h>
@@ -17,7 +15,6 @@
 #include <common/image/functors/srcPlanar3Functor.h>
 #include <common/image/functors/srcPlanar4Functor.h>
 #include <common/image/functors/srcSingleChannelFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -35,20 +32,17 @@ template <typename SrcT, typename DstT>
 void InvokeCopy(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                 const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using copySrc = SrcFunctor<TupelSize, SrcT, SrcT, DstT, mpp::Copy<SrcT, DstT>, RoundingMode::None>;
+    using copySrc = SrcFunctor<TupelSize, SrcT, SrcT, DstT, mpp::Copy<SrcT, DstT>, RoundingMode::None>;
 
-        const mpp::Copy<SrcT, DstT> op;
+    const mpp::Copy<SrcT, DstT> op;
 
-        const copySrc functor(aSrc1, aPitchSrc1, op);
+    const copySrc functor(aSrc1, aPitchSrc1, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, copySrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, copySrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -77,21 +71,18 @@ template <SingleChannel SrcT, typename DstT>
 void InvokeCopyChannel(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, Channel aDstChannel,
                        const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
-        constexpr size_t TupelSize = 1;
+    constexpr size_t TupelSize = 1;
 
-        using copySrc = SrcFunctor<TupelSize, SrcT, SrcT, SrcT, mpp::Copy<SrcT, SrcT>, RoundingMode::None>;
+    using copySrc = SrcFunctor<TupelSize, SrcT, SrcT, SrcT, mpp::Copy<SrcT, SrcT>, RoundingMode::None>;
 
-        const mpp::Copy<SrcT, SrcT> op;
+    const mpp::Copy<SrcT, SrcT> op;
 
-        const copySrc functor(aSrc1, aPitchSrc1, op);
+    const copySrc functor(aSrc1, aPitchSrc1, op);
 
-        InvokeForEachPixelSingleChannelKernelDefault<DstT, copySrc>(aDst, aPitchDst, aDstChannel, aSize, aStreamCtx,
-                                                                    functor);
-    }
+    InvokeForEachPixelSingleChannelKernelDefault<DstT, copySrc>(aDst, aPitchDst, aDstChannel, aSize, aStreamCtx,
+                                                                functor);
 }
 
 #pragma region Instantiate
@@ -112,20 +103,17 @@ template <typename SrcT, SingleChannel DstT>
 void InvokeCopyChannel(const SrcT *aSrc1, size_t aPitchSrc1, Channel aSrcChannel, DstT *aDst, size_t aPitchDst,
                        const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using copySrc = SrcSingleChannelFunctor<TupelSize, SrcT, DstT, DstT, mpp::Copy<DstT, DstT>, RoundingMode::None>;
+    using copySrc = SrcSingleChannelFunctor<TupelSize, SrcT, DstT, DstT, mpp::Copy<DstT, DstT>, RoundingMode::None>;
 
-        const mpp::Copy<DstT, DstT> op;
+    const mpp::Copy<DstT, DstT> op;
 
-        const copySrc functor(aSrc1, aPitchSrc1, aSrcChannel, op);
+    const copySrc functor(aSrc1, aPitchSrc1, aSrcChannel, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, copySrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, copySrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -146,24 +134,21 @@ template <typename SrcT, typename DstT>
 void InvokeCopyChannel(const SrcT *aSrc1, size_t aPitchSrc1, Channel aSrcChannel, DstT *aDst, size_t aPitchDst,
                        Channel aDstChannel, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        using ComputeT = Vector1<remove_vector_t<SrcT>>;
+    using ComputeT = Vector1<remove_vector_t<SrcT>>;
 
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = 1;
+    constexpr size_t TupelSize = 1;
 
-        using copySrc = SrcSingleChannelFunctor<TupelSize, SrcT, ComputeT, ComputeT, mpp::Copy<ComputeT, ComputeT>,
-                                                RoundingMode::None>;
+    using copySrc =
+        SrcSingleChannelFunctor<TupelSize, SrcT, ComputeT, ComputeT, mpp::Copy<ComputeT, ComputeT>, RoundingMode::None>;
 
-        const mpp::Copy<ComputeT, ComputeT> op;
+    const mpp::Copy<ComputeT, ComputeT> op;
 
-        const copySrc functor(aSrc1, aPitchSrc1, aSrcChannel, op);
+    const copySrc functor(aSrc1, aPitchSrc1, aSrcChannel, op);
 
-        InvokeForEachPixelSingleChannelKernelDefault<DstT, copySrc>(aDst, aPitchDst, aDstChannel, aSize, aStreamCtx,
-                                                                    functor);
-    }
+    InvokeForEachPixelSingleChannelKernelDefault<DstT, copySrc>(aDst, aPitchDst, aDstChannel, aSize, aStreamCtx,
+                                                                functor);
 }
 
 #pragma region Instantiate
@@ -190,20 +175,17 @@ template <SingleChannel SrcT, TwoChannel DstT>
 void InvokeCopyPlanar(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst,
                       size_t aPitchDst, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using copySrc = SrcPlanar2Functor<TupelSize, SrcT, DstT, DstT, mpp::Copy<DstT, DstT>, RoundingMode::None>;
+    using copySrc = SrcPlanar2Functor<TupelSize, SrcT, DstT, DstT, mpp::Copy<DstT, DstT>, RoundingMode::None>;
 
-        const mpp::Copy<DstT, DstT> op;
+    const mpp::Copy<DstT, DstT> op;
 
-        const copySrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+    const copySrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, copySrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, copySrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -221,20 +203,17 @@ template <SingleChannel SrcT, ThreeChannel DstT>
 void InvokeCopyPlanar(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, const SrcT *aSrc3,
                       size_t aPitchSrc3, DstT *aDst, size_t aPitchDst, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using copySrc = SrcPlanar3Functor<TupelSize, SrcT, DstT, DstT, mpp::Copy<DstT, DstT>, RoundingMode::None>;
+    using copySrc = SrcPlanar3Functor<TupelSize, SrcT, DstT, DstT, mpp::Copy<DstT, DstT>, RoundingMode::None>;
 
-        const mpp::Copy<DstT, DstT> op;
+    const mpp::Copy<DstT, DstT> op;
 
-        const copySrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, op);
+    const copySrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, copySrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, copySrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -253,20 +232,17 @@ void InvokeCopyPlanar(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, s
                       size_t aPitchSrc3, const SrcT *aSrc4, size_t aPitchSrc4, DstT *aDst, size_t aPitchDst,
                       const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using copySrc = SrcPlanar4Functor<TupelSize, SrcT, DstT, DstT, mpp::Copy<DstT, DstT>, RoundingMode::None>;
+    using copySrc = SrcPlanar4Functor<TupelSize, SrcT, DstT, DstT, mpp::Copy<DstT, DstT>, RoundingMode::None>;
 
-        const mpp::Copy<DstT, DstT> op;
+    const mpp::Copy<DstT, DstT> op;
 
-        const copySrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4, op);
+    const copySrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, copySrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, copySrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -285,21 +261,18 @@ template <TwoChannel SrcT, SingleChannel DstT>
 void InvokeCopyPlanar(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst1, size_t aPitchDst1, DstT *aDst2,
                       size_t aPitchDst2, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using copySrc = SrcFunctor<TupelSize, SrcT, SrcT, SrcT, mpp::Copy<SrcT, SrcT>, RoundingMode::None>;
+    using copySrc = SrcFunctor<TupelSize, SrcT, SrcT, SrcT, mpp::Copy<SrcT, SrcT>, RoundingMode::None>;
 
-        const mpp::Copy<SrcT, SrcT> op;
+    const mpp::Copy<SrcT, SrcT> op;
 
-        const copySrc functor(aSrc1, aPitchSrc1, op);
+    const copySrc functor(aSrc1, aPitchSrc1, op);
 
-        InvokeForEachPixelPlanar2KernelDefault<SrcT, TupelSize, copySrc>(aDst1, aPitchDst1, aDst2, aPitchDst2, aSize,
-                                                                         aStreamCtx, functor);
-    }
+    InvokeForEachPixelPlanar2KernelDefault<SrcT, TupelSize, copySrc>(aDst1, aPitchDst1, aDst2, aPitchDst2, aSize,
+                                                                     aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -318,21 +291,18 @@ void InvokeCopyPlanar(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst1, size_t 
                       size_t aPitchDst2, DstT *aDst3, size_t aPitchDst3, const Size2D &aSize,
                       const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
-        constexpr size_t TupelSize = 1;
+    constexpr size_t TupelSize = 1;
 
-        using copySrc = SrcFunctor<TupelSize, SrcT, SrcT, SrcT, mpp::Copy<SrcT, SrcT>, RoundingMode::None>;
+    using copySrc = SrcFunctor<TupelSize, SrcT, SrcT, SrcT, mpp::Copy<SrcT, SrcT>, RoundingMode::None>;
 
-        const mpp::Copy<SrcT, SrcT> op;
+    const mpp::Copy<SrcT, SrcT> op;
 
-        const copySrc functor(aSrc1, aPitchSrc1, op);
+    const copySrc functor(aSrc1, aPitchSrc1, op);
 
-        InvokeForEachPixelPlanar3KernelDefault<SrcT, TupelSize, copySrc>(aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3,
-                                                                         aPitchDst3, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelPlanar3KernelDefault<SrcT, TupelSize, copySrc>(aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3,
+                                                                     aPitchDst3, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -351,21 +321,18 @@ void InvokeCopyPlanar(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst1, size_t 
                       size_t aPitchDst2, DstT *aDst3, size_t aPitchDst3, DstT *aDst4, size_t aPitchDst4,
                       const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using copySrc = SrcFunctor<TupelSize, SrcT, SrcT, SrcT, mpp::Copy<SrcT, SrcT>, RoundingMode::None>;
+    using copySrc = SrcFunctor<TupelSize, SrcT, SrcT, SrcT, mpp::Copy<SrcT, SrcT>, RoundingMode::None>;
 
-        const mpp::Copy<SrcT, SrcT> op;
+    const mpp::Copy<SrcT, SrcT> op;
 
-        const copySrc functor(aSrc1, aPitchSrc1, op);
+    const copySrc functor(aSrc1, aPitchSrc1, op);
 
-        InvokeForEachPixelPlanar4KernelDefault<SrcT, TupelSize, copySrc>(
-            aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aDst4, aPitchDst4, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelPlanar4KernelDefault<SrcT, TupelSize, copySrc>(
+        aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aDst4, aPitchDst4, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -380,4 +347,3 @@ void InvokeCopyPlanar(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst1, size_t 
 
 #pragma endregion
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

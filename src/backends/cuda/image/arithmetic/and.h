@@ -1,7 +1,4 @@
 #pragma once
-#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include <backends/cuda/streamCtx.h>
 #include <common/image/functors/imageFunctors.h>
 #include <common/image/pixelTypes.h>
@@ -36,4 +33,3 @@ void InvokeAndInplaceDevC(DstT *aSrcDst, size_t aPitchDst, const SrcT *aConst, c
                           const mpp::cuda::StreamCtx &aStreamCtx);
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

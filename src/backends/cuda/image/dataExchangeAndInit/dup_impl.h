@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "dup.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelKernel.h>
@@ -8,7 +6,6 @@
 #include <common/dataExchangeAndInit/operators.h>
 #include <common/defines.h>
 #include <common/image/functors/srcFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -26,20 +23,17 @@ template <typename SrcT, typename DstT>
 void InvokeDupSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                   const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using dupSrc = SrcFunctor<TupelSize, SrcT, SrcT, DstT, mpp::Dup<SrcT, DstT>, RoundingMode::None>;
+    using dupSrc = SrcFunctor<TupelSize, SrcT, SrcT, DstT, mpp::Dup<SrcT, DstT>, RoundingMode::None>;
 
-        const mpp::Dup<SrcT, DstT> op;
+    const mpp::Dup<SrcT, DstT> op;
 
-        const dupSrc functor(aSrc1, aPitchSrc1, op);
+    const dupSrc functor(aSrc1, aPitchSrc1, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, dupSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, dupSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -62,4 +56,3 @@ void InvokeDupSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitc
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

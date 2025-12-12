@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "normDiffInf.h"
 #include "normDiffInfMasked.h"
 #include <backends/cuda/image/configurations.h>
@@ -10,7 +8,6 @@
 #include <common/defines.h>
 #include <common/image/functors/reductionInitValues.h>
 #include <common/image/functors/srcSrcReductionFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -32,30 +29,27 @@ void InvokeNormDiffInfMaskedSrcSrc(const Pixel8uC1 *aMask, size_t aPitchMask, co
                                    remove_vector_t<DstT> *aDstScalar, const Size2D &aSize,
                                    const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
-        using normInfSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffInf<SrcT, ComputeT>>;
+    using normInfSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffInf<SrcT, ComputeT>>;
 
-        const mpp::NormDiffInf<SrcT, ComputeT> op;
+    const mpp::NormDiffInf<SrcT, ComputeT> op;
 
-        const normInfSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+    const normInfSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
-        InvokeReductionMaskedAlongXKernelDefault<SrcT, ComputeT, TupelSize, normInfSrcSrc, mpp::MaxRed<ComputeT>,
-                                                 ReductionInitValue::Zero>(aMask, aPitchMask, aSrc1, aTempBuffer, aSize,
-                                                                           aStreamCtx, functor);
+    InvokeReductionMaskedAlongXKernelDefault<SrcT, ComputeT, TupelSize, normInfSrcSrc, mpp::MaxRed<ComputeT>,
+                                             ReductionInitValue::Zero>(aMask, aPitchMask, aSrc1, aTempBuffer, aSize,
+                                                                       aStreamCtx, functor);
 
-        const mpp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
 
-        const mpp::MaxScalar<DstT> postOpScalar;
+    const mpp::MaxScalar<DstT> postOpScalar;
 
-        InvokeReductionAlongYKernelDefault<ComputeT, DstT, mpp::MaxRed<DstT>, ReductionInitValue::Zero,
-                                           mpp::Nothing<DstT>, mpp::MaxScalar<DstT>>(
-            aTempBuffer, aDst, aDstScalar, aSize.y, postOp, postOpScalar, aStreamCtx);
-    }
+    InvokeReductionAlongYKernelDefault<ComputeT, DstT, mpp::MaxRed<DstT>, ReductionInitValue::Zero, mpp::Nothing<DstT>,
+                                       mpp::MaxScalar<DstT>>(aTempBuffer, aDst, aDstScalar, aSize.y, postOp,
+                                                             postOpScalar, aStreamCtx);
 }
 
 #pragma region Instantiate
@@ -83,4 +77,3 @@ void InvokeNormDiffInfMaskedSrcSrc(const Pixel8uC1 *aMask, size_t aPitchMask, co
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

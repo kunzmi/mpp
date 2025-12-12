@@ -1,7 +1,4 @@
 #pragma once
-#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/streamCtx.h>
@@ -278,4 +275,3 @@ void InvokeReductionMaskedAlongXKernelDefault(const Pixel8uC1 *aMask, size_t aPi
 }
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

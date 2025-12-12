@@ -1,7 +1,3 @@
-#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if MPP_ENABLE_NPP_BACKEND
-#include <common/image/pixelTypeEnabler.h> //NOLINT(misc-include-cleaner)
-
 #include "image64f.h"
 #include "image64fC1View.h"
 #include "image64fC2View.h"
@@ -274,4 +270,3 @@ Image64fC4 &Image64fC4::operator=(Image64fC4 &&aOther) noexcept
 }
 
 } // namespace mpp::image::npp
-#endif // MPP_ENABLE_NPP_BACKEND

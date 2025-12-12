@@ -1,5 +1,3 @@
-#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if MPP_ENABLE_CUDA_BACKEND
 #include "dllexport_cudai.h" //NOLINT(misc-include-cleaner)
 
 #include "dataExchangeAndInit/instantiateConversion.h"
@@ -25,10 +23,14 @@ template class ImageView<Pixel32scC1>;
 template class ImageView<Pixel32scC2>;
 template class ImageView<Pixel32scC3>;
 template class ImageView<Pixel32scC4>;
-template <> ImageView<Pixel32scC1> ImageView<Pixel32scC1>::Null = ImageView<Pixel32scC1>(nullptr, Size2D(0, 0), 0);
-template <> ImageView<Pixel32scC2> ImageView<Pixel32scC2>::Null = ImageView<Pixel32scC2>(nullptr, Size2D(0, 0), 0);
-template <> ImageView<Pixel32scC3> ImageView<Pixel32scC3>::Null = ImageView<Pixel32scC3>(nullptr, Size2D(0, 0), 0);
-template <> ImageView<Pixel32scC4> ImageView<Pixel32scC4>::Null = ImageView<Pixel32scC4>(nullptr, Size2D(0, 0), 0);
+template <>
+ImageView<Pixel32scC1> MPPEXPORT_CUDAI ImageView<Pixel32scC1>::Null = ImageView<Pixel32scC1>(nullptr, Size2D(0, 0), 0);
+template <>
+ImageView<Pixel32scC2> MPPEXPORT_CUDAI ImageView<Pixel32scC2>::Null = ImageView<Pixel32scC2>(nullptr, Size2D(0, 0), 0);
+template <>
+ImageView<Pixel32scC3> MPPEXPORT_CUDAI ImageView<Pixel32scC3>::Null = ImageView<Pixel32scC3>(nullptr, Size2D(0, 0), 0);
+template <>
+ImageView<Pixel32scC4> MPPEXPORT_CUDAI ImageView<Pixel32scC4>::Null = ImageView<Pixel32scC4>(nullptr, Size2D(0, 0), 0);
 
 ForAllChannelsConvertNoAlpha(32sc, 16sc);
 ForAllChannelsConvertNoAlpha(32sc, 32fc);
@@ -52,4 +54,3 @@ ForAllChannelsScaleAnyToAnyRoundNoAlpha(32sc, 16sc);
 ForAllChannelsScaleAnyToAnyNoAlpha(32sc, 32fc);
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

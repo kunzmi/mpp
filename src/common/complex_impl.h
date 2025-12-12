@@ -11,7 +11,7 @@
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
 #include <common/utilities.h>
-#include <common/vector2_impl.h>
+#include <common/vector2.h>
 #include <complex>
 #include <concepts>
 #include <iostream>

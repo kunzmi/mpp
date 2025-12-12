@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "averageError.h"
 #include "averageErrorMasked.h"
 #include <backends/cuda/image/configurations.h>
@@ -10,7 +8,6 @@
 #include <common/defines.h>
 #include <common/image/functors/reductionInitValues.h>
 #include <common/image/functors/srcSrcReductionFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -32,26 +29,23 @@ void InvokeAverageErrorMaskedSrcSrc(const Pixel8uC1 *aMask, size_t aPitchMask, c
                                     DstT *aDst, remove_vector_t<DstT> *aDstScalar, const Size2D &aSize,
                                     const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
-        using normL1SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL1<SrcT, ComputeT>>;
+    using normL1SrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::NormDiffL1<SrcT, ComputeT>>;
 
-        const mpp::NormDiffL1<SrcT, ComputeT> op;
+    const mpp::NormDiffL1<SrcT, ComputeT> op;
 
-        const normL1SrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+    const normL1SrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
-        InvokeReductionMaskedCountingAlongXKernelDefault<SrcT, ComputeT, TupelSize, normL1SrcSrc,
-                                                         mpp::Sum<ComputeT, ComputeT>, ReductionInitValue::Zero>(
-            aMask, aPitchMask, aSrc1, aTempBuffer, aMaskBuffer, aSize, aStreamCtx, functor);
+    InvokeReductionMaskedCountingAlongXKernelDefault<SrcT, ComputeT, TupelSize, normL1SrcSrc,
+                                                     mpp::Sum<ComputeT, ComputeT>, ReductionInitValue::Zero>(
+        aMask, aPitchMask, aSrc1, aTempBuffer, aMaskBuffer, aSize, aStreamCtx, functor);
 
-        InvokeReductionMaskedCountingAlongYKernelDefault<ComputeT, DstT, mpp::Sum<DstT, DstT>, ReductionInitValue::Zero,
-                                                         mpp::DivPostOp<DstT>, mpp::DivScalar<DstT>>(
-            aMaskBuffer, aTempBuffer, aDst, aDstScalar, aSize.y, aStreamCtx);
-    }
+    InvokeReductionMaskedCountingAlongYKernelDefault<ComputeT, DstT, mpp::Sum<DstT, DstT>, ReductionInitValue::Zero,
+                                                     mpp::DivPostOp<DstT>, mpp::DivScalar<DstT>>(
+        aMaskBuffer, aTempBuffer, aDst, aDstScalar, aSize.y, aStreamCtx);
 }
 
 #pragma region Instantiate
@@ -79,4 +73,3 @@ void InvokeAverageErrorMaskedSrcSrc(const Pixel8uC1 *aMask, size_t aPitchMask, c
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

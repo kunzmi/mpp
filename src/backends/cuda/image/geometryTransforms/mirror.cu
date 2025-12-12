@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "mirror.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelInHalfRoiSwapKernel.h>
@@ -235,4 +233,3 @@ ForAllChannelsNoAlphaInvokeMirrorInplace(32fc);
 #undef ForAllChannelsNoAlphaInvokeMirrorInplace
 #pragma endregion
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

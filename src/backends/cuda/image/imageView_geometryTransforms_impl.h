@@ -1,7 +1,4 @@
 #pragma once
-#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "imageView.h"
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/devVarView.h>
@@ -2387,4 +2384,3 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

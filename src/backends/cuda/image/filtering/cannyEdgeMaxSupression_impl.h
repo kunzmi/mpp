@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "cannyEdgeMaxSupression.h"
 #include <backends/cuda/image/cannyEdgeMaxSupressionKernel.h>
 #include <backends/cuda/image/configurations.h>
@@ -11,7 +9,6 @@
 #include <common/image/fixedSizeFilters.h>
 #include <common/image/functors/borderControl.h>
 #include <common/image/functors/reductionInitValues.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -34,18 +31,15 @@ void InvokeCannyEdgeMaxSupression(const SrcT *aSrc1, size_t aPitchSrc1, const Pi
                                   const Vector2<int> &aOffsetToActualRoi, const Size2D &aSize,
                                   const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
-        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+    using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
+    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
 
-        InvokeCannyEdgeMaxSupressionKernelDefault<DstT, TupelSize, SrcT, BCType>(
-            bc, aSrcAngle, aPitchSrcAngle, aDst, aPitchDst, aLowThreshold, aHighThreshold, aSize, aStreamCtx);
-    }
+    InvokeCannyEdgeMaxSupressionKernelDefault<DstT, TupelSize, SrcT, BCType>(
+        bc, aSrcAngle, aPitchSrcAngle, aDst, aPitchDst, aLowThreshold, aHighThreshold, aSize, aStreamCtx);
 }
 
 #pragma region Instantiate
@@ -60,4 +54,3 @@ void InvokeCannyEdgeMaxSupression(const SrcT *aSrc1, size_t aPitchSrc1, const Pi
 
 #pragma endregion
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

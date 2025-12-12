@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "rowWindowSum.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/filtering/windowSumResultType.h>
@@ -8,7 +6,6 @@
 #include <backends/cuda/templateRegistry.h>
 #include <common/defines.h>
 #include <common/image/fixedSizeFilters.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -30,76 +27,73 @@ void InvokeRowWindowSum(const SrcT *aSrc1, size_t aPitchSrc1, window_sum_result_
                         const Size2D &aAllowedReadRoiSize, const Vector2<int> &aOffsetToActualRoi, const Size2D &aSize,
                         const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
+    using DstT    = window_sum_result_type_t<SrcT>;
+    using FilterT = remove_vector_t<window_sum_result_type_t<SrcT>>;
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    using ComputeT             = DstT;
+
+    switch (aBorderType)
     {
-        using DstT    = window_sum_result_type_t<SrcT>;
-        using FilterT = remove_vector_t<window_sum_result_type_t<SrcT>>;
-        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
-
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
-        using ComputeT             = DstT;
-
-        switch (aBorderType)
+        case mpp::BorderType::None:
         {
-            case mpp::BorderType::None:
-            {
-                using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+            using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
 
-                InvokeRowWindowSumKernelDefault<ComputeT, DstT, TupelSize, RoundingMode::None, BCType, FilterT>(
-                    bc, aDst, aPitchDst, aScalingValue, aFilterSize, aFilterCenter, aSize, aStreamCtx);
-            }
-            break;
-            case mpp::BorderType::Constant:
-            {
-                using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
-
-                InvokeRowWindowSumKernelDefault<ComputeT, DstT, TupelSize, RoundingMode::None, BCType, FilterT>(
-                    bc, aDst, aPitchDst, aScalingValue, aFilterSize, aFilterCenter, aSize, aStreamCtx);
-            }
-            break;
-            case mpp::BorderType::Replicate:
-            {
-                using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                InvokeRowWindowSumKernelDefault<ComputeT, DstT, TupelSize, RoundingMode::None, BCType, FilterT>(
-                    bc, aDst, aPitchDst, aScalingValue, aFilterSize, aFilterCenter, aSize, aStreamCtx);
-            }
-            break;
-            case mpp::BorderType::Mirror:
-            {
-                using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                InvokeRowWindowSumKernelDefault<ComputeT, DstT, TupelSize, RoundingMode::None, BCType, FilterT>(
-                    bc, aDst, aPitchDst, aScalingValue, aFilterSize, aFilterCenter, aSize, aStreamCtx);
-            }
-            break;
-            case mpp::BorderType::MirrorReplicate:
-            {
-                using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                InvokeRowWindowSumKernelDefault<ComputeT, DstT, TupelSize, RoundingMode::None, BCType, FilterT>(
-                    bc, aDst, aPitchDst, aScalingValue, aFilterSize, aFilterCenter, aSize, aStreamCtx);
-            }
-            break;
-            case mpp::BorderType::Wrap:
-            {
-                using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                InvokeRowWindowSumKernelDefault<ComputeT, DstT, TupelSize, RoundingMode::None, BCType, FilterT>(
-                    bc, aDst, aPitchDst, aScalingValue, aFilterSize, aFilterCenter, aSize, aStreamCtx);
-            }
-            break;
-            default:
-                throw INVALIDARGUMENT(aBorderType,
-                                      aBorderType << " is not a supported border type mode for row window sum.");
-                break;
+            InvokeRowWindowSumKernelDefault<ComputeT, DstT, TupelSize, RoundingMode::None, BCType, FilterT>(
+                bc, aDst, aPitchDst, aScalingValue, aFilterSize, aFilterCenter, aSize, aStreamCtx);
         }
+        break;
+        case mpp::BorderType::Constant:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
+
+            InvokeRowWindowSumKernelDefault<ComputeT, DstT, TupelSize, RoundingMode::None, BCType, FilterT>(
+                bc, aDst, aPitchDst, aScalingValue, aFilterSize, aFilterCenter, aSize, aStreamCtx);
+        }
+        break;
+        case mpp::BorderType::Replicate:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+            InvokeRowWindowSumKernelDefault<ComputeT, DstT, TupelSize, RoundingMode::None, BCType, FilterT>(
+                bc, aDst, aPitchDst, aScalingValue, aFilterSize, aFilterCenter, aSize, aStreamCtx);
+        }
+        break;
+        case mpp::BorderType::Mirror:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+            InvokeRowWindowSumKernelDefault<ComputeT, DstT, TupelSize, RoundingMode::None, BCType, FilterT>(
+                bc, aDst, aPitchDst, aScalingValue, aFilterSize, aFilterCenter, aSize, aStreamCtx);
+        }
+        break;
+        case mpp::BorderType::MirrorReplicate:
+        {
+            using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+            InvokeRowWindowSumKernelDefault<ComputeT, DstT, TupelSize, RoundingMode::None, BCType, FilterT>(
+                bc, aDst, aPitchDst, aScalingValue, aFilterSize, aFilterCenter, aSize, aStreamCtx);
+        }
+        break;
+        case mpp::BorderType::Wrap:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+            InvokeRowWindowSumKernelDefault<ComputeT, DstT, TupelSize, RoundingMode::None, BCType, FilterT>(
+                bc, aDst, aPitchDst, aScalingValue, aFilterSize, aFilterCenter, aSize, aStreamCtx);
+        }
+        break;
+        default:
+            throw INVALIDARGUMENT(aBorderType,
+                                  aBorderType << " is not a supported border type mode for row window sum.");
+            break;
     }
 }
 
@@ -127,4 +121,3 @@ void InvokeRowWindowSum(const SrcT *aSrc1, size_t aPitchSrc1, window_sum_result_
 
 #pragma endregion
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

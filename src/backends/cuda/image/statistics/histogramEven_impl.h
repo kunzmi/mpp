@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "histogramEven.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/reductionAlongXKernel.h>
@@ -7,13 +5,12 @@
 #include <backends/cuda/streamCtx.h>
 #include <backends/cuda/templateRegistry.h>
 #include <common/defines.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/mpp_defs.h>
 #include <common/safeCast.h>
-#include <common/vectorTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vectorTypes.h>
 #include <concepts>
 #include <cub/device/device_histogram.cuh>
 #include <cuda_runtime.h>
@@ -28,37 +25,34 @@ size_t InvokeHistogramEvenGetBufferSize(const SrcT *aSrc1, size_t aPitchSrc1,
                                         const int aLevels[vector_active_size<SrcT>::value], const Size2D &aSize,
                                         const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
+    size_t bufferSize = 0;
+    LevelT lower_level(0);
+    LevelT upper_level(1);
+    int *hist[vector_active_size<SrcT>::value]{nullptr};
+
+    if constexpr (std::same_as<HalfFp16, remove_vector_t<SrcT>>)
     {
-        size_t bufferSize = 0;
-        LevelT lower_level(0);
-        LevelT upper_level(1);
-        int *hist[vector_active_size<SrcT>::value]{nullptr};
-
-        if constexpr (std::same_as<HalfFp16, remove_vector_t<SrcT>>)
-        {
-            cudaSafeCall(
-                (cub::DeviceHistogram::MultiHistogramEven<vector_size<SrcT>::value, vector_active_size<SrcT>::value>(
-                    nullptr, bufferSize, reinterpret_cast<const __half *>(aSrc1), hist, aLevels, lower_level.data(),
-                    upper_level.data(), aSize.x, aSize.y, aPitchSrc1, aStreamCtx.Stream)));
-        }
-        else if constexpr (std::same_as<BFloat16, remove_vector_t<SrcT>>)
-        {
-            cudaSafeCall(
-                (cub::DeviceHistogram::MultiHistogramEven<vector_size<SrcT>::value, vector_active_size<SrcT>::value>(
-                    nullptr, bufferSize, reinterpret_cast<const __nv_bfloat16 *>(aSrc1), hist, aLevels,
-                    lower_level.data(), upper_level.data(), aSize.x, aSize.y, aPitchSrc1, aStreamCtx.Stream)));
-        }
-        else
-        {
-            cudaSafeCall(
-                (cub::DeviceHistogram::MultiHistogramEven<vector_size<SrcT>::value, vector_active_size<SrcT>::value>(
-                    nullptr, bufferSize, reinterpret_cast<const remove_vector_t<SrcT> *>(aSrc1), hist, aLevels,
-                    lower_level.data(), upper_level.data(), aSize.x, aSize.y, aPitchSrc1, aStreamCtx.Stream)));
-        }
-
-        return bufferSize;
+        cudaSafeCall(
+            (cub::DeviceHistogram::MultiHistogramEven<vector_size<SrcT>::value, vector_active_size<SrcT>::value>(
+                nullptr, bufferSize, reinterpret_cast<const __half *>(aSrc1), hist, aLevels, lower_level.data(),
+                upper_level.data(), aSize.x, aSize.y, aPitchSrc1, aStreamCtx.Stream)));
     }
+    else if constexpr (std::same_as<BFloat16, remove_vector_t<SrcT>>)
+    {
+        cudaSafeCall(
+            (cub::DeviceHistogram::MultiHistogramEven<vector_size<SrcT>::value, vector_active_size<SrcT>::value>(
+                nullptr, bufferSize, reinterpret_cast<const __nv_bfloat16 *>(aSrc1), hist, aLevels, lower_level.data(),
+                upper_level.data(), aSize.x, aSize.y, aPitchSrc1, aStreamCtx.Stream)));
+    }
+    else
+    {
+        cudaSafeCall(
+            (cub::DeviceHistogram::MultiHistogramEven<vector_size<SrcT>::value, vector_active_size<SrcT>::value>(
+                nullptr, bufferSize, reinterpret_cast<const remove_vector_t<SrcT> *>(aSrc1), hist, aLevels,
+                lower_level.data(), upper_level.data(), aSize.x, aSize.y, aPitchSrc1, aStreamCtx.Stream)));
+    }
+
+    return bufferSize;
 }
 
 template <typename SrcT, typename LevelT>
@@ -67,31 +61,28 @@ void InvokeHistogramEven(const SrcT *aSrc1, size_t aPitchSrc1, void *aTempBuffer
                          const int aLevels[vector_active_size<SrcT>::value], const LevelT &aLowerLevel,
                          const LevelT &aUpperLevel, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
+    MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
 
-        if constexpr (std::same_as<HalfFp16, remove_vector_t<SrcT>>)
-        {
-            cudaSafeCall(
-                (cub::DeviceHistogram::MultiHistogramEven<vector_size<SrcT>::value, vector_active_size<SrcT>::value>(
-                    aTempBuffer, aTempBufferSize, reinterpret_cast<const __nv_bfloat16 *>(aSrc1), aHist, aLevels,
-                    aLowerLevel.data(), aUpperLevel.data(), aSize.x, aSize.y, aPitchSrc1, aStreamCtx.Stream)));
-        }
-        else if constexpr (std::same_as<BFloat16, remove_vector_t<SrcT>>)
-        {
-            cudaSafeCall(
-                (cub::DeviceHistogram::MultiHistogramEven<vector_size<SrcT>::value, vector_active_size<SrcT>::value>(
-                    aTempBuffer, aTempBufferSize, reinterpret_cast<const __half *>(aSrc1), aHist, aLevels,
-                    aLowerLevel.data(), aUpperLevel.data(), aSize.x, aSize.y, aPitchSrc1, aStreamCtx.Stream)));
-        }
-        else
-        {
-            cudaSafeCall(
-                (cub::DeviceHistogram::MultiHistogramEven<vector_size<SrcT>::value, vector_active_size<SrcT>::value>(
-                    aTempBuffer, aTempBufferSize, reinterpret_cast<const remove_vector_t<SrcT> *>(aSrc1), aHist,
-                    aLevels, aLowerLevel.data(), aUpperLevel.data(), aSize.x, aSize.y, aPitchSrc1, aStreamCtx.Stream)));
-        }
+    if constexpr (std::same_as<HalfFp16, remove_vector_t<SrcT>>)
+    {
+        cudaSafeCall(
+            (cub::DeviceHistogram::MultiHistogramEven<vector_size<SrcT>::value, vector_active_size<SrcT>::value>(
+                aTempBuffer, aTempBufferSize, reinterpret_cast<const __nv_bfloat16 *>(aSrc1), aHist, aLevels,
+                aLowerLevel.data(), aUpperLevel.data(), aSize.x, aSize.y, aPitchSrc1, aStreamCtx.Stream)));
+    }
+    else if constexpr (std::same_as<BFloat16, remove_vector_t<SrcT>>)
+    {
+        cudaSafeCall(
+            (cub::DeviceHistogram::MultiHistogramEven<vector_size<SrcT>::value, vector_active_size<SrcT>::value>(
+                aTempBuffer, aTempBufferSize, reinterpret_cast<const __half *>(aSrc1), aHist, aLevels,
+                aLowerLevel.data(), aUpperLevel.data(), aSize.x, aSize.y, aPitchSrc1, aStreamCtx.Stream)));
+    }
+    else
+    {
+        cudaSafeCall(
+            (cub::DeviceHistogram::MultiHistogramEven<vector_size<SrcT>::value, vector_active_size<SrcT>::value>(
+                aTempBuffer, aTempBufferSize, reinterpret_cast<const remove_vector_t<SrcT> *>(aSrc1), aHist, aLevels,
+                aLowerLevel.data(), aUpperLevel.data(), aSize.x, aSize.y, aPitchSrc1, aStreamCtx.Stream)));
     }
 }
 
@@ -116,4 +107,3 @@ void InvokeHistogramEven(const SrcT *aSrc1, size_t aPitchSrc1, void *aTempBuffer
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

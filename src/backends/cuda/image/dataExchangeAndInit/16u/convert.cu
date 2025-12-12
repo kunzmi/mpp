@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "../convert_impl.h"
 
 using namespace mpp::cuda;
@@ -21,4 +19,3 @@ ForAllChannelsWithAlphaInvokeConvertScaleRound(16u, 8s);
 ForAllChannelsWithAlphaInvokeConvertScaleRound(16u, 16s);
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "minMaxEvery.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelKernel.h>
@@ -10,7 +8,6 @@
 #include <common/defines.h>
 #include <common/image/functors/inplaceSrcFunctor.h>
 #include <common/image/functors/srcSrcFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -28,20 +25,17 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMinEverySrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst,
                           size_t aPitchDst, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using minEverySrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Min<ComputeT>, RoundingMode::None>;
+    using minEverySrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Min<ComputeT>, RoundingMode::None>;
 
-        const mpp::Min<ComputeT> op;
+    const mpp::Min<ComputeT> op;
 
-        const minEverySrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+    const minEverySrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, minEverySrcSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, minEverySrcSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -63,22 +57,19 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMinEveryInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, size_t aPitchSrc2,
                               const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using minEveryInplaceSrc =
-            InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Min<ComputeT>, RoundingMode::None>;
+    using minEveryInplaceSrc =
+        InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Min<ComputeT>, RoundingMode::None>;
 
-        const mpp::Min<ComputeT> op;
+    const mpp::Min<ComputeT> op;
 
-        const minEveryInplaceSrc functor(aSrc2, aPitchSrc2, op);
+    const minEveryInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, minEveryInplaceSrc>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
-                                                                             functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, minEveryInplaceSrc>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
+                                                                         functor);
 }
 
 #pragma region Instantiate
@@ -100,20 +91,17 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMaxEverySrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst,
                           size_t aPitchDst, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using maxEverySrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Max<ComputeT>, RoundingMode::None>;
+    using maxEverySrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Max<ComputeT>, RoundingMode::None>;
 
-        const mpp::Max<ComputeT> op;
+    const mpp::Max<ComputeT> op;
 
-        const maxEverySrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+    const maxEverySrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, maxEverySrcSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, maxEverySrcSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -135,22 +123,19 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMaxEveryInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, size_t aPitchSrc2,
                               const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using maxEveryInplaceSrc =
-            InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Max<ComputeT>, RoundingMode::None>;
+    using maxEveryInplaceSrc =
+        InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Max<ComputeT>, RoundingMode::None>;
 
-        const mpp::Max<ComputeT> op;
+    const mpp::Max<ComputeT> op;
 
-        const maxEveryInplaceSrc functor(aSrc2, aPitchSrc2, op);
+    const maxEveryInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, maxEveryInplaceSrc>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
-                                                                             functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, maxEveryInplaceSrc>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
+                                                                         functor);
 }
 
 #pragma region Instantiate
@@ -169,4 +154,3 @@ void InvokeMaxEveryInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aS
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

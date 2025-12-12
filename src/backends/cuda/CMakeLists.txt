@@ -25,6 +25,8 @@ target_link_libraries(backends.cuda PUBLIC
 						common
 						CUDA::cudart
 						)
+						
+set_target_properties(backends.cuda PROPERTIES OUTPUT_NAME mpp-cuda)
 endif()
 
 if(MPP_ENABLE_CUDA_BACKEND)

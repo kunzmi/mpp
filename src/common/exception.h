@@ -29,7 +29,7 @@ class MPPEXPORT_COMMON MPPException : public std::exception
     explicit MPPException(std::string aMessage);
     ~MPPException() noexcept override;
 
-    // we have some linking issues with derived exceptions in DLL if we use the default constructors:
+    // we have linking issues in MSVC with derived exceptions in DLL if we use the default constructors:
     MPPException(MPPException &&aOther) noexcept;
     MPPException(const MPPException &aOther);
     MPPException &operator=(const MPPException &) = delete;

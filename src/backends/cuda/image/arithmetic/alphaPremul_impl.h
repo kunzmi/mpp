@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "alphaPremul.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelKernel.h>
@@ -10,7 +8,6 @@
 #include <common/defines.h>
 #include <common/image/functors/inplaceFunctor.h>
 #include <common/image/functors/srcFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -28,21 +25,18 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAlphaPremulSrc(const SrcT *aSrc, size_t aPitchSrc, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                           const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using alphaPremulSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::AlphaPremul<ComputeT, SrcT>,
-                                          RoundingMode::NearestTiesToEven>;
+    using alphaPremulSrc =
+        SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::AlphaPremul<ComputeT, SrcT>, RoundingMode::NearestTiesToEven>;
 
-        const mpp::AlphaPremul<ComputeT, SrcT> op;
+    const mpp::AlphaPremul<ComputeT, SrcT> op;
 
-        const alphaPremulSrc functor(aSrc, aPitchSrc, op);
+    const alphaPremulSrc functor(aSrc, aPitchSrc, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaPremulSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaPremulSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -61,22 +55,20 @@ void InvokeAlphaPremulInplace(SrcDstT *aSrcDst, size_t aPitchSrcDst, const Size2
 {
     using SrcT = SrcDstT;
     using DstT = SrcDstT;
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        using alphaPremulInplace = InplaceFunctor<TupelSize, ComputeT, DstT, mpp::AlphaPremul<ComputeT, SrcT>,
-                                                  RoundingMode::NearestTiesToEven>;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        const mpp::AlphaPremul<ComputeT, SrcT> op;
+    using alphaPremulInplace =
+        InplaceFunctor<TupelSize, ComputeT, DstT, mpp::AlphaPremul<ComputeT, SrcT>, RoundingMode::NearestTiesToEven>;
 
-        const alphaPremulInplace functor(op);
+    const mpp::AlphaPremul<ComputeT, SrcT> op;
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaPremulInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
-                                                                             functor);
-    }
+    const alphaPremulInplace functor(op);
+
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaPremulInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
+                                                                         functor);
 }
 
 #pragma region Instantiate
@@ -91,21 +83,18 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAlphaPremulACSrc(const SrcT *aSrc, size_t aPitchSrc, DstT *aDst, size_t aPitchDst,
                             remove_vector_t<SrcT> aAlpha, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using alphaPremulACSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::AlphaPremulAC<ComputeT, SrcT>,
-                                            RoundingMode::NearestTiesToEven>;
+    using alphaPremulACSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::AlphaPremulAC<ComputeT, SrcT>,
+                                        RoundingMode::NearestTiesToEven>;
 
-        const mpp::AlphaPremulAC<ComputeT, SrcT> op(aAlpha);
+    const mpp::AlphaPremulAC<ComputeT, SrcT> op(aAlpha);
 
-        const alphaPremulACSrc functor(aSrc, aPitchSrc, op);
+    const alphaPremulACSrc functor(aSrc, aPitchSrc, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaPremulACSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaPremulACSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -124,22 +113,20 @@ void InvokeAlphaPremulACInplace(SrcDstT *aSrcDst, size_t aPitchSrcDst, remove_ve
 {
     using SrcT = SrcDstT;
     using DstT = SrcDstT;
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        using alphaPremulACInplace = InplaceFunctor<TupelSize, ComputeT, DstT, mpp::AlphaPremulAC<ComputeT, SrcT>,
-                                                    RoundingMode::NearestTiesToEven>;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        const mpp::AlphaPremulAC<ComputeT, SrcT> op(aAlpha);
+    using alphaPremulACInplace =
+        InplaceFunctor<TupelSize, ComputeT, DstT, mpp::AlphaPremulAC<ComputeT, SrcT>, RoundingMode::NearestTiesToEven>;
 
-        const alphaPremulACInplace functor(op);
+    const mpp::AlphaPremulAC<ComputeT, SrcT> op(aAlpha);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaPremulACInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
-                                                                               functor);
-    }
+    const alphaPremulACInplace functor(op);
+
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, alphaPremulACInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
+                                                                           functor);
 }
 
 #pragma region Instantiate
@@ -152,4 +139,3 @@ void InvokeAlphaPremulACInplace(SrcDstT *aSrcDst, size_t aPitchSrcDst, remove_ve
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

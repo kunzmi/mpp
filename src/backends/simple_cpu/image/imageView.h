@@ -1,10 +1,9 @@
 #pragma once
 #include "../dllexport_simplecpu.h"
-#include <backends/cuda/image/imageView.h>
-#include <backends/npp/image/imageView.h>
 #include <backends/simple_cpu/image/addSquareProductWeightedOutputType.h>
 #include <backends/simple_cpu/image/conversionRelations.h>
 #include <backends/simple_cpu/image/histogramLevelsTypes.h>
+#include <backends/simple_cpu/image/morphologyComputeT.h>
 #include <backends/simple_cpu/image/scaleRelations.h>
 #include <common/arithmetic/binary_operators.h>
 #include <common/bfloat16.h>
@@ -14,6 +13,8 @@
 #include <common/image/affineTransformation.h>
 #include <common/image/border.h>
 #include <common/image/channel.h>
+#include <common/image/channelList.h>
+#include <common/image/filterArea.h>
 #include <common/image/functors/constantFunctor.h>
 #include <common/image/functors/imageFunctors.h>
 #include <common/image/functors/inplaceConstantFunctor.h>
@@ -365,14 +366,7 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
     friend iterator;
     friend const_iterator;
 
-#ifdef _MSC_VER
-    friend MPPEXPORT_SIMPLECPU iterator operator+(iterator::difference_type aLhs, const iterator &aRhs);
-    friend MPPEXPORT_SIMPLECPU iterator operator-(iterator::difference_type aLhs, const iterator &aRhs);
-    friend MPPEXPORT_SIMPLECPU const_iterator operator+(const_iterator::difference_type aLhs,
-                                                        const const_iterator &aRhs);
-    friend MPPEXPORT_SIMPLECPU const_iterator operator-(const_iterator::difference_type aLhs,
-                                                        const const_iterator &aRhs);
-#elif __clang__
+#if defined(_MSC_VER) || defined(__clang__)
     friend MPPEXPORT_SIMPLECPU iterator operator+(iterator::difference_type aLhs, const iterator &aRhs);
     friend MPPEXPORT_SIMPLECPU iterator operator-(iterator::difference_type aLhs, const iterator &aRhs);
     friend MPPEXPORT_SIMPLECPU const_iterator operator+(const_iterator::difference_type aLhs,
@@ -388,7 +382,6 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
     template <bool _isConst>
     friend _iterator<_isConst> MPPEXPORT_SIMPLECPU operator-(_iterator<_isConst>::difference_type aLhs,
                                                              const _iterator<_isConst> &aRhs);
-
 #endif
 
 #pragma endregion

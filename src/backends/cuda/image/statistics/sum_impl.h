@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "sum.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/reductionAlongXKernel.h>
@@ -9,7 +7,6 @@
 #include <common/defines.h>
 #include <common/image/functors/reductionInitValues.h>
 #include <common/image/functors/srcReductionFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -29,28 +26,25 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeSumSrc(const SrcT *aSrc, size_t aPitchSrc, ComputeT *aTempBuffer, DstT *aDst,
                   remove_vector_t<DstT> *aDstScalar, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
-        using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::Sum<SrcT, ComputeT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::Sum<SrcT, ComputeT>>;
 
-        const mpp::Sum<SrcT, ComputeT> op;
+    const mpp::Sum<SrcT, ComputeT> op;
 
-        const sumSrc functor(aSrc, aPitchSrc, op);
+    const sumSrc functor(aSrc, aPitchSrc, op);
 
-        InvokeReductionAlongXKernelDefault<SrcT, ComputeT, TupelSize, sumSrc, mpp::Sum<ComputeT, ComputeT>,
-                                           ReductionInitValue::Zero>(aSrc, aTempBuffer, aSize, aStreamCtx, functor);
+    InvokeReductionAlongXKernelDefault<SrcT, ComputeT, TupelSize, sumSrc, mpp::Sum<ComputeT, ComputeT>,
+                                       ReductionInitValue::Zero>(aSrc, aTempBuffer, aSize, aStreamCtx, functor);
 
-        const mpp::Nothing<DstT> postOp;
-        const mpp::SumScalar<DstT> postOpScalar;
+    const mpp::Nothing<DstT> postOp;
+    const mpp::SumScalar<DstT> postOpScalar;
 
-        InvokeReductionAlongYKernelDefault<ComputeT, DstT, mpp::Sum<DstT, DstT>, ReductionInitValue::Zero,
-                                           mpp::Nothing<DstT>, mpp::SumScalar<DstT>>(
-            aTempBuffer, aDst, aDstScalar, aSize.y, postOp, postOpScalar, aStreamCtx);
-    }
+    InvokeReductionAlongYKernelDefault<ComputeT, DstT, mpp::Sum<DstT, DstT>, ReductionInitValue::Zero,
+                                       mpp::Nothing<DstT>, mpp::SumScalar<DstT>>(aTempBuffer, aDst, aDstScalar, aSize.y,
+                                                                                 postOp, postOpScalar, aStreamCtx);
 }
 
 #pragma region Instantiate
@@ -77,4 +71,3 @@ void InvokeSumSrc(const SrcT *aSrc, size_t aPitchSrc, ComputeT *aTempBuffer, Dst
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

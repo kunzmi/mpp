@@ -1,7 +1,4 @@
 #pragma once
-#include <common/moduleEnabler.h>
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include <common/defines.h>
 #include <common/image/pixelTypes.h>
 #include <cuda_runtime_api.h>
@@ -81,4 +78,3 @@ template <size_t typeSize> struct ConfigTupelSize<"Default", typeSize>
     static constexpr size_t value{typeSize == 1 ? 8 : typeSize == 2 ? 4 : typeSize == 4 ? 2 : 1};
 };
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

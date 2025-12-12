@@ -9,6 +9,7 @@ namespace mpp::fileIO
 FileIOException::FileIOException(const std::filesystem::path &aFileName, const std::string &aMessage,
                                  [[maybe_unused]] const std::filesystem::path &aCodeFileName,
                                  [[maybe_unused]] int aLineNumber, [[maybe_unused]] const std::string &aFunctionName)
+    : MPPException(aMessage)
 {
 #ifdef NDEBUG
     std::stringstream ss;

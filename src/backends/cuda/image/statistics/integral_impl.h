@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "integral.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/dataExchangeAndInit/transpose.h>
@@ -8,7 +6,6 @@
 #include <backends/cuda/streamCtx.h>
 #include <backends/cuda/templateRegistry.h>
 #include <common/defines.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -26,22 +23,19 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeIntegralSrc(const SrcT *aSrc, size_t aPitchSrc, DstT *aTemp, size_t aPitchTemp, DstT *aDst, size_t aPitchDst,
                        const DstT &aStartValue, const Size2D &aSizeDst, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        InvokeIntegralXKernelDefault<SrcT, DstT, TupelSize>(aSrc, aPitchSrc, aDst, aPitchDst, aSizeDst, aStreamCtx);
+    InvokeIntegralXKernelDefault<SrcT, DstT, TupelSize>(aSrc, aPitchSrc, aDst, aPitchDst, aSizeDst, aStreamCtx);
 
-        const Size2D sizeTrans(aSizeDst.y, aSizeDst.x);
+    const Size2D sizeTrans(aSizeDst.y, aSizeDst.x);
 
-        InvokeTransposeSrc<DstT>(aDst, aPitchDst, aTemp, aPitchTemp, sizeTrans, aStreamCtx);
+    InvokeTransposeSrc<DstT>(aDst, aPitchDst, aTemp, aPitchTemp, sizeTrans, aStreamCtx);
 
-        InvokeIntegralYKernelDefault<DstT, TupelSize>(aTemp, aPitchTemp, aStartValue, sizeTrans, aStreamCtx);
+    InvokeIntegralYKernelDefault<DstT, TupelSize>(aTemp, aPitchTemp, aStartValue, sizeTrans, aStreamCtx);
 
-        InvokeTransposeSrc<DstT>(aTemp, aPitchTemp, aDst, aPitchDst, aSizeDst, aStreamCtx);
-    }
+    InvokeTransposeSrc<DstT>(aTemp, aPitchTemp, aDst, aPitchDst, aSizeDst, aStreamCtx);
 }
 
 #pragma region Instantiate
@@ -59,4 +53,3 @@ void InvokeIntegralSrc(const SrcT *aSrc, size_t aPitchSrc, DstT *aTemp, size_t a
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

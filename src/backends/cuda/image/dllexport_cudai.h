@@ -12,6 +12,10 @@
 
 #else
 
+#ifdef MPP_CUDAI
+#define MPPEXPORT_CUDAI __attribute__((visibility("default")))
+#else
 #define MPPEXPORT_CUDAI
+#endif
 
 #endif

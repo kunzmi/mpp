@@ -1,43 +1,34 @@
 #pragma once
-#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if MPP_ENABLE_CUDA_BACKEND
-
-#include "dataExchangeAndInit/conversionRelations.h"
-#include "dataExchangeAndInit/scaleRelations.h"
 #include "dllexport_cudai.h"
-#include "morphology/morphologyComputeT.h"
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/devVarView.h>
 #include <backends/cuda/image/arithmetic/addSquareProductWeightedOutputType.h>
-#include <backends/cuda/image/arithmetic/arithmeticKernel.h>
-#include <backends/cuda/image/dataExchangeAndInit/dataExchangeAndInitKernel.h>
+#include <backends/cuda/image/dataExchangeAndInit/conversionRelations.h>
+#include <backends/cuda/image/dataExchangeAndInit/scaleRelations.h>
 #include <backends/cuda/image/filtering/windowSumResultType.h>
-#include <backends/cuda/image/geometryTransforms/geometryTransformsKernel.h>
-#include <backends/cuda/image/statistics/statisticsKernel.h>
+#include <backends/cuda/image/morphology/morphologyComputeT.h>
+#include <backends/cuda/image/statistics/statisticsTypes.h>
 #include <backends/cuda/streamCtx.h>
 #include <common/bfloat16.h>
 #include <common/complex.h>
 #include <common/defines.h>
 #include <common/half_fp16.h>
+#include <common/image/affineTransformation.h>
 #include <common/image/border.h>
+#include <common/image/channel.h>
+#include <common/image/channelList.h>
 #include <common/image/filterArea.h>
-#include <common/image/functors/imageFunctors.h>
-#include <common/image/gotoPtr.h>
 #include <common/image/imageViewBase.h>
+#include <common/image/matrix.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
-#include <common/image/roiException.h>
 #include <common/image/size2D.h>
 #include <common/image/sizePitched.h>
 #include <common/mpp_defs.h>
 #include <common/numberTypes.h>
-#include <common/safeCast.h>
 #include <common/statistics/indexMinMax.h>
 #include <common/vector_typetraits.h>
 #include <concepts>
-#include <cstddef>
-#include <cuda_runtime_api.h>
-#include <driver_types.h>
 #include <vector>
 
 namespace mpp::image::cuda
@@ -669,7 +660,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// smaller or larger the output range are clamped to min or max value if necessary for integer output types.
     /// </summary>
     template <PixelType TTo>
-    ImageView<TTo> &Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax,
+    ImageView<TTo> &Scale(ImageView<TTo> &aDst, complex_basetype_t<pixel_basetype_t<TTo>> aDstMin,
+                          complex_basetype_t<pixel_basetype_t<TTo>> aDstMax,
                           const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<T> &&
                 RealOrComplexFloatingVector<TTo> && ScaleImplemented<T, TTo>;
@@ -681,8 +673,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// smaller or larger the output range are clamped to min or max value if necessary for integer output types.
     /// </summary>
     template <PixelType TTo>
-    ImageView<TTo> &Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax,
-                          RoundingMode aRoundingMode,
+    ImageView<TTo> &Scale(ImageView<TTo> &aDst, complex_basetype_t<pixel_basetype_t<TTo>> aDstMin,
+                          complex_basetype_t<pixel_basetype_t<TTo>> aDstMax, RoundingMode aRoundingMode,
                           const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<T> &&
                 RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>;
@@ -694,8 +686,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// smaller or larger the output range are clamped to min or max value if necessary.
     /// </summary>
     template <PixelType TTo>
-    ImageView<TTo> &Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
-                          RoundingMode aRoundingMode,
+    ImageView<TTo> &Scale(ImageView<TTo> &aDst, complex_basetype_t<pixel_basetype_t<T>> aSrcMin,
+                          complex_basetype_t<pixel_basetype_t<T>> aSrcMax, RoundingMode aRoundingMode,
                           const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires(!std::same_as<T, TTo>) &&
                 (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>;
@@ -707,8 +699,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// smaller or larger the output range are clamped to min or max value if necessary for integer output types.
     /// </summary>
     template <PixelType TTo>
-    ImageView<TTo> &Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
-                          scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax,
+    ImageView<TTo> &Scale(ImageView<TTo> &aDst, complex_basetype_t<pixel_basetype_t<T>> aSrcMin,
+                          complex_basetype_t<pixel_basetype_t<T>> aSrcMax,
+                          complex_basetype_t<pixel_basetype_t<TTo>> aDstMin,
+                          complex_basetype_t<pixel_basetype_t<TTo>> aDstMax,
                           const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires(!std::same_as<T, TTo>) &&
                 (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexFloatingVector<TTo> && ScaleImplemented<T, TTo>
@@ -721,8 +715,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// smaller or larger the output range are clamped to min or max value if necessary for integer output types.
     /// </summary>
     template <PixelType TTo>
-    ImageView<TTo> &Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
-                          scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax, RoundingMode aRoundingMode,
+    ImageView<TTo> &Scale(ImageView<TTo> &aDst, complex_basetype_t<pixel_basetype_t<T>> aSrcMin,
+                          complex_basetype_t<pixel_basetype_t<T>> aSrcMax,
+                          complex_basetype_t<pixel_basetype_t<TTo>> aDstMin,
+                          complex_basetype_t<pixel_basetype_t<TTo>> aDstMax, RoundingMode aRoundingMode,
                           const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires(!std::same_as<T, TTo>) &&
                 (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>;
@@ -9951,5 +9947,5 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
 #pragma endregion
 #pragma endregion
 };
+
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

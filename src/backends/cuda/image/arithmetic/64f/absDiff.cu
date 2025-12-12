@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "../absDiff_impl.h"
 
 using namespace mpp::cuda;
@@ -15,4 +13,3 @@ ForAllChannelsWithAlphaInvokeAbsDiffInplaceC(64f);
 ForAllChannelsWithAlphaInvokeAbsDiffInplaceDevC(64f);
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

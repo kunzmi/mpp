@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "addSquare.h"
 #include "addSquareProductWeightedOutputType.h"
 #include <backends/cuda/image/configurations.h>
@@ -11,7 +9,6 @@
 #include <common/arithmetic/binary_operators.h>
 #include <common/defines.h>
 #include <common/image/functors/inplaceSrcFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -29,22 +26,19 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAddSquareInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, size_t aPitchSrc2,
                                const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using addSqrInplaceSrc =
-            InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::AddSqr<ComputeT>, RoundingMode::None>;
+    using addSqrInplaceSrc =
+        InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::AddSqr<ComputeT>, RoundingMode::None>;
 
-        const mpp::AddSqr<ComputeT> op;
+    const mpp::AddSqr<ComputeT> op;
 
-        const addSqrInplaceSrc functor(aSrc2, aPitchSrc2, op);
+    const addSqrInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, addSqrInplaceSrc>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
-                                                                           functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, addSqrInplaceSrc>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
+                                                                       functor);
 }
 
 #pragma region Instantiate
@@ -70,4 +64,3 @@ void InvokeAddSquareInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *a
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

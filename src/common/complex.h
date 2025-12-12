@@ -32,8 +32,8 @@ namespace mpp
 {
 
 // forward declaration
-template <Number T> struct MPPEXPORT_COMMON Vector2;
-template <RealSignedNumber T> struct MPPEXPORT_COMMON Complex;
+template <Number T> struct MPPEXPORTFWDDECL_COMMON Vector2;
+template <RealSignedNumber T> struct MPPEXPORTFWDDECL_COMMON Complex;
 
 using c_short    = Complex<short>;
 using c_int      = Complex<int>;
@@ -1030,4 +1030,185 @@ template <RealFloatingPoint T> DEVICE_CODE inline bool isfinite(const Complex<T>
 {
     return isfinite(aVal.real) && isfinite(aVal.imag);
 }
+
+#ifdef IS_HOST_COMPILER
+extern template struct Complex<sbyte>;
+extern template struct Complex<short>;
+extern template struct Complex<int>;
+extern template struct Complex<long64>;
+extern template struct Complex<float>;
+extern template struct Complex<double>;
+extern template struct Complex<HalfFp16>;
+extern template struct Complex<BFloat16>;
+
+extern template MPPEXPORT_COMMON Complex<sbyte>::Complex(const Complex<short> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<sbyte>::Complex(const Complex<int> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<sbyte>::Complex(const Complex<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<sbyte>::Complex(const Complex<float> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<sbyte>::Complex(const Complex<double> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<sbyte>::Complex(const Complex<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<sbyte>::Complex(const Complex<BFloat16> &) noexcept;
+
+extern template MPPEXPORT_COMMON Complex<short>::Complex(const Complex<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<short>::Complex(const Complex<int> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<short>::Complex(const Complex<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<short>::Complex(const Complex<float> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<short>::Complex(const Complex<double> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<short>::Complex(const Complex<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<short>::Complex(const Complex<BFloat16> &) noexcept;
+
+extern template MPPEXPORT_COMMON Complex<int>::Complex(const Complex<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<int>::Complex(const Complex<short> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<int>::Complex(const Complex<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<int>::Complex(const Complex<float> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<int>::Complex(const Complex<double> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<int>::Complex(const Complex<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<int>::Complex(const Complex<BFloat16> &) noexcept;
+
+extern template MPPEXPORT_COMMON Complex<long64>::Complex(const Complex<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<long64>::Complex(const Complex<short> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<long64>::Complex(const Complex<int> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<long64>::Complex(const Complex<float> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<long64>::Complex(const Complex<double> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<long64>::Complex(const Complex<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<long64>::Complex(const Complex<BFloat16> &) noexcept;
+
+extern template MPPEXPORT_COMMON Complex<float>::Complex(const Complex<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<float>::Complex(const Complex<short> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<float>::Complex(const Complex<int> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<float>::Complex(const Complex<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<float>::Complex(const Complex<double> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<float>::Complex(const Complex<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<float>::Complex(const Complex<BFloat16> &) noexcept;
+
+extern template MPPEXPORT_COMMON Complex<double>::Complex(const Complex<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<double>::Complex(const Complex<short> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<double>::Complex(const Complex<int> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<double>::Complex(const Complex<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<double>::Complex(const Complex<float> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<double>::Complex(const Complex<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<double>::Complex(const Complex<BFloat16> &) noexcept;
+
+extern template MPPEXPORT_COMMON Complex<HalfFp16>::Complex(const Complex<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<HalfFp16>::Complex(const Complex<short> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<HalfFp16>::Complex(const Complex<int> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<HalfFp16>::Complex(const Complex<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<HalfFp16>::Complex(const Complex<float> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<HalfFp16>::Complex(const Complex<double> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<HalfFp16>::Complex(const Complex<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<HalfFp16>::Complex(const Complex<float> &, RoundingMode) noexcept;
+
+extern template MPPEXPORT_COMMON Complex<BFloat16>::Complex(const Complex<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<BFloat16>::Complex(const Complex<short> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<BFloat16>::Complex(const Complex<int> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<BFloat16>::Complex(const Complex<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<BFloat16>::Complex(const Complex<float> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<BFloat16>::Complex(const Complex<double> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<BFloat16>::Complex(const Complex<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<BFloat16>::Complex(const Complex<float> &, RoundingMode) noexcept;
+
+extern template MPPEXPORT_COMMON Complex<sbyte>::Complex(Complex<short> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<sbyte>::Complex(Complex<int> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<sbyte>::Complex(Complex<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<sbyte>::Complex(Complex<float> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<sbyte>::Complex(Complex<double> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<sbyte>::Complex(Complex<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<sbyte>::Complex(Complex<BFloat16> &) noexcept;
+
+extern template MPPEXPORT_COMMON Complex<short>::Complex(Complex<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<short>::Complex(Complex<int> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<short>::Complex(Complex<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<short>::Complex(Complex<float> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<short>::Complex(Complex<double> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<short>::Complex(Complex<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<short>::Complex(Complex<BFloat16> &) noexcept;
+
+extern template MPPEXPORT_COMMON Complex<int>::Complex(Complex<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<int>::Complex(Complex<short> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<int>::Complex(Complex<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<int>::Complex(Complex<float> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<int>::Complex(Complex<double> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<int>::Complex(Complex<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<int>::Complex(Complex<BFloat16> &) noexcept;
+
+extern template MPPEXPORT_COMMON Complex<long64>::Complex(Complex<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<long64>::Complex(Complex<short> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<long64>::Complex(Complex<int> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<long64>::Complex(Complex<float> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<long64>::Complex(Complex<double> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<long64>::Complex(Complex<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<long64>::Complex(Complex<BFloat16> &) noexcept;
+
+extern template MPPEXPORT_COMMON Complex<float>::Complex(Complex<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<float>::Complex(Complex<short> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<float>::Complex(Complex<int> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<float>::Complex(Complex<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<float>::Complex(Complex<double> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<float>::Complex(Complex<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<float>::Complex(Complex<BFloat16> &) noexcept;
+
+extern template MPPEXPORT_COMMON Complex<double>::Complex(Complex<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<double>::Complex(Complex<short> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<double>::Complex(Complex<int> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<double>::Complex(Complex<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<double>::Complex(Complex<float> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<double>::Complex(Complex<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<double>::Complex(Complex<BFloat16> &) noexcept;
+
+extern template MPPEXPORT_COMMON Complex<HalfFp16>::Complex(Complex<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<HalfFp16>::Complex(Complex<short> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<HalfFp16>::Complex(Complex<int> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<HalfFp16>::Complex(Complex<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<HalfFp16>::Complex(Complex<float> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<HalfFp16>::Complex(Complex<double> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<HalfFp16>::Complex(Complex<BFloat16> &) noexcept;
+
+extern template MPPEXPORT_COMMON Complex<BFloat16>::Complex(Complex<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<BFloat16>::Complex(Complex<short> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<BFloat16>::Complex(Complex<int> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<BFloat16>::Complex(Complex<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<BFloat16>::Complex(Complex<float> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<BFloat16>::Complex(Complex<double> &) noexcept;
+extern template MPPEXPORT_COMMON Complex<BFloat16>::Complex(Complex<HalfFp16> &) noexcept;
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const mpp::Complex<mpp::sbyte> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const mpp::Complex<mpp::sbyte> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, mpp::Complex<mpp::sbyte> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, mpp::Complex<mpp::sbyte> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const mpp::Complex<short> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const mpp::Complex<short> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, mpp::Complex<short> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, mpp::Complex<short> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const mpp::Complex<long64> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const mpp::Complex<long64> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, mpp::Complex<long64> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, mpp::Complex<long64> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const mpp::Complex<int> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const mpp::Complex<int> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, mpp::Complex<int> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, mpp::Complex<int> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const mpp::Complex<float> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const mpp::Complex<float> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, mpp::Complex<float> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, mpp::Complex<float> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const mpp::Complex<double> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const mpp::Complex<double> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, mpp::Complex<double> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, mpp::Complex<double> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const mpp::Complex<mpp::HalfFp16> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const mpp::Complex<mpp::HalfFp16> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, mpp::Complex<mpp::HalfFp16> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, mpp::Complex<mpp::HalfFp16> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const mpp::Complex<mpp::BFloat16> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const mpp::Complex<mpp::BFloat16> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, mpp::Complex<mpp::BFloat16> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, mpp::Complex<mpp::BFloat16> &aVec);
+#endif
 } // namespace mpp

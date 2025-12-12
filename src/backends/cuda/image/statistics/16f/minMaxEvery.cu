@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "../minMaxEvery_impl.h"
 
 using namespace mpp::cuda;
@@ -16,4 +14,3 @@ ForAllChannelsWithAlphaInvokeMaxEverySrcSrc(16f);
 ForAllChannelsWithAlphaInvokeMaxEveryInplaceSrc(16f);
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

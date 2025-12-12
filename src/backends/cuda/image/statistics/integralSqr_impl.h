@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "integralSqr.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/dataExchangeAndInit/transpose.h>
@@ -8,7 +6,6 @@
 #include <backends/cuda/streamCtx.h>
 #include <backends/cuda/templateRegistry.h>
 #include <common/defines.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -28,27 +25,24 @@ void InvokeIntegralSqrSrc(const SrcT *aSrc, size_t aPitchSrc, DstT *aTemp, size_
                           const DstT &aStartValue, const DstSqrT &aStartValueSqr, const Size2D &aSizeDst,
                           const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
-        // DstSqrT is always 64 wide, so TupelSize is always 1 for DstSqrT
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    // DstSqrT is always 64 wide, so TupelSize is always 1 for DstSqrT
 
-        InvokeIntegralSqrXKernelDefault<SrcT, DstT, DstSqrT, 1>(aSrc, aPitchSrc, aDst, aPitchDst, aDstSqr, aPitchDstSqr,
-                                                                aSizeDst, aStreamCtx);
+    InvokeIntegralSqrXKernelDefault<SrcT, DstT, DstSqrT, 1>(aSrc, aPitchSrc, aDst, aPitchDst, aDstSqr, aPitchDstSqr,
+                                                            aSizeDst, aStreamCtx);
 
-        const Size2D sizeTrans(aSizeDst.y, aSizeDst.x);
+    const Size2D sizeTrans(aSizeDst.y, aSizeDst.x);
 
-        InvokeTransposeSrc<DstT>(aDst, aPitchDst, aTemp, aPitchTemp, sizeTrans, aStreamCtx);
-        InvokeTransposeSrc<DstSqrT>(aDstSqr, aPitchDstSqr, aTemp2, aPitchTemp2, sizeTrans, aStreamCtx);
+    InvokeTransposeSrc<DstT>(aDst, aPitchDst, aTemp, aPitchTemp, sizeTrans, aStreamCtx);
+    InvokeTransposeSrc<DstSqrT>(aDstSqr, aPitchDstSqr, aTemp2, aPitchTemp2, sizeTrans, aStreamCtx);
 
-        InvokeIntegralYKernelDefault<DstT, TupelSize>(aTemp, aPitchTemp, aStartValue, sizeTrans, aStreamCtx);
-        InvokeIntegralYKernelDefault<DstSqrT, 1>(aTemp2, aPitchTemp2, aStartValueSqr, sizeTrans, aStreamCtx);
+    InvokeIntegralYKernelDefault<DstT, TupelSize>(aTemp, aPitchTemp, aStartValue, sizeTrans, aStreamCtx);
+    InvokeIntegralYKernelDefault<DstSqrT, 1>(aTemp2, aPitchTemp2, aStartValueSqr, sizeTrans, aStreamCtx);
 
-        InvokeTransposeSrc<DstT>(aTemp, aPitchTemp, aDst, aPitchDst, aSizeDst, aStreamCtx);
-        InvokeTransposeSrc<DstSqrT>(aTemp2, aPitchTemp2, aDstSqr, aPitchDstSqr, aSizeDst, aStreamCtx);
-    }
+    InvokeTransposeSrc<DstT>(aTemp, aPitchTemp, aDst, aPitchDst, aSizeDst, aStreamCtx);
+    InvokeTransposeSrc<DstSqrT>(aTemp2, aPitchTemp2, aDstSqr, aPitchDstSqr, aSizeDst, aStreamCtx);
 }
 
 #pragma region Instantiate
@@ -69,4 +63,3 @@ void InvokeIntegralSqrSrc(const SrcT *aSrc, size_t aPitchSrc, DstT *aTemp, size_
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

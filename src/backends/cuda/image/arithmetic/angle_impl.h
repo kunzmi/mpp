@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "angle.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelKernel.h>
@@ -9,7 +7,6 @@
 #include <common/arithmetic/unary_operators.h>
 #include <common/defines.h>
 #include <common/image/functors/srcFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -27,21 +24,18 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAngleSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                     const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using angleSrc =
-            SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Angle<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
+    using angleSrc =
+        SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Angle<ComputeT>, RoundingMode::NearestTiesAwayFromZero>;
 
-        const mpp::Angle<ComputeT> op;
+    const mpp::Angle<ComputeT> op;
 
-        const angleSrc functor(aSrc1, aPitchSrc1, op);
+    const angleSrc functor(aSrc1, aPitchSrc1, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, angleSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, angleSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -60,4 +54,3 @@ void InvokeAngleSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPi
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

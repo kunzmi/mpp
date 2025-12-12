@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "replaceIf.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelKernel.h>
@@ -16,7 +14,6 @@
 #include <common/image/functors/srcDevConstantFunctor.h>
 #include <common/image/functors/srcFunctor.h>
 #include <common/image/functors/srcSrcFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -48,181 +45,174 @@ void InvokeReplaceIfSrcSrc(const SrcDstT *aSrc1, size_t aPitchSrc1, const SrcDst
                            const SrcDstT &aValue, SrcDstT *aDst, size_t aPitchDst, CompareOp aCompare,
                            const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcDstT> && mppEnableCudaBackend<SrcDstT>)
+    using SrcT     = SrcDstT;
+    using DstT     = SrcDstT;
+    using ComputeT = SrcDstT;
+
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+
+    if (CompareOp_IsAnyChannel(aCompare) && CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
     {
-        using SrcT     = SrcDstT;
-        using DstT     = SrcDstT;
-        using ComputeT = SrcDstT;
+        throw INVALIDARGUMENT(aCompare, "CompareOp " << aCompare
+                                                     << " is not supported: Flags CompareOp::AnyChannel and "
+                                                        "CompareOp::PerChannel cannot be set at the same time.");
+    }
 
-        MPP_CUDA_REGISTER_TEMPALTE;
+    auto runComperator = [&]<typename T>(T /*instantiationHelper*/) {
+        using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT,
+                                            ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t>,
+                                            RoundingMode::None, voidType, voidType, true>;
+        const ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t> op(aValue);
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+        const compareSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+    };
 
-        if (CompareOp_IsAnyChannel(aCompare) && CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    auto runAnyChannel = [&]<typename T>(T /*instantiationHelper2*/) {
+        constexpr bool anyChannel = T::is_any_channel;
+        constexpr bool perChannel = vector_size_v<typename T::compare_t> > 1;
+
+        switch (CompareOp_NoFlags(aCompare))
         {
-            throw INVALIDARGUMENT(aCompare, "CompareOp " << aCompare
-                                                         << " is not supported: Flags CompareOp::AnyChannel and "
-                                                            "CompareOp::PerChannel cannot be set at the same time.");
-        }
-
-        auto runComperator = [&]<typename T>(T /*instantiationHelper*/) {
-            using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT,
-                                                ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t>,
-                                                RoundingMode::None, voidType, voidType, true>;
-            const ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t> op(aValue);
-
-            const compareSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
-            InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcSrc>(aDst, aPitchDst, aSize, aStreamCtx,
-                                                                            functor);
-        };
-
-        auto runAnyChannel = [&]<typename T>(T /*instantiationHelper2*/) {
-            constexpr bool anyChannel = T::is_any_channel;
-            constexpr bool perChannel = vector_size_v<typename T::compare_t> > 1;
-
-            switch (CompareOp_NoFlags(aCompare))
+            case mpp::CompareOp::Less:
             {
-                case mpp::CompareOp::Less:
+                if constexpr (ComplexVector<SrcT>)
                 {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareLt<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Lt<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
                 }
-                break;
-                case mpp::CompareOp::LessEq:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareLe<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Le<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
-                }
-                break;
-                case mpp::CompareOp::Eq:
+                else
                 {
                     if constexpr (perChannel)
                     {
-                        runComperator(instantiationHelper<SrcT, mpp::CompareEq<ComputeT>, typename T::compare_t>{});
+                        runComperator(instantiationHelper<SrcT, mpp::CompareLt<ComputeT>, typename T::compare_t>{});
                     }
                     else
                     {
                         runComperator(
-                            instantiationHelper<SrcT, mpp::Eq<ComputeT, anyChannel>, typename T::compare_t>{});
+                            instantiationHelper<SrcT, mpp::Lt<ComputeT, anyChannel>, typename T::compare_t>{});
                     }
                 }
-                break;
-                case mpp::CompareOp::Greater:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareGt<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Gt<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
-                }
-                break;
-                case mpp::CompareOp::GreaterEq:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareGe<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Ge<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
-                }
-                break;
-                case mpp::CompareOp::NEq:
-                {
-                    if constexpr (perChannel)
-                    {
-                        runComperator(instantiationHelper<SrcT, mpp::CompareNEq<ComputeT>, typename T::compare_t>{});
-                    }
-                    else
-                    {
-                        runComperator(
-                            instantiationHelper<SrcT, mpp::NEq<ComputeT, anyChannel>, typename T::compare_t>{});
-                    }
-                }
-                break;
-                default:
-                    throw INVALIDARGUMENT(aCompare, "Unsupported CompareOp: "
-                                                        << aCompare
-                                                        << ". This function only supports binary comparisons.");
             }
-        };
+            break;
+            case mpp::CompareOp::LessEq:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
+                }
+                else
+                {
+                    if constexpr (perChannel)
+                    {
+                        runComperator(instantiationHelper<SrcT, mpp::CompareLe<ComputeT>, typename T::compare_t>{});
+                    }
+                    else
+                    {
+                        runComperator(
+                            instantiationHelper<SrcT, mpp::Le<ComputeT, anyChannel>, typename T::compare_t>{});
+                    }
+                }
+            }
+            break;
+            case mpp::CompareOp::Eq:
+            {
+                if constexpr (perChannel)
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::CompareEq<ComputeT>, typename T::compare_t>{});
+                }
+                else
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::Eq<ComputeT, anyChannel>, typename T::compare_t>{});
+                }
+            }
+            break;
+            case mpp::CompareOp::Greater:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
+                }
+                else
+                {
+                    if constexpr (perChannel)
+                    {
+                        runComperator(instantiationHelper<SrcT, mpp::CompareGt<ComputeT>, typename T::compare_t>{});
+                    }
+                    else
+                    {
+                        runComperator(
+                            instantiationHelper<SrcT, mpp::Gt<ComputeT, anyChannel>, typename T::compare_t>{});
+                    }
+                }
+            }
+            break;
+            case mpp::CompareOp::GreaterEq:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
+                }
+                else
+                {
+                    if constexpr (perChannel)
+                    {
+                        runComperator(instantiationHelper<SrcT, mpp::CompareGe<ComputeT>, typename T::compare_t>{});
+                    }
+                    else
+                    {
+                        runComperator(
+                            instantiationHelper<SrcT, mpp::Ge<ComputeT, anyChannel>, typename T::compare_t>{});
+                    }
+                }
+            }
+            break;
+            case mpp::CompareOp::NEq:
+            {
+                if constexpr (perChannel)
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::CompareNEq<ComputeT>, typename T::compare_t>{});
+                }
+                else
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::NEq<ComputeT, anyChannel>, typename T::compare_t>{});
+                }
+            }
+            break;
+            default:
+                throw INVALIDARGUMENT(aCompare, "Unsupported CompareOp: "
+                                                    << aCompare << ". This function only supports binary comparisons.");
+        }
+    };
 
-        if (CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    if (CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    {
+        using CompareT = same_vector_size_different_type_t<SrcT, byte>;
+        runAnyChannel(instantiationHelper2<CompareT, false>{});
+    }
+    else
+    {
+        using CompareT = Vector1<byte>;
+        if (CompareOp_IsAnyChannel(aCompare))
         {
-            using CompareT = same_vector_size_different_type_t<SrcT, byte>;
-            runAnyChannel(instantiationHelper2<CompareT, false>{});
+            runAnyChannel(instantiationHelper2<CompareT, true>{});
         }
         else
         {
-            using CompareT = Vector1<byte>;
-            if (CompareOp_IsAnyChannel(aCompare))
-            {
-                runAnyChannel(instantiationHelper2<CompareT, true>{});
-            }
-            else
-            {
-                runAnyChannel(instantiationHelper2<CompareT, false>{});
-            }
+            runAnyChannel(instantiationHelper2<CompareT, false>{});
         }
     }
 }
@@ -255,180 +245,174 @@ void InvokeReplaceIfSrcC(const SrcDstT *aSrc1, size_t aPitchSrc1, const SrcDstT 
                          SrcDstT *aDst, size_t aPitchDst, CompareOp aCompare, const Size2D &aSize,
                          const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcDstT> && mppEnableCudaBackend<SrcDstT>)
+    using SrcT     = SrcDstT;
+    using DstT     = SrcDstT;
+    using ComputeT = SrcDstT;
+
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+
+    if (CompareOp_IsAnyChannel(aCompare) && CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
     {
-        using SrcT     = SrcDstT;
-        using DstT     = SrcDstT;
-        using ComputeT = SrcDstT;
+        throw INVALIDARGUMENT(aCompare, "CompareOp " << aCompare
+                                                     << " is not supported: Flags CompareOp::AnyChannel and "
+                                                        "CompareOp::PerChannel cannot be set at the same time.");
+    }
 
-        MPP_CUDA_REGISTER_TEMPALTE;
+    auto runComperator = [&]<typename T>(T /*instantiationHelper*/) {
+        using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT,
+                                               ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t>,
+                                               RoundingMode::None, voidType, voidType, true>;
+        const ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t> op(aValue);
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+        const compareSrcC functor(aSrc1, aPitchSrc1, aConst, op);
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+    };
 
-        if (CompareOp_IsAnyChannel(aCompare) && CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    auto runAnyChannel = [&]<typename T>(T /*instantiationHelper2*/) {
+        constexpr bool anyChannel = T::is_any_channel;
+        constexpr bool perChannel = vector_size_v<typename T::compare_t> > 1;
+
+        switch (CompareOp_NoFlags(aCompare))
         {
-            throw INVALIDARGUMENT(aCompare, "CompareOp " << aCompare
-                                                         << " is not supported: Flags CompareOp::AnyChannel and "
-                                                            "CompareOp::PerChannel cannot be set at the same time.");
-        }
-
-        auto runComperator = [&]<typename T>(T /*instantiationHelper*/) {
-            using compareSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT,
-                                                   ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t>,
-                                                   RoundingMode::None, voidType, voidType, true>;
-            const ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t> op(aValue);
-
-            const compareSrcC functor(aSrc1, aPitchSrc1, aConst, op);
-            InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-        };
-
-        auto runAnyChannel = [&]<typename T>(T /*instantiationHelper2*/) {
-            constexpr bool anyChannel = T::is_any_channel;
-            constexpr bool perChannel = vector_size_v<typename T::compare_t> > 1;
-
-            switch (CompareOp_NoFlags(aCompare))
+            case mpp::CompareOp::Less:
             {
-                case mpp::CompareOp::Less:
+                if constexpr (ComplexVector<SrcT>)
                 {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareLt<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Lt<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
                 }
-                break;
-                case mpp::CompareOp::LessEq:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareLe<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Le<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
-                }
-                break;
-                case mpp::CompareOp::Eq:
+                else
                 {
                     if constexpr (perChannel)
                     {
-                        runComperator(instantiationHelper<SrcT, mpp::CompareEq<ComputeT>, typename T::compare_t>{});
+                        runComperator(instantiationHelper<SrcT, mpp::CompareLt<ComputeT>, typename T::compare_t>{});
                     }
                     else
                     {
                         runComperator(
-                            instantiationHelper<SrcT, mpp::Eq<ComputeT, anyChannel>, typename T::compare_t>{});
+                            instantiationHelper<SrcT, mpp::Lt<ComputeT, anyChannel>, typename T::compare_t>{});
                     }
                 }
-                break;
-                case mpp::CompareOp::Greater:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareGt<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Gt<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
-                }
-                break;
-                case mpp::CompareOp::GreaterEq:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareGe<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Ge<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
-                }
-                break;
-                case mpp::CompareOp::NEq:
-                {
-                    if constexpr (perChannel)
-                    {
-                        runComperator(instantiationHelper<SrcT, mpp::CompareNEq<ComputeT>, typename T::compare_t>{});
-                    }
-                    else
-                    {
-                        runComperator(
-                            instantiationHelper<SrcT, mpp::NEq<ComputeT, anyChannel>, typename T::compare_t>{});
-                    }
-                }
-                break;
-                default:
-                    throw INVALIDARGUMENT(aCompare, "Unsupported CompareOp: "
-                                                        << aCompare
-                                                        << ". This function only supports binary comparisons.");
             }
-        };
+            break;
+            case mpp::CompareOp::LessEq:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
+                }
+                else
+                {
+                    if constexpr (perChannel)
+                    {
+                        runComperator(instantiationHelper<SrcT, mpp::CompareLe<ComputeT>, typename T::compare_t>{});
+                    }
+                    else
+                    {
+                        runComperator(
+                            instantiationHelper<SrcT, mpp::Le<ComputeT, anyChannel>, typename T::compare_t>{});
+                    }
+                }
+            }
+            break;
+            case mpp::CompareOp::Eq:
+            {
+                if constexpr (perChannel)
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::CompareEq<ComputeT>, typename T::compare_t>{});
+                }
+                else
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::Eq<ComputeT, anyChannel>, typename T::compare_t>{});
+                }
+            }
+            break;
+            case mpp::CompareOp::Greater:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
+                }
+                else
+                {
+                    if constexpr (perChannel)
+                    {
+                        runComperator(instantiationHelper<SrcT, mpp::CompareGt<ComputeT>, typename T::compare_t>{});
+                    }
+                    else
+                    {
+                        runComperator(
+                            instantiationHelper<SrcT, mpp::Gt<ComputeT, anyChannel>, typename T::compare_t>{});
+                    }
+                }
+            }
+            break;
+            case mpp::CompareOp::GreaterEq:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
+                }
+                else
+                {
+                    if constexpr (perChannel)
+                    {
+                        runComperator(instantiationHelper<SrcT, mpp::CompareGe<ComputeT>, typename T::compare_t>{});
+                    }
+                    else
+                    {
+                        runComperator(
+                            instantiationHelper<SrcT, mpp::Ge<ComputeT, anyChannel>, typename T::compare_t>{});
+                    }
+                }
+            }
+            break;
+            case mpp::CompareOp::NEq:
+            {
+                if constexpr (perChannel)
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::CompareNEq<ComputeT>, typename T::compare_t>{});
+                }
+                else
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::NEq<ComputeT, anyChannel>, typename T::compare_t>{});
+                }
+            }
+            break;
+            default:
+                throw INVALIDARGUMENT(aCompare, "Unsupported CompareOp: "
+                                                    << aCompare << ". This function only supports binary comparisons.");
+        }
+    };
 
-        if (CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    if (CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    {
+        using CompareT = same_vector_size_different_type_t<SrcT, byte>;
+        runAnyChannel(instantiationHelper2<CompareT, false>{});
+    }
+    else
+    {
+        using CompareT = Vector1<byte>;
+        if (CompareOp_IsAnyChannel(aCompare))
         {
-            using CompareT = same_vector_size_different_type_t<SrcT, byte>;
-            runAnyChannel(instantiationHelper2<CompareT, false>{});
+            runAnyChannel(instantiationHelper2<CompareT, true>{});
         }
         else
         {
-            using CompareT = Vector1<byte>;
-            if (CompareOp_IsAnyChannel(aCompare))
-            {
-                runAnyChannel(instantiationHelper2<CompareT, true>{});
-            }
-            else
-            {
-                runAnyChannel(instantiationHelper2<CompareT, false>{});
-            }
+            runAnyChannel(instantiationHelper2<CompareT, false>{});
         }
     }
 }
@@ -460,180 +444,174 @@ void InvokeReplaceIfSrcDevC(const SrcDstT *aSrc1, size_t aPitchSrc1, const SrcDs
                             SrcDstT *aDst, size_t aPitchDst, CompareOp aCompare, const Size2D &aSize,
                             const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcDstT> && mppEnableCudaBackend<SrcDstT>)
+    using SrcT     = SrcDstT;
+    using DstT     = SrcDstT;
+    using ComputeT = SrcDstT;
+
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+
+    if (CompareOp_IsAnyChannel(aCompare) && CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
     {
-        using SrcT     = SrcDstT;
-        using DstT     = SrcDstT;
-        using ComputeT = SrcDstT;
+        throw INVALIDARGUMENT(aCompare, "CompareOp " << aCompare
+                                                     << " is not supported: Flags CompareOp::AnyChannel and "
+                                                        "CompareOp::PerChannel cannot be set at the same time.");
+    }
 
-        MPP_CUDA_REGISTER_TEMPALTE;
+    auto runComperator = [&]<typename T>(T /*instantiationHelper*/) {
+        using compareSrcC = SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT,
+                                                  ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t>,
+                                                  RoundingMode::None, true>;
+        const ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t> op(aValue);
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+        const compareSrcC functor(aSrc1, aPitchSrc1, aConst, op);
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+    };
 
-        if (CompareOp_IsAnyChannel(aCompare) && CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    auto runAnyChannel = [&]<typename T>(T /*instantiationHelper2*/) {
+        constexpr bool anyChannel = T::is_any_channel;
+        constexpr bool perChannel = vector_size_v<typename T::compare_t> > 1;
+
+        switch (CompareOp_NoFlags(aCompare))
         {
-            throw INVALIDARGUMENT(aCompare, "CompareOp " << aCompare
-                                                         << " is not supported: Flags CompareOp::AnyChannel and "
-                                                            "CompareOp::PerChannel cannot be set at the same time.");
-        }
-
-        auto runComperator = [&]<typename T>(T /*instantiationHelper*/) {
-            using compareSrcC = SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT,
-                                                      ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t>,
-                                                      RoundingMode::None, true>;
-            const ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t> op(aValue);
-
-            const compareSrcC functor(aSrc1, aPitchSrc1, aConst, op);
-            InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrcC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-        };
-
-        auto runAnyChannel = [&]<typename T>(T /*instantiationHelper2*/) {
-            constexpr bool anyChannel = T::is_any_channel;
-            constexpr bool perChannel = vector_size_v<typename T::compare_t> > 1;
-
-            switch (CompareOp_NoFlags(aCompare))
+            case mpp::CompareOp::Less:
             {
-                case mpp::CompareOp::Less:
+                if constexpr (ComplexVector<SrcT>)
                 {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareLt<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Lt<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
                 }
-                break;
-                case mpp::CompareOp::LessEq:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareLe<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Le<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
-                }
-                break;
-                case mpp::CompareOp::Eq:
+                else
                 {
                     if constexpr (perChannel)
                     {
-                        runComperator(instantiationHelper<SrcT, mpp::CompareEq<ComputeT>, typename T::compare_t>{});
+                        runComperator(instantiationHelper<SrcT, mpp::CompareLt<ComputeT>, typename T::compare_t>{});
                     }
                     else
                     {
                         runComperator(
-                            instantiationHelper<SrcT, mpp::Eq<ComputeT, anyChannel>, typename T::compare_t>{});
+                            instantiationHelper<SrcT, mpp::Lt<ComputeT, anyChannel>, typename T::compare_t>{});
                     }
                 }
-                break;
-                case mpp::CompareOp::Greater:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareGt<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Gt<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
-                }
-                break;
-                case mpp::CompareOp::GreaterEq:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareGe<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Ge<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
-                }
-                break;
-                case mpp::CompareOp::NEq:
-                {
-                    if constexpr (perChannel)
-                    {
-                        runComperator(instantiationHelper<SrcT, mpp::CompareNEq<ComputeT>, typename T::compare_t>{});
-                    }
-                    else
-                    {
-                        runComperator(
-                            instantiationHelper<SrcT, mpp::NEq<ComputeT, anyChannel>, typename T::compare_t>{});
-                    }
-                }
-                break;
-                default:
-                    throw INVALIDARGUMENT(aCompare, "Unsupported CompareOp: "
-                                                        << aCompare
-                                                        << ". This function only supports binary comparisons.");
             }
-        };
+            break;
+            case mpp::CompareOp::LessEq:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
+                }
+                else
+                {
+                    if constexpr (perChannel)
+                    {
+                        runComperator(instantiationHelper<SrcT, mpp::CompareLe<ComputeT>, typename T::compare_t>{});
+                    }
+                    else
+                    {
+                        runComperator(
+                            instantiationHelper<SrcT, mpp::Le<ComputeT, anyChannel>, typename T::compare_t>{});
+                    }
+                }
+            }
+            break;
+            case mpp::CompareOp::Eq:
+            {
+                if constexpr (perChannel)
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::CompareEq<ComputeT>, typename T::compare_t>{});
+                }
+                else
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::Eq<ComputeT, anyChannel>, typename T::compare_t>{});
+                }
+            }
+            break;
+            case mpp::CompareOp::Greater:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
+                }
+                else
+                {
+                    if constexpr (perChannel)
+                    {
+                        runComperator(instantiationHelper<SrcT, mpp::CompareGt<ComputeT>, typename T::compare_t>{});
+                    }
+                    else
+                    {
+                        runComperator(
+                            instantiationHelper<SrcT, mpp::Gt<ComputeT, anyChannel>, typename T::compare_t>{});
+                    }
+                }
+            }
+            break;
+            case mpp::CompareOp::GreaterEq:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
+                }
+                else
+                {
+                    if constexpr (perChannel)
+                    {
+                        runComperator(instantiationHelper<SrcT, mpp::CompareGe<ComputeT>, typename T::compare_t>{});
+                    }
+                    else
+                    {
+                        runComperator(
+                            instantiationHelper<SrcT, mpp::Ge<ComputeT, anyChannel>, typename T::compare_t>{});
+                    }
+                }
+            }
+            break;
+            case mpp::CompareOp::NEq:
+            {
+                if constexpr (perChannel)
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::CompareNEq<ComputeT>, typename T::compare_t>{});
+                }
+                else
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::NEq<ComputeT, anyChannel>, typename T::compare_t>{});
+                }
+            }
+            break;
+            default:
+                throw INVALIDARGUMENT(aCompare, "Unsupported CompareOp: "
+                                                    << aCompare << ". This function only supports binary comparisons.");
+        }
+    };
 
-        if (CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    if (CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    {
+        using CompareT = same_vector_size_different_type_t<SrcT, byte>;
+        runAnyChannel(instantiationHelper2<CompareT, false>{});
+    }
+    else
+    {
+        using CompareT = Vector1<byte>;
+        if (CompareOp_IsAnyChannel(aCompare))
         {
-            using CompareT = same_vector_size_different_type_t<SrcT, byte>;
-            runAnyChannel(instantiationHelper2<CompareT, false>{});
+            runAnyChannel(instantiationHelper2<CompareT, true>{});
         }
         else
         {
-            using CompareT = Vector1<byte>;
-            if (CompareOp_IsAnyChannel(aCompare))
-            {
-                runAnyChannel(instantiationHelper2<CompareT, true>{});
-            }
-            else
-            {
-                runAnyChannel(instantiationHelper2<CompareT, false>{});
-            }
+            runAnyChannel(instantiationHelper2<CompareT, false>{});
         }
     }
 }
@@ -664,116 +642,112 @@ template <typename SrcDstT>
 void InvokeReplaceIfSrc(const SrcDstT *aSrc1, size_t aPitchSrc1, const SrcDstT &aValue, SrcDstT *aDst, size_t aPitchDst,
                         CompareOp aCompare, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcDstT> && mppEnableCudaBackend<SrcDstT>)
+    using SrcT     = SrcDstT;
+    using DstT     = SrcDstT;
+    using ComputeT = SrcDstT;
+
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+
+    if (CompareOp_IsAnyChannel(aCompare) && CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
     {
-        using SrcT     = SrcDstT;
-        using DstT     = SrcDstT;
-        using ComputeT = SrcDstT;
+        throw INVALIDARGUMENT(aCompare, "CompareOp " << aCompare
+                                                     << " is not supported: Flags CompareOp::AnyChannel and "
+                                                        "CompareOp::PerChannel cannot be set at the same time.");
+    }
 
-        MPP_CUDA_REGISTER_TEMPALTE;
+    auto runComperator = [&]<typename T>(T /*instantiationHelper*/) {
+        using compareSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT,
+                                      ReplaceIfFP<SrcT, typename T::comperator_t, typename T::compare_t>,
+                                      RoundingMode::None, voidType, voidType, true>;
+        const ReplaceIfFP<SrcT, typename T::comperator_t, typename T::compare_t> op(aValue);
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+        const compareSrc functor(aSrc1, aPitchSrc1, op);
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+    };
 
-        if (CompareOp_IsAnyChannel(aCompare) && CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    auto runAnyChannel = [&]<typename T>(T /*instantiationHelper2*/) {
+        constexpr bool anyChannel = T::is_any_channel;
+
+        switch (CompareOp_NoFlags(aCompare))
         {
-            throw INVALIDARGUMENT(aCompare, "CompareOp " << aCompare
-                                                         << " is not supported: Flags CompareOp::AnyChannel and "
-                                                            "CompareOp::PerChannel cannot be set at the same time.");
-        }
-
-        auto runComperator = [&]<typename T>(T /*instantiationHelper*/) {
-            using compareSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT,
-                                          ReplaceIfFP<SrcT, typename T::comperator_t, typename T::compare_t>,
-                                          RoundingMode::None, voidType, voidType, true>;
-            const ReplaceIfFP<SrcT, typename T::comperator_t, typename T::compare_t> op(aValue);
-
-            const compareSrc functor(aSrc1, aPitchSrc1, op);
-            InvokeForEachPixelKernelDefault<DstT, TupelSize, compareSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-        };
-
-        auto runAnyChannel = [&]<typename T>(T /*instantiationHelper2*/) {
-            constexpr bool anyChannel = T::is_any_channel;
-
-            switch (CompareOp_NoFlags(aCompare))
+            case mpp::CompareOp::IsFinite:
             {
-                case mpp::CompareOp::IsFinite:
-                {
-                    runComperator(
-                        instantiationHelper<SrcT, mpp::IsFinite<ComputeT, anyChannel>, typename T::compare_t>{});
-                }
-                break;
-                case mpp::CompareOp::IsNaN:
-                {
-                    runComperator(instantiationHelper<SrcT, mpp::IsNaN<ComputeT, anyChannel>, typename T::compare_t>{});
-                }
-                break;
-                case mpp::CompareOp::IsInf:
-                {
-                    runComperator(instantiationHelper<SrcT, mpp::IsInf<ComputeT, anyChannel>, typename T::compare_t>{});
-                }
-                break;
-                case mpp::CompareOp::IsInfOrNaN:
-                {
-                    runComperator(
-                        instantiationHelper<SrcT, mpp::IsInfOrNaN<ComputeT, anyChannel>, typename T::compare_t>{});
-                }
-                break;
-                case mpp::CompareOp::IsPositiveInf:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare,
-                            "CompareOp " << aCompare
-                                         << " is not supported for complex datatypes, use IsInf without sign instead.");
-                    }
-                    else
-                    {
-                        runComperator(instantiationHelper<SrcT, mpp::IsPositiveInf<ComputeT, anyChannel>,
-                                                          typename T::compare_t>{});
-                    }
-                }
-                break;
-                case mpp::CompareOp::IsNegativeInf:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare,
-                            "CompareOp " << aCompare
-                                         << " is not supported for complex datatypes, use IsInf without sign instead.");
-                    }
-                    else
-                    {
-                        runComperator(instantiationHelper<SrcT, mpp::IsNegativeInf<ComputeT, anyChannel>,
-                                                          typename T::compare_t>{});
-                    }
-                }
-                break;
-                default:
-                    throw INVALIDARGUMENT(
-                        aCompare, "Unsupported CompareOp: "
-                                      << aCompare
-                                      << ". This function only supports unary comparisons (IsInf, IsNaN, etc.).");
+                runComperator(instantiationHelper<SrcT, mpp::IsFinite<ComputeT, anyChannel>, typename T::compare_t>{});
             }
-        };
+            break;
+            case mpp::CompareOp::IsNaN:
+            {
+                runComperator(instantiationHelper<SrcT, mpp::IsNaN<ComputeT, anyChannel>, typename T::compare_t>{});
+            }
+            break;
+            case mpp::CompareOp::IsInf:
+            {
+                runComperator(instantiationHelper<SrcT, mpp::IsInf<ComputeT, anyChannel>, typename T::compare_t>{});
+            }
+            break;
+            case mpp::CompareOp::IsInfOrNaN:
+            {
+                runComperator(
+                    instantiationHelper<SrcT, mpp::IsInfOrNaN<ComputeT, anyChannel>, typename T::compare_t>{});
+            }
+            break;
+            case mpp::CompareOp::IsPositiveInf:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, use IsInf without sign instead.");
+                }
+                else
+                {
+                    runComperator(
+                        instantiationHelper<SrcT, mpp::IsPositiveInf<ComputeT, anyChannel>, typename T::compare_t>{});
+                }
+            }
+            break;
+            case mpp::CompareOp::IsNegativeInf:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, use IsInf without sign instead.");
+                }
+                else
+                {
+                    runComperator(
+                        instantiationHelper<SrcT, mpp::IsNegativeInf<ComputeT, anyChannel>, typename T::compare_t>{});
+                }
+            }
+            break;
+            default:
+                throw INVALIDARGUMENT(aCompare,
+                                      "Unsupported CompareOp: "
+                                          << aCompare
+                                          << ". This function only supports unary comparisons (IsInf, IsNaN, etc.).");
+        }
+    };
 
-        if (CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    if (CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    {
+        using CompareT = same_vector_size_different_type_t<SrcT, byte>;
+        runAnyChannel(instantiationHelper2<CompareT, false>{});
+    }
+    else
+    {
+        using CompareT = Vector1<byte>;
+        if (CompareOp_IsAnyChannel(aCompare))
         {
-            using CompareT = same_vector_size_different_type_t<SrcT, byte>;
-            runAnyChannel(instantiationHelper2<CompareT, false>{});
+            runAnyChannel(instantiationHelper2<CompareT, true>{});
         }
         else
         {
-            using CompareT = Vector1<byte>;
-            if (CompareOp_IsAnyChannel(aCompare))
-            {
-                runAnyChannel(instantiationHelper2<CompareT, true>{});
-            }
-            else
-            {
-                runAnyChannel(instantiationHelper2<CompareT, false>{});
-            }
+            runAnyChannel(instantiationHelper2<CompareT, false>{});
         }
     }
 }
@@ -805,182 +779,175 @@ void InvokeReplaceIfInplaceSrcSrc(SrcDstT *aSrcDst, size_t aPitchSrcDst, const S
                                   const SrcDstT &aValue, CompareOp aCompare, const Size2D &aSize,
                                   const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcDstT> && mppEnableCudaBackend<SrcDstT>)
+    using SrcT     = SrcDstT;
+    using DstT     = SrcDstT;
+    using ComputeT = SrcDstT;
+
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+
+    if (CompareOp_IsAnyChannel(aCompare) && CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
     {
-        using SrcT     = SrcDstT;
-        using DstT     = SrcDstT;
-        using ComputeT = SrcDstT;
+        throw INVALIDARGUMENT(aCompare, "CompareOp " << aCompare
+                                                     << " is not supported: Flags CompareOp::AnyChannel and "
+                                                        "CompareOp::PerChannel cannot be set at the same time.");
+    }
 
-        MPP_CUDA_REGISTER_TEMPALTE;
+    auto runComperator = [&]<typename T>(T /*instantiationHelper*/) {
+        using compareInplaceSrc = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT,
+                                                    ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t>,
+                                                    RoundingMode::None, voidType, voidType>;
+        const ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t> op(aValue);
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+        const compareInplaceSrc functor(aSrc2, aPitchSrc2, op);
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, compareInplaceSrc>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
+                                                                            functor);
+    };
 
-        if (CompareOp_IsAnyChannel(aCompare) && CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    auto runAnyChannel = [&]<typename T>(T /*instantiationHelper2*/) {
+        constexpr bool anyChannel = T::is_any_channel;
+        constexpr bool perChannel = vector_size_v<typename T::compare_t> > 1;
+
+        switch (CompareOp_NoFlags(aCompare))
         {
-            throw INVALIDARGUMENT(aCompare, "CompareOp " << aCompare
-                                                         << " is not supported: Flags CompareOp::AnyChannel and "
-                                                            "CompareOp::PerChannel cannot be set at the same time.");
-        }
-
-        auto runComperator = [&]<typename T>(T /*instantiationHelper*/) {
-            using compareInplaceSrc =
-                InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT,
-                                  ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t>, RoundingMode::None,
-                                  voidType, voidType>;
-            const ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t> op(aValue);
-
-            const compareInplaceSrc functor(aSrc2, aPitchSrc2, op);
-            InvokeForEachPixelKernelDefault<DstT, TupelSize, compareInplaceSrc>(aSrcDst, aPitchSrcDst, aSize,
-                                                                                aStreamCtx, functor);
-        };
-
-        auto runAnyChannel = [&]<typename T>(T /*instantiationHelper2*/) {
-            constexpr bool anyChannel = T::is_any_channel;
-            constexpr bool perChannel = vector_size_v<typename T::compare_t> > 1;
-
-            switch (CompareOp_NoFlags(aCompare))
+            case mpp::CompareOp::Less:
             {
-                case mpp::CompareOp::Less:
+                if constexpr (ComplexVector<SrcT>)
                 {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareLt<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Lt<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
                 }
-                break;
-                case mpp::CompareOp::LessEq:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareLe<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Le<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
-                }
-                break;
-                case mpp::CompareOp::Eq:
+                else
                 {
                     if constexpr (perChannel)
                     {
-                        runComperator(instantiationHelper<SrcT, mpp::CompareEq<ComputeT>, typename T::compare_t>{});
+                        runComperator(instantiationHelper<SrcT, mpp::CompareLt<ComputeT>, typename T::compare_t>{});
                     }
                     else
                     {
                         runComperator(
-                            instantiationHelper<SrcT, mpp::Eq<ComputeT, anyChannel>, typename T::compare_t>{});
+                            instantiationHelper<SrcT, mpp::Lt<ComputeT, anyChannel>, typename T::compare_t>{});
                     }
                 }
-                break;
-                case mpp::CompareOp::Greater:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareGt<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Gt<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
-                }
-                break;
-                case mpp::CompareOp::GreaterEq:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareGe<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Ge<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
-                }
-                break;
-                case mpp::CompareOp::NEq:
-                {
-                    if constexpr (perChannel)
-                    {
-                        runComperator(instantiationHelper<SrcT, mpp::CompareNEq<ComputeT>, typename T::compare_t>{});
-                    }
-                    else
-                    {
-                        runComperator(
-                            instantiationHelper<SrcT, mpp::NEq<ComputeT, anyChannel>, typename T::compare_t>{});
-                    }
-                }
-                break;
-                default:
-                    throw INVALIDARGUMENT(aCompare, "Unsupported CompareOp: "
-                                                        << aCompare
-                                                        << ". This function only supports binary comparisons.");
             }
-        };
+            break;
+            case mpp::CompareOp::LessEq:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
+                }
+                else
+                {
+                    if constexpr (perChannel)
+                    {
+                        runComperator(instantiationHelper<SrcT, mpp::CompareLe<ComputeT>, typename T::compare_t>{});
+                    }
+                    else
+                    {
+                        runComperator(
+                            instantiationHelper<SrcT, mpp::Le<ComputeT, anyChannel>, typename T::compare_t>{});
+                    }
+                }
+            }
+            break;
+            case mpp::CompareOp::Eq:
+            {
+                if constexpr (perChannel)
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::CompareEq<ComputeT>, typename T::compare_t>{});
+                }
+                else
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::Eq<ComputeT, anyChannel>, typename T::compare_t>{});
+                }
+            }
+            break;
+            case mpp::CompareOp::Greater:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
+                }
+                else
+                {
+                    if constexpr (perChannel)
+                    {
+                        runComperator(instantiationHelper<SrcT, mpp::CompareGt<ComputeT>, typename T::compare_t>{});
+                    }
+                    else
+                    {
+                        runComperator(
+                            instantiationHelper<SrcT, mpp::Gt<ComputeT, anyChannel>, typename T::compare_t>{});
+                    }
+                }
+            }
+            break;
+            case mpp::CompareOp::GreaterEq:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
+                }
+                else
+                {
+                    if constexpr (perChannel)
+                    {
+                        runComperator(instantiationHelper<SrcT, mpp::CompareGe<ComputeT>, typename T::compare_t>{});
+                    }
+                    else
+                    {
+                        runComperator(
+                            instantiationHelper<SrcT, mpp::Ge<ComputeT, anyChannel>, typename T::compare_t>{});
+                    }
+                }
+            }
+            break;
+            case mpp::CompareOp::NEq:
+            {
+                if constexpr (perChannel)
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::CompareNEq<ComputeT>, typename T::compare_t>{});
+                }
+                else
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::NEq<ComputeT, anyChannel>, typename T::compare_t>{});
+                }
+            }
+            break;
+            default:
+                throw INVALIDARGUMENT(aCompare, "Unsupported CompareOp: "
+                                                    << aCompare << ". This function only supports binary comparisons.");
+        }
+    };
 
-        if (CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    if (CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    {
+        using CompareT = same_vector_size_different_type_t<SrcT, byte>;
+        runAnyChannel(instantiationHelper2<CompareT, false>{});
+    }
+    else
+    {
+        using CompareT = Vector1<byte>;
+        if (CompareOp_IsAnyChannel(aCompare))
         {
-            using CompareT = same_vector_size_different_type_t<SrcT, byte>;
-            runAnyChannel(instantiationHelper2<CompareT, false>{});
+            runAnyChannel(instantiationHelper2<CompareT, true>{});
         }
         else
         {
-            using CompareT = Vector1<byte>;
-            if (CompareOp_IsAnyChannel(aCompare))
-            {
-                runAnyChannel(instantiationHelper2<CompareT, true>{});
-            }
-            else
-            {
-                runAnyChannel(instantiationHelper2<CompareT, false>{});
-            }
+            runAnyChannel(instantiationHelper2<CompareT, false>{});
         }
     }
 }
@@ -1011,182 +978,175 @@ template <typename SrcDstT>
 void InvokeReplaceIfInplaceSrcC(SrcDstT *aSrcDst, size_t aPitchSrcDst, const SrcDstT &aConst, const SrcDstT &aValue,
                                 CompareOp aCompare, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcDstT> && mppEnableCudaBackend<SrcDstT>)
+    using SrcT     = SrcDstT;
+    using DstT     = SrcDstT;
+    using ComputeT = SrcDstT;
+
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+
+    if (CompareOp_IsAnyChannel(aCompare) && CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
     {
-        using SrcT     = SrcDstT;
-        using DstT     = SrcDstT;
-        using ComputeT = SrcDstT;
+        throw INVALIDARGUMENT(aCompare, "CompareOp " << aCompare
+                                                     << " is not supported: Flags CompareOp::AnyChannel and "
+                                                        "CompareOp::PerChannel cannot be set at the same time.");
+    }
 
-        MPP_CUDA_REGISTER_TEMPALTE;
+    auto runComperator = [&]<typename T>(T /*instantiationHelper*/) {
+        using compareInplaceC = InplaceConstantFunctor<TupelSize, ComputeT, DstT,
+                                                       ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t>,
+                                                       RoundingMode::None, voidType, voidType>;
+        const ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t> op(aValue);
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+        const compareInplaceC functor(aConst, op);
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, compareInplaceC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
+                                                                          functor);
+    };
 
-        if (CompareOp_IsAnyChannel(aCompare) && CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    auto runAnyChannel = [&]<typename T>(T /*instantiationHelper2*/) {
+        constexpr bool anyChannel = T::is_any_channel;
+        constexpr bool perChannel = vector_size_v<typename T::compare_t> > 1;
+
+        switch (CompareOp_NoFlags(aCompare))
         {
-            throw INVALIDARGUMENT(aCompare, "CompareOp " << aCompare
-                                                         << " is not supported: Flags CompareOp::AnyChannel and "
-                                                            "CompareOp::PerChannel cannot be set at the same time.");
-        }
-
-        auto runComperator = [&]<typename T>(T /*instantiationHelper*/) {
-            using compareInplaceC =
-                InplaceConstantFunctor<TupelSize, ComputeT, DstT,
-                                       ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t>,
-                                       RoundingMode::None, voidType, voidType>;
-            const ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t> op(aValue);
-
-            const compareInplaceC functor(aConst, op);
-            InvokeForEachPixelKernelDefault<DstT, TupelSize, compareInplaceC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
-                                                                              functor);
-        };
-
-        auto runAnyChannel = [&]<typename T>(T /*instantiationHelper2*/) {
-            constexpr bool anyChannel = T::is_any_channel;
-            constexpr bool perChannel = vector_size_v<typename T::compare_t> > 1;
-
-            switch (CompareOp_NoFlags(aCompare))
+            case mpp::CompareOp::Less:
             {
-                case mpp::CompareOp::Less:
+                if constexpr (ComplexVector<SrcT>)
                 {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareLt<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Lt<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
                 }
-                break;
-                case mpp::CompareOp::LessEq:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareLe<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Le<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
-                }
-                break;
-                case mpp::CompareOp::Eq:
+                else
                 {
                     if constexpr (perChannel)
                     {
-                        runComperator(instantiationHelper<SrcT, mpp::CompareEq<ComputeT>, typename T::compare_t>{});
+                        runComperator(instantiationHelper<SrcT, mpp::CompareLt<ComputeT>, typename T::compare_t>{});
                     }
                     else
                     {
                         runComperator(
-                            instantiationHelper<SrcT, mpp::Eq<ComputeT, anyChannel>, typename T::compare_t>{});
+                            instantiationHelper<SrcT, mpp::Lt<ComputeT, anyChannel>, typename T::compare_t>{});
                     }
                 }
-                break;
-                case mpp::CompareOp::Greater:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareGt<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Gt<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
-                }
-                break;
-                case mpp::CompareOp::GreaterEq:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareGe<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Ge<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
-                }
-                break;
-                case mpp::CompareOp::NEq:
-                {
-                    if constexpr (perChannel)
-                    {
-                        runComperator(instantiationHelper<SrcT, mpp::CompareNEq<ComputeT>, typename T::compare_t>{});
-                    }
-                    else
-                    {
-                        runComperator(
-                            instantiationHelper<SrcT, mpp::NEq<ComputeT, anyChannel>, typename T::compare_t>{});
-                    }
-                }
-                break;
-                default:
-                    throw INVALIDARGUMENT(aCompare, "Unsupported CompareOp: "
-                                                        << aCompare
-                                                        << ". This function only supports binary comparisons.");
             }
-        };
+            break;
+            case mpp::CompareOp::LessEq:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
+                }
+                else
+                {
+                    if constexpr (perChannel)
+                    {
+                        runComperator(instantiationHelper<SrcT, mpp::CompareLe<ComputeT>, typename T::compare_t>{});
+                    }
+                    else
+                    {
+                        runComperator(
+                            instantiationHelper<SrcT, mpp::Le<ComputeT, anyChannel>, typename T::compare_t>{});
+                    }
+                }
+            }
+            break;
+            case mpp::CompareOp::Eq:
+            {
+                if constexpr (perChannel)
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::CompareEq<ComputeT>, typename T::compare_t>{});
+                }
+                else
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::Eq<ComputeT, anyChannel>, typename T::compare_t>{});
+                }
+            }
+            break;
+            case mpp::CompareOp::Greater:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
+                }
+                else
+                {
+                    if constexpr (perChannel)
+                    {
+                        runComperator(instantiationHelper<SrcT, mpp::CompareGt<ComputeT>, typename T::compare_t>{});
+                    }
+                    else
+                    {
+                        runComperator(
+                            instantiationHelper<SrcT, mpp::Gt<ComputeT, anyChannel>, typename T::compare_t>{});
+                    }
+                }
+            }
+            break;
+            case mpp::CompareOp::GreaterEq:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
+                }
+                else
+                {
+                    if constexpr (perChannel)
+                    {
+                        runComperator(instantiationHelper<SrcT, mpp::CompareGe<ComputeT>, typename T::compare_t>{});
+                    }
+                    else
+                    {
+                        runComperator(
+                            instantiationHelper<SrcT, mpp::Ge<ComputeT, anyChannel>, typename T::compare_t>{});
+                    }
+                }
+            }
+            break;
+            case mpp::CompareOp::NEq:
+            {
+                if constexpr (perChannel)
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::CompareNEq<ComputeT>, typename T::compare_t>{});
+                }
+                else
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::NEq<ComputeT, anyChannel>, typename T::compare_t>{});
+                }
+            }
+            break;
+            default:
+                throw INVALIDARGUMENT(aCompare, "Unsupported CompareOp: "
+                                                    << aCompare << ". This function only supports binary comparisons.");
+        }
+    };
 
-        if (CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    if (CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    {
+        using CompareT = same_vector_size_different_type_t<SrcT, byte>;
+        runAnyChannel(instantiationHelper2<CompareT, false>{});
+    }
+    else
+    {
+        using CompareT = Vector1<byte>;
+        if (CompareOp_IsAnyChannel(aCompare))
         {
-            using CompareT = same_vector_size_different_type_t<SrcT, byte>;
-            runAnyChannel(instantiationHelper2<CompareT, false>{});
+            runAnyChannel(instantiationHelper2<CompareT, true>{});
         }
         else
         {
-            using CompareT = Vector1<byte>;
-            if (CompareOp_IsAnyChannel(aCompare))
-            {
-                runAnyChannel(instantiationHelper2<CompareT, true>{});
-            }
-            else
-            {
-                runAnyChannel(instantiationHelper2<CompareT, false>{});
-            }
+            runAnyChannel(instantiationHelper2<CompareT, false>{});
         }
     }
 }
@@ -1217,182 +1177,176 @@ template <typename SrcDstT>
 void InvokeReplaceIfInplaceSrcDevC(SrcDstT *aSrcDst, size_t aPitchSrcDst, const SrcDstT *aConst, const SrcDstT &aValue,
                                    CompareOp aCompare, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcDstT> && mppEnableCudaBackend<SrcDstT>)
+    using SrcT     = SrcDstT;
+    using DstT     = SrcDstT;
+    using ComputeT = SrcDstT;
+
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+
+    if (CompareOp_IsAnyChannel(aCompare) && CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
     {
-        using SrcT     = SrcDstT;
-        using DstT     = SrcDstT;
-        using ComputeT = SrcDstT;
+        throw INVALIDARGUMENT(aCompare, "CompareOp " << aCompare
+                                                     << " is not supported: Flags CompareOp::AnyChannel and "
+                                                        "CompareOp::PerChannel cannot be set at the same time.");
+    }
 
-        MPP_CUDA_REGISTER_TEMPALTE;
+    auto runComperator = [&]<typename T>(T /*instantiationHelper*/) {
+        using compareInplaceC =
+            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT,
+                                      ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t>,
+                                      RoundingMode::None>;
+        const ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t> op(aValue);
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+        const compareInplaceC functor(aConst, op);
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, compareInplaceC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
+                                                                          functor);
+    };
 
-        if (CompareOp_IsAnyChannel(aCompare) && CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    auto runAnyChannel = [&]<typename T>(T /*instantiationHelper2*/) {
+        constexpr bool anyChannel = T::is_any_channel;
+        constexpr bool perChannel = vector_size_v<typename T::compare_t> > 1;
+
+        switch (CompareOp_NoFlags(aCompare))
         {
-            throw INVALIDARGUMENT(aCompare, "CompareOp " << aCompare
-                                                         << " is not supported: Flags CompareOp::AnyChannel and "
-                                                            "CompareOp::PerChannel cannot be set at the same time.");
-        }
-
-        auto runComperator = [&]<typename T>(T /*instantiationHelper*/) {
-            using compareInplaceC =
-                InplaceDevConstantFunctor<TupelSize, ComputeT, DstT,
-                                          ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t>,
-                                          RoundingMode::None>;
-            const ReplaceIf<SrcT, typename T::comperator_t, typename T::compare_t> op(aValue);
-
-            const compareInplaceC functor(aConst, op);
-            InvokeForEachPixelKernelDefault<DstT, TupelSize, compareInplaceC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
-                                                                              functor);
-        };
-
-        auto runAnyChannel = [&]<typename T>(T /*instantiationHelper2*/) {
-            constexpr bool anyChannel = T::is_any_channel;
-            constexpr bool perChannel = vector_size_v<typename T::compare_t> > 1;
-
-            switch (CompareOp_NoFlags(aCompare))
+            case mpp::CompareOp::Less:
             {
-                case mpp::CompareOp::Less:
+                if constexpr (ComplexVector<SrcT>)
                 {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareLt<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Lt<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
                 }
-                break;
-                case mpp::CompareOp::LessEq:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareLe<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Le<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
-                }
-                break;
-                case mpp::CompareOp::Eq:
+                else
                 {
                     if constexpr (perChannel)
                     {
-                        runComperator(instantiationHelper<SrcT, mpp::CompareEq<ComputeT>, typename T::compare_t>{});
+                        runComperator(instantiationHelper<SrcT, mpp::CompareLt<ComputeT>, typename T::compare_t>{});
                     }
                     else
                     {
                         runComperator(
-                            instantiationHelper<SrcT, mpp::Eq<ComputeT, anyChannel>, typename T::compare_t>{});
+                            instantiationHelper<SrcT, mpp::Lt<ComputeT, anyChannel>, typename T::compare_t>{});
                     }
                 }
-                break;
-                case mpp::CompareOp::Greater:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareGt<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Gt<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
-                }
-                break;
-                case mpp::CompareOp::GreaterEq:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare, "CompareOp "
-                                          << aCompare
-                                          << " is not supported for complex datatypes, only Eq and NEq are supported.");
-                    }
-                    else
-                    {
-                        if constexpr (perChannel)
-                        {
-                            runComperator(instantiationHelper<SrcT, mpp::CompareGe<ComputeT>, typename T::compare_t>{});
-                        }
-                        else
-                        {
-                            runComperator(
-                                instantiationHelper<SrcT, mpp::Ge<ComputeT, anyChannel>, typename T::compare_t>{});
-                        }
-                    }
-                }
-                break;
-                case mpp::CompareOp::NEq:
-                {
-                    if constexpr (perChannel)
-                    {
-                        runComperator(instantiationHelper<SrcT, mpp::CompareNEq<ComputeT>, typename T::compare_t>{});
-                    }
-                    else
-                    {
-                        runComperator(
-                            instantiationHelper<SrcT, mpp::NEq<ComputeT, anyChannel>, typename T::compare_t>{});
-                    }
-                }
-                break;
-                default:
-                    throw INVALIDARGUMENT(aCompare, "Unsupported CompareOp: "
-                                                        << aCompare
-                                                        << ". This function only supports binary comparisons.");
             }
-        };
+            break;
+            case mpp::CompareOp::LessEq:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
+                }
+                else
+                {
+                    if constexpr (perChannel)
+                    {
+                        runComperator(instantiationHelper<SrcT, mpp::CompareLe<ComputeT>, typename T::compare_t>{});
+                    }
+                    else
+                    {
+                        runComperator(
+                            instantiationHelper<SrcT, mpp::Le<ComputeT, anyChannel>, typename T::compare_t>{});
+                    }
+                }
+            }
+            break;
+            case mpp::CompareOp::Eq:
+            {
+                if constexpr (perChannel)
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::CompareEq<ComputeT>, typename T::compare_t>{});
+                }
+                else
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::Eq<ComputeT, anyChannel>, typename T::compare_t>{});
+                }
+            }
+            break;
+            case mpp::CompareOp::Greater:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
+                }
+                else
+                {
+                    if constexpr (perChannel)
+                    {
+                        runComperator(instantiationHelper<SrcT, mpp::CompareGt<ComputeT>, typename T::compare_t>{});
+                    }
+                    else
+                    {
+                        runComperator(
+                            instantiationHelper<SrcT, mpp::Gt<ComputeT, anyChannel>, typename T::compare_t>{});
+                    }
+                }
+            }
+            break;
+            case mpp::CompareOp::GreaterEq:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, only Eq and NEq are supported.");
+                }
+                else
+                {
+                    if constexpr (perChannel)
+                    {
+                        runComperator(instantiationHelper<SrcT, mpp::CompareGe<ComputeT>, typename T::compare_t>{});
+                    }
+                    else
+                    {
+                        runComperator(
+                            instantiationHelper<SrcT, mpp::Ge<ComputeT, anyChannel>, typename T::compare_t>{});
+                    }
+                }
+            }
+            break;
+            case mpp::CompareOp::NEq:
+            {
+                if constexpr (perChannel)
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::CompareNEq<ComputeT>, typename T::compare_t>{});
+                }
+                else
+                {
+                    runComperator(instantiationHelper<SrcT, mpp::NEq<ComputeT, anyChannel>, typename T::compare_t>{});
+                }
+            }
+            break;
+            default:
+                throw INVALIDARGUMENT(aCompare, "Unsupported CompareOp: "
+                                                    << aCompare << ". This function only supports binary comparisons.");
+        }
+    };
 
-        if (CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    if (CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    {
+        using CompareT = same_vector_size_different_type_t<SrcT, byte>;
+        runAnyChannel(instantiationHelper2<CompareT, false>{});
+    }
+    else
+    {
+        using CompareT = Vector1<byte>;
+        if (CompareOp_IsAnyChannel(aCompare))
         {
-            using CompareT = same_vector_size_different_type_t<SrcT, byte>;
-            runAnyChannel(instantiationHelper2<CompareT, false>{});
+            runAnyChannel(instantiationHelper2<CompareT, true>{});
         }
         else
         {
-            using CompareT = Vector1<byte>;
-            if (CompareOp_IsAnyChannel(aCompare))
-            {
-                runAnyChannel(instantiationHelper2<CompareT, true>{});
-            }
-            else
-            {
-                runAnyChannel(instantiationHelper2<CompareT, false>{});
-            }
+            runAnyChannel(instantiationHelper2<CompareT, false>{});
         }
     }
 }
@@ -1423,117 +1377,113 @@ template <typename SrcDstT>
 void InvokeReplaceIfInplaceSrc(SrcDstT *aSrcDst, size_t aPitchSrcDst, const SrcDstT &aValue, CompareOp aCompare,
                                const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcDstT> && mppEnableCudaBackend<SrcDstT>)
+    using SrcT     = SrcDstT;
+    using DstT     = SrcDstT;
+    using ComputeT = SrcDstT;
+
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+
+    if (CompareOp_IsAnyChannel(aCompare) && CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
     {
-        using SrcT     = SrcDstT;
-        using DstT     = SrcDstT;
-        using ComputeT = SrcDstT;
+        throw INVALIDARGUMENT(aCompare, "CompareOp " << aCompare
+                                                     << " is not supported: Flags CompareOp::AnyChannel and "
+                                                        "CompareOp::PerChannel cannot be set at the same time.");
+    }
 
-        MPP_CUDA_REGISTER_TEMPALTE;
+    auto runComperator = [&]<typename T>(T /*instantiationHelper*/) {
+        using compareInplace = InplaceFunctor<TupelSize, ComputeT, DstT,
+                                              ReplaceIfFP<SrcT, typename T::comperator_t, typename T::compare_t>,
+                                              RoundingMode::None, voidType, voidType>;
+        const ReplaceIfFP<SrcT, typename T::comperator_t, typename T::compare_t> op(aValue);
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+        const compareInplace functor(op);
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, compareInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
+                                                                         functor);
+    };
 
-        if (CompareOp_IsAnyChannel(aCompare) && CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    auto runAnyChannel = [&]<typename T>(T /*instantiationHelper2*/) {
+        constexpr bool anyChannel = T::is_any_channel;
+
+        switch (CompareOp_NoFlags(aCompare))
         {
-            throw INVALIDARGUMENT(aCompare, "CompareOp " << aCompare
-                                                         << " is not supported: Flags CompareOp::AnyChannel and "
-                                                            "CompareOp::PerChannel cannot be set at the same time.");
-        }
-
-        auto runComperator = [&]<typename T>(T /*instantiationHelper*/) {
-            using compareInplace = InplaceFunctor<TupelSize, ComputeT, DstT,
-                                                  ReplaceIfFP<SrcT, typename T::comperator_t, typename T::compare_t>,
-                                                  RoundingMode::None, voidType, voidType>;
-            const ReplaceIfFP<SrcT, typename T::comperator_t, typename T::compare_t> op(aValue);
-
-            const compareInplace functor(op);
-            InvokeForEachPixelKernelDefault<DstT, TupelSize, compareInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
-                                                                             functor);
-        };
-
-        auto runAnyChannel = [&]<typename T>(T /*instantiationHelper2*/) {
-            constexpr bool anyChannel = T::is_any_channel;
-
-            switch (CompareOp_NoFlags(aCompare))
+            case mpp::CompareOp::IsFinite:
             {
-                case mpp::CompareOp::IsFinite:
-                {
-                    runComperator(
-                        instantiationHelper<SrcT, mpp::IsFinite<ComputeT, anyChannel>, typename T::compare_t>{});
-                }
-                break;
-                case mpp::CompareOp::IsNaN:
-                {
-                    runComperator(instantiationHelper<SrcT, mpp::IsNaN<ComputeT, anyChannel>, typename T::compare_t>{});
-                }
-                break;
-                case mpp::CompareOp::IsInf:
-                {
-                    runComperator(instantiationHelper<SrcT, mpp::IsInf<ComputeT, anyChannel>, typename T::compare_t>{});
-                }
-                break;
-                case mpp::CompareOp::IsInfOrNaN:
-                {
-                    runComperator(
-                        instantiationHelper<SrcT, mpp::IsInfOrNaN<ComputeT, anyChannel>, typename T::compare_t>{});
-                }
-                break;
-                case mpp::CompareOp::IsPositiveInf:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare,
-                            "CompareOp " << aCompare
-                                         << " is not supported for complex datatypes, use IsInf without sign instead.");
-                    }
-                    else
-                    {
-                        runComperator(instantiationHelper<SrcT, mpp::IsPositiveInf<ComputeT, anyChannel>,
-                                                          typename T::compare_t>{});
-                    }
-                }
-                break;
-                case mpp::CompareOp::IsNegativeInf:
-                {
-                    if constexpr (ComplexVector<SrcT>)
-                    {
-                        throw INVALIDARGUMENT(
-                            aCompare,
-                            "CompareOp " << aCompare
-                                         << " is not supported for complex datatypes, use IsInf without sign instead.");
-                    }
-                    else
-                    {
-                        runComperator(instantiationHelper<SrcT, mpp::IsNegativeInf<ComputeT, anyChannel>,
-                                                          typename T::compare_t>{});
-                    }
-                }
-                break;
-                default:
-                    throw INVALIDARGUMENT(
-                        aCompare, "Unsupported CompareOp: "
-                                      << aCompare
-                                      << ". This function only supports unary comparisons (IsInf, IsNaN, etc.).");
+                runComperator(instantiationHelper<SrcT, mpp::IsFinite<ComputeT, anyChannel>, typename T::compare_t>{});
             }
-        };
+            break;
+            case mpp::CompareOp::IsNaN:
+            {
+                runComperator(instantiationHelper<SrcT, mpp::IsNaN<ComputeT, anyChannel>, typename T::compare_t>{});
+            }
+            break;
+            case mpp::CompareOp::IsInf:
+            {
+                runComperator(instantiationHelper<SrcT, mpp::IsInf<ComputeT, anyChannel>, typename T::compare_t>{});
+            }
+            break;
+            case mpp::CompareOp::IsInfOrNaN:
+            {
+                runComperator(
+                    instantiationHelper<SrcT, mpp::IsInfOrNaN<ComputeT, anyChannel>, typename T::compare_t>{});
+            }
+            break;
+            case mpp::CompareOp::IsPositiveInf:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, use IsInf without sign instead.");
+                }
+                else
+                {
+                    runComperator(
+                        instantiationHelper<SrcT, mpp::IsPositiveInf<ComputeT, anyChannel>, typename T::compare_t>{});
+                }
+            }
+            break;
+            case mpp::CompareOp::IsNegativeInf:
+            {
+                if constexpr (ComplexVector<SrcT>)
+                {
+                    throw INVALIDARGUMENT(
+                        aCompare, "CompareOp "
+                                      << aCompare
+                                      << " is not supported for complex datatypes, use IsInf without sign instead.");
+                }
+                else
+                {
+                    runComperator(
+                        instantiationHelper<SrcT, mpp::IsNegativeInf<ComputeT, anyChannel>, typename T::compare_t>{});
+                }
+            }
+            break;
+            default:
+                throw INVALIDARGUMENT(aCompare,
+                                      "Unsupported CompareOp: "
+                                          << aCompare
+                                          << ". This function only supports unary comparisons (IsInf, IsNaN, etc.).");
+        }
+    };
 
-        if (CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    if (CompareOp_IsPerChannel(aCompare) && vector_size_v<SrcT> > 1)
+    {
+        using CompareT = same_vector_size_different_type_t<SrcT, byte>;
+        runAnyChannel(instantiationHelper2<CompareT, false>{});
+    }
+    else
+    {
+        using CompareT = Vector1<byte>;
+        if (CompareOp_IsAnyChannel(aCompare))
         {
-            using CompareT = same_vector_size_different_type_t<SrcT, byte>;
-            runAnyChannel(instantiationHelper2<CompareT, false>{});
+            runAnyChannel(instantiationHelper2<CompareT, true>{});
         }
         else
         {
-            using CompareT = Vector1<byte>;
-            if (CompareOp_IsAnyChannel(aCompare))
-            {
-                runAnyChannel(instantiationHelper2<CompareT, true>{});
-            }
-            else
-            {
-                runAnyChannel(instantiationHelper2<CompareT, false>{});
-            }
+            runAnyChannel(instantiationHelper2<CompareT, false>{});
         }
     }
 }
@@ -1561,4 +1511,3 @@ void InvokeReplaceIfInplaceSrc(SrcDstT *aSrcDst, size_t aPitchSrcDst, const SrcD
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

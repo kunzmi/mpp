@@ -1,8 +1,4 @@
 #pragma once
-#include <common/moduleEnabler.h>
-#if MPP_ENABLE_NPP_BACKEND
-#include <common/image/pixelTypeEnabler.h>
-
 #include "../dllexport_npp.h"
 #include "image8sC1View.h"
 #include "image8sC2View.h"
@@ -87,4 +83,3 @@ class MPPEXPORT_NPP Image8sC4 : public Image8sC4View
     Image8sC4 &operator=(Image8sC4 &&aOther) noexcept;
 };
 } // namespace mpp::image::npp
-#endif // MPP_ENABLE_NPP_BACKEND

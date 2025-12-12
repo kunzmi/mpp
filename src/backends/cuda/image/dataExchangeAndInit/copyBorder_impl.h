@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "copyBorder.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelKernel.h>
@@ -12,7 +10,6 @@
 #include <common/image/functors/interpolator.h>
 #include <common/image/functors/transformer.h>
 #include <common/image/functors/transformerFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -31,100 +28,92 @@ void InvokeCopyBorder(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t a
                       const Vector2<int> &aLowerBorderSize, BorderType aBorder, const SrcT &aConstant,
                       const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+    constexpr RoundingMode roundingMode = RoundingMode::None;
+    using CoordT                        = int;
+
+    const TransformerShift<CoordT> shift(aLowerBorderSize);
+
+    constexpr Vector2<int> roiOffset(0);
+
+    switch (aBorder)
     {
-        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
-
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
-
-        constexpr RoundingMode roundingMode = RoundingMode::None;
-        using CoordT                        = int;
-
-        const TransformerShift<CoordT> shift(aLowerBorderSize);
-
-        constexpr Vector2<int> roiOffset(0);
-
-        switch (aBorder)
+        case mpp::BorderType::Constant:
         {
-            case mpp::BorderType::Constant:
-            {
-                using BCType = BorderControl<SrcT, BorderType::Constant, false, true, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aSize, roiOffset, aConstant);
+            using BCType = BorderControl<SrcT, BorderType::Constant, false, true, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aSize, roiOffset, aConstant);
 
-                using InterpolatorT = Interpolator<SrcT, BCType, CoordT, InterpolationMode::Undefined>;
-                const InterpolatorT interpol(bc);
-                using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, false, InterpolatorT,
-                                                        TransformerShift<CoordT>, roundingMode>;
-                const TransformerT functor(interpol, shift, aSize);
+            using InterpolatorT = Interpolator<SrcT, BCType, CoordT, InterpolationMode::Undefined>;
+            const InterpolatorT interpol(bc);
+            using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, false, InterpolatorT,
+                                                    TransformerShift<CoordT>, roundingMode>;
+            const TransformerT functor(interpol, shift, aSize);
 
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx,
-                                                                               functor);
-            }
-            break;
-            case mpp::BorderType::Replicate:
-            {
-                using BCType = BorderControl<SrcT, BorderType::Replicate, false, true, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aSize, roiOffset);
-
-                using InterpolatorT = Interpolator<SrcT, BCType, CoordT, InterpolationMode::Undefined>;
-                const InterpolatorT interpol(bc);
-                using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, false, InterpolatorT,
-                                                        TransformerShift<CoordT>, roundingMode>;
-                const TransformerT functor(interpol, shift, aSize);
-
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx,
-                                                                               functor);
-            }
-            break;
-            case mpp::BorderType::Mirror:
-            {
-                using BCType = BorderControl<SrcT, BorderType::Mirror, false, true, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aSize, roiOffset);
-
-                using InterpolatorT = Interpolator<SrcT, BCType, CoordT, InterpolationMode::Undefined>;
-                const InterpolatorT interpol(bc);
-                using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, false, InterpolatorT,
-                                                        TransformerShift<CoordT>, roundingMode>;
-                const TransformerT functor(interpol, shift, aSize);
-
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx,
-                                                                               functor);
-            }
-            break;
-            case mpp::BorderType::MirrorReplicate:
-            {
-                using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, true, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aSize, roiOffset);
-
-                using InterpolatorT = Interpolator<SrcT, BCType, CoordT, InterpolationMode::Undefined>;
-                const InterpolatorT interpol(bc);
-                using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, false, InterpolatorT,
-                                                        TransformerShift<CoordT>, roundingMode>;
-                const TransformerT functor(interpol, shift, aSize);
-
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx,
-                                                                               functor);
-            }
-            break;
-            case mpp::BorderType::Wrap:
-            {
-                using BCType = BorderControl<SrcT, BorderType::Wrap, false, true, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aSize, roiOffset);
-
-                using InterpolatorT = Interpolator<SrcT, BCType, CoordT, InterpolationMode::Undefined>;
-                const InterpolatorT interpol(bc);
-                using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, false, InterpolatorT,
-                                                        TransformerShift<CoordT>, roundingMode>;
-                const TransformerT functor(interpol, shift, aSize);
-
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx,
-                                                                               functor);
-            }
-            break;
-            default:
-                throw INVALIDARGUMENT(aBorder, aBorder << " is not a supported border type mode for CopyBorder.");
-                break;
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx, functor);
         }
+        break;
+        case mpp::BorderType::Replicate:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Replicate, false, true, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aSize, roiOffset);
+
+            using InterpolatorT = Interpolator<SrcT, BCType, CoordT, InterpolationMode::Undefined>;
+            const InterpolatorT interpol(bc);
+            using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, false, InterpolatorT,
+                                                    TransformerShift<CoordT>, roundingMode>;
+            const TransformerT functor(interpol, shift, aSize);
+
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        }
+        break;
+        case mpp::BorderType::Mirror:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Mirror, false, true, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aSize, roiOffset);
+
+            using InterpolatorT = Interpolator<SrcT, BCType, CoordT, InterpolationMode::Undefined>;
+            const InterpolatorT interpol(bc);
+            using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, false, InterpolatorT,
+                                                    TransformerShift<CoordT>, roundingMode>;
+            const TransformerT functor(interpol, shift, aSize);
+
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        }
+        break;
+        case mpp::BorderType::MirrorReplicate:
+        {
+            using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, true, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aSize, roiOffset);
+
+            using InterpolatorT = Interpolator<SrcT, BCType, CoordT, InterpolationMode::Undefined>;
+            const InterpolatorT interpol(bc);
+            using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, false, InterpolatorT,
+                                                    TransformerShift<CoordT>, roundingMode>;
+            const TransformerT functor(interpol, shift, aSize);
+
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        }
+        break;
+        case mpp::BorderType::Wrap:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Wrap, false, true, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aSize, roiOffset);
+
+            using InterpolatorT = Interpolator<SrcT, BCType, CoordT, InterpolationMode::Undefined>;
+            const InterpolatorT interpol(bc);
+            using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, false, InterpolatorT,
+                                                    TransformerShift<CoordT>, roundingMode>;
+            const TransformerT functor(interpol, shift, aSize);
+
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        }
+        break;
+        default:
+            throw INVALIDARGUMENT(aBorder, aBorder << " is not a supported border type mode for CopyBorder.");
+            break;
     }
 }
 
@@ -152,4 +141,3 @@ void InvokeCopyBorder(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t a
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

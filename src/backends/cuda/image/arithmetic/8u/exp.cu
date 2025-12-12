@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "../exp_impl.h"
 
 using namespace mpp::cuda;
@@ -11,4 +9,3 @@ ForAllChannelsWithAlphaInvokeExpSrc(8u);
 ForAllChannelsWithAlphaInvokeExpInplace(8u);
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

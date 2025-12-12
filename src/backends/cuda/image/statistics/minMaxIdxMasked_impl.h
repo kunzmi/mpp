@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "minMaxIdxMasked.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/reductionMaskedMinMaxIndexAlongXKernel.h>
@@ -9,7 +7,6 @@
 #include <common/defines.h>
 #include <common/image/functors/reductionInitValues.h>
 #include <common/image/functors/srcReduction2Functor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -34,20 +31,17 @@ void InvokeMinMaxIdxMaskedSrc(const Pixel8uC1 *aMask, size_t aPitchMask, const S
                               remove_vector_t<SrcT> *aDstScalarMax, IndexMinMaxChannel *aDstScalarIdx,
                               const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
+    MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
-        InvokeReductionMaskedMinMaxIdxAlongXKernelDefault<SrcT, TupelSize>(aMask, aPitchMask, aSrc, aPitchSrc,
-                                                                           aTempBufferMin, aTempBufferMax, aTempMinIdxX,
-                                                                           aTempMaxIdxX, aSize, aStreamCtx);
+    InvokeReductionMaskedMinMaxIdxAlongXKernelDefault<SrcT, TupelSize>(aMask, aPitchMask, aSrc, aPitchSrc,
+                                                                       aTempBufferMin, aTempBufferMax, aTempMinIdxX,
+                                                                       aTempMaxIdxX, aSize, aStreamCtx);
 
-        InvokeReductionMinMaxIdxAlongYKernelDefault<SrcT>(aTempBufferMin, aTempBufferMax, aTempMinIdxX, aTempMaxIdxX,
-                                                          aDstMin, aDstMax, aDstIdx, aDstScalarMin, aDstScalarMax,
-                                                          aDstScalarIdx, aSize.y, aStreamCtx);
-    }
+    InvokeReductionMinMaxIdxAlongYKernelDefault<SrcT>(aTempBufferMin, aTempBufferMax, aTempMinIdxX, aTempMaxIdxX,
+                                                      aDstMin, aDstMax, aDstIdx, aDstScalarMin, aDstScalarMax,
+                                                      aDstScalarIdx, aSize.y, aStreamCtx);
 }
 
 #pragma region Instantiate
@@ -69,4 +63,3 @@ void InvokeMinMaxIdxMaskedSrc(const Pixel8uC1 *aMask, size_t aPitchMask, const S
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

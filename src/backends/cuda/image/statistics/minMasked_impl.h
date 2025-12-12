@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "minMasked.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/reductionAlongYKernel.h>
@@ -9,7 +7,6 @@
 #include <common/defines.h>
 #include <common/image/functors/reductionInitValues.h>
 #include <common/image/functors/srcReductionFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -30,29 +27,25 @@ void InvokeMinMaskedSrc(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *a
                         SrcT *aTempBuffer, SrcT *aDst, remove_vector_t<SrcT> *aDstScalar, const Size2D &aSize,
                         const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
+    MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
-        using minSrc = SrcReductionFunctor<TupelSize, SrcT, SrcT, mpp::MinRed<SrcT>>;
+    using minSrc = SrcReductionFunctor<TupelSize, SrcT, SrcT, mpp::MinRed<SrcT>>;
 
-        const mpp::MinRed<SrcT> op;
+    const mpp::MinRed<SrcT> op;
 
-        const minSrc functor(aSrc, aPitchSrc, op);
+    const minSrc functor(aSrc, aPitchSrc, op);
 
-        InvokeReductionMaskedAlongXKernelDefault<SrcT, SrcT, TupelSize, minSrc, mpp::MinRed<SrcT>,
-                                                 ReductionInitValue::Max>(aMask, aPitchMask, aSrc, aTempBuffer, aSize,
-                                                                          aStreamCtx, functor);
+    InvokeReductionMaskedAlongXKernelDefault<SrcT, SrcT, TupelSize, minSrc, mpp::MinRed<SrcT>, ReductionInitValue::Max>(
+        aMask, aPitchMask, aSrc, aTempBuffer, aSize, aStreamCtx, functor);
 
-        const mpp::Nothing<SrcT> postOp;
-        const mpp::MinScalar<SrcT> postOpScalar;
+    const mpp::Nothing<SrcT> postOp;
+    const mpp::MinScalar<SrcT> postOpScalar;
 
-        InvokeReductionAlongYKernelDefault<SrcT, SrcT, mpp::MinRed<SrcT>, ReductionInitValue::Max, mpp::Nothing<SrcT>,
-                                           mpp::MinScalar<SrcT>>(aTempBuffer, aDst, aDstScalar, aSize.y, postOp,
-                                                                 postOpScalar, aStreamCtx);
-    }
+    InvokeReductionAlongYKernelDefault<SrcT, SrcT, mpp::MinRed<SrcT>, ReductionInitValue::Max, mpp::Nothing<SrcT>,
+                                       mpp::MinScalar<SrcT>>(aTempBuffer, aDst, aDstScalar, aSize.y, postOp,
+                                                             postOpScalar, aStreamCtx);
 }
 
 #pragma region Instantiate
@@ -71,4 +64,3 @@ void InvokeMinMaskedSrc(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *a
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "../fixedSizeDilationGray_impl.h"
 
 using namespace mpp::cuda;
@@ -11,4 +9,3 @@ ForAllChannelsWithAlpha(8s, 8s);
 ForAllChannelsWithAlpha(8s, 16s);
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

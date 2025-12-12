@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "perspectiveBack.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelKernel.h>
@@ -15,7 +13,6 @@
 #include <common/image/functors/transformer.h>
 #include <common/image/functors/transformerFunctor.h>
 #include <common/image/matrix.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
 #include <common/image/size2D.h>
@@ -37,217 +34,213 @@ void InvokePerspectiveBackSrc(const SrcT *aSrc1, size_t aPitchSrc1, SrcT *aDst, 
                               const Size2D &aAllowedReadRoiSize, const Size2D &aSizeSrc, const Size2D &aSizeDst,
                               const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
+    MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
-        constexpr RoundingMode roundingMode = RoundingMode::NearestTiesToEven;
-        using CoordTInterpol                = coordinate_type_interpolation_for_t<SrcT>;
-        using CoordT                        = coordinate_type_interpolation_for_t<SrcT>; // double for Vector<double>...
-        const PerspectiveTransformation<CoordT> transformTyped(aPerspective);
-        const TransformerPerspective<CoordT> perspective(transformTyped);
+    constexpr RoundingMode roundingMode = RoundingMode::NearestTiesToEven;
+    using CoordTInterpol                = coordinate_type_interpolation_for_t<SrcT>;
+    using CoordT                        = coordinate_type_interpolation_for_t<SrcT>; // double for Vector<double>...
+    const PerspectiveTransformation<CoordT> transformTyped(aPerspective);
+    const TransformerPerspective<CoordT> perspective(transformTyped);
 
-        auto runOverInterpolation = [&]<typename bcT>(const bcT &aBC) {
-            switch (aInterpolation)
-            {
-                case mpp::InterpolationMode::NearestNeighbor:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT = Interpolator<SrcT, bcT, CoordTInterpol, InterpolationMode::NearestNeighbor>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelKernelDefault<SrcT, tupelSize, FunctorT>(aDst, aPitchDst, aSizeDst, aStreamCtx,
-                                                                               functor);
-                }
-                break;
-                case mpp::InterpolationMode::Linear:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT =
-                        Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol, InterpolationMode::Linear>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelKernelDefault<SrcT, tupelSize, FunctorT>(aDst, aPitchDst, aSizeDst, aStreamCtx,
-                                                                               functor);
-                }
-                break;
-                case mpp::InterpolationMode::CubicHermiteSpline:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::CubicHermiteSpline>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelKernelDefault<SrcT, tupelSize, FunctorT>(aDst, aPitchDst, aSizeDst, aStreamCtx,
-                                                                               functor);
-                }
-                break;
-                case mpp::InterpolationMode::CubicLagrange:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::CubicLagrange>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelKernelDefault<SrcT, tupelSize, FunctorT>(aDst, aPitchDst, aSizeDst, aStreamCtx,
-                                                                               functor);
-                }
-                break;
-                case mpp::InterpolationMode::Cubic2ParamBSpline:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::Cubic2ParamBSpline>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelKernelDefault<SrcT, tupelSize, FunctorT>(aDst, aPitchDst, aSizeDst, aStreamCtx,
-                                                                               functor);
-                }
-                break;
-                case mpp::InterpolationMode::Cubic2ParamCatmullRom:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::Cubic2ParamCatmullRom>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelKernelDefault<SrcT, tupelSize, FunctorT>(aDst, aPitchDst, aSizeDst, aStreamCtx,
-                                                                               functor);
-                }
-                break;
-                case mpp::InterpolationMode::Cubic2ParamB05C03:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::Cubic2ParamB05C03>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelKernelDefault<SrcT, tupelSize, FunctorT>(aDst, aPitchDst, aSizeDst, aStreamCtx,
-                                                                               functor);
-                }
-                break;
-                case mpp::InterpolationMode::Lanczos2Lobed:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::Lanczos2Lobed>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelKernelDefault<SrcT, tupelSize, FunctorT>(aDst, aPitchDst, aSizeDst, aStreamCtx,
-                                                                               functor);
-                }
-                break;
-                case mpp::InterpolationMode::Lanczos3Lobed:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::Lanczos3Lobed>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelKernelDefault<SrcT, tupelSize, FunctorT>(aDst, aPitchDst, aSizeDst, aStreamCtx,
-                                                                               functor);
-                }
-                break;
-                default:
-                    throw INVALIDARGUMENT(aInterpolation,
-                                          aInterpolation
-                                              << " is not a supported interpolation mode for WarpPerspective.");
-                    break;
-            }
-        };
-
-        switch (aBorder)
+    auto runOverInterpolation = [&]<typename bcT>(const bcT &aBC) {
+        switch (aInterpolation)
         {
-            case mpp::BorderType::None:
+            case mpp::InterpolationMode::NearestNeighbor:
             {
-                // for interpolation at the border we will still use replicate:
-                using BCType = BorderControl<SrcT, BorderType::Replicate, true, false, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT = Interpolator<SrcT, bcT, CoordTInterpol, InterpolationMode::NearestNeighbor>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelKernelDefault<SrcT, tupelSize, FunctorT>(aDst, aPitchDst, aSizeDst, aStreamCtx,
+                                                                           functor);
             }
             break;
-            case mpp::BorderType::Constant:
+            case mpp::InterpolationMode::Linear:
             {
-                using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset, aConstant);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT =
+                    Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol, InterpolationMode::Linear>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelKernelDefault<SrcT, tupelSize, FunctorT>(aDst, aPitchDst, aSizeDst, aStreamCtx,
+                                                                           functor);
             }
             break;
-            case mpp::BorderType::Replicate:
+            case mpp::InterpolationMode::CubicHermiteSpline:
             {
-                using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::CubicHermiteSpline>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelKernelDefault<SrcT, tupelSize, FunctorT>(aDst, aPitchDst, aSizeDst, aStreamCtx,
+                                                                           functor);
             }
             break;
-            case mpp::BorderType::Mirror:
+            case mpp::InterpolationMode::CubicLagrange:
             {
-                using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::CubicLagrange>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelKernelDefault<SrcT, tupelSize, FunctorT>(aDst, aPitchDst, aSizeDst, aStreamCtx,
+                                                                           functor);
             }
             break;
-            case mpp::BorderType::MirrorReplicate:
+            case mpp::InterpolationMode::Cubic2ParamBSpline:
             {
-                using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::Cubic2ParamBSpline>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelKernelDefault<SrcT, tupelSize, FunctorT>(aDst, aPitchDst, aSizeDst, aStreamCtx,
+                                                                           functor);
             }
             break;
-            case mpp::BorderType::Wrap:
+            case mpp::InterpolationMode::Cubic2ParamCatmullRom:
             {
-                using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::Cubic2ParamCatmullRom>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelKernelDefault<SrcT, tupelSize, FunctorT>(aDst, aPitchDst, aSizeDst, aStreamCtx,
+                                                                           functor);
             }
             break;
-            case mpp::BorderType::SmoothEdge:
+            case mpp::InterpolationMode::Cubic2ParamB05C03:
             {
-                using BCType = BorderControl<SrcT, BorderType::SmoothEdge, true, false, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::Cubic2ParamB05C03>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelKernelDefault<SrcT, tupelSize, FunctorT>(aDst, aPitchDst, aSizeDst, aStreamCtx,
+                                                                           functor);
+            }
+            break;
+            case mpp::InterpolationMode::Lanczos2Lobed:
+            {
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::Lanczos2Lobed>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
+
+                InvokeForEachPixelKernelDefault<SrcT, tupelSize, FunctorT>(aDst, aPitchDst, aSizeDst, aStreamCtx,
+                                                                           functor);
+            }
+            break;
+            case mpp::InterpolationMode::Lanczos3Lobed:
+            {
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::Lanczos3Lobed>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
+
+                InvokeForEachPixelKernelDefault<SrcT, tupelSize, FunctorT>(aDst, aPitchDst, aSizeDst, aStreamCtx,
+                                                                           functor);
             }
             break;
             default:
-                throw INVALIDARGUMENT(aBorder, aBorder << " is not a supported border type mode for WarpPerspective.");
+                throw INVALIDARGUMENT(aInterpolation,
+                                      aInterpolation << " is not a supported interpolation mode for WarpPerspective.");
                 break;
         }
+    };
+
+    switch (aBorder)
+    {
+        case mpp::BorderType::None:
+        {
+            // for interpolation at the border we will still use replicate:
+            using BCType = BorderControl<SrcT, BorderType::Replicate, true, false, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::Constant:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset, aConstant);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::Replicate:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::Mirror:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::MirrorReplicate:
+        {
+            using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::Wrap:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::SmoothEdge:
+        {
+            using BCType = BorderControl<SrcT, BorderType::SmoothEdge, true, false, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        default:
+            throw INVALIDARGUMENT(aBorder, aBorder << " is not a supported border type mode for WarpPerspective.");
+            break;
     }
 }
 
@@ -285,218 +278,214 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                               const Size2D &aAllowedReadRoiSize, const Size2D &aSizeSrc, const Size2D &aSizeDst,
                               const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
+    MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
-        constexpr RoundingMode roundingMode = RoundingMode::NearestTiesToEven;
-        using CoordTInterpol                = coordinate_type_interpolation_for_t<SrcT>;
-        using CoordT                        = coordinate_type_interpolation_for_t<SrcT>; // double for Vector<double>...
-        const PerspectiveTransformation<CoordT> transformTyped(aPerspective);
-        const TransformerPerspective<CoordT> perspective(transformTyped);
+    constexpr RoundingMode roundingMode = RoundingMode::NearestTiesToEven;
+    using CoordTInterpol                = coordinate_type_interpolation_for_t<SrcT>;
+    using CoordT                        = coordinate_type_interpolation_for_t<SrcT>; // double for Vector<double>...
+    const PerspectiveTransformation<CoordT> transformTyped(aPerspective);
+    const TransformerPerspective<CoordT> perspective(transformTyped);
 
-        auto runOverInterpolation = [&]<typename bcT>(const bcT &aBC) {
-            switch (aInterpolation)
-            {
-                case mpp::InterpolationMode::NearestNeighbor:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT = Interpolator<SrcT, bcT, CoordTInterpol, InterpolationMode::NearestNeighbor>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar2KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::Linear:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT =
-                        Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol, InterpolationMode::Linear>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar2KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::CubicHermiteSpline:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::CubicHermiteSpline>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar2KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::CubicLagrange:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::CubicLagrange>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar2KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::Cubic2ParamBSpline:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::Cubic2ParamBSpline>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar2KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::Cubic2ParamCatmullRom:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::Cubic2ParamCatmullRom>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar2KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::Cubic2ParamB05C03:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::Cubic2ParamB05C03>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar2KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::Lanczos2Lobed:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::Lanczos2Lobed>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar2KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::Lanczos3Lobed:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::Lanczos3Lobed>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar2KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aSizeDst, aStreamCtx, functor);
-                }
-                break;
-                default:
-                    throw INVALIDARGUMENT(aInterpolation,
-                                          aInterpolation
-                                              << " is not a supported interpolation mode for WarpPerspective.");
-                    break;
-            }
-        };
-
-        switch (aBorder)
+    auto runOverInterpolation = [&]<typename bcT>(const bcT &aBC) {
+        switch (aInterpolation)
         {
-            case mpp::BorderType::None:
+            case mpp::InterpolationMode::NearestNeighbor:
             {
-                // for interpolation at the border we will still use replicate:
-                using BCType = BorderControl<SrcT, BorderType::Replicate, true, false, false, true>;
-                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT = Interpolator<SrcT, bcT, CoordTInterpol, InterpolationMode::NearestNeighbor>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelPlanar2KernelDefault<SrcT, tupelSize, FunctorT>(aDst1, aPitchDst1, aDst2, aPitchDst2,
+                                                                                  aSizeDst, aStreamCtx, functor);
             }
             break;
-            case mpp::BorderType::Constant:
+            case mpp::InterpolationMode::Linear:
             {
-                using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, true>;
-                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset,
-                                aConstant);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT =
+                    Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol, InterpolationMode::Linear>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelPlanar2KernelDefault<SrcT, tupelSize, FunctorT>(aDst1, aPitchDst1, aDst2, aPitchDst2,
+                                                                                  aSizeDst, aStreamCtx, functor);
             }
             break;
-            case mpp::BorderType::Replicate:
+            case mpp::InterpolationMode::CubicHermiteSpline:
             {
-                using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, true>;
-                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::CubicHermiteSpline>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelPlanar2KernelDefault<SrcT, tupelSize, FunctorT>(aDst1, aPitchDst1, aDst2, aPitchDst2,
+                                                                                  aSizeDst, aStreamCtx, functor);
             }
             break;
-            case mpp::BorderType::Mirror:
+            case mpp::InterpolationMode::CubicLagrange:
             {
-                using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, true>;
-                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::CubicLagrange>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelPlanar2KernelDefault<SrcT, tupelSize, FunctorT>(aDst1, aPitchDst1, aDst2, aPitchDst2,
+                                                                                  aSizeDst, aStreamCtx, functor);
             }
             break;
-            case mpp::BorderType::MirrorReplicate:
+            case mpp::InterpolationMode::Cubic2ParamBSpline:
             {
-                using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, true>;
-                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::Cubic2ParamBSpline>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelPlanar2KernelDefault<SrcT, tupelSize, FunctorT>(aDst1, aPitchDst1, aDst2, aPitchDst2,
+                                                                                  aSizeDst, aStreamCtx, functor);
             }
             break;
-            case mpp::BorderType::Wrap:
+            case mpp::InterpolationMode::Cubic2ParamCatmullRom:
             {
-                using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, true>;
-                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::Cubic2ParamCatmullRom>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelPlanar2KernelDefault<SrcT, tupelSize, FunctorT>(aDst1, aPitchDst1, aDst2, aPitchDst2,
+                                                                                  aSizeDst, aStreamCtx, functor);
             }
             break;
-            case mpp::BorderType::SmoothEdge:
+            case mpp::InterpolationMode::Cubic2ParamB05C03:
             {
-                using BCType = BorderControl<SrcT, BorderType::SmoothEdge, true, false, false, true>;
-                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::Cubic2ParamB05C03>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelPlanar2KernelDefault<SrcT, tupelSize, FunctorT>(aDst1, aPitchDst1, aDst2, aPitchDst2,
+                                                                                  aSizeDst, aStreamCtx, functor);
+            }
+            break;
+            case mpp::InterpolationMode::Lanczos2Lobed:
+            {
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::Lanczos2Lobed>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
+
+                InvokeForEachPixelPlanar2KernelDefault<SrcT, tupelSize, FunctorT>(aDst1, aPitchDst1, aDst2, aPitchDst2,
+                                                                                  aSizeDst, aStreamCtx, functor);
+            }
+            break;
+            case mpp::InterpolationMode::Lanczos3Lobed:
+            {
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::Lanczos3Lobed>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
+
+                InvokeForEachPixelPlanar2KernelDefault<SrcT, tupelSize, FunctorT>(aDst1, aPitchDst1, aDst2, aPitchDst2,
+                                                                                  aSizeDst, aStreamCtx, functor);
             }
             break;
             default:
-                throw INVALIDARGUMENT(aBorder, aBorder << " is not a supported border type mode for WarpPerspective.");
+                throw INVALIDARGUMENT(aInterpolation,
+                                      aInterpolation << " is not a supported interpolation mode for WarpPerspective.");
                 break;
         }
+    };
+
+    switch (aBorder)
+    {
+        case mpp::BorderType::None:
+        {
+            // for interpolation at the border we will still use replicate:
+            using BCType = BorderControl<SrcT, BorderType::Replicate, true, false, false, true>;
+            const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::Constant:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, true>;
+            const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset,
+                            aConstant);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::Replicate:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, true>;
+            const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::Mirror:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, true>;
+            const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::MirrorReplicate:
+        {
+            using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, true>;
+            const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::Wrap:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, true>;
+            const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::SmoothEdge:
+        {
+            using BCType = BorderControl<SrcT, BorderType::SmoothEdge, true, false, false, true>;
+            const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        default:
+            throw INVALIDARGUMENT(aBorder, aBorder << " is not a supported border type mode for WarpPerspective.");
+            break;
     }
 }
 
@@ -528,224 +517,220 @@ void InvokePerspectiveBackSrc(const Vector1<remove_vector_t<SrcT>> *aSrc1, size_
                               const Size2D &aAllowedReadRoiSize, const Size2D &aSizeSrc, const Size2D &aSizeDst,
                               const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
+    MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
-        constexpr RoundingMode roundingMode = RoundingMode::NearestTiesToEven;
-        using CoordTInterpol                = coordinate_type_interpolation_for_t<SrcT>;
-        using CoordT                        = coordinate_type_interpolation_for_t<SrcT>; // double for Vector<double>...
-        const PerspectiveTransformation<CoordT> transformTyped(aPerspective);
-        const TransformerPerspective<CoordT> perspective(transformTyped);
+    constexpr RoundingMode roundingMode = RoundingMode::NearestTiesToEven;
+    using CoordTInterpol                = coordinate_type_interpolation_for_t<SrcT>;
+    using CoordT                        = coordinate_type_interpolation_for_t<SrcT>; // double for Vector<double>...
+    const PerspectiveTransformation<CoordT> transformTyped(aPerspective);
+    const TransformerPerspective<CoordT> perspective(transformTyped);
 
-        auto runOverInterpolation = [&]<typename bcT>(const bcT &aBC) {
-            switch (aInterpolation)
-            {
-                case mpp::InterpolationMode::NearestNeighbor:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT = Interpolator<SrcT, bcT, CoordTInterpol, InterpolationMode::NearestNeighbor>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar3KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::Linear:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT =
-                        Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol, InterpolationMode::Linear>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar3KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::CubicHermiteSpline:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::CubicHermiteSpline>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar3KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::CubicLagrange:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::CubicLagrange>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar3KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::Cubic2ParamBSpline:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::Cubic2ParamBSpline>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar3KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::Cubic2ParamCatmullRom:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::Cubic2ParamCatmullRom>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar3KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::Cubic2ParamB05C03:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::Cubic2ParamB05C03>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar3KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::Lanczos2Lobed:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::Lanczos2Lobed>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar3KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::Lanczos3Lobed:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::Lanczos3Lobed>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar3KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
-                }
-                break;
-                default:
-                    throw INVALIDARGUMENT(aInterpolation,
-                                          aInterpolation
-                                              << " is not a supported interpolation mode for WarpPerspective.");
-                    break;
-            }
-        };
-
-        switch (aBorder)
+    auto runOverInterpolation = [&]<typename bcT>(const bcT &aBC) {
+        switch (aInterpolation)
         {
-            case mpp::BorderType::None:
+            case mpp::InterpolationMode::NearestNeighbor:
             {
-                // for interpolation at the border we will still use replicate:
-                using BCType = BorderControl<SrcT, BorderType::Replicate, true, false, false, true>;
-                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
-                                aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT = Interpolator<SrcT, bcT, CoordTInterpol, InterpolationMode::NearestNeighbor>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelPlanar3KernelDefault<SrcT, tupelSize, FunctorT>(
+                    aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
             }
             break;
-            case mpp::BorderType::Constant:
+            case mpp::InterpolationMode::Linear:
             {
-                using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, true>;
-                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
-                                aAllowedReadRoiOffset, aConstant);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT =
+                    Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol, InterpolationMode::Linear>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelPlanar3KernelDefault<SrcT, tupelSize, FunctorT>(
+                    aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
             }
             break;
-            case mpp::BorderType::Replicate:
+            case mpp::InterpolationMode::CubicHermiteSpline:
             {
-                using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, true>;
-                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
-                                aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::CubicHermiteSpline>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelPlanar3KernelDefault<SrcT, tupelSize, FunctorT>(
+                    aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
             }
             break;
-            case mpp::BorderType::Mirror:
+            case mpp::InterpolationMode::CubicLagrange:
             {
-                using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, true>;
-                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
-                                aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::CubicLagrange>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelPlanar3KernelDefault<SrcT, tupelSize, FunctorT>(
+                    aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
             }
             break;
-            case mpp::BorderType::MirrorReplicate:
+            case mpp::InterpolationMode::Cubic2ParamBSpline:
             {
-                using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, true>;
-                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
-                                aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::Cubic2ParamBSpline>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelPlanar3KernelDefault<SrcT, tupelSize, FunctorT>(
+                    aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
             }
             break;
-            case mpp::BorderType::Wrap:
+            case mpp::InterpolationMode::Cubic2ParamCatmullRom:
             {
-                using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, true>;
-                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
-                                aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::Cubic2ParamCatmullRom>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelPlanar3KernelDefault<SrcT, tupelSize, FunctorT>(
+                    aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
             }
             break;
-            case mpp::BorderType::SmoothEdge:
+            case mpp::InterpolationMode::Cubic2ParamB05C03:
             {
-                using BCType = BorderControl<SrcT, BorderType::SmoothEdge, true, false, false, true>;
-                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
-                                aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::Cubic2ParamB05C03>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelPlanar3KernelDefault<SrcT, tupelSize, FunctorT>(
+                    aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
+            }
+            break;
+            case mpp::InterpolationMode::Lanczos2Lobed:
+            {
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::Lanczos2Lobed>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
+
+                InvokeForEachPixelPlanar3KernelDefault<SrcT, tupelSize, FunctorT>(
+                    aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
+            }
+            break;
+            case mpp::InterpolationMode::Lanczos3Lobed:
+            {
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::Lanczos3Lobed>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
+
+                InvokeForEachPixelPlanar3KernelDefault<SrcT, tupelSize, FunctorT>(
+                    aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aSizeDst, aStreamCtx, functor);
             }
             break;
             default:
-                throw INVALIDARGUMENT(aBorder, aBorder << " is not a supported border type mode for WarpPerspective.");
+                throw INVALIDARGUMENT(aInterpolation,
+                                      aInterpolation << " is not a supported interpolation mode for WarpPerspective.");
                 break;
         }
+    };
+
+    switch (aBorder)
+    {
+        case mpp::BorderType::None:
+        {
+            // for interpolation at the border we will still use replicate:
+            using BCType = BorderControl<SrcT, BorderType::Replicate, true, false, false, true>;
+            const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
+                            aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::Constant:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, true>;
+            const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
+                            aAllowedReadRoiOffset, aConstant);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::Replicate:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, true>;
+            const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
+                            aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::Mirror:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, true>;
+            const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
+                            aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::MirrorReplicate:
+        {
+            using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, true>;
+            const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
+                            aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::Wrap:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, true>;
+            const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
+                            aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::SmoothEdge:
+        {
+            using BCType = BorderControl<SrcT, BorderType::SmoothEdge, true, false, false, true>;
+            const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aAllowedReadRoiSize,
+                            aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        default:
+            throw INVALIDARGUMENT(aBorder, aBorder << " is not a supported border type mode for WarpPerspective.");
+            break;
     }
 }
 
@@ -778,233 +763,229 @@ void InvokePerspectiveBackSrc(
     const SrcT &aConstant, const Vector2<int> aAllowedReadRoiOffset, const Size2D &aAllowedReadRoiSize,
     const Size2D &aSizeSrc, const Size2D &aSizeDst, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
+    MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
-        constexpr RoundingMode roundingMode = RoundingMode::NearestTiesToEven;
-        using CoordTInterpol                = coordinate_type_interpolation_for_t<SrcT>;
-        using CoordT                        = coordinate_type_interpolation_for_t<SrcT>; // double for Vector<double>...
-        const PerspectiveTransformation<CoordT> transformTyped(aPerspective);
-        const TransformerPerspective<CoordT> perspective(transformTyped);
+    constexpr RoundingMode roundingMode = RoundingMode::NearestTiesToEven;
+    using CoordTInterpol                = coordinate_type_interpolation_for_t<SrcT>;
+    using CoordT                        = coordinate_type_interpolation_for_t<SrcT>; // double for Vector<double>...
+    const PerspectiveTransformation<CoordT> transformTyped(aPerspective);
+    const TransformerPerspective<CoordT> perspective(transformTyped);
 
-        auto runOverInterpolation = [&]<typename bcT>(const bcT &aBC) {
-            switch (aInterpolation)
-            {
-                case mpp::InterpolationMode::NearestNeighbor:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT = Interpolator<SrcT, bcT, CoordTInterpol, InterpolationMode::NearestNeighbor>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar4KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aDst4, aPitchDst4, aSizeDst,
-                        aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::Linear:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT =
-                        Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol, InterpolationMode::Linear>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar4KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aDst4, aPitchDst4, aSizeDst,
-                        aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::CubicHermiteSpline:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::CubicHermiteSpline>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar4KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aDst4, aPitchDst4, aSizeDst,
-                        aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::CubicLagrange:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::CubicLagrange>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar4KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aDst4, aPitchDst4, aSizeDst,
-                        aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::Cubic2ParamBSpline:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::Cubic2ParamBSpline>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar4KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aDst4, aPitchDst4, aSizeDst,
-                        aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::Cubic2ParamCatmullRom:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::Cubic2ParamCatmullRom>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar4KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aDst4, aPitchDst4, aSizeDst,
-                        aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::Cubic2ParamB05C03:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::Cubic2ParamB05C03>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar4KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aDst4, aPitchDst4, aSizeDst,
-                        aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::Lanczos2Lobed:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::Lanczos2Lobed>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar4KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aDst4, aPitchDst4, aSizeDst,
-                        aStreamCtx, functor);
-                }
-                break;
-                case mpp::InterpolationMode::Lanczos3Lobed:
-                {
-                    constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
-                    using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
-                                                              InterpolationMode::Lanczos3Lobed>;
-                    const InterpolatorT interpol(aBC);
-                    using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation,
-                                                        InterpolatorT, TransformerPerspective<CoordT>, roundingMode>;
-                    const FunctorT functor(interpol, perspective, aSizeSrc);
-
-                    InvokeForEachPixelPlanar4KernelDefault<SrcT, tupelSize, FunctorT>(
-                        aDst1, aPitchDst1, aDst2, aPitchDst2, aDst3, aPitchDst3, aDst4, aPitchDst4, aSizeDst,
-                        aStreamCtx, functor);
-                }
-                break;
-                default:
-                    throw INVALIDARGUMENT(aInterpolation,
-                                          aInterpolation
-                                              << " is not a supported interpolation mode for WarpPerspective.");
-                    break;
-            }
-        };
-
-        switch (aBorder)
+    auto runOverInterpolation = [&]<typename bcT>(const bcT &aBC) {
+        switch (aInterpolation)
         {
-            case mpp::BorderType::None:
+            case mpp::InterpolationMode::NearestNeighbor:
             {
-                // for interpolation at the border we will still use replicate:
-                using BCType = BorderControl<SrcT, BorderType::Replicate, true, false, false, true>;
-                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
-                                aAllowedReadRoiSize, aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT = Interpolator<SrcT, bcT, CoordTInterpol, InterpolationMode::NearestNeighbor>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelPlanar4KernelDefault<SrcT, tupelSize, FunctorT>(aDst1, aPitchDst1, aDst2, aPitchDst2,
+                                                                                  aDst3, aPitchDst3, aDst4, aPitchDst4,
+                                                                                  aSizeDst, aStreamCtx, functor);
             }
             break;
-            case mpp::BorderType::Constant:
+            case mpp::InterpolationMode::Linear:
             {
-                using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, true>;
-                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
-                                aAllowedReadRoiSize, aAllowedReadRoiOffset, aConstant);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT =
+                    Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol, InterpolationMode::Linear>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelPlanar4KernelDefault<SrcT, tupelSize, FunctorT>(aDst1, aPitchDst1, aDst2, aPitchDst2,
+                                                                                  aDst3, aPitchDst3, aDst4, aPitchDst4,
+                                                                                  aSizeDst, aStreamCtx, functor);
             }
             break;
-            case mpp::BorderType::Replicate:
+            case mpp::InterpolationMode::CubicHermiteSpline:
             {
-                using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, true>;
-                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
-                                aAllowedReadRoiSize, aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::CubicHermiteSpline>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelPlanar4KernelDefault<SrcT, tupelSize, FunctorT>(aDst1, aPitchDst1, aDst2, aPitchDst2,
+                                                                                  aDst3, aPitchDst3, aDst4, aPitchDst4,
+                                                                                  aSizeDst, aStreamCtx, functor);
             }
             break;
-            case mpp::BorderType::Mirror:
+            case mpp::InterpolationMode::CubicLagrange:
             {
-                using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, true>;
-                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
-                                aAllowedReadRoiSize, aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::CubicLagrange>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelPlanar4KernelDefault<SrcT, tupelSize, FunctorT>(aDst1, aPitchDst1, aDst2, aPitchDst2,
+                                                                                  aDst3, aPitchDst3, aDst4, aPitchDst4,
+                                                                                  aSizeDst, aStreamCtx, functor);
             }
             break;
-            case mpp::BorderType::MirrorReplicate:
+            case mpp::InterpolationMode::Cubic2ParamBSpline:
             {
-                using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, true>;
-                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
-                                aAllowedReadRoiSize, aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::Cubic2ParamBSpline>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelPlanar4KernelDefault<SrcT, tupelSize, FunctorT>(aDst1, aPitchDst1, aDst2, aPitchDst2,
+                                                                                  aDst3, aPitchDst3, aDst4, aPitchDst4,
+                                                                                  aSizeDst, aStreamCtx, functor);
             }
             break;
-            case mpp::BorderType::Wrap:
+            case mpp::InterpolationMode::Cubic2ParamCatmullRom:
             {
-                using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, true>;
-                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
-                                aAllowedReadRoiSize, aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::Cubic2ParamCatmullRom>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelPlanar4KernelDefault<SrcT, tupelSize, FunctorT>(aDst1, aPitchDst1, aDst2, aPitchDst2,
+                                                                                  aDst3, aPitchDst3, aDst4, aPitchDst4,
+                                                                                  aSizeDst, aStreamCtx, functor);
             }
             break;
-            case mpp::BorderType::SmoothEdge:
+            case mpp::InterpolationMode::Cubic2ParamB05C03:
             {
-                using BCType = BorderControl<SrcT, BorderType::SmoothEdge, true, false, false, true>;
-                const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
-                                aAllowedReadRoiSize, aAllowedReadRoiOffset);
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::Cubic2ParamB05C03>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
 
-                runOverInterpolation(bc);
+                InvokeForEachPixelPlanar4KernelDefault<SrcT, tupelSize, FunctorT>(aDst1, aPitchDst1, aDst2, aPitchDst2,
+                                                                                  aDst3, aPitchDst3, aDst4, aPitchDst4,
+                                                                                  aSizeDst, aStreamCtx, functor);
+            }
+            break;
+            case mpp::InterpolationMode::Lanczos2Lobed:
+            {
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::Lanczos2Lobed>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
+
+                InvokeForEachPixelPlanar4KernelDefault<SrcT, tupelSize, FunctorT>(aDst1, aPitchDst1, aDst2, aPitchDst2,
+                                                                                  aDst3, aPitchDst3, aDst4, aPitchDst4,
+                                                                                  aSizeDst, aStreamCtx, functor);
+            }
+            break;
+            case mpp::InterpolationMode::Lanczos3Lobed:
+            {
+                constexpr size_t tupelSize = bcT::only_for_interpolation ? 1 : TupelSize;
+                using InterpolatorT        = Interpolator<geometry_compute_type_for_t<SrcT>, bcT, CoordTInterpol,
+                                                          InterpolationMode::Lanczos3Lobed>;
+                const InterpolatorT interpol(aBC);
+                using FunctorT = TransformerFunctor<tupelSize, SrcT, CoordT, bcT::only_for_interpolation, InterpolatorT,
+                                                    TransformerPerspective<CoordT>, roundingMode>;
+                const FunctorT functor(interpol, perspective, aSizeSrc);
+
+                InvokeForEachPixelPlanar4KernelDefault<SrcT, tupelSize, FunctorT>(aDst1, aPitchDst1, aDst2, aPitchDst2,
+                                                                                  aDst3, aPitchDst3, aDst4, aPitchDst4,
+                                                                                  aSizeDst, aStreamCtx, functor);
             }
             break;
             default:
-                throw INVALIDARGUMENT(aBorder, aBorder << " is not a supported border type mode for WarpPerspective.");
+                throw INVALIDARGUMENT(aInterpolation,
+                                      aInterpolation << " is not a supported interpolation mode for WarpPerspective.");
                 break;
         }
+    };
+
+    switch (aBorder)
+    {
+        case mpp::BorderType::None:
+        {
+            // for interpolation at the border we will still use replicate:
+            using BCType = BorderControl<SrcT, BorderType::Replicate, true, false, false, true>;
+            const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
+                            aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::Constant:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, true>;
+            const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
+                            aAllowedReadRoiSize, aAllowedReadRoiOffset, aConstant);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::Replicate:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, true>;
+            const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
+                            aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::Mirror:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, true>;
+            const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
+                            aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::MirrorReplicate:
+        {
+            using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, true>;
+            const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
+                            aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::Wrap:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, true>;
+            const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
+                            aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        case mpp::BorderType::SmoothEdge:
+        {
+            using BCType = BorderControl<SrcT, BorderType::SmoothEdge, true, false, false, true>;
+            const BCType bc(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSrc3, aPitchSrc3, aSrc4, aPitchSrc4,
+                            aAllowedReadRoiSize, aAllowedReadRoiOffset);
+
+            runOverInterpolation(bc);
+        }
+        break;
+        default:
+            throw INVALIDARGUMENT(aBorder, aBorder << " is not a supported border type mode for WarpPerspective.");
+            break;
     }
 }
 
@@ -1028,4 +1009,3 @@ void InvokePerspectiveBackSrc(
 
 #pragma endregion
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

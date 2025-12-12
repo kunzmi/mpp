@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "sqr.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelKernel.h>
@@ -11,7 +9,6 @@
 #include <common/defines.h>
 #include <common/image/functors/inplaceFunctor.h>
 #include <common/image/functors/srcFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -29,20 +26,17 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeSqrSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                   const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using sqrSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sqr<ComputeT>, RoundingMode::None>;
+    using sqrSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sqr<ComputeT>, RoundingMode::None>;
 
-        const mpp::Sqr<ComputeT> op;
+    const mpp::Sqr<ComputeT> op;
 
-        const sqrSrc functor(aSrc1, aPitchSrc1, op);
+    const sqrSrc functor(aSrc1, aPitchSrc1, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, sqrSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, sqrSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -71,20 +65,17 @@ void InvokeSqrSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitc
 template <typename DstT, typename ComputeT>
 void InvokeSqrInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_COMPUTE_DST;
+    MPP_CUDA_REGISTER_TEMPALTE_COMPUTE_DST;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using sqrInplace = InplaceFunctor<TupelSize, ComputeT, DstT, mpp::Sqr<ComputeT>, RoundingMode::None>;
+    using sqrInplace = InplaceFunctor<TupelSize, ComputeT, DstT, mpp::Sqr<ComputeT>, RoundingMode::None>;
 
-        const mpp::Sqr<ComputeT> op;
+    const mpp::Sqr<ComputeT> op;
 
-        const sqrInplace functor(op);
+    const sqrInplace functor(op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, sqrInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, sqrInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -109,4 +100,3 @@ void InvokeSqrInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, c
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

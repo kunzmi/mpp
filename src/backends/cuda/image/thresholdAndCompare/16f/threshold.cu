@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "../threshold_impl.h"
 
 using namespace mpp::cuda;
@@ -36,4 +34,3 @@ ForAllChannelsWithAlphaInvokeThresholdLTValGTValSrcC(16f);
 ForAllChannelsWithAlphaInvokeThresholdLTValGTValInplaceC(16f);
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

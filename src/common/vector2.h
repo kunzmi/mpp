@@ -16,10 +16,10 @@ namespace mpp
 {
 
 // forward declaration:
-template <Number T> struct Vector1;
-template <Number T> struct Vector2;
-template <Number T> struct Vector3;
-template <Number T> struct Vector4;
+template <Number T> struct MPPEXPORTFWDDECL_COMMON Vector1;
+template <Number T> struct MPPEXPORTFWDDECL_COMMON Vector2;
+template <Number T> struct MPPEXPORTFWDDECL_COMMON Vector3;
+template <Number T> struct MPPEXPORTFWDDECL_COMMON Vector4;
 
 enum class Axis2D // NOLINT(performance-enum-size)
 {
@@ -1854,4 +1854,867 @@ template <HostCode T2>
 MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector2<T2> &aVec)
     requires ByteSizeType<T2>;
 
+#ifdef IS_HOST_COMPILER
+extern template struct Vector2<sbyte>;
+extern template struct Vector2<byte>;
+extern template struct Vector2<short>;
+extern template struct Vector2<ushort>;
+extern template struct Vector2<int>;
+extern template struct Vector2<uint>;
+extern template struct Vector2<long64>;
+extern template struct Vector2<ulong64>;
+
+extern template struct Vector2<BFloat16>;
+extern template struct Vector2<HalfFp16>;
+extern template struct Vector2<float>;
+extern template struct Vector2<double>;
+
+extern template struct Vector2<Complex<sbyte>>;
+extern template struct Vector2<Complex<short>>;
+extern template struct Vector2<Complex<int>>;
+extern template struct Vector2<Complex<long64>>;
+extern template struct Vector2<Complex<BFloat16>>;
+extern template struct Vector2<Complex<HalfFp16>>;
+extern template struct Vector2<Complex<float>>;
+extern template struct Vector2<Complex<double>>;
+
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(const Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(const Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(const Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(const Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(const Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(const Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(const Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(const Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(const Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(const Vector2<float> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(const Vector2<double> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(const Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(const Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(const Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(const Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(const Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(const Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(const Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(const Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(const Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(const Vector2<float> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(const Vector2<double> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(const Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(const Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(const Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(const Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(const Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(const Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(const Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(const Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(const Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(const Vector2<float> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(const Vector2<double> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(const Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(const Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(const Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(const Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(const Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(const Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(const Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(const Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(const Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(const Vector2<float> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(const Vector2<double> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(const Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(const Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(const Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(const Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(const Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(const Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(const Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(const Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(const Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(const Vector2<float> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(const Vector2<double> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(const Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(const Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(const Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(const Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(const Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(const Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(const Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(const Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(const Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(const Vector2<float> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(const Vector2<double> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(const Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(const Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(const Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(const Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(const Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(const Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(const Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(const Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(const Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(const Vector2<float> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(const Vector2<double> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(const Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(const Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(const Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(const Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(const Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(const Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(const Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(const Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(const Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(const Vector2<float> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(const Vector2<double> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(const Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(const Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(const Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(const Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(const Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(const Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(const Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(const Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(const Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(const Vector2<float> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(const Vector2<double> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(const Vector2<float> &, RoundingMode);
+
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(const Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(const Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(const Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(const Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(const Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(const Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(const Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(const Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(const Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(const Vector2<float> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(const Vector2<double> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(const Vector2<float> &, RoundingMode);
+
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(const Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(const Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(const Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(const Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(const Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(const Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(const Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(const Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(const Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(const Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(const Vector2<double> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(const Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(const Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(const Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(const Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(const Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(const Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(const Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(const Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(const Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(const Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(const Vector2<float> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>>::Vector2(const Vector2<Complex<short>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>>::Vector2(const Vector2<Complex<int>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>>::Vector2(const Vector2<Complex<long64>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>>::Vector2(const Vector2<Complex<BFloat16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>>::Vector2(const Vector2<Complex<HalfFp16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>>::Vector2(const Vector2<Complex<float>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>>::Vector2(const Vector2<Complex<double>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>>::Vector2(const Vector2<sbyte> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<short>>::Vector2(const Vector2<Complex<sbyte>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>>::Vector2(const Vector2<Complex<int>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>>::Vector2(const Vector2<Complex<long64>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>>::Vector2(const Vector2<Complex<BFloat16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>>::Vector2(const Vector2<Complex<HalfFp16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>>::Vector2(const Vector2<Complex<float>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>>::Vector2(const Vector2<Complex<double>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>>::Vector2(const Vector2<short> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<int>>::Vector2(const Vector2<Complex<sbyte>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>>::Vector2(const Vector2<Complex<short>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>>::Vector2(const Vector2<Complex<long64>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>>::Vector2(const Vector2<Complex<BFloat16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>>::Vector2(const Vector2<Complex<HalfFp16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>>::Vector2(const Vector2<Complex<float>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>>::Vector2(const Vector2<Complex<double>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>>::Vector2(const Vector2<int> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>>::Vector2(const Vector2<Complex<sbyte>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>>::Vector2(const Vector2<Complex<short>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>>::Vector2(const Vector2<Complex<int>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>>::Vector2(const Vector2<Complex<BFloat16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>>::Vector2(const Vector2<Complex<HalfFp16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>>::Vector2(const Vector2<Complex<float>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>>::Vector2(const Vector2<Complex<double>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>>::Vector2(const Vector2<long64> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>>::Vector2(const Vector2<Complex<sbyte>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>>::Vector2(const Vector2<Complex<short>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>>::Vector2(const Vector2<Complex<int>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>>::Vector2(const Vector2<Complex<long64>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>>::Vector2(const Vector2<Complex<HalfFp16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>>::Vector2(const Vector2<Complex<float>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>>::Vector2(const Vector2<Complex<double>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>>::Vector2(const Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>>::Vector2(const Vector2<Complex<float>> &, RoundingMode);
+
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>>::Vector2(const Vector2<Complex<sbyte>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>>::Vector2(const Vector2<Complex<short>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>>::Vector2(const Vector2<Complex<int>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>>::Vector2(const Vector2<Complex<long64>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>>::Vector2(const Vector2<Complex<BFloat16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>>::Vector2(const Vector2<Complex<float>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>>::Vector2(const Vector2<Complex<double>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>>::Vector2(const Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>>::Vector2(const Vector2<Complex<float>> &, RoundingMode);
+
+extern template MPPEXPORT_COMMON Vector2<Complex<float>>::Vector2(const Vector2<Complex<sbyte>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>>::Vector2(const Vector2<Complex<short>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>>::Vector2(const Vector2<Complex<int>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>>::Vector2(const Vector2<Complex<long64>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>>::Vector2(const Vector2<Complex<BFloat16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>>::Vector2(const Vector2<Complex<HalfFp16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>>::Vector2(const Vector2<Complex<double>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>>::Vector2(const Vector2<float> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<double>>::Vector2(const Vector2<Complex<sbyte>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>>::Vector2(const Vector2<Complex<short>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>>::Vector2(const Vector2<Complex<int>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>>::Vector2(const Vector2<Complex<long64>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>>::Vector2(const Vector2<Complex<BFloat16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>>::Vector2(const Vector2<Complex<HalfFp16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>>::Vector2(const Vector2<Complex<float>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>>::Vector2(const Vector2<double> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(Vector2<float> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte>::Vector2(Vector2<double> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(Vector2<float> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte>::Vector2(Vector2<double> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(Vector2<float> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<short>::Vector2(Vector2<double> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(Vector2<float> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort>::Vector2(Vector2<double> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(Vector2<float> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<int>::Vector2(Vector2<double> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(Vector2<float> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint>::Vector2(Vector2<double> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(Vector2<float> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64>::Vector2(Vector2<double> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(Vector2<float> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64>::Vector2(Vector2<double> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(Vector2<float> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16>::Vector2(Vector2<double> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(Vector2<float> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16>::Vector2(Vector2<double> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<float>::Vector2(Vector2<double> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(Vector2<sbyte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(Vector2<byte> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(Vector2<short> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(Vector2<ushort> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(Vector2<int> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(Vector2<uint> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(Vector2<long64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(Vector2<ulong64> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(Vector2<BFloat16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(Vector2<HalfFp16> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<double>::Vector2(Vector2<float> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>>::Vector2(Vector2<Complex<short>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>>::Vector2(Vector2<Complex<int>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>>::Vector2(Vector2<Complex<long64>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>>::Vector2(Vector2<Complex<BFloat16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>>::Vector2(Vector2<Complex<HalfFp16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>>::Vector2(Vector2<Complex<float>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>>::Vector2(Vector2<Complex<double>> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<short>>::Vector2(Vector2<Complex<sbyte>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>>::Vector2(Vector2<Complex<int>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>>::Vector2(Vector2<Complex<long64>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>>::Vector2(Vector2<Complex<BFloat16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>>::Vector2(Vector2<Complex<HalfFp16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>>::Vector2(Vector2<Complex<float>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>>::Vector2(Vector2<Complex<double>> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<int>>::Vector2(Vector2<Complex<sbyte>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>>::Vector2(Vector2<Complex<short>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>>::Vector2(Vector2<Complex<long64>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>>::Vector2(Vector2<Complex<BFloat16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>>::Vector2(Vector2<Complex<HalfFp16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>>::Vector2(Vector2<Complex<float>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>>::Vector2(Vector2<Complex<double>> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>>::Vector2(Vector2<Complex<sbyte>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>>::Vector2(Vector2<Complex<short>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>>::Vector2(Vector2<Complex<int>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>>::Vector2(Vector2<Complex<BFloat16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>>::Vector2(Vector2<Complex<HalfFp16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>>::Vector2(Vector2<Complex<float>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>>::Vector2(Vector2<Complex<double>> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>>::Vector2(Vector2<Complex<sbyte>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>>::Vector2(Vector2<Complex<short>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>>::Vector2(Vector2<Complex<int>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>>::Vector2(Vector2<Complex<long64>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>>::Vector2(Vector2<Complex<HalfFp16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>>::Vector2(Vector2<Complex<float>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>>::Vector2(Vector2<Complex<double>> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>>::Vector2(Vector2<Complex<sbyte>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>>::Vector2(Vector2<Complex<short>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>>::Vector2(Vector2<Complex<int>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>>::Vector2(Vector2<Complex<long64>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>>::Vector2(Vector2<Complex<BFloat16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>>::Vector2(Vector2<Complex<float>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>>::Vector2(Vector2<Complex<double>> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<float>>::Vector2(Vector2<Complex<sbyte>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>>::Vector2(Vector2<Complex<short>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>>::Vector2(Vector2<Complex<int>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>>::Vector2(Vector2<Complex<long64>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>>::Vector2(Vector2<Complex<BFloat16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>>::Vector2(Vector2<Complex<HalfFp16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>>::Vector2(Vector2<Complex<double>> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<double>>::Vector2(Vector2<Complex<sbyte>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>>::Vector2(Vector2<Complex<short>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>>::Vector2(Vector2<Complex<int>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>>::Vector2(Vector2<Complex<long64>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>>::Vector2(Vector2<Complex<BFloat16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>>::Vector2(Vector2<Complex<HalfFp16>> &) noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>>::Vector2(Vector2<Complex<float>> &) noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<sbyte> &Vector2<sbyte>::ClampToTargetType<sbyte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte> &Vector2<sbyte>::ClampToTargetType<byte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte> &Vector2<sbyte>::ClampToTargetType<short>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte> &Vector2<sbyte>::ClampToTargetType<ushort>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte> &Vector2<sbyte>::ClampToTargetType<int>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte> &Vector2<sbyte>::ClampToTargetType<uint>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte> &Vector2<sbyte>::ClampToTargetType<long64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte> &Vector2<sbyte>::ClampToTargetType<ulong64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte> &Vector2<sbyte>::ClampToTargetType<BFloat16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte> &Vector2<sbyte>::ClampToTargetType<HalfFp16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte> &Vector2<sbyte>::ClampToTargetType<float>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<sbyte> &Vector2<sbyte>::ClampToTargetType<double>() noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<byte> &Vector2<byte>::ClampToTargetType<sbyte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte> &Vector2<byte>::ClampToTargetType<byte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte> &Vector2<byte>::ClampToTargetType<short>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte> &Vector2<byte>::ClampToTargetType<ushort>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte> &Vector2<byte>::ClampToTargetType<int>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte> &Vector2<byte>::ClampToTargetType<uint>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte> &Vector2<byte>::ClampToTargetType<long64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte> &Vector2<byte>::ClampToTargetType<ulong64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte> &Vector2<byte>::ClampToTargetType<BFloat16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte> &Vector2<byte>::ClampToTargetType<HalfFp16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte> &Vector2<byte>::ClampToTargetType<float>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<byte> &Vector2<byte>::ClampToTargetType<double>() noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<short> &Vector2<short>::ClampToTargetType<byte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<short> &Vector2<short>::ClampToTargetType<sbyte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<short> &Vector2<short>::ClampToTargetType<short>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<short> &Vector2<short>::ClampToTargetType<ushort>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<short> &Vector2<short>::ClampToTargetType<int>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<short> &Vector2<short>::ClampToTargetType<uint>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<short> &Vector2<short>::ClampToTargetType<long64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<short> &Vector2<short>::ClampToTargetType<ulong64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<short> &Vector2<short>::ClampToTargetType<BFloat16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<short> &Vector2<short>::ClampToTargetType<HalfFp16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<short> &Vector2<short>::ClampToTargetType<float>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<short> &Vector2<short>::ClampToTargetType<double>() noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<ushort> &Vector2<ushort>::ClampToTargetType<byte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort> &Vector2<ushort>::ClampToTargetType<sbyte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort> &Vector2<ushort>::ClampToTargetType<short>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort> &Vector2<ushort>::ClampToTargetType<ushort>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort> &Vector2<ushort>::ClampToTargetType<int>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort> &Vector2<ushort>::ClampToTargetType<uint>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort> &Vector2<ushort>::ClampToTargetType<long64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort> &Vector2<ushort>::ClampToTargetType<ulong64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort> &Vector2<ushort>::ClampToTargetType<BFloat16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort> &Vector2<ushort>::ClampToTargetType<HalfFp16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort> &Vector2<ushort>::ClampToTargetType<float>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ushort> &Vector2<ushort>::ClampToTargetType<double>() noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<int> &Vector2<int>::ClampToTargetType<byte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<int> &Vector2<int>::ClampToTargetType<sbyte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<int> &Vector2<int>::ClampToTargetType<short>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<int> &Vector2<int>::ClampToTargetType<ushort>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<int> &Vector2<int>::ClampToTargetType<int>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<int> &Vector2<int>::ClampToTargetType<uint>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<int> &Vector2<int>::ClampToTargetType<long64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<int> &Vector2<int>::ClampToTargetType<ulong64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<int> &Vector2<int>::ClampToTargetType<BFloat16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<int> &Vector2<int>::ClampToTargetType<HalfFp16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<int> &Vector2<int>::ClampToTargetType<float>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<int> &Vector2<int>::ClampToTargetType<double>() noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<uint> &Vector2<uint>::ClampToTargetType<byte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint> &Vector2<uint>::ClampToTargetType<sbyte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint> &Vector2<uint>::ClampToTargetType<short>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint> &Vector2<uint>::ClampToTargetType<ushort>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint> &Vector2<uint>::ClampToTargetType<int>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint> &Vector2<uint>::ClampToTargetType<uint>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint> &Vector2<uint>::ClampToTargetType<long64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint> &Vector2<uint>::ClampToTargetType<ulong64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint> &Vector2<uint>::ClampToTargetType<BFloat16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint> &Vector2<uint>::ClampToTargetType<HalfFp16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint> &Vector2<uint>::ClampToTargetType<float>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<uint> &Vector2<uint>::ClampToTargetType<double>() noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<long64> &Vector2<long64>::ClampToTargetType<byte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64> &Vector2<long64>::ClampToTargetType<sbyte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64> &Vector2<long64>::ClampToTargetType<short>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64> &Vector2<long64>::ClampToTargetType<ushort>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64> &Vector2<long64>::ClampToTargetType<int>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64> &Vector2<long64>::ClampToTargetType<uint>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64> &Vector2<long64>::ClampToTargetType<long64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64> &Vector2<long64>::ClampToTargetType<ulong64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64> &Vector2<long64>::ClampToTargetType<BFloat16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64> &Vector2<long64>::ClampToTargetType<HalfFp16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64> &Vector2<long64>::ClampToTargetType<float>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<long64> &Vector2<long64>::ClampToTargetType<double>() noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<ulong64> &Vector2<ulong64>::ClampToTargetType<byte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64> &Vector2<ulong64>::ClampToTargetType<sbyte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64> &Vector2<ulong64>::ClampToTargetType<short>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64> &Vector2<ulong64>::ClampToTargetType<ushort>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64> &Vector2<ulong64>::ClampToTargetType<int>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64> &Vector2<ulong64>::ClampToTargetType<uint>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64> &Vector2<ulong64>::ClampToTargetType<long64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64> &Vector2<ulong64>::ClampToTargetType<ulong64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64> &Vector2<ulong64>::ClampToTargetType<BFloat16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64> &Vector2<ulong64>::ClampToTargetType<HalfFp16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64> &Vector2<ulong64>::ClampToTargetType<float>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<ulong64> &Vector2<ulong64>::ClampToTargetType<double>() noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<BFloat16> &Vector2<BFloat16>::ClampToTargetType<byte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16> &Vector2<BFloat16>::ClampToTargetType<sbyte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16> &Vector2<BFloat16>::ClampToTargetType<short>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16> &Vector2<BFloat16>::ClampToTargetType<ushort>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16> &Vector2<BFloat16>::ClampToTargetType<int>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16> &Vector2<BFloat16>::ClampToTargetType<uint>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16> &Vector2<BFloat16>::ClampToTargetType<long64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16> &Vector2<BFloat16>::ClampToTargetType<ulong64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16> &Vector2<BFloat16>::ClampToTargetType<BFloat16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16> &Vector2<BFloat16>::ClampToTargetType<HalfFp16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16> &Vector2<BFloat16>::ClampToTargetType<float>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<BFloat16> &Vector2<BFloat16>::ClampToTargetType<double>() noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<HalfFp16> &Vector2<HalfFp16>::ClampToTargetType<byte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16> &Vector2<HalfFp16>::ClampToTargetType<sbyte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16> &Vector2<HalfFp16>::ClampToTargetType<short>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16> &Vector2<HalfFp16>::ClampToTargetType<ushort>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16> &Vector2<HalfFp16>::ClampToTargetType<int>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16> &Vector2<HalfFp16>::ClampToTargetType<uint>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16> &Vector2<HalfFp16>::ClampToTargetType<long64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16> &Vector2<HalfFp16>::ClampToTargetType<ulong64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16> &Vector2<HalfFp16>::ClampToTargetType<BFloat16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16> &Vector2<HalfFp16>::ClampToTargetType<HalfFp16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16> &Vector2<HalfFp16>::ClampToTargetType<float>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<HalfFp16> &Vector2<HalfFp16>::ClampToTargetType<double>() noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<float> &Vector2<float>::ClampToTargetType<byte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<float> &Vector2<float>::ClampToTargetType<sbyte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<float> &Vector2<float>::ClampToTargetType<short>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<float> &Vector2<float>::ClampToTargetType<ushort>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<float> &Vector2<float>::ClampToTargetType<int>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<float> &Vector2<float>::ClampToTargetType<uint>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<float> &Vector2<float>::ClampToTargetType<long64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<float> &Vector2<float>::ClampToTargetType<ulong64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<float> &Vector2<float>::ClampToTargetType<BFloat16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<float> &Vector2<float>::ClampToTargetType<HalfFp16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<float> &Vector2<float>::ClampToTargetType<float>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<float> &Vector2<float>::ClampToTargetType<double>() noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<double> &Vector2<double>::ClampToTargetType<byte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<double> &Vector2<double>::ClampToTargetType<sbyte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<double> &Vector2<double>::ClampToTargetType<short>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<double> &Vector2<double>::ClampToTargetType<ushort>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<double> &Vector2<double>::ClampToTargetType<int>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<double> &Vector2<double>::ClampToTargetType<uint>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<double> &Vector2<double>::ClampToTargetType<long64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<double> &Vector2<double>::ClampToTargetType<ulong64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<double> &Vector2<double>::ClampToTargetType<BFloat16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<double> &Vector2<double>::ClampToTargetType<HalfFp16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<double> &Vector2<double>::ClampToTargetType<float>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<double> &Vector2<double>::ClampToTargetType<double>() noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>> &Vector2<Complex<sbyte>>::ClampToTargetType<sbyte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>> &Vector2<Complex<sbyte>>::ClampToTargetType<byte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>> &Vector2<Complex<sbyte>>::ClampToTargetType<short>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>> &Vector2<Complex<sbyte>>::ClampToTargetType<ushort>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>> &Vector2<Complex<sbyte>>::ClampToTargetType<int>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>> &Vector2<Complex<sbyte>>::ClampToTargetType<uint>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>> &Vector2<Complex<sbyte>>::ClampToTargetType<long64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>> &Vector2<Complex<sbyte>>::ClampToTargetType<
+    ulong64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>> &Vector2<Complex<sbyte>>::ClampToTargetType<
+    BFloat16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>> &Vector2<Complex<sbyte>>::ClampToTargetType<
+    HalfFp16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>> &Vector2<Complex<sbyte>>::ClampToTargetType<float>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<sbyte>> &Vector2<Complex<sbyte>>::ClampToTargetType<double>() noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<short>> &Vector2<Complex<short>>::ClampToTargetType<sbyte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>> &Vector2<Complex<short>>::ClampToTargetType<byte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>> &Vector2<Complex<short>>::ClampToTargetType<short>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>> &Vector2<Complex<short>>::ClampToTargetType<ushort>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>> &Vector2<Complex<short>>::ClampToTargetType<int>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>> &Vector2<Complex<short>>::ClampToTargetType<uint>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>> &Vector2<Complex<short>>::ClampToTargetType<long64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>> &Vector2<Complex<short>>::ClampToTargetType<
+    ulong64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>> &Vector2<Complex<short>>::ClampToTargetType<
+    BFloat16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>> &Vector2<Complex<short>>::ClampToTargetType<
+    HalfFp16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>> &Vector2<Complex<short>>::ClampToTargetType<float>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<short>> &Vector2<Complex<short>>::ClampToTargetType<double>() noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<int>> &Vector2<Complex<int>>::ClampToTargetType<sbyte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>> &Vector2<Complex<int>>::ClampToTargetType<byte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>> &Vector2<Complex<int>>::ClampToTargetType<short>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>> &Vector2<Complex<int>>::ClampToTargetType<ushort>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>> &Vector2<Complex<int>>::ClampToTargetType<int>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>> &Vector2<Complex<int>>::ClampToTargetType<uint>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>> &Vector2<Complex<int>>::ClampToTargetType<long64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>> &Vector2<Complex<int>>::ClampToTargetType<ulong64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>> &Vector2<Complex<int>>::ClampToTargetType<BFloat16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>> &Vector2<Complex<int>>::ClampToTargetType<HalfFp16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>> &Vector2<Complex<int>>::ClampToTargetType<float>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<int>> &Vector2<Complex<int>>::ClampToTargetType<double>() noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>> &Vector2<Complex<long64>>::ClampToTargetType<
+    sbyte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>> &Vector2<Complex<long64>>::ClampToTargetType<byte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>> &Vector2<Complex<long64>>::ClampToTargetType<
+    short>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>> &Vector2<Complex<long64>>::ClampToTargetType<
+    ushort>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>> &Vector2<Complex<long64>>::ClampToTargetType<int>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>> &Vector2<Complex<long64>>::ClampToTargetType<uint>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>> &Vector2<Complex<long64>>::ClampToTargetType<
+    long64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>> &Vector2<Complex<long64>>::ClampToTargetType<
+    ulong64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>> &Vector2<Complex<long64>>::ClampToTargetType<
+    BFloat16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>> &Vector2<Complex<long64>>::ClampToTargetType<
+    HalfFp16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>> &Vector2<Complex<long64>>::ClampToTargetType<
+    float>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<long64>> &Vector2<Complex<long64>>::ClampToTargetType<
+    double>() noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>> &Vector2<Complex<BFloat16>>::ClampToTargetType<
+    sbyte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>> &Vector2<Complex<BFloat16>>::ClampToTargetType<
+    byte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>> &Vector2<Complex<BFloat16>>::ClampToTargetType<
+    short>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>> &Vector2<Complex<BFloat16>>::ClampToTargetType<
+    ushort>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>> &Vector2<Complex<BFloat16>>::ClampToTargetType<
+    int>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>> &Vector2<Complex<BFloat16>>::ClampToTargetType<
+    uint>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>> &Vector2<Complex<BFloat16>>::ClampToTargetType<
+    long64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>> &Vector2<Complex<BFloat16>>::ClampToTargetType<
+    ulong64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>> &Vector2<Complex<BFloat16>>::ClampToTargetType<
+    BFloat16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>> &Vector2<Complex<BFloat16>>::ClampToTargetType<
+    HalfFp16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>> &Vector2<Complex<BFloat16>>::ClampToTargetType<
+    float>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<BFloat16>> &Vector2<Complex<BFloat16>>::ClampToTargetType<
+    double>() noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>> &Vector2<Complex<HalfFp16>>::ClampToTargetType<
+    sbyte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>> &Vector2<Complex<HalfFp16>>::ClampToTargetType<
+    byte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>> &Vector2<Complex<HalfFp16>>::ClampToTargetType<
+    short>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>> &Vector2<Complex<HalfFp16>>::ClampToTargetType<
+    ushort>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>> &Vector2<Complex<HalfFp16>>::ClampToTargetType<
+    int>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>> &Vector2<Complex<HalfFp16>>::ClampToTargetType<
+    uint>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>> &Vector2<Complex<HalfFp16>>::ClampToTargetType<
+    long64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>> &Vector2<Complex<HalfFp16>>::ClampToTargetType<
+    ulong64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>> &Vector2<Complex<HalfFp16>>::ClampToTargetType<
+    BFloat16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>> &Vector2<Complex<HalfFp16>>::ClampToTargetType<
+    HalfFp16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>> &Vector2<Complex<HalfFp16>>::ClampToTargetType<
+    float>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<HalfFp16>> &Vector2<Complex<HalfFp16>>::ClampToTargetType<
+    double>() noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<float>> &Vector2<Complex<float>>::ClampToTargetType<sbyte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>> &Vector2<Complex<float>>::ClampToTargetType<byte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>> &Vector2<Complex<float>>::ClampToTargetType<short>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>> &Vector2<Complex<float>>::ClampToTargetType<ushort>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>> &Vector2<Complex<float>>::ClampToTargetType<int>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>> &Vector2<Complex<float>>::ClampToTargetType<uint>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>> &Vector2<Complex<float>>::ClampToTargetType<long64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>> &Vector2<Complex<float>>::ClampToTargetType<
+    ulong64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>> &Vector2<Complex<float>>::ClampToTargetType<
+    BFloat16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>> &Vector2<Complex<float>>::ClampToTargetType<
+    HalfFp16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>> &Vector2<Complex<float>>::ClampToTargetType<float>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<float>> &Vector2<Complex<float>>::ClampToTargetType<double>() noexcept;
+
+extern template MPPEXPORT_COMMON Vector2<Complex<double>> &Vector2<Complex<double>>::ClampToTargetType<
+    sbyte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>> &Vector2<Complex<double>>::ClampToTargetType<byte>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>> &Vector2<Complex<double>>::ClampToTargetType<
+    short>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>> &Vector2<Complex<double>>::ClampToTargetType<
+    ushort>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>> &Vector2<Complex<double>>::ClampToTargetType<int>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>> &Vector2<Complex<double>>::ClampToTargetType<uint>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>> &Vector2<Complex<double>>::ClampToTargetType<
+    long64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>> &Vector2<Complex<double>>::ClampToTargetType<
+    ulong64>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>> &Vector2<Complex<double>>::ClampToTargetType<
+    BFloat16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>> &Vector2<Complex<double>>::ClampToTargetType<
+    HalfFp16>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>> &Vector2<Complex<double>>::ClampToTargetType<
+    float>() noexcept;
+extern template MPPEXPORT_COMMON Vector2<Complex<double>> &Vector2<Complex<double>>::ClampToTargetType<
+    double>() noexcept;
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector2<sbyte> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector2<sbyte> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector2<sbyte> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector2<sbyte> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector2<byte> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector2<byte> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector2<byte> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector2<byte> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector2<short> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector2<short> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector2<short> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector2<short> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector2<ushort> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector2<ushort> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector2<ushort> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector2<ushort> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector2<int> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector2<int> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector2<int> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector2<int> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector2<uint> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector2<uint> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector2<uint> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector2<uint> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector2<long64> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector2<long64> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector2<long64> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector2<long64> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector2<ulong64> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector2<ulong64> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector2<ulong64> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector2<ulong64> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector2<BFloat16> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector2<BFloat16> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector2<BFloat16> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector2<BFloat16> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector2<HalfFp16> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector2<HalfFp16> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector2<HalfFp16> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector2<HalfFp16> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector2<float> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector2<float> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector2<float> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector2<float> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector2<double> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector2<double> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector2<double> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector2<double> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector2<Complex<sbyte>> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector2<Complex<sbyte>> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector2<Complex<sbyte>> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector2<Complex<sbyte>> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector2<Complex<short>> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector2<Complex<short>> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector2<Complex<short>> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector2<Complex<short>> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector2<Complex<int>> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector2<Complex<int>> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector2<Complex<int>> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector2<Complex<int>> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector2<Complex<long64>> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector2<Complex<long64>> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector2<Complex<long64>> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector2<Complex<long64>> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector2<Complex<BFloat16>> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector2<Complex<BFloat16>> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector2<Complex<BFloat16>> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector2<Complex<BFloat16>> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector2<Complex<HalfFp16>> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector2<Complex<HalfFp16>> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector2<Complex<HalfFp16>> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector2<Complex<HalfFp16>> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector2<Complex<float>> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector2<Complex<float>> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector2<Complex<float>> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector2<Complex<float>> &aVec);
+
+extern template MPPEXPORT_COMMON std::ostream &operator<<(std::ostream &aOs, const Vector2<Complex<double>> &aVec);
+extern template MPPEXPORT_COMMON std::wostream &operator<<(std::wostream &aOs, const Vector2<Complex<double>> &aVec);
+extern template MPPEXPORT_COMMON std::istream &operator>>(std::istream &aIs, Vector2<Complex<double>> &aVec);
+extern template MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector2<Complex<double>> &aVec);
+#endif // IS_HOST_COMPILER
 } // namespace mpp

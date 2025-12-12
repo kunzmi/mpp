@@ -34,4 +34,6 @@ target_link_libraries(backends.npp PUBLIC
 						CUDA::npps
 						)
 
+set_target_properties(backends.npp PROPERTIES OUTPUT_NAME mpp-npp)
+
 endif() # MPP_ENABLE_NPP_BACKEND

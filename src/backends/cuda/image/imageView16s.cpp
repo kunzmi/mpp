@@ -1,5 +1,3 @@
-#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if MPP_ENABLE_CUDA_BACKEND
 #include "dllexport_cudai.h" //NOLINT(misc-include-cleaner)
 
 #include "dataExchangeAndInit/instantiateConversion.h"
@@ -26,11 +24,16 @@ template class ImageView<Pixel16sC2>;
 template class ImageView<Pixel16sC3>;
 template class ImageView<Pixel16sC4>;
 template class ImageView<Pixel16sC4A>;
-template <> ImageView<Pixel16sC1> ImageView<Pixel16sC1>::Null   = ImageView<Pixel16sC1>(nullptr, Size2D(0, 0), 0);
-template <> ImageView<Pixel16sC2> ImageView<Pixel16sC2>::Null   = ImageView<Pixel16sC2>(nullptr, Size2D(0, 0), 0);
-template <> ImageView<Pixel16sC3> ImageView<Pixel16sC3>::Null   = ImageView<Pixel16sC3>(nullptr, Size2D(0, 0), 0);
-template <> ImageView<Pixel16sC4> ImageView<Pixel16sC4>::Null   = ImageView<Pixel16sC4>(nullptr, Size2D(0, 0), 0);
-template <> ImageView<Pixel16sC4A> ImageView<Pixel16sC4A>::Null = ImageView<Pixel16sC4A>(nullptr, Size2D(0, 0), 0);
+template <>
+ImageView<Pixel16sC1> MPPEXPORT_CUDAI ImageView<Pixel16sC1>::Null = ImageView<Pixel16sC1>(nullptr, Size2D(0, 0), 0);
+template <>
+ImageView<Pixel16sC2> MPPEXPORT_CUDAI ImageView<Pixel16sC2>::Null = ImageView<Pixel16sC2>(nullptr, Size2D(0, 0), 0);
+template <>
+ImageView<Pixel16sC3> MPPEXPORT_CUDAI ImageView<Pixel16sC3>::Null = ImageView<Pixel16sC3>(nullptr, Size2D(0, 0), 0);
+template <>
+ImageView<Pixel16sC4> MPPEXPORT_CUDAI ImageView<Pixel16sC4>::Null = ImageView<Pixel16sC4>(nullptr, Size2D(0, 0), 0);
+template <>
+ImageView<Pixel16sC4A> MPPEXPORT_CUDAI ImageView<Pixel16sC4A>::Null = ImageView<Pixel16sC4A>(nullptr, Size2D(0, 0), 0);
 
 ForAllChannelsConvertWithAlpha(16s, 8u);
 ForAllChannelsConvertWithAlpha(16s, 8s);
@@ -83,4 +86,3 @@ ForAllChannelsScaleAnyToAnyWithAlpha(16s, 32f);
 ForAllChannelsScaleAnyToAnyWithAlpha(16s, 64f);
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

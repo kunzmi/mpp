@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "ln.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelKernel.h>
@@ -11,7 +9,6 @@
 #include <common/defines.h>
 #include <common/image/functors/inplaceFunctor.h>
 #include <common/image/functors/srcFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -29,36 +26,32 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeLnSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                  const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+    using simdOP_t = simd::Ln<Tupel<DstT, TupelSize>>;
+    if constexpr (simdOP_t::has_simd)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        using lnSrcSIMD = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Ln<ComputeT>,
+                                     RoundingMode::NearestTiesToEven, ComputeT, simdOP_t>;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+        const mpp::Ln<ComputeT> op;
+        const simdOP_t opSIMD;
 
-        using simdOP_t = simd::Ln<Tupel<DstT, TupelSize>>;
-        if constexpr (simdOP_t::has_simd)
-        {
-            using lnSrcSIMD = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Ln<ComputeT>,
-                                         RoundingMode::NearestTiesToEven, ComputeT, simdOP_t>;
+        const lnSrcSIMD functor(aSrc1, aPitchSrc1, op, opSIMD);
 
-            const mpp::Ln<ComputeT> op;
-            const simdOP_t opSIMD;
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, lnSrcSIMD>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        using lnSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Ln<ComputeT>, RoundingMode::NearestTiesToEven>;
 
-            const lnSrcSIMD functor(aSrc1, aPitchSrc1, op, opSIMD);
+        const mpp::Ln<ComputeT> op;
 
-            InvokeForEachPixelKernelDefault<DstT, TupelSize, lnSrcSIMD>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            using lnSrc =
-                SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Ln<ComputeT>, RoundingMode::NearestTiesToEven>;
+        const lnSrc functor(aSrc1, aPitchSrc1, op);
 
-            const mpp::Ln<ComputeT> op;
-
-            const lnSrc functor(aSrc1, aPitchSrc1, op);
-
-            InvokeForEachPixelKernelDefault<DstT, TupelSize, lnSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, lnSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
 }
 
@@ -88,38 +81,33 @@ void InvokeLnSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitch
 template <typename DstT, typename ComputeT>
 void InvokeLnInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE_COMPUTE_DST;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+    using simdOP_t = simd::Ln<Tupel<DstT, TupelSize>>;
+    if constexpr (simdOP_t::has_simd)
     {
-        MPP_CUDA_REGISTER_TEMPALTE_COMPUTE_DST;
+        using lnInplaceSIMD = InplaceFunctor<TupelSize, ComputeT, DstT, mpp::Ln<ComputeT>,
+                                             RoundingMode::NearestTiesToEven, ComputeT, simdOP_t>;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+        const mpp::Ln<ComputeT> op;
+        const simdOP_t opSIMD;
 
-        using simdOP_t = simd::Ln<Tupel<DstT, TupelSize>>;
-        if constexpr (simdOP_t::has_simd)
-        {
-            using lnInplaceSIMD = InplaceFunctor<TupelSize, ComputeT, DstT, mpp::Ln<ComputeT>,
-                                                 RoundingMode::NearestTiesToEven, ComputeT, simdOP_t>;
+        const lnInplaceSIMD functor(op, opSIMD);
 
-            const mpp::Ln<ComputeT> op;
-            const simdOP_t opSIMD;
-
-            const lnInplaceSIMD functor(op, opSIMD);
-
-            InvokeForEachPixelKernelDefault<DstT, TupelSize, lnInplaceSIMD>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
-                                                                            functor);
-        }
-        else
-        {
-            using lnInplace =
-                InplaceFunctor<TupelSize, ComputeT, DstT, mpp::Ln<ComputeT>, RoundingMode::NearestTiesToEven>;
-
-            const mpp::Ln<ComputeT> op;
-
-            const lnInplace functor(op);
-
-            InvokeForEachPixelKernelDefault<DstT, TupelSize, lnInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, lnInplaceSIMD>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
                                                                         functor);
-        }
+    }
+    else
+    {
+        using lnInplace = InplaceFunctor<TupelSize, ComputeT, DstT, mpp::Ln<ComputeT>, RoundingMode::NearestTiesToEven>;
+
+        const mpp::Ln<ComputeT> op;
+
+        const lnInplace functor(op);
+
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, lnInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
     }
 }
 
@@ -145,4 +133,3 @@ void InvokeLnInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, co
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

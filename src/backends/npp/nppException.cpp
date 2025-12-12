@@ -1,7 +1,5 @@
-#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if MPP_ENABLE_NPP_BACKEND
-
 #include "nppException.h"
+#include <common/exception.h>
 #include <filesystem>
 #include <nppdefs.h>
 #include <ostream>
@@ -38,6 +36,7 @@ NppException::NppException(NppStatus aNppStatus, [[maybe_unused]] const std::fil
 NppException::NppException(NppStatus aNppStatus, const std::string &aMessage,
                            [[maybe_unused]] const std::filesystem::path &aCodeFileName,
                            [[maybe_unused]] int aLineNumber, [[maybe_unused]] const std::string &aFunctionName)
+    : MPPException(aMessage)
 {
 #ifdef NDEBUG
     std::stringstream ss;
@@ -65,6 +64,7 @@ NppException::NppException(NppStatus aNppStatus, const std::string &aMessage,
 
 NppException::NppException(const std::string &aMessage, [[maybe_unused]] const std::filesystem::path &aCodeFileName,
                            [[maybe_unused]] int aLineNumber, [[maybe_unused]] const std::string &aFunctionName)
+    : MPPException(aMessage)
 {
 #ifdef NDEBUG
     std::stringstream ss;
@@ -86,4 +86,3 @@ NppException::NppException(const std::string &aMessage, [[maybe_unused]] const s
     What() = ss.str();
 }
 } // namespace mpp::npp
-#endif // MPP_ENABLE_NPP_BACKEND

@@ -1,7 +1,4 @@
 #pragma once
-#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "imageView.h"
 #include <backends/cuda/cudaException.h>
 #include <common/defines.h>
@@ -86,4 +83,3 @@ template <PixelType T> class Image : public ImageView<T>
     }
 };
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

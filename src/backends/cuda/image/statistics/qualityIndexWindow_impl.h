@@ -1,17 +1,14 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "qualityIndexWindow.h"
-#include <backends/cuda/image/SSIMFilterKernel.h>
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/reductionAlongXKernel.h>
 #include <backends/cuda/image/reductionAlongYKernel.h>
+#include <backends/cuda/image/SSIMFilterKernel.h>
 #include <backends/cuda/streamCtx.h>
 #include <backends/cuda/templateRegistry.h>
 #include <common/defines.h>
 #include <common/image/fixedSizeFilters.h>
 #include <common/image/functors/reductionInitValues.h>
 #include <common/image/functors/srcReductionFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -51,45 +48,41 @@ void InvokeQIWSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, si
                      const Vector2<int> &aOffsetToActualRoi2, const Size2D &aSize,
                      const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr int filterSize   = 11;
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
-        using ComputeT             = DstT;
-        using FilterT              = FixedFilterKernel<mpp::FixedFilter::LowPass, filterSize, float>;
+    constexpr int filterSize   = 11;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    using ComputeT             = DstT;
+    using FilterT              = FixedFilterKernel<mpp::FixedFilter::LowPass, filterSize, float>;
 
-        constexpr int pixelBlockSizeY = pixel_block_size_y<DstT>::value;
+    constexpr int pixelBlockSizeY = pixel_block_size_y<DstT>::value;
 
-        using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
-        const BCType bc1(aSrc1, aPitchSrc1, aAllowedReadRoiSize1, aOffsetToActualRoi1);
-        const BCType bc2(aSrc2, aPitchSrc2, aAllowedReadRoiSize2, aOffsetToActualRoi2);
+    using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
+    const BCType bc1(aSrc1, aPitchSrc1, aAllowedReadRoiSize1, aOffsetToActualRoi1);
+    const BCType bc2(aSrc2, aPitchSrc2, aAllowedReadRoiSize2, aOffsetToActualRoi2);
 
-        const mpp::QualityIndexWindow<DstT> postOp;
+    const mpp::QualityIndexWindow<DstT> postOp;
 
-        InvokeSSIMFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, pixelBlockSizeY, BCType, FilterT,
-                                      mpp::QualityIndexWindow<DstT>>(bc1, bc2, aTempBuffer, aSize.x * sizeof(DstT),
-                                                                     postOp, aSize, aStreamCtx);
+    InvokeSSIMFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, pixelBlockSizeY, BCType, FilterT,
+                                  mpp::QualityIndexWindow<DstT>>(bc1, bc2, aTempBuffer, aSize.x * sizeof(DstT), postOp,
+                                                                 aSize, aStreamCtx);
 
-        using sumSrc = SrcReductionFunctor<TupelSize, ComputeT, ComputeT, mpp::Sum<ComputeT, ComputeT>>;
+    using sumSrc = SrcReductionFunctor<TupelSize, ComputeT, ComputeT, mpp::Sum<ComputeT, ComputeT>>;
 
-        const mpp::Sum<ComputeT, ComputeT> op;
+    const mpp::Sum<ComputeT, ComputeT> op;
 
-        const sumSrc functor(aTempBuffer, aSize.x * sizeof(DstT), op);
+    const sumSrc functor(aTempBuffer, aSize.x * sizeof(DstT), op);
 
-        InvokeReductionAlongXKernelDefault<ComputeT, ComputeT, TupelSize, sumSrc, mpp::Sum<ComputeT, ComputeT>,
-                                           ReductionInitValue::Zero>(aTempBuffer, aTempBufferAvg, aSize, aStreamCtx,
-                                                                     functor);
+    InvokeReductionAlongXKernelDefault<ComputeT, ComputeT, TupelSize, sumSrc, mpp::Sum<ComputeT, ComputeT>,
+                                       ReductionInitValue::Zero>(aTempBuffer, aTempBufferAvg, aSize, aStreamCtx,
+                                                                 functor);
 
-        const mpp::DivPostOp<DstT> postOpAvg(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(aSize.TotalSize()));
-        const mpp::DivScalar<DstT> postOpScalar(
-            static_cast<complex_basetype_t<remove_vector_t<DstT>>>(aSize.TotalSize()));
+    const mpp::DivPostOp<DstT> postOpAvg(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(aSize.TotalSize()));
+    const mpp::DivScalar<DstT> postOpScalar(static_cast<complex_basetype_t<remove_vector_t<DstT>>>(aSize.TotalSize()));
 
-        InvokeReductionAlongYKernelDefault<ComputeT, DstT, mpp::Sum<DstT, DstT>, ReductionInitValue::Zero,
-                                           mpp::DivPostOp<DstT>, mpp::DivScalar<DstT>>(
-            aTempBufferAvg, aDst, nullptr, aSize.y, postOpAvg, postOpScalar, aStreamCtx);
-    }
+    InvokeReductionAlongYKernelDefault<ComputeT, DstT, mpp::Sum<DstT, DstT>, ReductionInitValue::Zero,
+                                       mpp::DivPostOp<DstT>, mpp::DivScalar<DstT>>(
+        aTempBufferAvg, aDst, nullptr, aSize.y, postOpAvg, postOpScalar, aStreamCtx);
 }
 
 #pragma region Instantiate
@@ -117,4 +110,3 @@ void InvokeQIWSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, si
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "../subMasked_impl.h"
 
 using namespace mpp::cuda;
@@ -18,4 +16,3 @@ ForAllChannelsNoAlphaInvokeSubInvInplaceCMask(32fc);
 ForAllChannelsNoAlphaInvokeSubInvInplaceDevCMask(32fc);
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

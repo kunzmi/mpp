@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "scale.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelKernel.h>
@@ -7,7 +5,6 @@
 #include <backends/cuda/templateRegistry.h>
 #include <common/defines.h>
 #include <common/image/functors/scaleConversionFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -27,18 +24,15 @@ void InvokeScale(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitch
                  const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
     requires(!use_int_division_for_scale_v<SrcT, DstT>) && RealOrComplexFloatingVector<DstT>
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using scale = ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::None>;
+    using scale = ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::None>;
 
-        const scale functor(aSrc1, aPitchSrc1, aScaleFactor, aSrcMin, aDstMin);
+    const scale functor(aSrc1, aPitchSrc1, aScaleFactor, aSrcMin, aDstMin);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -72,55 +66,50 @@ void InvokeScale(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitch
                  RoundingMode aRoundingMode, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
     requires(!use_int_division_for_scale_v<SrcT, DstT>) && RealOrComplexIntVector<DstT>
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+    switch (aRoundingMode)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
-
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
-
-        switch (aRoundingMode)
+        case mpp::RoundingMode::NearestTiesToEven:
         {
-            case mpp::RoundingMode::NearestTiesToEven:
-            {
-                using scale = ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::NearestTiesToEven>;
-                const scale functor(aSrc1, aPitchSrc1, aScaleFactor, aSrcMin, aDstMin);
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            case mpp::RoundingMode::NearestTiesAwayFromZero:
-            {
-                using scale =
-                    ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::NearestTiesAwayFromZero>;
-                const scale functor(aSrc1, aPitchSrc1, aScaleFactor, aSrcMin, aDstMin);
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            case mpp::RoundingMode::TowardZero:
-            {
-                using scale = ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::TowardZero>;
-                const scale functor(aSrc1, aPitchSrc1, aScaleFactor, aSrcMin, aDstMin);
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            case mpp::RoundingMode::TowardNegativeInfinity:
-            {
-                using scale =
-                    ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::TowardNegativeInfinity>;
-                const scale functor(aSrc1, aPitchSrc1, aScaleFactor, aSrcMin, aDstMin);
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            case mpp::RoundingMode::TowardPositiveInfinity:
-            {
-                using scale =
-                    ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::TowardPositiveInfinity>;
-                const scale functor(aSrc1, aPitchSrc1, aScaleFactor, aSrcMin, aDstMin);
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            default:
-                throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
+            using scale = ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::NearestTiesToEven>;
+            const scale functor(aSrc1, aPitchSrc1, aScaleFactor, aSrcMin, aDstMin);
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
         }
+        break;
+        case mpp::RoundingMode::NearestTiesAwayFromZero:
+        {
+            using scale =
+                ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::NearestTiesAwayFromZero>;
+            const scale functor(aSrc1, aPitchSrc1, aScaleFactor, aSrcMin, aDstMin);
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        }
+        break;
+        case mpp::RoundingMode::TowardZero:
+        {
+            using scale = ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::TowardZero>;
+            const scale functor(aSrc1, aPitchSrc1, aScaleFactor, aSrcMin, aDstMin);
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        }
+        break;
+        case mpp::RoundingMode::TowardNegativeInfinity:
+        {
+            using scale = ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::TowardNegativeInfinity>;
+            const scale functor(aSrc1, aPitchSrc1, aScaleFactor, aSrcMin, aDstMin);
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        }
+        break;
+        case mpp::RoundingMode::TowardPositiveInfinity:
+        {
+            using scale = ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::TowardPositiveInfinity>;
+            const scale functor(aSrc1, aPitchSrc1, aScaleFactor, aSrcMin, aDstMin);
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        }
+        break;
+        default:
+            throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
     }
 }
 
@@ -155,55 +144,50 @@ void InvokeScale(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitch
                  RoundingMode aRoundingMode, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
     requires(use_int_division_for_scale_v<SrcT, DstT>)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+    switch (aRoundingMode)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
-
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
-
-        switch (aRoundingMode)
+        case mpp::RoundingMode::NearestTiesToEven:
         {
-            case mpp::RoundingMode::NearestTiesToEven:
-            {
-                using scale = ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::NearestTiesToEven>;
-                const scale functor(aSrc1, aPitchSrc1, aSrcMin, aDstMin, aSrcRange, aDstRange);
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            case mpp::RoundingMode::NearestTiesAwayFromZero:
-            {
-                using scale =
-                    ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::NearestTiesAwayFromZero>;
-                const scale functor(aSrc1, aPitchSrc1, aSrcMin, aDstMin, aSrcRange, aDstRange);
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            case mpp::RoundingMode::TowardZero:
-            {
-                using scale = ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::TowardZero>;
-                const scale functor(aSrc1, aPitchSrc1, aSrcMin, aDstMin, aSrcRange, aDstRange);
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            case mpp::RoundingMode::TowardNegativeInfinity:
-            {
-                using scale =
-                    ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::TowardNegativeInfinity>;
-                const scale functor(aSrc1, aPitchSrc1, aSrcMin, aDstMin, aSrcRange, aDstRange);
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            case mpp::RoundingMode::TowardPositiveInfinity:
-            {
-                using scale =
-                    ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::TowardPositiveInfinity>;
-                const scale functor(aSrc1, aPitchSrc1, aSrcMin, aDstMin, aSrcRange, aDstRange);
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-            }
-            break;
-            default:
-                throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
+            using scale = ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::NearestTiesToEven>;
+            const scale functor(aSrc1, aPitchSrc1, aSrcMin, aDstMin, aSrcRange, aDstRange);
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
         }
+        break;
+        case mpp::RoundingMode::NearestTiesAwayFromZero:
+        {
+            using scale =
+                ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::NearestTiesAwayFromZero>;
+            const scale functor(aSrc1, aPitchSrc1, aSrcMin, aDstMin, aSrcRange, aDstRange);
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        }
+        break;
+        case mpp::RoundingMode::TowardZero:
+        {
+            using scale = ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::TowardZero>;
+            const scale functor(aSrc1, aPitchSrc1, aSrcMin, aDstMin, aSrcRange, aDstRange);
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        }
+        break;
+        case mpp::RoundingMode::TowardNegativeInfinity:
+        {
+            using scale = ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::TowardNegativeInfinity>;
+            const scale functor(aSrc1, aPitchSrc1, aSrcMin, aDstMin, aSrcRange, aDstRange);
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        }
+        break;
+        case mpp::RoundingMode::TowardPositiveInfinity:
+        {
+            using scale = ScaleConversionFunctor<TupelSize, SrcT, ComputeT, DstT, RoundingMode::TowardPositiveInfinity>;
+            const scale functor(aSrc1, aPitchSrc1, aSrcMin, aDstMin, aSrcRange, aDstRange);
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, scale>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        }
+        break;
+        default:
+            throw INVALIDARGUMENT(aRoundingMode, "Unsupported rounding mode: " << aRoundingMode);
     }
 }
 
@@ -234,4 +218,3 @@ void InvokeScale(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitch
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

@@ -1,8 +1,4 @@
 #pragma once
-#include <common/moduleEnabler.h>
-#if MPP_ENABLE_NPP_BACKEND
-#include <common/image/pixelTypeEnabler.h>
-
 #include "../dllexport_npp.h"
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/stream.h>
@@ -22,6 +18,11 @@
 #include <common/image/sizePitched.h>
 #include <common/safeCast.h>
 #include <common/vector_typetraits.h>
+#include <common/vector1.h>
+#include <common/vector2.h>
+#include <common/vector3.h>
+#include <common/vector4.h>
+#include <common/vector4A.h>
 #include <cstddef>
 #include <cuda_runtime_api.h>
 #include <nppcore.h>
@@ -659,4 +660,3 @@ template <PixelType T> class MPPEXPORT_NPP ImageView : public ImageViewBase<T>
     }
 };
 } // namespace mpp::image::npp
-#endif // MPP_ENABLE_NPP_BACKEND

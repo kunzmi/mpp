@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "../divMasked_impl.h"
 
 using namespace mpp::cuda;
@@ -18,4 +16,3 @@ ForAllChannelsNoAlphaInvokeDivInvInplaceCScaleMask(16sc);
 ForAllChannelsNoAlphaInvokeDivInvInplaceDevCScaleMask(16sc);
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

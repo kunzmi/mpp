@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "swapChannel.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelKernel.h>
@@ -12,7 +10,6 @@
 #include <common/image/functors/inplaceFunctor.h>
 #include <common/image/functors/srcDstAsSrcFunctor.h>
 #include <common/image/functors/srcFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -31,39 +28,34 @@ void InvokeSwapChannelSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size
                           const ChannelList<vector_active_size_v<DstT>> &aDstChannels, const Size2D &aSize,
                           const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+
+    // in case that either input or ourput type is three-channel, we can't use tupels:
+    if constexpr (vector_size_v<SrcT> == 3 || vector_size_v<DstT> == 3)
     {
-        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+        constexpr size_t TupelSize = 1;
 
-        // in case that either input or ourput type is three-channel, we can't use tupels:
-        if constexpr (vector_size_v<SrcT> == 3 || vector_size_v<DstT> == 3)
-        {
-            constexpr size_t TupelSize = 1;
+        using swapChannelSrc =
+            SrcFunctor<TupelSize, SrcT, SrcT, DstT, mpp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
 
-            using swapChannelSrc =
-                SrcFunctor<TupelSize, SrcT, SrcT, DstT, mpp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
+        const mpp::SwapChannel<SrcT, DstT> op(aDstChannels);
 
-            const mpp::SwapChannel<SrcT, DstT> op(aDstChannels);
+        const swapChannelSrc functor(aSrc1, aPitchSrc1, op);
 
-            const swapChannelSrc functor(aSrc1, aPitchSrc1, op);
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, swapChannelSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-            InvokeForEachPixelKernelDefault<DstT, TupelSize, swapChannelSrc>(aDst, aPitchDst, aSize, aStreamCtx,
-                                                                             functor);
-        }
-        else
-        {
-            constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+        using swapChannelSrc =
+            SrcFunctor<TupelSize, SrcT, SrcT, DstT, mpp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
 
-            using swapChannelSrc =
-                SrcFunctor<TupelSize, SrcT, SrcT, DstT, mpp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
+        const mpp::SwapChannel<SrcT, DstT> op(aDstChannels);
 
-            const mpp::SwapChannel<SrcT, DstT> op(aDstChannels);
+        const swapChannelSrc functor(aSrc1, aPitchSrc1, op);
 
-            const swapChannelSrc functor(aSrc1, aPitchSrc1, op);
-
-            InvokeForEachPixelKernelDefault<DstT, TupelSize, swapChannelSrc>(aDst, aPitchDst, aSize, aStreamCtx,
-                                                                             functor);
-        }
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, swapChannelSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
     }
 }
 
@@ -87,41 +79,37 @@ void InvokeSwapChannelSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size
                           const ChannelList<vector_active_size_v<DstT>> &aDstChannels, remove_vector_t<DstT> aValue,
                           const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+
+    constexpr size_t TupelSize = 1; // ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+    bool allChannelsSet = true;
+    for (size_t i = 0; i < vector_active_size_v<DstT>; i++)
     {
-        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+        allChannelsSet &= aDstChannels.data()[i].template IsInRange<DstT>();
+    }
 
-        constexpr size_t TupelSize = 1; // ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    if (allChannelsSet)
+    {
+        using swapChannelSrc =
+            SrcFunctor<TupelSize, SrcT, SrcT, DstT, mpp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
 
-        bool allChannelsSet = true;
-        for (size_t i = 0; i < vector_active_size_v<DstT>; i++)
-        {
-            allChannelsSet &= aDstChannels.data()[i].template IsInRange<DstT>();
-        }
+        const mpp::SwapChannel<SrcT, DstT> op(aDstChannels, aValue);
 
-        if (allChannelsSet)
-        {
-            using swapChannelSrc =
-                SrcFunctor<TupelSize, SrcT, SrcT, DstT, mpp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
+        const swapChannelSrc functor(aSrc1, aPitchSrc1, op);
 
-            const mpp::SwapChannel<SrcT, DstT> op(aDstChannels, aValue);
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, swapChannelSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        using swapChannelSrcDstAsSrc = SrcDstAsSrcFunctor<TupelSize, SrcT, DstT, mpp::SwapChannel<SrcT, DstT>>;
 
-            const swapChannelSrc functor(aSrc1, aPitchSrc1, op);
+        const mpp::SwapChannel<SrcT, DstT> op(aDstChannels, aValue);
 
-            InvokeForEachPixelKernelDefault<DstT, TupelSize, swapChannelSrc>(aDst, aPitchDst, aSize, aStreamCtx,
-                                                                             functor);
-        }
-        else
-        {
-            using swapChannelSrcDstAsSrc = SrcDstAsSrcFunctor<TupelSize, SrcT, DstT, mpp::SwapChannel<SrcT, DstT>>;
+        const swapChannelSrcDstAsSrc functor(aSrc1, aPitchSrc1, aDst, aPitchDst, op);
 
-            const mpp::SwapChannel<SrcT, DstT> op(aDstChannels, aValue);
-
-            const swapChannelSrcDstAsSrc functor(aSrc1, aPitchSrc1, aDst, aPitchDst, op);
-
-            InvokeForEachPixelKernelDefault<DstT, TupelSize, swapChannelSrcDstAsSrc>(aDst, aPitchDst, aSize, aStreamCtx,
-                                                                                     functor);
-        }
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, swapChannelSrcDstAsSrc>(aDst, aPitchDst, aSize, aStreamCtx,
+                                                                                 functor);
     }
 }
 
@@ -142,23 +130,19 @@ void InvokeSwapChannelInplace(SrcT *aSrcDst, size_t aPitchSrcDst,
                               const ChannelList<vector_active_size_v<SrcT>> &aDstChannels, const Size2D &aSize,
                               const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
-    {
-        using DstT = SrcT;
-        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+    using DstT = SrcT;
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using swapChannelInplace =
-            InplaceFunctor<TupelSize, SrcT, DstT, mpp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
+    using swapChannelInplace = InplaceFunctor<TupelSize, SrcT, DstT, mpp::SwapChannel<SrcT, DstT>, RoundingMode::None>;
 
-        const mpp::SwapChannel<SrcT, DstT> op(aDstChannels);
+    const mpp::SwapChannel<SrcT, DstT> op(aDstChannels);
 
-        const swapChannelInplace functor(op);
+    const swapChannelInplace functor(op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, swapChannelInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
-                                                                             functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, swapChannelInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
+                                                                         functor);
 }
 
 #pragma region Instantiate
@@ -174,4 +158,3 @@ void InvokeSwapChannelInplace(SrcT *aSrcDst, size_t aPitchSrcDst,
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

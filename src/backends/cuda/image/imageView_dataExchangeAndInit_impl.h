@@ -1,7 +1,4 @@
 #pragma once
-#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "dataExchangeAndInit/conversionRelations.h"
 #include "dataExchangeAndInit/scale.h"
 #include "dataExchangeAndInit/scaleRelations.h"
@@ -380,7 +377,8 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, RoundingMode aRounding
 
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax,
+ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, complex_basetype_t<pixel_basetype_t<TTo>> aDstMin,
+                                    complex_basetype_t<pixel_basetype_t<TTo>> aDstMax,
                                     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<T> &&
             RealOrComplexFloatingVector<TTo> && ScaleImplemented<T, TTo>
@@ -406,8 +404,9 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDs
 
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax,
-                                    RoundingMode aRoundingMode, const mpp::cuda::StreamCtx &aStreamCtx) const
+ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, complex_basetype_t<pixel_basetype_t<TTo>> aDstMin,
+                                    complex_basetype_t<pixel_basetype_t<TTo>> aDstMax, RoundingMode aRoundingMode,
+                                    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<T> &&
             RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>
 {
@@ -442,8 +441,9 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<TTo> aDs
 
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
-                                    RoundingMode aRoundingMode, const mpp::cuda::StreamCtx &aStreamCtx) const
+ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, complex_basetype_t<pixel_basetype_t<T>> aSrcMin,
+                                    complex_basetype_t<pixel_basetype_t<T>> aSrcMax, RoundingMode aRoundingMode,
+                                    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(!std::same_as<T, TTo>) &&
             (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>
 {
@@ -503,8 +503,10 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcM
 
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
-                                    scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax,
+ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, complex_basetype_t<pixel_basetype_t<T>> aSrcMin,
+                                    complex_basetype_t<pixel_basetype_t<T>> aSrcMax,
+                                    complex_basetype_t<pixel_basetype_t<TTo>> aDstMin,
+                                    complex_basetype_t<pixel_basetype_t<TTo>> aDstMax,
                                     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(!std::same_as<T, TTo>) &&
             (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexFloatingVector<TTo> && ScaleImplemented<T, TTo>
@@ -530,8 +532,10 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcM
 
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, scalefactor_t<T> aSrcMin, scalefactor_t<T> aSrcMax,
-                                    scalefactor_t<TTo> aDstMin, scalefactor_t<TTo> aDstMax, RoundingMode aRoundingMode,
+ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, complex_basetype_t<pixel_basetype_t<T>> aSrcMin,
+                                    complex_basetype_t<pixel_basetype_t<T>> aSrcMax,
+                                    complex_basetype_t<pixel_basetype_t<TTo>> aDstMin,
+                                    complex_basetype_t<pixel_basetype_t<TTo>> aDstMax, RoundingMode aRoundingMode,
                                     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(!std::same_as<T, TTo>) &&
             (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>
@@ -720,4 +724,3 @@ ImageView<T> &ImageView<T>::Transpose(ImageView<T> &aDst, const mpp::cuda::Strea
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

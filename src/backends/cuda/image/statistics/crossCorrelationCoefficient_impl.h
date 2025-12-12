@@ -1,12 +1,9 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "crossCorrelationCoefficient.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/crossCorrelationCoefficientKernel.h>
 #include <backends/cuda/streamCtx.h>
 #include <backends/cuda/templateRegistry.h>
 #include <common/defines.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -59,96 +56,86 @@ void InvokeCrossCorrelationCoefficient(const SrcT *aSrc1, size_t aPitchSrc1, con
                                        const Size2D &aAllowedReadRoiSize, const Vector2<int> &aOffsetToActualRoi,
                                        const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    using ComputeT             = DstT;
+
+    constexpr int pixelBlockSizeX = pixel_block_size_x<DstT>::value;
+    constexpr int pixelBlockSizeY = pixel_block_size_y<DstT>::value;
+
+    switch (aBorderType)
     {
-        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
-
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
-        using ComputeT             = DstT;
-
-        constexpr int pixelBlockSizeX = pixel_block_size_x<DstT>::value;
-        constexpr int pixelBlockSizeY = pixel_block_size_y<DstT>::value;
-
-        switch (aBorderType)
+        case mpp::BorderType::None:
         {
-            case mpp::BorderType::None:
-            {
-                using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+            using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
 
-                InvokeCrossCorrelationCoefficientKernelDefault<ComputeT, DstT, TupelSize, SrcT, pixelBlockSizeX,
-                                                               pixelBlockSizeY, RoundingMode::NearestTiesToEven,
-                                                               BCType>(bc, aSrcBoxFiltered, aPitchSrcBoxFiltered, aDst,
-                                                                       aPitchDst, aTemplate, aPitchTemplate,
-                                                                       aSizeTemplate, aMeanTemplate, aSize, aStreamCtx);
-            }
-            break;
-            case mpp::BorderType::Constant:
-            {
-                using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
-
-                InvokeCrossCorrelationCoefficientKernelDefault<ComputeT, DstT, TupelSize, SrcT, pixelBlockSizeX,
-                                                               pixelBlockSizeY, RoundingMode::NearestTiesToEven,
-                                                               BCType>(bc, aSrcBoxFiltered, aPitchSrcBoxFiltered, aDst,
-                                                                       aPitchDst, aTemplate, aPitchTemplate,
-                                                                       aSizeTemplate, aMeanTemplate, aSize, aStreamCtx);
-            }
-            break;
-            case mpp::BorderType::Replicate:
-            {
-                using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                InvokeCrossCorrelationCoefficientKernelDefault<ComputeT, DstT, TupelSize, SrcT, pixelBlockSizeX,
-                                                               pixelBlockSizeY, RoundingMode::NearestTiesToEven,
-                                                               BCType>(bc, aSrcBoxFiltered, aPitchSrcBoxFiltered, aDst,
-                                                                       aPitchDst, aTemplate, aPitchTemplate,
-                                                                       aSizeTemplate, aMeanTemplate, aSize, aStreamCtx);
-            }
-            break;
-            case mpp::BorderType::Mirror:
-            {
-                using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                InvokeCrossCorrelationCoefficientKernelDefault<ComputeT, DstT, TupelSize, SrcT, pixelBlockSizeX,
-                                                               pixelBlockSizeY, RoundingMode::NearestTiesToEven,
-                                                               BCType>(bc, aSrcBoxFiltered, aPitchSrcBoxFiltered, aDst,
-                                                                       aPitchDst, aTemplate, aPitchTemplate,
-                                                                       aSizeTemplate, aMeanTemplate, aSize, aStreamCtx);
-            }
-            break;
-            case mpp::BorderType::MirrorReplicate:
-            {
-                using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                InvokeCrossCorrelationCoefficientKernelDefault<ComputeT, DstT, TupelSize, SrcT, pixelBlockSizeX,
-                                                               pixelBlockSizeY, RoundingMode::NearestTiesToEven,
-                                                               BCType>(bc, aSrcBoxFiltered, aPitchSrcBoxFiltered, aDst,
-                                                                       aPitchDst, aTemplate, aPitchTemplate,
-                                                                       aSizeTemplate, aMeanTemplate, aSize, aStreamCtx);
-            }
-            break;
-            case mpp::BorderType::Wrap:
-            {
-                using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
-                const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                InvokeCrossCorrelationCoefficientKernelDefault<ComputeT, DstT, TupelSize, SrcT, pixelBlockSizeX,
-                                                               pixelBlockSizeY, RoundingMode::NearestTiesToEven,
-                                                               BCType>(bc, aSrcBoxFiltered, aPitchSrcBoxFiltered, aDst,
-                                                                       aPitchDst, aTemplate, aPitchTemplate,
-                                                                       aSizeTemplate, aMeanTemplate, aSize, aStreamCtx);
-            }
-            break;
-            default:
-                throw INVALIDARGUMENT(aBorderType,
-                                      aBorderType
-                                          << " is not a supported border type mode for CrossCorrelationCoefficient.");
-                break;
+            InvokeCrossCorrelationCoefficientKernelDefault<ComputeT, DstT, TupelSize, SrcT, pixelBlockSizeX,
+                                                           pixelBlockSizeY, RoundingMode::NearestTiesToEven, BCType>(
+                bc, aSrcBoxFiltered, aPitchSrcBoxFiltered, aDst, aPitchDst, aTemplate, aPitchTemplate, aSizeTemplate,
+                aMeanTemplate, aSize, aStreamCtx);
         }
+        break;
+        case mpp::BorderType::Constant:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
+
+            InvokeCrossCorrelationCoefficientKernelDefault<ComputeT, DstT, TupelSize, SrcT, pixelBlockSizeX,
+                                                           pixelBlockSizeY, RoundingMode::NearestTiesToEven, BCType>(
+                bc, aSrcBoxFiltered, aPitchSrcBoxFiltered, aDst, aPitchDst, aTemplate, aPitchTemplate, aSizeTemplate,
+                aMeanTemplate, aSize, aStreamCtx);
+        }
+        break;
+        case mpp::BorderType::Replicate:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+            InvokeCrossCorrelationCoefficientKernelDefault<ComputeT, DstT, TupelSize, SrcT, pixelBlockSizeX,
+                                                           pixelBlockSizeY, RoundingMode::NearestTiesToEven, BCType>(
+                bc, aSrcBoxFiltered, aPitchSrcBoxFiltered, aDst, aPitchDst, aTemplate, aPitchTemplate, aSizeTemplate,
+                aMeanTemplate, aSize, aStreamCtx);
+        }
+        break;
+        case mpp::BorderType::Mirror:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+            InvokeCrossCorrelationCoefficientKernelDefault<ComputeT, DstT, TupelSize, SrcT, pixelBlockSizeX,
+                                                           pixelBlockSizeY, RoundingMode::NearestTiesToEven, BCType>(
+                bc, aSrcBoxFiltered, aPitchSrcBoxFiltered, aDst, aPitchDst, aTemplate, aPitchTemplate, aSizeTemplate,
+                aMeanTemplate, aSize, aStreamCtx);
+        }
+        break;
+        case mpp::BorderType::MirrorReplicate:
+        {
+            using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+            InvokeCrossCorrelationCoefficientKernelDefault<ComputeT, DstT, TupelSize, SrcT, pixelBlockSizeX,
+                                                           pixelBlockSizeY, RoundingMode::NearestTiesToEven, BCType>(
+                bc, aSrcBoxFiltered, aPitchSrcBoxFiltered, aDst, aPitchDst, aTemplate, aPitchTemplate, aSizeTemplate,
+                aMeanTemplate, aSize, aStreamCtx);
+        }
+        break;
+        case mpp::BorderType::Wrap:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
+            const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+            InvokeCrossCorrelationCoefficientKernelDefault<ComputeT, DstT, TupelSize, SrcT, pixelBlockSizeX,
+                                                           pixelBlockSizeY, RoundingMode::NearestTiesToEven, BCType>(
+                bc, aSrcBoxFiltered, aPitchSrcBoxFiltered, aDst, aPitchDst, aTemplate, aPitchTemplate, aSizeTemplate,
+                aMeanTemplate, aSize, aStreamCtx);
+        }
+        break;
+        default:
+            throw INVALIDARGUMENT(
+                aBorderType, aBorderType << " is not a supported border type mode for CrossCorrelationCoefficient.");
+            break;
     }
 }
 
@@ -166,4 +153,3 @@ void InvokeCrossCorrelationCoefficient(const SrcT *aSrc1, size_t aPitchSrc1, con
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

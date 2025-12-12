@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "maxRelativeError.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/reductionAlongXKernel.h>
@@ -9,7 +7,6 @@
 #include <common/defines.h>
 #include <common/image/functors/reductionInitValues.h>
 #include <common/image/functors/srcSrcReductionFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -30,30 +27,26 @@ void InvokeMaxRelativeErrorSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const Sr
                                   ComputeT *aTempBuffer, DstT *aDst, remove_vector_t<DstT> *aDstScalar,
                                   const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
-        using avgErrorSrcSrc =
-            SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::MaximumRelativeError<SrcT, ComputeT>>;
+    using avgErrorSrcSrc = SrcSrcReductionFunctor<TupelSize, SrcT, ComputeT, mpp::MaximumRelativeError<SrcT, ComputeT>>;
 
-        const mpp::MaximumRelativeError<SrcT, ComputeT> op;
+    const mpp::MaximumRelativeError<SrcT, ComputeT> op;
 
-        const avgErrorSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+    const avgErrorSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
-        InvokeReductionAlongXKernelDefault<SrcT, ComputeT, TupelSize, avgErrorSrcSrc, mpp::MaxRed<ComputeT>,
-                                           ReductionInitValue::Zero>(aSrc1, aTempBuffer, aSize, aStreamCtx, functor);
+    InvokeReductionAlongXKernelDefault<SrcT, ComputeT, TupelSize, avgErrorSrcSrc, mpp::MaxRed<ComputeT>,
+                                       ReductionInitValue::Zero>(aSrc1, aTempBuffer, aSize, aStreamCtx, functor);
 
-        const mpp::Nothing<DstT> postOp;
+    const mpp::Nothing<DstT> postOp;
 
-        const mpp::MaxScalar<DstT> postOpScalar;
+    const mpp::MaxScalar<DstT> postOpScalar;
 
-        InvokeReductionAlongYKernelDefault<ComputeT, DstT, mpp::MaxRed<DstT>, ReductionInitValue::Zero,
-                                           mpp::Nothing<DstT>, mpp::MaxScalar<DstT>>(
-            aTempBuffer, aDst, aDstScalar, aSize.y, postOp, postOpScalar, aStreamCtx);
-    }
+    InvokeReductionAlongYKernelDefault<ComputeT, DstT, mpp::MaxRed<DstT>, ReductionInitValue::Zero, mpp::Nothing<DstT>,
+                                       mpp::MaxScalar<DstT>>(aTempBuffer, aDst, aDstScalar, aSize.y, postOp,
+                                                             postOpScalar, aStreamCtx);
 }
 
 #pragma region Instantiate
@@ -81,4 +74,3 @@ void InvokeMaxRelativeErrorSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const Sr
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "setMasked.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelMaskedKernel.h>
@@ -8,7 +6,6 @@
 #include <common/defines.h>
 #include <common/image/functors/constantFunctor.h>
 #include <common/image/functors/devConstantFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -26,19 +23,16 @@ template <typename DstT>
 void InvokeSetCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const DstT &aConst, DstT *aDst, size_t aPitchDst,
                     const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE;
+    MPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using setC = ConstantFunctor<TupelSize, DstT>;
+    using setC = ConstantFunctor<TupelSize, DstT>;
 
-        const setC functor(aConst);
+    const setC functor(aConst);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, setC>(aMask, aPitchMask, aDst, aPitchDst, aSize,
-                                                                     aStreamCtx, functor);
-    }
+    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, setC>(aMask, aPitchMask, aDst, aPitchDst, aSize, aStreamCtx,
+                                                                 functor);
 }
 
 #pragma region Instantiate
@@ -66,19 +60,16 @@ template <typename DstT>
 void InvokeSetDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const DstT *aConst, DstT *aDst, size_t aPitchDst,
                        const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE;
+    MPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using setDevC = DevConstantFunctor<TupelSize, DstT>;
+    using setDevC = DevConstantFunctor<TupelSize, DstT>;
 
-        const setDevC functor(aConst);
+    const setDevC functor(aConst);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, setDevC>(aMask, aPitchMask, aDst, aPitchDst, aSize,
-                                                                        aStreamCtx, functor);
-    }
+    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, setDevC>(aMask, aPitchMask, aDst, aPitchDst, aSize,
+                                                                    aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -103,4 +94,3 @@ void InvokeSetDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const DstT *aC
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "conjMul.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelKernel.h>
@@ -11,7 +9,6 @@
 #include <common/defines.h>
 #include <common/image/functors/inplaceSrcFunctor.h>
 #include <common/image/functors/srcSrcFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -29,21 +26,17 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeConjMulSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst,
                          size_t aPitchDst, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using conjMulSrcSrc =
-            SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::ConjMul<ComputeT>, RoundingMode::None>;
+    using conjMulSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::ConjMul<ComputeT>, RoundingMode::None>;
 
-        const mpp::ConjMul<ComputeT> op;
+    const mpp::ConjMul<ComputeT> op;
 
-        const conjMulSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+    const conjMulSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, conjMulSrcSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, conjMulSrcSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -66,23 +59,20 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeConjMulInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, size_t aPitchSrc2,
                              const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        // integer multiplication results in integers, so no rounding needed:
-        using conjMulInplaceSrc =
-            InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::ConjMul<ComputeT>, RoundingMode::None>;
+    // integer multiplication results in integers, so no rounding needed:
+    using conjMulInplaceSrc =
+        InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::ConjMul<ComputeT>, RoundingMode::None>;
 
-        const mpp::ConjMul<ComputeT> op;
+    const mpp::ConjMul<ComputeT> op;
 
-        const conjMulInplaceSrc functor(aSrc2, aPitchSrc2, op);
+    const conjMulInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, conjMulInplaceSrc>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
-                                                                            functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, conjMulInplaceSrc>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
+                                                                        functor);
 }
 
 #pragma region Instantiate
@@ -102,4 +92,3 @@ void InvokeConjMulInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSr
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

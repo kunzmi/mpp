@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "bilateralGaussFilter.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/precomputeBilateralGaussFilterKernel.h>
@@ -7,7 +5,6 @@
 #include <backends/cuda/templateRegistry.h>
 #include <common/defines.h>
 #include <common/image/filterArea.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -29,4 +26,3 @@ void InvokePrecomputeBilateralGaussFilter(Pixel32fC1 *aPreCompGeomDistCoeff, con
 }
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

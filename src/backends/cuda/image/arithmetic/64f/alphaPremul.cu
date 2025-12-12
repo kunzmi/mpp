@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "../alphaPremul_impl.h"
 
 using namespace mpp::cuda;
@@ -20,4 +18,3 @@ InstantiateInvokeAlphaPremulACSrc_For(Pixel64fC4);
 InstantiateInvokeAlphaPremulACInplace_For(Pixel64fC4);
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

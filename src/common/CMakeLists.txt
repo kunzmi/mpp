@@ -28,5 +28,7 @@ target_include_directories(common  PUBLIC
 						   ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
 						   ${PROJECT_SOURCE_DIR}/src
 						  )
+
+set_target_properties(common PROPERTIES OUTPUT_NAME mpp-common)
 					
 add_subdirectory(fileIO)	

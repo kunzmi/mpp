@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "copySubpix.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelKernel.h>
@@ -12,7 +10,6 @@
 #include <common/image/functors/interpolator.h>
 #include <common/image/functors/transformer.h>
 #include <common/image/functors/transformerFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -30,137 +27,126 @@ template <typename SrcT, typename DstT>
 void InvokeCopySubpix(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, const Pixel32fC2 &aDelta,
                       InterpolationMode aInterpolation, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+    using CoordT         = float;
+    using CoordTInterpol = CoordT;
+
+    // for compatibility with NPP, negate the shift:
+    const TransformerShift<CoordT> shift(-aDelta);
+
+    constexpr Vector2<int> roiOffset(0);
+
+    constexpr RoundingMode roundingMode = RoundingMode::NearestTiesToEven;
+
+    // for interpolation at the border we will use replicate:
+    using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
+    const BCType bc(aSrc1, aPitchSrc1, aSize, roiOffset);
+
+    switch (aInterpolation)
     {
-        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
-
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
-
-        using CoordT         = float;
-        using CoordTInterpol = CoordT;
-
-        // for compatibility with NPP, negate the shift:
-        const TransformerShift<CoordT> shift(-aDelta);
-
-        constexpr Vector2<int> roiOffset(0);
-
-        constexpr RoundingMode roundingMode = RoundingMode::NearestTiesToEven;
-
-        // for interpolation at the border we will use replicate:
-        using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
-        const BCType bc(aSrc1, aPitchSrc1, aSize, roiOffset);
-
-        switch (aInterpolation)
+        case mpp::InterpolationMode::Linear:
         {
-            case mpp::InterpolationMode::Linear:
-            {
-                using InterpolatorT =
-                    Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol, InterpolationMode::Linear>;
-                const InterpolatorT interpol(bc);
-                using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, BCType::only_for_interpolation,
-                                                        InterpolatorT, TransformerShift<CoordT>, roundingMode>;
-                const TransformerT functor(interpol, shift, aSize);
+            using InterpolatorT =
+                Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol, InterpolationMode::Linear>;
+            const InterpolatorT interpol(bc);
+            using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, BCType::only_for_interpolation,
+                                                    InterpolatorT, TransformerShift<CoordT>, roundingMode>;
+            const TransformerT functor(interpol, shift, aSize);
 
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx,
-                                                                               functor);
-            }
-            break;
-            case mpp::InterpolationMode::CubicHermiteSpline:
-            {
-                using InterpolatorT = Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol,
-                                                   InterpolationMode::CubicHermiteSpline>;
-                const InterpolatorT interpol(bc);
-                using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, BCType::only_for_interpolation,
-                                                        InterpolatorT, TransformerShift<CoordT>, roundingMode>;
-                const TransformerT functor(interpol, shift, aSize);
-
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx,
-                                                                               functor);
-            }
-            break;
-            case mpp::InterpolationMode::CubicLagrange:
-            {
-                using InterpolatorT = Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol,
-                                                   InterpolationMode::CubicLagrange>;
-                const InterpolatorT interpol(bc);
-                using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, BCType::only_for_interpolation,
-                                                        InterpolatorT, TransformerShift<CoordT>, roundingMode>;
-                const TransformerT functor(interpol, shift, aSize);
-
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx,
-                                                                               functor);
-            }
-            break;
-            case mpp::InterpolationMode::Cubic2ParamBSpline:
-            {
-                using InterpolatorT = Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol,
-                                                   InterpolationMode::Cubic2ParamBSpline>;
-                const InterpolatorT interpol(bc);
-                using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, BCType::only_for_interpolation,
-                                                        InterpolatorT, TransformerShift<CoordT>, roundingMode>;
-                const TransformerT functor(interpol, shift, aSize);
-
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx,
-                                                                               functor);
-            }
-            break;
-            case mpp::InterpolationMode::Cubic2ParamCatmullRom:
-            {
-                using InterpolatorT = Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol,
-                                                   InterpolationMode::Cubic2ParamCatmullRom>;
-                const InterpolatorT interpol(bc);
-                using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, BCType::only_for_interpolation,
-                                                        InterpolatorT, TransformerShift<CoordT>, roundingMode>;
-                const TransformerT functor(interpol, shift, aSize);
-
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx,
-                                                                               functor);
-            }
-            break;
-            case mpp::InterpolationMode::Cubic2ParamB05C03:
-            {
-                using InterpolatorT = Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol,
-                                                   InterpolationMode::Cubic2ParamB05C03>;
-                const InterpolatorT interpol(bc);
-                using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, BCType::only_for_interpolation,
-                                                        InterpolatorT, TransformerShift<CoordT>, roundingMode>;
-                const TransformerT functor(interpol, shift, aSize);
-
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx,
-                                                                               functor);
-            }
-            break;
-            case mpp::InterpolationMode::Lanczos2Lobed:
-            {
-                using InterpolatorT = Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol,
-                                                   InterpolationMode::Lanczos2Lobed>;
-                const InterpolatorT interpol(bc);
-                using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, BCType::only_for_interpolation,
-                                                        InterpolatorT, TransformerShift<CoordT>, roundingMode>;
-                const TransformerT functor(interpol, shift, aSize);
-
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx,
-                                                                               functor);
-            }
-            break;
-            case mpp::InterpolationMode::Lanczos3Lobed:
-            {
-                using InterpolatorT = Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol,
-                                                   InterpolationMode::Lanczos3Lobed>;
-                const InterpolatorT interpol(bc);
-                using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, BCType::only_for_interpolation,
-                                                        InterpolatorT, TransformerShift<CoordT>, roundingMode>;
-                const TransformerT functor(interpol, shift, aSize);
-
-                InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx,
-                                                                               functor);
-            }
-            break;
-            default:
-                throw INVALIDARGUMENT(aInterpolation,
-                                      aInterpolation << " is not a supported interpolation mode for CopySubPix.");
-                break;
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx, functor);
         }
+        break;
+        case mpp::InterpolationMode::CubicHermiteSpline:
+        {
+            using InterpolatorT = Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol,
+                                               InterpolationMode::CubicHermiteSpline>;
+            const InterpolatorT interpol(bc);
+            using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, BCType::only_for_interpolation,
+                                                    InterpolatorT, TransformerShift<CoordT>, roundingMode>;
+            const TransformerT functor(interpol, shift, aSize);
+
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        }
+        break;
+        case mpp::InterpolationMode::CubicLagrange:
+        {
+            using InterpolatorT = Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol,
+                                               InterpolationMode::CubicLagrange>;
+            const InterpolatorT interpol(bc);
+            using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, BCType::only_for_interpolation,
+                                                    InterpolatorT, TransformerShift<CoordT>, roundingMode>;
+            const TransformerT functor(interpol, shift, aSize);
+
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        }
+        break;
+        case mpp::InterpolationMode::Cubic2ParamBSpline:
+        {
+            using InterpolatorT = Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol,
+                                               InterpolationMode::Cubic2ParamBSpline>;
+            const InterpolatorT interpol(bc);
+            using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, BCType::only_for_interpolation,
+                                                    InterpolatorT, TransformerShift<CoordT>, roundingMode>;
+            const TransformerT functor(interpol, shift, aSize);
+
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        }
+        break;
+        case mpp::InterpolationMode::Cubic2ParamCatmullRom:
+        {
+            using InterpolatorT = Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol,
+                                               InterpolationMode::Cubic2ParamCatmullRom>;
+            const InterpolatorT interpol(bc);
+            using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, BCType::only_for_interpolation,
+                                                    InterpolatorT, TransformerShift<CoordT>, roundingMode>;
+            const TransformerT functor(interpol, shift, aSize);
+
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        }
+        break;
+        case mpp::InterpolationMode::Cubic2ParamB05C03:
+        {
+            using InterpolatorT = Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol,
+                                               InterpolationMode::Cubic2ParamB05C03>;
+            const InterpolatorT interpol(bc);
+            using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, BCType::only_for_interpolation,
+                                                    InterpolatorT, TransformerShift<CoordT>, roundingMode>;
+            const TransformerT functor(interpol, shift, aSize);
+
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        }
+        break;
+        case mpp::InterpolationMode::Lanczos2Lobed:
+        {
+            using InterpolatorT = Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol,
+                                               InterpolationMode::Lanczos2Lobed>;
+            const InterpolatorT interpol(bc);
+            using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, BCType::only_for_interpolation,
+                                                    InterpolatorT, TransformerShift<CoordT>, roundingMode>;
+            const TransformerT functor(interpol, shift, aSize);
+
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        }
+        break;
+        case mpp::InterpolationMode::Lanczos3Lobed:
+        {
+            using InterpolatorT = Interpolator<geometry_compute_type_for_t<SrcT>, BCType, CoordTInterpol,
+                                               InterpolationMode::Lanczos3Lobed>;
+            const InterpolatorT interpol(bc);
+            using TransformerT = TransformerFunctor<TupelSize, SrcT, CoordT, BCType::only_for_interpolation,
+                                                    InterpolatorT, TransformerShift<CoordT>, roundingMode>;
+            const TransformerT functor(interpol, shift, aSize);
+
+            InvokeForEachPixelKernelDefault<DstT, TupelSize, TransformerT>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        }
+        break;
+        default:
+            throw INVALIDARGUMENT(aInterpolation,
+                                  aInterpolation << " is not a supported interpolation mode for CopySubPix.");
+            break;
     }
 }
 
@@ -188,4 +174,3 @@ void InvokeCopySubpix(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t a
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

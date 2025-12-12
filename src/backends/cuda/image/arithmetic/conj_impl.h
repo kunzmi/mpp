@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "conj.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelKernel.h>
@@ -10,7 +8,6 @@
 #include <common/defines.h>
 #include <common/image/functors/inplaceFunctor.h>
 #include <common/image/functors/srcFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -28,20 +25,17 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeConjSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                    const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using conjSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Conj<ComputeT>, RoundingMode::None>;
+    using conjSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Conj<ComputeT>, RoundingMode::None>;
 
-        const mpp::Conj<ComputeT> op;
+    const mpp::Conj<ComputeT> op;
 
-        const conjSrc functor(aSrc1, aPitchSrc1, op);
+    const conjSrc functor(aSrc1, aPitchSrc1, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, conjSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, conjSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -62,21 +56,17 @@ void InvokeConjSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPit
 template <typename DstT, typename ComputeT>
 void InvokeConjInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_COMPUTE_DST;
+    MPP_CUDA_REGISTER_TEMPALTE_COMPUTE_DST;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using conjInplace = InplaceFunctor<TupelSize, ComputeT, DstT, mpp::Conj<ComputeT>, RoundingMode::None>;
+    using conjInplace = InplaceFunctor<TupelSize, ComputeT, DstT, mpp::Conj<ComputeT>, RoundingMode::None>;
 
-        const mpp::Conj<ComputeT> op;
+    const mpp::Conj<ComputeT> op;
 
-        const conjInplace functor(op);
+    const conjInplace functor(op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, conjInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
-                                                                      functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, conjInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -94,4 +84,3 @@ void InvokeConjInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, 
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

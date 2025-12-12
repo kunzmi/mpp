@@ -1,7 +1,4 @@
 #pragma once
-#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "reduction5AlongXKernel.h" // for DuShuffle function
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/image/configurations.h>
@@ -264,4 +261,3 @@ void InvokeReduction5AlongYKernelDefault(const SrcT1 *aSrc1, const SrcT2 *aSrc2,
 }
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

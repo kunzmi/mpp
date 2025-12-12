@@ -1,7 +1,4 @@
 #pragma once
-#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "add.h"
 #include <backends/cuda/streamCtx.h>
 #include <common/image/functors/imageFunctors.h>
@@ -71,4 +68,3 @@ void InvokeAddInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
                                    const mpp::cuda::StreamCtx &aStreamCtx);
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

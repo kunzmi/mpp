@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "and.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelKernel.h>
@@ -15,7 +13,6 @@
 #include <common/image/functors/srcConstantFunctor.h>
 #include <common/image/functors/srcDevConstantFunctor.h>
 #include <common/image/functors/srcSrcFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -33,20 +30,17 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAndSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst,
                      size_t aPitchDst, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using andSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::And<ComputeT>, RoundingMode::None>;
+    using andSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::And<ComputeT>, RoundingMode::None>;
 
-        const mpp::And<ComputeT> op;
+    const mpp::And<ComputeT> op;
 
-        const andSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+    const andSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, andSrcSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, andSrcSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -75,20 +69,17 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAndSrcC(const SrcT *aSrc, size_t aPitchSrc, const SrcT &aConst, DstT *aDst, size_t aPitchDst,
                    const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using andSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::And<ComputeT>, RoundingMode::None>;
+    using andSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::And<ComputeT>, RoundingMode::None>;
 
-        const mpp::And<ComputeT> op;
+    const mpp::And<ComputeT> op;
 
-        const andSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
+    const andSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, andSrcC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, andSrcC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -116,21 +107,17 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAndSrcDevC(const SrcT *aSrc, size_t aPitchSrc, const SrcT *aConst, DstT *aDst, size_t aPitchDst,
                       const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using andSrcDevC =
-            SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::And<ComputeT>, RoundingMode::None>;
+    using andSrcDevC = SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::And<ComputeT>, RoundingMode::None>;
 
-        const mpp::And<ComputeT> op;
+    const mpp::And<ComputeT> op;
 
-        const andSrcDevC functor(aSrc, aPitchSrc, aConst, op);
+    const andSrcDevC functor(aSrc, aPitchSrc, aConst, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, andSrcDevC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, andSrcDevC>(aDst, aPitchDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -159,22 +146,17 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAndInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, size_t aPitchSrc2, const Size2D &aSize,
                          const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using andInplaceSrc =
-            InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::And<ComputeT>, RoundingMode::None>;
+    using andInplaceSrc = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::And<ComputeT>, RoundingMode::None>;
 
-        const mpp::And<ComputeT> op;
+    const mpp::And<ComputeT> op;
 
-        const andInplaceSrc functor(aSrc2, aPitchSrc2, op);
+    const andInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, andInplaceSrc>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
-                                                                        functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, andInplaceSrc>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -202,21 +184,17 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAndInplaceC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT &aConst, const Size2D &aSize,
                        const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using andInplaceC = InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::And<ComputeT>, RoundingMode::None>;
+    using andInplaceC = InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::And<ComputeT>, RoundingMode::None>;
 
-        const mpp::And<ComputeT> op;
+    const mpp::And<ComputeT> op;
 
-        const andInplaceC functor(static_cast<ComputeT>(aConst), op);
+    const andInplaceC functor(static_cast<ComputeT>(aConst), op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, andInplaceC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
-                                                                      functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, andInplaceC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -244,22 +222,17 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAndInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aConst, const Size2D &aSize,
                           const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using andInplaceDevC =
-            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, mpp::And<ComputeT>, RoundingMode::None>;
+    using andInplaceDevC = InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, mpp::And<ComputeT>, RoundingMode::None>;
 
-        const mpp::And<ComputeT> op;
+    const mpp::And<ComputeT> op;
 
-        const andInplaceDevC functor(aConst, op);
+    const andInplaceDevC functor(aConst, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, andInplaceDevC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
-                                                                         functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, andInplaceDevC>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -284,4 +257,3 @@ void InvokeAndInplaceDevC(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aConst
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

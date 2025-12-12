@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "transpose.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/transposeKernel.h>
@@ -7,7 +5,6 @@
 #include <backends/cuda/templateRegistry.h>
 #include <common/arithmetic/unary_operators.h>
 #include <common/defines.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -25,14 +22,11 @@ template <typename SrcDstT>
 void InvokeTransposeSrc(const SrcDstT *aSrc, size_t aPitchSrc, SrcDstT *aDst, size_t aPitchDst, const Size2D &aSizeDst,
                         const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcDstT> && mppEnableCudaBackend<SrcDstT>)
-    {
-        using SrcT = SrcDstT;
-        using DstT = SrcDstT;
-        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+    using SrcT = SrcDstT;
+    using DstT = SrcDstT;
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
 
-        InvokeTransposeKernelDefault<SrcDstT>(aSrc, aPitchSrc, aDst, aPitchDst, aSizeDst, aStreamCtx);
-    }
+    InvokeTransposeKernelDefault<SrcDstT>(aSrc, aPitchSrc, aDst, aPitchDst, aSizeDst, aStreamCtx);
 }
 
 #pragma region Instantiate
@@ -50,4 +44,3 @@ void InvokeTransposeSrc(const SrcDstT *aSrc, size_t aPitchSrc, SrcDstT *aDst, si
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

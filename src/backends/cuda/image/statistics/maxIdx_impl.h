@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "maxIdx.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/reductionMaxIndexAlongXKernel.h>
@@ -9,7 +7,6 @@
 #include <common/defines.h>
 #include <common/image/functors/reductionInitValues.h>
 #include <common/image/functors/srcReduction2Functor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -32,18 +29,15 @@ void InvokeMaxIdxSrc(const SrcT *aSrc, size_t aPitchSrc, SrcT *aTempBufferMax,
                      same_vector_size_different_type_t<SrcT, int> *aDstMaxIdxY, remove_vector_t<SrcT> *aDstScalarMax,
                      Vector3<int> *aDstScalarIdxMax, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
+    MPP_CUDA_REGISTER_TEMPALTE_ONLY_SRCTYPE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
-        InvokeReductionMaxIdxAlongXKernelDefault<SrcT, TupelSize>(aSrc, aPitchSrc, aTempBufferMax, aTempMaxIdxX, aSize,
-                                                                  aStreamCtx);
+    InvokeReductionMaxIdxAlongXKernelDefault<SrcT, TupelSize>(aSrc, aPitchSrc, aTempBufferMax, aTempMaxIdxX, aSize,
+                                                              aStreamCtx);
 
-        InvokeReductionMaxIdxAlongYKernelDefault<SrcT>(aTempBufferMax, aTempMaxIdxX, aDstMax, aDstMaxIdxX, aDstMaxIdxY,
-                                                       aDstScalarMax, aDstScalarIdxMax, aSize.y, aStreamCtx);
-    }
+    InvokeReductionMaxIdxAlongYKernelDefault<SrcT>(aTempBufferMax, aTempMaxIdxX, aDstMax, aDstMaxIdxX, aDstMaxIdxY,
+                                                   aDstScalarMax, aDstScalarIdxMax, aSize.y, aStreamCtx);
 }
 
 #pragma region Instantiate
@@ -65,4 +59,3 @@ void InvokeMaxIdxSrc(const SrcT *aSrc, size_t aPitchSrc, SrcT *aTempBufferMax,
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

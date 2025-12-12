@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "not.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelKernel.h>
@@ -11,7 +9,6 @@
 #include <common/defines.h>
 #include <common/image/functors/inplaceFunctor.h>
 #include <common/image/functors/srcFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -29,20 +26,17 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeNotSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                   const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using notSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Not<ComputeT>, RoundingMode::None>;
+    using notSrc = SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Not<ComputeT>, RoundingMode::None>;
 
-        const mpp::Not<ComputeT> op;
+    const mpp::Not<ComputeT> op;
 
-        const notSrc functor(aSrc1, aPitchSrc1, op);
+    const notSrc functor(aSrc1, aPitchSrc1, op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, notSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, notSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -64,20 +58,17 @@ void InvokeNotSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitc
 template <typename DstT>
 void InvokeNotInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE;
+    MPP_CUDA_REGISTER_TEMPALTE_ONLY_DSTTYPE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using notInplace = InplaceFunctor<TupelSize, DstT, DstT, mpp::Not<DstT>, RoundingMode::None>;
+    using notInplace = InplaceFunctor<TupelSize, DstT, DstT, mpp::Not<DstT>, RoundingMode::None>;
 
-        const mpp::Not<DstT> op;
+    const mpp::Not<DstT> op;
 
-        const notInplace functor(op);
+    const notInplace functor(op);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, notInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, notInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -95,4 +86,3 @@ void InvokeNotInplace(DstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize, c
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

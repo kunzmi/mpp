@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "../compare_impl.h"
 
 using namespace mpp::cuda;
@@ -16,4 +14,3 @@ ForAllChannelsNoAlphaInvokeCompareSrcCAnyChannel(16sc);
 ForAllChannelsNoAlphaInvokeCompareSrcDevCAnyChannel(16sc);
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

@@ -1,7 +1,4 @@
 #pragma once
-#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include <common/image/pixelTypes.h>
 #include <common/mpp_defs.h>
 
@@ -39,4 +36,3 @@ struct window_sum_result_type<T>
 template <typename T> using window_sum_result_type_t = typename window_sum_result_type<T>::type;
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

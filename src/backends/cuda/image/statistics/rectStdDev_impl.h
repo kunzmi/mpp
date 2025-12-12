@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "rectStdDev.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelKernel.h>
@@ -8,7 +6,6 @@
 #include <common/defines.h>
 #include <common/exception.h>
 #include <common/image/functors/rectStdDevFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -27,19 +24,16 @@ void InvokeRectStdDev(const Src1T *aSrc1, size_t aPitchSrc1, const Src2T *aSrc2,
                       size_t aPitchDst, const FilterArea &aFilterArea, const Size2D &aSize,
                       const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<Src1T> && mppEnableCudaBackend<DstT>)
-    {
-        using SrcT = Src1T;
-        MPP_CUDA_REGISTER_TEMPALTE;
+    using SrcT = Src1T;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using rectStdDev = RectStdDevFunctor<TupelSize, Src1T, Src2T, ComputeT, DstT>;
+    using rectStdDev = RectStdDevFunctor<TupelSize, Src1T, Src2T, ComputeT, DstT>;
 
-        const rectStdDev functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSize, aFilterArea);
+    const rectStdDev functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aSize, aFilterArea);
 
-        InvokeForEachPixelKernelDefault<DstT, TupelSize, rectStdDev>(aDst, aPitchDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, rectStdDev>(aDst, aPitchDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -58,4 +52,3 @@ void InvokeRectStdDev(const Src1T *aSrc1, size_t aPitchSrc1, const Src2T *aSrc2,
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

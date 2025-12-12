@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "../replaceIf_impl.h"
 
 using namespace mpp::cuda;
@@ -18,4 +16,3 @@ ForAllChannelsWithAlphaInvokeReplaceIfInplaceSrcDevC(32f);
 ForAllChannelsWithAlphaInvokeReplaceIfInplaceSrc(32f);
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "mulMasked.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelMaskedKernel.h>
@@ -21,7 +19,6 @@
 #include <common/image/functors/srcDevConstantScaleFunctor.h>
 #include <common/image/functors/srcSrcFunctor.h>
 #include <common/image/functors/srcSrcScaleFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -40,39 +37,36 @@ void InvokeMulSrcSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *
                          const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                          const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+    using simdOP_t = simd::Mul<Tupel<DstT, TupelSize>>;
+    if constexpr (simdOP_t::has_simd)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
+        using mulSrcSrcSIMD =
+            SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None, ComputeT, simdOP_t>;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+        const mpp::Mul<ComputeT> op;
+        const simdOP_t opSIMD;
 
-        using simdOP_t = simd::Mul<Tupel<DstT, TupelSize>>;
-        if constexpr (simdOP_t::has_simd)
-        {
-            // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
-            using mulSrcSrcSIMD = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None,
-                                                ComputeT, simdOP_t>;
+        const mulSrcSrcSIMD functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, opSIMD);
 
-            const mpp::Mul<ComputeT> op;
-            const simdOP_t opSIMD;
-
-            const mulSrcSrcSIMD functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, opSIMD);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcSrcSIMD>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                  aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
-            using mulSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None>;
-
-            const mpp::Mul<ComputeT> op;
-
-            const mulSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcSrc>(aMask, aPitchMask, aDst, aPitchDst, aSize,
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcSrcSIMD>(aMask, aPitchMask, aDst, aPitchDst, aSize,
                                                                               aStreamCtx, functor);
-        }
+    }
+    else
+    {
+        // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
+        using mulSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None>;
+
+        const mpp::Mul<ComputeT> op;
+
+        const mulSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcSrc>(aMask, aPitchMask, aDst, aPitchDst, aSize,
+                                                                          aStreamCtx, functor);
     }
 }
 
@@ -105,49 +99,46 @@ void InvokeMulSrcSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const S
                               const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst, size_t aPitchDst, double aScaleFactor,
                               const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    // if no scale, use SIMD versions if possible:
+    if (aScaleFactor == 1.0)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        InvokeMulSrcSrcMask(aMask, aPitchMask, aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aDst, aPitchDst, aSize,
+                            aStreamCtx);
+        return;
+    }
 
-        // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0)
-        {
-            InvokeMulSrcSrcMask(aMask, aPitchMask, aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aDst, aPitchDst, aSize,
-                                aStreamCtx);
-            return;
-        }
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    {
+        using ScalerT = Scale<ComputeT, false>;
+        const ScalerT scaler(aScaleFactor);
+        using mulSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT,
+                                                  RoundingMode::NearestTiesToEven>;
 
-        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
-        {
-            using ScalerT = Scale<ComputeT, false>;
-            const ScalerT scaler(aScaleFactor);
-            using mulSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT,
-                                                      RoundingMode::NearestTiesToEven>;
+        const mpp::Mul<ComputeT> op;
 
-            const mpp::Mul<ComputeT> op;
+        const mulSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, scaler);
 
-            const mulSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, scaler);
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcSrcScale>(aMask, aPitchMask, aDst, aPitchDst,
+                                                                               aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        // Scaler performs NearestTiesToEven rounding:
+        using ScalerT = Scale<ComputeT, true>;
+        const ScalerT scaler(aScaleFactor);
+        using mulSrcSrcScale =
+            SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT, RoundingMode::None>;
 
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcSrcScale>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                   aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // Scaler performs NearestTiesToEven rounding:
-            using ScalerT = Scale<ComputeT, true>;
-            const ScalerT scaler(aScaleFactor);
-            using mulSrcSrcScale =
-                SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT, RoundingMode::None>;
+        const mpp::Mul<ComputeT> op;
 
-            const mpp::Mul<ComputeT> op;
+        const mulSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, scaler);
 
-            const mulSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, scaler);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcSrcScale>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                   aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcSrcScale>(aMask, aPitchMask, aDst, aPitchDst,
+                                                                               aSize, aStreamCtx, functor);
     }
 }
 
@@ -180,41 +171,38 @@ void InvokeMulSrcCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aS
                        const SrcT &aConst, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                        const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+    using simdOP_t = simd::Mul<Tupel<DstT, TupelSize>>;
+    if constexpr (simdOP_t::has_simd)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
+        using mulSrcCSIMD = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None,
+                                               Tupel<ComputeT, TupelSize>, simdOP_t>;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+        const mpp::Mul<ComputeT> op;
+        const simdOP_t opSIMD;
+        const Tupel<ComputeT, TupelSize> tupelConstant =
+            Tupel<ComputeT, TupelSize>::GetConstant(static_cast<ComputeT>(aConst));
 
-        using simdOP_t = simd::Mul<Tupel<DstT, TupelSize>>;
-        if constexpr (simdOP_t::has_simd)
-        {
-            // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
-            using mulSrcCSIMD = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>,
-                                                   RoundingMode::None, Tupel<ComputeT, TupelSize>, simdOP_t>;
+        const mulSrcCSIMD functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
 
-            const mpp::Mul<ComputeT> op;
-            const simdOP_t opSIMD;
-            const Tupel<ComputeT, TupelSize> tupelConstant =
-                Tupel<ComputeT, TupelSize>::GetConstant(static_cast<ComputeT>(aConst));
-
-            const mulSrcCSIMD functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcCSIMD>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
-            using mulSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None>;
-
-            const mpp::Mul<ComputeT> op;
-
-            const mulSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcC>(aMask, aPitchMask, aDst, aPitchDst, aSize,
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcCSIMD>(aMask, aPitchMask, aDst, aPitchDst, aSize,
                                                                             aStreamCtx, functor);
-        }
+    }
+    else
+    {
+        // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
+        using mulSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None>;
+
+        const mpp::Mul<ComputeT> op;
+
+        const mulSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
+
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcC>(aMask, aPitchMask, aDst, aPitchDst, aSize,
+                                                                        aStreamCtx, functor);
     }
 }
 
@@ -247,48 +235,45 @@ void InvokeMulSrcCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const Src
                             const SrcT &aConst, DstT *aDst, size_t aPitchDst, double aScaleFactor, const Size2D &aSize,
                             const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    // if no scale, use SIMD versions if possible:
+    if (aScaleFactor == 1.0)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        InvokeMulSrcCMask(aMask, aPitchMask, aSrc, aPitchSrc, aConst, aDst, aPitchDst, aSize, aStreamCtx);
+        return;
+    }
 
-        // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0)
-        {
-            InvokeMulSrcCMask(aMask, aPitchMask, aSrc, aPitchSrc, aConst, aDst, aPitchDst, aSize, aStreamCtx);
-            return;
-        }
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    {
+        using ScalerT = Scale<ComputeT, false>;
+        const ScalerT scaler(aScaleFactor);
+        using mulSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT,
+                                                     RoundingMode::NearestTiesToEven>;
 
-        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
-        {
-            using ScalerT = Scale<ComputeT, false>;
-            const ScalerT scaler(aScaleFactor);
-            using mulSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT,
-                                                         RoundingMode::NearestTiesToEven>;
+        const mpp::Mul<ComputeT> op;
 
-            const mpp::Mul<ComputeT> op;
+        const mulSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, scaler);
 
-            const mulSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, scaler);
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcCScale>(aMask, aPitchMask, aDst, aPitchDst, aSize,
+                                                                             aStreamCtx, functor);
+    }
+    else
+    {
+        // Scaler performs NearestTiesToEven rounding:
+        using ScalerT = Scale<ComputeT, true>;
+        const ScalerT scaler(aScaleFactor);
+        using mulSrcCScale =
+            SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT, RoundingMode::None>;
 
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcCScale>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                 aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // Scaler performs NearestTiesToEven rounding:
-            using ScalerT = Scale<ComputeT, true>;
-            const ScalerT scaler(aScaleFactor);
-            using mulSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT,
-                                                         RoundingMode::None>;
+        const mpp::Mul<ComputeT> op;
 
-            const mpp::Mul<ComputeT> op;
+        const mulSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, scaler);
 
-            const mulSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, scaler);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcCScale>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                 aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcCScale>(aMask, aPitchMask, aDst, aPitchDst, aSize,
+                                                                             aStreamCtx, functor);
     }
 }
 
@@ -321,23 +306,19 @@ void InvokeMulSrcDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT 
                           const SrcT *aConst, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                           const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
-        using mulSrcDevC =
-            SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None>;
+    // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
+    using mulSrcDevC = SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None>;
 
-        const Mul<ComputeT> op;
+    const Mul<ComputeT> op;
 
-        const mulSrcDevC functor(aSrc, aPitchSrc, aConst, op);
+    const mulSrcDevC functor(aSrc, aPitchSrc, aConst, op);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcDevC>(aMask, aPitchMask, aDst, aPitchDst, aSize,
-                                                                           aStreamCtx, functor);
-    }
+    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcDevC>(aMask, aPitchMask, aDst, aPitchDst, aSize,
+                                                                       aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -369,48 +350,45 @@ void InvokeMulSrcDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const 
                                const SrcT *aConst, DstT *aDst, size_t aPitchDst, double aScaleFactor,
                                const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    // if no scale, use SIMD versions if possible:
+    if (aScaleFactor == 1.0)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        InvokeMulSrcDevCMask(aMask, aPitchMask, aSrc, aPitchSrc, aConst, aDst, aPitchDst, aSize, aStreamCtx);
+        return;
+    }
 
-        // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0)
-        {
-            InvokeMulSrcDevCMask(aMask, aPitchMask, aSrc, aPitchSrc, aConst, aDst, aPitchDst, aSize, aStreamCtx);
-            return;
-        }
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    {
+        using ScalerT = Scale<ComputeT, false>;
+        const ScalerT scaler(aScaleFactor);
+        using mulSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT,
+                                                           RoundingMode::NearestTiesToEven>;
 
-        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
-        {
-            using ScalerT = Scale<ComputeT, false>;
-            const ScalerT scaler(aScaleFactor);
-            using mulSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>,
-                                                               ScalerT, RoundingMode::NearestTiesToEven>;
+        const mpp::Mul<ComputeT> op;
 
-            const mpp::Mul<ComputeT> op;
+        const mulSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, scaler);
 
-            const mulSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, scaler);
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcDevCScale>(aMask, aPitchMask, aDst, aPitchDst,
+                                                                                aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        // Scaler performs NearestTiesToEven rounding:
+        using ScalerT = Scale<ComputeT, true>;
+        const ScalerT scaler(aScaleFactor);
+        using mulSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT,
+                                                           RoundingMode::None>;
 
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcDevCScale>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                    aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // Scaler performs NearestTiesToEven rounding:
-            using ScalerT = Scale<ComputeT, true>;
-            const ScalerT scaler(aScaleFactor);
-            using mulSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>,
-                                                               ScalerT, RoundingMode::None>;
+        const mpp::Mul<ComputeT> op;
 
-            const mpp::Mul<ComputeT> op;
+        const mulSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, scaler);
 
-            const mulSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, scaler);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcDevCScale>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                    aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulSrcDevCScale>(aMask, aPitchMask, aDst, aPitchDst,
+                                                                                aSize, aStreamCtx, functor);
     }
 }
 
@@ -442,40 +420,37 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMulInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
                              const SrcT *aSrc2, size_t aPitchSrc2, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+    using simdOP_t = simd::Mul<Tupel<DstT, TupelSize>>;
+    if constexpr (simdOP_t::has_simd)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
+        using mulInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>,
+                                                    RoundingMode::None, ComputeT, simdOP_t>;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+        const mpp::Mul<ComputeT> op;
+        const simdOP_t opSIMD;
 
-        using simdOP_t = simd::Mul<Tupel<DstT, TupelSize>>;
-        if constexpr (simdOP_t::has_simd)
-        {
-            // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
-            using mulInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>,
-                                                        RoundingMode::None, ComputeT, simdOP_t>;
+        const mulInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
 
-            const mpp::Mul<ComputeT> op;
-            const simdOP_t opSIMD;
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceSrcSIMD>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
+        using mulInplaceSrc =
+            InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None>;
 
-            const mulInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
+        const mpp::Mul<ComputeT> op;
 
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceSrcSIMD>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
-            using mulInplaceSrc =
-                InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None>;
+        const mulInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
-            const mpp::Mul<ComputeT> op;
-
-            const mulInplaceSrc functor(aSrc2, aPitchSrc2, op);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceSrc>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceSrc>(aMask, aPitchMask, aSrcDst, aPitchSrcDst,
+                                                                              aSize, aStreamCtx, functor);
     }
 }
 
@@ -507,48 +482,45 @@ void InvokeMulInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Dst
                                   const SrcT *aSrc2, size_t aPitchSrc2, double aScaleFactor, const Size2D &aSize,
                                   const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    // if no scale, use SIMD versions if possible:
+    if (aScaleFactor == 1.0)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        InvokeMulInplaceSrcMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSrc2, aPitchSrc2, aSize, aStreamCtx);
+        return;
+    }
 
-        // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0)
-        {
-            InvokeMulInplaceSrcMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSrc2, aPitchSrc2, aSize, aStreamCtx);
-            return;
-        }
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    {
+        using ScalerT = Scale<ComputeT, false>;
+        const ScalerT scaler(aScaleFactor);
+        using mulInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT,
+                                                          RoundingMode::NearestTiesToEven>;
 
-        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
-        {
-            using ScalerT = Scale<ComputeT, false>;
-            const ScalerT scaler(aScaleFactor);
-            using mulInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>,
-                                                              ScalerT, RoundingMode::NearestTiesToEven>;
+        const mpp::Mul<ComputeT> op;
 
-            const mpp::Mul<ComputeT> op;
+        const mulInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
 
-            const mulInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceSrcScale>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        // Scaler performs NearestTiesToEven rounding:
+        using ScalerT = Scale<ComputeT, true>;
+        const ScalerT scaler(aScaleFactor);
+        using mulInplaceSrcScale =
+            InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT, RoundingMode::None>;
 
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceSrcScale>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // Scaler performs NearestTiesToEven rounding:
-            using ScalerT = Scale<ComputeT, true>;
-            const ScalerT scaler(aScaleFactor);
-            using mulInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Mul<ComputeT>,
-                                                              ScalerT, RoundingMode::None>;
+        const mpp::Mul<ComputeT> op;
 
-            const mpp::Mul<ComputeT> op;
+        const mulInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
 
-            const mulInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceSrcScale>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceSrcScale>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
     }
 }
 
@@ -580,42 +552,38 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMulInplaceCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
                            const SrcT &aConst, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+    using simdOP_t = simd::Mul<Tupel<DstT, TupelSize>>;
+    if constexpr (simdOP_t::has_simd)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
+        using mulInplaceCSIMD = InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>,
+                                                       RoundingMode::None, Tupel<ComputeT, TupelSize>, simdOP_t>;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+        const mpp::Mul<ComputeT> op;
+        const simdOP_t opSIMD;
+        const Tupel<ComputeT, TupelSize> tupelConstant =
+            Tupel<ComputeT, TupelSize>::GetConstant(static_cast<ComputeT>(aConst));
 
-        using simdOP_t = simd::Mul<Tupel<DstT, TupelSize>>;
-        if constexpr (simdOP_t::has_simd)
-        {
-            // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
-            using mulInplaceCSIMD = InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>,
-                                                           RoundingMode::None, Tupel<ComputeT, TupelSize>, simdOP_t>;
+        const mulInplaceCSIMD functor(static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
 
-            const mpp::Mul<ComputeT> op;
-            const simdOP_t opSIMD;
-            const Tupel<ComputeT, TupelSize> tupelConstant =
-                Tupel<ComputeT, TupelSize>::GetConstant(static_cast<ComputeT>(aConst));
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceCSIMD>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
+        using mulInplaceC = InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None>;
 
-            const mulInplaceCSIMD functor(static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
+        const mpp::Mul<ComputeT> op;
 
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceCSIMD>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
-            using mulInplaceC =
-                InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None>;
+        const mulInplaceC functor(static_cast<ComputeT>(aConst), op);
 
-            const mpp::Mul<ComputeT> op;
-
-            const mulInplaceC functor(static_cast<ComputeT>(aConst), op);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceC>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceC>(aMask, aPitchMask, aSrcDst, aPitchSrcDst,
+                                                                            aSize, aStreamCtx, functor);
     }
 }
 
@@ -647,48 +615,45 @@ void InvokeMulInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT 
                                 const SrcT &aConst, double aScaleFactor, const Size2D &aSize,
                                 const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    // if no scale, use SIMD versions if possible:
+    if (aScaleFactor == 1.0)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        InvokeMulInplaceCMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aConst, aSize, aStreamCtx);
+        return;
+    }
 
-        // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0)
-        {
-            InvokeMulInplaceCMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aConst, aSize, aStreamCtx);
-            return;
-        }
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    {
+        using ScalerT = Scale<ComputeT, false>;
+        const ScalerT scaler(aScaleFactor);
+        using mulInplaceCScale = InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT,
+                                                             RoundingMode::NearestTiesToEven>;
 
-        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
-        {
-            using ScalerT = Scale<ComputeT, false>;
-            const ScalerT scaler(aScaleFactor);
-            using mulInplaceCScale = InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT,
-                                                                 RoundingMode::NearestTiesToEven>;
+        const mpp::Mul<ComputeT> op;
 
-            const mpp::Mul<ComputeT> op;
+        const mulInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
 
-            const mulInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceCScale>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        // Scaler performs NearestTiesToEven rounding:
+        using ScalerT = Scale<ComputeT, true>;
+        const ScalerT scaler(aScaleFactor);
+        using mulInplaceCScale =
+            InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT, RoundingMode::None>;
 
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceCScale>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // Scaler performs NearestTiesToEven rounding:
-            using ScalerT = Scale<ComputeT, true>;
-            const ScalerT scaler(aScaleFactor);
-            using mulInplaceCScale =
-                InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT, RoundingMode::None>;
+        const mpp::Mul<ComputeT> op;
 
-            const mpp::Mul<ComputeT> op;
+        const mulInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
 
-            const mulInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceCScale>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceCScale>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
     }
 }
 
@@ -719,23 +684,19 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeMulInplaceDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
                               const SrcT *aConst, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
-        using mulInplaceDevC =
-            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None>;
+    // set to roundingmode NONE, because Mul cannot produce non-integers in computations with ints:
+    using mulInplaceDevC = InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>, RoundingMode::None>;
 
-        const mpp::Mul<ComputeT> op;
+    const mpp::Mul<ComputeT> op;
 
-        const mulInplaceDevC functor(aConst, op);
+    const mulInplaceDevC functor(aConst, op);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceDevC>(aMask, aPitchMask, aSrcDst, aPitchSrcDst,
-                                                                               aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceDevC>(aMask, aPitchMask, aSrcDst, aPitchSrcDst,
+                                                                           aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -766,48 +727,45 @@ void InvokeMulInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
                                    const SrcT *aConst, double aScaleFactor, const Size2D &aSize,
                                    const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    // if no scale, use SIMD versions if possible:
+    if (aScaleFactor == 1.0)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        InvokeMulInplaceDevCMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aConst, aSize, aStreamCtx);
+        return;
+    }
 
-        // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0)
-        {
-            InvokeMulInplaceDevCMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aConst, aSize, aStreamCtx);
-            return;
-        }
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    {
+        using ScalerT = Scale<ComputeT, false>;
+        const ScalerT scaler(aScaleFactor);
+        using mulInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>,
+                                                                   ScalerT, RoundingMode::NearestTiesToEven>;
 
-        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
-        {
-            using ScalerT = Scale<ComputeT, false>;
-            const ScalerT scaler(aScaleFactor);
-            using mulInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>,
-                                                                       ScalerT, RoundingMode::NearestTiesToEven>;
+        const mpp::Mul<ComputeT> op;
 
-            const mpp::Mul<ComputeT> op;
+        const mulInplaceDevCScale functor(aConst, op, scaler);
 
-            const mulInplaceDevCScale functor(aConst, op, scaler);
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceDevCScale>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        // Scaler performs NearestTiesToEven rounding:
+        using ScalerT = Scale<ComputeT, true>;
+        const ScalerT scaler(aScaleFactor);
+        using mulInplaceDevCScale =
+            InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>, ScalerT, RoundingMode::None>;
 
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceDevCScale>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // Scaler performs NearestTiesToEven rounding:
-            using ScalerT = Scale<ComputeT, true>;
-            const ScalerT scaler(aScaleFactor);
-            using mulInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Mul<ComputeT>,
-                                                                       ScalerT, RoundingMode::None>;
+        const mpp::Mul<ComputeT> op;
 
-            const mpp::Mul<ComputeT> op;
+        const mulInplaceDevCScale functor(aConst, op, scaler);
 
-            const mulInplaceDevCScale functor(aConst, op, scaler);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceDevCScale>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, mulInplaceDevCScale>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
     }
 }
 
@@ -835,4 +793,3 @@ void InvokeMulInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

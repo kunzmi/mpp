@@ -10,8 +10,8 @@
 namespace mpp
 {
 // forward declaration:
-class MPPEXPORT_COMMON HalfFp16;
-class MPPEXPORT_COMMON BFloat16;
+class MPPEXPORTFWDDECL_COMMON HalfFp16;
+class MPPEXPORTFWDDECL_COMMON BFloat16;
 } // namespace mpp
 
 namespace mpp::image

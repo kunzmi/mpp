@@ -1,7 +1,4 @@
 #pragma once
-#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include <backends/cuda/streamCtx.h>
 #include <common/image/channel.h>
 #include <common/image/functors/imageFunctors.h>
@@ -55,4 +52,3 @@ void InvokeCopyPlanar(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst1, size_t 
                       size_t aPitchDst2, DstT *aDst3, size_t aPitchDst3, DstT *aDst4, size_t aPitchDst4,
                       const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

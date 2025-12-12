@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "addSquareProductWeightedOutputType.h"
 #include "addWeightedMasked.h"
 #include <backends/cuda/image/configurations.h>
@@ -10,7 +8,6 @@
 #include <common/defines.h>
 #include <common/image/functors/inplaceSrcFunctor.h>
 #include <common/image/functors/srcSrcFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -30,22 +27,19 @@ void InvokeAddWeightedSrcSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, cons
                                  remove_vector_t<ComputeT> aAlpha, const Size2D &aSize,
                                  const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using addWeightedSrcSrc =
-            SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::AddWeighted<ComputeT>, RoundingMode::None>;
+    using addWeightedSrcSrc =
+        SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::AddWeighted<ComputeT>, RoundingMode::None>;
 
-        const mpp::AddWeighted<ComputeT> op(aAlpha);
+    const mpp::AddWeighted<ComputeT> op(aAlpha);
 
-        const addWeightedSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+    const addWeightedSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addWeightedSrcSrc>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                  aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addWeightedSrcSrc>(aMask, aPitchMask, aDst, aPitchDst, aSize,
+                                                                              aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -76,22 +70,19 @@ void InvokeAddWeightedInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, 
                                      const SrcT *aSrc2, size_t aPitchSrc2, remove_vector_t<ComputeT> aAlpha,
                                      const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        using addWeightedInplaceSrc =
-            InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::AddWeighted<ComputeT>, RoundingMode::None>;
+    using addWeightedInplaceSrc =
+        InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::AddWeighted<ComputeT>, RoundingMode::None>;
 
-        const mpp::AddWeighted<ComputeT> op(aAlpha);
+    const mpp::AddWeighted<ComputeT> op(aAlpha);
 
-        const addWeightedInplaceSrc functor(aSrc2, aPitchSrc2, op);
+    const addWeightedInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addWeightedInplaceSrc>(
-            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, addWeightedInplaceSrc>(
+        aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -119,4 +110,3 @@ void InvokeAddWeightedInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, 
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

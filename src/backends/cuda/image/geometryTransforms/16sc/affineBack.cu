@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "../affineBack_impl.h"
 
 using namespace mpp::cuda;
@@ -13,4 +11,3 @@ InstantiateInvokeAffineBackSrcP3ForGeomType(16sc);
 InstantiateInvokeAffineBackSrcP4ForGeomType(16sc);
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

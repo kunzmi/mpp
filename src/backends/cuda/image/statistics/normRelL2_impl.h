@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "normRelL2.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/reduction2AlongXKernel.h>
@@ -9,7 +7,6 @@
 #include <common/defines.h>
 #include <common/image/functors/reductionInitValues.h>
 #include <common/image/functors/srcSrcReduction2Functor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -31,40 +28,36 @@ void InvokeNormRelL2SrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
                            remove_vector_t<DstT> *aDstScalar, const Size2D &aSize,
                            const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<SrcT> && mppEnableCudaBackend<SrcT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(SrcT)>::value;
 
-        using normL2SrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT,
-                                                     mpp::NormRelL2<SrcT, ComputeT>, mpp::NormL2<SrcT, ComputeT>>;
+    using normL2SrcSrc = SrcSrcReduction2Functor<TupelSize, SrcT, ComputeT, ComputeT, mpp::NormRelL2<SrcT, ComputeT>,
+                                                 mpp::NormL2<SrcT, ComputeT>>;
 
-        const mpp::NormRelL2<SrcT, ComputeT> op1;
-        const mpp::NormL2<SrcT, ComputeT> op2;
+    const mpp::NormRelL2<SrcT, ComputeT> op1;
+    const mpp::NormL2<SrcT, ComputeT> op2;
 
-        const normL2SrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op1, op2);
+    const normL2SrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op1, op2);
 
-        InvokeReduction2AlongXKernelDefault<SrcT, ComputeT, ComputeT, TupelSize, normL2SrcSrc,
-                                            mpp::Sum<ComputeT, ComputeT>, mpp::Sum<ComputeT, ComputeT>,
-                                            ReductionInitValue::Zero, ReductionInitValue::Zero>(
-            aSrc1, aTempBuffer1, aTempBuffer2, aSize, aStreamCtx, functor);
+    InvokeReduction2AlongXKernelDefault<SrcT, ComputeT, ComputeT, TupelSize, normL2SrcSrc, mpp::Sum<ComputeT, ComputeT>,
+                                        mpp::Sum<ComputeT, ComputeT>, ReductionInitValue::Zero,
+                                        ReductionInitValue::Zero>(aSrc1, aTempBuffer1, aTempBuffer2, aSize, aStreamCtx,
+                                                                  functor);
 
-        const mpp::Nothing<DstT> postOp1;
-        const mpp::NormRelL2Post<DstT> postOp2;
+    const mpp::Nothing<DstT> postOp1;
+    const mpp::NormRelL2Post<DstT> postOp2;
 
-        const mpp::NothingScalar<DstT> postOpScalar1;
-        const mpp::NormRelL2Post<DstT> postOpScalar2;
+    const mpp::NothingScalar<DstT> postOpScalar1;
+    const mpp::NormRelL2Post<DstT> postOpScalar2;
 
-        // ignore output on Dst1, the postOp only creates a meaning output value on Dst2:
-        InvokeReduction2AlongYKernelDefault<ComputeT, ComputeT, DstT, DstT, mpp::Sum<DstT, DstT>, mpp::Sum<DstT, DstT>,
-                                            ReductionInitValue::Zero, ReductionInitValue::Zero, mpp::Nothing<DstT>,
-                                            mpp::NormRelL2Post<DstT>, mpp::NothingScalar<DstT>,
-                                            mpp::NormRelL2Post<DstT>>(
-            aTempBuffer1, aTempBuffer2, reinterpret_cast<DstT *>(aTempBuffer1), aDst,
-            reinterpret_cast<remove_vector_t<DstT> *>(aTempBuffer1), aDstScalar, aSize.y, postOp1, postOp2,
-            postOpScalar1, postOpScalar2, aStreamCtx);
-    }
+    // ignore output on Dst1, the postOp only creates a meaning output value on Dst2:
+    InvokeReduction2AlongYKernelDefault<ComputeT, ComputeT, DstT, DstT, mpp::Sum<DstT, DstT>, mpp::Sum<DstT, DstT>,
+                                        ReductionInitValue::Zero, ReductionInitValue::Zero, mpp::Nothing<DstT>,
+                                        mpp::NormRelL2Post<DstT>, mpp::NothingScalar<DstT>, mpp::NormRelL2Post<DstT>>(
+        aTempBuffer1, aTempBuffer2, reinterpret_cast<DstT *>(aTempBuffer1), aDst,
+        reinterpret_cast<remove_vector_t<DstT> *>(aTempBuffer1), aDstScalar, aSize.y, postOp1, postOp2, postOpScalar1,
+        postOpScalar2, aStreamCtx);
 }
 
 #pragma region Instantiate
@@ -91,4 +84,3 @@ void InvokeNormRelL2SrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSr
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

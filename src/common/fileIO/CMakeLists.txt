@@ -24,3 +24,4 @@ target_link_libraries(common.fileIO PRIVATE
 						project_warnings						
 						)
 						
+set_target_properties(common.fileIO PROPERTIES OUTPUT_NAME mpp-common-fileIO)

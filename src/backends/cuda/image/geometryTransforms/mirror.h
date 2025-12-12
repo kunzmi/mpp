@@ -1,7 +1,4 @@
 #pragma once
-#include <common/moduleEnabler.h> //NOLINT(misc-include-cleaner)
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include <backends/cuda/streamCtx.h>
 #include <common/defines.h>
 #include <common/image/affineTransformation.h>
@@ -21,4 +18,3 @@ template <typename SrcT>
 void InvokeMirrorInplace(SrcT *aSrcDst, size_t aPitchSrcDst, MirrorAxis aAxis, const Size2D &aSize,
                          const mpp::cuda::StreamCtx &aStreamCtx);
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

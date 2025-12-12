@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "subMasked.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelMaskedKernel.h>
@@ -21,7 +19,6 @@
 #include <common/image/functors/srcDevConstantScaleFunctor.h>
 #include <common/image/functors/srcSrcFunctor.h>
 #include <common/image/functors/srcSrcScaleFunctor.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -40,41 +37,38 @@ void InvokeSubSrcSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *
                          const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                          const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+    using simdOP_t = simd::Sub<Tupel<DstT, TupelSize>>;
+
+    if constexpr (simdOP_t::has_simd)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        using ComputeT_SIMD = sub_simd_tupel_compute_type_for_t<SrcT>;
+        // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
+        using subSrcSrcSIMD = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, RoundingMode::None,
+                                            ComputeT_SIMD, simdOP_t>;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+        const mpp::Sub<ComputeT> op;
+        const simdOP_t opSIMD;
 
-        using simdOP_t = simd::Sub<Tupel<DstT, TupelSize>>;
+        const subSrcSrcSIMD functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, opSIMD);
 
-        if constexpr (simdOP_t::has_simd)
-        {
-            using ComputeT_SIMD = sub_simd_tupel_compute_type_for_t<SrcT>;
-            // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
-            using subSrcSrcSIMD = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, RoundingMode::None,
-                                                ComputeT_SIMD, simdOP_t>;
-
-            const mpp::Sub<ComputeT> op;
-            const simdOP_t opSIMD;
-
-            const subSrcSrcSIMD functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, opSIMD);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcSrcSIMD>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                  aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
-            using subSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, RoundingMode::None>;
-
-            const mpp::Sub<ComputeT> op;
-
-            const subSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcSrc>(aMask, aPitchMask, aDst, aPitchDst, aSize,
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcSrcSIMD>(aMask, aPitchMask, aDst, aPitchDst, aSize,
                                                                               aStreamCtx, functor);
-        }
+    }
+    else
+    {
+        // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
+        using subSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, RoundingMode::None>;
+
+        const mpp::Sub<ComputeT> op;
+
+        const subSrcSrc functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op);
+
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcSrc>(aMask, aPitchMask, aDst, aPitchDst, aSize,
+                                                                          aStreamCtx, functor);
     }
 }
 
@@ -107,49 +101,46 @@ void InvokeSubSrcSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const S
                               const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst, size_t aPitchDst, double aScaleFactor,
                               const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    // if no scale, use SIMD versions if possible:
+    if (aScaleFactor == 1.0)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        InvokeSubSrcSrcMask(aMask, aPitchMask, aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aDst, aPitchDst, aSize,
+                            aStreamCtx);
+        return;
+    }
 
-        // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0)
-        {
-            InvokeSubSrcSrcMask(aMask, aPitchMask, aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, aDst, aPitchDst, aSize,
-                                aStreamCtx);
-            return;
-        }
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    {
+        using ScalerT = Scale<ComputeT, false>;
+        const ScalerT scaler(aScaleFactor);
+        using subSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT,
+                                                  RoundingMode::NearestTiesToEven>;
 
-        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
-        {
-            using ScalerT = Scale<ComputeT, false>;
-            const ScalerT scaler(aScaleFactor);
-            using subSrcSrcScale = SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT,
-                                                      RoundingMode::NearestTiesToEven>;
+        const mpp::Sub<ComputeT> op;
 
-            const mpp::Sub<ComputeT> op;
+        const subSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, scaler);
 
-            const subSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, scaler);
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcSrcScale>(aMask, aPitchMask, aDst, aPitchDst,
+                                                                               aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        // Scaler performs NearestTiesToEven rounding:
+        using ScalerT = Scale<ComputeT, true>;
+        const ScalerT scaler(aScaleFactor);
+        using subSrcSrcScale =
+            SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT, RoundingMode::None>;
 
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcSrcScale>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                   aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // Scaler performs NearestTiesToEven rounding:
-            using ScalerT = Scale<ComputeT, true>;
-            const ScalerT scaler(aScaleFactor);
-            using subSrcSrcScale =
-                SrcSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT, RoundingMode::None>;
+        const mpp::Sub<ComputeT> op;
 
-            const mpp::Sub<ComputeT> op;
+        const subSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, scaler);
 
-            const subSrcSrcScale functor(aSrc1, aPitchSrc1, aSrc2, aPitchSrc2, op, scaler);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcSrcScale>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                   aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcSrcScale>(aMask, aPitchMask, aDst, aPitchDst,
+                                                                               aSize, aStreamCtx, functor);
     }
 }
 
@@ -182,42 +173,39 @@ void InvokeSubSrcCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aS
                        const SrcT &aConst, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                        const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+    using simdOP_t = simd::Sub<Tupel<DstT, TupelSize>>;
+    if constexpr (simdOP_t::has_simd)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        using ComputeT_SIMD = sub_simd_tupel_compute_type_for_t<SrcT>;
+        // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
+        using subSrcCSIMD = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, RoundingMode::None,
+                                               Tupel<ComputeT_SIMD, TupelSize>, simdOP_t>;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+        const mpp::Sub<ComputeT> op;
+        const simdOP_t opSIMD;
+        const Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
+            Tupel<ComputeT_SIMD, TupelSize>::GetConstant(static_cast<ComputeT_SIMD>(aConst));
 
-        using simdOP_t = simd::Sub<Tupel<DstT, TupelSize>>;
-        if constexpr (simdOP_t::has_simd)
-        {
-            using ComputeT_SIMD = sub_simd_tupel_compute_type_for_t<SrcT>;
-            // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
-            using subSrcCSIMD = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>,
-                                                   RoundingMode::None, Tupel<ComputeT_SIMD, TupelSize>, simdOP_t>;
+        const subSrcCSIMD functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
 
-            const mpp::Sub<ComputeT> op;
-            const simdOP_t opSIMD;
-            const Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
-                Tupel<ComputeT_SIMD, TupelSize>::GetConstant(static_cast<ComputeT_SIMD>(aConst));
-
-            const subSrcCSIMD functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcCSIMD>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
-            using subSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, RoundingMode::None>;
-
-            const mpp::Sub<ComputeT> op;
-
-            const subSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcC>(aMask, aPitchMask, aDst, aPitchDst, aSize,
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcCSIMD>(aMask, aPitchMask, aDst, aPitchDst, aSize,
                                                                             aStreamCtx, functor);
-        }
+    }
+    else
+    {
+        // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
+        using subSrcC = SrcConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, RoundingMode::None>;
+
+        const mpp::Sub<ComputeT> op;
+
+        const subSrcC functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op);
+
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcC>(aMask, aPitchMask, aDst, aPitchDst, aSize,
+                                                                        aStreamCtx, functor);
     }
 }
 
@@ -250,48 +238,45 @@ void InvokeSubSrcCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const Src
                             const SrcT &aConst, DstT *aDst, size_t aPitchDst, double aScaleFactor, const Size2D &aSize,
                             const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    // if no scale, use SIMD versions if possible:
+    if (aScaleFactor == 1.0)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        InvokeSubSrcCMask(aMask, aPitchMask, aSrc, aPitchSrc, aConst, aDst, aPitchDst, aSize, aStreamCtx);
+        return;
+    }
 
-        // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0)
-        {
-            InvokeSubSrcCMask(aMask, aPitchMask, aSrc, aPitchSrc, aConst, aDst, aPitchDst, aSize, aStreamCtx);
-            return;
-        }
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    {
+        using ScalerT = Scale<ComputeT, false>;
+        const ScalerT scaler(aScaleFactor);
+        using subSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT,
+                                                     RoundingMode::NearestTiesToEven>;
 
-        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
-        {
-            using ScalerT = Scale<ComputeT, false>;
-            const ScalerT scaler(aScaleFactor);
-            using subSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT,
-                                                         RoundingMode::NearestTiesToEven>;
+        const mpp::Sub<ComputeT> op;
 
-            const mpp::Sub<ComputeT> op;
+        const subSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, scaler);
 
-            const subSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, scaler);
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcCScale>(aMask, aPitchMask, aDst, aPitchDst, aSize,
+                                                                             aStreamCtx, functor);
+    }
+    else
+    {
+        // Scaler performs NearestTiesToEven rounding:
+        using ScalerT = Scale<ComputeT, true>;
+        const ScalerT scaler(aScaleFactor);
+        using subSrcCScale =
+            SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT, RoundingMode::None>;
 
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcCScale>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                 aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // Scaler performs NearestTiesToEven rounding:
-            using ScalerT = Scale<ComputeT, true>;
-            const ScalerT scaler(aScaleFactor);
-            using subSrcCScale = SrcConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT,
-                                                         RoundingMode::None>;
+        const mpp::Sub<ComputeT> op;
 
-            const mpp::Sub<ComputeT> op;
+        const subSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, scaler);
 
-            const subSrcCScale functor(aSrc, aPitchSrc, static_cast<ComputeT>(aConst), op, scaler);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcCScale>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                 aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcCScale>(aMask, aPitchMask, aDst, aPitchDst, aSize,
+                                                                             aStreamCtx, functor);
     }
 }
 
@@ -324,23 +309,19 @@ void InvokeSubSrcDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT 
                           const SrcT *aConst, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
                           const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
-        using subSrcDevC =
-            SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, RoundingMode::None>;
+    // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
+    using subSrcDevC = SrcDevConstantFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, RoundingMode::None>;
 
-        const mpp::Sub<ComputeT> op;
+    const mpp::Sub<ComputeT> op;
 
-        const subSrcDevC functor(aSrc, aPitchSrc, aConst, op);
+    const subSrcDevC functor(aSrc, aPitchSrc, aConst, op);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcDevC>(aMask, aPitchMask, aDst, aPitchDst, aSize,
-                                                                           aStreamCtx, functor);
-    }
+    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcDevC>(aMask, aPitchMask, aDst, aPitchDst, aSize,
+                                                                       aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -372,48 +353,45 @@ void InvokeSubSrcDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, const 
                                const SrcT *aConst, DstT *aDst, size_t aPitchDst, double aScaleFactor,
                                const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    // if no scale, use SIMD versions if possible:
+    if (aScaleFactor == 1.0)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        InvokeSubSrcDevCMask(aMask, aPitchMask, aSrc, aPitchSrc, aConst, aDst, aPitchDst, aSize, aStreamCtx);
+        return;
+    }
 
-        // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0)
-        {
-            InvokeSubSrcDevCMask(aMask, aPitchMask, aSrc, aPitchSrc, aConst, aDst, aPitchDst, aSize, aStreamCtx);
-            return;
-        }
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    {
+        using ScalerT = Scale<ComputeT, false>;
+        const ScalerT scaler(aScaleFactor);
+        using subSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT,
+                                                           RoundingMode::NearestTiesToEven>;
 
-        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
-        {
-            using ScalerT = Scale<ComputeT, false>;
-            const ScalerT scaler(aScaleFactor);
-            using subSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>,
-                                                               ScalerT, RoundingMode::NearestTiesToEven>;
+        const mpp::Sub<ComputeT> op;
 
-            const mpp::Sub<ComputeT> op;
+        const subSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, scaler);
 
-            const subSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, scaler);
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcDevCScale>(aMask, aPitchMask, aDst, aPitchDst,
+                                                                                aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        // Scaler performs NearestTiesToEven rounding:
+        using ScalerT = Scale<ComputeT, true>;
+        const ScalerT scaler(aScaleFactor);
+        using subSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT,
+                                                           RoundingMode::None>;
 
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcDevCScale>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                    aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // Scaler performs NearestTiesToEven rounding:
-            using ScalerT = Scale<ComputeT, true>;
-            const ScalerT scaler(aScaleFactor);
-            using subSrcDevCScale = SrcDevConstantScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>,
-                                                               ScalerT, RoundingMode::None>;
+        const mpp::Sub<ComputeT> op;
 
-            const mpp::Sub<ComputeT> op;
+        const subSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, scaler);
 
-            const subSrcDevCScale functor(aSrc, aPitchSrc, aConst, op, scaler);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcDevCScale>(aMask, aPitchMask, aDst, aPitchDst,
-                                                                                    aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subSrcDevCScale>(aMask, aPitchMask, aDst, aPitchDst,
+                                                                                aSize, aStreamCtx, functor);
     }
 }
 
@@ -445,41 +423,38 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeSubInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
                              const SrcT *aSrc2, size_t aPitchSrc2, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+    using simdOP_t = simd::Sub<Tupel<DstT, TupelSize>>;
+    if constexpr (simdOP_t::has_simd)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        using ComputeT_SIMD = sub_simd_tupel_compute_type_for_t<SrcT>;
+        // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
+        using subInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>,
+                                                    RoundingMode::None, ComputeT_SIMD, simdOP_t>;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+        const mpp::Sub<ComputeT> op;
+        const simdOP_t opSIMD;
 
-        using simdOP_t = simd::Sub<Tupel<DstT, TupelSize>>;
-        if constexpr (simdOP_t::has_simd)
-        {
-            using ComputeT_SIMD = sub_simd_tupel_compute_type_for_t<SrcT>;
-            // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
-            using subInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>,
-                                                        RoundingMode::None, ComputeT_SIMD, simdOP_t>;
+        const subInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
 
-            const mpp::Sub<ComputeT> op;
-            const simdOP_t opSIMD;
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcSIMD>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
+        using subInplaceSrc =
+            InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, RoundingMode::None>;
 
-            const subInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
+        const mpp::Sub<ComputeT> op;
 
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcSIMD>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
-            using subInplaceSrc =
-                InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, RoundingMode::None>;
+        const subInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
-            const mpp::Sub<ComputeT> op;
-
-            const subInplaceSrc functor(aSrc2, aPitchSrc2, op);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrc>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrc>(aMask, aPitchMask, aSrcDst, aPitchSrcDst,
+                                                                              aSize, aStreamCtx, functor);
     }
 }
 
@@ -511,48 +486,45 @@ void InvokeSubInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Dst
                                   const SrcT *aSrc2, size_t aPitchSrc2, double aScaleFactor, const Size2D &aSize,
                                   const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    // if no scale, use SIMD versions if possible:
+    if (aScaleFactor == 1.0)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        InvokeSubInplaceSrcMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSrc2, aPitchSrc2, aSize, aStreamCtx);
+        return;
+    }
 
-        // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0)
-        {
-            InvokeSubInplaceSrcMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSrc2, aPitchSrc2, aSize, aStreamCtx);
-            return;
-        }
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    {
+        using ScalerT = Scale<ComputeT, false>;
+        const ScalerT scaler(aScaleFactor);
+        using subInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT,
+                                                          RoundingMode::NearestTiesToEven>;
 
-        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
-        {
-            using ScalerT = Scale<ComputeT, false>;
-            const ScalerT scaler(aScaleFactor);
-            using subInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>,
-                                                              ScalerT, RoundingMode::NearestTiesToEven>;
+        const mpp::Sub<ComputeT> op;
 
-            const mpp::Sub<ComputeT> op;
+        const subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
 
-            const subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcScale>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        // Scaler performs NearestTiesToEven rounding:
+        using ScalerT = Scale<ComputeT, true>;
+        const ScalerT scaler(aScaleFactor);
+        using subInplaceSrcScale =
+            InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT, RoundingMode::None>;
 
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcScale>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // Scaler performs NearestTiesToEven rounding:
-            using ScalerT = Scale<ComputeT, true>;
-            const ScalerT scaler(aScaleFactor);
-            using subInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Sub<ComputeT>,
-                                                              ScalerT, RoundingMode::None>;
+        const mpp::Sub<ComputeT> op;
 
-            const mpp::Sub<ComputeT> op;
+        const subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
 
-            const subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcScale>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcScale>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
     }
 }
 
@@ -584,44 +556,39 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeSubInplaceCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
                            const SrcT &aConst, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+    using simdOP_t = simd::Sub<Tupel<DstT, TupelSize>>;
+    if constexpr (simdOP_t::has_simd)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        using ComputeT_SIMD = sub_simd_tupel_compute_type_for_t<SrcT>;
+        // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
+        using subInplaceCSIMD = InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::Sub<ComputeT>,
+                                                       RoundingMode::None, Tupel<ComputeT_SIMD, TupelSize>, simdOP_t>;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+        const mpp::Sub<ComputeT> op;
+        const simdOP_t opSIMD;
+        const Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
+            Tupel<ComputeT_SIMD, TupelSize>::GetConstant(static_cast<ComputeT_SIMD>(aConst));
 
-        using simdOP_t = simd::Sub<Tupel<DstT, TupelSize>>;
-        if constexpr (simdOP_t::has_simd)
-        {
-            using ComputeT_SIMD = sub_simd_tupel_compute_type_for_t<SrcT>;
-            // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
-            using subInplaceCSIMD =
-                InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::Sub<ComputeT>, RoundingMode::None,
-                                       Tupel<ComputeT_SIMD, TupelSize>, simdOP_t>;
+        const subInplaceCSIMD functor(static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
 
-            const mpp::Sub<ComputeT> op;
-            const simdOP_t opSIMD;
-            const Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
-                Tupel<ComputeT_SIMD, TupelSize>::GetConstant(static_cast<ComputeT_SIMD>(aConst));
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCSIMD>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
+        using subInplaceC = InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::Sub<ComputeT>, RoundingMode::None>;
 
-            const subInplaceCSIMD functor(static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
+        const mpp::Sub<ComputeT> op;
 
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCSIMD>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
-            using subInplaceC =
-                InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::Sub<ComputeT>, RoundingMode::None>;
+        const subInplaceC functor(static_cast<ComputeT>(aConst), op);
 
-            const mpp::Sub<ComputeT> op;
-
-            const subInplaceC functor(static_cast<ComputeT>(aConst), op);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceC>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceC>(aMask, aPitchMask, aSrcDst, aPitchSrcDst,
+                                                                            aSize, aStreamCtx, functor);
     }
 }
 
@@ -653,48 +620,45 @@ void InvokeSubInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT 
                                 const SrcT &aConst, double aScaleFactor, const Size2D &aSize,
                                 const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    // if no scale, use SIMD versions if possible:
+    if (aScaleFactor == 1.0)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        InvokeSubInplaceCMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aConst, aSize, aStreamCtx);
+        return;
+    }
 
-        // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0)
-        {
-            InvokeSubInplaceCMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aConst, aSize, aStreamCtx);
-            return;
-        }
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    {
+        using ScalerT = Scale<ComputeT, false>;
+        const ScalerT scaler(aScaleFactor);
+        using subInplaceCScale = InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT,
+                                                             RoundingMode::NearestTiesToEven>;
 
-        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
-        {
-            using ScalerT = Scale<ComputeT, false>;
-            const ScalerT scaler(aScaleFactor);
-            using subInplaceCScale = InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT,
-                                                                 RoundingMode::NearestTiesToEven>;
+        const mpp::Sub<ComputeT> op;
 
-            const mpp::Sub<ComputeT> op;
+        const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
 
-            const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCScale>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        // Scaler performs NearestTiesToEven rounding:
+        using ScalerT = Scale<ComputeT, true>;
+        const ScalerT scaler(aScaleFactor);
+        using subInplaceCScale =
+            InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT, RoundingMode::None>;
 
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCScale>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // Scaler performs NearestTiesToEven rounding:
-            using ScalerT = Scale<ComputeT, true>;
-            const ScalerT scaler(aScaleFactor);
-            using subInplaceCScale =
-                InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT, RoundingMode::None>;
+        const mpp::Sub<ComputeT> op;
 
-            const mpp::Sub<ComputeT> op;
+        const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
 
-            const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCScale>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCScale>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
     }
 }
 
@@ -725,23 +689,19 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeSubInplaceDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
                               const SrcT *aConst, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
-        using subInplaceDevC =
-            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, mpp::Sub<ComputeT>, RoundingMode::None>;
+    // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
+    using subInplaceDevC = InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, mpp::Sub<ComputeT>, RoundingMode::None>;
 
-        const mpp::Sub<ComputeT> op;
+    const mpp::Sub<ComputeT> op;
 
-        const subInplaceDevC functor(aConst, op);
+    const subInplaceDevC functor(aConst, op);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevC>(aMask, aPitchMask, aSrcDst, aPitchSrcDst,
-                                                                               aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevC>(aMask, aPitchMask, aSrcDst, aPitchSrcDst,
+                                                                           aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -772,48 +732,45 @@ void InvokeSubInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
                                    const SrcT *aConst, double aScaleFactor, const Size2D &aSize,
                                    const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    // if no scale, use SIMD versions if possible:
+    if (aScaleFactor == 1.0)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        InvokeSubInplaceDevCMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aConst, aSize, aStreamCtx);
+        return;
+    }
 
-        // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0)
-        {
-            InvokeSubInplaceDevCMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aConst, aSize, aStreamCtx);
-            return;
-        }
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    {
+        using ScalerT = Scale<ComputeT, false>;
+        const ScalerT scaler(aScaleFactor);
+        using subInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Sub<ComputeT>,
+                                                                   ScalerT, RoundingMode::NearestTiesToEven>;
 
-        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
-        {
-            using ScalerT = Scale<ComputeT, false>;
-            const ScalerT scaler(aScaleFactor);
-            using subInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Sub<ComputeT>,
-                                                                       ScalerT, RoundingMode::NearestTiesToEven>;
+        const mpp::Sub<ComputeT> op;
 
-            const mpp::Sub<ComputeT> op;
+        const subInplaceDevCScale functor(aConst, op, scaler);
 
-            const subInplaceDevCScale functor(aConst, op, scaler);
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevCScale>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        // Scaler performs NearestTiesToEven rounding:
+        using ScalerT = Scale<ComputeT, true>;
+        const ScalerT scaler(aScaleFactor);
+        using subInplaceDevCScale =
+            InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Sub<ComputeT>, ScalerT, RoundingMode::None>;
 
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevCScale>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // Scaler performs NearestTiesToEven rounding:
-            using ScalerT = Scale<ComputeT, true>;
-            const ScalerT scaler(aScaleFactor);
-            using subInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::Sub<ComputeT>,
-                                                                       ScalerT, RoundingMode::None>;
+        const mpp::Sub<ComputeT> op;
 
-            const mpp::Sub<ComputeT> op;
+        const subInplaceDevCScale functor(aConst, op, scaler);
 
-            const subInplaceDevCScale functor(aConst, op, scaler);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevCScale>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevCScale>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
     }
 }
 
@@ -844,41 +801,38 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeSubInvInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
                                 const SrcT *aSrc2, size_t aPitchSrc2, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+    using simdOP_t = simd::SubInv<Tupel<DstT, TupelSize>>;
+    if constexpr (simdOP_t::has_simd)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        using ComputeT_SIMD = sub_simd_tupel_compute_type_for_t<SrcT>;
+        // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
+        using subInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::SubInv<ComputeT>,
+                                                    RoundingMode::None, ComputeT_SIMD, simdOP_t>;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+        const mpp::SubInv<ComputeT> op;
+        const simdOP_t opSIMD;
 
-        using simdOP_t = simd::SubInv<Tupel<DstT, TupelSize>>;
-        if constexpr (simdOP_t::has_simd)
-        {
-            using ComputeT_SIMD = sub_simd_tupel_compute_type_for_t<SrcT>;
-            // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
-            using subInplaceSrcSIMD = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::SubInv<ComputeT>,
-                                                        RoundingMode::None, ComputeT_SIMD, simdOP_t>;
+        const subInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
 
-            const mpp::SubInv<ComputeT> op;
-            const simdOP_t opSIMD;
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcSIMD>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
+        using subInplaceSrc =
+            InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::SubInv<ComputeT>, RoundingMode::None>;
 
-            const subInplaceSrcSIMD functor(aSrc2, aPitchSrc2, op, opSIMD);
+        const mpp::SubInv<ComputeT> op;
 
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcSIMD>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
-            using subInplaceSrc =
-                InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::SubInv<ComputeT>, RoundingMode::None>;
+        const subInplaceSrc functor(aSrc2, aPitchSrc2, op);
 
-            const mpp::SubInv<ComputeT> op;
-
-            const subInplaceSrc functor(aSrc2, aPitchSrc2, op);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrc>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrc>(aMask, aPitchMask, aSrcDst, aPitchSrcDst,
+                                                                              aSize, aStreamCtx, functor);
     }
 }
 
@@ -910,48 +864,45 @@ void InvokeSubInvInplaceSrcScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, 
                                      const SrcT *aSrc2, size_t aPitchSrc2, double aScaleFactor, const Size2D &aSize,
                                      const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    // if no scale, use SIMD versions if possible:
+    if (aScaleFactor == 1.0)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        InvokeSubInvInplaceSrcMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSrc2, aPitchSrc2, aSize, aStreamCtx);
+        return;
+    }
 
-        // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0)
-        {
-            InvokeSubInvInplaceSrcMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSrc2, aPitchSrc2, aSize, aStreamCtx);
-            return;
-        }
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    {
+        using ScalerT = Scale<ComputeT, false>;
+        const ScalerT scaler(aScaleFactor);
+        using subInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::SubInv<ComputeT>,
+                                                          ScalerT, RoundingMode::NearestTiesToEven>;
 
-        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
-        {
-            using ScalerT = Scale<ComputeT, false>;
-            const ScalerT scaler(aScaleFactor);
-            using subInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::SubInv<ComputeT>,
-                                                              ScalerT, RoundingMode::NearestTiesToEven>;
+        const mpp::SubInv<ComputeT> op;
 
-            const mpp::SubInv<ComputeT> op;
+        const subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
 
-            const subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcScale>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        // Scaler performs NearestTiesToEven rounding:
+        using ScalerT = Scale<ComputeT, true>;
+        const ScalerT scaler(aScaleFactor);
+        using subInplaceSrcScale =
+            InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::SubInv<ComputeT>, ScalerT, RoundingMode::None>;
 
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcScale>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // Scaler performs NearestTiesToEven rounding:
-            using ScalerT = Scale<ComputeT, true>;
-            const ScalerT scaler(aScaleFactor);
-            using subInplaceSrcScale = InplaceSrcScaleFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::SubInv<ComputeT>,
-                                                              ScalerT, RoundingMode::None>;
+        const mpp::SubInv<ComputeT> op;
 
-            const mpp::SubInv<ComputeT> op;
+        const subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
 
-            const subInplaceSrcScale functor(aSrc2, aPitchSrc2, op, scaler);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcScale>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceSrcScale>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
     }
 }
 
@@ -983,44 +934,40 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeSubInvInplaceCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
                               const SrcT &aConst, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+    using simdOP_t = simd::SubInv<Tupel<DstT, TupelSize>>;
+    if constexpr (simdOP_t::has_simd)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        using ComputeT_SIMD = sub_simd_tupel_compute_type_for_t<SrcT>;
+        // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
+        using subInplaceCSIMD = InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::SubInv<ComputeT>,
+                                                       RoundingMode::None, Tupel<ComputeT_SIMD, TupelSize>, simdOP_t>;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+        const mpp::SubInv<ComputeT> op;
+        const simdOP_t opSIMD;
+        const Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
+            Tupel<ComputeT_SIMD, TupelSize>::GetConstant(static_cast<ComputeT_SIMD>(aConst));
 
-        using simdOP_t = simd::SubInv<Tupel<DstT, TupelSize>>;
-        if constexpr (simdOP_t::has_simd)
-        {
-            using ComputeT_SIMD = sub_simd_tupel_compute_type_for_t<SrcT>;
-            // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
-            using subInplaceCSIMD =
-                InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::SubInv<ComputeT>, RoundingMode::None,
-                                       Tupel<ComputeT_SIMD, TupelSize>, simdOP_t>;
+        const subInplaceCSIMD functor(static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
 
-            const mpp::SubInv<ComputeT> op;
-            const simdOP_t opSIMD;
-            const Tupel<ComputeT_SIMD, TupelSize> tupelConstant =
-                Tupel<ComputeT_SIMD, TupelSize>::GetConstant(static_cast<ComputeT_SIMD>(aConst));
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCSIMD>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
+        using subInplaceC =
+            InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::SubInv<ComputeT>, RoundingMode::None>;
 
-            const subInplaceCSIMD functor(static_cast<ComputeT>(aConst), op, tupelConstant, opSIMD);
+        const mpp::SubInv<ComputeT> op;
 
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCSIMD>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
-            using subInplaceC =
-                InplaceConstantFunctor<TupelSize, ComputeT, DstT, mpp::SubInv<ComputeT>, RoundingMode::None>;
+        const subInplaceC functor(static_cast<ComputeT>(aConst), op);
 
-            const mpp::SubInv<ComputeT> op;
-
-            const subInplaceC functor(static_cast<ComputeT>(aConst), op);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceC>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceC>(aMask, aPitchMask, aSrcDst, aPitchSrcDst,
+                                                                            aSize, aStreamCtx, functor);
     }
 }
 
@@ -1052,48 +999,45 @@ void InvokeSubInvInplaceCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask, Ds
                                    const SrcT &aConst, double aScaleFactor, const Size2D &aSize,
                                    const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    // if no scale, use SIMD versions if possible:
+    if (aScaleFactor == 1.0)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        InvokeSubInvInplaceCMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aConst, aSize, aStreamCtx);
+        return;
+    }
 
-        // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0)
-        {
-            InvokeSubInvInplaceCMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aConst, aSize, aStreamCtx);
-            return;
-        }
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    {
+        using ScalerT = Scale<ComputeT, false>;
+        const ScalerT scaler(aScaleFactor);
+        using subInplaceCScale = InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::SubInv<ComputeT>, ScalerT,
+                                                             RoundingMode::NearestTiesToEven>;
 
-        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
-        {
-            using ScalerT = Scale<ComputeT, false>;
-            const ScalerT scaler(aScaleFactor);
-            using subInplaceCScale = InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::SubInv<ComputeT>,
-                                                                 ScalerT, RoundingMode::NearestTiesToEven>;
+        const mpp::SubInv<ComputeT> op;
 
-            const mpp::SubInv<ComputeT> op;
+        const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
 
-            const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCScale>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        // Scaler performs NearestTiesToEven rounding:
+        using ScalerT = Scale<ComputeT, true>;
+        const ScalerT scaler(aScaleFactor);
+        using subInplaceCScale =
+            InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::SubInv<ComputeT>, ScalerT, RoundingMode::None>;
 
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCScale>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // Scaler performs NearestTiesToEven rounding:
-            using ScalerT = Scale<ComputeT, true>;
-            const ScalerT scaler(aScaleFactor);
-            using subInplaceCScale = InplaceConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::SubInv<ComputeT>,
-                                                                 ScalerT, RoundingMode::None>;
+        const mpp::SubInv<ComputeT> op;
 
-            const mpp::SubInv<ComputeT> op;
+        const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
 
-            const subInplaceCScale functor(static_cast<ComputeT>(aConst), op, scaler);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCScale>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceCScale>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
     }
 }
 
@@ -1124,23 +1068,20 @@ template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeSubInvInplaceDevCMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
                                  const SrcT *aConst, const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
-    {
-        MPP_CUDA_REGISTER_TEMPALTE;
+    MPP_CUDA_REGISTER_TEMPALTE;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
-        using subInplaceDevC =
-            InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, mpp::SubInv<ComputeT>, RoundingMode::None>;
+    // set to roundingmode NONE, because Sub cannot produce non-integers in computations with ints:
+    using subInplaceDevC =
+        InplaceDevConstantFunctor<TupelSize, ComputeT, DstT, mpp::SubInv<ComputeT>, RoundingMode::None>;
 
-        const mpp::SubInv<ComputeT> op;
+    const mpp::SubInv<ComputeT> op;
 
-        const subInplaceDevC functor(aConst, op);
+    const subInplaceDevC functor(aConst, op);
 
-        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevC>(aMask, aPitchMask, aSrcDst, aPitchSrcDst,
-                                                                               aSize, aStreamCtx, functor);
-    }
+    InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevC>(aMask, aPitchMask, aSrcDst, aPitchSrcDst,
+                                                                           aSize, aStreamCtx, functor);
 }
 
 #pragma region Instantiate
@@ -1171,48 +1112,45 @@ void InvokeSubInvInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask,
                                       const SrcT *aConst, double aScaleFactor, const Size2D &aSize,
                                       const StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE;
+
+    // if no scale, use SIMD versions if possible:
+    if (aScaleFactor == 1.0)
     {
-        MPP_CUDA_REGISTER_TEMPALTE;
+        InvokeSubInvInplaceDevCMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aConst, aSize, aStreamCtx);
+        return;
+    }
 
-        // if no scale, use SIMD versions if possible:
-        if (aScaleFactor == 1.0)
-        {
-            InvokeSubInvInplaceDevCMask(aMask, aPitchMask, aSrcDst, aPitchSrcDst, aConst, aSize, aStreamCtx);
-            return;
-        }
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
 
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
+    {
+        using ScalerT = Scale<ComputeT, false>;
+        const ScalerT scaler(aScaleFactor);
+        using subInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::SubInv<ComputeT>,
+                                                                   ScalerT, RoundingMode::NearestTiesToEven>;
 
-        if (aScaleFactor > 1.0 || RealOrComplexFloatingVector<ComputeT>)
-        {
-            using ScalerT = Scale<ComputeT, false>;
-            const ScalerT scaler(aScaleFactor);
-            using subInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::SubInv<ComputeT>,
-                                                                       ScalerT, RoundingMode::NearestTiesToEven>;
+        const mpp::SubInv<ComputeT> op;
 
-            const mpp::SubInv<ComputeT> op;
+        const subInplaceDevCScale functor(aConst, op, scaler);
 
-            const subInplaceDevCScale functor(aConst, op, scaler);
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevCScale>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        // Scaler performs NearestTiesToEven rounding:
+        using ScalerT = Scale<ComputeT, true>;
+        const ScalerT scaler(aScaleFactor);
+        using subInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::SubInv<ComputeT>,
+                                                                   ScalerT, RoundingMode::None>;
 
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevCScale>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
-        else
-        {
-            // Scaler performs NearestTiesToEven rounding:
-            using ScalerT = Scale<ComputeT, true>;
-            const ScalerT scaler(aScaleFactor);
-            using subInplaceDevCScale = InplaceDevConstantScaleFunctor<TupelSize, ComputeT, DstT, mpp::SubInv<ComputeT>,
-                                                                       ScalerT, RoundingMode::None>;
+        const mpp::SubInv<ComputeT> op;
 
-            const mpp::SubInv<ComputeT> op;
+        const subInplaceDevCScale functor(aConst, op, scaler);
 
-            const subInplaceDevCScale functor(aConst, op, scaler);
-
-            InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevCScale>(
-                aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
-        }
+        InvokeForEachPixelMaskedKernelDefault<DstT, TupelSize, subInplaceDevCScale>(
+            aMask, aPitchMask, aSrcDst, aPitchSrcDst, aSize, aStreamCtx, functor);
     }
 }
 
@@ -1240,4 +1178,3 @@ void InvokeSubInvInplaceDevCScaleMask(const Pixel8uC1 *aMask, size_t aPitchMask,
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

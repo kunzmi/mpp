@@ -1,11 +1,13 @@
 #pragma once
-#include "image/pixelTypes.h"
 #include <concepts>
 
 // define concepts and constexpr based on the C-preprocessor macros to en- or disable MPP modules
 namespace mpp
 {
 // if these macros are not set in CMAKE, fall back to enable:
+#ifndef MPP_ENABLE_CUDA_CORE
+#define MPP_ENABLE_CUDA_CORE 1
+#endif
 #ifndef MPP_ENABLE_CUDA_BACKEND
 #define MPP_ENABLE_CUDA_BACKEND 1
 #endif
@@ -18,6 +20,14 @@ namespace mpp
 #ifndef MPP_ENABLE_NPP_BACKEND
 #define MPP_ENABLE_NPP_BACKEND 1
 #endif
+
+#if MPP_ENABLE_CUDA_CORE
+static constexpr bool enableCudaCore = true;
+#else
+static constexpr bool enableCudaCore = false;
+#endif
+template <typename T>
+concept mppEnableCudaCore = enableCudaCore;
 
 #if MPP_ENABLE_CUDA_BACKEND
 static constexpr bool enableCudaBackend = true;

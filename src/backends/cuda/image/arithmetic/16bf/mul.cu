@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "../mul_impl.h"
 
 using namespace mpp::cuda;
@@ -15,4 +13,3 @@ ForAllChannelsWithAlphaInvokeMulInplaceC(16bf);
 ForAllChannelsWithAlphaInvokeMulInplaceDevC(16bf);
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

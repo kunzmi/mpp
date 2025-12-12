@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "sobelHoriz.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/fixedFilterKernel.h>
@@ -7,7 +5,6 @@
 #include <backends/cuda/templateRegistry.h>
 #include <common/defines.h>
 #include <common/image/fixedSizeFilters.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -58,187 +55,184 @@ void InvokeSobelHoriz(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t a
                       const Vector2<int> &aOffsetToActualRoi, const Size2D &aSize,
                       const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    using ComputeT             = filter_integer_compute_type_for_t<SrcT>;
+    using FilterT              = filtertype_for_t<ComputeT>;
+
+    constexpr int pixelBlockSizeX = pixel_block_size_x<DstT>::value;
+    constexpr int pixelBlockSizeY = pixel_block_size_y<DstT>::value;
+
+    switch (aMaskSize)
     {
-        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
-
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
-        using ComputeT             = filter_integer_compute_type_for_t<SrcT>;
-        using FilterT              = filtertype_for_t<ComputeT>;
-
-        constexpr int pixelBlockSizeX = pixel_block_size_x<DstT>::value;
-        constexpr int pixelBlockSizeY = pixel_block_size_y<DstT>::value;
-
-        switch (aMaskSize)
+        case MaskSize::Mask_3x3:
         {
-            case MaskSize::Mask_3x3:
+            constexpr int filterSize  = 3;
+            constexpr int centerPixel = 1;
+
+            using FixedFilterKernelT = FixedFilterKernel<mpp::FixedFilter::SobelHoriz, filterSize, FilterT>;
+
+            switch (aBorderType)
             {
-                constexpr int filterSize  = 3;
-                constexpr int centerPixel = 1;
-
-                using FixedFilterKernelT = FixedFilterKernel<mpp::FixedFilter::SobelHoriz, filterSize, FilterT>;
-
-                switch (aBorderType)
+                case mpp::BorderType::None:
                 {
-                    case mpp::BorderType::None:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+                    using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
 
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Constant:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
-
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Replicate:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Mirror:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::MirrorReplicate:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Wrap:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
-                    }
-                    break;
-                    default:
-                        throw INVALIDARGUMENT(
-                            aBorderType, aBorderType << " is not a supported border type mode for SobelHoriz filter.");
-                        break;
+                    InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
+                                                   centerPixel, pixelBlockSizeX, pixelBlockSizeY,
+                                                   RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
+                        bc, aDst, aPitchDst, aSize, aStreamCtx);
                 }
-            }
-            break;
-            case MaskSize::Mask_5x5:
-            {
-                constexpr int filterSize  = 5;
-                constexpr int centerPixel = 2;
-
-                using FixedFilterKernelT = FixedFilterKernel<mpp::FixedFilter::SobelHoriz, filterSize, FilterT>;
-
-                switch (aBorderType)
-                {
-                    case mpp::BorderType::None:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Constant:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
-
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Replicate:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Mirror:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::MirrorReplicate:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Wrap:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
-                                                       centerPixel, pixelBlockSizeX, pixelBlockSizeY,
-                                                       RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
-                            bc, aDst, aPitchDst, aSize, aStreamCtx);
-                    }
-                    break;
-                    default:
-                        throw INVALIDARGUMENT(
-                            aBorderType, aBorderType << " is not a supported border type mode for SobelHoriz filter.");
-                        break;
-                }
-            }
-            break;
-            default:
-                throw INVALIDARGUMENT(aMaskSize, "Invalid MaskSize for SobelHoriz filter: " << aMaskSize);
                 break;
+                case mpp::BorderType::Constant:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
+
+                    InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
+                                                   centerPixel, pixelBlockSizeX, pixelBlockSizeY,
+                                                   RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
+                        bc, aDst, aPitchDst, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Replicate:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
+                                                   centerPixel, pixelBlockSizeX, pixelBlockSizeY,
+                                                   RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
+                        bc, aDst, aPitchDst, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Mirror:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
+                                                   centerPixel, pixelBlockSizeX, pixelBlockSizeY,
+                                                   RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
+                        bc, aDst, aPitchDst, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::MirrorReplicate:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
+                                                   centerPixel, pixelBlockSizeX, pixelBlockSizeY,
+                                                   RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
+                        bc, aDst, aPitchDst, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Wrap:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
+                                                   centerPixel, pixelBlockSizeX, pixelBlockSizeY,
+                                                   RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
+                        bc, aDst, aPitchDst, aSize, aStreamCtx);
+                }
+                break;
+                default:
+                    throw INVALIDARGUMENT(aBorderType,
+                                          aBorderType << " is not a supported border type mode for SobelHoriz filter.");
+                    break;
+            }
         }
+        break;
+        case MaskSize::Mask_5x5:
+        {
+            constexpr int filterSize  = 5;
+            constexpr int centerPixel = 2;
+
+            using FixedFilterKernelT = FixedFilterKernel<mpp::FixedFilter::SobelHoriz, filterSize, FilterT>;
+
+            switch (aBorderType)
+            {
+                case mpp::BorderType::None:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
+                                                   centerPixel, pixelBlockSizeX, pixelBlockSizeY,
+                                                   RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
+                        bc, aDst, aPitchDst, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Constant:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
+
+                    InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
+                                                   centerPixel, pixelBlockSizeX, pixelBlockSizeY,
+                                                   RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
+                        bc, aDst, aPitchDst, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Replicate:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
+                                                   centerPixel, pixelBlockSizeX, pixelBlockSizeY,
+                                                   RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
+                        bc, aDst, aPitchDst, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Mirror:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
+                                                   centerPixel, pixelBlockSizeX, pixelBlockSizeY,
+                                                   RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
+                        bc, aDst, aPitchDst, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::MirrorReplicate:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
+                                                   centerPixel, pixelBlockSizeX, pixelBlockSizeY,
+                                                   RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
+                        bc, aDst, aPitchDst, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Wrap:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, filterSize, centerPixel,
+                                                   centerPixel, pixelBlockSizeX, pixelBlockSizeY,
+                                                   RoundingMode::NearestTiesToEven, BCType, FixedFilterKernelT>(
+                        bc, aDst, aPitchDst, aSize, aStreamCtx);
+                }
+                break;
+                default:
+                    throw INVALIDARGUMENT(aBorderType,
+                                          aBorderType << " is not a supported border type mode for SobelHoriz filter.");
+                    break;
+            }
+        }
+        break;
+        default:
+            throw INVALIDARGUMENT(aMaskSize, "Invalid MaskSize for SobelHoriz filter: " << aMaskSize);
+            break;
     }
 }
 
@@ -266,4 +260,3 @@ void InvokeSobelHoriz(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t a
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

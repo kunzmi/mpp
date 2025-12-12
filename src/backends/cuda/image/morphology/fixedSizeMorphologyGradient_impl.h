@@ -1,12 +1,9 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "fixedSizeMorphologyGradient.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/fixedSizeMorphologyGradientKernel.h>
 #include <backends/cuda/streamCtx.h>
 #include <backends/cuda/templateRegistry.h>
 #include <common/defines.h>
-#include <common/image/pixelTypeEnabler.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -60,318 +57,315 @@ void InvokeFixedSizeMorphologyGradient(const SrcT *aSrc1, size_t aPitchSrc1, Dst
                                        const Vector2<int> &aOffsetToActualRoi, const Size2D &aSize,
                                        const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    if constexpr (mppEnablePixelType<DstT> && mppEnableCudaBackend<DstT>)
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    using FilterT              = Pixel8uC1;
+
+    constexpr int pixelBlockSizeX = pixel_block_size_x<DstT>::value;
+    constexpr int pixelBlockSizeY = pixel_block_size_y<DstT>::value;
+
+    switch (aMaskSize)
     {
-        MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
-
-        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
-        using FilterT              = Pixel8uC1;
-
-        constexpr int pixelBlockSizeX = pixel_block_size_x<DstT>::value;
-        constexpr int pixelBlockSizeY = pixel_block_size_y<DstT>::value;
-
-        switch (aMaskSize)
+        case MaskSize::Mask_3x3:
         {
-            case MaskSize::Mask_3x3:
+            constexpr int filterSize = 3;
+
+            switch (aBorderType)
             {
-                constexpr int filterSize = 3;
-
-                switch (aBorderType)
+                case mpp::BorderType::None:
                 {
-                    case mpp::BorderType::None:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+                    using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
 
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Constant:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Replicate:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Mirror:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::MirrorReplicate:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Wrap:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    default:
-                        throw INVALIDARGUMENT(
-                            aBorderType,
-                            aBorderType << " is not a supported border type mode for Fixed Size Morphology Gradient.");
-                        break;
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
                 }
-            }
-            break;
-            case MaskSize::Mask_5x5:
-            {
-                constexpr int filterSize = 5;
-
-                switch (aBorderType)
-                {
-                    case mpp::BorderType::None:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Constant:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Replicate:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Mirror:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::MirrorReplicate:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Wrap:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    default:
-                        throw INVALIDARGUMENT(
-                            aBorderType,
-                            aBorderType << " is not a supported border type mode for Fixed Size Morphology Gradient.");
-                        break;
-                }
-            }
-            break;
-            case MaskSize::Mask_7x7:
-            {
-                constexpr int filterSize = 7;
-
-                switch (aBorderType)
-                {
-                    case mpp::BorderType::None:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Constant:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Replicate:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Mirror:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::MirrorReplicate:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Wrap:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    default:
-                        throw INVALIDARGUMENT(
-                            aBorderType,
-                            aBorderType << " is not a supported border type mode for Fixed Size Morphology Gradient.");
-                        break;
-                }
-            }
-            break;
-            case MaskSize::Mask_9x9:
-            {
-                constexpr int filterSize = 9;
-
-                switch (aBorderType)
-                {
-                    case mpp::BorderType::None:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Constant:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Replicate:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Mirror:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::MirrorReplicate:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    case mpp::BorderType::Wrap:
-                    {
-                        using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
-                        const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
-
-                        InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
-                                                                       pixelBlockSizeX, pixelBlockSizeY, BCType>(
-                            bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
-                    }
-                    break;
-                    default:
-                        throw INVALIDARGUMENT(
-                            aBorderType,
-                            aBorderType << " is not a supported border type mode for Fixed Size Morphology Gradient.");
-                        break;
-                }
-            }
-            break;
-            default:
-                throw INVALIDARGUMENT(aMaskSize, "Invalid MaskSize for Fixed Size Morphology Gradient: " << aMaskSize);
                 break;
+                case mpp::BorderType::Constant:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Replicate:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Mirror:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::MirrorReplicate:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Wrap:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                default:
+                    throw INVALIDARGUMENT(
+                        aBorderType,
+                        aBorderType << " is not a supported border type mode for Fixed Size Morphology Gradient.");
+                    break;
+            }
         }
+        break;
+        case MaskSize::Mask_5x5:
+        {
+            constexpr int filterSize = 5;
+
+            switch (aBorderType)
+            {
+                case mpp::BorderType::None:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Constant:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Replicate:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Mirror:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::MirrorReplicate:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Wrap:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                default:
+                    throw INVALIDARGUMENT(
+                        aBorderType,
+                        aBorderType << " is not a supported border type mode for Fixed Size Morphology Gradient.");
+                    break;
+            }
+        }
+        break;
+        case MaskSize::Mask_7x7:
+        {
+            constexpr int filterSize = 7;
+
+            switch (aBorderType)
+            {
+                case mpp::BorderType::None:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Constant:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Replicate:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Mirror:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::MirrorReplicate:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Wrap:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                default:
+                    throw INVALIDARGUMENT(
+                        aBorderType,
+                        aBorderType << " is not a supported border type mode for Fixed Size Morphology Gradient.");
+                    break;
+            }
+        }
+        break;
+        case MaskSize::Mask_9x9:
+        {
+            constexpr int filterSize = 9;
+
+            switch (aBorderType)
+            {
+                case mpp::BorderType::None:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::None, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Constant:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Replicate:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Mirror:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::MirrorReplicate:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::MirrorReplicate, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                case mpp::BorderType::Wrap:
+                {
+                    using BCType = BorderControl<SrcT, BorderType::Wrap, false, false, false, false>;
+                    const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
+
+                    InvokeFixedSizeMorphologyGradientKernelDefault<DstT, TupelSize, FilterT, filterSize, filterSize,
+                                                                   pixelBlockSizeX, pixelBlockSizeY, BCType>(
+                        bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
+                }
+                break;
+                default:
+                    throw INVALIDARGUMENT(
+                        aBorderType,
+                        aBorderType << " is not a supported border type mode for Fixed Size Morphology Gradient.");
+                    break;
+            }
+        }
+        break;
+        default:
+            throw INVALIDARGUMENT(aMaskSize, "Invalid MaskSize for Fixed Size Morphology Gradient: " << aMaskSize);
+            break;
     }
 }
 
@@ -394,4 +388,3 @@ void InvokeFixedSizeMorphologyGradient(const SrcT *aSrc1, size_t aPitchSrc1, Dst
 #pragma endregion
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND

@@ -1,13 +1,11 @@
 #pragma once
 #include <common/defines.h>
-#include <common/image/gotoPtr.h>
-#include <common/mpp_defs.h>
+#include <common/vector_typetraits.h>
 #include <common/vector1.h>
 #include <common/vectorTypes.h>
-#include <common/vector_typetraits.h>
 #include <concepts>
 
-namespace mpp
+namespace mpp::image::cuda
 {
 template <typename T> struct morph_compute_type
 {
@@ -35,4 +33,4 @@ using morph_compute_type_t =
     same_vector_size_different_type_t<T, typename morph_compute_type<remove_vector_t<T>>::type>;
 
 template <typename T> using morph_gray_compute_type_t = Vector1<typename morph_compute_type<remove_vector_t<T>>::type>;
-} // namespace mpp
+} // namespace mpp::image::cuda

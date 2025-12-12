@@ -1,5 +1,3 @@
-#if MPP_ENABLE_CUDA_BACKEND
-
 #include "../copy_impl.h"
 
 using namespace mpp::cuda;
@@ -19,4 +17,3 @@ ForAllChannelsNoAlphaInvokeCopy3Planar(16sc);
 ForAllChannelsNoAlphaInvokeCopy4Planar(16sc);
 
 } // namespace mpp::image::cuda
-#endif // MPP_ENABLE_CUDA_BACKEND
