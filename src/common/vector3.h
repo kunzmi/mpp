@@ -1270,28 +1270,28 @@ template <Number T> struct alignas(sizeof(T)) MPPEXPORT_COMMON Vector3
 };
 
 template <typename T, typename T2>
-DEVICE_CODE Vector3<T> operator+(const Vector3<T> &aLeft, T2 aRight)
+DEVICE_CODE constexpr Vector3<T> operator+(const Vector3<T> &aLeft, T2 aRight)
     requires Number<T2>
 {
     return Vector3<T>{static_cast<T>(aLeft.x + aRight), static_cast<T>(aLeft.y + aRight),
                       static_cast<T>(aLeft.z + aRight)};
 }
 template <typename T, typename T2>
-DEVICE_CODE Vector3<T> operator+(T2 aLeft, const Vector3<T> &aRight)
+DEVICE_CODE constexpr Vector3<T> operator+(T2 aLeft, const Vector3<T> &aRight)
     requires Number<T2>
 {
     return Vector3<T>{static_cast<T>(aLeft + aRight.x), static_cast<T>(aLeft + aRight.y),
                       static_cast<T>(aLeft + aRight.z)};
 }
 template <typename T, typename T2>
-DEVICE_CODE Vector3<T> operator-(const Vector3<T> &aLeft, T2 aRight)
+DEVICE_CODE constexpr Vector3<T> operator-(const Vector3<T> &aLeft, T2 aRight)
     requires Number<T2>
 {
     return Vector3<T>{static_cast<T>(aLeft.x - aRight), static_cast<T>(aLeft.y - aRight),
                       static_cast<T>(aLeft.z - aRight)};
 }
 template <typename T, typename T2>
-DEVICE_CODE Vector3<T> operator-(T2 aLeft, const Vector3<T> &aRight)
+DEVICE_CODE constexpr Vector3<T> operator-(T2 aLeft, const Vector3<T> &aRight)
     requires Number<T2>
 {
     return Vector3<T>{static_cast<T>(aLeft - aRight.x), static_cast<T>(aLeft - aRight.y),
@@ -1299,28 +1299,28 @@ DEVICE_CODE Vector3<T> operator-(T2 aLeft, const Vector3<T> &aRight)
 }
 
 template <typename T, typename T2>
-DEVICE_CODE Vector3<T> operator*(const Vector3<T> &aLeft, T2 aRight)
+DEVICE_CODE constexpr Vector3<T> operator*(const Vector3<T> &aLeft, T2 aRight)
     requires Number<T2>
 {
     return Vector3<T>{static_cast<T>(aLeft.x * aRight), static_cast<T>(aLeft.y * aRight),
                       static_cast<T>(aLeft.z * aRight)};
 }
 template <typename T, typename T2>
-DEVICE_CODE Vector3<T> operator*(T2 aLeft, const Vector3<T> &aRight)
+DEVICE_CODE constexpr Vector3<T> operator*(T2 aLeft, const Vector3<T> &aRight)
     requires Number<T2>
 {
     return Vector3<T>{static_cast<T>(aLeft * aRight.x), static_cast<T>(aLeft * aRight.y),
                       static_cast<T>(aLeft * aRight.z)};
 }
 template <typename T, typename T2>
-DEVICE_CODE Vector3<T> operator/(const Vector3<T> &aLeft, T2 aRight)
+DEVICE_CODE constexpr Vector3<T> operator/(const Vector3<T> &aLeft, T2 aRight)
     requires Number<T2>
 {
     return Vector3<T>{static_cast<T>(aLeft.x / aRight), static_cast<T>(aLeft.y / aRight),
                       static_cast<T>(aLeft.z / aRight)};
 }
 template <typename T, typename T2>
-DEVICE_CODE Vector3<T> operator/(T2 aLeft, const Vector3<T> &aRight)
+DEVICE_CODE constexpr Vector3<T> operator/(T2 aLeft, const Vector3<T> &aRight)
     requires Number<T2>
 {
     return Vector3<T>{static_cast<T>(aLeft / aRight.x), static_cast<T>(aLeft / aRight.y),

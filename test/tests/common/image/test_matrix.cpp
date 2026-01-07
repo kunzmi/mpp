@@ -2,6 +2,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <common/defines.h>
 #include <common/image/matrix.h>
+#include <common/image/matrix3x4.h>
+#include <common/image/matrix4x4.h>
 #include <common/image/quad.h>
 #include <common/image/roi.h>
 #include <common/vectorTypes.h>
@@ -305,4 +307,230 @@ TEST_CASE("Matrix<double>", "[Common.Image]")
         diff += std::abs(diffPerspective.Data()[i]);
     }
     CHECK(diff < 1e-15);
+}
+
+TEST_CASE("Matrix3x4<float>", "[Common.Image]")
+{
+    // check size:
+    CHECK(sizeof(Matrix3x4<float>) == 12 * sizeof(float));
+
+    Matrix3x4<float> b(10);
+    CHECK(b[0] == 10);
+    CHECK(b[1] == 10);
+    CHECK(b[2] == 10);
+    CHECK(b[3] == 10);
+    CHECK(b[4] == 10);
+    CHECK(b[5] == 10);
+    CHECK(b[6] == 10);
+    CHECK(b[7] == 10);
+    CHECK(b[8] == 10);
+    CHECK(b[9] == 10);
+    CHECK(b[10] == 10);
+    CHECK(b[11] == 10);
+
+    Matrix3x4<float> c;
+    CHECK(c[0] == 1);
+    CHECK(c[1] == 0);
+    CHECK(c[2] == 0);
+    CHECK(c[3] == 0);
+    CHECK(c[4] == 0);
+    CHECK(c[5] == 1);
+    CHECK(c[6] == 0);
+    CHECK(c[7] == 0);
+    CHECK(c[8] == 0);
+    CHECK(c[9] == 0);
+    CHECK(c[10] == 1);
+    CHECK(c[11] == 0);
+
+    Matrix3x4<float> d(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+    CHECK(d[0] == 0);
+    CHECK(d[1] == 1);
+    CHECK(d[2] == 2);
+    CHECK(d[3] == 3);
+    CHECK(d[4] == 4);
+    CHECK(d[5] == 5);
+    CHECK(d[6] == 6);
+    CHECK(d[7] == 7);
+    CHECK(d[8] == 8);
+    CHECK(d[9] == 9);
+    CHECK(d[10] == 10);
+    CHECK(d[11] == 11);
+
+    CHECK(c != d);
+    CHECK(d == d);
+
+    CHECK(d[0] == d(0, 0));
+    CHECK(d[1] == d(0, 1));
+    CHECK(d[2] == d(0, 2));
+    CHECK(d[3] == d(0, 3));
+    CHECK(d[4] == d(1, 0));
+    CHECK(d[5] == d(1, 1));
+    CHECK(d[6] == d(1, 2));
+    CHECK(d[7] == d(1, 3));
+    CHECK(d[8] == d(2, 0));
+    CHECK(d[9] == d(2, 1));
+    CHECK(d[10] == d(2, 2));
+    CHECK(d[11] == d(2, 3));
+
+    Matrix3x4<float> e = d + b;
+    CHECK(e[0] == 10);
+    CHECK(e[5] == 15);
+    CHECK(e[8] == 18);
+
+    e = d - b;
+    CHECK(e[0] == -10);
+    CHECK(e[5] == -5);
+    CHECK(e[8] == -2);
+
+    CHECK(Matrix3x4<float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12) * Vec3f(10, 20, 30) == Vec3f(144, 388, 632));
+
+    std::stringstream ss;
+    ss << Matrix3x4<float>(2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24);
+
+    CHECK(ss.str() == "( 2.000000  4.000000  6.000000  8.000000)\n(10.000000 12.000000 14.000000 "
+                      "16.000000)\n(18.000000 20.000000 22.000000 24.000000)\n");
+}
+
+TEST_CASE("Matrix4x4<float>", "[Common.Image]")
+{
+    // check size:
+    CHECK(sizeof(Matrix4x4<float>) == 16 * sizeof(float));
+
+    Matrix4x4<float> b(10);
+    CHECK(b[0] == 10);
+    CHECK(b[1] == 10);
+    CHECK(b[2] == 10);
+    CHECK(b[3] == 10);
+    CHECK(b[4] == 10);
+    CHECK(b[5] == 10);
+    CHECK(b[6] == 10);
+    CHECK(b[7] == 10);
+    CHECK(b[8] == 10);
+    CHECK(b[9] == 10);
+    CHECK(b[10] == 10);
+    CHECK(b[11] == 10);
+    CHECK(b[12] == 10);
+    CHECK(b[13] == 10);
+    CHECK(b[14] == 10);
+    CHECK(b[15] == 10);
+
+    Matrix4x4<float> c;
+    CHECK(c[0] == 1);
+    CHECK(c[1] == 0);
+    CHECK(c[2] == 0);
+    CHECK(c[3] == 0);
+    CHECK(c[4] == 0);
+    CHECK(c[5] == 1);
+    CHECK(c[6] == 0);
+    CHECK(c[7] == 0);
+    CHECK(c[8] == 0);
+    CHECK(c[9] == 0);
+    CHECK(c[10] == 1);
+    CHECK(c[11] == 0);
+    CHECK(c[12] == 0);
+    CHECK(c[13] == 0);
+    CHECK(c[14] == 0);
+    CHECK(c[15] == 1);
+
+    Matrix4x4<float> d(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+    CHECK(d[0] == 0);
+    CHECK(d[1] == 1);
+    CHECK(d[2] == 2);
+    CHECK(d[3] == 3);
+    CHECK(d[4] == 4);
+    CHECK(d[5] == 5);
+    CHECK(d[6] == 6);
+    CHECK(d[7] == 7);
+    CHECK(d[8] == 8);
+    CHECK(d[9] == 9);
+    CHECK(d[10] == 10);
+    CHECK(d[11] == 11);
+    CHECK(d[12] == 12);
+    CHECK(d[13] == 13);
+    CHECK(d[14] == 14);
+    CHECK(d[15] == 15);
+
+    CHECK(c != d);
+    CHECK(d == d);
+
+    CHECK(d[0] == d(0, 0));
+    CHECK(d[1] == d(0, 1));
+    CHECK(d[2] == d(0, 2));
+    CHECK(d[3] == d(0, 3));
+    CHECK(d[4] == d(1, 0));
+    CHECK(d[5] == d(1, 1));
+    CHECK(d[6] == d(1, 2));
+    CHECK(d[7] == d(1, 3));
+    CHECK(d[8] == d(2, 0));
+    CHECK(d[9] == d(2, 1));
+    CHECK(d[10] == d(2, 2));
+    CHECK(d[11] == d(2, 3));
+    CHECK(d[12] == d(3, 0));
+    CHECK(d[13] == d(3, 1));
+    CHECK(d[14] == d(3, 2));
+    CHECK(d[15] == d(3, 3));
+
+    Matrix4x4<float> e = d + b;
+    CHECK(e[0] == 10);
+    CHECK(e[5] == 15);
+    CHECK(e[8] == 18);
+
+    e = d - b;
+    CHECK(e[0] == -10);
+    CHECK(e[5] == -5);
+    CHECK(e[8] == -2);
+
+    e = Matrix4x4<float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16) *
+        Matrix4x4<float>(16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1);
+    CHECK(e == Matrix4x4<float>(80, 70, 60, 50, 240, 214, 188, 162, 400, 358, 316, 274, 560, 502, 444, 386));
+
+    CHECK(Matrix4x4<float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16) * Vec4f(10, 20, 30, 40) ==
+          Vec4f(300, 700, 1100, 1500));
+    CHECK(Vec4f(10, 20, 30, 40) * Matrix4x4<float>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16) ==
+          Vec4f(900, 1000, 1100, 1200));
+
+    CHECK(Matrix4x4<float>(9, 7, 10, 10, 10, 1, 10, 5, 2, 3, 2, 9, 10, 6, 10, 2).Det() == -484.0f);
+    d = Matrix4x4<float>(9, 7, 10, 10, 10, 1, 10, 5, 2, 3, 2, 9, 10, 6, 10, 2).Inverse();
+
+    CHECK(d[0] == Approx(-1).margin(0.001));
+    CHECK(d[1] == Approx(0.1198).margin(0.001));
+    CHECK(d[2] == Approx(0.8884).margin(0.001));
+    CHECK(d[3] == Approx(0.7025).margin(0.001));
+    CHECK(d[4] == Approx(0).margin(0.001));
+    CHECK(d[5] == Approx(-0.1777).margin(0.001));
+    CHECK(d[6] == Approx(0.0620).margin(0.001));
+    CHECK(d[7] == Approx(0.1653).margin(0.001));
+    CHECK(d[8] == Approx(1).margin(0.001));
+    CHECK(d[9] == Approx(-0.0207).margin(0.001));
+    CHECK(d[10] == Approx(-0.9463).margin(0.001));
+    CHECK(d[11] == Approx(-0.6901).margin(0.001));
+    CHECK(d[12] == Approx(0).margin(0.001));
+    CHECK(d[13] == Approx(0.0372).margin(0.001));
+    CHECK(d[14] == Approx(0.1033).margin(0.001));
+    CHECK(d[15] == Approx(-0.0579).margin(0.001));
+
+    d = d.Inverse();
+    CHECK(d[0] == Approx(9).margin(0.001));
+    CHECK(d[1] == Approx(7).margin(0.001));
+    CHECK(d[2] == Approx(10).margin(0.001));
+    CHECK(d[3] == Approx(10).margin(0.001));
+    CHECK(d[4] == Approx(10).margin(0.001));
+    CHECK(d[5] == Approx(1).margin(0.001));
+    CHECK(d[6] == Approx(10).margin(0.001));
+    CHECK(d[7] == Approx(5).margin(0.001));
+    CHECK(d[8] == Approx(2).margin(0.001));
+    CHECK(d[9] == Approx(3).margin(0.001));
+    CHECK(d[10] == Approx(2).margin(0.001));
+    CHECK(d[11] == Approx(9).margin(0.001));
+    CHECK(d[12] == Approx(10).margin(0.001));
+    CHECK(d[13] == Approx(6).margin(0.001));
+    CHECK(d[14] == Approx(10).margin(0.001));
+    CHECK(d[15] == Approx(2).margin(0.001));
+
+    std::stringstream ss;
+    ss << Matrix4x4<float>(2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32);
+
+    CHECK(ss.str() ==
+          "( 2.000000  4.000000  6.000000  8.000000)\n(10.000000 12.000000 14.000000 16.000000)\n(18.000000 20.000000 "
+          "22.000000 24.000000)\n(26.000000 28.000000 30.000000 32.000000)\n");
 }

@@ -86,7 +86,13 @@ enum class RoundingMode // NOLINT(performance-enum-size)
     /// <summary>
     /// No rounding at all, NOP, for internal use
     /// </summary>
-    None
+    None,
+    /// <summary>
+    /// Round according to financial rule, only for positive numbers.<para/>
+    /// Equals to adding .5 and then rounding with TowardNegativeInfinity / floor(). <para/>
+    /// The result is the same as with NearestTiesAwayFromZero / round(), but only valid for positive numbers.
+    /// </summary>
+    NearestTiesAwayFromZeroPositive
 };
 
 template <RoundingMode T> struct rouding_mode_name
@@ -117,6 +123,10 @@ template <> struct rouding_mode_name<RoundingMode::None>
 {
     static constexpr char value[] = "None";
 };
+template <> struct rouding_mode_name<RoundingMode::NearestTiesAwayFromZeroPositive>
+{
+    static constexpr char value[] = "NearestTiesAwayFromZeroPositive";
+};
 
 inline std::ostream &operator<<(std::ostream &aOs, const RoundingMode &aRoundingMode)
 {
@@ -139,6 +149,9 @@ inline std::ostream &operator<<(std::ostream &aOs, const RoundingMode &aRounding
             break;
         case RoundingMode::None:
             aOs << rouding_mode_name<RoundingMode::None>::value;
+            break;
+        case RoundingMode::NearestTiesAwayFromZeroPositive:
+            aOs << rouding_mode_name<RoundingMode::NearestTiesAwayFromZeroPositive>::value;
             break;
         default:
         {
@@ -172,6 +185,9 @@ inline std::wostream &operator<<(std::wostream &aOs, const RoundingMode &aRoundi
             break;
         case RoundingMode::None:
             aOs << rouding_mode_name<RoundingMode::None>::value;
+            break;
+        case RoundingMode::NearestTiesAwayFromZeroPositive:
+            aOs << rouding_mode_name<RoundingMode::NearestTiesAwayFromZeroPositive>::value;
             break;
         default:
         {
@@ -2002,6 +2018,112 @@ inline std::wostream &operator<<(std::wostream &aOs, const Norm &aNorm)
         {
             const std::ios::fmtflags f(aOs.flags());
             aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aNorm);
+            aOs.flags(f);
+        }
+        break;
+    }
+    return aOs;
+}
+#pragma endregion
+
+#pragma region ChromaSubsamplePos
+/// <summary>
+/// Chroma sub-sample position: Defines the location of the sub-sampled chroma sample location relative to the fully
+/// sampled Y channel: <para/> Similar as defined in FFMPEG:<para/> Illustration showing the location of the first(top
+/// left) chroma sample of the image, the left shows only luma, the right shows the location of the chroma sample, the 2
+/// could be imagined to overlay each other but are drawn separately due to limitations of ASCII <para/>
+///< para/>
+///                 1st 2nd       1st 2nd horizontal luma sample positions<para/>
+///                  v   v         v   v<para/>
+///                  ______        ______<para/>
+/// 1st luma line > |X   X ...    |3 0 X ...     X are luma samples,<para/>
+///                 |             |1 2           1-6 are possible chroma positions<para/>
+/// 2nd luma line > |X   X ...    |0 0 X ...     0 is undefined/unknown position
+/// </summary>
+enum class ChromaSubsamplePos // NOLINT(performance-enum-size)
+{
+    /// <summary>
+    /// Undefined
+    /// </summary>
+    Undefined,
+    /// <summary>
+    /// X: same as luma sample / Y: in-between two sample points
+    /// </summary>
+    Left,
+    /// <summary>
+    /// X: in-between two sample points / Y: in-between two sample points
+    /// </summary>
+    Center,
+    /// <summary>
+    /// X: same as luma sample / Y: same as luma sample
+    /// </summary>
+    TopLeft
+};
+
+template <ChromaSubsamplePos T> struct chroma_sample_pos_name
+{
+    static constexpr char value[] = "Undefined";
+};
+template <> struct chroma_sample_pos_name<ChromaSubsamplePos::Left>
+{
+    static constexpr char value[] = "Left";
+};
+template <> struct chroma_sample_pos_name<ChromaSubsamplePos::Center>
+{
+    static constexpr char value[] = "Center";
+};
+template <> struct chroma_sample_pos_name<ChromaSubsamplePos::TopLeft>
+{
+    static constexpr char value[] = "TopLeft";
+};
+
+inline std::ostream &operator<<(std::ostream &aOs, const ChromaSubsamplePos &aChromaSubsamplePos)
+{
+    switch (aChromaSubsamplePos)
+    {
+        case ChromaSubsamplePos::Undefined:
+            aOs << chroma_sample_pos_name<ChromaSubsamplePos::Undefined>::value;
+            break;
+        case ChromaSubsamplePos::Left:
+            aOs << chroma_sample_pos_name<ChromaSubsamplePos::Left>::value;
+            break;
+        case ChromaSubsamplePos::Center:
+            aOs << chroma_sample_pos_name<ChromaSubsamplePos::Center>::value;
+            break;
+        case ChromaSubsamplePos::TopLeft:
+            aOs << chroma_sample_pos_name<ChromaSubsamplePos::TopLeft>::value;
+            break;
+        default:
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aChromaSubsamplePos);
+            aOs.flags(f);
+        }
+        break;
+    }
+    return aOs;
+}
+
+inline std::wostream &operator<<(std::wostream &aOs, const ChromaSubsamplePos &aChromaSubsamplePos)
+{
+    switch (aChromaSubsamplePos)
+    {
+        case ChromaSubsamplePos::Undefined:
+            aOs << chroma_sample_pos_name<ChromaSubsamplePos::Undefined>::value;
+            break;
+        case ChromaSubsamplePos::Left:
+            aOs << chroma_sample_pos_name<ChromaSubsamplePos::Left>::value;
+            break;
+        case ChromaSubsamplePos::Center:
+            aOs << chroma_sample_pos_name<ChromaSubsamplePos::Center>::value;
+            break;
+        case ChromaSubsamplePos::TopLeft:
+            aOs << chroma_sample_pos_name<ChromaSubsamplePos::TopLeft>::value;
+            break;
+        default:
+        {
+            const std::ios::fmtflags f(aOs.flags());
+            aOs << "Unknown: 0x" << std::hex << std::uppercase << static_cast<uint>(aChromaSubsamplePos);
             aOs.flags(f);
         }
         break;

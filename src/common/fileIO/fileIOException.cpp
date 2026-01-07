@@ -1,4 +1,5 @@
 #include "fileIOException.h"
+#include <common/exception.h>
 #include <filesystem>
 #include <ostream>
 #include <sstream>

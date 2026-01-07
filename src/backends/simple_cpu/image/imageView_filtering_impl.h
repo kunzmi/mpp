@@ -788,6 +788,28 @@ ImageView<T> &ImageView<T>::MinFilter(ImageView<T> &aDst, const FilterArea &aFil
 }
 #pragma endregion
 
+#pragma region Median Filter
+template <PixelType T>
+ImageView<T> &ImageView<T>::MedianFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder) const
+    requires RealVector<T>
+{
+    return this->MedianFilter(aDst, aFilterArea, aBorder, ROI());
+}
+
+template <PixelType T>
+ImageView<T> &ImageView<T>::MedianFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+                                         const Roi &aAllowedReadRoi) const
+    requires RealVector<T>
+{
+    checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
+
+    medianFilterEachPixel(*this, aDst, aFilterArea, aBorder, aAllowedReadRoi);
+
+    return aDst;
+}
+
+#pragma endregion
+
 #pragma region Wiener Filter
 template <PixelType T>
 ImageView<T> &ImageView<T>::WienerFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,

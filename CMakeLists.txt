@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
   set(CMAKE_CUDA_ARCHITECTURES 89-real)
+  #set(CMAKE_CUDA_ARCHITECTURES 75-real 80-real 86-real 89-real 90-real 100-real 103-real 120-real 121-real 121-virtual)
 endif()
 
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --compress-mode=size") #compress the fatbin with cuda modules

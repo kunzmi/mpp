@@ -1,6 +1,5 @@
 
 add_subdirectory(image)
-add_subdirectory(signal)
 
 add_library(common SHARED
 	bfloat16.cpp
@@ -14,7 +13,7 @@ add_library(common SHARED
 	vector4.cpp
 	vector4A.cpp
 	)
-target_compile_definitions(common PUBLIC -DMPP_COMMON)  
+target_compile_definitions(common PRIVATE -DMPP_COMMON)  
 
 target_link_libraries(common PRIVATE  
 						project_options

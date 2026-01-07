@@ -452,7 +452,7 @@ void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
 
     const copySrc functor(PointerRoi(), Pitch(), op);
 
-    forEachPixelPlanar(aDstChannel1, aDstChannel2, functor);
+    forEachPixelPlanar<T>(aDstChannel1, aDstChannel2, functor);
 }
 
 /// <summary>
@@ -474,7 +474,7 @@ void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
 
     const copySrc functor(PointerRoi(), Pitch(), op);
 
-    forEachPixelPlanar(aDstChannel1, aDstChannel2, aDstChannel3, functor);
+    forEachPixelPlanar<T>(aDstChannel1, aDstChannel2, aDstChannel3, functor);
 }
 
 /// <summary>
@@ -498,7 +498,7 @@ void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
 
     const copySrc functor(PointerRoi(), Pitch(), op);
 
-    forEachPixelPlanar(aDstChannel1, aDstChannel2, aDstChannel3, aDstChannel4, functor);
+    forEachPixelPlanar<T>(aDstChannel1, aDstChannel2, aDstChannel3, aDstChannel4, functor);
 }
 
 /// <summary>
@@ -816,6 +816,40 @@ template <PixelType T> ImageView<T> &ImageView<T>::Set(remove_vector_t<T> aConst
 #pragma endregion
 
 #pragma region Swap Channel
+/// <summary>
+/// Swap channels
+/// </summary>
+template <PixelType T>
+ImageView<T> &ImageView<T>::SwapChannel(ImageView<T> &aDst) const
+    requires(vector_size_v<T> == 2)
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    using swapChannelSrc = SrcFunctor<1, T, T, T, mpp::SwapChannel<T>, RoundingMode::None>;
+
+    const mpp::SwapChannel<T> op;
+
+    const swapChannelSrc functor(PointerRoi(), Pitch(), op);
+
+    forEachPixel(aDst, functor);
+    return aDst;
+}
+/// <summary>
+/// Swap channels (inplace)
+/// </summary>
+template <PixelType T>
+ImageView<T> &ImageView<T>::SwapChannel()
+    requires(vector_size_v<T> == 2)
+{
+    using swapChannelInplace = InplaceFunctor<1, T, T, mpp::SwapChannel<T>, RoundingMode::None>;
+
+    const mpp::SwapChannel<T> op;
+
+    const swapChannelInplace functor(op);
+
+    forEachPixel(*this, functor);
+    return *this;
+}
 /// <summary>
 /// Swap channels
 /// </summary>

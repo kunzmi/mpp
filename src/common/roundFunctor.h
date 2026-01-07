@@ -1,9 +1,9 @@
 #pragma once
 #include <common/defines.h>
-#include <common/numberTypes.h>
 #include <common/mpp_defs.h>
-#include <common/vectorTypes.h>
+#include <common/numberTypes.h>
 #include <common/vector_typetraits.h>
+#include <common/vectorTypes.h>
 
 namespace mpp
 {
@@ -39,6 +39,12 @@ template <RoundingMode roundingMode, typename T> struct RoundFunctor
         }
         else if constexpr (roundingMode == RoundingMode::None)
         {
+            return;
+        }
+        else if constexpr (roundingMode == RoundingMode::NearestTiesAwayFromZeroPositive)
+        {
+            aVec += static_cast<complex_basetype_t<remove_vector_t<T>>>(0.5);
+            aVec.Floor();
             return;
         }
         else

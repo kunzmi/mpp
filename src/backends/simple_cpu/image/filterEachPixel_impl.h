@@ -305,6 +305,104 @@ void maxFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, cons
 }
 
 template <typename BorderControlT, typename DstT>
+void medianFilterEachPixel(BorderControlT aSrcWithBC, ImageView<DstT> &aDst, const FilterArea &aFilterArea)
+{
+    std::vector<remove_vector_t<DstT>> block0(aFilterArea.Size.x * aFilterArea.Size.y);
+    std::vector<remove_vector_t<DstT>> block1(aFilterArea.Size.x * aFilterArea.Size.y);
+    std::vector<remove_vector_t<DstT>> block2(aFilterArea.Size.x * aFilterArea.Size.y);
+    std::vector<remove_vector_t<DstT>> block3(aFilterArea.Size.x * aFilterArea.Size.y);
+    size_t medianIdx = static_cast<size_t>(aFilterArea.Size.x * aFilterArea.Size.y) / 2;
+
+    for (auto &pixelIterator : aDst)
+    {
+        int pixelX = pixelIterator.Pixel().x - aDst.ROI().x;
+        int pixelY = pixelIterator.Pixel().y - aDst.ROI().y;
+
+        DstT res       = numeric_limits<remove_vector_t<DstT>>::min();
+        DstT &pixelOut = pixelIterator.Value();
+
+        auto blockIter0 = block0.begin();
+        auto blockIter1 = block1.begin();
+        auto blockIter2 = block2.begin();
+        auto blockIter3 = block3.begin();
+        for (const auto &f : aFilterArea.Size)
+        {
+            const int i = pixelX + f.Pixel.x - aFilterArea.Center.x;
+            const int j = pixelY + f.Pixel.y - aFilterArea.Center.y;
+
+            DstT pixel  = aSrcWithBC(i, j);
+            *blockIter0 = pixel.x;
+            blockIter0++;
+            if constexpr (vector_active_size_v<DstT> > 1)
+            {
+                *blockIter1 = pixel.y;
+                blockIter1++;
+            }
+            if constexpr (vector_active_size_v<DstT> > 2)
+            {
+                *blockIter2 = pixel.z;
+                blockIter2++;
+            }
+            if constexpr (vector_active_size_v<DstT> > 3)
+            {
+                *blockIter3 = pixel.w;
+                blockIter3++;
+            }
+        }
+
+        std::sort(block0.begin(), block0.end());
+        res.x = block0[medianIdx];
+        if constexpr (vector_active_size_v<DstT> > 1)
+        {
+            std::sort(block1.begin(), block1.end());
+            res.y = block1[medianIdx];
+        }
+        if constexpr (vector_active_size_v<DstT> > 2)
+        {
+            std::sort(block2.begin(), block2.end());
+            res.z = block2[medianIdx];
+        }
+        if constexpr (vector_active_size_v<DstT> > 3)
+        {
+            std::sort(block3.begin(), block3.end());
+            res.w = block3[medianIdx];
+        }
+
+        // restore alpha channel value:
+        if constexpr (has_alpha_channel_v<DstT>)
+        {
+            res.w = pixelOut.w;
+        }
+
+        pixelOut = res;
+    }
+}
+
+template <typename SrcT>
+void medianFilterEachPixel(const ImageView<SrcT> &aSrc, ImageView<SrcT> &aDst, const FilterArea &aFilterArea,
+                           BorderType aBorderType, const Roi &aAllowedReadRoi)
+{
+
+    const Vector2<int> roiOffset = aSrc.ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
+    const SrcT *allowedPtr = gotoPtr(aSrc.Pointer(), aSrc.Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
+
+    switch (aBorderType)
+    {
+        case mpp::BorderType::Replicate:
+        {
+            using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
+            const BCType bc(allowedPtr, aSrc.Pitch(), aAllowedReadRoi.Size(), roiOffset);
+
+            medianFilterEachPixel(bc, aDst, aFilterArea);
+        }
+        break;
+        default:
+            throw INVALIDARGUMENT(aBorderType, aBorderType << " is not a supported border type mode for minFilter.");
+            break;
+    }
+}
+
+template <typename BorderControlT, typename DstT>
 void wienerFilterEachPixel(BorderControlT aSrcWithBC, ImageView<DstT> &aDst, const FilterArea &aFilterArea,
                            const filter_compute_type_for_t<DstT> &aNoise)
 {

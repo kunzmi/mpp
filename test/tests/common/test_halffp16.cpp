@@ -23,6 +23,10 @@ float getZero(float aVal)
     return 0.0f;
 }
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4723) // potential divide by 0 warning
+#endif
 TEST_CASE("HalfFp16", "[Common]")
 {
     HalfFp16 bf;
@@ -266,6 +270,9 @@ TEST_CASE("HalfFp16", "[Common]")
     ss << HalfFp16(13.256f);
     CHECK(ss.str() == "13.2578");
 }
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 TEST_CASE("HalfFp16 - limits", "[Common]")
 {

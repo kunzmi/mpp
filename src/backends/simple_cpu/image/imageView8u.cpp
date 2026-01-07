@@ -1,5 +1,20 @@
+#include "../dllexport_simplecpu.h" //NOLINT
+#define MPPEXPORT_SIMPLECPU8U MPPEXPORT_SIMPLECPU
 #include "imageView.h"
+
+namespace mpp::image::cpuSimple
+{
+#ifndef _WIN32
+extern template class MPPEXPORT_SIMPLECPU ImageView<Pixel8uC1>;
+extern template class MPPEXPORT_SIMPLECPU ImageView<Pixel8uC2>;
+extern template class MPPEXPORT_SIMPLECPU ImageView<Pixel8uC3>;
+extern template class MPPEXPORT_SIMPLECPU ImageView<Pixel8uC4>;
+extern template class MPPEXPORT_SIMPLECPU ImageView<Pixel8uC4A>;
+#endif
+} // namespace mpp::image::cpuSimple
+
 #include "imageView_arithmetic_impl.h"                     //NOLINT(misc-include-cleaner)
+#include "imageView_colorConversion_impl.h"                //NOLINT(misc-include-cleaner)
 #include "imageView_dataExchangeAndInit_impl.h"            //NOLINT(misc-include-cleaner)
 #include "imageView_filtering_impl.h"                      //NOLINT(misc-include-cleaner)
 #include "imageView_geometryTransforms_affine_impl.h"      //NOLINT(misc-include-cleaner)
@@ -16,22 +31,23 @@
 #include "instantiateScale.h"
 #include "instantiateSwapChannel.h"
 #include <backends/simple_cpu/image/forEachPixel.h>
-#include <backends/simple_cpu/image/forEachPixel_impl.h>              //NOLINT(misc-include-cleaner)
 #include <backends/simple_cpu/image/forEachPixelMasked.h>
 #include <backends/simple_cpu/image/forEachPixelMasked_impl.h> //NOLINT(misc-include-cleaner)
 #include <backends/simple_cpu/image/forEachPixelPlanar.h>
 #include <backends/simple_cpu/image/forEachPixelPlanar_impl.h> //NOLINT(misc-include-cleaner)
 #include <backends/simple_cpu/image/forEachPixelSingleChannel.h>
 #include <backends/simple_cpu/image/forEachPixelSingleChannel_impl.h> //NOLINT(misc-include-cleaner)
+#include <backends/simple_cpu/image/forEachPixel_impl.h>              //NOLINT(misc-include-cleaner)
 #include <backends/simple_cpu/image/reduction.h>
-#include <backends/simple_cpu/image/reduction_impl.h>       //NOLINT(misc-include-cleaner)
 #include <backends/simple_cpu/image/reductionMasked.h>
 #include <backends/simple_cpu/image/reductionMasked_impl.h> //NOLINT(misc-include-cleaner)
+#include <backends/simple_cpu/image/reduction_impl.h>       //NOLINT(misc-include-cleaner)
 #include <common/image/pixelTypes.h>
 #include <common/mpp_defs.h> //NOLINT(misc-include-cleaner)
 
 namespace mpp::image::cpuSimple
 {
+
 template class ImageView<Pixel8uC1>;
 template class ImageView<Pixel8uC2>;
 template class ImageView<Pixel8uC3>;

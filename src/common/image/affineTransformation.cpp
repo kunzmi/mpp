@@ -483,32 +483,43 @@ template class AffineTransformation<double>;
 template MPPEXPORT_COMMON AffineTransformation<float>::AffineTransformation(const AffineTransformation<double> &aOther);
 template MPPEXPORT_COMMON AffineTransformation<double>::AffineTransformation(const AffineTransformation<float> &aOther);
 
-template AffineTransformation<float> operator+(const AffineTransformation<float> &aLeft, float aRight);
-template AffineTransformation<float> operator+(float aLeft, const AffineTransformation<float> &aRight);
-template AffineTransformation<float> operator-(const AffineTransformation<float> &aLeft, float aRight);
-template AffineTransformation<float> operator-(float aLeft, const AffineTransformation<float> &aRight);
+template AffineTransformation<float> MPPEXPORT_COMMON operator+(const AffineTransformation<float> &aLeft, float aRight);
+template AffineTransformation<float> MPPEXPORT_COMMON operator+(float aLeft, const AffineTransformation<float> &aRight);
+template AffineTransformation<float> MPPEXPORT_COMMON operator-(const AffineTransformation<float> &aLeft, float aRight);
+template AffineTransformation<float> MPPEXPORT_COMMON operator-(float aLeft, const AffineTransformation<float> &aRight);
 
-template AffineTransformation<float> operator*(const AffineTransformation<float> &aLeft, float aRight);
-template AffineTransformation<float> operator*(float aLeft, const AffineTransformation<float> &aRight);
-template AffineTransformation<float> operator/(const AffineTransformation<float> &aLeft, float aRight);
+template AffineTransformation<float> MPPEXPORT_COMMON operator*(const AffineTransformation<float> &aLeft, float aRight);
+template AffineTransformation<float> MPPEXPORT_COMMON operator*(float aLeft, const AffineTransformation<float> &aRight);
+template AffineTransformation<float> MPPEXPORT_COMMON operator/(const AffineTransformation<float> &aLeft, float aRight);
 
-template Vector3<float> operator*(const AffineTransformation<float> &aLeft, const Vector3<float> &aRight);
-template Vector3<float> operator*(const Vector3<float> &aLeft, const AffineTransformation<float> &aRight);
-template Quad<float> operator*(const AffineTransformation<float> &aLeft, const Quad<float> &aRight);
-template Quad<float> operator*(const AffineTransformation<float> &aLeft, const Roi &aRight);
+template Vector3<float> MPPEXPORT_COMMON operator*(const AffineTransformation<float> &aLeft,
+                                                   const Vector3<float> &aRight);
+template Vector3<float> MPPEXPORT_COMMON operator*(const Vector3<float> &aLeft,
+                                                   const AffineTransformation<float> &aRight);
+template Quad<float> MPPEXPORT_COMMON operator*(const AffineTransformation<float> &aLeft, const Quad<float> &aRight);
+template Quad<float> MPPEXPORT_COMMON operator*(const AffineTransformation<float> &aLeft, const Roi &aRight);
 
-template AffineTransformation<double> operator+(const AffineTransformation<double> &aLeft, double aRight);
-template AffineTransformation<double> operator+(double aLeft, const AffineTransformation<double> &aRight);
-template AffineTransformation<double> operator-(const AffineTransformation<double> &aLeft, double aRight);
-template AffineTransformation<double> operator-(double aLeft, const AffineTransformation<double> &aRight);
+template AffineTransformation<double> MPPEXPORT_COMMON operator+(const AffineTransformation<double> &aLeft,
+                                                                 double aRight);
+template AffineTransformation<double> MPPEXPORT_COMMON operator+(double aLeft,
+                                                                 const AffineTransformation<double> &aRight);
+template AffineTransformation<double> MPPEXPORT_COMMON operator-(const AffineTransformation<double> &aLeft,
+                                                                 double aRight);
+template AffineTransformation<double> MPPEXPORT_COMMON operator-(double aLeft,
+                                                                 const AffineTransformation<double> &aRight);
 
-template AffineTransformation<double> operator*(const AffineTransformation<double> &aLeft, double aRight);
-template AffineTransformation<double> operator*(double aLeft, const AffineTransformation<double> &aRight);
-template AffineTransformation<double> operator/(const AffineTransformation<double> &aLeft, double aRight);
+template AffineTransformation<double> MPPEXPORT_COMMON operator*(const AffineTransformation<double> &aLeft,
+                                                                 double aRight);
+template AffineTransformation<double> MPPEXPORT_COMMON operator*(double aLeft,
+                                                                 const AffineTransformation<double> &aRight);
+template AffineTransformation<double> MPPEXPORT_COMMON operator/(const AffineTransformation<double> &aLeft,
+                                                                 double aRight);
 
-template Vector3<double> operator*(const AffineTransformation<double> &aLeft, const Vector3<double> &aRight);
-template Vector3<double> operator*(const Vector3<double> &aLeft, const AffineTransformation<double> &aRight);
-template Quad<double> operator*(const AffineTransformation<double> &aLeft, const Quad<double> &aRight);
-template Quad<double> operator*(const AffineTransformation<double> &aLeft, const Roi &aRight);
+template Vector3<double> MPPEXPORT_COMMON operator*(const AffineTransformation<double> &aLeft,
+                                                    const Vector3<double> &aRight);
+template Vector3<double> MPPEXPORT_COMMON operator*(const Vector3<double> &aLeft,
+                                                    const AffineTransformation<double> &aRight);
+template Quad<double> MPPEXPORT_COMMON operator*(const AffineTransformation<double> &aLeft, const Quad<double> &aRight);
+template Quad<double> MPPEXPORT_COMMON operator*(const AffineTransformation<double> &aLeft, const Roi &aRight);
 
 } // namespace mpp::image

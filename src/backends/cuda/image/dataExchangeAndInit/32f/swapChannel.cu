@@ -8,5 +8,7 @@ namespace mpp::image::cuda
 ForAllChannelsNoAlphaInvokeSwapChannelSrc(32f);
 ForAllChannelsNoAlphaInvokeSwapChannelSrc34(32f);
 ForAllChannelsNoAlphaInvokeSwapChannelInplace(32f);
+ForAllChannelsNoAlphaInvokeSwapChannelSrc2(32f);
+ForAllChannelsNoAlphaInvokeSwapChannelInplace2(32f);
 
 } // namespace mpp::image::cuda

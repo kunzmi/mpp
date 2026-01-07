@@ -157,4 +157,62 @@ void InvokeSwapChannelInplace(SrcT *aSrcDst, size_t aPitchSrcDst,
     InstantiateInvokeSwapChannelInplace_For(Pixel##type##C4);
 #pragma endregion
 
+template <TwoChannel SrcDstT>
+void InvokeSwapChannelSrc(const SrcDstT *aSrc1, size_t aPitchSrc1, SrcDstT *aDst, size_t aPitchDst, const Size2D &aSize,
+                          const mpp::cuda::StreamCtx &aStreamCtx)
+{
+    using SrcT = SrcDstT;
+    using DstT = SrcDstT;
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+    using swapChannelSrc = SrcFunctor<TupelSize, SrcT, SrcT, DstT, mpp::SwapChannel<SrcDstT>, RoundingMode::None>;
+
+    const mpp::SwapChannel<SrcDstT> op;
+
+    const swapChannelSrc functor(aSrc1, aPitchSrc1, op);
+
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, swapChannelSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+}
+
+#pragma region Instantiate
+
+#define InstantiateInvokeSwapChannelSrc2_For(typeSrcDst)                                                               \
+    template void InvokeSwapChannelSrc<typeSrcDst>(const typeSrcDst *aSrc1, size_t aPitchSrc1, typeSrcDst *aDst,       \
+                                                   size_t aPitchDst, const Size2D &aSize,                              \
+                                                   const StreamCtx &aStreamCtx);
+
+#define ForAllChannelsNoAlphaInvokeSwapChannelSrc2(type) InstantiateInvokeSwapChannelSrc2_For(Pixel##type##C2);
+#pragma endregion
+
+template <TwoChannel SrcDstT>
+void InvokeSwapChannelInplace(SrcDstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize,
+                              const mpp::cuda::StreamCtx &aStreamCtx)
+{
+    using SrcT = SrcDstT;
+    using DstT = SrcDstT;
+    MPP_CUDA_REGISTER_TEMPALTE_SRC_DST;
+
+    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+    using swapChannelInplace = InplaceFunctor<TupelSize, SrcT, DstT, mpp::SwapChannel<SrcDstT>, RoundingMode::None>;
+
+    const mpp::SwapChannel<SrcDstT> op;
+
+    const swapChannelInplace functor(op);
+
+    InvokeForEachPixelKernelDefault<DstT, TupelSize, swapChannelInplace>(aSrcDst, aPitchSrcDst, aSize, aStreamCtx,
+                                                                         functor);
+}
+
+#pragma region Instantiate
+
+#define InstantiateInvokeSwapChannelInplace2_For(typeSrc)                                                              \
+    template void InvokeSwapChannelInplace<typeSrc>(typeSrc * aSrcDst, size_t aPitchSrcDst, const Size2D &aSize,       \
+                                                    const StreamCtx &aStreamCtx);
+
+#define ForAllChannelsNoAlphaInvokeSwapChannelInplace2(type) InstantiateInvokeSwapChannelInplace2_For(Pixel##type##C2);
+#pragma endregion
+
 } // namespace mpp::image::cuda

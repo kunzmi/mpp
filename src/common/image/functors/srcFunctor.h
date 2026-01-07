@@ -101,6 +101,25 @@ struct SrcFunctor : public ImageFunctor<false>
     /// Returns true if the value has been successfully set
     /// </summary>
     DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
+        requires(vector_size_v<DstT> == 1 && vector_size_v<ComputeT> > 1 &&
+                 !std::same_as<remove_vector_t<ComputeT>, remove_vector_t<DstT>> &&
+                 std::same_as<remove_vector_t<SrcT>, remove_vector_t<DstT>>)
+    {
+        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+        Vector1<remove_vector_t<ComputeT>> temp;
+        Op(static_cast<ComputeT>(*pixelSrc1), temp);
+
+        RoundFunctor<roundingMode, Vector1<remove_vector_t<ComputeT>>> round1;
+        round1(temp); // NOP for integer ComputeT
+        // DstT constructor will clamp temp to value range of DstT
+        aDst = static_cast<DstT>(temp);
+        return true;
+    }
+
+    /// <summary>
+    /// Returns true if the value has been successfully set
+    /// </summary>
+    DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
         requires(!std::same_as<ComputeT, DstT>) && ((ComplexVector<ComputeT> && RealVector<DstT>)) &&
                 (!SrcIsSameAsCompute)
     {
@@ -190,6 +209,27 @@ struct SrcFunctor : public ImageFunctor<false>
             ComputeT temp;
             Op(static_cast<ComputeT>(tupelSrc1.value[i]), temp);
             round(temp); // NOP for integer ComputeT
+            // DstT constructor will clamp temp to value range of DstT
+            aDst.value[i] = static_cast<DstT>(temp);
+        }
+    }
+
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
+        requires(vector_size_v<DstT> == 1 && vector_size_v<ComputeT> > 1 &&
+                 !std::same_as<remove_vector_t<ComputeT>, remove_vector_t<DstT>> &&
+                 std::same_as<remove_vector_t<SrcT>, remove_vector_t<DstT>>)
+    {
+        const SrcT *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+
+        Tupel<SrcT, tupelSize> tupelSrc1 = Tupel<SrcT, tupelSize>::Load(pixelSrc1);
+
+        RoundFunctor<roundingMode, Vector1<remove_vector_t<ComputeT>>> round1;
+#pragma unroll
+        for (size_t i = 0; i < tupelSize; i++)
+        {
+            Vector1<remove_vector_t<ComputeT>> temp;
+            Op(static_cast<ComputeT>(tupelSrc1.value[i]), temp);
+            round1(temp); // NOP for integer ComputeT
             // DstT constructor will clamp temp to value range of DstT
             aDst.value[i] = static_cast<DstT>(temp);
         }

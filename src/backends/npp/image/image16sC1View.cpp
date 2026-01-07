@@ -10,6 +10,9 @@
 #include "image64fC1View.h" //NOLINT
 #include "image8sC1View.h" //NOLINT
 #include "image8uC1View.h" //NOLINT
+#ifdef _MSC_VER
+#include "../dllexport_npp.h"
+#endif
 #include "imageView.h"  //NOLINT
 #include <backends/cuda/devVarView.h> //NOLINT
 #include <backends/npp/nppException.h>  //NOLINT
@@ -39,6 +42,10 @@
 
 namespace mpp::image::npp
 {
+#ifdef _MSC_VER
+template class MPPEXPORT_NPP ImageView<Pixel16sC1>;
+#endif
+
 Image16sC1View::Image16sC1View(const Size2D &aSize) : ImageView<Pixel16sC1>(aSize)
 {
 }

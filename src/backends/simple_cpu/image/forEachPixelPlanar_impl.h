@@ -9,8 +9,8 @@
 #include <common/image/threadSplit.h>
 #include <common/tupel.h>
 #include <common/utilities.h>
-#include <common/vector1.h>
 #include <common/vector_typetraits.h>
+#include <common/vector1.h>
 #include <iostream>
 
 namespace mpp::image::cpuSimple
@@ -19,7 +19,8 @@ namespace mpp::image::cpuSimple
 /// runs aFunctor on every pixel of an image. Inplace and outplace operation, no mask. Planar 2 channel destination.
 /// </summary>
 template <typename DstT, typename functor>
-void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, const functor &aFunctor)
+void forEachPixelPlanar(ImageView<Vector1<remove_vector_t<DstT>>> &aDst1,
+                        ImageView<Vector1<remove_vector_t<DstT>>> &aDst2, const functor &aFunctor)
 {
     using DstPlaneT = Vector1<remove_vector_t<DstT>>;
 
@@ -29,7 +30,7 @@ void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, const fu
         int pixelX = pixelIterator1.Pixel().x - aDst1.ROI().x;
         int pixelY = pixelIterator1.Pixel().y - aDst1.ROI().y;
 
-        Vector2<remove_vector_t<DstT>> res;
+        DstT res;
         DstPlaneT &pixelOut1 = pixelIterator1.Value();
         DstPlaneT &pixelOut2 = pixelIterator2.Value();
 
@@ -56,7 +57,9 @@ void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, const fu
 /// runs aFunctor on every pixel of an image. Inplace and outplace operation, no mask. Planar 3 channel destination.
 /// </summary>
 template <typename DstT, typename functor>
-void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, ImageView<DstT> &aDst3, const functor &aFunctor)
+void forEachPixelPlanar(ImageView<Vector1<remove_vector_t<DstT>>> &aDst1,
+                        ImageView<Vector1<remove_vector_t<DstT>>> &aDst2,
+                        ImageView<Vector1<remove_vector_t<DstT>>> &aDst3, const functor &aFunctor)
 {
     using DstPlaneT = Vector1<remove_vector_t<DstT>>;
 
@@ -67,7 +70,7 @@ void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, ImageVie
         int pixelX = pixelIterator1.Pixel().x - aDst1.ROI().x;
         int pixelY = pixelIterator1.Pixel().y - aDst1.ROI().y;
 
-        Vector3<remove_vector_t<DstT>> res;
+        DstT res;
         DstPlaneT &pixelOut1 = pixelIterator1.Value();
         DstPlaneT &pixelOut2 = pixelIterator2.Value();
         DstPlaneT &pixelOut3 = pixelIterator3.Value();
@@ -98,8 +101,10 @@ void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, ImageVie
 /// runs aFunctor on every pixel of an image. Inplace and outplace operation, no mask. Planar 4 channel destination.
 /// </summary>
 template <typename DstT, typename functor>
-void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, ImageView<DstT> &aDst3, ImageView<DstT> &aDst4,
-                        const functor &aFunctor)
+void forEachPixelPlanar(ImageView<Vector1<remove_vector_t<DstT>>> &aDst1,
+                        ImageView<Vector1<remove_vector_t<DstT>>> &aDst2,
+                        ImageView<Vector1<remove_vector_t<DstT>>> &aDst3,
+                        ImageView<Vector1<remove_vector_t<DstT>>> &aDst4, const functor &aFunctor)
 {
     using DstPlaneT = Vector1<remove_vector_t<DstT>>;
 
@@ -111,7 +116,7 @@ void forEachPixelPlanar(ImageView<DstT> &aDst1, ImageView<DstT> &aDst2, ImageVie
         int pixelX = pixelIterator1.Pixel().x - aDst1.ROI().x;
         int pixelY = pixelIterator1.Pixel().y - aDst1.ROI().y;
 
-        Vector4<remove_vector_t<DstT>> res;
+        DstT res;
         DstPlaneT &pixelOut1 = pixelIterator1.Value();
         DstPlaneT &pixelOut2 = pixelIterator2.Value();
         DstPlaneT &pixelOut3 = pixelIterator3.Value();

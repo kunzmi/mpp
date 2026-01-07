@@ -32,6 +32,8 @@
 #include <common/image/gotoPtr.h>
 #include <common/image/imageViewBase.h>
 #include <common/image/matrix.h>
+#include <common/image/matrix3x4.h>
+#include <common/image/matrix4x4.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
 #include <common/image/roiException.h>
@@ -1217,6 +1219,18 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
     /// <summary>
     /// Swap channels
     /// </summary>
+    ImageView<T> &SwapChannel(ImageView<T> &aDst) const
+        requires(vector_size_v<T> == 2);
+
+    /// <summary>
+    /// Swap channels (inplace)
+    /// </summary>
+    ImageView<T> &SwapChannel()
+        requires(vector_size_v<T> == 2);
+
+    /// <summary>
+    /// Swap channels
+    /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &SwapChannel(ImageView<TTo> &aDst, const ChannelList<vector_active_size_v<TTo>> &aDstChannels) const
         requires((vector_active_size_v<TTo> <= vector_active_size_v<T>)) && //
@@ -2132,6 +2146,20 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
     /// </summary>
     ImageView<T> &MinFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
                             const Roi &aAllowedReadRoi) const
+        requires RealVector<T>;
+
+#pragma endregion
+#pragma region Median Filter
+    /// <summary>
+    /// Median filter
+    /// </summary>
+    ImageView<T> &MedianFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder) const
+        requires RealVector<T>;
+    /// <summary>
+    /// Median filter
+    /// </summary>
+    ImageView<T> &MedianFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+                               const Roi &aAllowedReadRoi) const
         requires RealVector<T>;
 
 #pragma endregion
@@ -5188,7 +5216,7 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
     ImageView<same_vector_size_different_type_t<T, float>> &Integral(
         ImageView<same_vector_size_different_type_t<T, float>> &aDst,
         const same_vector_size_different_type_t<T, float> &aVal) const
-        requires RealVector<T> && (!std::same_as<double, remove_vector<T>>);
+        requires RealVector<T> && (!std::same_as<double, remove_vector_t<T>>);
 
     ImageView<same_vector_size_different_type_t<T, long64>> &Integral(
         ImageView<same_vector_size_different_type_t<T, long64>> &aDst,
@@ -5216,7 +5244,7 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
                      ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
                      const same_vector_size_different_type_t<T, float> &aVal,
                      const same_vector_size_different_type_t<T, double> &aValSqr) const
-        requires RealVector<T> && (!std::same_as<double, remove_vector<T>>);
+        requires RealVector<T> && (!std::same_as<double, remove_vector_t<T>>);
 
     void SqrIntegral(ImageView<same_vector_size_different_type_t<T, double>> &aDst,
                      ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
@@ -5431,6 +5459,43 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
         requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8);
 
 #pragma endregion
+
+#pragma region RadialProfile
+
+    /// <summary>
+    /// Radial profile. Circular around provided center point, the center does not have to be on the image.
+    /// </summary>
+    /// <param name="aProfileCount">The number of pixels that have the distance of the array index to the center
+    /// point.</param>
+    /// <param name="aProfileSum">Per-channel sum, one element per radius. Must be of the same size as
+    /// aProfileCount.</param>
+    /// <param name="aProfileSumSqr">Per-channel squared sum, if provided the array must have the same size as
+    /// aProfileSum, can be nullptr.</param>
+    /// <param name="aCenter">The center of the circular average.</param>
+    /// <param name="aStreamCtx"></param>
+    void RadialProfile(int *aProfileCount, same_vector_size_different_type_t<T, float> *aProfileSum,
+                       same_vector_size_different_type_t<T, float> *aProfileSumSqr, int aProfileSize,
+                       const Vec2f &aCenter) const
+        requires RealVector<T> && (!std::same_as<remove_vector_t<T>, double>);
+
+    /// <summary>
+    /// Radial profile. Circular around provided center point, the center does not have to be on the image.
+    /// </summary>
+    /// <param name="aProfileCount">The number of pixels that have the distance of the array index to the center
+    /// point.</param>
+    /// <param name="aProfileSum">Per-channel sum, one element per radius. Must be of the same size as
+    /// aProfileCount.</param>
+    /// <param name="aProfileSumSqr">Per-channel squared sum, if provided the array must have the same size as
+    /// aProfileSum, can be nullptr.</param>
+    /// <param name="aCenter">The center of the circular average.</param>
+    /// <param name="aRadiusRatio">Ratio of orientation axis to orthogonal axis. (i.e. 1.5 means stretched 1.5x)</param>
+    /// <param name="aAngleInRad">Orientation of the ellipse's orthogonal axis, clockwise in radians with 0.0 being
+    /// vertical.</param> <param name="aStreamCtx"></param>
+    void RadialProfile(int *aProfileCount, same_vector_size_different_type_t<T, float> *aProfileSum,
+                       same_vector_size_different_type_t<T, float> *aProfileSumSqr, int aProfileSize,
+                       const Vec2f &aCenter, float aRadiusRatio, float aAngleInRad) const
+        requires RealVector<T> && (!std::same_as<remove_vector_t<T>, double>);
+#pragma endregion
 #pragma endregion
 
 #pragma region Threshold and Compare
@@ -5562,5 +5627,3274 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
         requires RealOrComplexFloatingVector<T>;
 #pragma endregion
 #pragma endregion
+
+#pragma region ColorConversion
+#pragma region HLS
+#pragma region RGBtoHLS
+    /// <summary>
+    /// Converts RGB to HLS<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &RGBtoHLS(ImageView<T> &aDst, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts RGB to HLS<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void RGBtoHLS(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts RGB to HLS<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void RGBtoHLS(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                  float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts RGB to HLS<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static void RGBtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
+                 std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// Converts RGB to HLS<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &RGBtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts RGB to HLS<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &RGBtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts RGB to HLS (inplace)<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &RGBtoHLS(float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+#pragma endregion
+#pragma region BGRtoHLS
+    /// <summary>
+    /// Converts BGR to HLS<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &BGRtoHLS(ImageView<T> &aDst, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts BGR to HLS<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void BGRtoHLS(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts BGR to HLS<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void BGRtoHLS(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                  float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts BGR to HLS<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static void BGRtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
+                 std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// Converts BGR to HLS<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &BGRtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts BGR to HLS<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &BGRtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts BGR to HLS (inplace)<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &BGRtoHLS(float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+#pragma endregion
+
+#pragma region HLStoRGB
+    /// <summary>
+    /// Converts HLS to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &HLStoRGB(ImageView<T> &aDst, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts HLS to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void HLStoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts HLS to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void HLStoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                  float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts HLS to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static void HLStoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
+                 std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// Converts HLS to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &HLStoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts HLS to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &HLStoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts HLS to RGB (inplace)<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &HLStoRGB(float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+#pragma endregion
+#pragma region HLStoBGR
+    /// <summary>
+    /// Converts HLS to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &HLStoBGR(ImageView<T> &aDst, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts HLS to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void HLStoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts HLS to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void HLStoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                  float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts HLS to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static void HLStoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
+                 std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// Converts HLS to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &HLStoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts HLS to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &HLStoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts HLS to BGR (inplace)<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &HLStoBGR(float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+#pragma endregion
+#pragma endregion
+
+#pragma region HSV
+#pragma region RGBtoHSV
+    /// <summary>
+    /// Converts RGB to HSV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &RGBtoHSV(ImageView<T> &aDst, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts RGB to HSV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void RGBtoHSV(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts RGB to HSV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void RGBtoHSV(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                  float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts RGB to HSV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static void RGBtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
+                 std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// Converts RGB to HSV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &RGBtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts RGB to HSV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &RGBtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts RGB to HSV (inplace)<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &RGBtoHSV(float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+#pragma endregion
+#pragma region BGRtoHSV
+    /// <summary>
+    /// Converts BGR to HSV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &BGRtoHSV(ImageView<T> &aDst, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts BGR to HSV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void BGRtoHSV(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts BGR to HSV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void BGRtoHSV(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                  float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts BGR to HSV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static void BGRtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
+                 std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// Converts BGR to HSV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &BGRtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts BGR to HSV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &BGRtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts BGR to HSV (inplace)<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &BGRtoHSV(float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+#pragma endregion
+
+#pragma region HSVtoRGB
+    /// <summary>
+    /// Converts HSV to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &HSVtoRGB(ImageView<T> &aDst, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts HSV to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void HSVtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts HSV to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void HSVtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                  float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts HSV to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static void HSVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
+                 std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// Converts HSV to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &HSVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts HSV to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &HSVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts HSV to RGB (inplace)<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &HSVtoRGB(float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+#pragma endregion
+#pragma region HSVtoBGR
+    /// <summary>
+    /// Converts HSV to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &HSVtoBGR(ImageView<T> &aDst, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts HSV to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void HSVtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts HSV to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void HSVtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                  float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts HSV to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static void HSVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
+                 std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// Converts HSV to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &HSVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts HSV to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &HSVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts HSV to BGR (inplace)<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &HSVtoBGR(float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+#pragma endregion
+#pragma endregion
+
+#pragma region Lab
+#pragma region RGBtoLab
+    /// <summary>
+    /// Converts RGB to Lab<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &RGBtoLab(ImageView<T> &aDst, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts RGB to Lab<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void RGBtoLab(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts RGB to Lab<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void RGBtoLab(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                  float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts RGB to Lab<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static void RGBtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
+                 std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// Converts RGB to Lab<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &RGBtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts RGB to Lab<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &RGBtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts RGB to Lab (inplace)<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &RGBtoLab(float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+#pragma endregion
+#pragma region BGRtoLab
+    /// <summary>
+    /// Converts BGR to Lab<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &BGRtoLab(ImageView<T> &aDst, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts BGR to Lab<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void BGRtoLab(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts BGR to Lab<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void BGRtoLab(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                  float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts BGR to Lab<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static void BGRtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
+                 std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// Converts BGR to Lab<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &BGRtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts BGR to Lab<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &BGRtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts BGR to Lab (inplace)<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &BGRtoLab(float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+#pragma endregion
+
+#pragma region LabtoRGB
+    /// <summary>
+    /// Converts Lab to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &LabtoRGB(ImageView<T> &aDst, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts Lab to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void LabtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts Lab to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void LabtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                  float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts Lab to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static void LabtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
+                 std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// Converts Lab to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &LabtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts Lab to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &LabtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts Lab to RGB (inplace)<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &LabtoRGB(float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+#pragma endregion
+#pragma region LabtoBGR
+    /// <summary>
+    /// Converts Lab to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &LabtoBGR(ImageView<T> &aDst, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts Lab to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void LabtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts Lab to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void LabtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                  float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts Lab to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static void LabtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
+                 std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// Converts Lab to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &LabtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts Lab to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &LabtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts Lab to BGR (inplace)<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &LabtoBGR(float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+#pragma endregion
+#pragma endregion
+
+#pragma region LUV
+#pragma region RGBtoLUV
+    /// <summary>
+    /// Converts RGB to LUV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &RGBtoLUV(ImageView<T> &aDst, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts RGB to LUV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void RGBtoLUV(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts RGB to LUV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void RGBtoLUV(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                  float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts RGB to LUV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static void RGBtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
+                 std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// Converts RGB to LUV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &RGBtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts RGB to LUV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &RGBtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts RGB to LUV (inplace)<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &RGBtoLUV(float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+#pragma endregion
+#pragma region BGRtoLUV
+    /// <summary>
+    /// Converts BGR to LUV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &BGRtoLUV(ImageView<T> &aDst, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts BGR to LUV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void BGRtoLUV(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts BGR to LUV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void BGRtoLUV(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                  float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts BGR to LUV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static void BGRtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
+                 std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// Converts BGR to LUV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &BGRtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts BGR to LUV<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &BGRtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts BGR to LUV (inplace)<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &BGRtoLUV(float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+#pragma endregion
+
+#pragma region LUVtoRGB
+    /// <summary>
+    /// Converts LUV to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &LUVtoRGB(ImageView<T> &aDst, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts LUV to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void LUVtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts LUV to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void LUVtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                  float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts LUV to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static void LUVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
+                 std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// Converts LUV to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &LUVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts LUV to RGB<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &LUVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts LUV to RGB (inplace)<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &LUVtoRGB(float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+#pragma endregion
+#pragma region LUVtoBGR
+    /// <summary>
+    /// Converts LUV to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &LUVtoBGR(ImageView<T> &aDst, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts LUV to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void LUVtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts LUV to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    void LUVtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                  float aNormalizationFactor) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts LUV to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static void LUVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
+                 std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// Converts LUV to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &LUVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// Converts LUV to BGR<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    static ImageView<T> &LUVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  float aNormalizationFactor)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
+                 std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// Converts LUV to BGR (inplace)<para/>
+    /// Internally the computation is done on normalized values ranging from [0..1], a normalization factor has to be
+    /// provided to normalize the input values to [0..1]. For byte images this is usually 255.0f, for unsigned short
+    /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
+    /// (16-bit value range). For float images the factor is usually 1.0f.
+    /// </summary>
+    ImageView<T> &LUVtoBGR(float aNormalizationFactor)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
+                 std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>;
+#pragma endregion
+#pragma endregion
+
+#pragma region ColorTwist3x3
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix
+    /// </summary>
+    ImageView<T> &ColorTwist(ImageView<T> &aDst, const Matrix<float> &aTwist) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix
+    /// </summary>
+    void ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                    ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix
+    /// </summary>
+    void ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                    ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                    const Matrix<float> &aTwist) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
+                 std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix
+    /// </summary>
+    static void ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix
+    /// </summary>
+    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+                                    const Matrix<float> &aTwist)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix. Alpha channel in destination image is set to aAlpha.
+    /// </summary>
+    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+                                    remove_vector_t<T> aAlpha, const Matrix<float> &aTwist)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
+                 std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix
+    /// </summary>
+    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                    const Matrix<float> &aTwist)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
+                 std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix (inplace)
+    /// </summary>
+    ImageView<T> &ColorTwist(const Matrix<float> &aTwist)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma downsampling to 422 (YCbCr/YCrCb/CbYCr).
+    /// </summary>
+    /// <param name="aDstLumaChroma">Destination image with Luma/Chroma interleaved</param>
+    /// <param name="aTwist"></param>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    /// <param name="aStreamCtx"></param>
+    ImageView<Vector2<remove_vector_t<T>>> &ColorTwistTo422(ImageView<Vector2<remove_vector_t<T>>> &aDstLumaChroma,
+                                                            const Matrix<float> &aTwist,
+                                                            ChromaSubsamplePos aChromaSubsamplePos,
+                                                            bool aSwapLumaChroma) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma downsampling to 422.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    void ColorTwistTo422(ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                         ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix<float> &aTwist,
+                         ChromaSubsamplePos aChromaSubsamplePos) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma downsampling to 422.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    void ColorTwistTo422(ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix<float> &aTwist,
+                         ChromaSubsamplePos aChromaSubsamplePos) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma downsampling to 420.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    void ColorTwistTo420(ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                         ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix<float> &aTwist,
+                         ChromaSubsamplePos aChromaSubsamplePos) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma downsampling to 420.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    void ColorTwistTo420(ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix<float> &aTwist,
+                         ChromaSubsamplePos aChromaSubsamplePos) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma downsampling to 411.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    void ColorTwistTo411(ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                         ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix<float> &aTwist,
+                         ChromaSubsamplePos aChromaSubsamplePos) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma downsampling to 411.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    void ColorTwistTo411(ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix<float> &aTwist,
+                         ChromaSubsamplePos aChromaSubsamplePos) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma downsampling to 422 (YCbCr/YCrCb/CbYCr).
+    /// </summary>
+    /// <param name="aDstLumaChroma">Destination image with Luma/Chroma interleaved</param>
+    /// <param name="aTwist"></param>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    /// <param name="aStreamCtx"></param>
+    static void ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                ImageView<Vector2<remove_vector_t<T>>> &aDstLumaChroma, const Matrix<float> &aTwist,
+                                ChromaSubsamplePos aChromaSubsamplePos, bool aSwapLumaChroma)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma downsampling to 422.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    static void ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                                ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix<float> &aTwist,
+                                ChromaSubsamplePos aChromaSubsamplePos)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma downsampling to 422.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    static void ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix<float> &aTwist,
+                                ChromaSubsamplePos aChromaSubsamplePos)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma downsampling to 420.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    static void ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                                ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix<float> &aTwist,
+                                ChromaSubsamplePos aChromaSubsamplePos)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma downsampling to 420.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    static void ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix<float> &aTwist,
+                                ChromaSubsamplePos aChromaSubsamplePos)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma downsampling to 411.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    static void ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                                ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix<float> &aTwist,
+                                ChromaSubsamplePos aChromaSubsamplePos)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma downsampling to 411.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    static void ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix<float> &aTwist,
+                                ChromaSubsamplePos aChromaSubsamplePos)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma upsampling from 422.
+    /// </summary>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    ImageView<Vector3<remove_vector_t<T>>> &ColorTwistFrom422(ImageView<Vector3<remove_vector_t<T>>> &aDst,
+                                                              const Matrix<float> &aTwist, bool aSwapLumaChroma) const
+        requires std::same_as<Pixel8uC2, T> || std::same_as<Pixel16uC2, T> || std::same_as<Pixel16sC2, T> ||
+                 std::same_as<Pixel16fC2, T> || std::same_as<Pixel32fC2, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma upsampling from 422.
+    /// </summary>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    void ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+                           bool aSwapLumaChroma) const
+        requires std::same_as<Pixel8uC2, T> || std::same_as<Pixel16uC2, T> || std::same_as<Pixel16sC2, T> ||
+                 std::same_as<Pixel16fC2, T> || std::same_as<Pixel32fC2, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma upsampling from 422.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static ImageView<T> &ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                           ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma, ImageView<T> &aDst,
+                                           const Matrix<float> &aTwist, ChromaSubsamplePos aChromaSubsamplePos,
+                                           InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma upsampling from 422.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static ImageView<T> &ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                           ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
+                                           ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2, ImageView<T> &aDst,
+                                           const Matrix<float> &aTwist, ChromaSubsamplePos aChromaSubsamplePos,
+                                           InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma upsampling from 422.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static void ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                  ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+                                  ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma upsampling from 422.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static void ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+                                  ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma upsampling from 420.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static ImageView<T> &ColorTwistFrom420(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                           ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma, ImageView<T> &aDst,
+                                           const Matrix<float> &aTwist, ChromaSubsamplePos aChromaSubsamplePos,
+                                           InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma upsampling from 420.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static ImageView<T> &ColorTwistFrom420(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                           ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
+                                           ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2, ImageView<T> &aDst,
+                                           const Matrix<float> &aTwist, ChromaSubsamplePos aChromaSubsamplePos,
+                                           InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma upsampling from 420.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static void ColorTwistFrom420(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                  ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+                                  ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma upsampling from 420.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static void ColorTwistFrom420(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+                                  ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma upsampling from 411.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static ImageView<T> &ColorTwistFrom411(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                           ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma, ImageView<T> &aDst,
+                                           const Matrix<float> &aTwist, ChromaSubsamplePos aChromaSubsamplePos,
+                                           InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma upsampling from 411.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static ImageView<T> &ColorTwistFrom411(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                           ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
+                                           ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2, ImageView<T> &aDst,
+                                           const Matrix<float> &aTwist, ChromaSubsamplePos aChromaSubsamplePos,
+                                           InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma upsampling from 411.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static void ColorTwistFrom411(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                  ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+                                  ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x3 matrix and chroma upsampling from 411.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static void ColorTwistFrom411(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+                                  ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+#pragma endregion
+
+#pragma region ColorTwist3x4
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix
+    /// </summary>
+    ImageView<T> &ColorTwist(ImageView<T> &aDst, const Matrix3x4<float> &aTwist) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix
+    /// </summary>
+    void ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                    ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix
+    /// </summary>
+    void ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                    ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                    const Matrix3x4<float> &aTwist) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
+                 std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix
+    /// </summary>
+    static void ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix
+    /// </summary>
+    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+                                    const Matrix3x4<float> &aTwist)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix. Alpha channel in destination image is set to aAlpha.
+    /// </summary>
+    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+                                    remove_vector_t<T> aAlpha, const Matrix3x4<float> &aTwist)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
+                 std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix
+    /// </summary>
+    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                    const Matrix3x4<float> &aTwist)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
+                 std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix (inplace)
+    /// </summary>
+    ImageView<T> &ColorTwist(const Matrix3x4<float> &aTwist)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma downsampling to 422 (YCbCr/YCrCb/CbYCr).
+    /// </summary>
+    /// <param name="aDstLumaChroma">Destination image with Luma/Chroma interleaved</param>
+    /// <param name="aTwist"></param>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    /// <param name="aStreamCtx"></param>
+    ImageView<Vector2<remove_vector_t<T>>> &ColorTwistTo422(ImageView<Vector2<remove_vector_t<T>>> &aDstLumaChroma,
+                                                            const Matrix3x4<float> &aTwist,
+                                                            ChromaSubsamplePos aChromaSubsamplePos,
+                                                            bool aSwapLumaChroma) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma downsampling to 422.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    void ColorTwistTo422(ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                         ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix3x4<float> &aTwist,
+                         ChromaSubsamplePos aChromaSubsamplePos) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma downsampling to 422.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    void ColorTwistTo422(ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix3x4<float> &aTwist,
+                         ChromaSubsamplePos aChromaSubsamplePos) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma downsampling to 420.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    void ColorTwistTo420(ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                         ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix3x4<float> &aTwist,
+                         ChromaSubsamplePos aChromaSubsamplePos) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma downsampling to 420.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    void ColorTwistTo420(ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix3x4<float> &aTwist,
+                         ChromaSubsamplePos aChromaSubsamplePos) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma downsampling to 411.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    void ColorTwistTo411(ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                         ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix3x4<float> &aTwist,
+                         ChromaSubsamplePos aChromaSubsamplePos) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma downsampling to 411.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    void ColorTwistTo411(ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix3x4<float> &aTwist,
+                         ChromaSubsamplePos aChromaSubsamplePos) const
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma downsampling to 422 (YCbCr/YCrCb/CbYCr).
+    /// </summary>
+    /// <param name="aDstLumaChroma">Destination image with Luma/Chroma interleaved</param>
+    /// <param name="aTwist"></param>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    /// <param name="aStreamCtx"></param>
+    static void ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                ImageView<Vector2<remove_vector_t<T>>> &aDstLumaChroma, const Matrix3x4<float> &aTwist,
+                                ChromaSubsamplePos aChromaSubsamplePos, bool aSwapLumaChroma)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma downsampling to 422.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    static void ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                                ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix3x4<float> &aTwist,
+                                ChromaSubsamplePos aChromaSubsamplePos)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma downsampling to 422.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    static void ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix3x4<float> &aTwist,
+                                ChromaSubsamplePos aChromaSubsamplePos)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma downsampling to 420.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    static void ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                                ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix3x4<float> &aTwist,
+                                ChromaSubsamplePos aChromaSubsamplePos)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma downsampling to 420.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    static void ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix3x4<float> &aTwist,
+                                ChromaSubsamplePos aChromaSubsamplePos)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma downsampling to 411.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    static void ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                                ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix3x4<float> &aTwist,
+                                ChromaSubsamplePos aChromaSubsamplePos)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma downsampling to 411.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    static void ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
+                                ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix3x4<float> &aTwist,
+                                ChromaSubsamplePos aChromaSubsamplePos)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma upsampling from 422.
+    /// </summary>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    ImageView<Vector3<remove_vector_t<T>>> &ColorTwistFrom422(ImageView<Vector3<remove_vector_t<T>>> &aDst,
+                                                              const Matrix3x4<float> &aTwist,
+                                                              bool aSwapLumaChroma) const
+        requires std::same_as<Pixel8uC2, T> || std::same_as<Pixel16uC2, T> || std::same_as<Pixel16sC2, T> ||
+                 std::same_as<Pixel16fC2, T> || std::same_as<Pixel32fC2, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma upsampling from 422.
+    /// </summary>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    void ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+                           bool aSwapLumaChroma) const
+        requires std::same_as<Pixel8uC2, T> || std::same_as<Pixel16uC2, T> || std::same_as<Pixel16sC2, T> ||
+                 std::same_as<Pixel16fC2, T> || std::same_as<Pixel32fC2, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma upsampling from 422.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static ImageView<T> &ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                           ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma, ImageView<T> &aDst,
+                                           const Matrix3x4<float> &aTwist, ChromaSubsamplePos aChromaSubsamplePos,
+                                           InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma upsampling from 422.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static ImageView<T> &ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                           ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
+                                           ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2, ImageView<T> &aDst,
+                                           const Matrix3x4<float> &aTwist, ChromaSubsamplePos aChromaSubsamplePos,
+                                           InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma upsampling from 422.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static void ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                  ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+                                  ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma upsampling from 422.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static void ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+                                  ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma upsampling from 420.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static ImageView<T> &ColorTwistFrom420(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                           ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma, ImageView<T> &aDst,
+                                           const Matrix3x4<float> &aTwist, ChromaSubsamplePos aChromaSubsamplePos,
+                                           InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma upsampling from 420.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static ImageView<T> &ColorTwistFrom420(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                           ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
+                                           ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2, ImageView<T> &aDst,
+                                           const Matrix3x4<float> &aTwist, ChromaSubsamplePos aChromaSubsamplePos,
+                                           InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma upsampling from 420.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static void ColorTwistFrom420(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                  ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+                                  ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma upsampling from 420.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static void ColorTwistFrom420(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+                                  ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma upsampling from 411.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static ImageView<T> &ColorTwistFrom411(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                           ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma, ImageView<T> &aDst,
+                                           const Matrix3x4<float> &aTwist, ChromaSubsamplePos aChromaSubsamplePos,
+                                           InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma upsampling from 411.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static ImageView<T> &ColorTwistFrom411(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                           ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
+                                           ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2, ImageView<T> &aDst,
+                                           const Matrix3x4<float> &aTwist, ChromaSubsamplePos aChromaSubsamplePos,
+                                           InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
+                 std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
+                 std::same_as<Pixel32fC4A, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma upsampling from 411.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static void ColorTwistFrom411(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                  ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+                                  ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+
+    /// <summary>
+    /// ColorTwist with a 3x4 matrix and chroma upsampling from 411.
+    /// </summary>
+    /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
+    /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
+    /// this parameter. Set to true for CbYCr.</param>
+    static void ColorTwistFrom411(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+                                  ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode)
+        requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
+                 std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
+#pragma endregion
+
+#pragma region ColorTwist4x4
+    /// <summary>
+    /// ColorTwist with a 4x4 matrix
+    /// </summary>
+    ImageView<T> &ColorTwist(ImageView<T> &aDst, const Matrix4x4<float> &aTwist) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
+                 std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// ColorTwist with a 4x4 matrix
+    /// </summary>
+    void ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                    ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                    const Matrix4x4<float> &aTwist) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
+                 std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// ColorTwist with a 4x4 matrix
+    /// </summary>
+    static void ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                           const Matrix4x4<float> &aTwist)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
+                 std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// ColorTwist with a 4x4 matrix
+    /// </summary>
+    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                    const Matrix4x4<float> &aTwist)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
+                 std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// ColorTwist with a 4x4 matrix (inplace)
+    /// </summary>
+    ImageView<T> &ColorTwist(const Matrix4x4<float> &aTwist)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
+                 std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>;
+
+#pragma endregion
+
+#pragma region ColorTwist4x4C
+    /// <summary>
+    /// ColorTwist with a 4x4 matrix and an additional constant vector addition
+    /// </summary>
+    ImageView<T> &ColorTwist(ImageView<T> &aDst, const Matrix4x4<float> &aTwist, const Pixel32fC4 &aConstant) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
+                 std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// ColorTwist with a 4x4 matrix and an additional constant vector addition
+    /// </summary>
+    void ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                    ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                    const Matrix4x4<float> &aTwist, const Pixel32fC4 &aConstant) const
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
+                 std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// ColorTwist with a 4x4 matrix and an additional constant vector addition
+    /// </summary>
+    static void ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                           const Matrix4x4<float> &aTwist, const Pixel32fC4 &aConstant)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
+                 std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// ColorTwist with a 4x4 matrix and an additional constant vector addition
+    /// </summary>
+    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                    const Matrix4x4<float> &aTwist, const Pixel32fC4 &aConstant)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
+                 std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>;
+
+    /// <summary>
+    /// ColorTwist with a 4x4 matrix (inplace) and an additional constant vector addition
+    /// </summary>
+    ImageView<T> &ColorTwist(const Matrix4x4<float> &aTwist, const Pixel32fC4 &aConstant)
+        requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
+                 std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>;
+
+#pragma endregion
+
+#pragma region GammaCorrBT709
+    /// <summary>
+    /// Conversion linear to gamma corrected using BT.709 curve. The values are normalized to [0..1] before the
+    /// operation using aNormFactor. For 8u images this is usually 255.0f.
+    /// </summary>
+    ImageView<T> &GammaCorrBT709(ImageView<T> &aDst, float aNormFactor) const
+        requires std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>;
+
+    /// <summary>
+    /// Conversion linear to gamma corrected using BT.709 curve. The values are normalized to [0..1] before the
+    /// operation using aNormFactor. For 8u images this is usually 255.0f.
+    /// </summary>
+    static void GammaCorrBT709(ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                               ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst1, float aNormFactor)
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> == 2);
+
+    /// <summary>
+    /// Conversion linear to gamma corrected using BT.709 curve. The values are normalized to [0..1] before the
+    /// operation using aNormFactor. For 8u images this is usually 255.0f.
+    /// </summary>
+    static void GammaCorrBT709(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormFactor)
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> == 3);
+
+    /// <summary>
+    /// Conversion linear to gamma corrected using BT.709 curve. The values are normalized to [0..1] before the
+    /// operation using aNormFactor. For 8u images this is usually 255.0f.
+    /// </summary>
+    static void GammaCorrBT709(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc0, const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormFactor)
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> == 4);
+
+    /// <summary>
+    /// Conversion linear to gamma corrected using BT.709 curve. The values are normalized to [0..1] before the
+    /// operation using aNormFactor. For 8u images this is usually 255.0f.
+    /// </summary>
+    ImageView<T> &GammaCorrBT709(float aNormFactor)
+        requires std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>;
+
+#pragma endregion
+
+#pragma region GammaInvCorrBT709
+    /// <summary>
+    /// Conversion gamma corrected to linear using BT.709 curve. The values are normalized to [0..1] before the
+    /// operation using aNormFactor. For 8u images this is usually 255.0f.
+    /// </summary>
+    ImageView<T> &GammaInvCorrBT709(ImageView<T> &aDst, float aNormFactor) const
+        requires std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>;
+
+    /// <summary>
+    /// Conversion gamma corrected to linear using BT.709 curve. The values are normalized to [0..1] before the
+    /// operation using aNormFactor. For 8u images this is usually 255.0f.
+    /// </summary>
+    static void GammaInvCorrBT709(ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst1, float aNormFactor)
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> == 2);
+
+    /// <summary>
+    /// Conversion gamma corrected to linear using BT.709 curve. The values are normalized to [0..1] before the
+    /// operation using aNormFactor. For 8u images this is usually 255.0f.
+    /// </summary>
+    static void GammaInvCorrBT709(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormFactor)
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> == 3);
+
+    /// <summary>
+    /// Conversion gamma corrected to linear using BT.709 curve. The values are normalized to [0..1] before the
+    /// operation using aNormFactor. For 8u images this is usually 255.0f.
+    /// </summary>
+    static void GammaInvCorrBT709(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc0, const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormFactor)
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> == 4);
+
+    /// <summary>
+    /// Conversion gamma corrected to linear using BT.709 curve. The values are normalized to [0..1] before the
+    /// operation using aNormFactor. For 8u images this is usually 255.0f.
+    /// </summary>
+    ImageView<T> &GammaInvCorrBT709(float aNormFactor)
+        requires std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>;
+
+#pragma endregion
+
+#pragma region GammaCorrsRGB
+    /// <summary>
+    /// Conversion linear to gamma corrected using sRGB curve. The values are normalized to [0..1] before the
+    /// operation using aNormFactor. For 8u images this is usually 255.0f.
+    /// </summary>
+    ImageView<T> &GammaCorrsRGB(ImageView<T> &aDst, float aNormFactor) const
+        requires std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>;
+
+    /// <summary>
+    /// Conversion linear to gamma corrected using sRGB curve. The values are normalized to [0..1] before the
+    /// operation using aNormFactor. For 8u images this is usually 255.0f.
+    /// </summary>
+    static void GammaCorrsRGB(ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                              ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst1, float aNormFactor)
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> == 2);
+
+    /// <summary>
+    /// Conversion linear to gamma corrected using sRGB curve. The values are normalized to [0..1] before the
+    /// operation using aNormFactor. For 8u images this is usually 255.0f.
+    /// </summary>
+    static void GammaCorrsRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                              const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                              const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormFactor)
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> == 3);
+
+    /// <summary>
+    /// Conversion linear to gamma corrected using sRGB curve. The values are normalized to [0..1] before the
+    /// operation using aNormFactor. For 8u images this is usually 255.0f.
+    /// </summary>
+    static void GammaCorrsRGB(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc0, const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormFactor)
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> == 4);
+
+    /// <summary>
+    /// Conversion linear to gamma corrected using sRGB curve. The values are normalized to [0..1] before the
+    /// operation using aNormFactor. For 8u images this is usually 255.0f.
+    /// </summary>
+    ImageView<T> &GammaCorrsRGB(float aNormFactor)
+        requires std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>;
+
+#pragma endregion
+
+#pragma region GammaInvCorrsRGB
+    /// <summary>
+    /// Conversion gamma corrected to linear using sRGB curve. The values are normalized to [0..1] before the
+    /// operation using aNormFactor. For 8u images this is usually 255.0f.
+    /// </summary>
+    ImageView<T> &GammaInvCorrsRGB(ImageView<T> &aDst, float aNormFactor) const
+        requires std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>;
+
+    /// <summary>
+    /// Conversion gamma corrected to linear using sRGB curve. The values are normalized to [0..1] before the
+    /// operation using aNormFactor. For 8u images this is usually 255.0f.
+    /// </summary>
+    static void GammaInvCorrsRGB(ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aDst1, float aNormFactor)
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> == 2);
+
+    /// <summary>
+    /// Conversion gamma corrected to linear using sRGB curve. The values are normalized to [0..1] before the
+    /// operation using aNormFactor. For 8u images this is usually 255.0f.
+    /// </summary>
+    static void GammaInvCorrsRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                 const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                 const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormFactor)
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> == 3);
+
+    /// <summary>
+    /// Conversion gamma corrected to linear using sRGB curve. The values are normalized to [0..1] before the
+    /// operation using aNormFactor. For 8u images this is usually 255.0f.
+    /// </summary>
+    static void GammaInvCorrsRGB(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc0, const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormFactor)
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> == 4);
+
+    /// <summary>
+    /// Conversion gamma corrected to linear using sRGB curve. The values are normalized to [0..1] before the
+    /// operation using aNormFactor. For 8u images this is usually 255.0f.
+    /// </summary>
+    ImageView<T> &GammaInvCorrsRGB(float aNormFactor)
+        requires std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>;
+
+#pragma endregion
+
+#pragma region GradientColorToGray
+    /// <summary>
+    /// Converts a color gradient image to grayscale.
+    /// </summary>
+    ImageView<Vector1<remove_vector_t<T>>> &GradientColorToGray(ImageView<Vector1<remove_vector_t<T>>> &aDst,
+                                                                Norm aNorm) const
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>) &&
+                (vector_size_v<T> > 1);
+
+    /// <summary>
+    /// Converts a color gradient image to grayscale.
+    /// </summary>
+    static void GradientColorToGray(ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aDst0, Norm aNorm)
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> == 2);
+
+    /// <summary>
+    /// Converts a color gradient image to grayscale.
+    /// </summary>
+    static void GradientColorToGray(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aDst0, Norm aNorm)
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> == 3);
+
+    /// <summary>
+    /// Converts a color gradient image to grayscale.
+    /// </summary>
+    static void GradientColorToGray(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aDst0, Norm aNorm)
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> == 4);
+
+#pragma endregion
+
+#pragma region ColorToGray
+    /// <summary>
+    /// Converts a multi-channel color image to a one channel gray scale image where each channel is weighted by the
+    /// factor provided in aWeights.<para/> Common values to convert RGB to gray are nGray = 0.299 * R + 0.587 * G +
+    /// 0.114 * B
+    /// </summary>
+    ImageView<Vector1<remove_vector_t<T>>> &ColorToGray(
+        ImageView<Vector1<remove_vector_t<T>>> &aDst, const same_vector_size_different_type_t<T, float> &aWeights) const
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>) &&
+                (vector_size_v<T> > 1);
+
+    /// <summary>
+    /// Converts a multi-channel color image to a one channel gray scale image where each channel is weighted by the
+    /// factor provided in aWeights.<para/> Common values to convert RGB to gray are nGray = 0.299 * R + 0.587 * G +
+    /// 0.114 * B
+    /// </summary>
+    static void ColorToGray(ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                            ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                            const same_vector_size_different_type_t<T, float> &aWeights)
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> == 2);
+
+    /// <summary>
+    /// Converts a multi-channel color image to a one channel gray scale image where each channel is weighted by the
+    /// factor provided in aWeights.<para/> Common values to convert RGB to gray are nGray = 0.299 * R + 0.587 * G +
+    /// 0.114 * B
+    /// </summary>
+    static void ColorToGray(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                            const same_vector_size_different_type_t<T, float> &aWeights)
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> == 3);
+
+    /// <summary>
+    /// Converts a multi-channel color image to a one channel gray scale image where each channel is weighted by the
+    /// factor provided in aWeights.<para/> Common values to convert RGB to gray are nGray = 0.299 * R + 0.587 * G +
+    /// 0.114 * B
+    /// </summary>
+    static void ColorToGray(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
+                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                            const same_vector_size_different_type_t<T, float> &aWeights)
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+                 std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> == 4);
+
+#pragma endregion
+
+#pragma region CFAToRGB
+    /// <summary>
+    /// Grayscale Color Filter Array to RGB Color Debayer conversion.<para/>
+    /// Generates one RGB color pixel for every grayscale source pixel. Source and destination image ROIs must have even
+    /// width and height. Missing pixel colors are generated using bilinear interpolation with chroma correlation of
+    /// generated green values. aBayerGrid allows the user to specify the Bayer grid registration position at source
+    /// image location oSrcROI.x, oSrcROI.y relative to pSrc.<para/> Possible registration positions are:<para/> BGGR,
+    /// RGGB, GBRG, GRBG<para/> If it becomes necessary to access source pixels outside the aAllowedReadRoi then the
+    /// source image borders are mirrored.
+    /// </summary>
+    ImageView<Vector3<remove_vector_t<T>>> &CFAToRGB(ImageView<Vector3<remove_vector_t<T>>> &aDst,
+                                                     BayerGridPosition aBayerGrid, Roi aAllowedReadRoi = Roi()) const
+        requires(std::same_as<Pixel8uC1, T> || std::same_as<Pixel16uC1, T> || std::same_as<Pixel32uC1, T> ||
+                 std::same_as<Pixel16sC1, T> || std::same_as<Pixel32sC1, T> || std::same_as<Pixel16bfC1, T> ||
+                 std::same_as<Pixel16fC1, T> || std::same_as<Pixel32fC1, T>);
+
+    /// <summary>
+    /// Grayscale Color Filter Array to RGB Color Debayer conversion.<para/>
+    /// Generates one RGB color pixel for every grayscale source pixel. Source and destination image ROIs must have even
+    /// width and height. Missing pixel colors are generated using bilinear interpolation with chroma correlation of
+    /// generated green values. aBayerGrid allows the user to specify the Bayer grid registration position at source
+    /// image location oSrcROI.x, oSrcROI.y relative to pSrc.<para/> Possible registration positions are:<para/> BGGR,
+    /// RGGB, GBRG, GRBG<para/> If it becomes necessary to access source pixels outside the aAllowedReadRoi then the
+    /// source image borders are mirrored.<para/> The alpha channel (the last channel), is set to aAlpha.
+    /// </summary>
+    ImageView<Vector4<remove_vector_t<T>>> &CFAToRGB(ImageView<Vector4<remove_vector_t<T>>> &aDst,
+                                                     remove_vector_t<T> aAlpha, BayerGridPosition aBayerGrid,
+                                                     Roi aAllowedReadRoi = Roi()) const
+        requires(std::same_as<Pixel8uC1, T> || std::same_as<Pixel16uC1, T> || std::same_as<Pixel32uC1, T> ||
+                 std::same_as<Pixel16sC1, T> || std::same_as<Pixel32sC1, T> || std::same_as<Pixel16bfC1, T> ||
+                 std::same_as<Pixel16fC1, T> || std::same_as<Pixel32fC1, T>);
+
+    /// <summary>
+    /// RGB Color to Grayscale Bayer Color Filter Array conversion.<para/>
+    /// Depending on the chosen BayerGridPosition and pixel position, only either red, green or blue channel is stored
+    /// in the destionation image.<para/> Image ROI must have even width and height.
+    /// </summary>
+    ImageView<Vector1<remove_vector_t<T>>> &RGBToCFA(ImageView<Vector1<remove_vector_t<T>>> &aDst,
+                                                     BayerGridPosition aBayerGrid) const
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<int, remove_vector_t<T>> ||
+                 std::same_as<uint, remove_vector_t<T>> || std::same_as<BFloat16, remove_vector_t<T>> ||
+                 std::same_as<HalfFp16, remove_vector_t<T>> || std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> == 3);
+
+#pragma endregion
+
+#pragma region LUTPalette
+    /// <summary>
+    /// Converts a LUT with levels aLevels and values aValues to a fixed palette of either 256 (8-bit types) or 65536
+    /// (16-bit types) values. aPalette must be an array of at least 256 or 65536 elements, depending on datatype.
+    /// </summary>
+    static void LUTToPalette(const int *aLevels, const int *aValues, int aLUTSize,
+                             Vector1<remove_vector_t<T>> *aPalette, InterpolationMode aInterpolationMode)
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, short> ||
+                 std::same_as<remove_vector_t<T>, ushort>);
+
+    /// <summary>
+    /// Palette look-up-table color conversion.<para/>
+    /// aPalette must be an array of at least 2^aBitSize elements.<para/>
+    /// aBitSize must be in range [1..(8*sizeof(pixel base type)].
+    /// </summary>
+    ImageView<T> &LUTPalette(ImageView<T> &aDst, const T *aPalette, int aBitSize) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, short> ||
+                 std::same_as<remove_vector_t<T>, ushort>) &&
+                (vector_size_v<T> == 1);
+
+    /// <summary>
+    /// Palette look-up-table color conversion - inplace.<para/>
+    /// aPalette must be an array of at least 2^aBitSize elements.<para/>
+    /// aBitSize must be in range [1..(8*sizeof(pixel base type)].
+    /// </summary>
+    ImageView<T> &LUTPalette(const T *aPalette, int aBitSize)
+        requires(std::same_as<Pixel8uC1, T> || std::same_as<Pixel16sC1, T> || std::same_as<Pixel16uC1, T>);
+
+    /// <summary>
+    /// Palette look-up-table color conversion.<para/>
+    /// aPalette must be an array of at least 2^aBitSize elements.<para/>
+    /// aBitSize must be in range [1..(8*sizeof(pixel base type)].
+    /// </summary>
+    ImageView<Vector3<remove_vector_t<T>>> &LUTPalette(ImageView<Vector3<remove_vector_t<T>>> &aDst,
+                                                       const Vector3<remove_vector_t<T>> *aPalette, int aBitSize) const
+        requires(std::same_as<Pixel8uC1, T> || std::same_as<Pixel16sC1, T> || std::same_as<Pixel16uC1, T>);
+
+    /// <summary>
+    /// Palette look-up-table color conversion. One channel gray scale to 3 channel color. The palette is padded to 4
+    /// channels where the last channel is not used.<para/> aPalette must be an array of at least 2^aBitSize
+    /// elements.<para/> aBitSize must be in range [1..(8*sizeof(pixel base type)].
+    /// </summary>
+    ImageView<Vector3<remove_vector_t<T>>> &LUTPalette(ImageView<Vector3<remove_vector_t<T>>> &aDst,
+                                                       const Vector4A<remove_vector_t<T>> *aPalette, int aBitSize) const
+        requires(std::same_as<Pixel8uC1, T> || std::same_as<Pixel16sC1, T> || std::same_as<Pixel16uC1, T>);
+
+    /// <summary>
+    /// Palette look-up-table color conversion. One channel gray scale to 3 channel color.<para/> aPalette must be an
+    /// array of at least 2^aBitSize elements.<para/> aBitSize must be in range [1..(8*sizeof(pixel base type)].
+    /// </summary>
+    ImageView<Vector4A<remove_vector_t<T>>> &LUTPalette(ImageView<Vector4A<remove_vector_t<T>>> &aDst,
+                                                        const Vector3<remove_vector_t<T>> *aPalette, int aBitSize) const
+        requires(std::same_as<Pixel8uC1, T> || std::same_as<Pixel16sC1, T> || std::same_as<Pixel16uC1, T>);
+
+    /// <summary>
+    /// Palette look-up-table color conversion. One channel gray scale to 3 channel color.<para/> aPalette must be an
+    /// array of at least 2^aBitSize elements. The palette is padded to 4 channels where the last channel is not
+    /// used.<para/> aBitSize must be in range [1..(8*sizeof(pixel base type)].
+    /// </summary>
+    ImageView<Vector4A<remove_vector_t<T>>> &LUTPalette(ImageView<Vector4A<remove_vector_t<T>>> &aDst,
+                                                        const Vector4A<remove_vector_t<T>> *aPalette,
+                                                        int aBitSize) const
+        requires(std::same_as<Pixel8uC1, T> || std::same_as<Pixel16sC1, T> || std::same_as<Pixel16uC1, T>);
+
+    /// <summary>
+    /// Palette look-up-table color conversion. One channel gray scale to 4 channel color.<para/> aPalette must be an
+    /// array of at least 2^aBitSize elements.<para/> aBitSize must be in range [1..(8*sizeof(pixel base type)].
+    /// </summary>
+    ImageView<Vector4<remove_vector_t<T>>> &LUTPalette(ImageView<Vector4<remove_vector_t<T>>> &aDst,
+                                                       const Vector4<remove_vector_t<T>> *aPalette, int aBitSize) const
+        requires(std::same_as<Pixel8uC1, T> || std::same_as<Pixel16sC1, T> || std::same_as<Pixel16uC1, T>);
+
+    /// <summary>
+    /// Palette look-up-table color conversion.<para/> aPalette is a pointer to number of color channels
+    /// arrays of at least 2^aBitSize elements.<para/> aBitSize must be in range [1..(8*sizeof(pixel base type)].
+    /// </summary>
+    ImageView<T> &LUTPalette(ImageView<T> &aDst,
+                             const Vector1<remove_vector_t<T>> *const aPalette[vector_active_size_v<T>],
+                             int aBitSize) const
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, short> ||
+                 std::same_as<remove_vector_t<T>, ushort>) &&
+                (vector_active_size_v<T> >= 2);
+
+    /// <summary>
+    /// Palette look-up-table color conversion - inplace.<para/> aPalette is a pointer to number of color channels
+    /// arrays of at least 2^aBitSize elements.<para/> aBitSize must be in range [1..(8*sizeof(pixel base type)].
+    /// </summary>
+    ImageView<T> &LUTPalette(const Vector1<remove_vector_t<T>> *const aPalette[vector_active_size_v<T>], int aBitSize)
+        requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, short> ||
+                 std::same_as<remove_vector_t<T>, ushort>) &&
+                (vector_active_size_v<T> >= 2);
+
+    /// <summary>
+    /// Palette look-up-table color conversion with 16 bit to 8 bit conversion.<para/> aPalette must be an
+    /// array of at least 2^aBitSize elements.<para/> aBitSize must be in range [1..(8*sizeof(pixel base type)].
+    /// </summary>
+    ImageView<Pixel8uC1> &LUTPalette(ImageView<Pixel8uC1> &aDst, const Pixel8uC1 *aPalette, int aBitSize) const
+        requires(std::same_as<Pixel16uC1, T>);
+
+    /// <summary>
+    /// Palette look-up-table color conversion with 16 bit to 8 bit conversion.<para/> aPalette must be an
+    /// array of at least 2^aBitSize elements.<para/> aBitSize must be in range [1..(8*sizeof(pixel base type)].
+    /// </summary>
+    ImageView<Pixel8uC3> &LUTPalette(ImageView<Pixel8uC3> &aDst, const Pixel8uC3 *aPalette, int aBitSize) const
+        requires(std::same_as<Pixel16uC1, T>);
+
+    /// <summary>
+    /// Palette look-up-table color conversion with 16 bit to 8 bit conversion.<para/> aPalette must be an
+    /// array of at least 2^aBitSize elements.<para/> aBitSize must be in range [1..(8*sizeof(pixel base type)].
+    /// </summary>
+    ImageView<Pixel8uC4> &LUTPalette(ImageView<Pixel8uC4> &aDst, const Pixel8uC4 *aPalette, int aBitSize) const
+        requires(std::same_as<Pixel16uC1, T>);
+
+    /// <summary>
+    /// Palette look-up-table color conversion with 16 bit to 8 bit conversion.<para/> aPalette must be an
+    /// array of at least 2^aBitSize elements.<para/> aBitSize must be in range [1..(8*sizeof(pixel base type)].
+    /// </summary>
+    ImageView<Pixel8uC4A> &LUTPalette(ImageView<Pixel8uC4A> &aDst, const Pixel8uC4A *aPalette, int aBitSize) const
+        requires(std::same_as<Pixel16uC1, T>);
+
+#pragma endregion
+#pragma region LUT
+    /// <summary>
+    /// Precomputes LUT indices in aAccelerator for an equispaced value range with aAcceleratorSize values.<para/>
+    /// aAccelerator must be of at least aAcceleratorSize elements and can then be passed as an argument to LUT().
+    /// </summary>
+    static void LUTAccelerator(const Pixel32fC1 *aLevels, int *aAccelerator, int aLUTSize, int aAcceleratorSize)
+        requires(RealFloatingPoint<remove_vector_t<T>>);
+
+    /// <summary>
+    /// Look-up-table color conversion.<para/>
+    /// The look-up-table is derived from a set of user defined mapping points given in aLevels and aValues. The table
+    /// is interpolated using the mode provided in aInterpolationMode, where only NearestNeighbor, Linear and
+    /// CubicLagrange are supported.<para/> To speed up the table look-up, an accelerator array must be provided
+    /// containing the LUT indices on an equispaced sampling. The method LUTAccelerator can be used to fill the array
+    /// for given aLevels values. The accelerator array should be larger than aLevels.
+    /// </summary>
+    ImageView<T> &LUT(ImageView<T> &aDst, const Pixel32fC1 *aLevels, const Pixel32fC1 *aValues, const int *aAccelerator,
+                      int aLutSize, int aAcceleratorSize, InterpolationMode aInterpolationMode) const
+        requires(RealFloatingPoint<remove_vector_t<T>>) && (vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Look-up-table color conversion.<para/>
+    /// The look-up-table is derived from a set of user defined mapping points given in aLevels and aValues. The table
+    /// is interpolated using the mode provided in aInterpolationMode, where only NearestNeighbor, Linear and
+    /// CubicLagrange are supported.<para/> To speed up the table look-up, an accelerator array must be provided
+    /// containing the LUT indices on an equispaced sampling. The method LUTAccelerator can be used to fill the array
+    /// for given aLevels values. The accelerator array should be larger than aLevels.
+    /// </summary>
+    ImageView<T> &LUT(ImageView<T> &aDst, const Pixel32fC1 *const aLevels[vector_active_size_v<T>],
+                      const Pixel32fC1 *const aValues[vector_active_size_v<T>],
+                      const int *const aAccelerator[vector_active_size_v<T>],
+                      int const aLutSize[vector_active_size_v<T>], int const aAcceleratorSize[vector_active_size_v<T>],
+                      InterpolationMode aInterpolationMode) const
+        requires(RealFloatingPoint<remove_vector_t<T>>) && (vector_active_size_v<T> > 1);
+
+    /// <summary>
+    /// Look-up-table color conversion - inplace.<para/>
+    /// The look-up-table is derived from a set of user defined mapping points given in aLevels and aValues. The table
+    /// is interpolated using the mode provided in aInterpolationMode, where only NearestNeighbor, Linear and
+    /// CubicLagrange are supported.<para/> To speed up the table look-up, an accelerator array must be provided
+    /// containing the LUT indices on an equispaced sampling. The method LUTAccelerator can be used to fill the array
+    /// for given aLevels values. The accelerator array should be larger than aLevels.
+    /// </summary>
+    ImageView<T> &LUT(const Pixel32fC1 *aLevels, const Pixel32fC1 *aValues, const int *aAccelerator, int aLutSize,
+                      int aAcceleratorSize, InterpolationMode aInterpolationMode)
+        requires(RealFloatingPoint<remove_vector_t<T>>) && (vector_active_size_v<T> == 1);
+
+    /// <summary>
+    /// Look-up-table color conversion - inplace.<para/>
+    /// The look-up-table is derived from a set of user defined mapping points given in aLevels and aValues. The table
+    /// is interpolated using the mode provided in aInterpolationMode, where only NearestNeighbor, Linear and
+    /// CubicLagrange are supported.<para/> To speed up the table look-up, an accelerator array must be provided
+    /// containing the LUT indices on an equispaced sampling. The method LUTAccelerator can be used to fill the array
+    /// for given aLevels values. The accelerator array should be larger than aLevels.
+    /// </summary>
+    ImageView<T> &LUT(const Pixel32fC1 *const aLevels[vector_active_size_v<T>],
+                      const Pixel32fC1 *const aValues[vector_active_size_v<T>],
+                      const int *const aAccelerator[vector_active_size_v<T>],
+                      int const aLutSize[vector_active_size_v<T>], int const aAcceleratorSize[vector_active_size_v<T>],
+                      InterpolationMode aInterpolationMode)
+        requires(RealFloatingPoint<remove_vector_t<T>>) && (vector_active_size_v<T> > 1);
+
+#pragma endregion
+#pragma region Lut3D
+    /// <summary>
+    /// Look-up-table color conversion using a 3D LUT and tri-linear interpolation.<para/>
+    /// For C4 pixel types, the alpha channel is copied from source to destination image, for C4A the alpha channel in
+    /// destination image remains untouched.<para/>
+    /// aLut3D is an array of size aLutSize.x * aLutSize.y * aLutSize.z, where the blue channel axis is the fastest
+    /// moving one. The LUT is provided with 3 elements per pixel (red, green, blue).
+    /// </summary>
+    ImageView<T> &LUTTrilinear(ImageView<T> &aDst, const Vector3<remove_vector_t<T>> *aLut3D,
+                               const Vector3<remove_vector_t<T>> &aMinLevel,
+                               const Vector3<remove_vector_t<T>> &aMaxLevel, const Pixel32sC3 &aLutSize) const
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> >= 3);
+
+    /// <summary>
+    /// Look-up-table color conversion using a 3D LUT and tri-linear interpolation.<para/>
+    /// For C4 pixel types, the alpha channel is copied from source to destination image, for C4A the alpha channel in
+    /// destination image remains untouched.<para/>
+    /// aLut3D is an array of size aLutSize.x * aLutSize.y * aLutSize.z, where the blue channel axis is the fastest
+    /// moving one. The LUT is provided with 4 elements per pixel (red, green, blue), 4th channel is unused and is only
+    /// for padding.
+    /// </summary>
+    ImageView<T> &LUTTrilinear(ImageView<T> &aDst, const Vector4A<remove_vector_t<T>> *aLut3D,
+                               const Vector3<remove_vector_t<T>> &aMinLevel,
+                               const Vector3<remove_vector_t<T>> &aMaxLevel, const Pixel32sC3 &aLutSize) const
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> >= 3);
+
+    /// <summary>
+    /// Look-up-table color conversion using a 3D LUT and tri-linear interpolation - inline.<para/>
+    /// For C4 pixel types, the alpha channel is copied from source to destination image, for C4A the alpha channel in
+    /// destination image remains untouched.<para/>
+    /// aLut3D is an array of size aLutSize.x * aLutSize.y * aLutSize.z, where the blue channel axis is the fastest
+    /// moving one. The LUT is provided with 3 elements per pixel (red, green, blue).
+    /// </summary>
+    ImageView<T> &LUTTrilinear(const Vector3<remove_vector_t<T>> *aLut3D, const Vector3<remove_vector_t<T>> &aMinLevel,
+                               const Vector3<remove_vector_t<T>> &aMaxLevel, const Pixel32sC3 &aLutSize)
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> >= 3);
+
+    /// <summary>
+    /// Look-up-table color conversion using a 3D LUT and tri-linear interpolation - inline.<para/>
+    /// For C4 pixel types, the alpha channel is copied from source to destination image, for C4A the alpha channel in
+    /// destination image remains untouched.<para/>
+    /// aLut3D is an array of size aLutSize.x * aLutSize.y * aLutSize.z, where the blue channel axis is the fastest
+    /// moving one. The LUT is provided with 4 elements per pixel (red, green, blue), 4th channel is unused and is only
+    /// for padding.
+    /// </summary>
+    ImageView<T> &LUTTrilinear(const Vector4A<remove_vector_t<T>> *aLut3D, const Vector3<remove_vector_t<T>> &aMinLevel,
+                               const Vector3<remove_vector_t<T>> &aMaxLevel, const Pixel32sC3 &aLutSize)
+        requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+                 std::same_as<short, remove_vector_t<T>> || std::same_as<float, remove_vector_t<T>>) &&
+                (vector_active_size_v<T> >= 3);
+
+#pragma endregion
+#pragma endregion
 };
+
 } // namespace mpp::image::cpuSimple

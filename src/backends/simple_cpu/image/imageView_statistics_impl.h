@@ -4246,7 +4246,7 @@ template <PixelType T>
 ImageView<same_vector_size_different_type_t<T, float>> &ImageView<T>::Integral(
     ImageView<same_vector_size_different_type_t<T, float>> &aDst,
     const same_vector_size_different_type_t<T, float> &aVal) const
-    requires RealVector<T> && (!std::same_as<double, remove_vector<T>>)
+    requires RealVector<T> && (!std::same_as<double, remove_vector_t<T>>)
 {
     if (SizeRoi() != aDst.SizeRoi() - 1)
     {
@@ -4446,7 +4446,7 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, fl
                                ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
                                const same_vector_size_different_type_t<T, float> &aVal,
                                const same_vector_size_different_type_t<T, double> &aValSqr) const
-    requires RealVector<T> && (!std::same_as<double, remove_vector<T>>)
+    requires RealVector<T> && (!std::same_as<double, remove_vector_t<T>>)
 {
     if (SizeRoi() != aDst.SizeRoi() - 1)
     {
@@ -4890,6 +4890,65 @@ ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationCoefficient(const ImageView
     requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
 {
     return this->CrossCorrelationCoefficient(aTemplate, aDst, aConstant, aBorder, ROI());
+}
+#pragma endregion
+
+#pragma region RadialProfile
+
+template <PixelType T>
+void ImageView<T>::RadialProfile(int *aProfileCount, same_vector_size_different_type_t<T, float> *aProfileSum,
+                                 same_vector_size_different_type_t<T, float> *aProfileSumSqr, int aProfileSize,
+                                 const Vec2f &aCenter) const
+    requires RealVector<T> && (!std::same_as<remove_vector_t<T>, double>)
+{
+    this->RadialProfile(aProfileCount, aProfileSum, aProfileSumSqr, aProfileSize, aCenter, 1.0f, 0.0f);
+}
+
+template <PixelType T>
+void ImageView<T>::RadialProfile(int *aProfileCount, same_vector_size_different_type_t<T, float> *aProfileSum,
+                                 same_vector_size_different_type_t<T, float> *aProfileSumSqr,
+                                 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+                                 int aProfileSize, const Vec2f &aCenter, float aRadiusRatio, float aAngleInRad) const
+    requires RealVector<T> && (!std::same_as<remove_vector_t<T>, double>)
+{
+    const AffineTransformation<float> shiftCenter = AffineTransformation<float>::GetTranslation(-aCenter);
+    const AffineTransformation<float> rot         = AffineTransformation<float>::GetTranslation(-aAngleInRad);
+    const AffineTransformation<float> scale  = AffineTransformation<float>::GetScale(Vec2f(1.0f, 1.0f / aRadiusRatio));
+    const AffineTransformation<float> affine = scale * rot * shiftCenter;
+
+    for (size_t i = 0; i < to_size_t(aProfileSize); i++)
+    {
+        aProfileCount[i] = 0;
+        aProfileSum[i]   = 0;
+        if (aProfileSumSqr != nullptr)
+        {
+            aProfileSumSqr[i] = 0;
+        }
+    }
+
+    for (auto &pixel : *this)
+    {
+        Pixel32fC2 coord = pixel.Pixel();
+        coord            = affine * coord;
+        coord.Sqr();
+        Pixel32fC1 r = coord.x + coord.y;
+
+        r.Sqrt();
+        r.Round();
+
+        if (r < aProfileSize)
+        {
+            const size_t idx = to_size_t(r.x);
+            aProfileCount[idx]++;
+            const same_vector_size_different_type_t<T, float> p =
+                same_vector_size_different_type_t<T, float>(pixel.Value());
+            aProfileSum[idx] += p;
+            if (aProfileSumSqr != nullptr)
+            {
+                aProfileSumSqr[idx] += p * p;
+            }
+        }
+    }
 }
 #pragma endregion
 } // namespace mpp::image::cpuSimple

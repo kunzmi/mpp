@@ -14,6 +14,8 @@
 #include <common/utilities.h>
 #include <common/vector2.h>
 #include <common/vector3.h>
+#include <common/vector4.h>
+#include <common/vector4A.h>
 #include <common/vectorTypes.h>
 #include <concepts>
 #include <cstddef>
@@ -45,12 +47,34 @@ template <RealFloatingPoint T> class MPPEXPORT_COMMON Matrix
     /// <summary>
     /// Unit matrix (diagonal is 1)
     /// </summary>
-    Matrix() noexcept;
+    DEVICE_CODE constexpr Matrix() noexcept
+    {
+        mData[0] = T(1);
+        mData[4] = T(1);
+        mData[8] = T(1);
+        mData[1] = T(0);
+        mData[2] = T(0);
+        mData[3] = T(0);
+        mData[5] = T(0);
+        mData[6] = T(0);
+        mData[7] = T(0);
+    }
 
     /// <summary>
     /// All values filled with value aX
     /// </summary>
-    explicit Matrix(T aX) noexcept;
+    DEVICE_CODE constexpr explicit Matrix(T aX) noexcept
+    {
+        mData[0] = aX;
+        mData[1] = aX;
+        mData[2] = aX;
+        mData[3] = aX;
+        mData[4] = aX;
+        mData[5] = aX;
+        mData[6] = aX;
+        mData[7] = aX;
+        mData[8] = aX;
+    }
 
     /// <summary>
     /// All values filled with aValues
@@ -68,7 +92,18 @@ template <RealFloatingPoint T> class MPPEXPORT_COMMON Matrix
     /// a10, a11, a12 <para/>
     /// a20, a21, a22
     /// </summary>
-    Matrix(T a00, T a01, T a02, T a10, T a11, T a12, T a20, T a21, T a22) noexcept; // NOLINT
+    DEVICE_CODE constexpr Matrix(T a00, T a01, T a02, T a10, T a11, T a12, T a20, T a21, T a22) noexcept // NOLINT
+    {
+        mData[0] = a00;
+        mData[1] = a01;
+        mData[2] = a02;
+        mData[3] = a10;
+        mData[4] = a11;
+        mData[5] = a12;
+        mData[6] = a20;
+        mData[7] = a21;
+        mData[8] = a22;
+    }
 
     /// <summary>
     /// Estimates a perspective transformation for four given points
@@ -113,7 +148,7 @@ template <RealFloatingPoint T> class MPPEXPORT_COMMON Matrix
     /// <summary>
     /// Row-major order
     /// </summary>
-    DEVICE_CODE const T &operator[](int aFlatIndex) const
+    DEVICE_CODE constexpr const T &operator[](int aFlatIndex) const
     {
 #ifdef IS_HOST_COMPILER
         assert(aFlatIndex >= 0);
@@ -132,7 +167,7 @@ template <RealFloatingPoint T> class MPPEXPORT_COMMON Matrix
     /// <summary>
     /// Row-major order
     /// </summary>
-    DEVICE_CODE const T &operator[](size_t aFlatIndex) const
+    DEVICE_CODE constexpr const T &operator[](size_t aFlatIndex) const
     {
 #ifdef IS_HOST_COMPILER
         assert(to_int(aFlatIndex) < mSize);
@@ -193,7 +228,22 @@ template <RealFloatingPoint T> class MPPEXPORT_COMMON Matrix
     /// <summary>
     /// Matrix-matrix multiplication
     /// </summary>
-    Matrix operator*(const Matrix &aOther) const;
+    constexpr DEVICE_CODE Matrix operator*(const Matrix &aOther) const
+    {
+        Matrix ret;
+
+        ret.mData[0] = mData[0] * aOther[0] + mData[1] * aOther[3] + mData[2] * aOther[6];
+        ret.mData[1] = mData[0] * aOther[1] + mData[1] * aOther[4] + mData[2] * aOther[7];
+        ret.mData[2] = mData[0] * aOther[2] + mData[1] * aOther[5] + mData[2] * aOther[8];
+        ret.mData[3] = mData[3] * aOther[0] + mData[4] * aOther[3] + mData[5] * aOther[6];
+        ret.mData[4] = mData[3] * aOther[1] + mData[4] * aOther[4] + mData[5] * aOther[7];
+        ret.mData[5] = mData[3] * aOther[2] + mData[4] * aOther[5] + mData[5] * aOther[8];
+        ret.mData[6] = mData[6] * aOther[0] + mData[7] * aOther[3] + mData[8] * aOther[6];
+        ret.mData[7] = mData[6] * aOther[1] + mData[7] * aOther[4] + mData[8] * aOther[7];
+        ret.mData[8] = mData[6] * aOther[2] + mData[7] * aOther[5] + mData[8] * aOther[8];
+
+        return ret;
+    }
 
     /// <summary>
     /// Element wise division
@@ -294,7 +344,8 @@ template <RealFloatingPoint T> Matrix<T> MPPEXPORT_COMMON operator/(const Matrix
 /// Matrix - vector multiplication <para/>
 /// assuming vector is column vector
 /// </summary>
-template <RealFloatingPoint T> DEVICE_CODE Vector3<T> operator*(const Matrix<T> &aLeft, const Vector3<T> &aRight)
+template <RealFloatingPoint T>
+DEVICE_CODE constexpr Vector3<T> operator*(const Matrix<T> &aLeft, const Vector3<T> &aRight)
 {
     return Vector3<T>{aLeft[0] * aRight.x + aLeft[1] * aRight.y + aLeft[2] * aRight.z,
                       aLeft[3] * aRight.x + aLeft[4] * aRight.y + aLeft[5] * aRight.z,
@@ -305,11 +356,48 @@ template <RealFloatingPoint T> DEVICE_CODE Vector3<T> operator*(const Matrix<T> 
 /// Vector-matrix multiplication <para/>
 /// assuming vector is row vector
 /// </summary>
-template <RealFloatingPoint T> DEVICE_CODE Vector3<T> operator*(const Vector3<T> &aLeft, const Matrix<T> &aRight)
+template <RealFloatingPoint T>
+DEVICE_CODE constexpr Vector3<T> operator*(const Vector3<T> &aLeft, const Matrix<T> &aRight)
 {
     return Vector3<T>{aLeft.x * aRight[0] + aLeft.y * aRight[3] + aLeft.z * aRight[6],
                       aLeft.x * aRight[1] + aLeft.y * aRight[4] + aLeft.z * aRight[7],
                       aLeft.x * aRight[2] + aLeft.y * aRight[5] + aLeft.z * aRight[8]};
+}
+
+/// <summary>
+/// Matrix - vector multiplication <para/>
+/// assuming vector is column vector
+/// </summary>
+template <RealFloatingPoint T>
+DEVICE_CODE constexpr Vector4A<T> operator*(const Matrix<T> &aLeft, const Vector4A<T> &aRight)
+{
+    return Vector4A<T>{aLeft[0] * aRight.x + aLeft[1] * aRight.y + aLeft[2] * aRight.z,
+                       aLeft[3] * aRight.x + aLeft[4] * aRight.y + aLeft[5] * aRight.z,
+                       aLeft[6] * aRight.x + aLeft[7] * aRight.y + aLeft[8] * aRight.z};
+}
+
+/// <summary>
+/// Vector-matrix multiplication <para/>
+/// assuming vector is row vector
+/// </summary>
+template <RealFloatingPoint T>
+DEVICE_CODE constexpr Vector4A<T> operator*(const Vector4A<T> &aLeft, const Matrix<T> &aRight)
+{
+    return Vector4A<T>{aLeft.x * aRight[0] + aLeft.y * aRight[3] + aLeft.z * aRight[6],
+                       aLeft.x * aRight[1] + aLeft.y * aRight[4] + aLeft.z * aRight[7],
+                       aLeft.x * aRight[2] + aLeft.y * aRight[5] + aLeft.z * aRight[8]};
+}
+
+/// <summary>
+/// Matrix - vector multiplication <para/>
+/// assuming vector is column vector - last element is set to 1
+/// </summary>
+template <RealFloatingPoint T>
+DEVICE_CODE constexpr Vector4<T> operator*(const Matrix<T> &aLeft, const Vector4<T> &aRight)
+{
+    return Vector4<T>{aLeft[0] * aRight.x + aLeft[1] * aRight.y + aLeft[2] * aRight.z,
+                      aLeft[3] * aRight.x + aLeft[4] * aRight.y + aLeft[5] * aRight.z,
+                      aLeft[6] * aRight.x + aLeft[7] * aRight.y + aLeft[8] * aRight.z, static_cast<T>(1)};
 }
 
 /// <summary>
@@ -334,15 +422,25 @@ template <RealFloatingPoint T> DEVICE_CODE Vector2<T> operator*(const Matrix<T> 
                       (aLeft[3] * aRight.x + aLeft[4] * aRight.y + aLeft[5]) / scaling};
 }
 
-// some common color space conversion matrices (values as used in NPP)
-extern const Matrix<float> RGBtoYUV;
-extern const Matrix<float> YUVtoRGB;
-
-extern const Matrix<float> RGBtoYCbCr;
-extern const Matrix<float> CbCrtoRGB;
-
-extern const Matrix<float> RGBtoXYZ;
-extern const Matrix<float> XYZtoRGB;
+//// some common color space conversion matrices (values as used in NPP/IPP)
+// extern const Matrix<float> RGBLimitedRangetoYUVBT709LimitedRange;
+// extern const Matrix<float> YUVBT709LimitedRangetoRGBLimitedRange;
+// extern const Matrix<float> RGBtoYUVBT709FullRange;
+// extern const Matrix<float> YUVBT709FullRangetoRGB;
+//
+// extern const Matrix<float> RGBtoYUVBT601LimitedRange;
+// extern const Matrix<float> YUVBT601LimitedRangetoRGB;
+// extern const Matrix<float> RGBtoYUVBT601FullRange;
+// extern const Matrix<float> YUVBT601FullRangetoRGB;
+//
+// extern const Matrix<float> RGBtoYCbCr;
+// extern const Matrix<float> CbCrtoRGB;
+//
+// extern const Matrix<float> RGBtoXYZ;
+// extern const Matrix<float> XYZtoRGB;
+//
+// extern const Matrix<float> RGBtoYCC;
+// extern const Matrix<float> YCCtoRGB;
 
 template <RealFloatingPoint T> using PerspectiveTransformation = Matrix<T>;
 } // namespace mpp::image

@@ -5,7 +5,7 @@ add_library(backends.npp SHARED
 	nppException.cpp
 	)
 
-target_compile_definitions(backends.npp PUBLIC -DMPP_NPP)  
+target_compile_definitions(backends.npp PRIVATE -DMPP_NPP)  
 	
 target_include_directories(backends.npp  PUBLIC 
 						   ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}

@@ -5,8 +5,8 @@
 #include <common/defines.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
-#include <common/numberTypes.h>
 #include <common/mpp_defs.h>
+#include <common/numberTypes.h>
 #include <common/roundFunctor.h>
 #include <common/tupel.h>
 #include <common/vector_typetraits.h>
@@ -79,18 +79,62 @@ struct SrcPlanar4Functor : public ImageFunctor<false>
     /// Returns true if the value has been successfully set
     /// </summary>
     DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
-        requires(!std::same_as<ComputeT, DstT>)
+        requires(!std::same_as<ComputeT, DstT>) && (vector_size_v<DstT> == vector_size_v<ComputeT>)
+    {
+        const SrcPlane *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+        const SrcPlane *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
+        const SrcPlane *pixelSrc3 = gotoPtr(Src3, SrcPitch3, aPixelX, aPixelY);
+        const SrcPlane *pixelSrc4 = gotoPtr(Src4, SrcPitch4, aPixelX, aPixelY);
+        const ComputeT pixelSrc(
+            static_cast<remove_vector_t<ComputeT>>(pixelSrc1->x), static_cast<remove_vector_t<ComputeT>>(pixelSrc2->x),
+            static_cast<remove_vector_t<ComputeT>>(pixelSrc3->x), static_cast<remove_vector_t<ComputeT>>(pixelSrc4->x));
+        ComputeT temp;
+        Op(pixelSrc, temp);
+        round(temp); // NOP for integer ComputeT
+        // DstT constructor will clamp temp to value range of DstT
+        aDst = static_cast<DstT>(temp);
+        return true;
+    }
+
+    /// <summary>
+    /// Returns true if the value has been successfully set
+    /// </summary>
+    DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
+        requires(!std::same_as<ComputeT, DstT>) && (vector_size_v<DstT> == 1 && vector_size_v<ComputeT> > 1 &&
+                                                    !std::same_as<remove_vector_t<ComputeT>, remove_vector_t<DstT>> &&
+                                                    std::same_as<remove_vector_t<SrcT>, remove_vector_t<DstT>>)
+    {
+        const SrcPlane *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+        const SrcPlane *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
+        const SrcPlane *pixelSrc3 = gotoPtr(Src3, SrcPitch3, aPixelX, aPixelY);
+        const SrcPlane *pixelSrc4 = gotoPtr(Src4, SrcPitch4, aPixelX, aPixelY);
+        const ComputeT pixelSrc(
+            static_cast<remove_vector_t<ComputeT>>(pixelSrc1->x), static_cast<remove_vector_t<ComputeT>>(pixelSrc2->x),
+            static_cast<remove_vector_t<ComputeT>>(pixelSrc3->x), static_cast<remove_vector_t<ComputeT>>(pixelSrc4->x));
+        Vector1<remove_vector_t<ComputeT>> temp;
+        Op(pixelSrc, temp);
+        RoundFunctor<roundingMode, Vector1<remove_vector_t<ComputeT>>> round1;
+        round1(temp); // NOP for integer ComputeT
+        // DstT constructor will clamp temp to value range of DstT
+        aDst = static_cast<DstT>(temp);
+        return true;
+    }
+
+    /// <summary>
+    /// Returns true if the value has been successfully set
+    /// </summary>
+    DEVICE_CODE bool operator()(int aPixelX, int aPixelY, DstT &aDst) const
+        requires(!std::same_as<ComputeT, DstT>) && (vector_size_v<DstT> == 1 && vector_size_v<ComputeT> > 1 &&
+                                                    std::same_as<remove_vector_t<ComputeT>, remove_vector_t<DstT>> &&
+                                                    std::same_as<remove_vector_t<SrcT>, remove_vector_t<DstT>>)
     {
         const SrcPlane *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         const SrcPlane *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
         const SrcPlane *pixelSrc3 = gotoPtr(Src3, SrcPitch3, aPixelX, aPixelY);
         const SrcPlane *pixelSrc4 = gotoPtr(Src4, SrcPitch4, aPixelX, aPixelY);
         const ComputeT pixelSrc(pixelSrc1->x, pixelSrc2->x, pixelSrc3->x, pixelSrc4->x);
-        ComputeT temp;
-        Op(pixelSrc, temp);
-        round(temp); // NOP for integer ComputeT
-        // DstT constructor will clamp temp to value range of DstT
-        aDst = static_cast<DstT>(temp);
+
+        Op(pixelSrc, aDst);
         return true;
     }
 #pragma endregion
@@ -128,7 +172,82 @@ struct SrcPlanar4Functor : public ImageFunctor<false>
     }
 
     DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
-        requires(!std::same_as<ComputeT, DstT>)
+        requires(!std::same_as<ComputeT, DstT>) && (vector_size_v<DstT> == vector_size_v<ComputeT>)
+    {
+        const SrcPlane *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+        const SrcPlane *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
+        const SrcPlane *pixelSrc3 = gotoPtr(Src3, SrcPitch3, aPixelX, aPixelY);
+        const SrcPlane *pixelSrc4 = gotoPtr(Src4, SrcPitch4, aPixelX, aPixelY);
+
+        Tupel<SrcPlane, tupelSize> tupelSrc1 = Tupel<SrcPlane, tupelSize>::Load(pixelSrc1);
+        Tupel<SrcPlane, tupelSize> tupelSrc2 = Tupel<SrcPlane, tupelSize>::Load(pixelSrc2);
+        Tupel<SrcPlane, tupelSize> tupelSrc3 = Tupel<SrcPlane, tupelSize>::Load(pixelSrc3);
+        Tupel<SrcPlane, tupelSize> tupelSrc4 = Tupel<SrcPlane, tupelSize>::Load(pixelSrc4);
+
+        Tupel<ComputeT, tupelSize> tupelSrc;
+
+#pragma unroll
+        for (size_t i = 0; i < tupelSize; i++)
+        {
+            tupelSrc.value[i].x = static_cast<remove_vector_t<ComputeT>>(tupelSrc1.value[i].x);
+            tupelSrc.value[i].y = static_cast<remove_vector_t<ComputeT>>(tupelSrc2.value[i].x);
+            tupelSrc.value[i].z = static_cast<remove_vector_t<ComputeT>>(tupelSrc3.value[i].x);
+            tupelSrc.value[i].w = static_cast<remove_vector_t<ComputeT>>(tupelSrc4.value[i].x);
+        }
+
+#pragma unroll
+        for (size_t i = 0; i < tupelSize; i++)
+        {
+            ComputeT temp;
+            Op(tupelSrc.value[i], temp);
+            round(temp); // NOP for integer ComputeT
+            // DstT constructor will clamp temp to value range of DstT
+            aDst.value[i] = static_cast<DstT>(temp);
+        }
+    }
+
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
+        requires(!std::same_as<ComputeT, DstT>) && (vector_size_v<DstT> == 1 && vector_size_v<ComputeT> > 1 &&
+                                                    !std::same_as<remove_vector_t<ComputeT>, remove_vector_t<DstT>> &&
+                                                    std::same_as<remove_vector_t<SrcT>, remove_vector_t<DstT>>)
+    {
+        const SrcPlane *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
+        const SrcPlane *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
+        const SrcPlane *pixelSrc3 = gotoPtr(Src3, SrcPitch3, aPixelX, aPixelY);
+        const SrcPlane *pixelSrc4 = gotoPtr(Src4, SrcPitch4, aPixelX, aPixelY);
+
+        Tupel<SrcPlane, tupelSize> tupelSrc1 = Tupel<SrcPlane, tupelSize>::Load(pixelSrc1);
+        Tupel<SrcPlane, tupelSize> tupelSrc2 = Tupel<SrcPlane, tupelSize>::Load(pixelSrc2);
+        Tupel<SrcPlane, tupelSize> tupelSrc3 = Tupel<SrcPlane, tupelSize>::Load(pixelSrc3);
+        Tupel<SrcPlane, tupelSize> tupelSrc4 = Tupel<SrcPlane, tupelSize>::Load(pixelSrc4);
+
+        Tupel<ComputeT, tupelSize> tupelSrc;
+
+#pragma unroll
+        for (size_t i = 0; i < tupelSize; i++)
+        {
+            tupelSrc.value[i].x = static_cast<remove_vector_t<ComputeT>>(tupelSrc1.value[i].x);
+            tupelSrc.value[i].y = static_cast<remove_vector_t<ComputeT>>(tupelSrc2.value[i].x);
+            tupelSrc.value[i].z = static_cast<remove_vector_t<ComputeT>>(tupelSrc3.value[i].x);
+            tupelSrc.value[i].w = static_cast<remove_vector_t<ComputeT>>(tupelSrc4.value[i].x);
+        }
+
+        RoundFunctor<roundingMode, Vector1<remove_vector_t<ComputeT>>> round1;
+#pragma unroll
+        for (size_t i = 0; i < tupelSize; i++)
+        {
+            Vector1<remove_vector_t<ComputeT>> temp;
+            Op(tupelSrc.value[i], temp);
+            round1(temp); // NOP for integer ComputeT
+            // DstT constructor will clamp temp to value range of DstT
+            aDst.value[i] = static_cast<DstT>(temp);
+        }
+    }
+
+    DEVICE_CODE void operator()(int aPixelX, int aPixelY, Tupel<DstT, tupelSize> &aDst) const
+        requires(!std::same_as<ComputeT, DstT>) && (vector_size_v<DstT> == 1 && vector_size_v<ComputeT> > 1 &&
+                                                    std::same_as<remove_vector_t<ComputeT>, remove_vector_t<DstT>> &&
+                                                    std::same_as<remove_vector_t<SrcT>, remove_vector_t<DstT>>)
     {
         const SrcPlane *pixelSrc1 = gotoPtr(Src1, SrcPitch1, aPixelX, aPixelY);
         const SrcPlane *pixelSrc2 = gotoPtr(Src2, SrcPitch2, aPixelX, aPixelY);
@@ -154,11 +273,7 @@ struct SrcPlanar4Functor : public ImageFunctor<false>
 #pragma unroll
         for (size_t i = 0; i < tupelSize; i++)
         {
-            ComputeT temp;
-            Op(tupelSrc.value[i], temp);
-            round(temp); // NOP for integer ComputeT
-            // DstT constructor will clamp temp to value range of DstT
-            aDst.value[i] = static_cast<DstT>(temp);
+            Op(tupelSrc.value[i], aDst.value[i]);
         }
     }
 #pragma endregion

@@ -9,4 +9,4 @@ target_link_libraries(nppFunctionLister PRIVATE
 target_link_libraries(nppFunctionLister PUBLIC  
 						nppParser)
 						
-target_compile_definitions(nppFunctionLister PUBLIC -DDEFAULT_OUT_DIR="${CMAKE_CURRENT_BINARY_DIR}")  
+target_compile_definitions(nppFunctionLister PRIVATE -DDEFAULT_OUT_DIR="${CMAKE_CURRENT_BINARY_DIR}")  

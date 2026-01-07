@@ -61,7 +61,7 @@ add_library(backends.npp.image OBJECT
 	image64fC4View.cpp
 	)
 
-target_compile_definitions(backends.npp.image PUBLIC -DMPP_NPP)  
+target_compile_definitions(backends.npp.image PRIVATE -DMPP_NPP)  
 	
 target_include_directories(backends.npp.image PUBLIC 
 						   ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}

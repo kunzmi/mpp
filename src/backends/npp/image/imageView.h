@@ -448,7 +448,7 @@ template <PixelType T> class MPPEXPORT_NPP ImageView : public ImageViewBase<T>
         NppStreamContext nppCtx = GetStreamContext();
         nppCtx.hStream          = aStream.Original();
 
-        nppSafeCall(cudaStreamGetFlags(nppCtx.hStream, &nppCtx.nStreamFlags));
+        cudaSafeCall(cudaStreamGetFlags(nppCtx.hStream, &nppCtx.nStreamFlags));
         return nppCtx;
     }
 

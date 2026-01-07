@@ -11,6 +11,7 @@ add_library(backends.cuda.image.filtering8s OBJECT
 	8s/fixedSizeBoxFilter.cu
 	8s/fixedSizeFilter.cu
 	8s/fixedSizeMaxFilter.cu
+	8s/fixedSizeMedianFilter.cu
 	8s/fixedSizeMinFilter.cu
 	8s/fixedSizeSeparableFilter.cu
 	8s/fixedSizeUnsharpFilter.cu
@@ -52,6 +53,7 @@ add_library(backends.cuda.image.filtering8u OBJECT
 	8u/fixedSizeBoxFilter.cu
 	8u/fixedSizeFilter.cu
 	8u/fixedSizeMaxFilter.cu
+	8u/fixedSizeMedianFilter.cu
 	8u/fixedSizeMinFilter.cu
 	8u/fixedSizeSeparableFilter.cu
 	8u/fixedSizeUnsharpFilter.cu
@@ -95,6 +97,7 @@ add_library(backends.cuda.image.filtering16s OBJECT
 	16s/fixedSizeBoxFilter.cu
 	16s/fixedSizeFilter.cu
 	16s/fixedSizeMaxFilter.cu
+	16s/fixedSizeMedianFilter.cu
 	16s/fixedSizeMinFilter.cu
 	16s/fixedSizeSeparableFilter.cu
 	16s/fixedSizeUnsharpFilter.cu
@@ -136,6 +139,7 @@ add_library(backends.cuda.image.filtering16u OBJECT
 	16u/fixedSizeBoxFilter.cu
 	16u/fixedSizeFilter.cu
 	16u/fixedSizeMaxFilter.cu
+	16u/fixedSizeMedianFilter.cu
 	16u/fixedSizeMinFilter.cu
 	16u/fixedSizeSeparableFilter.cu
 	16u/fixedSizeUnsharpFilter.cu
@@ -177,6 +181,7 @@ add_library(backends.cuda.image.filtering32s OBJECT
 	32s/fixedSizeBoxFilter.cu
 	32s/fixedSizeFilter.cu
 	32s/fixedSizeMaxFilter.cu
+	32s/fixedSizeMedianFilter.cu
 	32s/fixedSizeMinFilter.cu
 	32s/fixedSizeSeparableFilter.cu
 	32s/fixedSizeUnsharpFilter.cu
@@ -215,6 +220,7 @@ add_library(backends.cuda.image.filtering32u OBJECT
 	32u/fixedSizeBoxFilter.cu
 	32u/fixedSizeFilter.cu
 	32u/fixedSizeMaxFilter.cu
+	32u/fixedSizeMedianFilter.cu
 	32u/fixedSizeMinFilter.cu
 	32u/fixedSizeSeparableFilter.cu
 	32u/fixedSizeUnsharpFilter.cu
@@ -253,6 +259,7 @@ add_library(backends.cuda.image.filtering16f OBJECT
 	16f/fixedSizeBoxFilter.cu
 	16f/fixedSizeFilter.cu
 	16f/fixedSizeMaxFilter.cu
+	16f/fixedSizeMedianFilter.cu
 	16f/fixedSizeMinFilter.cu
 	16f/fixedSizeSeparableFilter.cu
 	16f/fixedSizeUnsharpFilter.cu
@@ -294,6 +301,7 @@ add_library(backends.cuda.image.filtering16bf OBJECT
 	16bf/fixedSizeBoxFilter.cu
 	16bf/fixedSizeFilter.cu
 	16bf/fixedSizeMaxFilter.cu
+	16bf/fixedSizeMedianFilter.cu
 	16bf/fixedSizeMinFilter.cu
 	16bf/fixedSizeSeparableFilter.cu
 	16bf/fixedSizeUnsharpFilter.cu
@@ -337,6 +345,7 @@ add_library(backends.cuda.image.filtering32f OBJECT
 	32f/fixedSizeBoxFilter.cu
 	32f/fixedSizeFilter.cu
 	32f/fixedSizeMaxFilter.cu
+	32f/fixedSizeMedianFilter.cu
 	32f/fixedSizeMinFilter.cu
 	32f/fixedSizeSeparableFilter.cu
 	32f/fixedSizeUnsharpFilter.cu
@@ -379,6 +388,7 @@ add_library(backends.cuda.image.filtering64f OBJECT
 	64f/fixedSizeBoxFilter.cu
 	64f/fixedSizeFilter.cu
 	64f/fixedSizeMaxFilter.cu
+	64f/fixedSizeMedianFilter.cu
 	64f/fixedSizeMinFilter.cu
 	64f/fixedSizeSeparableFilter.cu
 	64f/fixedSizeUnsharpFilter.cu

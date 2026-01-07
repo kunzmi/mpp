@@ -6,7 +6,6 @@
 #include <common/half_fp16.h>
 #include <common/safeCast.h>
 #include <common/Vector2.h>
-#include <common/Vector2_impl.h>
 #include <complex>
 #include <cstddef>
 #include <cstdint>

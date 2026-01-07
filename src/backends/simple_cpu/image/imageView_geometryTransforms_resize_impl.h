@@ -379,7 +379,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, functor);
             }
             break;
             case mpp::InterpolationMode::Linear:
@@ -391,7 +391,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, functor);
             }
             break;
             case mpp::InterpolationMode::CubicHermiteSpline:
@@ -403,7 +403,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, functor);
             }
             break;
             case mpp::InterpolationMode::CubicLagrange:
@@ -415,7 +415,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, functor);
             }
             break;
             case mpp::InterpolationMode::Cubic2ParamBSpline:
@@ -427,7 +427,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, functor);
             }
             break;
             case mpp::InterpolationMode::Cubic2ParamCatmullRom:
@@ -439,7 +439,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, functor);
             }
             break;
             case mpp::InterpolationMode::Cubic2ParamB05C03:
@@ -451,7 +451,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, functor);
             }
             break;
             case mpp::InterpolationMode::Lanczos2Lobed:
@@ -463,7 +463,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, functor);
             }
             break;
             case mpp::InterpolationMode::Lanczos3Lobed:
@@ -475,7 +475,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, functor);
             }
             break;
             case mpp::InterpolationMode::Super:
@@ -488,7 +488,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, functor);
             }
             break;
             default:
@@ -628,7 +628,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, aDst3, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, aDst3, functor);
             }
             break;
             case mpp::InterpolationMode::Linear:
@@ -640,7 +640,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, aDst3, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, aDst3, functor);
             }
             break;
             case mpp::InterpolationMode::CubicHermiteSpline:
@@ -652,7 +652,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, aDst3, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, aDst3, functor);
             }
             break;
             case mpp::InterpolationMode::CubicLagrange:
@@ -664,7 +664,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, aDst3, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, aDst3, functor);
             }
             break;
             case mpp::InterpolationMode::Cubic2ParamBSpline:
@@ -676,7 +676,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, aDst3, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, aDst3, functor);
             }
             break;
             case mpp::InterpolationMode::Cubic2ParamCatmullRom:
@@ -688,7 +688,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, aDst3, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, aDst3, functor);
             }
             break;
             case mpp::InterpolationMode::Cubic2ParamB05C03:
@@ -700,7 +700,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, aDst3, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, aDst3, functor);
             }
             break;
             case mpp::InterpolationMode::Lanczos2Lobed:
@@ -712,7 +712,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, aDst3, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, aDst3, functor);
             }
             break;
             case mpp::InterpolationMode::Lanczos3Lobed:
@@ -724,7 +724,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, aDst3, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, aDst3, functor);
             }
             break;
             case mpp::InterpolationMode::Super:
@@ -737,7 +737,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, aDst3, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, aDst3, functor);
             }
             break;
             default:
@@ -888,7 +888,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, aDst3, aDst4, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, aDst3, aDst4, functor);
             }
             break;
             case mpp::InterpolationMode::Linear:
@@ -900,7 +900,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, aDst3, aDst4, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, aDst3, aDst4, functor);
             }
             break;
             case mpp::InterpolationMode::CubicHermiteSpline:
@@ -912,7 +912,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, aDst3, aDst4, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, aDst3, aDst4, functor);
             }
             break;
             case mpp::InterpolationMode::CubicLagrange:
@@ -924,7 +924,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, aDst3, aDst4, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, aDst3, aDst4, functor);
             }
             break;
             case mpp::InterpolationMode::Cubic2ParamBSpline:
@@ -936,7 +936,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, aDst3, aDst4, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, aDst3, aDst4, functor);
             }
             break;
             case mpp::InterpolationMode::Cubic2ParamCatmullRom:
@@ -948,7 +948,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, aDst3, aDst4, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, aDst3, aDst4, functor);
             }
             break;
             case mpp::InterpolationMode::Cubic2ParamB05C03:
@@ -960,7 +960,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, aDst3, aDst4, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, aDst3, aDst4, functor);
             }
             break;
             case mpp::InterpolationMode::Lanczos2Lobed:
@@ -972,7 +972,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, aDst3, aDst4, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, aDst3, aDst4, functor);
             }
             break;
             case mpp::InterpolationMode::Lanczos3Lobed:
@@ -984,7 +984,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, aDst3, aDst4, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, aDst3, aDst4, functor);
             }
             break;
             case mpp::InterpolationMode::Super:
@@ -997,7 +997,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                          TransformerResize<CoordT>, roundingMode>
                     functor(interpol, resize, aSrc1.SizeRoi());
 
-                forEachPixelPlanar(aDst1, aDst2, aDst3, aDst4, functor);
+                forEachPixelPlanar<T>(aDst1, aDst2, aDst3, aDst4, functor);
             }
             break;
             default:

@@ -11,7 +11,7 @@ endif()
 
 add_library(backends.cuda SHARED ${filesForbackends.cuda})
 
-target_compile_definitions(backends.cuda PUBLIC -DMPP_CUDACORE)  
+target_compile_definitions(backends.cuda PRIVATE -DMPP_CUDACORE)  
 	
 target_include_directories(backends.cuda  PUBLIC 
 						   ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}

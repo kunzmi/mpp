@@ -1,0 +1,140 @@
+#pragma once
+#include <backends/cuda/cudaException.h>
+#include <backends/cuda/image/configurations.h>
+#include <backends/cuda/streamCtx.h>
+#include <common/exception.h>
+#include <common/image/gotoPtr.h>
+#include <common/image/pixelTypes.h>
+#include <common/image/size2D.h>
+#include <common/image/threadSplit.h>
+#include <common/mpp_defs.h>
+#include <common/tupel.h>
+#include <common/utilities.h>
+#include <common/vectorTypes_impl.h>
+#include <cuda_runtime.h>
+#include <device_launch_parameters.h>
+
+namespace mpp::image::cuda
+{
+/// <summary>
+/// runs aFunctor on every pixel of an image. Inplace and outplace operation, no mask. Planar 2 channel destination,
+/// with 411 chroma sub-sampling.
+/// </summary>
+template <class DstT, typename funcType, ChromaSubsamplePos chromaSubsamplePos>
+__global__ void forEachPixel411Planar2Kernel(Vector1<remove_vector_t<DstT>> *__restrict__ aDst1, size_t aPitchDst1,
+                                             Vector2<remove_vector_t<DstT>> *__restrict__ aDst2, size_t aPitchDst2,
+                                             Size2D aSize, funcType aFunctor)
+{
+    using DstPlaneLumaT         = Vector1<remove_vector_t<DstT>>;
+    using DstPlaneChromaT       = Vector2<remove_vector_t<DstT>>;
+    int threadX                 = blockIdx.x * blockDim.x + threadIdx.x;
+    int threadY                 = blockIdx.y * blockDim.y + threadIdx.y;
+    constexpr int subSampleSize = 4;
+
+    const int pixelX       = threadX * subSampleSize;
+    const int pixelXChroma = threadX;
+    const int pixelY       = threadY;
+
+    // skip non-multiple of 4 pixels at the border
+    if (threadX >= aSize.x / subSampleSize || threadY >= aSize.y)
+    {
+        return;
+    }
+
+    DstT res[subSampleSize];
+    DstPlaneLumaT *pixelOutLuma     = gotoPtr(aDst1, aPitchDst1, pixelX, pixelY);
+    DstPlaneChromaT *pixelOutChroma = gotoPtr(aDst2, aPitchDst2, pixelXChroma, pixelY);
+
+    // load the destination pixel in case of inplace operation:
+    static_assert(!funcType::DoLoadBeforeOp, "Pre-loading on 411 sub-sampled data is not implemented.");
+
+    Tupel<DstPlaneLumaT, subSampleSize> resLuma;
+#pragma unroll
+    for (int i = 0; i < subSampleSize; i++)
+    {
+        // ignore functor result, as only transformerFunctor can return false and they are not used in chroma
+        // sub-sampled kernels
+        aFunctor(pixelX + i, pixelY, res[i]);
+        resLuma.value[i].x = res[i].x;
+    }
+    // maybe aligned or un-aligned:
+    Tupel<DstPlaneLumaT, subSampleSize>::Store(resLuma, pixelOutLuma);
+
+    DstPlaneChromaT resChroma;
+    if constexpr (chromaSubsamplePos == ChromaSubsamplePos::Center)
+    {
+        // average chroma values:
+        if constexpr (RealFloatingVector<DstT>)
+        {
+            resChroma = res[0].YZ();
+            resChroma += res[1].YZ();
+            resChroma += res[2].YZ();
+            resChroma += res[3].YZ();
+            resChroma /= static_cast<remove_vector_t<DstT>>(subSampleSize);
+        }
+        else
+        {
+            Vector2<int> temp = static_cast<Vector2<int>>(res[0].YZ());
+            temp += static_cast<Vector2<int>>(res[1].YZ());
+            temp += static_cast<Vector2<int>>(res[2].YZ());
+            temp += static_cast<Vector2<int>>(res[3].YZ());
+            temp.DivScaleRoundZero(subSampleSize); // simple integer division, same as in NPP
+            resChroma = static_cast<DstPlaneChromaT>(temp);
+        }
+    }
+    else // CenterLeft is treated as Left
+    {
+        resChroma = res[0].YZ();
+    }
+    *pixelOutChroma = resChroma;
+
+    return;
+}
+
+template <typename DstT, typename funcType>
+void InvokeForEachPixel411Planar2Kernel(const dim3 &aBlockSize, cudaStream_t aStream,
+                                        Vector1<remove_vector_t<DstT>> *__restrict__ aDst1, size_t aPitchDst1,
+                                        Vector2<remove_vector_t<DstT>> *__restrict__ aDst2, size_t aPitchDst2,
+                                        const Size2D &aSize, const funcType &aFunctor,
+                                        ChromaSubsamplePos chromaSubsamplePos)
+{
+
+    dim3 blocksPerGrid(DIV_UP(aSize.x / 4, aBlockSize.x), DIV_UP(aSize.y, aBlockSize.y), 1);
+
+    if (chromaSubsamplePos == ChromaSubsamplePos::Center || chromaSubsamplePos == ChromaSubsamplePos::Undefined)
+    {
+        forEachPixel411Planar2Kernel<DstT, funcType, ChromaSubsamplePos::Center>
+            <<<blocksPerGrid, aBlockSize, 0, aStream>>>(aDst1, aPitchDst1, aDst2, aPitchDst2, aSize, aFunctor);
+    }
+    else
+    {
+        forEachPixel411Planar2Kernel<DstT, funcType, ChromaSubsamplePos::Left>
+            <<<blocksPerGrid, aBlockSize, 0, aStream>>>(aDst1, aPitchDst1, aDst2, aPitchDst2, aSize, aFunctor);
+    }
+
+    peekAndCheckLastCudaError("Block size: " << aBlockSize << " Grid size: " << blocksPerGrid << " SharedMemory: " << 0
+                                             << " Stream: " << aStream);
+}
+
+template <typename DstT, typename funcType>
+void InvokeForEachPixel411Planar2KernelDefault(Vector1<remove_vector_t<DstT>> *__restrict__ aDst1, size_t aPitchDst1,
+                                               Vector2<remove_vector_t<DstT>> *__restrict__ aDst2, size_t aPitchDst2,
+                                               const Size2D &aSize, ChromaSubsamplePos chromaSubsamplePos,
+                                               const mpp::cuda::StreamCtx &aStreamCtx, const funcType &aFunc)
+{
+    if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
+    {
+        const dim3 BlockSize = ConfigBlockSize<"Default">::value;
+
+        InvokeForEachPixel411Planar2Kernel<DstT, funcType>(BlockSize, aStreamCtx.Stream, aDst1, aPitchDst1, aDst2,
+                                                           aPitchDst2, aSize, aFunc, chromaSubsamplePos);
+    }
+    else
+    {
+        throw CUDAUNSUPPORTED(forEachPixel411Planar2Kernel,
+                              "Trying to execute on a platform with an unsupported compute capability: "
+                                  << aStreamCtx.ComputeCapabilityMajor << "." << aStreamCtx.ComputeCapabilityMinor);
+    }
+}
+
+} // namespace mpp::image::cuda

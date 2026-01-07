@@ -6,30 +6,33 @@ For a very long time now, many – if not all – of my cuda related projects re
 
 But from [managedCuda](https://github.com/kunzmi/managedCuda) I also know that many things are repetitive in NPP: nppiAdd does (mostly) the same for all datatypes, nppiSub is basically the same as nppiAdd, etc. If one only counts the actual functionalities independent of the data type, that means leaving out different variations, temp-buffer size and other helper functions, the number of 5000 functions quickly reduces to less than 300. A feasible number. Once I knew that number, the idea for MPP was born – because even though the number of functions is large, there is always one function missing: a special edge case, a special variant, a different datatype. At the end, one usually must implement a similar kernel with hopefully a similar performance. But to do so, what is the special ingredient that makes NPP a set of performance primitives and not just another vectorAdd-hello-world example?  
 
- Working now with Cuda for more than 15 years, this was not per se the most difficult problem to solve – the question was more to get things generalized and scaled to all NPP-use-cases: The solution is to use C++ templates and making heavy use of concepts introduced in C++20. And a different approach to handle unaligned data compared to NPP, but this would go beyond the scope of a project readme.md – I’ll likely fill the wiki with some information on that over time. 
+Working now with Cuda for more than 15 years, this was not per se the most difficult problem to solve – the question was more to get things generalized and scaled to all NPP-use-cases: The solution is to use C++ templates and making heavy use of concepts introduced in C++20. And a different approach to handle unaligned data as compared to NPP, but this would go beyond the scope of a project readme.md – I’ll likely fill the wiki with some information on that over time. 
 
-Finally, now that I implemented a very large subset of NPP for all datatypes, I can say that it is not that complicated to achieve the performance of NPP, it is even possible to become faster than NPP, sometimes even much faster!
+Finally, now that I implemented the entire imaging subset of NPP for all datatypes, I can say that it is not that complicated to achieve the performance of NPP, it is even possible to become faster than NPP, sometimes even much faster!
 
 I compared the average runtime of a few exemplery primitives in this table: [Performance Analysis](/performanceAnalysis/results.html). 
 
 The short resume: 
-- Aligned data is either as fast as NPP or faster (with a few exceptions).
+- Aligned data is either as fast as NPP or faster (with very few exceptions).
 - Unaligned data is significantly faster with MPP than with NPP due to my one-kernel-approach.
 - Box- or Gauss-filtering with large kernels is (up to 90x) faster with MPP than with NPP. All tests were done on a RTX4090.
+- Median-filtering with NPP is quite slow, I've seen up to 400x improvement. But for the time beeing, only kernel sizes 3x3, 5x5 and 7x7 are implemented, NPP supports all possible kernel sizes.
 
-To date, nearly all functions of the image processing subset of NPP are implemented – except for color conversion and a few functions where I either have not yet decided on how to implement them or I simply have no idea what they are good for or how to use them.
+To date, nearly all functions of the image processing subset of NPP are implemented – except for a few functions where I either have not yet decided on how to implement them or I simply have no idea what they are good for or how to use them. Also missing is batch-processing and the 1D signal processing part of NPP.
 
 # What is already available in MPP:
 
 - All functionality in 
   - arithmetic
+  - colorConversion, except nppiAlphaCompColorKey, nppiLUTPaletteSwap, nppiRGBToCbYCr422Gamma
   - dataExchangeAndInit
   - geometricTransforms 
   - morphology
   - thresholdAndCompare 
-  - statistics, except the circularRadialProfile functions.
-  - filtering is also complete except for approximately 5 functions.
-  - (colorConversion is still work in progress...)
+  - statistics
+  - filtering is also complete except for nppiHistogramOfGradients, nppiFilterGaussPyramidLayerUp/Down, nppiFilterHoughLine, nppiFloodFill, nppiLabelMarkersUF, nppiSegmentWatershed and nppiSignedDistanceTransform
+
+- Some new functions that I always missed in NPP, e.g. conjugate complex multiplication
 
 - Supported datatypes are: 
   - unsigned byte (**8u**)
@@ -66,14 +69,15 @@ To date, nearly all functions of the image processing subset of NPP are implemen
   - Mirror
   - MirrorReplicate
   - Wrap
-- A C++ class-based wrapper for NPP like the one in managedCuda – initially the idea was to use NPP as a reference implementation but I quickly gave that up, the code is still there though and was usefull for performance comparisons.
+  - SmoothEdge, which mimics IPP's SmoothEdge edge feature and which is not implemented in NPP.
+- A C++ class-based wrapper for NPP like the one in managedCuda – initially the idea was to use NPP as a reference implementation but I quickly gave that up: NPP has too many bugs and inconsistencies that it could be used as a reference. The code is still there though and was usefull for performance comparisons.
 - All cuda kernels are also implemented in a “simpleCPU” variant using no optimization and no parallelization at all, but the same operators and functors as the cuda kernels. This simplified variant is now considered as the reference implementation, the gold standard that all computed values must reach.
 - Compiles on Windows with VisualC++ and Linux with GCC 13.3+
 - No dependencies other than provided in the repository (except Cuda SDK)
 
 # Other than adding the missing functionality, there is still a lot to do:
-- So far, everything is compiled to static libraries and then finally linked to one big executable... some DLLs/SOs get more and more necessary for the library to be of any practical use.
 - A C-API is not there yet at all, currently MPP is only a class-based C++ API
+- No install, releasing or packaging, CMake as of now just compiles the code and that's it.
 
 # What is next?
 - Once MPP is fully implemented with Cuda, the next logical step would be to port the cuda kernels to hip for AMD GPUs.

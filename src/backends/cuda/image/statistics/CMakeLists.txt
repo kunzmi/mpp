@@ -55,6 +55,7 @@ add_library(backends.cuda.image.statistics8s OBJECT
 	8s/psnr.cu
 	8s/qualityIndex.cu
 	8s/qualityIndexWindow.cu
+	8s/radialProfile.cu
 	8s/squareDistanceNormalized.cu
 	8s/ssim.cu
 	8s/sum.cu
@@ -121,6 +122,7 @@ add_library(backends.cuda.image.statistics8u OBJECT
 	8u/psnr.cu
 	8u/qualityIndex.cu
 	8u/qualityIndexWindow.cu
+	8u/radialProfile.cu
 	8u/squareDistanceNormalized.cu
 	8u/ssim.cu
 	8u/sum.cu
@@ -187,6 +189,7 @@ add_library(backends.cuda.image.statistics16bf OBJECT
 	16bf/psnr.cu
 	16bf/qualityIndex.cu
 	16bf/qualityIndexWindow.cu
+	16bf/radialProfile.cu
 	16bf/squareDistanceNormalized.cu
 	16bf/ssim.cu
 	16bf/sum.cu
@@ -253,6 +256,7 @@ add_library(backends.cuda.image.statistics16f OBJECT
 	16f/psnr.cu
 	16f/qualityIndex.cu
 	16f/qualityIndexWindow.cu
+	16f/radialProfile.cu
 	16f/squareDistanceNormalized.cu
 	16f/ssim.cu
 	16f/sum.cu
@@ -319,6 +323,7 @@ add_library(backends.cuda.image.statistics16s OBJECT
 	16s/psnr.cu
 	16s/qualityIndex.cu
 	16s/qualityIndexWindow.cu
+	16s/radialProfile.cu
 	16s/squareDistanceNormalized.cu
 	16s/ssim.cu
 	16s/sum.cu
@@ -406,6 +411,7 @@ add_library(backends.cuda.image.statistics16u OBJECT
 	16u/psnr.cu
 	16u/qualityIndex.cu
 	16u/qualityIndexWindow.cu
+	16u/radialProfile.cu
 	16u/squareDistanceNormalized.cu
 	16u/ssim.cu
 	16u/sum.cu
@@ -472,6 +478,7 @@ add_library(backends.cuda.image.statistics32f OBJECT
 	32f/psnr.cu
 	32f/qualityIndex.cu
 	32f/qualityIndexWindow.cu
+	32f/radialProfile.cu
 	32f/rectStdDev.cu
 	32f/squareDistanceNormalized.cu
 	32f/ssim.cu
@@ -560,6 +567,7 @@ add_library(backends.cuda.image.statistics32s OBJECT
 	32s/psnr.cu
 	32s/qualityIndex.cu
 	32s/qualityIndexWindow.cu
+	32s/radialProfile.cu
 	32s/rectStdDev.cu
 	32s/squareDistanceNormalized.cu
 	32s/ssim.cu
@@ -648,6 +656,7 @@ add_library(backends.cuda.image.statistics32u OBJECT
 	32u/psnr.cu
 	32u/qualityIndex.cu
 	32u/qualityIndexWindow.cu
+	32u/radialProfile.cu
 	32u/squareDistanceNormalized.cu
 	32u/ssim.cu
 	32u/sum.cu

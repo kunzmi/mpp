@@ -87,7 +87,7 @@ template <class T> inline constexpr int vector_active_size_v = vector_active_siz
 
 template <typename TVector, typename TOther> struct same_vector_size_different_type
 {
-    using type = void;
+    using type = TOther;
 };
 template <typename TVector, typename TOther> struct same_vector_size_different_type<Vector1<TVector>, TOther>
 {

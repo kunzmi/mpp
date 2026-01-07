@@ -1,0 +1,32 @@
+#include "../gammaCorr_impl.h"
+
+using namespace mpp::cuda;
+
+namespace mpp::image::cuda
+{
+
+ForAllChannelsWithAlphaInvokeGammaCorrBT709Src(16f);
+ForAllChannelsWithAlphaInvokeGammaCorrBT709P2SrcP2(16f);
+ForAllChannelsWithAlphaInvokeGammaCorrBT709P3SrcP3(16f);
+ForAllChannelsWithAlphaInvokeGammaCorrBT709P4SrcP4(16f);
+ForAllChannelsWithAlphaInvokeGammaCorrBT709Inplace(16f);
+
+ForAllChannelsWithAlphaInvokeGammaInvCorrBT709Src(16f);
+ForAllChannelsWithAlphaInvokeGammaInvCorrBT709P2SrcP2(16f);
+ForAllChannelsWithAlphaInvokeGammaInvCorrBT709P3SrcP3(16f);
+ForAllChannelsWithAlphaInvokeGammaInvCorrBT709P4SrcP4(16f);
+ForAllChannelsWithAlphaInvokeGammaInvCorrBT709Inplace(16f);
+
+ForAllChannelsWithAlphaInvokeGammaCorrsRGBSrc(16f);
+ForAllChannelsWithAlphaInvokeGammaCorrsRGBP2SrcP2(16f);
+ForAllChannelsWithAlphaInvokeGammaCorrsRGBP3SrcP3(16f);
+ForAllChannelsWithAlphaInvokeGammaCorrsRGBP4SrcP4(16f);
+ForAllChannelsWithAlphaInvokeGammaCorrsRGBInplace(16f);
+
+ForAllChannelsWithAlphaInvokeGammaInvCorrsRGBSrc(16f);
+ForAllChannelsWithAlphaInvokeGammaInvCorrsRGBP2SrcP2(16f);
+ForAllChannelsWithAlphaInvokeGammaInvCorrsRGBP3SrcP3(16f);
+ForAllChannelsWithAlphaInvokeGammaInvCorrsRGBP4SrcP4(16f);
+ForAllChannelsWithAlphaInvokeGammaInvCorrsRGBInplace(16f);
+
+} // namespace mpp::image::cuda

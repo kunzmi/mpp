@@ -56,6 +56,7 @@
 #include "psnr.h"
 #include "qualityIndex.h"
 #include "qualityIndexWindow.h"
+#include "radialProfile.h"
 #include "rectStdDev.h"
 #include "squareDistanceNormalized.h"
 #include "ssim.h"

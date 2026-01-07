@@ -1,5 +1,6 @@
 
 add_subdirectory(arithmetic)
+add_subdirectory(colorConversion)
 add_subdirectory(dataExchangeAndInit)
 add_subdirectory(filtering)
 add_subdirectory(geometryTransforms)
@@ -12,11 +13,15 @@ add_library(backends.cuda.image8u SHARED
 						imageView8u.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image8u PUBLIC -DMPP_CUDAI) 
+# somwhere in some dark corners of NVCC the destinction between host and device compiler gets lost and some vector constructors 
+# will be defined in host code whereas they should get linked to mpp-common.dll. To avoid linkage issues due to double defined 
+# symbols we simply export those symbols again by defining -DMPP_COMMON... (Issue only appears on windows)
+target_compile_definitions(backends.cuda.image8u PRIVATE -DMPP_CUDAI -DMPP_COMMON) 
 target_include_directories(backends.cuda.image8u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image8u PRIVATE project_options)
 target_link_libraries(backends.cuda.image8u PUBLIC  
 						backends.cuda.image.arithmetic8u
+						backends.cuda.image.colorConversion8u
 						backends.cuda.image.dataExchangeAndInit8u 
 						backends.cuda.image.filtering8u 
 						backends.cuda.image.geometryTransforms8u 
@@ -36,7 +41,7 @@ add_library(backends.cuda.image8s SHARED
 						imageView8s.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image8s PUBLIC -DMPP_CUDAI) 
+target_compile_definitions(backends.cuda.image8s PRIVATE -DMPP_CUDAI -DMPP_COMMON) 
 target_include_directories(backends.cuda.image8s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image8s PRIVATE project_options)
 target_link_libraries(backends.cuda.image8s PUBLIC  
@@ -60,11 +65,12 @@ add_library(backends.cuda.image16u SHARED
 						imageView16u.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image16u PUBLIC -DMPP_CUDAI) 
+target_compile_definitions(backends.cuda.image16u PRIVATE -DMPP_CUDAI -DMPP_COMMON) 
 target_include_directories(backends.cuda.image16u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image16u PRIVATE project_options)
 target_link_libraries(backends.cuda.image16u PUBLIC  
 						backends.cuda.image.arithmetic16u
+						backends.cuda.image.colorConversion16u
 						backends.cuda.image.dataExchangeAndInit16u 
 						backends.cuda.image.filtering16u 
 						backends.cuda.image.geometryTransforms16u 
@@ -84,11 +90,12 @@ add_library(backends.cuda.image16s SHARED
 						imageView16s.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image16s PUBLIC -DMPP_CUDAI) 
+target_compile_definitions(backends.cuda.image16s PRIVATE -DMPP_CUDAI -DMPP_COMMON) 
 target_include_directories(backends.cuda.image16s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image16s PRIVATE project_options)
 target_link_libraries(backends.cuda.image16s PUBLIC  
 						backends.cuda.image.arithmetic16s
+						backends.cuda.image.colorConversion16s
 						backends.cuda.image.dataExchangeAndInit16s 
 						backends.cuda.image.filtering16s 
 						backends.cuda.image.geometryTransforms16s 
@@ -107,11 +114,12 @@ add_library(backends.cuda.image32u SHARED
 						imageView32u.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image32u PUBLIC -DMPP_CUDAI) 
+target_compile_definitions(backends.cuda.image32u PRIVATE -DMPP_CUDAI -DMPP_COMMON) 
 target_include_directories(backends.cuda.image32u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image32u PRIVATE project_options)
 target_link_libraries(backends.cuda.image32u PUBLIC  
 						backends.cuda.image.arithmetic32u
+						backends.cuda.image.colorConversion32u
 						backends.cuda.image.dataExchangeAndInit32u 
 						backends.cuda.image.filtering32u 
 						backends.cuda.image.geometryTransforms32u 
@@ -130,11 +138,12 @@ add_library(backends.cuda.image32s SHARED
 						imageView32s.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image32s PUBLIC -DMPP_CUDAI) 
+target_compile_definitions(backends.cuda.image32s PRIVATE -DMPP_CUDAI -DMPP_COMMON) 
 target_include_directories(backends.cuda.image32s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image32s PRIVATE project_options)
 target_link_libraries(backends.cuda.image32s PUBLIC  
 						backends.cuda.image.arithmetic32s
+						backends.cuda.image.colorConversion32s
 						backends.cuda.image.dataExchangeAndInit32s 
 						backends.cuda.image.filtering32s 
 						backends.cuda.image.geometryTransforms32s 
@@ -154,7 +163,7 @@ add_library(backends.cuda.image16sc SHARED
 						imageView16sc.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image16sc PUBLIC -DMPP_CUDAI) 
+target_compile_definitions(backends.cuda.image16sc PRIVATE -DMPP_CUDAI -DMPP_COMMON) 
 target_include_directories(backends.cuda.image16sc PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image16sc PRIVATE project_options)
 target_link_libraries(backends.cuda.image16sc PUBLIC  
@@ -175,7 +184,7 @@ add_library(backends.cuda.image32sc SHARED
 						imageView32sc.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image32sc PUBLIC -DMPP_CUDAI) 
+target_compile_definitions(backends.cuda.image32sc PRIVATE -DMPP_CUDAI -DMPP_COMMON) 
 target_include_directories(backends.cuda.image32sc PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image32sc PRIVATE project_options)
 target_link_libraries(backends.cuda.image32sc PUBLIC  
@@ -196,7 +205,7 @@ add_library(backends.cuda.image32fc SHARED
 						imageView32fc.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image32fc PUBLIC -DMPP_CUDAI) 
+target_compile_definitions(backends.cuda.image32fc PRIVATE -DMPP_CUDAI -DMPP_COMMON) 
 target_include_directories(backends.cuda.image32fc PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image32fc PRIVATE project_options)
 target_link_libraries(backends.cuda.image32fc PUBLIC  
@@ -217,11 +226,12 @@ add_library(backends.cuda.image16bf SHARED
 						imageView16bf.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image16bf PUBLIC -DMPP_CUDAI) 
+target_compile_definitions(backends.cuda.image16bf PRIVATE -DMPP_CUDAI -DMPP_COMMON) 
 target_include_directories(backends.cuda.image16bf PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image16bf PRIVATE project_options)
 target_link_libraries(backends.cuda.image16bf PUBLIC  
 						backends.cuda.image.arithmetic16bf
+						backends.cuda.image.colorConversion16bf
 						backends.cuda.image.dataExchangeAndInit16bf 
 						backends.cuda.image.filtering16bf 
 						backends.cuda.image.geometryTransforms16bf 
@@ -241,11 +251,12 @@ add_library(backends.cuda.image16f SHARED
 						imageView16f.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image16f PUBLIC -DMPP_CUDAI) 
+target_compile_definitions(backends.cuda.image16f PRIVATE -DMPP_CUDAI -DMPP_COMMON) 
 target_include_directories(backends.cuda.image16f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image16f PRIVATE project_options)
 target_link_libraries(backends.cuda.image16f PUBLIC  
 						backends.cuda.image.arithmetic16f
+						backends.cuda.image.colorConversion16f
 						backends.cuda.image.dataExchangeAndInit16f 
 						backends.cuda.image.filtering16f 
 						backends.cuda.image.geometryTransforms16f 
@@ -265,11 +276,12 @@ add_library(backends.cuda.image32f SHARED
 						imageView32f.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image32f PUBLIC -DMPP_CUDAI) 
+target_compile_definitions(backends.cuda.image32f PRIVATE -DMPP_CUDAI -DMPP_COMMON) 
 target_include_directories(backends.cuda.image32f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image32f PRIVATE project_options)
 target_link_libraries(backends.cuda.image32f PUBLIC  
 						backends.cuda.image.arithmetic32f
+						backends.cuda.image.colorConversion32f
 						backends.cuda.image.dataExchangeAndInit32f 
 						backends.cuda.image.filtering32f 
 						backends.cuda.image.geometryTransforms32f 
@@ -289,7 +301,7 @@ add_library(backends.cuda.image64f SHARED
 						imageView64f.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image64f PUBLIC -DMPP_CUDAI)  
+target_compile_definitions(backends.cuda.image64f PRIVATE -DMPP_CUDAI -DMPP_COMMON)  
 target_include_directories(backends.cuda.image64f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image64f PRIVATE project_options)
 target_link_libraries(backends.cuda.image64f PUBLIC  

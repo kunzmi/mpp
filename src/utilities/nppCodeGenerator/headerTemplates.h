@@ -62,7 +62,10 @@ const std::string headerFooter =
 )";
 
 // NOLINTNEXTLINE
-const std::string cppHeader1 = R"(#include "imageView.h"  //NOLINT
+const std::string cppHeader1 = R"(#ifdef _MSC_VER
+#include "../dllexport_npp.h"
+#endif
+#include "imageView.h"  //NOLINT
 #include <backends/cuda/devVarView.h> //NOLINT
 #include <backends/npp/nppException.h>  //NOLINT
 #include <common/defines.h> //NOLINT
@@ -86,6 +89,10 @@ const std::string cppHeader1 = R"(#include "imageView.h"  //NOLINT
 const std::string cppHeader2 = R"(
 namespace mpp::image::npp
 {
+#ifdef _MSC_VER
+template class MPPEXPORT_NPP ImageView<Pixel####>;
+#endif
+
 Image####View::Image####View(const Size2D &aSize) : ImageView<Pixel####>(aSize)
 {
 }

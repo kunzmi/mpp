@@ -7,6 +7,7 @@
 #include "dataExchangeAndInit/instantiateSwapChannel.h"
 #include "imageView.h"
 #include "imageView_arithmetic_impl.h"          //NOLINT(misc-include-cleaner)
+#include "imageView_colorConversion_impl.h"     //NOLINT(misc-include-cleaner)
 #include "imageView_dataExchangeAndInit_impl.h" //NOLINT(misc-include-cleaner)
 #include "imageView_filtering_impl.h"           //NOLINT(misc-include-cleaner)
 #include "imageView_geometryTransforms_impl.h"  //NOLINT(misc-include-cleaner)

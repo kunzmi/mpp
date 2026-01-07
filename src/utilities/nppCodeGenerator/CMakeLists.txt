@@ -11,4 +11,4 @@ target_link_libraries(nppCodeGenerator PRIVATE
 target_link_libraries(nppCodeGenerator PUBLIC  
 						nppParser)
 						
-target_compile_definitions(nppCodeGenerator PUBLIC -DDEFAULT_OUT_DIR="${PROJECT_SOURCE_DIR}/src/backends/npp")  
+target_compile_definitions(nppCodeGenerator PRIVATE -DDEFAULT_OUT_DIR="${PROJECT_SOURCE_DIR}/src/backends/npp")  

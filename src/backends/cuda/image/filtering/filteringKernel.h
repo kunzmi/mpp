@@ -11,6 +11,7 @@
 #include "fixedSizeBoxFilter.h"
 #include "fixedSizeFilter.h"
 #include "fixedSizeMaxFilter.h"
+#include "fixedSizeMedianFilter.h"
 #include "fixedSizeMinFilter.h"
 #include "fixedSizeSeparableFilter.h"
 #include "fixedSizeUnsharpFilter.h"

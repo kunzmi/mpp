@@ -27,10 +27,11 @@ class MPPEXPORT_CUDACORE CudaException : public MPPException
                   int aLineNumber, const std::string &aFunctionName);
     CudaException(const std::string &aMessage, const std::filesystem::path &aCodeFileName, int aLineNumber,
                   const std::string &aFunctionName);
-    ~CudaException() noexcept override = default;
+    ~CudaException() noexcept override;
 
-    CudaException(CudaException &&)                 = default;
-    CudaException(const CudaException &)            = default;
+    // we have linking issues in MSVC with derived exceptions in DLL if we use the default constructors:
+    CudaException(CudaException && /*aOther*/) noexcept;
+    CudaException(const CudaException & /*aOther*/);
     CudaException &operator=(const CudaException &) = delete;
     CudaException &operator=(CudaException &&)      = delete;
 };

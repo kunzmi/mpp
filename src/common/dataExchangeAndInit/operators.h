@@ -41,6 +41,22 @@ template <AnyVector SrcT, AnyVector DstT = SrcT> struct SwapChannel
     }
 };
 template <AnyVector SrcDstT>
+    requires mpp::image::TwoChannel<SrcDstT>
+struct SwapChannel<SrcDstT, SrcDstT>
+{
+    DEVICE_CODE void operator()(const SrcDstT &aSrc1, SrcDstT &aDst) const
+    {
+        aDst.x = aSrc1.y;
+        aDst.y = aSrc1.x;
+    }
+    DEVICE_CODE void operator()(SrcDstT &aSrcDst) const
+    {
+        remove_vector_t<SrcDstT> temp = aSrcDst.x;
+        aSrcDst.x                     = aSrcDst.y;
+        aSrcDst.y                     = temp;
+    }
+};
+template <AnyVector SrcDstT>
     requires mpp::image::ThreeChannel<SrcDstT> || mpp::image::FourChannelAlpha<SrcDstT>
 struct SwapChannel<SrcDstT, SrcDstT>
 {

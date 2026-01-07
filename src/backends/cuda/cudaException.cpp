@@ -9,9 +9,25 @@
 #include <ostream>
 #include <sstream>
 #include <string>
+#include <utility>
 
 namespace mpp::cuda
 {
+// NOLINTNEXTLINE(hicpp-use-equals-default,modernize-use-equals-default)
+CudaException::~CudaException() noexcept
+{
+}
+
+CudaException::CudaException(CudaException &&aOther) noexcept
+    // NOLINTNEXTLINE(bugprone-use-after-move,hicpp-invalid-access-moved)
+    : MPPException(std::move(aOther))
+{
+}
+// NOLINTNEXTLINE(hicpp-use-equals-default,modernize-use-equals-default)
+CudaException::CudaException(const CudaException &aOther) : MPPException(aOther)
+{
+}
+
 const char *CudaException::ConvertErrorCodeToMessage(cudaError_t aErrorCode)
 {
     return cudaGetErrorString(aErrorCode);

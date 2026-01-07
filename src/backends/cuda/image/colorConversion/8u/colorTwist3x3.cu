@@ -1,0 +1,52 @@
+#include "../colorTwist3x3_impl.h"
+
+using namespace mpp::cuda;
+
+namespace mpp::image::cuda
+{
+
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3P3Src(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3P4Src(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3P3SrcP3(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3SrcP3(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3C4SrcP3(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3SrcP4(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3Inplace(8u);
+
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src444to422C2(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3SrcP3444to422C2(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src444to422P2(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3SrcP3444to422P2(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src444to422P3(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3SrcP3444to422P3(8u);
+
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src444to420P2(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3SrcP3444to420P2(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src444to420P3(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3SrcP3444to420P3(8u);
+
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src444to411P2(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3SrcP3444to411P2(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src444to411P3(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3SrcP3444to411P3(8u);
+
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src422C2to444(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src422P2to444(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src422P3to444(8u);
+
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src422C2to444P3(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src422P2to444P3(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src422P3to444P3(8u);
+
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src420P2to444(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src420P3to444(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src420P2to444P3(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src420P3to444P3(8u);
+
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src411P2to444(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src411P3to444(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src411P2to444P3(8u);
+ForAllChannelsWithAlphaInvokeColorTwist3x3Src411P3to444P3(8u);
+
+} // namespace mpp::image::cuda

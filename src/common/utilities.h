@@ -645,4 +645,315 @@ DEVICE_CODE T DivScaleRoundTowardPosInf(T aSrc0, T aSrc1)
     return (aSrc0 + src1Minus) / aSrc1;
 }
 
+// Finds the largest array index of the element that is either equal to aValue or smaller. If the last array element is
+// equal to aValue, -1 is returned, but as LUT operation returns the input value for out of range values, this has no
+// impact.
+// aStartIndex can either be provided from an acceleration array or from a previous search.
+// values in aArray must be strictly monotonically increasing.
+template <RealNumber T>
+DEVICE_CODE int LastIndexSmallerOrEqual(const T *aArray, int aCountElements, int aStartIndex, T aValue)
+{
+    for (int i = aStartIndex; i < aCountElements; i++)
+    {
+        if (aArray[i] > aValue)
+        {
+            return i - 1;
+        }
+    }
+    return -1; // not found
+}
+
+// linear interpolation for aXValue in the range [aX[0]..aX[1]].
+template <RealNumber T> DEVICE_CODE T LinearInterpolate(const T aX[2], const T aY[2], T aXValue)
+{
+    const T fraction = (aXValue - aX[0]) / (aX[1] - aX[0]);
+    return (T(1) - fraction) * aY[0] + fraction * aY[1];
+}
+
+// cubic lagrange interpolation for aXValue in the range [aX[0]..aX[3]].
+template <RealNumber T> DEVICE_CODE T CubicInterpolate(const T aX[4], const T aY[4], T aXValue)
+{
+    T res = aY[0] * (aXValue - aX[1]) / (aX[0] - aX[1]) * (aXValue - aX[2]) / (aX[0] - aX[2]) * (aXValue - aX[3]) /
+            (aX[0] - aX[3]);
+    res += aY[1] * (aXValue - aX[0]) / (aX[1] - aX[0]) * (aXValue - aX[2]) / (aX[1] - aX[2]) * (aXValue - aX[3]) /
+           (aX[1] - aX[3]);
+    res += aY[2] * (aXValue - aX[0]) / (aX[2] - aX[0]) * (aXValue - aX[1]) / (aX[2] - aX[1]) * (aXValue - aX[3]) /
+           (aX[2] - aX[3]);
+    res += aY[3] * (aXValue - aX[0]) / (aX[3] - aX[0]) * (aXValue - aX[1]) / (aX[3] - aX[1]) * (aXValue - aX[2]) /
+           (aX[3] - aX[2]);
+    return res;
+}
+
+inline void LUTtoPalette(const int *aX, const int *aY, int aLUTSize, byte *aPalette)
+{
+    int lastIdx = 0;
+    for (int i = 0; i < 256; i++)
+    {
+        int idx = LastIndexSmallerOrEqual(aX, aLUTSize, lastIdx, i);
+        if (idx >= 0)
+        {
+            lastIdx     = idx;
+            aPalette[i] = static_cast<byte>(aY[idx]);
+        }
+        else
+        {
+            aPalette[i] = static_cast<byte>(i);
+        }
+    }
+}
+
+// identical to IPP, NPP only truncates the floating point result and doesn't round correctly
+inline void LUTtoPaletteLinear(const int *aX, const int *aY, int aLUTSize, byte *aPalette)
+{
+    int lastIdx = 0;
+    float valX[2];
+    float valY[2];
+    for (int i = 0; i < 256; i++)
+    {
+        int idx = LastIndexSmallerOrEqual(aX, aLUTSize, lastIdx, i);
+        if (idx >= 0 && idx < aLUTSize - 1)
+        {
+            lastIdx         = idx;
+            valX[0]         = static_cast<float>(aX[idx]);
+            valX[1]         = static_cast<float>(aX[idx + 1]);
+            valY[0]         = static_cast<float>(aY[idx]);
+            valY[1]         = static_cast<float>(aY[idx + 1]);
+            const float val = LinearInterpolate(valX, valY, static_cast<float>(i));
+            aPalette[i]     = static_cast<byte>(val + 0.5f);
+        }
+        else if (idx == aLUTSize - 1)
+        {
+            aPalette[i] = static_cast<byte>(aY[idx]);
+        }
+        else
+        {
+            aPalette[i] = static_cast<byte>(i);
+        }
+    }
+}
+
+// identical to IPP, NPP only truncates the floating point result and doesn't round correctly
+inline void LUTtoPaletteCubic(const int *aX, const int *aY, int aLUTSize, byte *aPalette)
+{
+    int lastIdx = 0;
+    float valX[4];
+    float valY[4];
+    for (int i = 0; i < 256; i++)
+    {
+        int idx = LastIndexSmallerOrEqual(aX, aLUTSize, lastIdx, i);
+        if (idx >= 0)
+        {
+            lastIdx = idx;
+            idx--;
+            idx = std::min(std::max(0, idx), aLUTSize - 4);
+
+            valX[0]         = static_cast<float>(aX[idx]);
+            valX[1]         = static_cast<float>(aX[idx + 1]);
+            valX[2]         = static_cast<float>(aX[idx + 2]);
+            valX[3]         = static_cast<float>(aX[idx + 3]);
+            valY[0]         = static_cast<float>(aY[idx]);
+            valY[1]         = static_cast<float>(aY[idx + 1]);
+            valY[2]         = static_cast<float>(aY[idx + 2]);
+            valY[3]         = static_cast<float>(aY[idx + 3]);
+            const float val = CubicInterpolate(valX, valY, static_cast<float>(i));
+            aPalette[i]     = static_cast<byte>(val + 0.5f);
+        }
+        else
+        {
+            aPalette[i] = static_cast<byte>(i);
+        }
+    }
+}
+
+// identical to IPP, NPP only truncates the floating point result and doesn't round correctly
+inline void LUTtoPalette(const int *aX, const int *aY, int aLUTSize, short *aPalette)
+{
+    int lastIdx = 0;
+    for (int i = numeric_limits<short>::lowest(); i <= numeric_limits<short>::max(); i++)
+    {
+        int idx = LastIndexSmallerOrEqual(aX, aLUTSize, lastIdx, i);
+        if (idx >= 0)
+        {
+            lastIdx                                       = idx;
+            aPalette[i + numeric_limits<short>::lowest()] = static_cast<short>(aY[idx]);
+        }
+        else
+        {
+            aPalette[i + numeric_limits<short>::lowest()] = static_cast<short>(i);
+        }
+    }
+}
+
+// identical to IPP, NPP only truncates the floating point result and doesn't round correctly
+inline void LUTtoPaletteLinear(const int *aX, const int *aY, int aLUTSize, short *aPalette)
+{
+    int lastIdx = 0;
+    double valX[2];
+    double valY[2];
+    for (int i = numeric_limits<short>::lowest(); i <= numeric_limits<short>::max(); i++)
+    {
+        int idx = LastIndexSmallerOrEqual(aX, aLUTSize, lastIdx, i);
+        if (idx >= 0 && idx < aLUTSize - 1)
+        {
+            lastIdx          = idx;
+            valX[0]          = static_cast<double>(aX[idx]);
+            valX[1]          = static_cast<double>(aX[idx + 1]);
+            valY[0]          = static_cast<double>(aY[idx]);
+            valY[1]          = static_cast<double>(aY[idx + 1]);
+            const double val = LinearInterpolate(valX, valY, static_cast<double>(i));
+
+            aPalette[i + numeric_limits<short>::lowest()] = static_cast<short>(val + 0.5);
+        }
+        else if (idx == aLUTSize - 1)
+        {
+            aPalette[i + numeric_limits<short>::lowest()] = static_cast<short>(aY[idx]);
+        }
+        else
+        {
+            aPalette[i + numeric_limits<short>::lowest()] = static_cast<short>(i);
+        }
+    }
+}
+
+// identical to IPP, NPP only truncates the floating point result and doesn't round correctly
+inline void LUTtoPaletteCubic(const int *aX, const int *aY, int aLUTSize, short *aPalette)
+{
+    int lastIdx = 0;
+    double valX[4];
+    double valY[4];
+    for (int i = numeric_limits<short>::lowest(); i <= numeric_limits<short>::max(); i++)
+    {
+        int idx = LastIndexSmallerOrEqual(aX, aLUTSize, lastIdx, i);
+        if (idx >= 0)
+        {
+            lastIdx = idx;
+            idx--;
+            idx = std::min(std::max(0, idx), aLUTSize - 4);
+
+            valX[0]          = static_cast<double>(aX[idx]);
+            valX[1]          = static_cast<double>(aX[idx + 1]);
+            valX[2]          = static_cast<double>(aX[idx + 2]);
+            valX[3]          = static_cast<double>(aX[idx + 3]);
+            valY[0]          = static_cast<double>(aY[idx]);
+            valY[1]          = static_cast<double>(aY[idx + 1]);
+            valY[2]          = static_cast<double>(aY[idx + 2]);
+            valY[3]          = static_cast<double>(aY[idx + 3]);
+            const double val = CubicInterpolate(valX, valY, static_cast<double>(i));
+
+            aPalette[i + numeric_limits<short>::lowest()] = static_cast<short>(val + 0.5);
+        }
+        else
+        {
+            aPalette[i + numeric_limits<short>::lowest()] = static_cast<short>(i);
+        }
+    }
+}
+
+// identical to IPP, NPP only truncates the floating point result and doesn't round correctly
+inline void LUTtoPalette(const int *aX, const int *aY, int aLUTSize, ushort *aPalette)
+{
+    int lastIdx = 0;
+    for (int i = 0; i <= numeric_limits<ushort>::max(); i++)
+    {
+        int idx = LastIndexSmallerOrEqual(aX, aLUTSize, lastIdx, i);
+        if (idx >= 0)
+        {
+            lastIdx     = idx;
+            aPalette[i] = static_cast<ushort>(aY[idx]);
+        }
+        else
+        {
+            aPalette[i] = static_cast<ushort>(i);
+        }
+    }
+}
+
+// identical to IPP, NPP only truncates the floating point result and doesn't round correctly
+inline void LUTtoPaletteLinear(const int *aX, const int *aY, int aLUTSize, ushort *aPalette)
+{
+    int lastIdx = 0;
+    double valX[2];
+    double valY[2];
+    for (int i = 0; i <= numeric_limits<ushort>::max(); i++)
+    {
+        int idx = LastIndexSmallerOrEqual(aX, aLUTSize, lastIdx, i);
+        if (idx >= 0 && idx < aLUTSize - 1)
+        {
+            lastIdx          = idx;
+            valX[0]          = static_cast<double>(aX[idx]);
+            valX[1]          = static_cast<double>(aX[idx + 1]);
+            valY[0]          = static_cast<double>(aY[idx]);
+            valY[1]          = static_cast<double>(aY[idx + 1]);
+            const double val = LinearInterpolate(valX, valY, static_cast<double>(i));
+
+            aPalette[i] = static_cast<ushort>(val + 0.5);
+        }
+        else if (idx == aLUTSize - 1)
+        {
+            aPalette[i] = static_cast<ushort>(aY[idx]);
+        }
+        else
+        {
+            aPalette[i] = static_cast<ushort>(i);
+        }
+    }
+}
+
+// identical to IPP, NPP only truncates the floating point result and doesn't round correctly
+inline void LUTtoPaletteCubic(const int *aX, const int *aY, int aLUTSize, ushort *aPalette)
+{
+    int lastIdx = 0;
+    double valX[4];
+    double valY[4];
+    for (int i = 0; i <= numeric_limits<ushort>::max(); i++)
+    {
+        int idx = LastIndexSmallerOrEqual(aX, aLUTSize, lastIdx, i);
+        if (idx >= 0)
+        {
+            lastIdx = idx;
+            idx--;
+            idx = std::min(std::max(0, idx), aLUTSize - 4);
+
+            valX[0]          = static_cast<double>(aX[idx]);
+            valX[1]          = static_cast<double>(aX[idx + 1]);
+            valX[2]          = static_cast<double>(aX[idx + 2]);
+            valX[3]          = static_cast<double>(aX[idx + 3]);
+            valY[0]          = static_cast<double>(aY[idx]);
+            valY[1]          = static_cast<double>(aY[idx + 1]);
+            valY[2]          = static_cast<double>(aY[idx + 2]);
+            valY[3]          = static_cast<double>(aY[idx + 3]);
+            const double val = CubicInterpolate(valX, valY, static_cast<double>(i));
+
+            aPalette[i] = static_cast<ushort>(val + 0.5);
+        }
+        else
+        {
+            aPalette[i] = static_cast<ushort>(i);
+        }
+    }
+}
+
+// precomputes the array indeces of aX for an equally spaced value range
+inline void LUTAccelerator(const float *aX, int aLUTSize, int *aAccelerator, int aAccerlatorSize)
+{
+    const float LUTMin   = aX[0];
+    const float LUTMax   = aX[aLUTSize - 1];
+    const float stepSize = (LUTMax - LUTMin) / static_cast<float>(aAccerlatorSize - 1);
+
+    int lastIdx = 0;
+    for (int i = 0; i < aAccerlatorSize; i++)
+    {
+        int idx = LastIndexSmallerOrEqual(aX, aLUTSize, lastIdx, LUTMin + static_cast<float>(i) * stepSize);
+        if (idx >= 0)
+        {
+            lastIdx         = idx;
+            aAccelerator[i] = idx;
+        }
+        else
+        {
+            return;
+        }
+    }
+}
+
 } // namespace mpp

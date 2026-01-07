@@ -633,6 +633,30 @@ ImageView<T> &ImageView<T>::Set(const mpp::cuda::DevVarView<remove_vector_t<T>> 
 /// Swap channels
 /// </summary>
 template <PixelType T>
+ImageView<T> &ImageView<T>::SwapChannel(ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
+    requires(vector_size_v<T> == 2)
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    InvokeSwapChannelSrc(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), SizeRoi(), aStreamCtx);
+
+    return aDst;
+}
+/// <summary>
+/// Swap channels (inplace)
+/// </summary>
+template <PixelType T>
+ImageView<T> &ImageView<T>::SwapChannel(const mpp::cuda::StreamCtx &aStreamCtx)
+    requires(vector_size_v<T> == 2)
+{
+    InvokeSwapChannelInplace(PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
+
+    return *this;
+}
+/// <summary>
+/// Swap channels
+/// </summary>
+template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::SwapChannel(ImageView<TTo> &aDst,
                                           const ChannelList<vector_active_size_v<TTo>> &aDstChannels,

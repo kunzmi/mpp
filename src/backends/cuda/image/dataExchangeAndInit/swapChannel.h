@@ -25,4 +25,12 @@ void InvokeSwapChannelInplace(SrcT *aSrcDst, size_t aPitchSrcDst,
                               const ChannelList<vector_active_size_v<SrcT>> &aDstChannels, const Size2D &aSize,
                               const mpp::cuda::StreamCtx &aStreamCtx);
 
+template <TwoChannel SrcDstT>
+void InvokeSwapChannelSrc(const SrcDstT *aSrc1, size_t aPitchSrc1, SrcDstT *aDst, size_t aPitchDst, const Size2D &aSize,
+                          const mpp::cuda::StreamCtx &aStreamCtx);
+
+template <TwoChannel SrcDstT>
+void InvokeSwapChannelInplace(SrcDstT *aSrcDst, size_t aPitchSrcDst, const Size2D &aSize,
+                              const mpp::cuda::StreamCtx &aStreamCtx);
+
 } // namespace mpp::image::cuda

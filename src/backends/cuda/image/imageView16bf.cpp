@@ -7,6 +7,7 @@
 #include "dataExchangeAndInit/instantiateSwapChannel.h"
 #include "imageView.h"
 #include "imageView_arithmetic_impl.h"          //NOLINT(misc-include-cleaner)
+#include "imageView_colorConversion_impl.h"     //NOLINT(misc-include-cleaner)
 #include "imageView_dataExchangeAndInit_impl.h" //NOLINT(misc-include-cleaner)
 #include "imageView_filtering_impl.h"           //NOLINT(misc-include-cleaner)
 #include "imageView_geometryTransforms_impl.h"  //NOLINT(misc-include-cleaner)
@@ -36,6 +37,7 @@ template <>
 ImageView<Pixel16bfC4A> MPPEXPORT_CUDAI ImageView<Pixel16bfC4A>::Null =
     ImageView<Pixel16bfC4A>(nullptr, Size2D(0, 0), 0);
 
+ForAllChannelsConvertWithAlpha(16bf, 32f);
 ForAllChannelsConvertRoundWithAlpha(16bf, 8u);
 ForAllChannelsConvertRoundWithAlpha(16bf, 8s);
 ForAllChannelsConvertRoundWithAlpha(16bf, 16u);

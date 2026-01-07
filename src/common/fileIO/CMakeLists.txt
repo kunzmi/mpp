@@ -12,7 +12,7 @@ add_library(common.fileIO SHARED
 	filetypes/tiffImageFileDirectory.cpp
 	)
 	
-target_compile_definitions(common.fileIO PUBLIC -DMPP_COMMON_FILEIO)  
+target_compile_definitions(common.fileIO PRIVATE -DMPP_COMMON_FILEIO)  
 	
 target_link_libraries(common.fileIO PUBLIC  
 						common

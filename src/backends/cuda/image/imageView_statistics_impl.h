@@ -4,6 +4,7 @@
 #include <backends/cuda/devVarView.h>
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/statistics/statisticsKernel.h>
+#include <backends/cuda/stream.h>
 #include <backends/cuda/streamCtx.h>
 #include <cmath>
 #include <common/bfloat16.h>
@@ -11,6 +12,7 @@
 #include <common/defines.h>
 #include <common/exception.h>
 #include <common/half_fp16.h>
+#include <common/image/affineTransformation.h>
 #include <common/image/functors/imageFunctors.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
@@ -4401,6 +4403,88 @@ ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationCoefficient(const ImageView
 {
     return this->CrossCorrelationCoefficient(aSrcBoxFiltered, aTemplate, aMeanTemplate, aDst, aConstant, aBorder, ROI(),
                                              aStreamCtx);
+}
+#pragma endregion
+
+#pragma region RadialProfile
+
+template <PixelType T>
+void ImageView<T>::RadialProfile(mpp::cuda::DevVarView<int> &aProfileCount,
+                                 mpp::cuda::DevVarView<same_vector_size_different_type_t<T, float>> &aProfileSum,
+                                 mpp::cuda::DevVarView<same_vector_size_different_type_t<T, float>> &aProfileSumSqr,
+                                 const Vec2f &aCenter, const mpp::cuda::StreamCtx &aStreamCtx) const
+    requires RealVector<T> && (!std::same_as<remove_vector_t<T>, double>)
+{
+    if (aProfileCount.Size() != aProfileSum.Size())
+    {
+        throw INVALIDARGUMENT(aProfileCount aProfileSum,
+                              "aProfileCount and aProfileSum must have the same size. aProfileCount size is "
+                                  << aProfileCount.Size() << " and aProfileSum size is " << aProfileSum.Size());
+    }
+    if (aProfileSumSqr.Pointer() != nullptr && aProfileCount.Size() != aProfileSum.Size())
+    {
+        throw INVALIDARGUMENT(
+            aProfileSumSqr aProfileSum,
+            "aProfileSumSqr and aProfileSum must have the same size or aProfileSumSqr is NULL. aProfileSumSqr size is "
+                << aProfileSumSqr.Size() << " and aProfileSum size is " << aProfileSum.Size()
+                << " and aProfileSumSqr is not NULL.");
+    }
+
+    const AffineTransformation<float> shiftCenter = AffineTransformation<float>::GetTranslation(-aCenter);
+
+    const mpp::cuda::Stream stream(aStreamCtx.Stream);
+    aProfileCount.Memset(0, stream);
+    aProfileSum.Memset(0, stream);
+    if (aProfileSumSqr.Pointer() != nullptr)
+    {
+        aProfileSumSqr.Memset(0, stream);
+    }
+
+    const int profileSize = static_cast<int>(aProfileCount.Size());
+    InvokeRadialProfileSrc(Pointer(), Pitch(), aProfileCount.Pointer(), aProfileSum.Pointer(), aProfileSumSqr.Pointer(),
+                           profileSize, shiftCenter, SizeRoi(), aStreamCtx);
+}
+
+template <PixelType T>
+void ImageView<T>::RadialProfile(mpp::cuda::DevVarView<int> &aProfileCount,
+                                 mpp::cuda::DevVarView<same_vector_size_different_type_t<T, float>> &aProfileSum,
+                                 mpp::cuda::DevVarView<same_vector_size_different_type_t<T, float>> &aProfileSumSqr,
+                                 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+                                 const Vec2f &aCenter, float aRadiusRatio, float aAngleInRad,
+                                 const mpp::cuda::StreamCtx &aStreamCtx) const
+    requires RealVector<T> && (!std::same_as<remove_vector_t<T>, double>)
+{
+    if (aProfileCount.Size() != aProfileSum.Size())
+    {
+        throw INVALIDARGUMENT(aProfileCount aProfileSum,
+                              "aProfileCount and aProfileSum must have the same size. aProfileCount size is "
+                                  << aProfileCount.Size() << " and aProfileSum size is " << aProfileSum.Size());
+    }
+    if (aProfileSumSqr.Pointer() != nullptr && aProfileCount.Size() != aProfileSum.Size())
+    {
+        throw INVALIDARGUMENT(
+            aProfileSumSqr aProfileSum,
+            "aProfileSumSqr and aProfileSum must have the same size or aProfileSumSqr is NULL. aProfileSumSqr size is "
+                << aProfileSumSqr.Size() << " and aProfileSum size is " << aProfileSum.Size()
+                << " and aProfileSumSqr is not NULL.");
+    }
+
+    const AffineTransformation<float> shiftCenter = AffineTransformation<float>::GetTranslation(-aCenter);
+    const AffineTransformation<float> rot         = AffineTransformation<float>::GetTranslation(-aAngleInRad);
+    const AffineTransformation<float> scale  = AffineTransformation<float>::GetScale(Vec2f(1.0f, 1.0f / aRadiusRatio));
+    const AffineTransformation<float> affine = scale * rot * shiftCenter;
+
+    const mpp::cuda::Stream stream(aStreamCtx.Stream);
+    aProfileCount.Memset(0, stream);
+    aProfileSum.Memset(0, stream);
+    if (aProfileSumSqr.Pointer() != nullptr)
+    {
+        aProfileSumSqr.Memset(0, stream);
+    }
+
+    const int profileSize = static_cast<int>(aProfileCount.Size());
+    InvokeRadialProfileSrc(Pointer(), Pitch(), aProfileCount.Pointer(), aProfileSum.Pointer(), aProfileSumSqr.Pointer(),
+                           profileSize, affine, SizeRoi(), aStreamCtx);
 }
 #pragma endregion
 } // namespace mpp::image::cuda

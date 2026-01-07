@@ -30,6 +30,10 @@ float getZero(float aVal)
     return 0.0f;
 }
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4723) // potential divide by 0 warning
+#endif
 TEST_CASE("HalfFp16 on Cuda", "[Common]")
 {
     cudaSafeCall(cudaSetDevice(DEFAULT_CUDA_DEVICE_ID));
@@ -225,3 +229,7 @@ TEST_CASE("HalfFp16 on Cuda", "[Common]")
         }
     }
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif

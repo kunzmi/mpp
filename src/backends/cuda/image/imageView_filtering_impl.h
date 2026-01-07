@@ -795,6 +795,42 @@ ImageView<T> &ImageView<T>::MinFilter(ImageView<T> &aDst, const FilterArea &aFil
 }
 #pragma endregion
 
+#pragma region Min/Max Filter
+template <PixelType T>
+ImageView<T> &ImageView<T>::MedianFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+                                         const mpp::cuda::StreamCtx &aStreamCtx) const
+    requires RealVector<T>
+{
+    return this->MedianFilter(aDst, aFilterArea, aBorder, ROI(), aStreamCtx);
+}
+
+template <PixelType T>
+ImageView<T> &ImageView<T>::MedianFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
+                                         const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
+    requires RealVector<T>
+{
+    checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
+
+    const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
+    const T *allowedPtr          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
+
+    if (aFilterArea.Size == 3 || aFilterArea.Size == 5 || aFilterArea.Size == 7)
+    {
+        // this implies aFilterArea.Size.x == aFilterArea.Size.y
+        InvokeFixedSizeMedianFilter(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aFilterArea.Size.x,
+                                    aFilterArea.Center, aBorder, aAllowedReadRoi.Size(), roiOffset, SizeRoi(),
+                                    aStreamCtx);
+    }
+    else
+    {
+        throw INVALIDARGUMENT(aFilterArea,
+                              "Only filter sizes 3x3, 5x5 and 7x7 are currently implemented, but requested size is: "
+                                  << aFilterArea.Size);
+    }
+    return aDst;
+}
+#pragma endregion
+
 #pragma region Wiener Filter
 template <PixelType T>
 ImageView<T> &ImageView<T>::WienerFilter(ImageView<T> &aDst, const FilterArea &aFilterArea,

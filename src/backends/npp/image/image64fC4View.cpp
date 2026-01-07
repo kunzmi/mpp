@@ -2,6 +2,9 @@
 
 #include "image64fC1View.h" //NOLINT
 #include "image64fC4View.h" //NOLINT
+#ifdef _MSC_VER
+#include "../dllexport_npp.h"
+#endif
 #include "imageView.h"  //NOLINT
 #include <backends/cuda/devVarView.h> //NOLINT
 #include <backends/npp/nppException.h>  //NOLINT
@@ -25,6 +28,10 @@
 
 namespace mpp::image::npp
 {
+#ifdef _MSC_VER
+template class MPPEXPORT_NPP ImageView<Pixel64fC4>;
+#endif
+
 Image64fC4View::Image64fC4View(const Size2D &aSize) : ImageView<Pixel64fC4>(aSize)
 {
 }

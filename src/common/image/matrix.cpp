@@ -29,31 +29,31 @@ template <RealFloatingPoint T> constexpr size_t Matrix<T>::GetIndex(int aRow, in
     return to_size_t(aCol + aRow * mCols);
 }
 
-template <RealFloatingPoint T> Matrix<T>::Matrix() noexcept : mData()
-{
-    mData[0] = T(1);
-    mData[4] = T(1);
-    mData[8] = T(1);
-    mData[1] = T(0);
-    mData[2] = T(0);
-    mData[3] = T(0);
-    mData[5] = T(0);
-    mData[6] = T(0);
-    mData[7] = T(0);
-}
+// template <RealFloatingPoint T> Matrix<T>::Matrix() noexcept : mData()
+//{
+//     mData[0] = T(1);
+//     mData[4] = T(1);
+//     mData[8] = T(1);
+//     mData[1] = T(0);
+//     mData[2] = T(0);
+//     mData[3] = T(0);
+//     mData[5] = T(0);
+//     mData[6] = T(0);
+//     mData[7] = T(0);
+// }
 
-template <RealFloatingPoint T> Matrix<T>::Matrix(T aX) noexcept : mData()
-{
-    mData[0] = aX;
-    mData[1] = aX;
-    mData[2] = aX;
-    mData[3] = aX;
-    mData[4] = aX;
-    mData[5] = aX;
-    mData[6] = aX;
-    mData[7] = aX;
-    mData[8] = aX;
-}
+// template <RealFloatingPoint T> Matrix<T>::Matrix(T aX) noexcept : mData()
+//{
+//     mData[0] = aX;
+//     mData[1] = aX;
+//     mData[2] = aX;
+//     mData[3] = aX;
+//     mData[4] = aX;
+//     mData[5] = aX;
+//     mData[6] = aX;
+//     mData[7] = aX;
+//     mData[8] = aX;
+// }
 
 template <RealFloatingPoint T> Matrix<T>::Matrix(T aValues[mSize]) noexcept : mData()
 {
@@ -73,19 +73,19 @@ template <RealFloatingPoint T> Matrix<T>::Matrix(const AffineTransformation<T> &
     mData[8] = T(1);
 }
 
-template <RealFloatingPoint T>
-Matrix<T>::Matrix(T a00, T a01, T a02, T a10, T a11, T a12, T a20, T a21, T a22) noexcept : mData() // NOLINT
-{
-    mData[GetIndex(0, 0)] = a00;
-    mData[GetIndex(0, 1)] = a01;
-    mData[GetIndex(0, 2)] = a02;
-    mData[GetIndex(1, 0)] = a10;
-    mData[GetIndex(1, 1)] = a11;
-    mData[GetIndex(1, 2)] = a12;
-    mData[GetIndex(2, 0)] = a20;
-    mData[GetIndex(2, 1)] = a21;
-    mData[GetIndex(2, 2)] = a22;
-}
+// template <RealFloatingPoint T>
+// Matrix<T>::Matrix(T a00, T a01, T a02, T a10, T a11, T a12, T a20, T a21, T a22) noexcept : mData() // NOLINT
+//{
+//     mData[GetIndex(0, 0)] = a00;
+//     mData[GetIndex(0, 1)] = a01;
+//     mData[GetIndex(0, 2)] = a02;
+//     mData[GetIndex(1, 0)] = a10;
+//     mData[GetIndex(1, 1)] = a11;
+//     mData[GetIndex(1, 2)] = a12;
+//     mData[GetIndex(2, 0)] = a20;
+//     mData[GetIndex(2, 1)] = a21;
+//     mData[GetIndex(2, 2)] = a22;
+// }
 
 template <RealFloatingPoint T>
 Matrix<T>::Matrix(const std::pair<Vector2<T>, Vector2<T>> &aP0, const std::pair<Vector2<T>, Vector2<T>> &aP1,
@@ -342,22 +342,22 @@ template <RealFloatingPoint T> Matrix<T> &Matrix<T>::operator*=(const Matrix &aO
     return *this;
 }
 
-template <RealFloatingPoint T> Matrix<T> Matrix<T>::operator*(const Matrix &aOther) const
-{
-    Matrix ret;
-
-    ret[0] = mData[0] * aOther[0] + mData[1] * aOther[3] + mData[2] * aOther[6];
-    ret[1] = mData[0] * aOther[1] + mData[1] * aOther[4] + mData[2] * aOther[7];
-    ret[2] = mData[0] * aOther[2] + mData[1] * aOther[5] + mData[2] * aOther[8];
-    ret[3] = mData[3] * aOther[0] + mData[4] * aOther[3] + mData[5] * aOther[6];
-    ret[4] = mData[3] * aOther[1] + mData[4] * aOther[4] + mData[5] * aOther[7];
-    ret[5] = mData[3] * aOther[2] + mData[4] * aOther[5] + mData[5] * aOther[8];
-    ret[6] = mData[6] * aOther[0] + mData[7] * aOther[3] + mData[8] * aOther[6];
-    ret[7] = mData[6] * aOther[1] + mData[7] * aOther[4] + mData[8] * aOther[7];
-    ret[8] = mData[6] * aOther[2] + mData[7] * aOther[5] + mData[8] * aOther[8];
-
-    return ret;
-}
+// template <RealFloatingPoint T> Matrix<T> Matrix<T>::operator*(const Matrix &aOther) const
+//{
+//     Matrix ret;
+//
+//     ret[0] = mData[0] * aOther[0] + mData[1] * aOther[3] + mData[2] * aOther[6];
+//     ret[1] = mData[0] * aOther[1] + mData[1] * aOther[4] + mData[2] * aOther[7];
+//     ret[2] = mData[0] * aOther[2] + mData[1] * aOther[5] + mData[2] * aOther[8];
+//     ret[3] = mData[3] * aOther[0] + mData[4] * aOther[3] + mData[5] * aOther[6];
+//     ret[4] = mData[3] * aOther[1] + mData[4] * aOther[4] + mData[5] * aOther[7];
+//     ret[5] = mData[3] * aOther[2] + mData[4] * aOther[5] + mData[5] * aOther[8];
+//     ret[6] = mData[6] * aOther[0] + mData[7] * aOther[3] + mData[8] * aOther[6];
+//     ret[7] = mData[6] * aOther[1] + mData[7] * aOther[4] + mData[8] * aOther[7];
+//     ret[8] = mData[6] * aOther[2] + mData[7] * aOther[5] + mData[8] * aOther[8];
+//
+//     return ret;
+// }
 
 template <RealFloatingPoint T> Matrix<T> &Matrix<T>::operator/=(T aOther)
 {
@@ -485,40 +485,28 @@ template class Matrix<double>;
 template MPPEXPORT_COMMON Matrix<float>::Matrix(const Matrix<double> &aOther);
 template MPPEXPORT_COMMON Matrix<double>::Matrix(const Matrix<float> &aOther);
 
-template Matrix<float> operator+(const Matrix<float> &aLeft, float aRight);
-template Matrix<float> operator+(float aLeft, const Matrix<float> &aRight);
-template Matrix<float> operator-(const Matrix<float> &aLeft, float aRight);
-template Matrix<float> operator-(float aLeft, const Matrix<float> &aRight);
+template Matrix<float> MPPEXPORT_COMMON operator+(const Matrix<float> &aLeft, float aRight);
+template Matrix<float> MPPEXPORT_COMMON operator+(float aLeft, const Matrix<float> &aRight);
+template Matrix<float> MPPEXPORT_COMMON operator-(const Matrix<float> &aLeft, float aRight);
+template Matrix<float> MPPEXPORT_COMMON operator-(float aLeft, const Matrix<float> &aRight);
 
-template Matrix<float> operator*(const Matrix<float> &aLeft, float aRight);
-template Matrix<float> operator*(float aLeft, const Matrix<float> &aRight);
-template Matrix<float> operator/(const Matrix<float> &aLeft, float aRight);
+template Matrix<float> MPPEXPORT_COMMON operator*(const Matrix<float> &aLeft, float aRight);
+template Matrix<float> MPPEXPORT_COMMON operator*(float aLeft, const Matrix<float> &aRight);
+template Matrix<float> MPPEXPORT_COMMON operator/(const Matrix<float> &aLeft, float aRight);
 
-template Quad<float> operator*(const Matrix<float> &aLeft, const Quad<float> &aRight);
-template Quad<float> operator*(const Matrix<float> &aLeft, const Roi &aRight);
+template Quad<float> MPPEXPORT_COMMON operator*(const Matrix<float> &aLeft, const Quad<float> &aRight);
+template Quad<float> MPPEXPORT_COMMON operator*(const Matrix<float> &aLeft, const Roi &aRight);
 
-template Matrix<double> operator+(const Matrix<double> &aLeft, double aRight);
-template Matrix<double> operator+(double aLeft, const Matrix<double> &aRight);
-template Matrix<double> operator-(const Matrix<double> &aLeft, double aRight);
-template Matrix<double> operator-(double aLeft, const Matrix<double> &aRight);
+template Matrix<double> MPPEXPORT_COMMON operator+(const Matrix<double> &aLeft, double aRight);
+template Matrix<double> MPPEXPORT_COMMON operator+(double aLeft, const Matrix<double> &aRight);
+template Matrix<double> MPPEXPORT_COMMON operator-(const Matrix<double> &aLeft, double aRight);
+template Matrix<double> MPPEXPORT_COMMON operator-(double aLeft, const Matrix<double> &aRight);
 
-template Matrix<double> operator*(const Matrix<double> &aLeft, double aRight);
-template Matrix<double> operator*(double aLeft, const Matrix<double> &aRight);
-template Matrix<double> operator/(const Matrix<double> &aLeft, double aRight);
+template Matrix<double> MPPEXPORT_COMMON operator*(const Matrix<double> &aLeft, double aRight);
+template Matrix<double> MPPEXPORT_COMMON operator*(double aLeft, const Matrix<double> &aRight);
+template Matrix<double> MPPEXPORT_COMMON operator/(const Matrix<double> &aLeft, double aRight);
 
-template Quad<double> operator*(const Matrix<double> &aLeft, const Quad<double> &aRight);
-template Quad<double> operator*(const Matrix<double> &aLeft, const Roi &aRight);
+template Quad<double> MPPEXPORT_COMMON operator*(const Matrix<double> &aLeft, const Quad<double> &aRight);
+template Quad<double> MPPEXPORT_COMMON operator*(const Matrix<double> &aLeft, const Roi &aRight);
 
-const Matrix<float> RGBtoYUV =
-    Matrix<float>(0.299f, 0.587f, 0.114f, -0.147f, -0.289f, 0.436f, 0.615f, -0.515f, -0.100f);
-const Matrix<float> YUVtoRGB = Matrix<float>(1.0f, 0.0f, 1.140f, 1.0f, -0.394f, -0.581f, 1.0f, 2.032f, 0.0f);
-
-const Matrix<float> RGBtoYCbCr =
-    Matrix<float>(0.257f, 0.504f, 0.098f, -0.148f, -0.291f, +0.439f, 0.439f, -0.368f, -0.071f);
-const Matrix<float> CbCrtoRGB = Matrix<float>(1.164f, 0.0f, 1.596f, 1.164f, -0.392f, -0.813f, 1.164f, 2.017f, 0.0f);
-
-const Matrix<float> RGBtoXYZ =
-    Matrix<float>(0.412453f, 0.35758f, 0.180423f, 0.212671f, 0.71516f, 0.072169f, 0.019334f, 0.119193f, 0.950227f);
-const Matrix<float> XYZtoRGB =
-    Matrix<float>(3.240479f, -1.53715f, -0.498535f, -0.969256f, 1.875991f, 0.041556f, 0.055648f, -0.204043f, 1.057311f);
 } // namespace mpp::image
