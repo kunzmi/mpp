@@ -36,6 +36,15 @@ TEST_CASE("AffineTransformation<double>", "[Common.Image]")
     CHECK(b0[4] == 4);
     CHECK(b0[5] == 5);
 
+    double values2[2][3] = {{0, 1, 2}, {3, 4, 5}};
+    AffineTransformation<double> b1(values2);
+    CHECK(b1[0] == 0);
+    CHECK(b1[1] == 1);
+    CHECK(b1[2] == 2);
+    CHECK(b1[3] == 3);
+    CHECK(b1[4] == 4);
+    CHECK(b1[5] == 5);
+
     AffineTransformation<double> c;
     CHECK(c[0] == 1);
     CHECK(c[1] == 0);
@@ -119,8 +128,8 @@ TEST_CASE("AffineTransformation<double>", "[Common.Image]")
     std::pair<Vec2d, Vec2d> pair2(p2, trans2);
     std::pair<Vec2d, Vec2d> pair3(p3, trans3);
 
-    AffineTransformation transform2(pair0, pair1, pair2);
-    Matrix<double> transformAffine(pair0, pair1, pair2, pair3);
+    AffineTransformation<double> transform2 = AffineTransformation<double>::FromPoints(pair0, pair1, pair2);
+    Matrix<double> transformAffine          = Matrix<double>::FromPoints(pair0, pair1, pair2, pair3);
 
     CHECK(transform[0] == Approx(transform2[0]).margin(0.00001));
     CHECK(transform[1] == Approx(transform2[1]).margin(0.00001));
@@ -190,7 +199,7 @@ TEST_CASE("AffineTransformation<double>", "[Common.Image]")
     AffineTransformation<double> shift2 = AffineTransformation<double>::GetTranslation({256, 256});
     AffineTransformation<double> affine = shift2 * rot * shift1;
 
-    AffineTransformation<double> affineFromQuad(roi, quadRot30);
+    AffineTransformation<double> affineFromQuad = AffineTransformation<double>::FromQuads(roi, quadRot30);
 
     AffineTransformation<double> diffAffine = affine - affineFromQuad;
     double diff                             = 0;
@@ -222,6 +231,15 @@ TEST_CASE("AffineTransformation<float>", "[Common.Image]")
     CHECK(b0[3] == 3);
     CHECK(b0[4] == 4);
     CHECK(b0[5] == 5);
+
+    float values2[2][3] = {{0, 1, 2}, {3, 4, 5}};
+    AffineTransformation<float> b1(values2);
+    CHECK(b1[0] == 0);
+    CHECK(b1[1] == 1);
+    CHECK(b1[2] == 2);
+    CHECK(b1[3] == 3);
+    CHECK(b1[4] == 4);
+    CHECK(b1[5] == 5);
 
     AffineTransformation<float> c;
     CHECK(c[0] == 1);
@@ -306,8 +324,8 @@ TEST_CASE("AffineTransformation<float>", "[Common.Image]")
     std::pair<Vec2f, Vec2f> pair2(p2, trans2);
     std::pair<Vec2f, Vec2f> pair3(p3, trans3);
 
-    AffineTransformation<float> transform2(pair0, pair1, pair2);
-    Matrix<float> transformAffine(pair0, pair1, pair2, pair3);
+    AffineTransformation<float> transform2 = AffineTransformation<float>::FromPoints(pair0, pair1, pair2);
+    Matrix<float> transformAffine          = Matrix<float>::FromPoints(pair0, pair1, pair2, pair3);
 
     CHECK(transform[0] == Approx(transform2[0]).margin(0.00001));
     CHECK(transform[1] == Approx(transform2[1]).margin(0.00001));
@@ -376,7 +394,7 @@ TEST_CASE("AffineTransformation<float>", "[Common.Image]")
     AffineTransformation<float> shift2 = AffineTransformation<float>::GetTranslation({256, 256});
     AffineTransformation<float> affine = shift2 * rot * shift1;
 
-    AffineTransformation<float> affineFromQuad(roi, quadRot30);
+    AffineTransformation<float> affineFromQuad = AffineTransformation<float>::FromQuads(roi, quadRot30);
 
     AffineTransformation<float> diffAffine = affine - affineFromQuad;
     float diff                             = 0;

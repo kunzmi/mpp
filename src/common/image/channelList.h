@@ -88,50 +88,50 @@ template <size_t listSize> class ChannelList
         mChannels[0] = aInt;
     }
 
-    ChannelList(int *aIntPtr)
+    ChannelList(const int *aIntPtr)
     {
         std::copy(aIntPtr, aIntPtr + listSize, mChannels.begin());
     }
 
-    ChannelList(uint *aIntPtr)
+    ChannelList(const uint *aIntPtr)
     {
         std::copy(aIntPtr, aIntPtr + listSize, mChannels.begin());
     }
 
-    ChannelList(Channel *aChannelPtr)
+    ChannelList(const Channel *aChannelPtr)
     {
         std::copy(aChannelPtr, aChannelPtr + listSize, mChannels.begin());
     }
 
-    ChannelList(Axis1D *aChannelPtr)
+    ChannelList(const Axis1D *aChannelPtr)
     {
         std::copy(aChannelPtr, aChannelPtr + listSize, mChannels.begin());
     }
 
-    ChannelList(Axis2D *aChannelPtr)
+    ChannelList(const Axis2D *aChannelPtr)
     {
         std::copy(aChannelPtr, aChannelPtr + listSize, mChannels.begin());
     }
 
-    ChannelList(Axis3D *aChannelPtr)
+    ChannelList(const Axis3D *aChannelPtr)
     {
         std::copy(aChannelPtr, aChannelPtr + listSize, mChannels.begin());
     }
 
-    ChannelList(Axis4D *aChannelPtr)
+    ChannelList(const Axis4D *aChannelPtr)
     {
         std::copy(aChannelPtr, aChannelPtr + listSize, mChannels.begin());
     }
 
     ChannelList(const std::ranges::forward_range auto &aRange)
     {
-        if (aRange.size() <= listSize)
+        if (std::ranges::size(aRange) <= listSize)
         {
-            std::copy(aRange.begin(), aRange.end(), mChannels.begin());
+            std::copy(std::ranges::begin(aRange), std::ranges::end(aRange), mChannels.begin());
         }
         else
         {
-            std::copy(aRange.begin(), aRange.begin() + listSize, mChannels.begin());
+            std::copy(std::ranges::begin(aRange), std::ranges::begin(aRange) + listSize, mChannels.begin());
         }
     }
 

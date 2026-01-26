@@ -23,73 +23,15 @@ template <RealFloatingPoint T> constexpr size_t Matrix4x4<T>::GetIndex(int aRow,
     return to_size_t(aCol + aRow * mCols);
 }
 
-// template <RealFloatingPoint T> Matrix4x4<T>::Matrix4x4() noexcept : mData()
-//{
-//     mData[0]  = T(1);
-//     mData[5]  = T(1);
-//     mData[10] = T(1);
-//     mData[15] = T(1);
-//     mData[1]  = T(0);
-//     mData[2]  = T(0);
-//     mData[3]  = T(0);
-//     mData[4]  = T(0);
-//     mData[6]  = T(0);
-//     mData[7]  = T(0);
-//     mData[8]  = T(0);
-//     mData[9]  = T(0);
-//     mData[11] = T(0);
-//     mData[12] = T(0);
-//     mData[13] = T(0);
-//     mData[14] = T(0);
-// }
-
-// template <RealFloatingPoint T> Matrix4x4<T>::Matrix4x4(T aX) noexcept : mData()
-//{
-//     mData[0]  = aX;
-//     mData[1]  = aX;
-//     mData[2]  = aX;
-//     mData[3]  = aX;
-//     mData[4]  = aX;
-//     mData[5]  = aX;
-//     mData[6]  = aX;
-//     mData[7]  = aX;
-//     mData[8]  = aX;
-//     mData[9]  = aX;
-//     mData[10] = aX;
-//     mData[11] = aX;
-//     mData[12] = aX;
-//     mData[13] = aX;
-//     mData[14] = aX;
-//     mData[15] = aX;
-// }
-
-template <RealFloatingPoint T> Matrix4x4<T>::Matrix4x4(T aValues[mSize]) noexcept : mData()
+template <RealFloatingPoint T> Matrix4x4<T>::Matrix4x4(const T aValues[mSize]) noexcept : mData()
 {
     std::copy(aValues, aValues + mSize, mData);
 }
 
-// template <RealFloatingPoint T>
-// Matrix4x4<T>::Matrix4x4(T a00, T a01, T a02, T a03, T a10, T a11, T a12, T a13, T a20, T a21, T a22, T a23, T a30,
-//                         T a31, T a32, T a33) noexcept
-//     : mData() // NOLINT
-//{
-//     mData[GetIndex(0, 0)] = a00;
-//     mData[GetIndex(0, 1)] = a01;
-//     mData[GetIndex(0, 2)] = a02;
-//     mData[GetIndex(0, 3)] = a03;
-//     mData[GetIndex(1, 0)] = a10;
-//     mData[GetIndex(1, 1)] = a11;
-//     mData[GetIndex(1, 2)] = a12;
-//     mData[GetIndex(1, 3)] = a13;
-//     mData[GetIndex(2, 0)] = a20;
-//     mData[GetIndex(2, 1)] = a21;
-//     mData[GetIndex(2, 2)] = a22;
-//     mData[GetIndex(2, 3)] = a23;
-//     mData[GetIndex(3, 0)] = a30;
-//     mData[GetIndex(3, 1)] = a31;
-//     mData[GetIndex(3, 2)] = a32;
-//     mData[GetIndex(3, 3)] = a33;
-// }
+template <RealFloatingPoint T> Matrix4x4<T>::Matrix4x4(const T aValues[mRows][mCols]) noexcept : mData()
+{
+    std::copy(reinterpret_cast<const T *>(aValues), reinterpret_cast<const T *>(aValues) + mSize, mData);
+}
 
 // for conversion
 template <RealFloatingPoint T>

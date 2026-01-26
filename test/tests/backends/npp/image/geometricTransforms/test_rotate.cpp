@@ -226,3 +226,54 @@ TEST_CASE("8uP3", "[NPP.GeometricTransforms.Rotate]")
 
     CHECK(summedErr == Vec3d{0, 0, 0});
 }
+
+TEST_CASE("8uC1", "[NPP.GeometricTransforms.RotateQuad]")
+{
+
+    AffineTransformation<double> shift1 = AffineTransformation<double>::GetTranslation(Vec2d(-size / 2, -size));
+    AffineTransformation<double> rot    = AffineTransformation<double>::GetRotation(30);
+    AffineTransformation<double> shift2 = AffineTransformation<double>::GetTranslation(Vec2d(size / 2, -size));
+    AffineTransformation<double> affine = shift2 * rot * shift1;
+    Vec2d shift(affine(0, 2), affine(1, 2));
+
+    const AffineTransformation<double> rotate =
+        AffineTransformation<double>::GetTranslation(shift) * AffineTransformation<double>::GetRotation(30);
+
+    nv::Image8uC1 npp_src1(size, 2 * size);
+    nv::Image8uC1 npp_dst(size, 2 * size);
+
+    Quad<double> quadNpp;
+
+    npp_src1.GetRotateQuad(quadNpp, 30, shift.x, shift.y);
+
+    Quad<double> quadMpp  = affine * Roi(0, 0, size, 2 * size);
+    Quad<double> quadMpp2 = rotate * Roi(0, 0, size, 2 * size);
+
+    CHECK(quadNpp == quadMpp);
+    CHECK(quadMpp2 == quadMpp);
+}
+
+TEST_CASE("8uC1", "[NPP.GeometricTransforms.RotateBound]")
+{
+
+    AffineTransformation<double> shift1 = AffineTransformation<double>::GetTranslation(Vec2d(-size / 2, -size));
+    AffineTransformation<double> rot    = AffineTransformation<double>::GetRotation(30);
+    AffineTransformation<double> shift2 = AffineTransformation<double>::GetTranslation(Vec2d(size / 2, -size));
+    AffineTransformation<double> affine = shift2 * rot * shift1;
+    Vec2d shift(affine(0, 2), affine(1, 2));
+
+    const AffineTransformation<double> rotate =
+        AffineTransformation<double>::GetTranslation(shift) * AffineTransformation<double>::GetRotation(30);
+
+    nv::Image8uC1 npp_src1(size, 2 * size);
+    nv::Image8uC1 npp_dst(size, 2 * size);
+
+    Bound<double> boundNpp;
+
+    npp_src1.GetRotateBound(boundNpp, 30, shift.x, shift.y);
+
+    Quad<double> quadMpp = affine * Roi(0, 0, size, 2 * size);
+    Bound<double> boundMpp(quadMpp);
+
+    CHECK(boundNpp == boundMpp);
+}

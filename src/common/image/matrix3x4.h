@@ -81,7 +81,12 @@ template <RealFloatingPoint T> class MPPEXPORT_COMMON Matrix3x4
     /// <summary>
     /// All values filled with aValues
     /// </summary>
-    explicit Matrix3x4(T aValues[mSize]) noexcept;
+    explicit Matrix3x4(const T aValues[mSize]) noexcept;
+
+    /// <summary>
+    /// All values filled with aValues
+    /// </summary>
+    explicit Matrix3x4(const T aValues[mRows][mCols]) noexcept;
 
     /// <summary>
     /// Set the left 3x3 matrix segment to aValues3x3, set the 4th column to aCol4

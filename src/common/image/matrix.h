@@ -79,7 +79,12 @@ template <RealFloatingPoint T> class MPPEXPORT_COMMON Matrix
     /// <summary>
     /// All values filled with aValues
     /// </summary>
-    explicit Matrix(T aValues[mSize]) noexcept;
+    explicit Matrix(const T aValues[mSize]) noexcept;
+
+    /// <summary>
+    /// All values filled with aValues
+    /// </summary>
+    explicit Matrix(const T aValues[mRows][mCols]) noexcept;
 
     /// <summary>
     /// All values from aAffine and [0 0 1] in last row
@@ -105,22 +110,6 @@ template <RealFloatingPoint T> class MPPEXPORT_COMMON Matrix
         mData[8] = a22;
     }
 
-    /// <summary>
-    /// Estimates a perspective transformation for four given points
-    /// </summary>
-    Matrix(const std::pair<Vector2<T>, Vector2<T>> &aP0, const std::pair<Vector2<T>, Vector2<T>> &aP1,
-           const std::pair<Vector2<T>, Vector2<T>> &aP2, const std::pair<Vector2<T>, Vector2<T>> &aP3) noexcept;
-
-    /// <summary>
-    /// Estimates a perspective transformation for a ROI and corresponding coordinates given as a Quad
-    /// </summary>
-    Matrix(const Roi &aRoi, const Quad<T> &aQuad) noexcept;
-
-    /// <summary>
-    /// Estimates a perspective transformation from aSrcQuad and corresponding coordinates given in aDstQuad
-    /// </summary>
-    Matrix(const Quad<T> &aSrcQuad, const Quad<T> &aDstQuad) noexcept;
-
     ~Matrix() = default;
 
     // for conversion
@@ -132,6 +121,18 @@ template <RealFloatingPoint T> class MPPEXPORT_COMMON Matrix
     Matrix(Matrix &&) noexcept                 = default;
     Matrix &operator=(const Matrix &) noexcept = default; // NOLINT
     Matrix &operator=(Matrix &&) noexcept      = default;
+
+    /// <summary>
+    /// Estimates a perspective transformation for four given points
+    /// </summary>
+    static Matrix FromPoints(const std::pair<Vector2<T>, Vector2<T>> &aP0, const std::pair<Vector2<T>, Vector2<T>> &aP1,
+                             const std::pair<Vector2<T>, Vector2<T>> &aP2,
+                             const std::pair<Vector2<T>, Vector2<T>> &aP3);
+
+    /// <summary>
+    /// Estimates a perspective transformation from aSrcQuad and corresponding coordinates given in aDstQuad
+    /// </summary>
+    static Matrix FromQuads(const Quad<T> &aSrcQuad, const Quad<T> &aDstQuad);
 
     bool operator==(const Matrix &aOther) const;
 

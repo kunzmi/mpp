@@ -14,7 +14,7 @@ RoiException::RoiException(const Roi &aRoi, [[maybe_unused]] const std::filesyst
 {
 #ifdef NDEBUG
     std::stringstream ss;
-    ss << "'" << aRoi << std::endl;
+    ss << aRoi << std::endl;
 #else
 #ifdef PROJECT_SOURCE_DIR
     const std::filesystem::path src          = PROJECT_SOURCE_DIR;

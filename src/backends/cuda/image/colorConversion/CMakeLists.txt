@@ -1,7 +1,6 @@
 
 	
 add_library(backends.cuda.image.colorConversion8u OBJECT 
-	8u/test.cu
 	8u/hls.cu
 	8u/hsv.cu
 	8u/lab.cu

@@ -83,7 +83,7 @@ void InvokeFixedSizeMorphologyGradient(const SrcT *aSrc1, size_t aPitchSrc1, Dst
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Constant:
+                /*case mpp::BorderType::Constant:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
@@ -92,7 +92,7 @@ void InvokeFixedSizeMorphologyGradient(const SrcT *aSrc1, size_t aPitchSrc1, Dst
                                                                    pixelBlockSizeX, pixelBlockSizeY, BCType>(
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
                 }
-                break;
+                break;*/
                 case mpp::BorderType::Replicate:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
@@ -103,7 +103,7 @@ void InvokeFixedSizeMorphologyGradient(const SrcT *aSrc1, size_t aPitchSrc1, Dst
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Mirror:
+                /*case mpp::BorderType::Mirror:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -132,7 +132,7 @@ void InvokeFixedSizeMorphologyGradient(const SrcT *aSrc1, size_t aPitchSrc1, Dst
                                                                    pixelBlockSizeX, pixelBlockSizeY, BCType>(
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
                 }
-                break;
+                break;*/
                 default:
                     throw INVALIDARGUMENT(
                         aBorderType,
@@ -157,7 +157,7 @@ void InvokeFixedSizeMorphologyGradient(const SrcT *aSrc1, size_t aPitchSrc1, Dst
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Constant:
+                /*case mpp::BorderType::Constant:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
@@ -166,7 +166,7 @@ void InvokeFixedSizeMorphologyGradient(const SrcT *aSrc1, size_t aPitchSrc1, Dst
                                                                    pixelBlockSizeX, pixelBlockSizeY, BCType>(
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
                 }
-                break;
+                break;*/
                 case mpp::BorderType::Replicate:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
@@ -177,7 +177,7 @@ void InvokeFixedSizeMorphologyGradient(const SrcT *aSrc1, size_t aPitchSrc1, Dst
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Mirror:
+                /*case mpp::BorderType::Mirror:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -206,7 +206,7 @@ void InvokeFixedSizeMorphologyGradient(const SrcT *aSrc1, size_t aPitchSrc1, Dst
                                                                    pixelBlockSizeX, pixelBlockSizeY, BCType>(
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
                 }
-                break;
+                break;*/
                 default:
                     throw INVALIDARGUMENT(
                         aBorderType,
@@ -231,7 +231,7 @@ void InvokeFixedSizeMorphologyGradient(const SrcT *aSrc1, size_t aPitchSrc1, Dst
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Constant:
+                /*case mpp::BorderType::Constant:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
@@ -240,7 +240,7 @@ void InvokeFixedSizeMorphologyGradient(const SrcT *aSrc1, size_t aPitchSrc1, Dst
                                                                    pixelBlockSizeX, pixelBlockSizeY, BCType>(
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
                 }
-                break;
+                break;*/
                 case mpp::BorderType::Replicate:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
@@ -251,7 +251,7 @@ void InvokeFixedSizeMorphologyGradient(const SrcT *aSrc1, size_t aPitchSrc1, Dst
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Mirror:
+                /*case mpp::BorderType::Mirror:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -280,7 +280,7 @@ void InvokeFixedSizeMorphologyGradient(const SrcT *aSrc1, size_t aPitchSrc1, Dst
                                                                    pixelBlockSizeX, pixelBlockSizeY, BCType>(
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
                 }
-                break;
+                break;*/
                 default:
                     throw INVALIDARGUMENT(
                         aBorderType,
@@ -305,7 +305,7 @@ void InvokeFixedSizeMorphologyGradient(const SrcT *aSrc1, size_t aPitchSrc1, Dst
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Constant:
+                /*case mpp::BorderType::Constant:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
@@ -314,7 +314,7 @@ void InvokeFixedSizeMorphologyGradient(const SrcT *aSrc1, size_t aPitchSrc1, Dst
                                                                    pixelBlockSizeX, pixelBlockSizeY, BCType>(
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
                 }
-                break;
+                break;*/
                 case mpp::BorderType::Replicate:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
@@ -325,7 +325,7 @@ void InvokeFixedSizeMorphologyGradient(const SrcT *aSrc1, size_t aPitchSrc1, Dst
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Mirror:
+                /*case mpp::BorderType::Mirror:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -354,7 +354,7 @@ void InvokeFixedSizeMorphologyGradient(const SrcT *aSrc1, size_t aPitchSrc1, Dst
                                                                    pixelBlockSizeX, pixelBlockSizeY, BCType>(
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, aStreamCtx);
                 }
-                break;
+                break;*/
                 default:
                     throw INVALIDARGUMENT(
                         aBorderType,

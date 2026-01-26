@@ -31,6 +31,30 @@ TEST_CASE("Matrix<float>", "[Common.Image]")
     CHECK(b[7] == 10);
     CHECK(b[8] == 10);
 
+    float values[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    Matrix<float> b0(values);
+    CHECK(b0[0] == 0);
+    CHECK(b0[1] == 1);
+    CHECK(b0[2] == 2);
+    CHECK(b0[3] == 3);
+    CHECK(b0[4] == 4);
+    CHECK(b0[5] == 5);
+    CHECK(b0[6] == 6);
+    CHECK(b0[7] == 7);
+    CHECK(b0[8] == 8);
+
+    float values2[3][3] = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}};
+    Matrix<float> b1(values2);
+    CHECK(b1[0] == 0);
+    CHECK(b1[1] == 1);
+    CHECK(b1[2] == 2);
+    CHECK(b1[3] == 3);
+    CHECK(b1[4] == 4);
+    CHECK(b1[5] == 5);
+    CHECK(b1[6] == 6);
+    CHECK(b1[7] == 7);
+    CHECK(b1[8] == 8);
+
     Matrix<float> c;
     CHECK(c[0] == 1);
     CHECK(c[1] == 0);
@@ -122,7 +146,7 @@ TEST_CASE("Matrix<float>", "[Common.Image]")
     AffineTransformation<float> affine = shift2 * rot * shift1;
     Matrix<float> perspective(affine);
 
-    Matrix<float> perspectiveFromQuad(roi, quadRot30);
+    Matrix<float> perspectiveFromQuad = Matrix<float>::FromQuads(roi, quadRot30);
 
     Matrix<float> diffPerspective = perspective - perspectiveFromQuad;
     float diff                    = 0;
@@ -160,6 +184,18 @@ TEST_CASE("Matrix<double>", "[Common.Image]")
     CHECK(b0[6] == 6);
     CHECK(b0[7] == 7);
     CHECK(b0[8] == 8);
+
+    double values2[3][3] = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}};
+    Matrix<double> b1(values2);
+    CHECK(b1[0] == 0);
+    CHECK(b1[1] == 1);
+    CHECK(b1[2] == 2);
+    CHECK(b1[3] == 3);
+    CHECK(b1[4] == 4);
+    CHECK(b1[5] == 5);
+    CHECK(b1[6] == 6);
+    CHECK(b1[7] == 7);
+    CHECK(b1[8] == 8);
 
     Matrix<double> c;
     CHECK(c[0] == 1);
@@ -275,7 +311,7 @@ TEST_CASE("Matrix<double>", "[Common.Image]")
     std::pair<Vec2d, Vec2d> pair2(p2, trans2);
     std::pair<Vec2d, Vec2d> pair3(p3, trans3);
 
-    Matrix<double> transform2(pair0, pair1, pair2, pair3);
+    Matrix<double> transform2 = Matrix<double>::FromPoints(pair0, pair1, pair2, pair3);
 
     CHECK(transform[0] == Approx(transform2[0]).margin(0.00001));
     CHECK(transform[1] == Approx(transform2[1]).margin(0.00001));
@@ -298,7 +334,7 @@ TEST_CASE("Matrix<double>", "[Common.Image]")
     AffineTransformation<double> affine2 = shift2 * rot * shift1;
     Matrix<double> perspective(affine2);
 
-    Matrix<double> perspectiveFromQuad(roi, quadRot30);
+    Matrix<double> perspectiveFromQuad = Matrix<double>::FromQuads(roi, quadRot30);
 
     Matrix<double> diffPerspective = perspective - perspectiveFromQuad;
     double diff                    = 0;
@@ -327,6 +363,36 @@ TEST_CASE("Matrix3x4<float>", "[Common.Image]")
     CHECK(b[9] == 10);
     CHECK(b[10] == 10);
     CHECK(b[11] == 10);
+
+    double values[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+    Matrix3x4<double> b0(values);
+    CHECK(b0[0] == 0);
+    CHECK(b0[1] == 1);
+    CHECK(b0[2] == 2);
+    CHECK(b0[3] == 3);
+    CHECK(b0[4] == 4);
+    CHECK(b0[5] == 5);
+    CHECK(b0[6] == 6);
+    CHECK(b0[7] == 7);
+    CHECK(b0[8] == 8);
+    CHECK(b0[9] == 9);
+    CHECK(b0[10] == 10);
+    CHECK(b0[11] == 11);
+
+    double values2[3][4] = {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}};
+    Matrix3x4<double> b1(values2);
+    CHECK(b1[0] == 0);
+    CHECK(b1[1] == 1);
+    CHECK(b1[2] == 2);
+    CHECK(b1[3] == 3);
+    CHECK(b1[4] == 4);
+    CHECK(b1[5] == 5);
+    CHECK(b1[6] == 6);
+    CHECK(b1[7] == 7);
+    CHECK(b1[8] == 8);
+    CHECK(b1[9] == 9);
+    CHECK(b1[10] == 10);
+    CHECK(b1[11] == 11);
 
     Matrix3x4<float> c;
     CHECK(c[0] == 1);
@@ -413,6 +479,44 @@ TEST_CASE("Matrix4x4<float>", "[Common.Image]")
     CHECK(b[13] == 10);
     CHECK(b[14] == 10);
     CHECK(b[15] == 10);
+
+    float values[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+    Matrix4x4<float> b0(values);
+    CHECK(b0[0] == 0);
+    CHECK(b0[1] == 1);
+    CHECK(b0[2] == 2);
+    CHECK(b0[3] == 3);
+    CHECK(b0[4] == 4);
+    CHECK(b0[5] == 5);
+    CHECK(b0[6] == 6);
+    CHECK(b0[7] == 7);
+    CHECK(b0[8] == 8);
+    CHECK(b0[9] == 9);
+    CHECK(b0[10] == 10);
+    CHECK(b0[11] == 11);
+    CHECK(b0[12] == 12);
+    CHECK(b0[13] == 13);
+    CHECK(b0[14] == 14);
+    CHECK(b0[15] == 15);
+
+    float values2[4][4] = {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}, {12, 13, 14, 15}};
+    Matrix4x4<float> b1(values2);
+    CHECK(b1[0] == 0);
+    CHECK(b1[1] == 1);
+    CHECK(b1[2] == 2);
+    CHECK(b1[3] == 3);
+    CHECK(b1[4] == 4);
+    CHECK(b1[5] == 5);
+    CHECK(b1[6] == 6);
+    CHECK(b1[7] == 7);
+    CHECK(b1[8] == 8);
+    CHECK(b1[9] == 9);
+    CHECK(b1[10] == 10);
+    CHECK(b1[11] == 11);
+    CHECK(b1[12] == 12);
+    CHECK(b1[13] == 13);
+    CHECK(b1[14] == 14);
+    CHECK(b1[15] == 15);
 
     Matrix4x4<float> c;
     CHECK(c[0] == 1);

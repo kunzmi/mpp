@@ -34,6 +34,11 @@ class MPPEXPORT_CUDACORE CudaException : public MPPException
     CudaException(const CudaException & /*aOther*/);
     CudaException &operator=(const CudaException &) = delete;
     CudaException &operator=(CudaException &&)      = delete;
+
+    [[nodiscard]] ExceptionCode GetCode() const override
+    {
+        return ExceptionCode::Cuda;
+    }
 };
 
 /// <summary>
@@ -54,6 +59,11 @@ class MPPEXPORT_CUDACORE CudaUnsupportedException : public MPPException
     CudaUnsupportedException(const CudaUnsupportedException &)            = default;
     CudaUnsupportedException &operator=(const CudaUnsupportedException &) = delete;
     CudaUnsupportedException &operator=(CudaUnsupportedException &&)      = delete;
+
+    [[nodiscard]] ExceptionCode GetCode() const override
+    {
+        return ExceptionCode::CudaUnsupported;
+    }
 };
 } // namespace mpp::cuda
 

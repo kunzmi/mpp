@@ -619,9 +619,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <param name="aDst">Destination image</param>
     /// <param name="aLowerBorderSize">Size of the border to add on the lower coordinate side
     /// (usually left and top side of the image)</param>
-    /// <param name="aBorder">Border control paramter</param>
     /// <param name="aConstant">Constant value needed in case BorderType::Constant</param>
-    ImageView<T> &Copy(ImageView<T> &aDst, const Vector2<int> &aLowerBorderSize, BorderType aBorder, const T &aConstant,
+    /// <param name="aBorder">Border control paramter</param>
+    ImageView<T> &Copy(ImageView<T> &aDst, const Vector2<int> &aLowerBorderSize, const T &aConstant, BorderType aBorder,
                        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
@@ -646,84 +646,100 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
 #pragma region Scale
     /// <summary>
     /// Convert with scaling the pixel value from input type value range to ouput type value range using the
-    /// equation:<para/> dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
-    /// whith scaleFactor = (dstMaxRangeValue - dstMinRangeValue) / (srcMaxRangeValue - srcMinRangeValue).
+    /// equation:<para/>
+    /// dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
+    /// whith scaleFactor = (dstMaxRangeValue - dstMinRangeValue) / (srcMaxRangeValue - srcMinRangeValue).<para/>
+    /// For source and destination, the min/max values are implicitly given by the type's min/max values.
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &Scale(ImageView<TTo> &aDst, RoundingMode aRoundingMode,
                           const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
-        requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<T> &&
+        requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) &&
+                (vector_active_size_v<T> == vector_active_size_v<TTo>) && RealOrComplexIntVector<T> &&
                 RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>;
 
     /// <summary>
     /// Convert with scaling the pixel value from input type value range to provided ouput value range using the
-    /// equation:<para/> dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
+    /// equation:<para/>
+    /// dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
     /// whith scaleFactor = (dstMaxRangeValue - dstMinRangeValue) / (srcMaxRangeValue - srcMinRangeValue). Values
-    /// smaller or larger the output range are clamped to min or max value if necessary for integer output types.
+    /// smaller or larger the output range are clamped to min or max value if necessary for integer output types.<para/>
+    /// For the source type, the min/max values are implicitly given by the type's min/max values.
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &Scale(ImageView<TTo> &aDst, complex_basetype_t<pixel_basetype_t<TTo>> aDstMin,
                           complex_basetype_t<pixel_basetype_t<TTo>> aDstMax,
                           const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
-        requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<T> &&
+        requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) &&
+                (vector_active_size_v<T> == vector_active_size_v<TTo>) && RealOrComplexIntVector<T> &&
                 RealOrComplexFloatingVector<TTo> && ScaleImplemented<T, TTo>;
 
     /// <summary>
     /// Convert with scaling the pixel value from input type value range to provided ouput value range using the
-    /// equation:<para/> dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
+    /// equation:<para/>
+    /// dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
     /// whith scaleFactor = (dstMaxRangeValue - dstMinRangeValue) / (srcMaxRangeValue - srcMinRangeValue). Values
-    /// smaller or larger the output range are clamped to min or max value if necessary for integer output types.
+    /// smaller or larger the output range are clamped to min or max value if necessary for integer output types.<para/>
+    /// For the source type, the min/max values are implicitly given by the type's min/max values.
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &Scale(ImageView<TTo> &aDst, complex_basetype_t<pixel_basetype_t<TTo>> aDstMin,
                           complex_basetype_t<pixel_basetype_t<TTo>> aDstMax, RoundingMode aRoundingMode,
                           const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
-        requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<T> &&
+        requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) &&
+                (vector_active_size_v<T> == vector_active_size_v<TTo>) && RealOrComplexIntVector<T> &&
                 RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>;
 
     /// <summary>
     /// Convert with scaling the pixel value from input type value range to provided ouput value range using the
-    /// equation:<para/> dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
+    /// equation:<para/>
+    /// dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
     /// whith scaleFactor = (dstMaxRangeValue - dstMinRangeValue) / (srcMaxRangeValue - srcMinRangeValue). Values
-    /// smaller or larger the output range are clamped to min or max value if necessary.
+    /// smaller or larger the output range are clamped to min or max value if necessary.<para/>
+    /// For the destination type, the min/max values are implicitly given by the type's min/max values.
     /// </summary>
     template <PixelType TTo>
-    ImageView<TTo> &Scale(ImageView<TTo> &aDst, complex_basetype_t<pixel_basetype_t<T>> aSrcMin,
-                          complex_basetype_t<pixel_basetype_t<T>> aSrcMax, RoundingMode aRoundingMode,
+    ImageView<TTo> &Scale(complex_basetype_t<pixel_basetype_t<T>> aSrcMin,
+                          complex_basetype_t<pixel_basetype_t<T>> aSrcMax, ImageView<TTo> &aDst,
+                          RoundingMode aRoundingMode,
                           const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
-        requires(!std::same_as<T, TTo>) &&
-                (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>;
+        requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) &&
+                (vector_active_size_v<T> == vector_active_size_v<TTo>) && RealOrComplexIntVector<TTo> &&
+                ScaleImplemented<T, TTo>;
 
     /// <summary>
     /// Convert with scaling the pixel value from input type value range to provided ouput value range using the
-    /// equation:<para/> dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
+    /// equation:<para/>
+    /// dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
     /// whith scaleFactor = (dstMaxRangeValue - dstMinRangeValue) / (srcMaxRangeValue - srcMinRangeValue). Values
     /// smaller or larger the output range are clamped to min or max value if necessary for integer output types.
     /// </summary>
     template <PixelType TTo>
-    ImageView<TTo> &Scale(ImageView<TTo> &aDst, complex_basetype_t<pixel_basetype_t<T>> aSrcMin,
-                          complex_basetype_t<pixel_basetype_t<T>> aSrcMax,
+    ImageView<TTo> &Scale(complex_basetype_t<pixel_basetype_t<T>> aSrcMin,
+                          complex_basetype_t<pixel_basetype_t<T>> aSrcMax, ImageView<TTo> &aDst,
                           complex_basetype_t<pixel_basetype_t<TTo>> aDstMin,
                           complex_basetype_t<pixel_basetype_t<TTo>> aDstMax,
                           const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
-        requires(!std::same_as<T, TTo>) &&
-                (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexFloatingVector<TTo> && ScaleImplemented<T, TTo>
-    ;
+        requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) &&
+                (vector_active_size_v<T> == vector_active_size_v<TTo>) && RealOrComplexFloatingVector<TTo> &&
+                ScaleImplemented<T, TTo>;
 
     /// <summary>
     /// Convert with scaling the pixel value from input type value range to provided ouput value range using the
-    /// equation:<para/> dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
+    /// equation:<para/>
+    /// dstPixelValue = dstMinRangeValue + scaleFactor * (srcPixelValue - srcMinRangeValue)<para/>
     /// whith scaleFactor = (dstMaxRangeValue - dstMinRangeValue) / (srcMaxRangeValue - srcMinRangeValue). Values
     /// smaller or larger the output range are clamped to min or max value if necessary for integer output types.
     /// </summary>
     template <PixelType TTo>
-    ImageView<TTo> &Scale(ImageView<TTo> &aDst, complex_basetype_t<pixel_basetype_t<T>> aSrcMin,
-                          complex_basetype_t<pixel_basetype_t<T>> aSrcMax,
+    ImageView<TTo> &Scale(complex_basetype_t<pixel_basetype_t<T>> aSrcMin,
+                          complex_basetype_t<pixel_basetype_t<T>> aSrcMax, ImageView<TTo> &aDst,
                           complex_basetype_t<pixel_basetype_t<TTo>> aDstMin,
                           complex_basetype_t<pixel_basetype_t<TTo>> aDstMax, RoundingMode aRoundingMode,
                           const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
-        requires(!std::same_as<T, TTo>) &&
-                (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>;
+        requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) &&
+                (vector_active_size_v<T> == vector_active_size_v<TTo>) && RealOrComplexIntVector<TTo> &&
+                ScaleImplemented<T, TTo>;
 
 #pragma endregion
 #pragma region Set
@@ -765,19 +781,24 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
 #pragma endregion
 #pragma region Swap Channel
     /// <summary>
-    /// Swap channels
+    /// Swap channels for two channel images.
     /// </summary>
     ImageView<T> &SwapChannel(ImageView<T> &aDst,
                               const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires(vector_size_v<T> == 2);
 
     /// <summary>
-    /// Swap channels (inplace)
+    /// Swap channels (inplace) for two channel images.
     /// </summary>
     ImageView<T> &SwapChannel(const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires(vector_size_v<T> == 2);
+
     /// <summary>
-    /// Swap channels
+    /// Swap channels<para/>
+    /// aDstChannels describes how channel values are permutated. The n-th entry
+    /// of the array contains the number of the channel that is stored in the n-th channel of
+    /// the output image. <para/>
+    /// E.g. Given an RGB image, aDstChannels = [2,1,0] converts this to BGR channel order.
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &SwapChannel(ImageView<TTo> &aDst, const ChannelList<vector_active_size_v<TTo>> &aDstChannels,
@@ -790,15 +811,24 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
                 std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>;
 
     /// <summary>
-    /// Swap channels (inplace)
+    /// Swap channels (inplace)<para/>
+    /// aDstChannels describes how channel values are permutated. The n-th entry
+    /// of the array contains the number of the channel that is stored in the n-th channel of
+    /// the output image. <para/>
+    /// E.g. Given an RGB image, aDstChannels = [2,1,0] converts this to BGR channel order.
     /// </summary>
     ImageView<T> &SwapChannel(const ChannelList<vector_active_size_v<T>> &aDstChannels,
                               const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires(vector_size_v<T> >= 3) && (!has_alpha_channel_v<T>);
 
     /// <summary>
-    /// Swap channels (3-channel to 4-channel with additional value). If aDstChannels[i] == 3, channel i of aDst is set
-    /// to aValue, if aDstChannels[i] > 3, channel i of aDst is kept unchanged.
+    /// Swap channels (3-channel to 4-channel with additional value).<para/>
+    /// aDstChannels describes how channel values are permutated. The n-th entry
+    /// of the array contains the number of the channel that is stored in the n-th channel of
+    /// the output image. <para/>
+    /// E.g. Given an RGB image, aDstChannels = [2,1,0] converts this to BGR channel order.<para/>
+    /// If aDstChannels[i] == 3, channel i of aDst is set to aValue, if aDstChannels[i] > 3, channel i of aDst is kept
+    /// unchanged.
     /// </summary>
     template <PixelType TTo>
     ImageView<TTo> &SwapChannel(ImageView<TTo> &aDst, const ChannelList<vector_active_size_v<TTo>> &aDstChannels,
@@ -1819,37 +1849,37 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
 #pragma endregion
 #pragma region AddSquare
     /// <summary>
-    /// SrcDst += this^2
+    /// aSrcDst += this^2
     /// </summary>
     ImageView<add_spw_output_for_t<T>> &AddSquare(
         ImageView<add_spw_output_for_t<T>> &aSrcDst,
-        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get());
+        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
-    /// SrcDst += this^2
+    /// aSrcDst += this^2
     /// </summary>
     ImageView<add_spw_output_for_t<T>> &AddSquareMasked(
         ImageView<add_spw_output_for_t<T>> &aSrcDst, const ImageView<Pixel8uC1> &aMask,
-        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get());
+        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const;
 #pragma endregion
 #pragma region AddProduct
     /// <summary>
-    /// SrcDst += this * Src2
+    /// aSrcDst += this * aSrc2
     /// </summary>
     ImageView<add_spw_output_for_t<T>> &AddProduct(
         const ImageView<T> &aSrc2, ImageView<add_spw_output_for_t<T>> &aSrcDst,
-        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get());
+        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
-    /// SrcDst += this * Src2
+    /// aSrcDst += this * aSrc2
     /// </summary>
     ImageView<add_spw_output_for_t<T>> &AddProductMasked(
         const ImageView<T> &aSrc2, ImageView<add_spw_output_for_t<T>> &aSrcDst, const ImageView<Pixel8uC1> &aMask,
-        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get());
+        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const;
 #pragma endregion
 #pragma region AddWeighted
     /// <summary>
-    /// Dst = this * alpha + Src2 * (1 - alpha)
+    /// aDst = this * alpha + aSrc2 * (1 - alpha)
     /// </summary>
     ImageView<add_spw_output_for_t<T>> &AddWeighted(
         const ImageView<T> &aSrc2, ImageView<add_spw_output_for_t<T>> &aDst,
@@ -1857,21 +1887,21 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
         const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
-    /// Dst = this * alpha + Src2 * (1 - alpha)
+    /// aDst = this * alpha + aSrc2 * (1 - alpha)
     /// </summary>
     ImageView<add_spw_output_for_t<T>> &AddWeightedMasked(
         const ImageView<T> &aSrc2, ImageView<add_spw_output_for_t<T>> &aDst,
         remove_vector_t<add_spw_output_for_t<T>> aAlpha, const ImageView<Pixel8uC1> &aMask,
         const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const;
     /// <summary>
-    /// SrcDst = this * alpha + SrcDst * (1 - alpha)
+    /// aSrcDst = this * alpha + aSrcDst * (1 - alpha)
     /// </summary>
     ImageView<add_spw_output_for_t<T>> &AddWeighted(
         ImageView<add_spw_output_for_t<T>> &aSrcDst, remove_vector_t<add_spw_output_for_t<T>> aAlpha,
         const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get());
 
     /// <summary>
-    /// SrcDst = this * alpha + SrcDst * (1 - alpha)
+    /// aSrcDst = this * alpha + aSrcDst * (1 - alpha)
     /// </summary>
     ImageView<add_spw_output_for_t<T>> &AddWeightedMasked(
         ImageView<add_spw_output_for_t<T>> &aSrcDst, remove_vector_t<add_spw_output_for_t<T>> aAlpha,
@@ -2922,19 +2952,28 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// This function pre-computes the geometrical distance coefficients for bilateral Gauss filtering. The result of
     /// this function can be passed to BilateralGaussFilter.
     /// </summary>
-    /// <param name="aPreCompGeomDistCoeff"></param>
-    /// <param name="aFilterArea"></param>
-    /// <param name="aPosSquareSigma"></param>
-    /// <param name="aStreamCtx"></param>
-    void PrecomputeBilateralGaussFilter(
+    /// <param name="aPreCompGeomDistCoeff">Device array that will be filled with the geometrical distance
+    /// coefficients. Array must be at least of size of the filter area, i.e. width * height.</param>
+    /// <param name="aFilterArea">Size of the filter.</param>
+    /// <param name="aPosSquareSigma">The square of the sigma for the relative geometric distance between
+    /// a source image pixel in the filter kernel and the source image pixel at the center of the filter kernel.
+    /// </param>
+    static void PrecomputeBilateralGaussFilter(
         mpp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff, const FilterArea &aFilterArea, float aPosSquareSigma,
-        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
+        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires RealVector<T> && (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
 
     /// <summary>
     /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
     /// from PrecomputeBilateralGaussFilter().
     /// </summary>
+    /// <param name="aDst">Destination image.</param>
+    /// <param name="aFilterArea">Size of the filter.</param>
+    /// <param name="aPreCompGeomDistCoeff">pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().</param>
+    /// <param name="aValSquareSigma">The square of the sigma for the relative intensity distance
+    /// between a source image pixel in the filter kernel and the source image pixel at the center
+    /// of the filter kernel.</param>
     ImageView<T> &BilateralGaussFilter(
         ImageView<T> &aDst, const FilterArea &aFilterArea,
         const mpp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff, float aValSquareSigma, const T &aConstant,
@@ -2946,6 +2985,13 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
     /// from PrecomputeBilateralGaussFilter().
     /// </summary>
+    /// <param name="aDst">Destination image.</param>
+    /// <param name="aFilterArea">Size of the filter.</param>
+    /// <param name="aPreCompGeomDistCoeff">pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().</param>
+    /// <param name="aValSquareSigma">The square of the sigma for the relative intensity distance
+    /// between a source image pixel in the filter kernel and the source image pixel at the center
+    /// of the filter kernel.</param>
     ImageView<T> &BilateralGaussFilter(
         ImageView<T> &aDst, const FilterArea &aFilterArea,
         const mpp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff, float aValSquareSigma, BorderType aBorder,
@@ -2957,6 +3003,13 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
     /// from PrecomputeBilateralGaussFilter().
     /// </summary>
+    /// <param name="aDst">Destination image.</param>
+    /// <param name="aFilterArea">Size of the filter.</param>
+    /// <param name="aPreCompGeomDistCoeff">pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().</param>
+    /// <param name="aValSquareSigma">The square of the sigma for the relative intensity distance
+    /// between a source image pixel in the filter kernel and the source image pixel at the center
+    /// of the filter kernel.</param>
     ImageView<T> &BilateralGaussFilter(
         ImageView<T> &aDst, const FilterArea &aFilterArea,
         const mpp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff, float aValSquareSigma, const T &aConstant,
@@ -2969,16 +3022,32 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
     /// from PrecomputeBilateralGaussFilter().
     /// </summary>
+    /// <param name="aDst">Destination image.</param>
+    /// <param name="aFilterArea">Size of the filter.</param>
+    /// <param name="aPreCompGeomDistCoeff">pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().</param>
+    /// <param name="aValSquareSigma">The square of the sigma for the relative intensity distance
+    /// between a source image pixel in the filter kernel and the source image pixel at the center
+    /// of the filter kernel.</param>
     ImageView<T> &BilateralGaussFilter(
         ImageView<T> &aDst, const FilterArea &aFilterArea,
         const mpp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff, float aValSquareSigma, BorderType aBorder,
         const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires SingleChannel<T> && RealVector<T> &&
                  (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
+
     /// <summary>
     /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
     /// from PrecomputeBilateralGaussFilter().
     /// </summary>
+    /// <param name="aDst">Destination image.</param>
+    /// <param name="aFilterArea">Size of the filter.</param>
+    /// <param name="aPreCompGeomDistCoeff">pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().</param>
+    /// <param name="aValSquareSigma">The square of the sigma for the relative intensity distance
+    /// between a source image pixel in the filter kernel and the source image pixel at the center
+    /// of the filter kernel.</param>
+    /// <param name="aNorm">Norm to use when computing the pixel weight for multi-channel images.</param>
     ImageView<T> &BilateralGaussFilter(
         ImageView<T> &aDst, const FilterArea &aFilterArea,
         const mpp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff, float aValSquareSigma, mpp::Norm aNorm,
@@ -2986,20 +3055,38 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
         const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires(!SingleChannel<T>) && RealVector<T> &&
                 (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
+
     /// <summary>
     /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
     /// from PrecomputeBilateralGaussFilter().
     /// </summary>
+    /// <param name="aDst">Destination image.</param>
+    /// <param name="aFilterArea">Size of the filter.</param>
+    /// <param name="aPreCompGeomDistCoeff">pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().</param>
+    /// <param name="aValSquareSigma">The square of the sigma for the relative intensity distance
+    /// between a source image pixel in the filter kernel and the source image pixel at the center
+    /// of the filter kernel.</param>
+    /// <param name="aNorm">Norm to use when computing the pixel weight for multi-channel images.</param>
     ImageView<T> &BilateralGaussFilter(
         ImageView<T> &aDst, const FilterArea &aFilterArea,
         const mpp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff, float aValSquareSigma, mpp::Norm aNorm,
         BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires(!SingleChannel<T>) && RealVector<T> &&
                 (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
+
     /// <summary>
     /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
     /// from PrecomputeBilateralGaussFilter().
     /// </summary>
+    /// <param name="aDst">Destination image.</param>
+    /// <param name="aFilterArea">Size of the filter.</param>
+    /// <param name="aPreCompGeomDistCoeff">pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().</param>
+    /// <param name="aValSquareSigma">The square of the sigma for the relative intensity distance
+    /// between a source image pixel in the filter kernel and the source image pixel at the center
+    /// of the filter kernel.</param>
+    /// <param name="aNorm">Norm to use when computing the pixel weight for multi-channel images.</param>
     ImageView<T> &BilateralGaussFilter(
         ImageView<T> &aDst, const FilterArea &aFilterArea,
         const mpp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff, float aValSquareSigma, mpp::Norm aNorm,
@@ -3007,10 +3094,19 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
         const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires(!SingleChannel<T>) && RealVector<T> &&
                 (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>);
+
     /// <summary>
     /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
     /// from PrecomputeBilateralGaussFilter().
     /// </summary>
+    /// <param name="aDst">Destination image.</param>
+    /// <param name="aFilterArea">Size of the filter.</param>
+    /// <param name="aPreCompGeomDistCoeff">pre-computed geometrical distance coefficients obtained
+    /// from PrecomputeBilateralGaussFilter().</param>
+    /// <param name="aValSquareSigma">The square of the sigma for the relative intensity distance
+    /// between a source image pixel in the filter kernel and the source image pixel at the center
+    /// of the filter kernel.</param>
+    /// <param name="aNorm">Norm to use when computing the pixel weight for multi-channel images.</param>
     ImageView<T> &BilateralGaussFilter(
         ImageView<T> &aDst, const FilterArea &aFilterArea,
         const mpp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff, float aValSquareSigma, mpp::Norm aNorm,
@@ -3636,7 +3732,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
 #pragma region Canny edge
     /// <summary>
     /// For an gradient magnitude image and an gradient orientation image obtained from one of the gradient vector
-    /// functions, this function performs canny edge detection.
+    /// functions, this function performs canny edge detection.<para/>
+    /// aTemp is a single channel unsigned char image with the same dimensions as the source image for temporary
+    /// storage.
     /// </summary>
     ImageView<Pixel8uC1> &CannyEdge(const ImageView<Pixel32fC1> &aSrcAngle, ImageView<Pixel8uC1> &aTemp,
                                     ImageView<Pixel8uC1> &aDst, T aLowThreshold, T aHighThreshold,
@@ -3644,7 +3742,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
         requires std::same_as<T, Pixel16sC1> || std::same_as<T, Pixel32fC1>;
     /// <summary>
     /// For an gradient magnitude image and an gradient orientation image obtained from one of the gradient vector
-    /// functions, this function performs canny edge detection.
+    /// functions, this function performs canny edge detection.<para/>
+    /// aTemp is a single channel unsigned char image with the same dimensions as the source image for temporary
+    /// storage.
     /// </summary>
     ImageView<Pixel8uC1> &CannyEdge(const ImageView<Pixel32fC1> &aSrcAngle, ImageView<Pixel8uC1> &aTemp,
                                     ImageView<Pixel8uC1> &aDst, T aLowThreshold, T aHighThreshold,
@@ -5372,7 +5472,7 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
         requires FourChannelNoAlpha<T>;
 
     /// <summary>
-    /// Returns a shift to be used in MPP resize method that matches to the result given by the NPP Resize-function.
+    /// Returns a shift to be used in MPP resize method that matches the result given by the NPP Resize-function.
     /// </summary>
     Vec2f ResizeGetNPPShift(ImageView<T> &aDst) const;
 
@@ -6714,7 +6814,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
 #pragma endregion
 #pragma region Open
     /// <summary>
-    /// First applies erosion then dilation.
+    /// First applies erosion then dilation.<para/>
+    /// aTemp is a temporary image of the same size and type as the source / destination image for intermediate results.
     /// </summary>
     ImageView<T> &Open(ImageView<T> &aTemp, ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                        const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder,
@@ -6722,7 +6823,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
                        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
     /// <summary>
-    /// First applies erosion then dilation.
+    /// First applies erosion then dilation.<para/>
+    /// aTemp is a temporary image of the same size and type as the source / destination image for intermediate results.
     /// </summary>
     ImageView<T> &Open(ImageView<T> &aTemp, ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                        const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi,
@@ -6730,14 +6832,16 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
         requires RealVector<T>;
 
     /// <summary>
-    /// First applies erosion then dilation.
+    /// First applies erosion then dilation.<para/>
+    /// aTemp is a temporary image of the same size and type as the source / destination image for intermediate results.
     /// </summary>
     ImageView<T> &Open(ImageView<T> &aTemp, ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                        const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder,
                        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
     /// <summary>
-    /// First applies erosion then dilation.
+    /// First applies erosion then dilation.<para/>
+    /// aTemp is a temporary image of the same size and type as the source / destination image for intermediate results.
     /// </summary>
     ImageView<T> &Open(ImageView<T> &aTemp, ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                        const FilterArea &aFilterArea, BorderType aBorder,
@@ -6746,7 +6850,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
 #pragma endregion
 #pragma region Close
     /// <summary>
-    /// First applies dilation then erosion.
+    /// First applies dilation then erosion.<para/>
+    /// aTemp is a temporary image of the same size and type as the source / destination image for intermediate results.
     /// </summary>
     ImageView<T> &Close(ImageView<T> &aTemp, ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                         const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder,
@@ -6754,7 +6859,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
                         const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
     /// <summary>
-    /// First applies dilation then erosion.
+    /// First applies dilation then erosion.<para/>
+    /// aTemp is a temporary image of the same size and type as the source / destination image for intermediate results.
     /// </summary>
     ImageView<T> &Close(ImageView<T> &aTemp, ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                         const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi,
@@ -6762,14 +6868,16 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
         requires RealVector<T>;
 
     /// <summary>
-    /// First applies dilation then erosion.
+    /// First applies dilation then erosion.<para/>
+    /// aTemp is a temporary image of the same size and type as the source / destination image for intermediate results.
     /// </summary>
     ImageView<T> &Close(ImageView<T> &aTemp, ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                         const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder,
                         const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
     /// <summary>
-    /// First applies dilation then erosion.
+    /// First applies dilation then erosion.<para/>
+    /// aTemp is a temporary image of the same size and type as the source / destination image for intermediate results.
     /// </summary>
     ImageView<T> &Close(ImageView<T> &aTemp, ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                         const FilterArea &aFilterArea, BorderType aBorder,
@@ -6778,7 +6886,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
 #pragma endregion
 #pragma region TopHat
     /// <summary>
-    /// The result is the original image minus the result from morphological opening.
+    /// The result is the original image minus the result from morphological opening.<para/>
+    /// aTemp is a temporary image of the same size and type as the source / destination image for intermediate results.
     /// </summary>
     ImageView<T> &TopHat(ImageView<T> &aTemp, ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                          const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder,
@@ -6786,7 +6895,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
                          const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
     /// <summary>
-    /// The result is the original image minus the result from morphological opening.
+    /// The result is the original image minus the result from morphological opening.<para/>
+    /// aTemp is a temporary image of the same size and type as the source / destination image for intermediate results.
     /// </summary>
     ImageView<T> &TopHat(ImageView<T> &aTemp, ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                          const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi,
@@ -6794,14 +6904,16 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
         requires RealVector<T>;
 
     /// <summary>
-    /// The result is the original image minus the result from morphological opening.
+    /// The result is the original image minus the result from morphological opening.<para/>
+    /// aTemp is a temporary image of the same size and type as the source / destination image for intermediate results.
     /// </summary>
     ImageView<T> &TopHat(ImageView<T> &aTemp, ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                          const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder,
                          const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
     /// <summary>
-    /// The result is the original image minus the result from morphological opening.
+    /// The result is the original image minus the result from morphological opening.<para/>
+    /// aTemp is a temporary image of the same size and type as the source / destination image for intermediate results.
     /// </summary>
     ImageView<T> &TopHat(ImageView<T> &aTemp, ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                          const FilterArea &aFilterArea, BorderType aBorder,
@@ -6810,7 +6922,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
 #pragma endregion
 #pragma region BlackHat
     /// <summary>
-    /// The result is the result from morphological closing minus the original image.
+    /// The result is the result from morphological closing minus the original image.<para/>
+    /// aTemp is a temporary image of the same size and type as the source / destination image for intermediate results.
     /// </summary>
     ImageView<T> &BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                            const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder,
@@ -6818,7 +6931,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
                            const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
     /// <summary>
-    /// The result is the result from morphological closing minus the original image.
+    /// The result is the result from morphological closing minus the original image.<para/>
+    /// aTemp is a temporary image of the same size and type as the source / destination image for intermediate results.
     /// </summary>
     ImageView<T> &BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                            const FilterArea &aFilterArea, BorderType aBorder, const Roi &aAllowedReadRoi,
@@ -6826,14 +6940,16 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
         requires RealVector<T>;
 
     /// <summary>
-    /// The result is the result from morphological closing minus the original image.
+    /// The result is the result from morphological closing minus the original image.<para/>
+    /// aTemp is a temporary image of the same size and type as the source / destination image for intermediate results.
     /// </summary>
     ImageView<T> &BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                            const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder,
                            const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
     /// <summary>
-    /// The result is the result from morphological closing minus the original image.
+    /// The result is the result from morphological closing minus the original image.<para/>
+    /// aTemp is a temporary image of the same size and type as the source / destination image for intermediate results.
     /// </summary>
     ImageView<T> &BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst, const mpp::cuda::DevVarView<Pixel8uC1> &aMask,
                            const FilterArea &aFilterArea, BorderType aBorder,
@@ -7874,9 +7990,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <param name="aSrc2">Second source image</param>
     /// <param name="aDst">Per-channel result, can be nullptr</param>
     /// <param name="aDstScalar">Result for all channels, can be nullptr</param>
-    /// <param name="aValueRange">The maximum possible pixel value, eg. 255 for 8 bit unsigned int images, 4095 for
-    /// 12-bit unsigned images, etc.</param> <param name="aBuffer">Temporary device memory buffer for
-    /// computation.</param> <param name="aStreamCtx"></param>
+    /// <param name="aValueRange">The maximum possible pixel value, eg. 255 for 8 bit unsigned int images,
+    /// 4095 for 12-bit unsigned images, etc.</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
     void PSNR(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<mse_types_for_rt<T>> &aDst,
               mpp::cuda::DevVarView<remove_vector_t<mse_types_for_rt<T>>> &aDstScalar,
               remove_vector_t<mse_types_for_rt<T>> aValueRange, mpp::cuda::DevVarView<byte> &aBuffer,
@@ -7888,9 +8005,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// </summary>
     /// <param name="aSrc2">Second source image</param>
     /// <param name="aDst">Result</param>
-    /// <param name="aValueRange">The maximum possible pixel value, eg. 255 for 8 bit unsigned int images, 4095 for
-    /// 12-bit unsigned images, etc.</param> <param name="aBuffer">Temporary device memory buffer for
-    /// computation.</param> <param name="aStreamCtx"></param>
+    /// <param name="aValueRange">The maximum possible pixel value, eg. 255 for 8 bit unsigned int images,
+    /// 4095 for 12-bit unsigned images, etc.</param>
+    /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
+    /// <param name="aStreamCtx"></param>
     void PSNR(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<mse_types_for_rt<T>> &aDst,
               remove_vector_t<mse_types_for_rt<T>> aValueRange, mpp::cuda::DevVarView<byte> &aBuffer,
               const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
@@ -8345,8 +8463,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// </summary>
     /// <param name="aMean">Per-channel mean value, can be nullptr if aStd is also nullptr</param>
     /// <param name="aStd">Per-channel standard deviation value, can be nullptr if aMean is also nullptr</param>
-    /// <param name="aMeanScalar">Mean value for all channels, can be nullptr if aStdScalar also nullptr</param>
-    /// <param name="aStdScalar">Standard deviation for all channels, can be nullptr if aMeanScalar also nullptr</param>
+    /// <param name="aMeanScalar">Mean value for all channels, can be nullptr if aStdScalar is also nullptr</param>
+    /// <param name="aStdScalar">Standard deviation for all channels, can be nullptr if aMeanScalar is also
+    /// nullptr</param>
     /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
     /// <param name="aStreamCtx"></param>
     void MeanStd(mpp::cuda::DevVarView<meanStd_types_for_rt1<T>> &aMean,
@@ -8364,8 +8483,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// </summary>
     /// <param name="aMean">Per-channel mean value, can be nullptr if aStd is also nullptr</param>
     /// <param name="aStd">Per-channel standard deviation value, can be nullptr if aMean is also nullptr</param>
-    /// <param name="aMeanScalar">Mean value for all channels, can be nullptr if aStdScalar also nullptr</param>
-    /// <param name="aStdScalar">Standard deviation for all channels, can be nullptr if aMeanScalar also nullptr</param>
+    /// <param name="aMeanScalar">Mean value for all channels, can be nullptr if aStdScalar is also nullptr</param>
+    /// <param name="aStdScalar">Standard deviation for all channels, can be nullptr if aMeanScalar is also
+    /// nullptr</param>
     /// <param name="aMask"></param>
     /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
     /// <param name="aStreamCtx"></param>
@@ -9369,22 +9489,22 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// computation.
     /// </summary>
     /// <param name="aHPtrLevels">A host pointer to array which receives the levels being computed.
-    /// The array needs to be of size aLevels.</ param>
-    /// <param name="aLevels">The number of levels being computed. aLevels must be at least 2</param>
+    /// The array needs to be of size aNumLevels.</ param>
+    /// <param name="aNumLevels">The number of levels being computed. aNumLevels must be at least 2</param>
     /// <param name="aLowerLevel">Lower boundary value of the lowest level.</param>
     /// <param name="aUpperLevel">Upper boundary value of the greatest level.</param>
     /// <param name="aHistorgamEvenMode">Switch compatibility mode: CUB (default) or NPP.</param>
-    void EvenLevels(int *aHPtrLevels, int aLevels, int aLowerLevel, int aUpperLevel,
-                    HistorgamEvenMode aHistorgamEvenMode = HistorgamEvenMode::Default)
+    static void EvenLevels(int *aHPtrLevels, int aNumLevels, int aLowerLevel, int aUpperLevel,
+                           HistorgamEvenMode aHistorgamEvenMode = HistorgamEvenMode::Default)
         requires RealVector<T>;
 
     /// <summary>
     /// Returns the required temporary buffer size for HistogramEven.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    /// <param name="aLevels">aLevels - 1 = number of histogram bins, per channel</param>
+    /// <param name="aNumLevels">aNumLevels - 1 = number of histogram bins, per channel</param>
     [[nodiscard]] size_t HistogramEvenBufferSize(
-        const same_vector_size_different_type_t<T, int> &aLevels,
+        const same_vector_size_different_type_t<T, int> &aNumLevels,
         const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T>;
 
@@ -9401,7 +9521,7 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     void HistogramEven(mpp::cuda::DevVarView<int> aHist[vector_active_size_v<T>],
                        const hist_even_level_types_for_t<T> &aLowerLevel,
                        const hist_even_level_types_for_t<T> &aUpperLevel, mpp::cuda::DevVarView<byte> &aBuffer,
-                       const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
+                       const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T> && (vector_active_size_v<T> > 1);
 
     /// <summary>
@@ -9416,7 +9536,7 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <param name="aStreamCtx"></param>
     void HistogramEven(mpp::cuda::DevVarView<int> &aHist, const hist_even_level_types_for_t<T> &aLowerLevel,
                        const hist_even_level_types_for_t<T> &aUpperLevel, mpp::cuda::DevVarView<byte> &aBuffer,
-                       const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
+                       const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T> && (vector_active_size_v<T> == 1);
 
     /// <summary>
@@ -9440,9 +9560,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <param name="aBuffer"></param>
     /// <param name="aStreamCtx"></param>
     void HistogramRange(mpp::cuda::DevVarView<int> aHist[vector_active_size_v<T>],
-                        mpp::cuda::DevVarView<hist_range_types_for_t<T>> aLevels[vector_active_size_v<T>],
+                        const mpp::cuda::DevVarView<hist_range_types_for_t<T>> aLevels[vector_active_size_v<T>],
                         mpp::cuda::DevVarView<byte> &aBuffer,
-                        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
+                        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T> && (vector_active_size_v<T> > 1);
 
     /// <summary>
@@ -9458,7 +9578,7 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     void HistogramRange(mpp::cuda::DevVarView<int> &aHist,
                         const mpp::cuda::DevVarView<hist_range_types_for_t<T>> &aLevels,
                         mpp::cuda::DevVarView<byte> &aBuffer,
-                        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
+                        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T> && (vector_active_size_v<T> == 1);
 #pragma endregion
 
@@ -10019,13 +10139,6 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
 #pragma endregion
 
 #pragma region ColorConversion
-    /// <summary>
-    /// </summary>
-    ImageView<Vector2<remove_vector_t<T>>> &RGB2YCbCr422C2(
-        ImageView<Vector2<remove_vector_t<T>>> &aDst,
-        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
-        requires std::same_as<Pixel8uC3, T>;
-
 #pragma region HLS
 #pragma region RGBtoHLS
     /// <summary>
@@ -10048,8 +10161,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void RGBtoHLS(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+    void RGBtoHLS(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
                  std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
@@ -10062,8 +10175,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void RGBtoHLS(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    void RGBtoHLS(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                   float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -10076,11 +10189,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static void RGBtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void RGBtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                          const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
                  std::same_as<Pixel32fC3, T>;
@@ -10092,9 +10205,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &RGBtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+    static ImageView<T> &RGBtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
@@ -10108,10 +10221,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &RGBtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static ImageView<T> &RGBtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -10151,8 +10264,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void BGRtoHLS(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+    void BGRtoHLS(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
                  std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
@@ -10165,8 +10278,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void BGRtoHLS(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    void BGRtoHLS(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                   float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -10179,11 +10292,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static void BGRtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void BGRtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                          const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
                  std::same_as<Pixel32fC3, T>;
@@ -10195,9 +10308,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &BGRtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+    static ImageView<T> &BGRtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
@@ -10211,10 +10324,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &BGRtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static ImageView<T> &BGRtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -10255,8 +10368,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void HLStoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+    void HLStoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
                  std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
@@ -10269,8 +10382,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void HLStoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    void HLStoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                   float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -10283,11 +10396,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static void HLStoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void HLStoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                          const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
                  std::same_as<Pixel32fC3, T>;
@@ -10299,9 +10412,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &HLStoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+    static ImageView<T> &HLStoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
@@ -10315,10 +10428,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &HLStoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static ImageView<T> &HLStoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -10358,8 +10471,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void HLStoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+    void HLStoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
                  std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
@@ -10372,8 +10485,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void HLStoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    void HLStoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                   float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -10386,11 +10499,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static void HLStoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void HLStoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                          const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
                  std::same_as<Pixel32fC3, T>;
@@ -10402,9 +10515,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &HLStoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+    static ImageView<T> &HLStoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
@@ -10418,10 +10531,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &HLStoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static ImageView<T> &HLStoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -10464,8 +10577,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void RGBtoHSV(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+    void RGBtoHSV(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
                  std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
@@ -10478,8 +10591,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void RGBtoHSV(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    void RGBtoHSV(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                   float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -10492,11 +10605,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static void RGBtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void RGBtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                          const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
                  std::same_as<Pixel32fC3, T>;
@@ -10508,9 +10621,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &RGBtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+    static ImageView<T> &RGBtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
@@ -10524,10 +10637,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &RGBtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static ImageView<T> &RGBtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -10567,8 +10680,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void BGRtoHSV(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+    void BGRtoHSV(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
                  std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
@@ -10581,8 +10694,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void BGRtoHSV(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    void BGRtoHSV(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                   float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -10595,11 +10708,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static void BGRtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void BGRtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                          const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
                  std::same_as<Pixel32fC3, T>;
@@ -10611,9 +10724,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &BGRtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+    static ImageView<T> &BGRtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
@@ -10627,10 +10740,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &BGRtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static ImageView<T> &BGRtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -10671,8 +10784,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void HSVtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+    void HSVtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
                  std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
@@ -10685,8 +10798,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void HSVtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    void HSVtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                   float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -10699,11 +10812,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static void HSVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void HSVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                          const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
                  std::same_as<Pixel32fC3, T>;
@@ -10715,9 +10828,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &HSVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+    static ImageView<T> &HSVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
@@ -10731,10 +10844,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &HSVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static ImageView<T> &HSVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -10774,8 +10887,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void HSVtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+    void HSVtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
                  std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
@@ -10788,8 +10901,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void HSVtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    void HSVtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                   float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -10802,11 +10915,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static void HSVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void HSVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                          const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
                  std::same_as<Pixel32fC3, T>;
@@ -10818,9 +10931,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &HSVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+    static ImageView<T> &HSVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
@@ -10834,10 +10947,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &HSVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static ImageView<T> &HSVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -10880,8 +10993,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void RGBtoLab(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+    void RGBtoLab(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
                  std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
@@ -10894,8 +11007,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void RGBtoLab(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    void RGBtoLab(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                   float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -10908,11 +11021,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static void RGBtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void RGBtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                          const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
                  std::same_as<Pixel32fC3, T>;
@@ -10924,9 +11037,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &RGBtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+    static ImageView<T> &RGBtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
@@ -10940,10 +11053,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &RGBtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static ImageView<T> &RGBtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -10983,8 +11096,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void BGRtoLab(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+    void BGRtoLab(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
                  std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
@@ -10997,8 +11110,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void BGRtoLab(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    void BGRtoLab(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                   float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -11011,11 +11124,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static void BGRtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void BGRtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                          const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
                  std::same_as<Pixel32fC3, T>;
@@ -11027,9 +11140,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &BGRtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+    static ImageView<T> &BGRtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
@@ -11043,10 +11156,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &BGRtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static ImageView<T> &BGRtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -11087,8 +11200,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void LabtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+    void LabtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
                  std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
@@ -11101,8 +11214,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void LabtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    void LabtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                   float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -11115,11 +11228,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static void LabtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void LabtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                          const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
                  std::same_as<Pixel32fC3, T>;
@@ -11131,9 +11244,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &LabtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+    static ImageView<T> &LabtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
@@ -11147,10 +11260,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &LabtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static ImageView<T> &LabtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -11190,8 +11303,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void LabtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+    void LabtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
                  std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
@@ -11204,8 +11317,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void LabtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    void LabtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                   float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -11218,11 +11331,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static void LabtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void LabtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                          const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
                  std::same_as<Pixel32fC3, T>;
@@ -11234,9 +11347,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &LabtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+    static ImageView<T> &LabtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
@@ -11250,10 +11363,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &LabtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static ImageView<T> &LabtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -11296,8 +11409,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void RGBtoLUV(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+    void RGBtoLUV(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
                  std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
@@ -11310,8 +11423,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void RGBtoLUV(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    void RGBtoLUV(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                   float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -11324,11 +11437,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static void RGBtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void RGBtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                          const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
                  std::same_as<Pixel32fC3, T>;
@@ -11340,9 +11453,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &RGBtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+    static ImageView<T> &RGBtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
@@ -11356,10 +11469,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &RGBtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static ImageView<T> &RGBtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -11399,8 +11512,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void BGRtoLUV(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+    void BGRtoLUV(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
                  std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
@@ -11413,8 +11526,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void BGRtoLUV(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    void BGRtoLUV(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                   float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -11427,11 +11540,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static void BGRtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void BGRtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                          const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
                  std::same_as<Pixel32fC3, T>;
@@ -11443,9 +11556,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &BGRtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+    static ImageView<T> &BGRtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
@@ -11459,10 +11572,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &BGRtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static ImageView<T> &BGRtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -11503,8 +11616,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void LUVtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+    void LUVtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
                  std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
@@ -11517,8 +11630,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void LUVtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    void LUVtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                   float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -11531,11 +11644,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static void LUVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void LUVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                          const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
                  std::same_as<Pixel32fC3, T>;
@@ -11547,9 +11660,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &LUVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+    static ImageView<T> &LUVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
@@ -11563,10 +11676,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &LUVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static ImageView<T> &LUVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -11606,8 +11719,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void LUVtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+    void LUVtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
                  std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
@@ -11620,8 +11733,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    void LUVtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    void LUVtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                   float aNormalizationFactor,
                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -11634,11 +11747,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static void LUVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void LUVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                         ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                         const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                         ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                          const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
                  std::same_as<Pixel32fC3, T>;
@@ -11650,9 +11763,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &LUVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+    static ImageView<T> &LUVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
@@ -11666,10 +11779,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// either 1023.0f (10-bit value range), 4095.0f (12-bit value range), 16383.0f (14-bit value range) or 65535.0f
     /// (16-bit value range). For float images the factor is usually 1.0f.
     /// </summary>
-    static ImageView<T> &LUVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static ImageView<T> &LUVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                   float aNormalizationFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
@@ -11704,8 +11817,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <summary>
     /// ColorTwist with a 3x3 matrix
     /// </summary>
-    void ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                    ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+    void ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                    ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix<float> &aTwist,
                     const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
                  std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
@@ -11715,8 +11828,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <summary>
     /// ColorTwist with a 3x3 matrix
     /// </summary>
-    void ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                    ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    void ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                    ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                     const Matrix<float> &aTwist,
                     const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
@@ -11725,11 +11838,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <summary>
     /// ColorTwist with a 3x3 matrix
     /// </summary>
-    static void ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                           ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                           ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix<float> &aTwist,
                            const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
                  std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
@@ -11737,9 +11850,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <summary>
     /// ColorTwist with a 3x3 matrix
     /// </summary>
-    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                     const Matrix<float> &aTwist,
                                     const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
@@ -11750,9 +11863,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <summary>
     /// ColorTwist with a 3x3 matrix. Alpha channel in destination image is set to aAlpha.
     /// </summary>
-    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                     remove_vector_t<T> aAlpha, const Matrix<float> &aTwist,
                                     const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
@@ -11761,10 +11874,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <summary>
     /// ColorTwist with a 3x3 matrix
     /// </summary>
-    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                     const Matrix<float> &aTwist,
                                     const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
@@ -11888,12 +12001,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
     /// this parameter. Set to true for CbYCr.</param>
     /// <param name="aStreamCtx"></param>
-    static void ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                ImageView<Vector2<remove_vector_t<T>>> &aDstLumaChroma, const Matrix<float> &aTwist,
-                                ChromaSubsamplePos aChromaSubsamplePos, bool aSwapLumaChroma,
-                                const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
+    static ImageView<Vector2<remove_vector_t<T>>> &ColorTwistTo422(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector2<remove_vector_t<T>>> &aDstLumaChroma,
+        const Matrix<float> &aTwist, ChromaSubsamplePos aChromaSubsamplePos, bool aSwapLumaChroma,
+        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
                  std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
 
@@ -11901,9 +12013,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// ColorTwist with a 3x3 matrix and chroma downsampling to 422.
     /// </summary>
     /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
-    static void ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                 const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                 ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix<float> &aTwist,
                                 ChromaSubsamplePos aChromaSubsamplePos,
@@ -11915,9 +12027,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// ColorTwist with a 3x3 matrix and chroma downsampling to 422.
     /// </summary>
     /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
-    static void ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                 const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix<float> &aTwist,
@@ -11930,9 +12042,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// ColorTwist with a 3x3 matrix and chroma downsampling to 420.
     /// </summary>
     /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
-    static void ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                 const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                 ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix<float> &aTwist,
                                 ChromaSubsamplePos aChromaSubsamplePos,
@@ -11944,9 +12056,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// ColorTwist with a 3x3 matrix and chroma downsampling to 420.
     /// </summary>
     /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
-    static void ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                 const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix<float> &aTwist,
@@ -11959,9 +12071,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// ColorTwist with a 3x3 matrix and chroma downsampling to 411.
     /// </summary>
     /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
-    static void ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                 const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                 ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix<float> &aTwist,
                                 ChromaSubsamplePos aChromaSubsamplePos,
@@ -11973,9 +12085,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// ColorTwist with a 3x3 matrix and chroma downsampling to 411.
     /// </summary>
     /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
-    static void ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                 const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix<float> &aTwist,
@@ -12000,8 +12112,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// </summary>
     /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
     /// this parameter. Set to true for CbYCr.</param>
-    void ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                           ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+    void ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix<float> &aTwist,
                            bool aSwapLumaChroma,
                            const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC2, T> || std::same_as<Pixel16uC2, T> || std::same_as<Pixel16sC2, T> ||
@@ -12047,9 +12159,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// this parameter. Set to true for CbYCr.</param>
     static void ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                   ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix<float> &aTwist,
                                   ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
@@ -12064,9 +12176,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     static void ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                   ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
                                   ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix<float> &aTwist,
                                   ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
@@ -12112,9 +12224,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// this parameter. Set to true for CbYCr.</param>
     static void ColorTwistFrom420(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                   ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix<float> &aTwist,
                                   ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
@@ -12129,9 +12241,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     static void ColorTwistFrom420(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                   ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
                                   ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix<float> &aTwist,
                                   ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
@@ -12177,9 +12289,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// this parameter. Set to true for CbYCr.</param>
     static void ColorTwistFrom411(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                   ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix<float> &aTwist,
                                   ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
@@ -12194,9 +12306,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     static void ColorTwistFrom411(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                   ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
                                   ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix<float> &aTwist,
                                   ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
@@ -12217,8 +12329,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <summary>
     /// ColorTwist with a 3x4 matrix
     /// </summary>
-    void ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                    ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+    void ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                    ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix3x4<float> &aTwist,
                     const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
                  std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
@@ -12228,8 +12340,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <summary>
     /// ColorTwist with a 3x4 matrix
     /// </summary>
-    void ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                    ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    void ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                    ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                     const Matrix3x4<float> &aTwist,
                     const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
@@ -12238,11 +12350,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <summary>
     /// ColorTwist with a 3x4 matrix
     /// </summary>
-    static void ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                           ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                           ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix3x4<float> &aTwist,
                            const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
                  std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
@@ -12250,9 +12362,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <summary>
     /// ColorTwist with a 3x4 matrix
     /// </summary>
-    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                     const Matrix3x4<float> &aTwist,
                                     const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
@@ -12263,9 +12375,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <summary>
     /// ColorTwist with a 3x4 matrix. Alpha channel in destination image is set to aAlpha.
     /// </summary>
-    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                     remove_vector_t<T> aAlpha, const Matrix3x4<float> &aTwist,
                                     const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
@@ -12274,10 +12386,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <summary>
     /// ColorTwist with a 3x4 matrix
     /// </summary>
-    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                     const Matrix3x4<float> &aTwist,
                                     const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
@@ -12401,12 +12513,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
     /// this parameter. Set to true for CbYCr.</param>
     /// <param name="aStreamCtx"></param>
-    static void ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                ImageView<Vector2<remove_vector_t<T>>> &aDstLumaChroma, const Matrix3x4<float> &aTwist,
-                                ChromaSubsamplePos aChromaSubsamplePos, bool aSwapLumaChroma,
-                                const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
+    static ImageView<Vector2<remove_vector_t<T>>> &ColorTwistTo422(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector2<remove_vector_t<T>>> &aDstLumaChroma,
+        const Matrix3x4<float> &aTwist, ChromaSubsamplePos aChromaSubsamplePos, bool aSwapLumaChroma,
+        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
                  std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>;
 
@@ -12414,9 +12525,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// ColorTwist with a 3x4 matrix and chroma downsampling to 422.
     /// </summary>
     /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
-    static void ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                 const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                 ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix3x4<float> &aTwist,
                                 ChromaSubsamplePos aChromaSubsamplePos,
@@ -12428,9 +12539,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// ColorTwist with a 3x4 matrix and chroma downsampling to 422.
     /// </summary>
     /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
-    static void ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                 const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix3x4<float> &aTwist,
@@ -12443,9 +12554,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// ColorTwist with a 3x4 matrix and chroma downsampling to 420.
     /// </summary>
     /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
-    static void ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                 const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                 ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix3x4<float> &aTwist,
                                 ChromaSubsamplePos aChromaSubsamplePos,
@@ -12457,9 +12568,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// ColorTwist with a 3x4 matrix and chroma downsampling to 420.
     /// </summary>
     /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
-    static void ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                 const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix3x4<float> &aTwist,
@@ -12472,9 +12583,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// ColorTwist with a 3x4 matrix and chroma downsampling to 411.
     /// </summary>
     /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
-    static void ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                 const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                 ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix3x4<float> &aTwist,
                                 ChromaSubsamplePos aChromaSubsamplePos,
@@ -12486,9 +12597,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// ColorTwist with a 3x4 matrix and chroma downsampling to 411.
     /// </summary>
     /// <param name="aChromaSubsamplePos">Position of the chroma sample point relative to luma</param>
-    static void ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                 const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
                                 ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix3x4<float> &aTwist,
@@ -12513,8 +12624,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// </summary>
     /// <param name="aSwapLumaChroma">Cb/Cr can be swapped in the TwistMatrix, but Luma and Chroma can only swapped with
     /// this parameter. Set to true for CbYCr.</param>
-    void ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                           ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+    void ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix3x4<float> &aTwist,
                            bool aSwapLumaChroma,
                            const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC2, T> || std::same_as<Pixel16uC2, T> || std::same_as<Pixel16sC2, T> ||
@@ -12560,9 +12671,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// this parameter. Set to true for CbYCr.</param>
     static void ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                   ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix3x4<float> &aTwist,
                                   ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
@@ -12577,9 +12688,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     static void ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                   ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
                                   ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix3x4<float> &aTwist,
                                   ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
@@ -12625,9 +12736,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// this parameter. Set to true for CbYCr.</param>
     static void ColorTwistFrom420(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                   ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix3x4<float> &aTwist,
                                   ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
@@ -12642,9 +12753,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     static void ColorTwistFrom420(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                   ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
                                   ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix3x4<float> &aTwist,
                                   ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
@@ -12690,9 +12801,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// this parameter. Set to true for CbYCr.</param>
     static void ColorTwistFrom411(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                   ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix3x4<float> &aTwist,
                                   ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
@@ -12707,9 +12818,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     static void ColorTwistFrom411(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                   ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
                                   ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix3x4<float> &aTwist,
                                   ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
@@ -12728,8 +12839,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <summary>
     /// ColorTwist with a 4x4 matrix
     /// </summary>
-    void ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                    ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    void ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                    ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                     const Matrix4x4<float> &aTwist,
                     const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
@@ -12738,12 +12849,12 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <summary>
     /// ColorTwist with a 4x4 matrix
     /// </summary>
-    static void ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
-                           ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                           ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                            const Matrix4x4<float> &aTwist,
                            const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
@@ -12752,10 +12863,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <summary>
     /// ColorTwist with a 4x4 matrix
     /// </summary>
-    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                     const Matrix4x4<float> &aTwist,
                                     const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
@@ -12783,8 +12894,8 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <summary>
     /// ColorTwist with a 4x4 matrix and an additional constant vector addition
     /// </summary>
-    void ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                    ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    void ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                    ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                     const Matrix4x4<float> &aTwist, const Pixel32fC4 &aConstant,
                     const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
@@ -12793,12 +12904,12 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <summary>
     /// ColorTwist with a 4x4 matrix and an additional constant vector addition
     /// </summary>
-    static void ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
-                           ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                           ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                           const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                           ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
                            const Matrix4x4<float> &aTwist, const Pixel32fC4 &aConstant,
                            const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
@@ -12807,10 +12918,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <summary>
     /// ColorTwist with a 4x4 matrix and an additional constant vector addition
     /// </summary>
-    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static ImageView<T> &ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                     const Matrix4x4<float> &aTwist, const Pixel32fC4 &aConstant,
                                     const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
@@ -12841,10 +12952,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// Conversion linear to gamma corrected using BT.709 curve. The values are normalized to [0..1] before the
     /// operation using aNormFactor. For 8u images this is usually 255.0f.
     /// </summary>
-    static void GammaCorrBT709(ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                               ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                               ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                               ImageView<Vector1<remove_vector_t<T>>> &aDst1, float aNormFactor,
+    static void GammaCorrBT709(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                               ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormFactor,
                                const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
                  std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
@@ -12855,12 +12966,12 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// Conversion linear to gamma corrected using BT.709 curve. The values are normalized to [0..1] before the
     /// operation using aNormFactor. For 8u images this is usually 255.0f.
     /// </summary>
-    static void GammaCorrBT709(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void GammaCorrBT709(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                               ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                               ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormFactor,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                               ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormFactor,
                                const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
                  std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
@@ -12872,10 +12983,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// operation using aNormFactor. For 8u images this is usually 255.0f.
     /// </summary>
     static void GammaCorrBT709(
-        const ImageView<Vector1<remove_vector_t<T>>> &aSrc0, const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-        const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
-        ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-        ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormFactor,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormFactor,
         const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
                  std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
@@ -12909,10 +13020,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// Conversion gamma corrected to linear using BT.709 curve. The values are normalized to [0..1] before the
     /// operation using aNormFactor. For 8u images this is usually 255.0f.
     /// </summary>
-    static void GammaInvCorrBT709(ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst1, float aNormFactor,
+    static void GammaInvCorrBT709(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
                  std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
@@ -12923,12 +13034,12 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// Conversion gamma corrected to linear using BT.709 curve. The values are normalized to [0..1] before the
     /// operation using aNormFactor. For 8u images this is usually 255.0f.
     /// </summary>
-    static void GammaInvCorrBT709(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void GammaInvCorrBT709(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormFactor,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
                  std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
@@ -12940,10 +13051,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// operation using aNormFactor. For 8u images this is usually 255.0f.
     /// </summary>
     static void GammaInvCorrBT709(
-        const ImageView<Vector1<remove_vector_t<T>>> &aSrc0, const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-        const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
-        ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-        ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormFactor,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormFactor,
         const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
                  std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
@@ -12977,10 +13088,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// Conversion linear to gamma corrected using sRGB curve. The values are normalized to [0..1] before the
     /// operation using aNormFactor. For 8u images this is usually 255.0f.
     /// </summary>
-    static void GammaCorrsRGB(ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                              ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                              ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                              ImageView<Vector1<remove_vector_t<T>>> &aDst1, float aNormFactor,
+    static void GammaCorrsRGB(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                              ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormFactor,
                               const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
                  std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
@@ -12991,12 +13102,12 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// Conversion linear to gamma corrected using sRGB curve. The values are normalized to [0..1] before the
     /// operation using aNormFactor. For 8u images this is usually 255.0f.
     /// </summary>
-    static void GammaCorrsRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                              const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void GammaCorrsRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                              ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                              const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                              ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormFactor,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormFactor,
                               const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
                  std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
@@ -13008,10 +13119,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// operation using aNormFactor. For 8u images this is usually 255.0f.
     /// </summary>
     static void GammaCorrsRGB(
-        const ImageView<Vector1<remove_vector_t<T>>> &aSrc0, const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-        const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
-        ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-        ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormFactor,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormFactor,
         const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
                  std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
@@ -13045,10 +13156,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// Conversion gamma corrected to linear using sRGB curve. The values are normalized to [0..1] before the
     /// operation using aNormFactor. For 8u images this is usually 255.0f.
     /// </summary>
-    static void GammaInvCorrsRGB(ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                 ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                 ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                                 ImageView<Vector1<remove_vector_t<T>>> &aDst1, float aNormFactor,
+    static void GammaInvCorrsRGB(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormFactor,
                                  const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
                  std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
@@ -13059,12 +13170,12 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// Conversion gamma corrected to linear using sRGB curve. The values are normalized to [0..1] before the
     /// operation using aNormFactor. For 8u images this is usually 255.0f.
     /// </summary>
-    static void GammaInvCorrsRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                 const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+    static void GammaInvCorrsRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                 ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                                 const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                  ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                 ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormFactor,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormFactor,
                                  const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
                  std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
@@ -13076,10 +13187,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// operation using aNormFactor. For 8u images this is usually 255.0f.
     /// </summary>
     static void GammaInvCorrsRGB(
-        const ImageView<Vector1<remove_vector_t<T>>> &aSrc0, const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-        const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
-        ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-        ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormFactor,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormFactor,
         const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
                  std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
@@ -13113,10 +13224,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <summary>
     /// Converts a color gradient image to grayscale.
     /// </summary>
-    static void GradientColorToGray(ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                    ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                    ImageView<Vector1<remove_vector_t<T>>> &aDst0, Norm aNorm,
-                                    const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
+    static ImageView<Vector1<remove_vector_t<T>>> &GradientColorToGray(
+        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst, Norm aNorm,
+        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
                  std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
                  std::same_as<float, remove_vector_t<T>>) &&
@@ -13125,11 +13236,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <summary>
     /// Converts a color gradient image to grayscale.
     /// </summary>
-    static void GradientColorToGray(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                    ImageView<Vector1<remove_vector_t<T>>> &aDst0, Norm aNorm,
-                                    const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
+    static ImageView<Vector1<remove_vector_t<T>>> &GradientColorToGray(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst, Norm aNorm,
+        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
                  std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
                  std::same_as<float, remove_vector_t<T>>) &&
@@ -13138,12 +13248,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// <summary>
     /// Converts a color gradient image to grayscale.
     /// </summary>
-    static void GradientColorToGray(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
-                                    ImageView<Vector1<remove_vector_t<T>>> &aDst0, Norm aNorm,
-                                    const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
+    static ImageView<Vector1<remove_vector_t<T>>> &GradientColorToGray(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst, Norm aNorm,
+        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
                  std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
                  std::same_as<float, remove_vector_t<T>>) &&
@@ -13170,11 +13279,10 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// factor provided in aWeights.<para/> Common values to convert RGB to gray are nGray = 0.299 * R + 0.587 * G +
     /// 0.114 * B
     /// </summary>
-    static void ColorToGray(ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            const same_vector_size_different_type_t<T, float> &aWeights,
-                            const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
+    static ImageView<Vector1<remove_vector_t<T>>> &ColorToGray(
+        ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst, const same_vector_size_different_type_t<T, float> &aWeights,
+        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
                  std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
                  std::same_as<float, remove_vector_t<T>>) &&
@@ -13185,12 +13293,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// factor provided in aWeights.<para/> Common values to convert RGB to gray are nGray = 0.299 * R + 0.587 * G +
     /// 0.114 * B
     /// </summary>
-    static void ColorToGray(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            const same_vector_size_different_type_t<T, float> &aWeights,
-                            const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
+    static ImageView<Vector1<remove_vector_t<T>>> &ColorToGray(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst,
+        const same_vector_size_different_type_t<T, float> &aWeights,
+        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
                  std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
                  std::same_as<float, remove_vector_t<T>>) &&
@@ -13201,13 +13308,11 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// factor provided in aWeights.<para/> Common values to convert RGB to gray are nGray = 0.299 * R + 0.587 * G +
     /// 0.114 * B
     /// </summary>
-    static void ColorToGray(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            const same_vector_size_different_type_t<T, float> &aWeights,
-                            const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
+    static ImageView<Vector1<remove_vector_t<T>>> &ColorToGray(
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+        const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+        ImageView<Vector1<remove_vector_t<T>>> &aDst, const same_vector_size_different_type_t<T, float> &aWeights,
+        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
         requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
                  std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
                  std::same_as<float, remove_vector_t<T>>) &&

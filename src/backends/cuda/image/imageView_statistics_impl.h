@@ -13,10 +13,12 @@
 #include <common/exception.h>
 #include <common/half_fp16.h>
 #include <common/image/affineTransformation.h>
+#include <common/image/filterAreaException.h>
 #include <common/image/functors/imageFunctors.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
 #include <common/image/roiException.h>
+#include <common/image/validateImage.h>
 #include <common/mpp_defs.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
@@ -67,7 +69,10 @@ void ImageView<T>::AverageError(const ImageView<T> &aSrc2, mpp::cuda::DevVarView
                                 mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = averageError_types_for_ct<T>;
 
     int divisor = 1;
@@ -92,8 +97,12 @@ void ImageView<T>::AverageErrorMasked(const ImageView<T> &aSrc2,
                                       const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = averageError_types_for_ct<T>;
 
     int divisor = 1;
@@ -117,7 +126,11 @@ void ImageView<T>::AverageError(const ImageView<T> &aSrc2, mpp::cuda::DevVarView
                                 mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = averageError_types_for_ct<T>;
 
     int divisor = 1;
@@ -141,8 +154,13 @@ void ImageView<T>::AverageErrorMasked(const ImageView<T> &aSrc2,
                                       const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = averageError_types_for_ct<T>;
 
     int divisor = 1;
@@ -201,7 +219,10 @@ void ImageView<T>::AverageRelativeError(
     mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = averageRelativeError_types_for_ct<T>;
 
     int divisor = 1;
@@ -227,8 +248,12 @@ void ImageView<T>::AverageRelativeErrorMasked(
     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = averageRelativeError_types_for_ct<T>;
 
     int divisor = 1;
@@ -254,7 +279,11 @@ void ImageView<T>::AverageRelativeError(const ImageView<T> &aSrc2,
                                         const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = averageRelativeError_types_for_ct<T>;
 
     int divisor = 1;
@@ -278,8 +307,13 @@ void ImageView<T>::AverageRelativeErrorMasked(const ImageView<T> &aSrc2,
                                               const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = averageRelativeError_types_for_ct<T>;
 
     int divisor = 1;
@@ -327,7 +361,10 @@ void ImageView<T>::DotProduct(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<d
                               mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = dotProduct_types_for_ct<T>;
 
     int divisor = 1;
@@ -351,8 +388,12 @@ void ImageView<T>::DotProductMasked(const ImageView<T> &aSrc2, mpp::cuda::DevVar
                                     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = dotProduct_types_for_ct<T>;
 
     int divisor = 1;
@@ -375,7 +416,11 @@ void ImageView<T>::DotProduct(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<d
                               mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = dotProduct_types_for_ct<T>;
 
     int divisor = 1;
@@ -398,8 +443,13 @@ void ImageView<T>::DotProductMasked(const ImageView<T> &aSrc2, mpp::cuda::DevVar
                                     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = dotProduct_types_for_ct<T>;
 
     int divisor = 1;
@@ -455,7 +505,10 @@ void ImageView<T>::MSE(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<mse_type
                        mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = mse_types_for_ct<T>;
 
     int divisor = 1;
@@ -479,8 +532,12 @@ void ImageView<T>::MSEMasked(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<ms
                              const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = mse_types_for_ct<T>;
 
     int divisor = 1;
@@ -504,7 +561,10 @@ void ImageView<T>::MSE(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<mse_type
                        mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = mse_types_for_ct<T>;
 
     int divisor = 1;
@@ -527,8 +587,13 @@ void ImageView<T>::MSEMasked(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<ms
                              const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = mse_types_for_ct<T>;
 
     int divisor = 1;
@@ -576,7 +641,10 @@ void ImageView<T>::MaximumError(const ImageView<T> &aSrc2, mpp::cuda::DevVarView
                                 mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = normDiffInf_types_for_ct<T>;
 
     int divisor = 1;
@@ -601,8 +669,12 @@ void ImageView<T>::MaximumErrorMasked(const ImageView<T> &aSrc2,
                                       const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = normDiffInf_types_for_ct<T>;
 
     int divisor = 1;
@@ -625,7 +697,11 @@ void ImageView<T>::MaximumError(const ImageView<T> &aSrc2, mpp::cuda::DevVarView
                                 mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aBuffer);
+    checkNullptr(aDst);
+    checkSameSize(*this, aSrc2);
     using ComputeT = normDiffInf_types_for_ct<T>;
 
     int divisor = 1;
@@ -649,8 +725,13 @@ void ImageView<T>::MaximumErrorMasked(const ImageView<T> &aSrc2,
                                       const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = normDiffInf_types_for_ct<T>;
 
     int divisor = 1;
@@ -699,7 +780,10 @@ void ImageView<T>::MaximumRelativeError(
     mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = maxRelativeError_types_for_ct<T>;
 
     int divisor = 1;
@@ -724,8 +808,12 @@ void ImageView<T>::MaximumRelativeErrorMasked(
     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = maxRelativeError_types_for_ct<T>;
 
     int divisor = 1;
@@ -750,7 +838,11 @@ void ImageView<T>::MaximumRelativeError(const ImageView<T> &aSrc2,
                                         const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = maxRelativeError_types_for_ct<T>;
 
     int divisor = 1;
@@ -774,8 +866,13 @@ void ImageView<T>::MaximumRelativeErrorMasked(const ImageView<T> &aSrc2,
                                               const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = maxRelativeError_types_for_ct<T>;
 
     int divisor = 1;
@@ -880,7 +977,10 @@ void ImageView<T>::NormDiffL1(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<n
                               mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = normDiffL1_types_for_ct<T>;
 
     int divisor = 1;
@@ -904,8 +1004,12 @@ void ImageView<T>::NormDiffL1Masked(const ImageView<T> &aSrc2, mpp::cuda::DevVar
                                     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = normDiffL1_types_for_ct<T>;
 
     int divisor = 1;
@@ -928,7 +1032,11 @@ void ImageView<T>::NormDiffL1(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<n
                               mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = normDiffL1_types_for_ct<T>;
 
     int divisor = 1;
@@ -951,8 +1059,13 @@ void ImageView<T>::NormDiffL1Masked(const ImageView<T> &aSrc2, mpp::cuda::DevVar
                                     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = normDiffL1_types_for_ct<T>;
 
     int divisor = 1;
@@ -1003,7 +1116,10 @@ void ImageView<T>::NormDiffL2(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<n
                               mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = normDiffL2_types_for_ct<T>;
 
     int divisor = 1;
@@ -1027,8 +1143,12 @@ void ImageView<T>::NormDiffL2Masked(const ImageView<T> &aSrc2, mpp::cuda::DevVar
                                     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = normDiffL2_types_for_ct<T>;
 
     int divisor = 1;
@@ -1051,7 +1171,11 @@ void ImageView<T>::NormDiffL2(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<n
                               mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = normDiffL2_types_for_ct<T>;
 
     int divisor = 1;
@@ -1074,8 +1198,13 @@ void ImageView<T>::NormDiffL2Masked(const ImageView<T> &aSrc2, mpp::cuda::DevVar
                                     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = normDiffL2_types_for_ct<T>;
 
     int divisor = 1;
@@ -1126,7 +1255,10 @@ void ImageView<T>::NormRelInf(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<n
                               mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = normRelInf_types_for_ct<T>;
 
     int divisor = 1;
@@ -1151,8 +1283,12 @@ void ImageView<T>::NormRelInfMasked(const ImageView<T> &aSrc2, mpp::cuda::DevVar
                                     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = normRelInf_types_for_ct<T>;
 
     int divisor = 1;
@@ -1176,7 +1312,11 @@ void ImageView<T>::NormRelInf(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<n
                               mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = normRelInf_types_for_ct<T>;
 
     int divisor = 1;
@@ -1200,8 +1340,13 @@ void ImageView<T>::NormRelInfMasked(const ImageView<T> &aSrc2, mpp::cuda::DevVar
                                     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = normRelInf_types_for_ct<T>;
 
     int divisor = 1;
@@ -1253,7 +1398,10 @@ void ImageView<T>::NormRelL1(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<no
                              mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = normRelL1_types_for_ct<T>;
 
     int divisor = 1;
@@ -1278,8 +1426,12 @@ void ImageView<T>::NormRelL1Masked(const ImageView<T> &aSrc2, mpp::cuda::DevVarV
                                    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = normRelL1_types_for_ct<T>;
 
     int divisor = 1;
@@ -1303,7 +1455,11 @@ void ImageView<T>::NormRelL1(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<no
                              mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = normRelL1_types_for_ct<T>;
 
     int divisor = 1;
@@ -1327,8 +1483,13 @@ void ImageView<T>::NormRelL1Masked(const ImageView<T> &aSrc2, mpp::cuda::DevVarV
                                    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = normRelL1_types_for_ct<T>;
 
     int divisor = 1;
@@ -1380,7 +1541,10 @@ void ImageView<T>::NormRelL2(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<no
                              mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = normRelL2_types_for_ct<T>;
 
     int divisor = 1;
@@ -1405,8 +1569,12 @@ void ImageView<T>::NormRelL2Masked(const ImageView<T> &aSrc2, mpp::cuda::DevVarV
                                    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = normRelL2_types_for_ct<T>;
 
     int divisor = 1;
@@ -1430,7 +1598,11 @@ void ImageView<T>::NormRelL2(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<no
                              mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = normRelL2_types_for_ct<T>;
 
     int divisor = 1;
@@ -1454,8 +1626,13 @@ void ImageView<T>::NormRelL2Masked(const ImageView<T> &aSrc2, mpp::cuda::DevVarV
                                    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aMask);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aMask);
     using ComputeT = normRelL2_types_for_ct<T>;
 
     int divisor = 1;
@@ -1500,7 +1677,10 @@ void ImageView<T>::PSNR(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<mse_typ
                         const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = mse_types_for_ct<T>;
 
     int divisor = 1;
@@ -1523,7 +1703,11 @@ void ImageView<T>::PSNR(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<mse_typ
                         const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = mse_types_for_ct<T>;
 
     int divisor = 1;
@@ -1566,7 +1750,11 @@ void ImageView<T>::QualityIndex(const ImageView<T> &aSrc2, mpp::cuda::DevVarView
                                 mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
     using ComputeT = qualityIndex_types_for_ct1<T>;
 
     int divisor = 1;
@@ -1601,7 +1789,11 @@ void ImageView<T>::QualityIndexWindow(const ImageView<T> &aSrc2, mpp::cuda::DevV
                                       const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
 
     using DstT = qiw_types_for_rt<T>;
 
@@ -1645,7 +1837,11 @@ void ImageView<T>::SSIM(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<ssim_ty
                         const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
 
     using DstT = ssim_types_for_rt<T>;
 
@@ -1720,7 +1916,11 @@ void ImageView<T>::MSSSIM(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<ssim_
                           const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aSrc2);
 
     using DstT       = ssim_types_for_rt<T>;
     using twoChannel = ImageView<Vector2<remove_vector_t<T>>>;
@@ -1854,6 +2054,8 @@ void ImageView<T>::NormInf(mpp::cuda::DevVarView<normInf_types_for_rt<T>> &aDst,
                            mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
+    validateImage(*this);
+    checkNullptr(aBuffer);
     using ComputeT = normInf_types_for_ct<T>;
 
     int divisor = 1;
@@ -1877,7 +2079,10 @@ void ImageView<T>::NormInfMasked(mpp::cuda::DevVarView<normInf_types_for_rt<T>> 
                                  const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = normInf_types_for_ct<T>;
 
     int divisor = 1;
@@ -1899,6 +2104,9 @@ void ImageView<T>::NormInf(mpp::cuda::DevVarView<normInf_types_for_rt<T>> &aDst,
                            const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
+    validateImage(*this);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
     using ComputeT = normInf_types_for_ct<T>;
 
     int divisor = 1;
@@ -1920,7 +2128,11 @@ void ImageView<T>::NormInfMasked(mpp::cuda::DevVarView<normInf_types_for_rt<T>> 
                                  const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = normInf_types_for_ct<T>;
 
     int divisor = 1;
@@ -1970,6 +2182,8 @@ void ImageView<T>::NormL1(mpp::cuda::DevVarView<normL1_types_for_rt<T>> &aDst,
                           mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
+    validateImage(*this);
+    checkNullptr(aBuffer);
     using ComputeT = normL1_types_for_ct<T>;
 
     int divisor = 1;
@@ -1993,7 +2207,10 @@ void ImageView<T>::NormL1Masked(mpp::cuda::DevVarView<normL1_types_for_rt<T>> &a
                                 const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = normL1_types_for_ct<T>;
 
     int divisor = 1;
@@ -2015,6 +2232,9 @@ void ImageView<T>::NormL1(mpp::cuda::DevVarView<normL1_types_for_rt<T>> &aDst, m
                           const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
+    validateImage(*this);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
     using ComputeT = normL1_types_for_ct<T>;
 
     int divisor = 1;
@@ -2035,7 +2255,11 @@ void ImageView<T>::NormL1Masked(mpp::cuda::DevVarView<normL1_types_for_rt<T>> &a
                                 mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = normL1_types_for_ct<T>;
 
     int divisor = 1;
@@ -2058,6 +2282,7 @@ template <PixelType T>
 size_t ImageView<T>::NormL2BufferSize(const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
+    validateImage(*this);
     using ComputeT = normL2_types_for_ct<T>;
 
     int divisor = 1;
@@ -2085,6 +2310,8 @@ void ImageView<T>::NormL2(mpp::cuda::DevVarView<normL2_types_for_rt<T>> &aDst,
                           mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
+    validateImage(*this);
+    checkNullptr(aBuffer);
     using ComputeT = normL2_types_for_ct<T>;
 
     int divisor = 1;
@@ -2108,7 +2335,10 @@ void ImageView<T>::NormL2Masked(mpp::cuda::DevVarView<normL2_types_for_rt<T>> &a
                                 const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = normL2_types_for_ct<T>;
 
     int divisor = 1;
@@ -2130,6 +2360,9 @@ void ImageView<T>::NormL2(mpp::cuda::DevVarView<normL2_types_for_rt<T>> &aDst, m
                           const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
+    validateImage(*this);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
     using ComputeT = normL2_types_for_ct<T>;
 
     int divisor = 1;
@@ -2150,7 +2383,11 @@ void ImageView<T>::NormL2Masked(mpp::cuda::DevVarView<normL2_types_for_rt<T>> &a
                                 mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = normL2_types_for_ct<T>;
 
     int divisor = 1;
@@ -2225,6 +2462,8 @@ void ImageView<T>::Sum(mpp::cuda::DevVarView<sum_types_for_rt<T, 1>> &aDst,
                        mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> > 1)
 {
+    validateImage(*this);
+    checkNullptr(aBuffer);
     using ComputeT = sum_types_for_ct<T, 1>;
 
     int divisor = 1;
@@ -2247,6 +2486,8 @@ void ImageView<T>::Sum(mpp::cuda::DevVarView<sum_types_for_rt<T, 2>> &aDst,
                        mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T> && (vector_active_size_v<T> > 1)
 {
+    validateImage(*this);
+    checkNullptr(aBuffer);
     using ComputeT = sum_types_for_ct<T, 2>;
 
     int divisor = 1;
@@ -2270,7 +2511,10 @@ void ImageView<T>::SumMasked(mpp::cuda::DevVarView<sum_types_for_rt<T, 1>> &aDst
                              const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = sum_types_for_ct<T, 1>;
 
     int divisor = 1;
@@ -2294,7 +2538,10 @@ void ImageView<T>::SumMasked(mpp::cuda::DevVarView<sum_types_for_rt<T, 2>> &aDst
                              const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = sum_types_for_ct<T, 2>;
 
     int divisor = 1;
@@ -2316,6 +2563,9 @@ void ImageView<T>::Sum(mpp::cuda::DevVarView<sum_types_for_rt<T, 1>> &aDst, mpp:
                        const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> == 1)
 {
+    validateImage(*this);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
     using ComputeT = sum_types_for_ct<T, 1>;
 
     int divisor = 1;
@@ -2336,6 +2586,9 @@ void ImageView<T>::Sum(mpp::cuda::DevVarView<sum_types_for_rt<T, 2>> &aDst, mpp:
                        const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T> && (vector_active_size_v<T> == 1)
 {
+    validateImage(*this);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
     using ComputeT = sum_types_for_ct<T, 2>;
 
     int divisor = 1;
@@ -2356,7 +2609,11 @@ void ImageView<T>::SumMasked(mpp::cuda::DevVarView<sum_types_for_rt<T, 1>> &aDst
                              mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = sum_types_for_ct<T, 1>;
 
     int divisor = 1;
@@ -2378,7 +2635,11 @@ void ImageView<T>::SumMasked(mpp::cuda::DevVarView<sum_types_for_rt<T, 2>> &aDst
                              mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealOrComplexIntVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = sum_types_for_ct<T, 2>;
 
     int divisor = 1;
@@ -2433,6 +2694,8 @@ void ImageView<T>::Mean(mpp::cuda::DevVarView<mean_types_for_rt<T>> &aDst,
                         mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> > 1)
 {
+    validateImage(*this);
+    checkNullptr(aBuffer);
     using ComputeT = mean_types_for_ct<T>;
 
     int divisor = 1;
@@ -2456,7 +2719,10 @@ void ImageView<T>::MeanMasked(mpp::cuda::DevVarView<mean_types_for_rt<T>> &aDst,
                               const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = mean_types_for_ct<T>;
 
     int divisor = 1;
@@ -2479,6 +2745,9 @@ void ImageView<T>::Mean(mpp::cuda::DevVarView<mean_types_for_rt<T>> &aDst, mpp::
                         const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> == 1)
 {
+    validateImage(*this);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
     using ComputeT = mean_types_for_ct<T>;
 
     int divisor = 1;
@@ -2499,7 +2768,11 @@ void ImageView<T>::MeanMasked(mpp::cuda::DevVarView<mean_types_for_rt<T>> &aDst,
                               mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = mean_types_for_ct<T>;
 
     int divisor = 1;
@@ -2558,6 +2831,8 @@ void ImageView<T>::MeanStd(mpp::cuda::DevVarView<meanStd_types_for_rt1<T>> &aMea
                            mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> > 1)
 {
+    validateImage(*this);
+    checkNullptr(aBuffer);
     using ComputeT = meanStd_types_for_ct<T>;
 
     int divisor = 1;
@@ -2584,7 +2859,10 @@ void ImageView<T>::MeanStdMasked(mpp::cuda::DevVarView<meanStd_types_for_rt1<T>>
                                  const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = meanStd_types_for_ct<T>;
 
     int divisor = 1;
@@ -2609,6 +2887,10 @@ void ImageView<T>::MeanStd(mpp::cuda::DevVarView<meanStd_types_for_rt1<T>> &aMea
                            const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> == 1)
 {
+    validateImage(*this);
+    checkNullptr(aMean);
+    checkNullptr(aStd);
+    checkNullptr(aBuffer);
     using ComputeT = meanStd_types_for_ct<T>;
 
     int divisor = 1;
@@ -2633,7 +2915,12 @@ void ImageView<T>::MeanStdMasked(mpp::cuda::DevVarView<meanStd_types_for_rt1<T>>
                                  const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aMean);
+    checkNullptr(aStd);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = meanStd_types_for_ct<T>;
 
     int divisor = 1;
@@ -2685,6 +2972,8 @@ void ImageView<T>::CountInRange(const T &aLowerLimit, const T &aUpperLimit,
                                 const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
+    validateImage(*this);
+    checkNullptr(aBuffer);
     using ComputeT = same_vector_size_different_type_t<T, size_t>;
 
     int divisor = 1;
@@ -2709,7 +2998,10 @@ void ImageView<T>::CountInRangeMasked(const T &aLowerLimit, const T &aUpperLimit
                                       const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = same_vector_size_different_type_t<T, size_t>;
 
     int divisor = 1;
@@ -2732,6 +3024,9 @@ void ImageView<T>::CountInRange(const T &aLowerLimit, const T &aUpperLimit,
                                 mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
+    validateImage(*this);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
     using ComputeT = same_vector_size_different_type_t<T, size_t>;
 
     int divisor = 1;
@@ -2755,7 +3050,11 @@ void ImageView<T>::CountInRangeMasked(const T &aLowerLimit, const T &aUpperLimit
                                       const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = same_vector_size_different_type_t<T, size_t>;
 
     int divisor = 1;
@@ -2803,6 +3102,8 @@ void ImageView<T>::Min(mpp::cuda::DevVarView<T> &aDst, mpp::cuda::DevVarView<rem
                        mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
+    validateImage(*this);
+    checkNullptr(aBuffer);
     using ComputeT = T;
 
     int divisor = 1;
@@ -2825,7 +3126,10 @@ void ImageView<T>::MinMasked(mpp::cuda::DevVarView<T> &aDst, mpp::cuda::DevVarVi
                              const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = T;
 
     int divisor = 1;
@@ -2847,6 +3151,9 @@ void ImageView<T>::Min(mpp::cuda::DevVarView<T> &aDst, mpp::cuda::DevVarView<byt
                        const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
+    validateImage(*this);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
     using ComputeT = T;
 
     int divisor = 1;
@@ -2867,7 +3174,11 @@ void ImageView<T>::MinMasked(mpp::cuda::DevVarView<T> &aDst, const ImageView<Pix
                              mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = T;
 
     int divisor = 1;
@@ -2914,6 +3225,8 @@ void ImageView<T>::Max(mpp::cuda::DevVarView<T> &aDst, mpp::cuda::DevVarView<rem
                        mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
+    validateImage(*this);
+    checkNullptr(aBuffer);
     using ComputeT = T;
 
     int divisor = 1;
@@ -2936,7 +3249,10 @@ void ImageView<T>::MaxMasked(mpp::cuda::DevVarView<T> &aDst, mpp::cuda::DevVarVi
                              const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = T;
 
     int divisor = 1;
@@ -2958,6 +3274,9 @@ void ImageView<T>::Max(mpp::cuda::DevVarView<T> &aDst, mpp::cuda::DevVarView<byt
                        const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
+    validateImage(*this);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
     using ComputeT = T;
 
     int divisor = 1;
@@ -2978,7 +3297,11 @@ void ImageView<T>::MaxMasked(mpp::cuda::DevVarView<T> &aDst, const ImageView<Pix
                              mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aDst);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = T;
 
     int divisor = 1;
@@ -3027,6 +3350,8 @@ void ImageView<T>::MinMax(mpp::cuda::DevVarView<T> &aDstMin, mpp::cuda::DevVarVi
                           mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
+    validateImage(*this);
+    checkNullptr(aBuffer);
     using ComputeT = T;
 
     int divisor = 1;
@@ -3052,7 +3377,10 @@ void ImageView<T>::MinMaxMasked(mpp::cuda::DevVarView<T> &aDstMin, mpp::cuda::De
                                 const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = T;
 
     int divisor = 1;
@@ -3076,6 +3404,10 @@ void ImageView<T>::MinMax(mpp::cuda::DevVarView<T> &aDstMin, mpp::cuda::DevVarVi
                           mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
+    validateImage(*this);
+    checkNullptr(aDstMin);
+    checkNullptr(aDstMax);
+    checkNullptr(aBuffer);
     using ComputeT = T;
 
     int divisor = 1;
@@ -3099,7 +3431,12 @@ void ImageView<T>::MinMaxMasked(mpp::cuda::DevVarView<T> &aDstMin, mpp::cuda::De
                                 const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aDstMin);
+    checkNullptr(aDstMax);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = T;
 
     int divisor = 1;
@@ -3153,6 +3490,8 @@ void ImageView<T>::MinIndex(mpp::cuda::DevVarView<T> &aDstMin,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
+    validateImage(*this);
+    checkNullptr(aBuffer);
     using ComputeT = T;
 
     int divisor = 1;
@@ -3180,7 +3519,10 @@ void ImageView<T>::MinIndexMasked(mpp::cuda::DevVarView<T> &aDstMin,
                                   mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = T;
 
     int divisor = 1;
@@ -3206,6 +3548,11 @@ void ImageView<T>::MinIndex(mpp::cuda::DevVarView<T> &aDstMin,
                             mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
+    validateImage(*this);
+    checkNullptr(aDstMin);
+    checkNullptr(aDstIndexX);
+    checkNullptr(aDstIndexY);
+    checkNullptr(aBuffer);
     using ComputeT = T;
 
     int divisor = 1;
@@ -3231,7 +3578,13 @@ void ImageView<T>::MinIndexMasked(mpp::cuda::DevVarView<T> &aDstMin,
                                   const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aDstMin);
+    checkNullptr(aDstIndexX);
+    checkNullptr(aDstIndexY);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = T;
 
     int divisor = 1;
@@ -3285,6 +3638,8 @@ void ImageView<T>::MaxIndex(mpp::cuda::DevVarView<T> &aDstMax,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
+    validateImage(*this);
+    checkNullptr(aBuffer);
     using ComputeT = T;
 
     int divisor = 1;
@@ -3312,7 +3667,10 @@ void ImageView<T>::MaxIndexMasked(mpp::cuda::DevVarView<T> &aDstMax,
                                   mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = T;
 
     int divisor = 1;
@@ -3338,6 +3696,11 @@ void ImageView<T>::MaxIndex(mpp::cuda::DevVarView<T> &aDstMax,
                             mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
+    validateImage(*this);
+    checkNullptr(aDstMax);
+    checkNullptr(aDstIndexX);
+    checkNullptr(aDstIndexY);
+    checkNullptr(aBuffer);
     using ComputeT = T;
 
     int divisor = 1;
@@ -3363,7 +3726,13 @@ void ImageView<T>::MaxIndexMasked(mpp::cuda::DevVarView<T> &aDstMax,
                                   const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aDstMax);
+    checkNullptr(aDstIndexX);
+    checkNullptr(aDstIndexY);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = T;
 
     int divisor = 1;
@@ -3419,6 +3788,8 @@ void ImageView<T>::MinMaxIndex(mpp::cuda::DevVarView<T> &aDstMin, mpp::cuda::Dev
                                mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
+    validateImage(*this);
+    checkNullptr(aBuffer);
     using ComputeT = T;
 
     int divisor = 1;
@@ -3450,7 +3821,10 @@ void ImageView<T>::MinMaxIndexMasked(mpp::cuda::DevVarView<T> &aDstMin, mpp::cud
                                      const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = T;
 
     int divisor = 1;
@@ -3478,6 +3852,11 @@ void ImageView<T>::MinMaxIndex(mpp::cuda::DevVarView<T> &aDstMin, mpp::cuda::Dev
                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
+    validateImage(*this);
+    checkNullptr(aDstMin);
+    checkNullptr(aDstMax);
+    checkNullptr(aDstIdx);
+    checkNullptr(aBuffer);
     using ComputeT = T;
 
     int divisor = 1;
@@ -3504,7 +3883,13 @@ void ImageView<T>::MinMaxIndexMasked(mpp::cuda::DevVarView<T> &aDstMin, mpp::cud
                                      mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkNullptr(aDstMin);
+    checkNullptr(aDstMax);
+    checkNullptr(aDstIdx);
+    checkNullptr(aBuffer);
+    checkSameSize(*this, aMask);
     using ComputeT = T;
 
     int divisor = 1;
@@ -3635,6 +4020,9 @@ ImageView<same_vector_size_different_type_t<T, int>> &ImageView<T>::Integral(
     mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T> && NoAlpha<T>
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aBuffer);
     if (SizeRoi() != aDst.SizeRoi() - 1)
     {
         throw ROIEXCEPTION(
@@ -3664,6 +4052,9 @@ ImageView<same_vector_size_different_type_t<T, float>> &ImageView<T>::Integral(
     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && NoAlpha<T> && (!std::same_as<double, remove_vector_t<T>>)
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aBuffer);
     if (SizeRoi() != aDst.SizeRoi() - 1)
     {
         throw ROIEXCEPTION(
@@ -3690,6 +4081,9 @@ ImageView<same_vector_size_different_type_t<T, long64>> &ImageView<T>::Integral(
     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T> && NoAlpha<T>
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aBuffer);
     if (SizeRoi() != aDst.SizeRoi() - 1)
     {
         throw ROIEXCEPTION(
@@ -3719,6 +4113,9 @@ ImageView<same_vector_size_different_type_t<T, double>> &ImageView<T>::Integral(
     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && NoAlpha<T>
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aBuffer);
     if (SizeRoi() != aDst.SizeRoi() - 1)
     {
         throw ROIEXCEPTION(
@@ -3749,6 +4146,10 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, in
                                mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T> && NoAlpha<T>
 {
+    validateImage(*this);
+    validateImage(aDst);
+    validateImage(aSqr);
+    checkNullptr(aBuffer);
     if (SizeRoi() != aDst.SizeRoi() - 1)
     {
         throw ROIEXCEPTION(
@@ -3782,6 +4183,10 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, in
                                mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T> && NoAlpha<T>
 {
+    validateImage(*this);
+    validateImage(aDst);
+    validateImage(aSqr);
+    checkNullptr(aBuffer);
     if (SizeRoi() != aDst.SizeRoi() - 1)
     {
         throw ROIEXCEPTION(
@@ -3815,6 +4220,10 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, fl
                                mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && NoAlpha<T> && (!std::same_as<double, remove_vector_t<T>>)
 {
+    validateImage(*this);
+    validateImage(aDst);
+    validateImage(aSqr);
+    checkNullptr(aBuffer);
     if (SizeRoi() != aDst.SizeRoi() - 1)
     {
         throw ROIEXCEPTION(
@@ -3848,6 +4257,10 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, do
                                mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && NoAlpha<T>
 {
+    validateImage(*this);
+    validateImage(aDst);
+    validateImage(aSqr);
+    checkNullptr(aBuffer);
     if (SizeRoi() != aDst.SizeRoi() - 1)
     {
         throw ROIEXCEPTION(
@@ -3883,7 +4296,10 @@ void ImageView<T>::RectStdDev(ImageView<same_vector_size_different_type_t<T, int
     using Src2T    = same_vector_size_different_type_t<T, int>;
     using DstT     = same_vector_size_different_type_t<T, float>;
 
-    checkSameSize(ROI(), aSqr.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkFilterArea(aFilterArea);
+    checkSameSize(*this, aSqr);
     // aDst roi may differ
 
     InvokeRectStdDev<T, Src2T, ComputeT, DstT>(PointerRoi(), Pitch(), aSqr.PointerRoi(), aSqr.Pitch(),
@@ -3900,7 +4316,11 @@ void ImageView<T>::RectStdDev(ImageView<same_vector_size_different_type_t<T, lon
     using Src2T    = same_vector_size_different_type_t<T, long64>;
     using DstT     = same_vector_size_different_type_t<T, float>;
 
-    checkSameSize(ROI(), aSqr.ROI());
+    validateImage(*this);
+    validateImage(aSqr);
+    validateImage(aDst);
+    checkFilterArea(aFilterArea);
+    checkSameSize(*this, aSqr);
     // aDst roi may differ
 
     InvokeRectStdDev<T, Src2T, ComputeT, DstT>(PointerRoi(), Pitch(), aSqr.PointerRoi(), aSqr.Pitch(),
@@ -3917,7 +4337,11 @@ void ImageView<T>::RectStdDev(ImageView<same_vector_size_different_type_t<T, dou
     using Src2T    = same_vector_size_different_type_t<T, double>;
     using DstT     = same_vector_size_different_type_t<T, float>;
 
-    checkSameSize(ROI(), aSqr.ROI());
+    validateImage(*this);
+    validateImage(aSqr);
+    validateImage(aDst);
+    checkFilterArea(aFilterArea);
+    checkSameSize(*this, aSqr);
     // aDst roi may differ
 
     InvokeRectStdDev<T, Src2T, ComputeT, DstT>(PointerRoi(), Pitch(), aSqr.PointerRoi(), aSqr.Pitch(),
@@ -3934,7 +4358,11 @@ void ImageView<T>::RectStdDev(ImageView<same_vector_size_different_type_t<T, dou
     using Src2T    = same_vector_size_different_type_t<T, double>;
     using DstT     = same_vector_size_different_type_t<T, double>;
 
-    checkSameSize(ROI(), aSqr.ROI());
+    validateImage(*this);
+    validateImage(aSqr);
+    validateImage(aDst);
+    checkFilterArea(aFilterArea);
+    checkSameSize(*this, aSqr);
     // aDst roi may differ
 
     InvokeRectStdDev<T, Src2T, ComputeT, DstT>(PointerRoi(), Pitch(), aSqr.PointerRoi(), aSqr.Pitch(),
@@ -3948,8 +4376,11 @@ ImageView<T> &ImageView<T>::MinEvery(const ImageView<T> &aSrc2, ImageView<T> &aD
                                      const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aDst);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aDst);
 
     InvokeMinEverySrcSrc(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
                          SizeRoi(), aStreamCtx);
@@ -3961,7 +4392,9 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::MinEvery(const ImageView<T> &aSrc2, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealVector<T>
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkSameSize(*this, aSrc2);
 
     InvokeMinEveryInplaceSrc(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), SizeRoi(), aStreamCtx);
 
@@ -3975,8 +4408,11 @@ ImageView<T> &ImageView<T>::MaxEvery(const ImageView<T> &aSrc2, ImageView<T> &aD
                                      const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
-    checkSameSize(ROI(), aSrc2.ROI());
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aDst);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aDst);
 
     InvokeMaxEverySrcSrc(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
                          SizeRoi(), aStreamCtx);
@@ -3988,7 +4424,9 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::MaxEvery(const ImageView<T> &aSrc2, const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealVector<T>
 {
-    checkSameSize(ROI(), aSrc2.ROI());
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkSameSize(*this, aSrc2);
 
     InvokeMaxEveryInplaceSrc(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), SizeRoi(), aStreamCtx);
     return *this;
@@ -3997,17 +4435,14 @@ ImageView<T> &ImageView<T>::MaxEvery(const ImageView<T> &aSrc2, const mpp::cuda:
 
 #pragma region Histogram
 template <PixelType T>
-void ImageView<T>::EvenLevels(int *aHPtrLevels, int aLevels, int aLowerLevel, int aUpperLevel,
+void ImageView<T>::EvenLevels(int *aHPtrLevels, int aNumLevels, int aLowerLevel, int aUpperLevel,
                               HistorgamEvenMode aHistorgamEvenMode)
     requires RealVector<T>
 {
-    if (aLevels < 2)
+    checkNullptr(aHPtrLevels);
+    if (aNumLevels < 2)
     {
-        throw INVALIDARGUMENT(aLevels, "aLevels must be at least 2 but provided value is: " << aLevels);
-    }
-    if (aHPtrLevels == nullptr)
-    {
-        throw INVALIDARGUMENT(aHPtrLevels, "nullptr");
+        throw INVALIDARGUMENT(aNumLevels, "aNumLevels must be at least 2 but provided value is: " << aNumLevels);
     }
     if (aLowerLevel >= aUpperLevel)
     {
@@ -4016,7 +4451,7 @@ void ImageView<T>::EvenLevels(int *aHPtrLevels, int aLevels, int aLowerLevel, in
     }
 
     const double step =
-        (static_cast<double>(aUpperLevel) - static_cast<double>(aLowerLevel)) / (static_cast<double>(aLevels) - 1.0);
+        (static_cast<double>(aUpperLevel) - static_cast<double>(aLowerLevel)) / (static_cast<double>(aNumLevels) - 1.0);
 
     if (aHistorgamEvenMode == HistorgamEvenMode::NPP)
     {
@@ -4024,14 +4459,14 @@ void ImageView<T>::EvenLevels(int *aHPtrLevels, int aLevels, int aLowerLevel, in
         const int bigStep   = static_cast<int>(std::ceil(step));
 
         const int bigStepCount =
-            static_cast<int>(std::round((step - smallStep) * (static_cast<double>(aLevels) - 1.0)));
+            static_cast<int>(std::round((step - smallStep) * (static_cast<double>(aNumLevels) - 1.0)));
 
         aHPtrLevels[0] = aLowerLevel;
         for (int i = 1; i <= bigStepCount; i++)
         {
             aHPtrLevels[i] = aHPtrLevels[i - 1] + bigStep;
         }
-        for (int i = bigStepCount + 1; i < aLevels; i++)
+        for (int i = bigStepCount + 1; i < aNumLevels; i++)
         {
             aHPtrLevels[i] = aHPtrLevels[i - 1] + smallStep;
         }
@@ -4039,7 +4474,7 @@ void ImageView<T>::EvenLevels(int *aHPtrLevels, int aLevels, int aLowerLevel, in
     }
 
     // default mode as in CUB:
-    for (int i = 0; i < aLevels; i++)
+    for (int i = 0; i < aNumLevels; i++)
     {
         const double bin = step * static_cast<double>(i);
         aHPtrLevels[i]   = static_cast<int>(std::ceil(bin)) + aLowerLevel;
@@ -4047,20 +4482,25 @@ void ImageView<T>::EvenLevels(int *aHPtrLevels, int aLevels, int aLowerLevel, in
 }
 
 template <PixelType T>
-size_t ImageView<T>::HistogramEvenBufferSize(const same_vector_size_different_type_t<T, int> &aLevels,
+size_t ImageView<T>::HistogramEvenBufferSize(const same_vector_size_different_type_t<T, int> &aNumLevels,
                                              const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
-    return InvokeHistogramEvenGetBufferSize(PointerRoi(), Pitch(), aLevels.data(), SizeRoi(), aStreamCtx);
+    validateImage(*this);
+    return InvokeHistogramEvenGetBufferSize(PointerRoi(), Pitch(), aNumLevels.data(), SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
 void ImageView<T>::HistogramEven(mpp::cuda::DevVarView<int> aHist[vector_active_size_v<T>],
                                  const hist_even_level_types_for_t<T> &aLowerLevel,
                                  const hist_even_level_types_for_t<T> &aUpperLevel,
-                                 mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx)
+                                 mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
+    validateImage(*this);
+    checkNullptr(aHist[0]);
+    checkNullptr(aHist[1]);
+    checkNullptr(aBuffer);
     int *histPtr[vector_active_size_v<T>];
     int histLevels[vector_active_size_v<T>];
     histPtr[0]    = aHist[0].Pointer();
@@ -4071,11 +4511,13 @@ void ImageView<T>::HistogramEven(mpp::cuda::DevVarView<int> aHist[vector_active_
 
     if constexpr (vector_active_size_v<T> > 2)
     {
+        checkNullptr(aHist[2]);
         histPtr[2]    = aHist[2].Pointer();
         histLevels[2] = to_int(aHist[2].Size()) + 1;
     }
     if constexpr (vector_active_size_v<T> > 3)
     {
+        checkNullptr(aHist[3]);
         histPtr[3]    = aHist[3].Pointer();
         histLevels[3] = to_int(aHist[3].Size()) + 1;
     }
@@ -4087,9 +4529,12 @@ void ImageView<T>::HistogramEven(mpp::cuda::DevVarView<int> aHist[vector_active_
 template <PixelType T>
 void ImageView<T>::HistogramEven(mpp::cuda::DevVarView<int> &aHist, const hist_even_level_types_for_t<T> &aLowerLevel,
                                  const hist_even_level_types_for_t<T> &aUpperLevel,
-                                 mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx)
+                                 mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
+    validateImage(*this);
+    checkNullptr(aHist);
+    checkNullptr(aBuffer);
     int *histPtr[vector_active_size_v<T>];
     int histLevels[vector_active_size_v<T>];
     histPtr[0]    = aHist.Pointer();
@@ -4104,17 +4549,23 @@ size_t ImageView<T>::HistogramRangeBufferSize(const same_vector_size_different_t
                                               const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
+    validateImage(*this);
     return InvokeHistogramRangeGetBufferSize(PointerRoi(), Pitch(), aNumLevels.data(), SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::HistogramRange(mpp::cuda::DevVarView<int> aHist[vector_active_size_v<T>],
-                                  mpp::cuda::DevVarView<hist_range_types_for_t<T>> aLevels[vector_active_size_v<T>],
-                                  mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx)
+void ImageView<T>::HistogramRange(
+    mpp::cuda::DevVarView<int> aHist[vector_active_size_v<T>],
+    const mpp::cuda::DevVarView<hist_range_types_for_t<T>> aLevels[vector_active_size_v<T>],
+    mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> > 1)
 {
+    validateImage(*this);
+    checkNullptr(aBuffer);
     for (size_t i = 0; i < vector_active_size_v<T>; i++)
     {
+        checkNullptr(aHist[i]);
+        checkNullptr(aLevels[i]);
         if (aHist[i].Size() + 1 != aLevels[i].Size())
         {
             throw INVALIDARGUMENT(
@@ -4156,9 +4607,13 @@ void ImageView<T>::HistogramRange(mpp::cuda::DevVarView<int> aHist[vector_active
 template <PixelType T>
 void ImageView<T>::HistogramRange(mpp::cuda::DevVarView<int> &aHist,
                                   const mpp::cuda::DevVarView<hist_range_types_for_t<T>> &aLevels,
-                                  mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx)
+                                  mpp::cuda::DevVarView<byte> &aBuffer, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (vector_active_size_v<T> == 1)
 {
+    validateImage(*this);
+    checkNullptr(aHist);
+    checkNullptr(aLevels);
+    checkNullptr(aBuffer);
     if (aHist.Size() + 1 != aLevels.Size())
     {
         throw INVALIDARGUMENT(aLevels, "The number of elements in the levels array must be one more than the number of "
@@ -4201,6 +4656,9 @@ ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelation(const ImageView<T> &aTempl
                                                       const mpp::cuda::StreamCtx &aStreamCtx) const
     requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
 {
+    validateImage(*this);
+    validateImage(aTemplate);
+    validateImage(aDst);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -4235,6 +4693,9 @@ ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationNormalized(const ImageView<
                                                                 const mpp::cuda::StreamCtx &aStreamCtx) const
     requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
 {
+    validateImage(*this);
+    validateImage(aTemplate);
+    validateImage(aDst);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -4269,6 +4730,9 @@ ImageView<Pixel32fC1> &ImageView<T>::SquareDistanceNormalized(const ImageView<T>
                                                               const mpp::cuda::StreamCtx &aStreamCtx) const
     requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
 {
+    validateImage(*this);
+    validateImage(aTemplate);
+    validateImage(aDst);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -4308,6 +4772,10 @@ ImageView<Pixel32fC1> &ImageView<T>::CrossCorrelationCoefficient(const ImageView
                                                                  const mpp::cuda::StreamCtx &aStreamCtx) const
     requires SingleChannel<T> && RealVector<T> && (sizeof(T) < 8)
 {
+    validateImage(*this);
+    validateImage(aTemplate);
+    validateImage(aDst);
+    checkNullptr(aMeanTemplate);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -4415,6 +4883,9 @@ void ImageView<T>::RadialProfile(mpp::cuda::DevVarView<int> &aProfileCount,
                                  const Vec2f &aCenter, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (!std::same_as<remove_vector_t<T>, double>)
 {
+    validateImage(*this);
+    checkNullptr(aProfileCount);
+    checkNullptr(aProfileSum);
     if (aProfileCount.Size() != aProfileSum.Size())
     {
         throw INVALIDARGUMENT(aProfileCount aProfileSum,
@@ -4454,6 +4925,9 @@ void ImageView<T>::RadialProfile(mpp::cuda::DevVarView<int> &aProfileCount,
                                  const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (!std::same_as<remove_vector_t<T>, double>)
 {
+    validateImage(*this);
+    checkNullptr(aProfileCount);
+    checkNullptr(aProfileSum);
     if (aProfileCount.Size() != aProfileSum.Size())
     {
         throw INVALIDARGUMENT(aProfileCount aProfileSum,

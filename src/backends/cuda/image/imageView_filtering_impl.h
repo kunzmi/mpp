@@ -10,11 +10,13 @@
 #include <common/exception.h>
 #include <common/half_fp16.h>
 #include <common/image/filterArea.h>
+#include <common/image/filterAreaException.h>
 #include <common/image/functors/imageFunctors.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
 #include <common/image/roiException.h>
 #include <common/image/size2D.h>
+#include <common/image/validateImage.h>
 #include <common/mpp_defs.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
@@ -58,6 +60,8 @@ ImageView<T> &ImageView<T>::FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFi
                                         const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                                         const mpp::cuda::StreamCtx &aStreamCtx) const
 {
+    validateImage(*this);
+    validateImage(aDst);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -173,6 +177,8 @@ ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::FixedFilter(
     const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(has_alternative_filter_output_type_for_v<T>)
 {
+    validateImage(*this);
+    validateImage(aDst);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -286,6 +292,9 @@ ImageView<T> &ImageView<T>::SeparableFilter(
     int aFilterSize, int aFilterCenter, const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
     const mpp::cuda::StreamCtx &aStreamCtx) const
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aFilter);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -349,6 +358,9 @@ ImageView<T> &ImageView<T>::ColumnFilter(
     int aFilterSize, int aFilterCenter, const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
     const mpp::cuda::StreamCtx &aStreamCtx) const
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aFilter);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -403,6 +415,8 @@ ImageView<window_sum_result_type_t<T>> &ImageView<T>::ColumnWindowSum(
     complex_basetype_t<remove_vector_t<window_sum_result_type_t<T>>> aScalingValue, int aFilterSize, int aFilterCenter,
     const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
+    validateImage(*this);
+    validateImage(aDst);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -452,6 +466,9 @@ ImageView<T> &ImageView<T>::RowFilter(
     int aFilterSize, int aFilterCenter, const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
     const mpp::cuda::StreamCtx &aStreamCtx) const
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aFilter);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -505,6 +522,8 @@ ImageView<window_sum_result_type_t<T>> &ImageView<T>::RowWindowSum(
     complex_basetype_t<remove_vector_t<window_sum_result_type_t<T>>> aScalingValue, int aFilterSize, int aFilterCenter,
     const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
+    validateImage(*this);
+    validateImage(aDst);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -551,12 +570,18 @@ ImageView<T> &ImageView<T>::BoxFilter(ImageView<T> &aDst, const FilterArea &aFil
                                       BorderType aBorder, const Roi &aAllowedReadRoi,
                                       const mpp::cuda::StreamCtx &aStreamCtx) const
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
     const T *allowedPtr          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
 
-    if (aFilterArea.Size == 3 || aFilterArea.Size == 5 || aFilterArea.Size == 7 || aFilterArea.Size == 9)
+    const bool haveFixedSize = aBorder == BorderType::None || aBorder == BorderType::Replicate;
+
+    if (haveFixedSize &&
+        (aFilterArea.Size == 3 || aFilterArea.Size == 5 || aFilterArea.Size == 7 || aFilterArea.Size == 9))
     {
         // this implies aFilterArea.Size.x == aFilterArea.Size.y
         InvokeFixedSizeBoxFilter(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aFilterArea.Size.x,
@@ -610,12 +635,18 @@ ImageView<same_vector_size_different_type_t<T, float>> &ImageView<T>::BoxFilter(
     BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealIntVector<T>
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
     const T *allowedPtr          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
 
-    if (aFilterArea.Size == 3 || aFilterArea.Size == 5 || aFilterArea.Size == 7 || aFilterArea.Size == 9)
+    const bool haveFixedSize = aBorder == BorderType::None || aBorder == BorderType::Replicate;
+
+    if (haveFixedSize &&
+        (aFilterArea.Size == 3 || aFilterArea.Size == 5 || aFilterArea.Size == 7 || aFilterArea.Size == 9))
     {
         // this implies aFilterArea.Size.x == aFilterArea.Size.y
         InvokeFixedSizeBoxFilter(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aFilterArea.Size.x,
@@ -670,6 +701,9 @@ ImageView<Pixel32fC2> &ImageView<T>::BoxAndSumSquareFilter(ImageView<Pixel32fC2>
                                                            const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && SingleChannel<T> && (sizeof(T) < 8)
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -718,12 +752,18 @@ ImageView<T> &ImageView<T>::MaxFilter(ImageView<T> &aDst, const FilterArea &aFil
                                       const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
     const T *allowedPtr          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
 
-    if (aFilterArea.Size == 3 || aFilterArea.Size == 5 || aFilterArea.Size == 7 || aFilterArea.Size == 9)
+    const bool haveFixedSize = aBorder == BorderType::None || aBorder == BorderType::Replicate;
+
+    if (haveFixedSize &&
+        (aFilterArea.Size == 3 || aFilterArea.Size == 5 || aFilterArea.Size == 7 || aFilterArea.Size == 9))
     {
         // this implies aFilterArea.Size.x == aFilterArea.Size.y
         InvokeFixedSizeMaxFilter(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aFilterArea.Size.x,
@@ -773,12 +813,18 @@ ImageView<T> &ImageView<T>::MinFilter(ImageView<T> &aDst, const FilterArea &aFil
                                       const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
     const T *allowedPtr          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
 
-    if (aFilterArea.Size == 3 || aFilterArea.Size == 5 || aFilterArea.Size == 7 || aFilterArea.Size == 9)
+    const bool haveFixedSize = aBorder == BorderType::None || aBorder == BorderType::Replicate;
+
+    if (haveFixedSize &&
+        (aFilterArea.Size == 3 || aFilterArea.Size == 5 || aFilterArea.Size == 7 || aFilterArea.Size == 9))
     {
         // this implies aFilterArea.Size.x == aFilterArea.Size.y
         InvokeFixedSizeMinFilter(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aFilterArea.Size.x,
@@ -795,7 +841,7 @@ ImageView<T> &ImageView<T>::MinFilter(ImageView<T> &aDst, const FilterArea &aFil
 }
 #pragma endregion
 
-#pragma region Min/Max Filter
+#pragma region Median Filter
 template <PixelType T>
 ImageView<T> &ImageView<T>::MedianFilter(ImageView<T> &aDst, const FilterArea &aFilterArea, BorderType aBorder,
                                          const mpp::cuda::StreamCtx &aStreamCtx) const
@@ -809,6 +855,9 @@ ImageView<T> &ImageView<T>::MedianFilter(ImageView<T> &aDst, const FilterArea &a
                                          const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -871,6 +920,9 @@ ImageView<T> &ImageView<T>::WienerFilter(ImageView<T> &aDst, const FilterArea &a
                                          const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -930,6 +982,9 @@ ImageView<T> &ImageView<T>::ThresholdAdaptiveBoxFilter(ImageView<T> &aDst, const
                                                        const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -983,30 +1038,36 @@ ImageView<T> &ImageView<T>::Filter(ImageView<T> &aDst,
                                    const FilterArea &aFilterArea, const T &aConstant, BorderType aBorder,
                                    const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aFilter);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
     const T *allowedPtr          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
 
-    if (aFilterArea.Size == Vec2i{3, 3})
+    const bool haveFixedSize = aBorder == BorderType::None || aBorder == BorderType::Replicate;
+
+    if (aFilterArea.Size == Vec2i{3, 3} && haveFixedSize)
     {
         InvokeFixedSizeFilter(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aFilter.Pointer(),
                               MaskSize::Mask_3x3, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                               roiOffset, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{5, 5})
+    else if (aFilterArea.Size == Vec2i{5, 5} && haveFixedSize)
     {
         InvokeFixedSizeFilter(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aFilter.Pointer(),
                               MaskSize::Mask_5x5, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                               roiOffset, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{7, 7})
+    else if (aFilterArea.Size == Vec2i{7, 7} && haveFixedSize)
     {
         InvokeFixedSizeFilter(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aFilter.Pointer(),
                               MaskSize::Mask_7x7, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                               roiOffset, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{9, 9})
+    else if (aFilterArea.Size == Vec2i{9, 9} && haveFixedSize)
     {
         InvokeFixedSizeFilter(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aFilter.Pointer(),
                               MaskSize::Mask_9x9, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -1063,30 +1124,36 @@ ImageView<alternative_filter_output_type_for_t<T>> &ImageView<T>::Filter(
     const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(has_alternative_filter_output_type_for_v<T>)
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aFilter);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
     const T *allowedPtr          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
 
-    if (aFilterArea.Size == Vec2i{3, 3})
+    const bool haveFixedSize = aBorder == BorderType::None || aBorder == BorderType::Replicate;
+
+    if (aFilterArea.Size == Vec2i{3, 3} && haveFixedSize)
     {
         InvokeFixedSizeFilter(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aFilter.Pointer(),
                               MaskSize::Mask_3x3, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                               roiOffset, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{5, 5})
+    else if (aFilterArea.Size == Vec2i{5, 5} && haveFixedSize)
     {
         InvokeFixedSizeFilter(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aFilter.Pointer(),
                               MaskSize::Mask_5x5, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                               roiOffset, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{7, 7})
+    else if (aFilterArea.Size == Vec2i{7, 7} && haveFixedSize)
     {
         InvokeFixedSizeFilter(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aFilter.Pointer(),
                               MaskSize::Mask_7x7, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                               roiOffset, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{9, 9})
+    else if (aFilterArea.Size == Vec2i{9, 9} && haveFixedSize)
     {
         InvokeFixedSizeFilter(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aFilter.Pointer(),
                               MaskSize::Mask_9x9, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -1131,13 +1198,10 @@ ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const Filte
 template <PixelType T>
 void ImageView<T>::PrecomputeBilateralGaussFilter(mpp::cuda::DevVarView<Pixel32fC1> &aPreCompGeomDistCoeff,
                                                   const FilterArea &aFilterArea, float aPosSquareSigma,
-                                                  const mpp::cuda::StreamCtx &aStreamCtx) const
+                                                  const mpp::cuda::StreamCtx &aStreamCtx)
     requires RealVector<T> && (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>)
 {
-    if (!aFilterArea.CheckIfValid())
-    {
-        throw INVALIDARGUMENT(aFilterArea, "Invalid filter area: " << aFilterArea);
-    }
+    checkFilterArea(aFilterArea);
     if (aPreCompGeomDistCoeff.Size() < aFilterArea.Size.TotalSize())
     {
         throw INVALIDARGUMENT(aPreCompGeomDistCoeff,
@@ -1174,10 +1238,10 @@ ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const Filte
     requires SingleChannel<T> && RealVector<T> &&
              (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>)
 {
-    if (!aFilterArea.CheckIfValid())
-    {
-        throw INVALIDARGUMENT(aFilterArea, "Invalid filter area: " << aFilterArea);
-    }
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aPreCompGeomDistCoeff);
+    checkFilterArea(aFilterArea);
     if (aPreCompGeomDistCoeff.Size() < aFilterArea.Size.TotalSize())
     {
         throw INVALIDARGUMENT(aPreCompGeomDistCoeff,
@@ -1248,6 +1312,10 @@ ImageView<T> &ImageView<T>::BilateralGaussFilter(ImageView<T> &aDst, const Filte
     requires(!SingleChannel<T>) && RealVector<T> &&
             (sizeof(remove_vector_t<T>) < 4 || std::same_as<remove_vector_t<T>, float>)
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aPreCompGeomDistCoeff);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -1288,6 +1356,7 @@ void ImageView<T>::GradientVectorSobel(ImageView<Pixel16sC1> &aDstX, ImageView<P
                                        const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>)
 {
+    validateImage(*this);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     // find first not nullptr output:
@@ -1312,8 +1381,8 @@ void ImageView<T>::GradientVectorSobel(ImageView<Pixel16sC1> &aDstX, ImageView<P
     if (aDstX.Pointer() == nullptr && aDstY.Pointer() == nullptr && aDstMag.Pointer() == nullptr &&
         aDstAngle.Pointer() == nullptr && aDstCovariance.Pointer() == nullptr)
     {
-        throw INVALIDARGUMENT(aDstX aDstY aDstMag aDstAngle aDstCovariance,
-                              "All output images are nullptr, at least one output must be provided.");
+        throw NULLPTR(aDstX aDstY aDstMag aDstAngle aDstCovariance,
+                      "All output images are nullptr, at least one output must be provided.");
     }
 
     if (aDstX.Pointer() != nullptr)
@@ -1373,6 +1442,7 @@ void ImageView<T>::GradientVectorSobel(ImageView<Pixel32fC1> &aDstX, ImageView<P
     requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
              std::same_as<remove_vector_t<T>, float>)
 {
+    validateImage(*this);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     // find first not nullptr output:
@@ -1397,8 +1467,8 @@ void ImageView<T>::GradientVectorSobel(ImageView<Pixel32fC1> &aDstX, ImageView<P
     if (aDstX.Pointer() == nullptr && aDstY.Pointer() == nullptr && aDstMag.Pointer() == nullptr &&
         aDstAngle.Pointer() == nullptr && aDstCovariance.Pointer() == nullptr)
     {
-        throw INVALIDARGUMENT(aDstX aDstY aDstMag aDstAngle aDstCovariance,
-                              "All output images are nullptr, at least one output must be provided.");
+        throw NULLPTR(aDstX aDstY aDstMag aDstAngle aDstCovariance,
+                      "All output images are nullptr, at least one output must be provided.");
     }
 
     if (aDstX.Pointer() != nullptr)
@@ -1456,6 +1526,7 @@ void ImageView<T>::GradientVectorScharr(ImageView<Pixel16sC1> &aDstX, ImageView<
                                         const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>)
 {
+    validateImage(*this);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     // find first not nullptr output:
@@ -1480,8 +1551,8 @@ void ImageView<T>::GradientVectorScharr(ImageView<Pixel16sC1> &aDstX, ImageView<
     if (aDstX.Pointer() == nullptr && aDstY.Pointer() == nullptr && aDstMag.Pointer() == nullptr &&
         aDstAngle.Pointer() == nullptr && aDstCovariance.Pointer() == nullptr)
     {
-        throw INVALIDARGUMENT(aDstX aDstY aDstMag aDstAngle aDstCovariance,
-                              "All output images are nullptr, at least one output must be provided.");
+        throw NULLPTR(aDstX aDstY aDstMag aDstAngle aDstCovariance,
+                      "All output images are nullptr, at least one output must be provided.");
     }
 
     if (aDstX.Pointer() != nullptr)
@@ -1541,6 +1612,7 @@ void ImageView<T>::GradientVectorScharr(ImageView<Pixel32fC1> &aDstX, ImageView<
     requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
              std::same_as<remove_vector_t<T>, float>)
 {
+    validateImage(*this);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     // find first not nullptr output:
@@ -1565,8 +1637,8 @@ void ImageView<T>::GradientVectorScharr(ImageView<Pixel32fC1> &aDstX, ImageView<
     if (aDstX.Pointer() == nullptr && aDstY.Pointer() == nullptr && aDstMag.Pointer() == nullptr &&
         aDstAngle.Pointer() == nullptr && aDstCovariance.Pointer() == nullptr)
     {
-        throw INVALIDARGUMENT(aDstX aDstY aDstMag aDstAngle aDstCovariance,
-                              "All output images are nullptr, at least one output must be provided.");
+        throw NULLPTR(aDstX aDstY aDstMag aDstAngle aDstCovariance,
+                      "All output images are nullptr, at least one output must be provided.");
     }
 
     if (aDstX.Pointer() != nullptr)
@@ -1624,6 +1696,7 @@ void ImageView<T>::GradientVectorPrewitt(ImageView<Pixel16sC1> &aDstX, ImageView
                                          const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, sbyte>)
 {
+    validateImage(*this);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     // find first not nullptr output:
@@ -1648,8 +1721,8 @@ void ImageView<T>::GradientVectorPrewitt(ImageView<Pixel16sC1> &aDstX, ImageView
     if (aDstX.Pointer() == nullptr && aDstY.Pointer() == nullptr && aDstMag.Pointer() == nullptr &&
         aDstAngle.Pointer() == nullptr && aDstCovariance.Pointer() == nullptr)
     {
-        throw INVALIDARGUMENT(aDstX aDstY aDstMag aDstAngle aDstCovariance,
-                              "All output images are nullptr, at least one output must be provided.");
+        throw NULLPTR(aDstX aDstY aDstMag aDstAngle aDstCovariance,
+                      "All output images are nullptr, at least one output must be provided.");
     }
 
     if (aDstX.Pointer() != nullptr)
@@ -1709,6 +1782,7 @@ void ImageView<T>::GradientVectorPrewitt(ImageView<Pixel32fC1> &aDstX, ImageView
     requires(std::same_as<remove_vector_t<T>, short> || std::same_as<remove_vector_t<T>, ushort> ||
              std::same_as<remove_vector_t<T>, float>)
 {
+    validateImage(*this);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     // find first not nullptr output:
@@ -1733,8 +1807,8 @@ void ImageView<T>::GradientVectorPrewitt(ImageView<Pixel32fC1> &aDstX, ImageView
     if (aDstX.Pointer() == nullptr && aDstY.Pointer() == nullptr && aDstMag.Pointer() == nullptr &&
         aDstAngle.Pointer() == nullptr && aDstCovariance.Pointer() == nullptr)
     {
-        throw INVALIDARGUMENT(aDstX aDstY aDstMag aDstAngle aDstCovariance,
-                              "All output images are nullptr, at least one output must be provided.");
+        throw NULLPTR(aDstX aDstY aDstMag aDstAngle aDstCovariance,
+                      "All output images are nullptr, at least one output must be provided.");
     }
 
     if (aDstX.Pointer() != nullptr)
@@ -1963,6 +2037,9 @@ ImageView<T> &ImageView<T>::UnsharpFilter(
     const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aFilter);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -2028,6 +2105,9 @@ ImageView<Pixel32fC1> &ImageView<T>::HarrisCornerResponse(ImageView<Pixel32fC1> 
                                                           const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<T, Pixel32fC4>
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkFilterArea(aAvgWindowSize);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -2057,6 +2137,10 @@ ImageView<Pixel8uC1> &ImageView<T>::CannyEdge(const ImageView<Pixel32fC1> &aSrcA
                                               const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<T, Pixel16sC1> || std::same_as<T, Pixel32fC1>
 {
+    validateImage(*this);
+    validateImage(aSrcAngle);
+    validateImage(aTemp);
+    validateImage(aDst);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();

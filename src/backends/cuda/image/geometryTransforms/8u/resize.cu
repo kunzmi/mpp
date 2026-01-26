@@ -6,8 +6,5 @@ namespace mpp::image::cuda
 {
 
 ForAllChannelsWithAlpha(8u);
-InstantiateP2_ForGeomType(8u);
-InstantiateP3_ForGeomType(8u);
-InstantiateP4_ForGeomType(8u);
 
 } // namespace mpp::image::cuda

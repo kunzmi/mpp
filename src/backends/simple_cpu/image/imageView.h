@@ -5490,7 +5490,8 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
     /// <param name="aCenter">The center of the circular average.</param>
     /// <param name="aRadiusRatio">Ratio of orientation axis to orthogonal axis. (i.e. 1.5 means stretched 1.5x)</param>
     /// <param name="aAngleInRad">Orientation of the ellipse's orthogonal axis, clockwise in radians with 0.0 being
-    /// vertical.</param> <param name="aStreamCtx"></param>
+    /// vertical.</param>
+    /// <param name="aStreamCtx"></param>
     void RadialProfile(int *aProfileCount, same_vector_size_different_type_t<T, float> *aProfileSum,
                        same_vector_size_different_type_t<T, float> *aProfileSumSqr, int aProfileSize,
                        const Vec2f &aCenter, float aRadiusRatio, float aAngleInRad) const

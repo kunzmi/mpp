@@ -3,6 +3,7 @@
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/streamCtx.h>
 #include <common/image/gotoPtr.h>
+#include <common/image/pitchException.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -152,6 +153,8 @@ void InvokeForEachPixelKernelDefault(DstT *aDst, size_t aPitchDst, const Size2D 
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {
+        checkPitchIsMultiple(aPitchDst, ConfigWarpAlignment<"Default">::value, TupelSize);
+
         const dim3 BlockSize               = ConfigBlockSize<"Default">::value;
         constexpr int WarpAlignmentInBytes = ConfigWarpAlignment<"Default">::value;
         constexpr uint SharedMemory        = 0;

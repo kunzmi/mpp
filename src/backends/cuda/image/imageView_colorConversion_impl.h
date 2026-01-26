@@ -7,7 +7,6 @@
 #include <backends/cuda/cudaException.h>
 #include <backends/cuda/devVarView.h>
 #include <backends/cuda/image/colorConversion/colorConversionKernel.h>
-#include <backends/cuda/image/colorConversion/test.h>
 #include <backends/cuda/streamCtx.h>
 #include <common/bfloat16.h>
 #include <common/complex.h>
@@ -19,6 +18,7 @@
 #include <common/image/roi.h>
 #include <common/image/roiException.h>
 #include <common/image/size2D.h>
+#include <common/image/validateImage.h>
 #include <common/mpp_defs.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
@@ -29,18 +29,6 @@
 namespace mpp::image::cuda
 {
 #pragma region ColorConversion
-template <PixelType T>
-ImageView<Vector2<remove_vector_t<T>>> &ImageView<T>::RGB2YCbCr422C2(ImageView<Vector2<remove_vector_t<T>>> &aDst,
-                                                                     const mpp::cuda::StreamCtx &aStreamCtx) const
-    requires std::same_as<Pixel8uC3, T>
-{
-    checkSameSize(ROI(), aDst.ROI());
-
-    InvokeTestSrc<T, Vector3<float>, T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), SizeRoi(), aStreamCtx);
-
-    return aDst;
-}
-
 #pragma region HLS
 #pragma region RGBtoHLS
 template <PixelType T>
@@ -50,7 +38,9 @@ ImageView<T> &ImageView<T>::RGBtoHLS(ImageView<T> &aDst, float aNormalizationFac
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeRGBtoHLSSrc<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, SizeRoi(),
                          aStreamCtx);
@@ -59,100 +49,124 @@ ImageView<T> &ImageView<T>::RGBtoHLS(ImageView<T> &aDst, float aNormalizationFac
 }
 
 template <PixelType T>
-void ImageView<T>::RGBtoHLS(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+void ImageView<T>::RGBtoHLS(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
 
-    InvokeRGBtoHLSSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
+    InvokeRGBtoHLSSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::RGBtoHLS(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+void ImageView<T>::RGBtoHLS(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
-    checkSameSize(ROI(), aDst3.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
+    checkSameSize(*this, aDst4);
 
-    InvokeRGBtoHLSSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor,
+    InvokeRGBtoHLSSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(), aNormalizationFactor,
                          SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::RGBtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::RGBtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                             const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
              std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
-    InvokeRGBtoHLSSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeRGBtoHLSSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::RGBtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::RGBtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeRGBtoHLSSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(),
+    InvokeRGBtoHLSSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(),
                          aStreamCtx);
 
     return aDst;
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::RGBtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+ImageView<T> &ImageView<T>::RGBtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
-    checkSameSize(aSrc1.ROI(), aDst.ROI());
-    checkSameSize(aSrc2.ROI(), aDst.ROI());
-    checkSameSize(aSrc3.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aDst);
+    checkSameSize(aSrc2, aDst);
+    checkSameSize(aSrc3, aDst);
+    checkSameSize(aSrc4, aDst);
 
-    InvokeRGBtoHLSSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
-                         aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeRGBtoHLSSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
+                         aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -163,6 +177,7 @@ ImageView<T> &ImageView<T>::RGBtoHLS(float aNormalizationFactor, const mpp::cuda
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
+    validateImage(*this);
     InvokeRGBtoHLSInplace<T>(PointerRoi(), Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -176,7 +191,9 @@ ImageView<T> &ImageView<T>::BGRtoHLS(ImageView<T> &aDst, float aNormalizationFac
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeBGRtoHLSSrc<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, SizeRoi(),
                          aStreamCtx);
@@ -185,100 +202,124 @@ ImageView<T> &ImageView<T>::BGRtoHLS(ImageView<T> &aDst, float aNormalizationFac
 }
 
 template <PixelType T>
-void ImageView<T>::BGRtoHLS(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+void ImageView<T>::BGRtoHLS(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
 
-    InvokeBGRtoHLSSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
+    InvokeBGRtoHLSSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::BGRtoHLS(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+void ImageView<T>::BGRtoHLS(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
-    checkSameSize(ROI(), aDst3.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
+    checkSameSize(*this, aDst4);
 
-    InvokeBGRtoHLSSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor,
+    InvokeBGRtoHLSSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(), aNormalizationFactor,
                          SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::BGRtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::BGRtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                             const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
              std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
-    InvokeBGRtoHLSSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeBGRtoHLSSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::BGRtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::BGRtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeBGRtoHLSSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(),
+    InvokeBGRtoHLSSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(),
                          aStreamCtx);
 
     return aDst;
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::BGRtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+ImageView<T> &ImageView<T>::BGRtoHLS(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
-    checkSameSize(aSrc1.ROI(), aDst.ROI());
-    checkSameSize(aSrc2.ROI(), aDst.ROI());
-    checkSameSize(aSrc3.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aDst);
+    checkSameSize(aSrc2, aDst);
+    checkSameSize(aSrc3, aDst);
+    checkSameSize(aSrc4, aDst);
 
-    InvokeBGRtoHLSSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
-                         aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeBGRtoHLSSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
+                         aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -289,6 +330,7 @@ ImageView<T> &ImageView<T>::BGRtoHLS(float aNormalizationFactor, const mpp::cuda
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
+    validateImage(*this);
     InvokeBGRtoHLSInplace<T>(PointerRoi(), Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -304,7 +346,9 @@ ImageView<T> &ImageView<T>::HLStoRGB(ImageView<T> &aDst, float aNormalizationFac
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeHLStoRGBSrc<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, SizeRoi(),
                          aStreamCtx);
@@ -313,100 +357,124 @@ ImageView<T> &ImageView<T>::HLStoRGB(ImageView<T> &aDst, float aNormalizationFac
 }
 
 template <PixelType T>
-void ImageView<T>::HLStoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+void ImageView<T>::HLStoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
 
-    InvokeHLStoRGBSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
+    InvokeHLStoRGBSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::HLStoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+void ImageView<T>::HLStoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
-    checkSameSize(ROI(), aDst3.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
+    checkSameSize(*this, aDst4);
 
-    InvokeHLStoRGBSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor,
+    InvokeHLStoRGBSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(), aNormalizationFactor,
                          SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::HLStoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::HLStoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                             const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
              std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
-    InvokeHLStoRGBSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeHLStoRGBSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::HLStoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::HLStoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeHLStoRGBSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(),
+    InvokeHLStoRGBSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(),
                          aStreamCtx);
 
     return aDst;
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::HLStoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+ImageView<T> &ImageView<T>::HLStoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
-    checkSameSize(aSrc1.ROI(), aDst.ROI());
-    checkSameSize(aSrc2.ROI(), aDst.ROI());
-    checkSameSize(aSrc3.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aDst);
+    checkSameSize(aSrc2, aDst);
+    checkSameSize(aSrc3, aDst);
+    checkSameSize(aSrc4, aDst);
 
-    InvokeHLStoRGBSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
-                         aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeHLStoRGBSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
+                         aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -417,6 +485,7 @@ ImageView<T> &ImageView<T>::HLStoRGB(float aNormalizationFactor, const mpp::cuda
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
+    validateImage(*this);
     InvokeHLStoRGBInplace<T>(PointerRoi(), Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -430,7 +499,9 @@ ImageView<T> &ImageView<T>::HLStoBGR(ImageView<T> &aDst, float aNormalizationFac
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeHLStoBGRSrc<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, SizeRoi(),
                          aStreamCtx);
@@ -439,100 +510,124 @@ ImageView<T> &ImageView<T>::HLStoBGR(ImageView<T> &aDst, float aNormalizationFac
 }
 
 template <PixelType T>
-void ImageView<T>::HLStoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+void ImageView<T>::HLStoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
 
-    InvokeHLStoBGRSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
+    InvokeHLStoBGRSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::HLStoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+void ImageView<T>::HLStoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
-    checkSameSize(ROI(), aDst3.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
+    checkSameSize(*this, aDst4);
 
-    InvokeHLStoBGRSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor,
+    InvokeHLStoBGRSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(), aNormalizationFactor,
                          SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::HLStoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::HLStoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                             const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
              std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
-    InvokeHLStoBGRSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeHLStoBGRSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::HLStoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::HLStoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeHLStoBGRSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(),
+    InvokeHLStoBGRSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(),
                          aStreamCtx);
 
     return aDst;
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::HLStoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+ImageView<T> &ImageView<T>::HLStoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
-    checkSameSize(aSrc1.ROI(), aDst.ROI());
-    checkSameSize(aSrc2.ROI(), aDst.ROI());
-    checkSameSize(aSrc3.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aDst);
+    checkSameSize(aSrc2, aDst);
+    checkSameSize(aSrc3, aDst);
+    checkSameSize(aSrc4, aDst);
 
-    InvokeHLStoBGRSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
-                         aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeHLStoBGRSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
+                         aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -543,6 +638,7 @@ ImageView<T> &ImageView<T>::HLStoBGR(float aNormalizationFactor, const mpp::cuda
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
+    validateImage(*this);
     InvokeHLStoBGRInplace<T>(PointerRoi(), Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -560,7 +656,9 @@ ImageView<T> &ImageView<T>::RGBtoHSV(ImageView<T> &aDst, float aNormalizationFac
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeRGBtoHSVSrc<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, SizeRoi(),
                          aStreamCtx);
@@ -569,100 +667,124 @@ ImageView<T> &ImageView<T>::RGBtoHSV(ImageView<T> &aDst, float aNormalizationFac
 }
 
 template <PixelType T>
-void ImageView<T>::RGBtoHSV(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+void ImageView<T>::RGBtoHSV(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
 
-    InvokeRGBtoHSVSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
+    InvokeRGBtoHSVSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::RGBtoHSV(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+void ImageView<T>::RGBtoHSV(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
-    checkSameSize(ROI(), aDst3.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
+    checkSameSize(*this, aDst4);
 
-    InvokeRGBtoHSVSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor,
+    InvokeRGBtoHSVSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(), aNormalizationFactor,
                          SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::RGBtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::RGBtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                             const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
              std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
-    InvokeRGBtoHSVSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeRGBtoHSVSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::RGBtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::RGBtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeRGBtoHSVSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(),
+    InvokeRGBtoHSVSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(),
                          aStreamCtx);
 
     return aDst;
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::RGBtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+ImageView<T> &ImageView<T>::RGBtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
-    checkSameSize(aSrc1.ROI(), aDst.ROI());
-    checkSameSize(aSrc2.ROI(), aDst.ROI());
-    checkSameSize(aSrc3.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aDst);
+    checkSameSize(aSrc2, aDst);
+    checkSameSize(aSrc3, aDst);
+    checkSameSize(aSrc4, aDst);
 
-    InvokeRGBtoHSVSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
-                         aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeRGBtoHSVSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
+                         aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -673,6 +795,7 @@ ImageView<T> &ImageView<T>::RGBtoHSV(float aNormalizationFactor, const mpp::cuda
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
+    validateImage(*this);
     InvokeRGBtoHSVInplace<T>(PointerRoi(), Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -686,7 +809,9 @@ ImageView<T> &ImageView<T>::BGRtoHSV(ImageView<T> &aDst, float aNormalizationFac
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeBGRtoHSVSrc<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, SizeRoi(),
                          aStreamCtx);
@@ -695,100 +820,124 @@ ImageView<T> &ImageView<T>::BGRtoHSV(ImageView<T> &aDst, float aNormalizationFac
 }
 
 template <PixelType T>
-void ImageView<T>::BGRtoHSV(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+void ImageView<T>::BGRtoHSV(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
 
-    InvokeBGRtoHSVSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
+    InvokeBGRtoHSVSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::BGRtoHSV(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+void ImageView<T>::BGRtoHSV(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
-    checkSameSize(ROI(), aDst3.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
+    checkSameSize(*this, aDst4);
 
-    InvokeBGRtoHSVSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor,
+    InvokeBGRtoHSVSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(), aNormalizationFactor,
                          SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::BGRtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::BGRtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                             const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
              std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
-    InvokeBGRtoHSVSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeBGRtoHSVSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::BGRtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::BGRtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeBGRtoHSVSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(),
+    InvokeBGRtoHSVSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(),
                          aStreamCtx);
 
     return aDst;
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::BGRtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+ImageView<T> &ImageView<T>::BGRtoHSV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
-    checkSameSize(aSrc1.ROI(), aDst.ROI());
-    checkSameSize(aSrc2.ROI(), aDst.ROI());
-    checkSameSize(aSrc3.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aDst);
+    checkSameSize(aSrc2, aDst);
+    checkSameSize(aSrc3, aDst);
+    checkSameSize(aSrc4, aDst);
 
-    InvokeBGRtoHSVSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
-                         aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeBGRtoHSVSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
+                         aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -799,6 +948,7 @@ ImageView<T> &ImageView<T>::BGRtoHSV(float aNormalizationFactor, const mpp::cuda
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
+    validateImage(*this);
     InvokeBGRtoHSVInplace<T>(PointerRoi(), Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -814,7 +964,9 @@ ImageView<T> &ImageView<T>::HSVtoRGB(ImageView<T> &aDst, float aNormalizationFac
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeHSVtoRGBSrc<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, SizeRoi(),
                          aStreamCtx);
@@ -823,100 +975,124 @@ ImageView<T> &ImageView<T>::HSVtoRGB(ImageView<T> &aDst, float aNormalizationFac
 }
 
 template <PixelType T>
-void ImageView<T>::HSVtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+void ImageView<T>::HSVtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
 
-    InvokeHSVtoRGBSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
+    InvokeHSVtoRGBSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::HSVtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+void ImageView<T>::HSVtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
-    checkSameSize(ROI(), aDst3.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
+    checkSameSize(*this, aDst4);
 
-    InvokeHSVtoRGBSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor,
+    InvokeHSVtoRGBSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(), aNormalizationFactor,
                          SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::HSVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::HSVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                             const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
              std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
-    InvokeHSVtoRGBSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeHSVtoRGBSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::HSVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::HSVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeHSVtoRGBSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(),
+    InvokeHSVtoRGBSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(),
                          aStreamCtx);
 
     return aDst;
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::HSVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+ImageView<T> &ImageView<T>::HSVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
-    checkSameSize(aSrc1.ROI(), aDst.ROI());
-    checkSameSize(aSrc2.ROI(), aDst.ROI());
-    checkSameSize(aSrc3.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aDst);
+    checkSameSize(aSrc2, aDst);
+    checkSameSize(aSrc3, aDst);
+    checkSameSize(aSrc4, aDst);
 
-    InvokeHSVtoRGBSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
-                         aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeHSVtoRGBSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
+                         aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -927,6 +1103,7 @@ ImageView<T> &ImageView<T>::HSVtoRGB(float aNormalizationFactor, const mpp::cuda
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
+    validateImage(*this);
     InvokeHSVtoRGBInplace<T>(PointerRoi(), Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -940,7 +1117,9 @@ ImageView<T> &ImageView<T>::HSVtoBGR(ImageView<T> &aDst, float aNormalizationFac
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeHSVtoBGRSrc<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, SizeRoi(),
                          aStreamCtx);
@@ -949,100 +1128,124 @@ ImageView<T> &ImageView<T>::HSVtoBGR(ImageView<T> &aDst, float aNormalizationFac
 }
 
 template <PixelType T>
-void ImageView<T>::HSVtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+void ImageView<T>::HSVtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
 
-    InvokeHSVtoBGRSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
+    InvokeHSVtoBGRSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::HSVtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+void ImageView<T>::HSVtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
-    checkSameSize(ROI(), aDst3.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
+    checkSameSize(*this, aDst4);
 
-    InvokeHSVtoBGRSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor,
+    InvokeHSVtoBGRSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(), aNormalizationFactor,
                          SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::HSVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::HSVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                             const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
              std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
-    InvokeHSVtoBGRSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeHSVtoBGRSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::HSVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::HSVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeHSVtoBGRSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(),
+    InvokeHSVtoBGRSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(),
                          aStreamCtx);
 
     return aDst;
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::HSVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+ImageView<T> &ImageView<T>::HSVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
-    checkSameSize(aSrc1.ROI(), aDst.ROI());
-    checkSameSize(aSrc2.ROI(), aDst.ROI());
-    checkSameSize(aSrc3.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aDst);
+    checkSameSize(aSrc2, aDst);
+    checkSameSize(aSrc3, aDst);
+    checkSameSize(aSrc4, aDst);
 
-    InvokeHSVtoBGRSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
-                         aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeHSVtoBGRSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
+                         aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -1053,6 +1256,7 @@ ImageView<T> &ImageView<T>::HSVtoBGR(float aNormalizationFactor, const mpp::cuda
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
+    validateImage(*this);
     InvokeHSVtoBGRInplace<T>(PointerRoi(), Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -1070,7 +1274,9 @@ ImageView<T> &ImageView<T>::RGBtoLab(ImageView<T> &aDst, float aNormalizationFac
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeRGBtoLabSrc<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, SizeRoi(),
                          aStreamCtx);
@@ -1079,100 +1285,124 @@ ImageView<T> &ImageView<T>::RGBtoLab(ImageView<T> &aDst, float aNormalizationFac
 }
 
 template <PixelType T>
-void ImageView<T>::RGBtoLab(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+void ImageView<T>::RGBtoLab(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
 
-    InvokeRGBtoLabSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
+    InvokeRGBtoLabSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::RGBtoLab(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+void ImageView<T>::RGBtoLab(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
-    checkSameSize(ROI(), aDst3.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
+    checkSameSize(*this, aDst4);
 
-    InvokeRGBtoLabSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor,
+    InvokeRGBtoLabSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(), aNormalizationFactor,
                          SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::RGBtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::RGBtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                             const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
              std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
-    InvokeRGBtoLabSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeRGBtoLabSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::RGBtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::RGBtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeRGBtoLabSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(),
+    InvokeRGBtoLabSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(),
                          aStreamCtx);
 
     return aDst;
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::RGBtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+ImageView<T> &ImageView<T>::RGBtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
-    checkSameSize(aSrc1.ROI(), aDst.ROI());
-    checkSameSize(aSrc2.ROI(), aDst.ROI());
-    checkSameSize(aSrc3.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aDst);
+    checkSameSize(aSrc2, aDst);
+    checkSameSize(aSrc3, aDst);
+    checkSameSize(aSrc4, aDst);
 
-    InvokeRGBtoLabSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
-                         aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeRGBtoLabSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
+                         aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -1183,6 +1413,7 @@ ImageView<T> &ImageView<T>::RGBtoLab(float aNormalizationFactor, const mpp::cuda
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
+    validateImage(*this);
     InvokeRGBtoLabInplace<T>(PointerRoi(), Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -1196,7 +1427,9 @@ ImageView<T> &ImageView<T>::BGRtoLab(ImageView<T> &aDst, float aNormalizationFac
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeBGRtoLabSrc<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, SizeRoi(),
                          aStreamCtx);
@@ -1205,100 +1438,123 @@ ImageView<T> &ImageView<T>::BGRtoLab(ImageView<T> &aDst, float aNormalizationFac
 }
 
 template <PixelType T>
-void ImageView<T>::BGRtoLab(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+void ImageView<T>::BGRtoLab(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
 
-    InvokeBGRtoLabSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
+    InvokeBGRtoLabSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::BGRtoLab(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+void ImageView<T>::BGRtoLab(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
-    checkSameSize(ROI(), aDst3.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
+    checkSameSize(*this, aDst4);
 
-    InvokeBGRtoLabSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor,
+    InvokeBGRtoLabSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(), aNormalizationFactor,
                          SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::BGRtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::BGRtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                             const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
              std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
-    InvokeBGRtoLabSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeBGRtoLabSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::BGRtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::BGRtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeBGRtoLabSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(),
+    InvokeBGRtoLabSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(),
                          aStreamCtx);
 
     return aDst;
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::BGRtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+ImageView<T> &ImageView<T>::BGRtoLab(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
-    checkSameSize(aSrc1.ROI(), aDst.ROI());
-    checkSameSize(aSrc2.ROI(), aDst.ROI());
-    checkSameSize(aSrc3.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aDst);
+    checkSameSize(aSrc2, aDst);
+    checkSameSize(aSrc3, aDst);
+    checkSameSize(aSrc4, aDst);
 
-    InvokeBGRtoLabSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
-                         aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeBGRtoLabSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
+                         aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -1309,6 +1565,7 @@ ImageView<T> &ImageView<T>::BGRtoLab(float aNormalizationFactor, const mpp::cuda
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
+    validateImage(*this);
     InvokeBGRtoLabInplace<T>(PointerRoi(), Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -1324,7 +1581,9 @@ ImageView<T> &ImageView<T>::LabtoRGB(ImageView<T> &aDst, float aNormalizationFac
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeLabtoRGBSrc<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, SizeRoi(),
                          aStreamCtx);
@@ -1333,100 +1592,124 @@ ImageView<T> &ImageView<T>::LabtoRGB(ImageView<T> &aDst, float aNormalizationFac
 }
 
 template <PixelType T>
-void ImageView<T>::LabtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+void ImageView<T>::LabtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
 
-    InvokeLabtoRGBSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
+    InvokeLabtoRGBSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::LabtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+void ImageView<T>::LabtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
-    checkSameSize(ROI(), aDst3.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
+    checkSameSize(*this, aDst4);
 
-    InvokeLabtoRGBSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor,
+    InvokeLabtoRGBSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(), aNormalizationFactor,
                          SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::LabtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::LabtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                             const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
              std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
-    InvokeLabtoRGBSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeLabtoRGBSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::LabtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::LabtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeLabtoRGBSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(),
+    InvokeLabtoRGBSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(),
                          aStreamCtx);
 
     return aDst;
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::LabtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+ImageView<T> &ImageView<T>::LabtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
-    checkSameSize(aSrc1.ROI(), aDst.ROI());
-    checkSameSize(aSrc2.ROI(), aDst.ROI());
-    checkSameSize(aSrc3.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aDst);
+    checkSameSize(aSrc2, aDst);
+    checkSameSize(aSrc3, aDst);
+    checkSameSize(aSrc4, aDst);
 
-    InvokeLabtoRGBSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
-                         aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeLabtoRGBSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
+                         aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -1437,6 +1720,7 @@ ImageView<T> &ImageView<T>::LabtoRGB(float aNormalizationFactor, const mpp::cuda
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
+    validateImage(*this);
     InvokeLabtoRGBInplace<T>(PointerRoi(), Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -1450,7 +1734,9 @@ ImageView<T> &ImageView<T>::LabtoBGR(ImageView<T> &aDst, float aNormalizationFac
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeLabtoBGRSrc<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, SizeRoi(),
                          aStreamCtx);
@@ -1459,100 +1745,124 @@ ImageView<T> &ImageView<T>::LabtoBGR(ImageView<T> &aDst, float aNormalizationFac
 }
 
 template <PixelType T>
-void ImageView<T>::LabtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+void ImageView<T>::LabtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
 
-    InvokeLabtoBGRSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
+    InvokeLabtoBGRSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::LabtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+void ImageView<T>::LabtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
-    checkSameSize(ROI(), aDst3.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
+    checkSameSize(*this, aDst4);
 
-    InvokeLabtoBGRSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor,
+    InvokeLabtoBGRSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(), aNormalizationFactor,
                          SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::LabtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::LabtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                             const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
              std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
-    InvokeLabtoBGRSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeLabtoBGRSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::LabtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::LabtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeLabtoBGRSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(),
+    InvokeLabtoBGRSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(),
                          aStreamCtx);
 
     return aDst;
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::LabtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+ImageView<T> &ImageView<T>::LabtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
-    checkSameSize(aSrc1.ROI(), aDst.ROI());
-    checkSameSize(aSrc2.ROI(), aDst.ROI());
-    checkSameSize(aSrc3.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aDst);
+    checkSameSize(aSrc2, aDst);
+    checkSameSize(aSrc3, aDst);
+    checkSameSize(aSrc4, aDst);
 
-    InvokeLabtoBGRSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
-                         aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeLabtoBGRSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
+                         aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -1563,6 +1873,7 @@ ImageView<T> &ImageView<T>::LabtoBGR(float aNormalizationFactor, const mpp::cuda
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
+    validateImage(*this);
     InvokeLabtoBGRInplace<T>(PointerRoi(), Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -1580,7 +1891,9 @@ ImageView<T> &ImageView<T>::RGBtoLUV(ImageView<T> &aDst, float aNormalizationFac
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeRGBtoLUVSrc<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, SizeRoi(),
                          aStreamCtx);
@@ -1589,100 +1902,124 @@ ImageView<T> &ImageView<T>::RGBtoLUV(ImageView<T> &aDst, float aNormalizationFac
 }
 
 template <PixelType T>
-void ImageView<T>::RGBtoLUV(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+void ImageView<T>::RGBtoLUV(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
 
-    InvokeRGBtoLUVSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
+    InvokeRGBtoLUVSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::RGBtoLUV(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+void ImageView<T>::RGBtoLUV(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
-    checkSameSize(ROI(), aDst3.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
+    checkSameSize(*this, aDst4);
 
-    InvokeRGBtoLUVSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor,
+    InvokeRGBtoLUVSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(), aNormalizationFactor,
                          SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::RGBtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::RGBtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                             const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
              std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
-    InvokeRGBtoLUVSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeRGBtoLUVSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::RGBtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::RGBtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeRGBtoLUVSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(),
+    InvokeRGBtoLUVSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(),
                          aStreamCtx);
 
     return aDst;
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::RGBtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+ImageView<T> &ImageView<T>::RGBtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
-    checkSameSize(aSrc1.ROI(), aDst.ROI());
-    checkSameSize(aSrc2.ROI(), aDst.ROI());
-    checkSameSize(aSrc3.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aDst);
+    checkSameSize(aSrc2, aDst);
+    checkSameSize(aSrc3, aDst);
+    checkSameSize(aSrc4, aDst);
 
-    InvokeRGBtoLUVSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
-                         aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeRGBtoLUVSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
+                         aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -1693,6 +2030,7 @@ ImageView<T> &ImageView<T>::RGBtoLUV(float aNormalizationFactor, const mpp::cuda
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
+    validateImage(*this);
     InvokeRGBtoLUVInplace<T>(PointerRoi(), Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -1706,7 +2044,9 @@ ImageView<T> &ImageView<T>::BGRtoLUV(ImageView<T> &aDst, float aNormalizationFac
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeBGRtoLUVSrc<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, SizeRoi(),
                          aStreamCtx);
@@ -1715,100 +2055,124 @@ ImageView<T> &ImageView<T>::BGRtoLUV(ImageView<T> &aDst, float aNormalizationFac
 }
 
 template <PixelType T>
-void ImageView<T>::BGRtoLUV(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+void ImageView<T>::BGRtoLUV(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
 
-    InvokeBGRtoLUVSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
+    InvokeBGRtoLUVSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::BGRtoLUV(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+void ImageView<T>::BGRtoLUV(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
-    checkSameSize(ROI(), aDst3.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
+    checkSameSize(*this, aDst4);
 
-    InvokeBGRtoLUVSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor,
+    InvokeBGRtoLUVSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(), aNormalizationFactor,
                          SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::BGRtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::BGRtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                             const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
              std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
-    InvokeBGRtoLUVSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeBGRtoLUVSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::BGRtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::BGRtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeBGRtoLUVSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(),
+    InvokeBGRtoLUVSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(),
                          aStreamCtx);
 
     return aDst;
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::BGRtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+ImageView<T> &ImageView<T>::BGRtoLUV(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
-    checkSameSize(aSrc1.ROI(), aDst.ROI());
-    checkSameSize(aSrc2.ROI(), aDst.ROI());
-    checkSameSize(aSrc3.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aDst);
+    checkSameSize(aSrc2, aDst);
+    checkSameSize(aSrc3, aDst);
+    checkSameSize(aSrc4, aDst);
 
-    InvokeBGRtoLUVSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
-                         aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeBGRtoLUVSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
+                         aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -1819,6 +2183,7 @@ ImageView<T> &ImageView<T>::BGRtoLUV(float aNormalizationFactor, const mpp::cuda
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
+    validateImage(*this);
     InvokeBGRtoLUVInplace<T>(PointerRoi(), Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -1834,7 +2199,9 @@ ImageView<T> &ImageView<T>::LUVtoRGB(ImageView<T> &aDst, float aNormalizationFac
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeLUVtoRGBSrc<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, SizeRoi(),
                          aStreamCtx);
@@ -1843,100 +2210,124 @@ ImageView<T> &ImageView<T>::LUVtoRGB(ImageView<T> &aDst, float aNormalizationFac
 }
 
 template <PixelType T>
-void ImageView<T>::LUVtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+void ImageView<T>::LUVtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
 
-    InvokeLUVtoRGBSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
+    InvokeLUVtoRGBSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::LUVtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+void ImageView<T>::LUVtoRGB(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
-    checkSameSize(ROI(), aDst3.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
+    checkSameSize(*this, aDst4);
 
-    InvokeLUVtoRGBSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor,
+    InvokeLUVtoRGBSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(), aNormalizationFactor,
                          SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::LUVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::LUVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                             const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
              std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
-    InvokeLUVtoRGBSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeLUVtoRGBSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::LUVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::LUVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeLUVtoRGBSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(),
+    InvokeLUVtoRGBSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(),
                          aStreamCtx);
 
     return aDst;
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::LUVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+ImageView<T> &ImageView<T>::LUVtoRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
-    checkSameSize(aSrc1.ROI(), aDst.ROI());
-    checkSameSize(aSrc2.ROI(), aDst.ROI());
-    checkSameSize(aSrc3.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aDst);
+    checkSameSize(aSrc2, aDst);
+    checkSameSize(aSrc3, aDst);
+    checkSameSize(aSrc4, aDst);
 
-    InvokeLUVtoRGBSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
-                         aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeLUVtoRGBSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
+                         aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -1947,6 +2338,7 @@ ImageView<T> &ImageView<T>::LUVtoRGB(float aNormalizationFactor, const mpp::cuda
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
+    validateImage(*this);
     InvokeLUVtoRGBInplace<T>(PointerRoi(), Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -1960,7 +2352,9 @@ ImageView<T> &ImageView<T>::LUVtoBGR(ImageView<T> &aDst, float aNormalizationFac
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeLUVtoBGRSrc<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, SizeRoi(),
                          aStreamCtx);
@@ -1969,100 +2363,124 @@ ImageView<T> &ImageView<T>::LUVtoBGR(ImageView<T> &aDst, float aNormalizationFac
 }
 
 template <PixelType T>
-void ImageView<T>::LUVtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+void ImageView<T>::LUVtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
 
-    InvokeLUVtoBGRSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
+    InvokeLUVtoBGRSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::LUVtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+void ImageView<T>::LUVtoBGR(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
-    checkSameSize(ROI(), aDst3.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
+    checkSameSize(*this, aDst4);
 
-    InvokeLUVtoBGRSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor,
+    InvokeLUVtoBGRSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(), aNormalizationFactor,
                          SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::LUVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::LUVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                             const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                            const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                             ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                            ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormalizationFactor,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormalizationFactor,
                             const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16fC3, T> ||
              std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
-    InvokeLUVtoBGRSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-                         aDst2.PointerRoi(), aDst2.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeLUVtoBGRSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+                         aDst3.PointerRoi(), aDst3.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::LUVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::LUVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeLUVtoBGRSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc1.SizeRoi(),
+    InvokeLUVtoBGRSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormalizationFactor, aSrc2.SizeRoi(),
                          aStreamCtx);
 
     return aDst;
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::LUVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+ImageView<T> &ImageView<T>::LUVtoBGR(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                      const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                      float aNormalizationFactor, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16fC4, T> ||
              std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
-    checkSameSize(aSrc1.ROI(), aDst.ROI());
-    checkSameSize(aSrc2.ROI(), aDst.ROI());
-    checkSameSize(aSrc3.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aDst);
+    checkSameSize(aSrc2, aDst);
+    checkSameSize(aSrc3, aDst);
+    checkSameSize(aSrc4, aDst);
 
-    InvokeLUVtoBGRSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                         aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
-                         aNormalizationFactor, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeLUVtoBGRSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                         aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
+                         aNormalizationFactor, aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -2073,6 +2491,7 @@ ImageView<T> &ImageView<T>::LUVtoBGR(float aNormalizationFactor, const mpp::cuda
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> ||
              std::same_as<Pixel32fC3, T> || std::same_as<Pixel32fC4A, T>
 {
+    validateImage(*this);
     InvokeLUVtoBGRInplace<T>(PointerRoi(), Pitch(), aNormalizationFactor, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -2090,7 +2509,9 @@ ImageView<T> &ImageView<T>::ColorTwist(ImageView<T> &aDst, const Matrix<float> &
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeColorTwist3x3Src<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aTwist, SizeRoi(), aStreamCtx);
 
@@ -2098,122 +2519,150 @@ ImageView<T> &ImageView<T>::ColorTwist(ImageView<T> &aDst, const Matrix<float> &
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                              ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                              ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+void ImageView<T>::ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix<float> &aTwist,
                               const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
 
-    InvokeColorTwist3x3Src<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(),
-                              aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aTwist, SizeRoi(), aStreamCtx);
+    InvokeColorTwist3x3Src<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(),
+                              aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aTwist, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                              ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+void ImageView<T>::ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                              ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix<float> &aTwist,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst4, const Matrix<float> &aTwist,
                               const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
              std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
-    checkSameSize(ROI(), aDst3.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
+    checkSameSize(*this, aDst4);
 
-    InvokeColorTwist3x3Src<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(),
-                              aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(),
+    InvokeColorTwist3x3Src<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(),
+                              aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(),
                               aTwist, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                              const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                              ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                              const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                              ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix<float> &aTwist,
                               const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
     InvokeColorTwist3x3Src<Vector4A<remove_vector_t<T>>>(
-        aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
-        aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aTwist,
-        aSrc1.SizeRoi(), aStreamCtx);
+        aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(),
+        aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aTwist,
+        aSrc2.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                        const Matrix<float> &aTwist, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeColorTwist3x3Src<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                              aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aTwist, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeColorTwist3x3Src<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                              aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aTwist, aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                        remove_vector_t<T> aAlpha, const Matrix<float> &aTwist,
                                        const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
              std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeColorTwist3x3Src<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                              aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aAlpha, aTwist, aSrc1.SizeRoi(),
+    InvokeColorTwist3x3Src<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                              aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aAlpha, aTwist, aSrc2.SizeRoi(),
                               aStreamCtx);
 
     return aDst;
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+ImageView<T> &ImageView<T>::ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                        const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                        const Matrix<float> &aTwist, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
              std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
-    checkSameSize(aSrc1.ROI(), aDst.ROI());
-    checkSameSize(aSrc2.ROI(), aDst.ROI());
-    checkSameSize(aSrc3.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aDst);
+    checkSameSize(aSrc2, aDst);
+    checkSameSize(aSrc3, aDst);
+    checkSameSize(aSrc4, aDst);
 
-    InvokeColorTwist3x3Src<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                              aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aTwist,
-                              aSrc1.SizeRoi(), aStreamCtx);
+    InvokeColorTwist3x3Src<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                              aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aTwist,
+                              aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -2225,6 +2674,7 @@ ImageView<T> &ImageView<T>::ColorTwist(const Matrix<float> &aTwist, const mpp::c
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
+    validateImage(*this);
     InvokeColorTwist3x3Inplace<T>(PointerRoi(), Pitch(), aTwist, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -2239,7 +2689,9 @@ ImageView<Vector2<remove_vector_t<T>>> &ImageView<T>::ColorTwistTo422(
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDstLumaChroma.ROI());
+    validateImage(*this);
+    validateImage(aDstLumaChroma);
+    checkSameSize(*this, aDstLumaChroma);
 
     InvokeColorTwist3x3Src444to422<T>(PointerRoi(), Pitch(), aDstLumaChroma.PointerRoi(), aDstLumaChroma.Pitch(),
                                       aTwist, SizeRoi(), aChromaSubsamplePos, aSwapLumaChroma, aStreamCtx);
@@ -2256,7 +2708,10 @@ void ImageView<T>::ColorTwistTo422(ImageView<Vector1<remove_vector_t<T>>> &aDstL
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDstLuma.ROI());
+    validateImage(*this);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma);
+    checkSameSize(*this, aDstLuma);
     checkSameSize(Size2D(WidthRoi() / 2, HeightRoi()), aDstChroma.SizeRoi());
     InvokeColorTwist3x3Src444to422<T>(PointerRoi(), Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
                                       aDstChroma.PointerRoi(), aDstChroma.Pitch(), aTwist, SizeRoi(),
@@ -2273,7 +2728,11 @@ void ImageView<T>::ColorTwistTo422(ImageView<Vector1<remove_vector_t<T>>> &aDstL
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDstLuma.ROI());
+    validateImage(*this);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma1);
+    validateImage(aDstChroma2);
+    checkSameSize(*this, aDstLuma);
     checkSameSize(Size2D(WidthRoi() / 2, HeightRoi()), aDstChroma1.SizeRoi());
     checkSameSize(Size2D(WidthRoi() / 2, HeightRoi()), aDstChroma2.SizeRoi());
 
@@ -2291,7 +2750,10 @@ void ImageView<T>::ColorTwistTo420(ImageView<Vector1<remove_vector_t<T>>> &aDstL
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDstLuma.ROI());
+    validateImage(*this);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma);
+    checkSameSize(*this, aDstLuma);
     checkSameSize(Size2D(WidthRoi() / 2, HeightRoi() / 2), aDstChroma.SizeRoi());
     InvokeColorTwist3x3Src444to420<T>(PointerRoi(), Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
                                       aDstChroma.PointerRoi(), aDstChroma.Pitch(), aTwist, SizeRoi(),
@@ -2308,7 +2770,11 @@ void ImageView<T>::ColorTwistTo420(ImageView<Vector1<remove_vector_t<T>>> &aDstL
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDstLuma.ROI());
+    validateImage(*this);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma1);
+    validateImage(aDstChroma2);
+    checkSameSize(*this, aDstLuma);
     checkSameSize(Size2D(WidthRoi() / 2, HeightRoi() / 2), aDstChroma1.SizeRoi());
     checkSameSize(Size2D(WidthRoi() / 2, HeightRoi() / 2), aDstChroma2.SizeRoi());
 
@@ -2326,7 +2792,10 @@ void ImageView<T>::ColorTwistTo411(ImageView<Vector1<remove_vector_t<T>>> &aDstL
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDstLuma.ROI());
+    validateImage(*this);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma);
+    checkSameSize(*this, aDstLuma);
     checkSameSize(Size2D(WidthRoi() / 4, HeightRoi()), aDstChroma.SizeRoi());
     InvokeColorTwist3x3Src444to411<T>(PointerRoi(), Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
                                       aDstChroma.PointerRoi(), aDstChroma.Pitch(), aTwist, SizeRoi(),
@@ -2343,7 +2812,11 @@ void ImageView<T>::ColorTwistTo411(ImageView<Vector1<remove_vector_t<T>>> &aDstL
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDstLuma.ROI());
+    validateImage(*this);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma1);
+    validateImage(aDstChroma2);
+    checkSameSize(*this, aDstLuma);
     checkSameSize(Size2D(WidthRoi() / 4, HeightRoi()), aDstChroma1.SizeRoi());
     checkSameSize(Size2D(WidthRoi() / 4, HeightRoi()), aDstChroma2.SizeRoi());
 
@@ -2353,49 +2826,58 @@ void ImageView<T>::ColorTwistTo411(ImageView<Vector1<remove_vector_t<T>>> &aDstL
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                   ImageView<Vector2<remove_vector_t<T>>> &aDstLumaChroma, const Matrix<float> &aTwist,
-                                   ChromaSubsamplePos aChromaSubsamplePos, bool aSwapLumaChroma,
-                                   const mpp::cuda::StreamCtx &aStreamCtx)
+ImageView<Vector2<remove_vector_t<T>>> &ImageView<T>::ColorTwistTo422(
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector2<remove_vector_t<T>>> &aDstLumaChroma,
+    const Matrix<float> &aTwist, ChromaSubsamplePos aChromaSubsamplePos, bool aSwapLumaChroma,
+    const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aDstLumaChroma.ROI());
-    checkSameSize(aSrc1.ROI(), aDstLumaChroma.ROI());
-    checkSameSize(aSrc2.ROI(), aDstLumaChroma.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDstLumaChroma);
+    checkSameSize(aSrc1, aDstLumaChroma);
+    checkSameSize(aSrc2, aDstLumaChroma);
+    checkSameSize(aSrc3, aDstLumaChroma);
 
-    InvokeColorTwist3x3Src444to422<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(),
-                                      aSrc2.PointerRoi(), aSrc2.Pitch(), aDstLumaChroma.PointerRoi(),
-                                      aDstLumaChroma.Pitch(), aTwist, aSrc0.SizeRoi(), aChromaSubsamplePos,
+    InvokeColorTwist3x3Src444to422<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
+                                      aSrc3.PointerRoi(), aSrc3.Pitch(), aDstLumaChroma.PointerRoi(),
+                                      aDstLumaChroma.Pitch(), aTwist, aSrc1.SizeRoi(), aChromaSubsamplePos,
                                       aSwapLumaChroma, aStreamCtx);
+    return aDstLumaChroma;
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                    ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix<float> &aTwist,
                                    ChromaSubsamplePos aChromaSubsamplePos, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc1.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc2.ROI(), aDstLuma.ROI());
-    checkSameSize(Size2D(aSrc0.WidthRoi() / 2, aSrc0.HeightRoi()), aDstChroma.SizeRoi());
-    InvokeColorTwist3x3Src444to422<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(),
-                                      aSrc2.PointerRoi(), aSrc2.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
-                                      aDstChroma.PointerRoi(), aDstChroma.Pitch(), aTwist, aSrc0.SizeRoi(),
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma);
+    checkSameSize(aSrc1, aDstLuma);
+    checkSameSize(aSrc2, aDstLuma);
+    checkSameSize(aSrc3, aDstLuma);
+    checkSameSize(Size2D(aSrc1.WidthRoi() / 2, aSrc1.HeightRoi()), aDstChroma.SizeRoi());
+    InvokeColorTwist3x3Src444to422<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
+                                      aSrc3.PointerRoi(), aSrc3.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
+                                      aDstChroma.PointerRoi(), aDstChroma.Pitch(), aTwist, aSrc1.SizeRoi(),
                                       aChromaSubsamplePos, aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix<float> &aTwist,
@@ -2403,42 +2885,53 @@ void ImageView<T>::ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> 
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc1.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc2.ROI(), aDstLuma.ROI());
-    checkSameSize(Size2D(aSrc0.WidthRoi() / 2, aSrc0.HeightRoi()), aDstChroma1.SizeRoi());
-    checkSameSize(Size2D(aSrc0.WidthRoi() / 2, aSrc0.HeightRoi()), aDstChroma2.SizeRoi());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma1);
+    validateImage(aDstChroma2);
+    checkSameSize(aSrc1, aDstLuma);
+    checkSameSize(aSrc2, aDstLuma);
+    checkSameSize(aSrc3, aDstLuma);
+    checkSameSize(Size2D(aSrc1.WidthRoi() / 2, aSrc1.HeightRoi()), aDstChroma1.SizeRoi());
+    checkSameSize(Size2D(aSrc1.WidthRoi() / 2, aSrc1.HeightRoi()), aDstChroma2.SizeRoi());
 
-    InvokeColorTwist3x3Src444to422<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(),
-                                      aSrc2.PointerRoi(), aSrc2.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
+    InvokeColorTwist3x3Src444to422<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
+                                      aSrc3.PointerRoi(), aSrc3.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
                                       aDstChroma1.PointerRoi(), aDstChroma1.Pitch(), aDstChroma2.PointerRoi(),
-                                      aDstChroma2.Pitch(), aTwist, aSrc0.SizeRoi(), aChromaSubsamplePos, aStreamCtx);
+                                      aDstChroma2.Pitch(), aTwist, aSrc1.SizeRoi(), aChromaSubsamplePos, aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                    ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix<float> &aTwist,
                                    ChromaSubsamplePos aChromaSubsamplePos, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc1.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc2.ROI(), aDstLuma.ROI());
-    checkSameSize(Size2D(aSrc0.WidthRoi() / 2, aSrc0.HeightRoi() / 2), aDstChroma.SizeRoi());
-    InvokeColorTwist3x3Src444to420<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(),
-                                      aSrc2.PointerRoi(), aSrc2.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
-                                      aDstChroma.PointerRoi(), aDstChroma.Pitch(), aTwist, aSrc0.SizeRoi(),
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma);
+    checkSameSize(aSrc1, aDstLuma);
+    checkSameSize(aSrc2, aDstLuma);
+    checkSameSize(aSrc3, aDstLuma);
+    checkSameSize(Size2D(aSrc1.WidthRoi() / 2, aSrc1.HeightRoi() / 2), aDstChroma.SizeRoi());
+    InvokeColorTwist3x3Src444to420<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
+                                      aSrc3.PointerRoi(), aSrc3.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
+                                      aDstChroma.PointerRoi(), aDstChroma.Pitch(), aTwist, aSrc1.SizeRoi(),
                                       aChromaSubsamplePos, aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix<float> &aTwist,
@@ -2446,42 +2939,53 @@ void ImageView<T>::ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> 
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc1.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc2.ROI(), aDstLuma.ROI());
-    checkSameSize(Size2D(aSrc0.WidthRoi() / 2, aSrc0.HeightRoi() / 2), aDstChroma1.SizeRoi());
-    checkSameSize(Size2D(aSrc0.WidthRoi() / 2, aSrc0.HeightRoi() / 2), aDstChroma2.SizeRoi());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma1);
+    validateImage(aDstChroma2);
+    checkSameSize(aSrc1, aDstLuma);
+    checkSameSize(aSrc2, aDstLuma);
+    checkSameSize(aSrc3, aDstLuma);
+    checkSameSize(Size2D(aSrc1.WidthRoi() / 2, aSrc1.HeightRoi() / 2), aDstChroma1.SizeRoi());
+    checkSameSize(Size2D(aSrc1.WidthRoi() / 2, aSrc1.HeightRoi() / 2), aDstChroma2.SizeRoi());
 
-    InvokeColorTwist3x3Src444to420<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(),
-                                      aSrc2.PointerRoi(), aSrc2.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
+    InvokeColorTwist3x3Src444to420<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
+                                      aSrc3.PointerRoi(), aSrc3.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
                                       aDstChroma1.PointerRoi(), aDstChroma1.Pitch(), aDstChroma2.PointerRoi(),
-                                      aDstChroma2.Pitch(), aTwist, aSrc0.SizeRoi(), aChromaSubsamplePos, aStreamCtx);
+                                      aDstChroma2.Pitch(), aTwist, aSrc1.SizeRoi(), aChromaSubsamplePos, aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                    ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix<float> &aTwist,
                                    ChromaSubsamplePos aChromaSubsamplePos, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc1.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc2.ROI(), aDstLuma.ROI());
-    checkSameSize(Size2D(aSrc0.WidthRoi() / 4, aSrc0.HeightRoi()), aDstChroma.SizeRoi());
-    InvokeColorTwist3x3Src444to411<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(),
-                                      aSrc2.PointerRoi(), aSrc2.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
-                                      aDstChroma.PointerRoi(), aDstChroma.Pitch(), aTwist, aSrc0.SizeRoi(),
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma);
+    checkSameSize(aSrc1, aDstLuma);
+    checkSameSize(aSrc2, aDstLuma);
+    checkSameSize(aSrc3, aDstLuma);
+    checkSameSize(Size2D(aSrc1.WidthRoi() / 4, aSrc1.HeightRoi()), aDstChroma.SizeRoi());
+    InvokeColorTwist3x3Src444to411<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
+                                      aSrc3.PointerRoi(), aSrc3.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
+                                      aDstChroma.PointerRoi(), aDstChroma.Pitch(), aTwist, aSrc1.SizeRoi(),
                                       aChromaSubsamplePos, aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix<float> &aTwist,
@@ -2489,16 +2993,22 @@ void ImageView<T>::ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> 
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc1.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc2.ROI(), aDstLuma.ROI());
-    checkSameSize(Size2D(aSrc0.WidthRoi() / 4, aSrc0.HeightRoi()), aDstChroma1.SizeRoi());
-    checkSameSize(Size2D(aSrc0.WidthRoi() / 4, aSrc0.HeightRoi()), aDstChroma2.SizeRoi());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma1);
+    validateImage(aDstChroma2);
+    checkSameSize(aSrc1, aDstLuma);
+    checkSameSize(aSrc2, aDstLuma);
+    checkSameSize(aSrc3, aDstLuma);
+    checkSameSize(Size2D(aSrc1.WidthRoi() / 4, aSrc1.HeightRoi()), aDstChroma1.SizeRoi());
+    checkSameSize(Size2D(aSrc1.WidthRoi() / 4, aSrc1.HeightRoi()), aDstChroma2.SizeRoi());
 
-    InvokeColorTwist3x3Src444to411<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(),
-                                      aSrc2.PointerRoi(), aSrc2.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
+    InvokeColorTwist3x3Src444to411<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
+                                      aSrc3.PointerRoi(), aSrc3.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
                                       aDstChroma1.PointerRoi(), aDstChroma1.Pitch(), aDstChroma2.PointerRoi(),
-                                      aDstChroma2.Pitch(), aTwist, aSrc0.SizeRoi(), aChromaSubsamplePos, aStreamCtx);
+                                      aDstChroma2.Pitch(), aTwist, aSrc1.SizeRoi(), aChromaSubsamplePos, aStreamCtx);
 }
 
 template <PixelType T>
@@ -2509,7 +3019,9 @@ ImageView<Vector3<remove_vector_t<T>>> &ImageView<T>::ColorTwistFrom422(ImageVie
     requires std::same_as<Pixel8uC2, T> || std::same_as<Pixel16uC2, T> || std::same_as<Pixel16sC2, T> ||
              std::same_as<Pixel16fC2, T> || std::same_as<Pixel32fC2, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeColorTwist3x3Src422to444<Vector3<remove_vector_t<T>>>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(),
                                                                 aTwist, SizeRoi(), aSwapLumaChroma, aStreamCtx);
@@ -2518,20 +3030,24 @@ ImageView<Vector3<remove_vector_t<T>>> &ImageView<T>::ColorTwistFrom422(ImageVie
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+void ImageView<T>::ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix<float> &aTwist,
                                      bool aSwapLumaChroma, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC2, T> || std::same_as<Pixel16uC2, T> || std::same_as<Pixel16sC2, T> ||
              std::same_as<Pixel16fC2, T> || std::same_as<Pixel32fC2, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
 
     InvokeColorTwist3x3Src422to444<Vector4A<remove_vector_t<T>>>(
-        PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(),
-        aDst2.Pitch(), aTwist, SizeRoi(), aSwapLumaChroma, aStreamCtx);
+        PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(),
+        aDst3.Pitch(), aTwist, SizeRoi(), aSwapLumaChroma, aStreamCtx);
 }
 
 template <PixelType T>
@@ -2545,7 +3061,10 @@ ImageView<T> &ImageView<T>::ColorTwistFrom422(ImageView<Vector1<remove_vector_t<
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst.ROI());
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma);
+    validateImage(aDst);
+    checkSameSize(aSrcLuma, aDst);
     checkSameSize(aSrcChroma.SizeRoi(), Size2D(aDst.WidthRoi() / 2, aDst.HeightRoi()));
 
     InvokeColorTwist3x3Src422to444<T>(aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma.PointerRoi(),
@@ -2567,7 +3086,11 @@ ImageView<T> &ImageView<T>::ColorTwistFrom422(ImageView<Vector1<remove_vector_t<
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst.ROI());
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma1);
+    validateImage(aSrcChroma2);
+    validateImage(aDst);
+    checkSameSize(aSrcLuma, aDst);
     checkSameSize(aSrcChroma1.SizeRoi(), Size2D(aDst.WidthRoi() / 2, aDst.HeightRoi()));
     checkSameSize(aSrcChroma2.SizeRoi(), Size2D(aDst.WidthRoi() / 2, aDst.HeightRoi()));
 
@@ -2582,22 +3105,27 @@ ImageView<T> &ImageView<T>::ColorTwistFrom422(ImageView<Vector1<remove_vector_t<
 template <PixelType T>
 void ImageView<T>::ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                      ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                      ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix<float> &aTwist,
                                      ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst0.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst1.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst2.ROI());
-    checkSameSize(aSrcChroma.SizeRoi(), Size2D(aDst0.WidthRoi() / 2, aDst0.HeightRoi()));
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrcLuma, aDst1);
+    checkSameSize(aSrcLuma, aDst2);
+    checkSameSize(aSrcLuma, aDst3);
+    checkSameSize(aSrcChroma.SizeRoi(), Size2D(aDst1.WidthRoi() / 2, aDst1.HeightRoi()));
 
     InvokeColorTwist3x3Src422to444<Vector4A<remove_vector_t<T>>>(
-        aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma.PointerRoi(), aSrcChroma.Pitch(), aDst0.PointerRoi(),
-        aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aTwist, aSrcLuma.SizeRoi(),
+        aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma.PointerRoi(), aSrcChroma.Pitch(), aDst1.PointerRoi(),
+        aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aTwist, aSrcLuma.SizeRoi(),
         aChromaSubsamplePos, aInterpolationMode, aStreamCtx);
 }
 
@@ -2605,24 +3133,30 @@ template <PixelType T>
 void ImageView<T>::ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                      ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
                                      ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                      ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix<float> &aTwist,
                                      ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst0.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst1.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst2.ROI());
-    checkSameSize(aSrcChroma1.SizeRoi(), Size2D(aDst0.WidthRoi() / 2, aDst0.HeightRoi()));
-    checkSameSize(aSrcChroma2.SizeRoi(), Size2D(aDst0.WidthRoi() / 2, aDst0.HeightRoi()));
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma1);
+    validateImage(aSrcChroma2);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrcLuma, aDst1);
+    checkSameSize(aSrcLuma, aDst2);
+    checkSameSize(aSrcLuma, aDst3);
+    checkSameSize(aSrcChroma1.SizeRoi(), Size2D(aDst1.WidthRoi() / 2, aDst1.HeightRoi()));
+    checkSameSize(aSrcChroma2.SizeRoi(), Size2D(aDst1.WidthRoi() / 2, aDst1.HeightRoi()));
 
     InvokeColorTwist3x3Src422to444<Vector4A<remove_vector_t<T>>>(
         aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma1.PointerRoi(), aSrcChroma1.Pitch(),
-        aSrcChroma2.PointerRoi(), aSrcChroma2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(),
-        aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aTwist, aSrcLuma.SizeRoi(), aChromaSubsamplePos,
+        aSrcChroma2.PointerRoi(), aSrcChroma2.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(),
+        aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aTwist, aSrcLuma.SizeRoi(), aChromaSubsamplePos,
         aInterpolationMode, aStreamCtx);
 }
 
@@ -2637,7 +3171,10 @@ ImageView<T> &ImageView<T>::ColorTwistFrom420(ImageView<Vector1<remove_vector_t<
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst.ROI());
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma);
+    validateImage(aDst);
+    checkSameSize(aSrcLuma, aDst);
     checkSameSize(aSrcChroma.SizeRoi(), Size2D(aDst.WidthRoi() / 2, aDst.HeightRoi() / 2));
 
     InvokeColorTwist3x3Src420to444<T>(aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma.PointerRoi(),
@@ -2659,7 +3196,11 @@ ImageView<T> &ImageView<T>::ColorTwistFrom420(ImageView<Vector1<remove_vector_t<
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst.ROI());
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma1);
+    validateImage(aSrcChroma2);
+    validateImage(aDst);
+    checkSameSize(aSrcLuma, aDst);
     checkSameSize(aSrcChroma1.SizeRoi(), Size2D(aDst.WidthRoi() / 2, aDst.HeightRoi() / 2));
     checkSameSize(aSrcChroma2.SizeRoi(), Size2D(aDst.WidthRoi() / 2, aDst.HeightRoi() / 2));
 
@@ -2674,22 +3215,27 @@ ImageView<T> &ImageView<T>::ColorTwistFrom420(ImageView<Vector1<remove_vector_t<
 template <PixelType T>
 void ImageView<T>::ColorTwistFrom420(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                      ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                      ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix<float> &aTwist,
                                      ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst0.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst1.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst2.ROI());
-    checkSameSize(aSrcChroma.SizeRoi(), Size2D(aDst0.WidthRoi() / 2, aDst0.HeightRoi() / 2));
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrcLuma, aDst1);
+    checkSameSize(aSrcLuma, aDst2);
+    checkSameSize(aSrcLuma, aDst3);
+    checkSameSize(aSrcChroma.SizeRoi(), Size2D(aDst1.WidthRoi() / 2, aDst1.HeightRoi() / 2));
 
     InvokeColorTwist3x3Src420to444<Vector4A<remove_vector_t<T>>>(
-        aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma.PointerRoi(), aSrcChroma.Pitch(), aDst0.PointerRoi(),
-        aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aTwist, aSrcLuma.SizeRoi(),
+        aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma.PointerRoi(), aSrcChroma.Pitch(), aDst1.PointerRoi(),
+        aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aTwist, aSrcLuma.SizeRoi(),
         aChromaSubsamplePos, aInterpolationMode, aStreamCtx);
 }
 
@@ -2697,24 +3243,30 @@ template <PixelType T>
 void ImageView<T>::ColorTwistFrom420(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                      ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
                                      ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                      ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix<float> &aTwist,
                                      ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst0.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst1.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst2.ROI());
-    checkSameSize(aSrcChroma1.SizeRoi(), Size2D(aDst0.WidthRoi() / 2, aDst0.HeightRoi() / 2));
-    checkSameSize(aSrcChroma2.SizeRoi(), Size2D(aDst0.WidthRoi() / 2, aDst0.HeightRoi() / 2));
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma1);
+    validateImage(aSrcChroma2);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrcLuma, aDst1);
+    checkSameSize(aSrcLuma, aDst2);
+    checkSameSize(aSrcLuma, aDst3);
+    checkSameSize(aSrcChroma1.SizeRoi(), Size2D(aDst1.WidthRoi() / 2, aDst1.HeightRoi() / 2));
+    checkSameSize(aSrcChroma2.SizeRoi(), Size2D(aDst1.WidthRoi() / 2, aDst1.HeightRoi() / 2));
 
     InvokeColorTwist3x3Src420to444<Vector4A<remove_vector_t<T>>>(
         aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma1.PointerRoi(), aSrcChroma1.Pitch(),
-        aSrcChroma2.PointerRoi(), aSrcChroma2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(),
-        aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aTwist, aSrcLuma.SizeRoi(), aChromaSubsamplePos,
+        aSrcChroma2.PointerRoi(), aSrcChroma2.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(),
+        aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aTwist, aSrcLuma.SizeRoi(), aChromaSubsamplePos,
         aInterpolationMode, aStreamCtx);
 }
 
@@ -2729,7 +3281,10 @@ ImageView<T> &ImageView<T>::ColorTwistFrom411(ImageView<Vector1<remove_vector_t<
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst.ROI());
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma);
+    validateImage(aDst);
+    checkSameSize(aSrcLuma, aDst);
     checkSameSize(aSrcChroma.SizeRoi(), Size2D(aDst.WidthRoi() / 4, aDst.HeightRoi()));
 
     InvokeColorTwist3x3Src411to444<T>(aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma.PointerRoi(),
@@ -2751,7 +3306,11 @@ ImageView<T> &ImageView<T>::ColorTwistFrom411(ImageView<Vector1<remove_vector_t<
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst.ROI());
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma1);
+    validateImage(aSrcChroma2);
+    validateImage(aDst);
+    checkSameSize(aSrcLuma, aDst);
     checkSameSize(aSrcChroma1.SizeRoi(), Size2D(aDst.WidthRoi() / 4, aDst.HeightRoi()));
     checkSameSize(aSrcChroma2.SizeRoi(), Size2D(aDst.WidthRoi() / 4, aDst.HeightRoi()));
 
@@ -2766,22 +3325,27 @@ ImageView<T> &ImageView<T>::ColorTwistFrom411(ImageView<Vector1<remove_vector_t<
 template <PixelType T>
 void ImageView<T>::ColorTwistFrom411(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                      ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                      ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix<float> &aTwist,
                                      ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst0.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst1.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst2.ROI());
-    checkSameSize(aSrcChroma.SizeRoi(), Size2D(aDst0.WidthRoi() / 4, aDst0.HeightRoi()));
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrcLuma, aDst1);
+    checkSameSize(aSrcLuma, aDst2);
+    checkSameSize(aSrcLuma, aDst3);
+    checkSameSize(aSrcChroma.SizeRoi(), Size2D(aDst1.WidthRoi() / 4, aDst1.HeightRoi()));
 
     InvokeColorTwist3x3Src411to444<Vector4A<remove_vector_t<T>>>(
-        aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma.PointerRoi(), aSrcChroma.Pitch(), aDst0.PointerRoi(),
-        aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aTwist, aSrcLuma.SizeRoi(),
+        aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma.PointerRoi(), aSrcChroma.Pitch(), aDst1.PointerRoi(),
+        aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aTwist, aSrcLuma.SizeRoi(),
         aChromaSubsamplePos, aInterpolationMode, aStreamCtx);
 }
 
@@ -2789,24 +3353,30 @@ template <PixelType T>
 void ImageView<T>::ColorTwistFrom411(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                      ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
                                      ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                      ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix<float> &aTwist,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix<float> &aTwist,
                                      ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst0.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst1.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst2.ROI());
-    checkSameSize(aSrcChroma1.SizeRoi(), Size2D(aDst0.WidthRoi() / 4, aDst0.HeightRoi()));
-    checkSameSize(aSrcChroma2.SizeRoi(), Size2D(aDst0.WidthRoi() / 4, aDst0.HeightRoi()));
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma1);
+    validateImage(aSrcChroma2);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrcLuma, aDst1);
+    checkSameSize(aSrcLuma, aDst2);
+    checkSameSize(aSrcLuma, aDst3);
+    checkSameSize(aSrcChroma1.SizeRoi(), Size2D(aDst1.WidthRoi() / 4, aDst1.HeightRoi()));
+    checkSameSize(aSrcChroma2.SizeRoi(), Size2D(aDst1.WidthRoi() / 4, aDst1.HeightRoi()));
 
     InvokeColorTwist3x3Src411to444<Vector4A<remove_vector_t<T>>>(
         aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma1.PointerRoi(), aSrcChroma1.Pitch(),
-        aSrcChroma2.PointerRoi(), aSrcChroma2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(),
-        aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aTwist, aSrcLuma.SizeRoi(), aChromaSubsamplePos,
+        aSrcChroma2.PointerRoi(), aSrcChroma2.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(),
+        aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aTwist, aSrcLuma.SizeRoi(), aChromaSubsamplePos,
         aInterpolationMode, aStreamCtx);
 }
 #pragma endregion
@@ -2820,7 +3390,9 @@ ImageView<T> &ImageView<T>::ColorTwist(ImageView<T> &aDst, const Matrix3x4<float
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeColorTwist3x4Src<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aTwist, SizeRoi(), aStreamCtx);
 
@@ -2828,122 +3400,150 @@ ImageView<T> &ImageView<T>::ColorTwist(ImageView<T> &aDst, const Matrix3x4<float
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                              ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                              ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+void ImageView<T>::ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix3x4<float> &aTwist,
                               const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
 
-    InvokeColorTwist3x4Src<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(),
-                              aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aTwist, SizeRoi(), aStreamCtx);
+    InvokeColorTwist3x4Src<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(),
+                              aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aTwist, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                              ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+void ImageView<T>::ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                              ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix3x4<float> &aTwist,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst4, const Matrix3x4<float> &aTwist,
                               const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
              std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
-    checkSameSize(ROI(), aDst3.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
+    checkSameSize(*this, aDst4);
 
-    InvokeColorTwist3x4Src<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(),
-                              aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(),
+    InvokeColorTwist3x4Src<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(),
+                              aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(),
                               aTwist, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                              const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                              ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+                              const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                              ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix3x4<float> &aTwist,
                               const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
     InvokeColorTwist3x4Src<Vector4A<remove_vector_t<T>>>(
-        aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
-        aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aTwist,
-        aSrc1.SizeRoi(), aStreamCtx);
+        aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(),
+        aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aTwist,
+        aSrc2.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                        const Matrix3x4<float> &aTwist, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel8uC4A, T> || std::same_as<Pixel16uC3, T> ||
              std::same_as<Pixel16uC4A, T> || std::same_as<Pixel16sC3, T> || std::same_as<Pixel16sC4A, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeColorTwist3x4Src<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                              aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aTwist, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeColorTwist3x4Src<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                              aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aTwist, aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, ImageView<T> &aDst,
+ImageView<T> &ImageView<T>::ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
                                        remove_vector_t<T> aAlpha, const Matrix3x4<float> &aTwist,
                                        const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
              std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeColorTwist3x4Src<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                              aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aAlpha, aTwist, aSrc1.SizeRoi(),
+    InvokeColorTwist3x4Src<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                              aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aAlpha, aTwist, aSrc2.SizeRoi(),
                               aStreamCtx);
 
     return aDst;
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+ImageView<T> &ImageView<T>::ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                        const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                        const Matrix3x4<float> &aTwist, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
              std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
-    checkSameSize(aSrc1.ROI(), aDst.ROI());
-    checkSameSize(aSrc2.ROI(), aDst.ROI());
-    checkSameSize(aSrc3.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aDst);
+    checkSameSize(aSrc2, aDst);
+    checkSameSize(aSrc3, aDst);
+    checkSameSize(aSrc4, aDst);
 
-    InvokeColorTwist3x4Src<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                              aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aTwist,
-                              aSrc1.SizeRoi(), aStreamCtx);
+    InvokeColorTwist3x4Src<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                              aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aTwist,
+                              aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -2955,6 +3555,7 @@ ImageView<T> &ImageView<T>::ColorTwist(const Matrix3x4<float> &aTwist, const mpp
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
+    validateImage(*this);
     InvokeColorTwist3x4Inplace<T>(PointerRoi(), Pitch(), aTwist, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -2969,7 +3570,9 @@ ImageView<Vector2<remove_vector_t<T>>> &ImageView<T>::ColorTwistTo422(
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDstLumaChroma.ROI());
+    validateImage(*this);
+    validateImage(aDstLumaChroma);
+    checkSameSize(*this, aDstLumaChroma);
 
     InvokeColorTwist3x4Src444to422<T>(PointerRoi(), Pitch(), aDstLumaChroma.PointerRoi(), aDstLumaChroma.Pitch(),
                                       aTwist, SizeRoi(), aChromaSubsamplePos, aSwapLumaChroma, aStreamCtx);
@@ -2986,7 +3589,10 @@ void ImageView<T>::ColorTwistTo422(ImageView<Vector1<remove_vector_t<T>>> &aDstL
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDstLuma.ROI());
+    validateImage(*this);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma);
+    checkSameSize(*this, aDstLuma);
     checkSameSize(Size2D(WidthRoi() / 2, HeightRoi()), aDstChroma.SizeRoi());
     InvokeColorTwist3x4Src444to422<T>(PointerRoi(), Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
                                       aDstChroma.PointerRoi(), aDstChroma.Pitch(), aTwist, SizeRoi(),
@@ -3003,7 +3609,11 @@ void ImageView<T>::ColorTwistTo422(ImageView<Vector1<remove_vector_t<T>>> &aDstL
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDstLuma.ROI());
+    validateImage(*this);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma1);
+    validateImage(aDstChroma2);
+    checkSameSize(*this, aDstLuma);
     checkSameSize(Size2D(WidthRoi() / 2, HeightRoi()), aDstChroma1.SizeRoi());
     checkSameSize(Size2D(WidthRoi() / 2, HeightRoi()), aDstChroma2.SizeRoi());
 
@@ -3021,7 +3631,10 @@ void ImageView<T>::ColorTwistTo420(ImageView<Vector1<remove_vector_t<T>>> &aDstL
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDstLuma.ROI());
+    validateImage(*this);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma);
+    checkSameSize(*this, aDstLuma);
     checkSameSize(Size2D(WidthRoi() / 2, HeightRoi() / 2), aDstChroma.SizeRoi());
     InvokeColorTwist3x4Src444to420<T>(PointerRoi(), Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
                                       aDstChroma.PointerRoi(), aDstChroma.Pitch(), aTwist, SizeRoi(),
@@ -3038,7 +3651,11 @@ void ImageView<T>::ColorTwistTo420(ImageView<Vector1<remove_vector_t<T>>> &aDstL
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDstLuma.ROI());
+    validateImage(*this);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma1);
+    validateImage(aDstChroma2);
+    checkSameSize(*this, aDstLuma);
     checkSameSize(Size2D(WidthRoi() / 2, HeightRoi() / 2), aDstChroma1.SizeRoi());
     checkSameSize(Size2D(WidthRoi() / 2, HeightRoi() / 2), aDstChroma2.SizeRoi());
 
@@ -3056,7 +3673,10 @@ void ImageView<T>::ColorTwistTo411(ImageView<Vector1<remove_vector_t<T>>> &aDstL
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDstLuma.ROI());
+    validateImage(*this);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma);
+    checkSameSize(*this, aDstLuma);
     checkSameSize(Size2D(WidthRoi() / 4, HeightRoi()), aDstChroma.SizeRoi());
     InvokeColorTwist3x4Src444to411<T>(PointerRoi(), Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
                                       aDstChroma.PointerRoi(), aDstChroma.Pitch(), aTwist, SizeRoi(),
@@ -3073,7 +3693,11 @@ void ImageView<T>::ColorTwistTo411(ImageView<Vector1<remove_vector_t<T>>> &aDstL
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(ROI(), aDstLuma.ROI());
+    validateImage(*this);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma1);
+    validateImage(aDstChroma2);
+    checkSameSize(*this, aDstLuma);
     checkSameSize(Size2D(WidthRoi() / 4, HeightRoi()), aDstChroma1.SizeRoi());
     checkSameSize(Size2D(WidthRoi() / 4, HeightRoi()), aDstChroma2.SizeRoi());
 
@@ -3083,49 +3707,58 @@ void ImageView<T>::ColorTwistTo411(ImageView<Vector1<remove_vector_t<T>>> &aDstL
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                   ImageView<Vector2<remove_vector_t<T>>> &aDstLumaChroma,
-                                   const Matrix3x4<float> &aTwist, ChromaSubsamplePos aChromaSubsamplePos,
-                                   bool aSwapLumaChroma, const mpp::cuda::StreamCtx &aStreamCtx)
+ImageView<Vector2<remove_vector_t<T>>> &ImageView<T>::ColorTwistTo422(
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector2<remove_vector_t<T>>> &aDstLumaChroma,
+    const Matrix3x4<float> &aTwist, ChromaSubsamplePos aChromaSubsamplePos, bool aSwapLumaChroma,
+    const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aDstLumaChroma.ROI());
-    checkSameSize(aSrc1.ROI(), aDstLumaChroma.ROI());
-    checkSameSize(aSrc2.ROI(), aDstLumaChroma.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDstLumaChroma);
+    checkSameSize(aSrc1, aDstLumaChroma);
+    checkSameSize(aSrc2, aDstLumaChroma);
+    checkSameSize(aSrc3, aDstLumaChroma);
 
-    InvokeColorTwist3x4Src444to422<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(),
-                                      aSrc2.PointerRoi(), aSrc2.Pitch(), aDstLumaChroma.PointerRoi(),
-                                      aDstLumaChroma.Pitch(), aTwist, aSrc0.SizeRoi(), aChromaSubsamplePos,
+    InvokeColorTwist3x4Src444to422<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
+                                      aSrc3.PointerRoi(), aSrc3.Pitch(), aDstLumaChroma.PointerRoi(),
+                                      aDstLumaChroma.Pitch(), aTwist, aSrc1.SizeRoi(), aChromaSubsamplePos,
                                       aSwapLumaChroma, aStreamCtx);
+    return aDstLumaChroma;
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                    ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix3x4<float> &aTwist,
                                    ChromaSubsamplePos aChromaSubsamplePos, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc1.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc2.ROI(), aDstLuma.ROI());
-    checkSameSize(Size2D(aSrc0.WidthRoi() / 2, aSrc0.HeightRoi()), aDstChroma.SizeRoi());
-    InvokeColorTwist3x4Src444to422<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(),
-                                      aSrc2.PointerRoi(), aSrc2.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
-                                      aDstChroma.PointerRoi(), aDstChroma.Pitch(), aTwist, aSrc0.SizeRoi(),
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma);
+    checkSameSize(aSrc1, aDstLuma);
+    checkSameSize(aSrc2, aDstLuma);
+    checkSameSize(aSrc3, aDstLuma);
+    checkSameSize(Size2D(aSrc1.WidthRoi() / 2, aSrc1.HeightRoi()), aDstChroma.SizeRoi());
+    InvokeColorTwist3x4Src444to422<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
+                                      aSrc3.PointerRoi(), aSrc3.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
+                                      aDstChroma.PointerRoi(), aDstChroma.Pitch(), aTwist, aSrc1.SizeRoi(),
                                       aChromaSubsamplePos, aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix3x4<float> &aTwist,
@@ -3133,42 +3766,53 @@ void ImageView<T>::ColorTwistTo422(const ImageView<Vector1<remove_vector_t<T>>> 
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc1.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc2.ROI(), aDstLuma.ROI());
-    checkSameSize(Size2D(aSrc0.WidthRoi() / 2, aSrc0.HeightRoi()), aDstChroma1.SizeRoi());
-    checkSameSize(Size2D(aSrc0.WidthRoi() / 2, aSrc0.HeightRoi()), aDstChroma2.SizeRoi());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma1);
+    validateImage(aDstChroma2);
+    checkSameSize(aSrc1, aDstLuma);
+    checkSameSize(aSrc2, aDstLuma);
+    checkSameSize(aSrc3, aDstLuma);
+    checkSameSize(Size2D(aSrc1.WidthRoi() / 2, aSrc1.HeightRoi()), aDstChroma1.SizeRoi());
+    checkSameSize(Size2D(aSrc1.WidthRoi() / 2, aSrc1.HeightRoi()), aDstChroma2.SizeRoi());
 
-    InvokeColorTwist3x4Src444to422<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(),
-                                      aSrc2.PointerRoi(), aSrc2.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
+    InvokeColorTwist3x4Src444to422<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
+                                      aSrc3.PointerRoi(), aSrc3.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
                                       aDstChroma1.PointerRoi(), aDstChroma1.Pitch(), aDstChroma2.PointerRoi(),
-                                      aDstChroma2.Pitch(), aTwist, aSrc0.SizeRoi(), aChromaSubsamplePos, aStreamCtx);
+                                      aDstChroma2.Pitch(), aTwist, aSrc1.SizeRoi(), aChromaSubsamplePos, aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                    ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix3x4<float> &aTwist,
                                    ChromaSubsamplePos aChromaSubsamplePos, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc1.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc2.ROI(), aDstLuma.ROI());
-    checkSameSize(Size2D(aSrc0.WidthRoi() / 2, aSrc0.HeightRoi() / 2), aDstChroma.SizeRoi());
-    InvokeColorTwist3x4Src444to420<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(),
-                                      aSrc2.PointerRoi(), aSrc2.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
-                                      aDstChroma.PointerRoi(), aDstChroma.Pitch(), aTwist, aSrc0.SizeRoi(),
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma);
+    checkSameSize(aSrc1, aDstLuma);
+    checkSameSize(aSrc2, aDstLuma);
+    checkSameSize(aSrc3, aDstLuma);
+    checkSameSize(Size2D(aSrc1.WidthRoi() / 2, aSrc1.HeightRoi() / 2), aDstChroma.SizeRoi());
+    InvokeColorTwist3x4Src444to420<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
+                                      aSrc3.PointerRoi(), aSrc3.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
+                                      aDstChroma.PointerRoi(), aDstChroma.Pitch(), aTwist, aSrc1.SizeRoi(),
                                       aChromaSubsamplePos, aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix3x4<float> &aTwist,
@@ -3176,42 +3820,53 @@ void ImageView<T>::ColorTwistTo420(const ImageView<Vector1<remove_vector_t<T>>> 
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc1.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc2.ROI(), aDstLuma.ROI());
-    checkSameSize(Size2D(aSrc0.WidthRoi() / 2, aSrc0.HeightRoi() / 2), aDstChroma1.SizeRoi());
-    checkSameSize(Size2D(aSrc0.WidthRoi() / 2, aSrc0.HeightRoi() / 2), aDstChroma2.SizeRoi());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma1);
+    validateImage(aDstChroma2);
+    checkSameSize(aSrc1, aDstLuma);
+    checkSameSize(aSrc2, aDstLuma);
+    checkSameSize(aSrc3, aDstLuma);
+    checkSameSize(Size2D(aSrc1.WidthRoi() / 2, aSrc1.HeightRoi() / 2), aDstChroma1.SizeRoi());
+    checkSameSize(Size2D(aSrc1.WidthRoi() / 2, aSrc1.HeightRoi() / 2), aDstChroma2.SizeRoi());
 
-    InvokeColorTwist3x4Src444to420<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(),
-                                      aSrc2.PointerRoi(), aSrc2.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
+    InvokeColorTwist3x4Src444to420<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
+                                      aSrc3.PointerRoi(), aSrc3.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
                                       aDstChroma1.PointerRoi(), aDstChroma1.Pitch(), aDstChroma2.PointerRoi(),
-                                      aDstChroma2.Pitch(), aTwist, aSrc0.SizeRoi(), aChromaSubsamplePos, aStreamCtx);
+                                      aDstChroma2.Pitch(), aTwist, aSrc1.SizeRoi(), aChromaSubsamplePos, aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                    ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, const Matrix3x4<float> &aTwist,
                                    ChromaSubsamplePos aChromaSubsamplePos, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc1.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc2.ROI(), aDstLuma.ROI());
-    checkSameSize(Size2D(aSrc0.WidthRoi() / 4, aSrc0.HeightRoi()), aDstChroma.SizeRoi());
-    InvokeColorTwist3x4Src444to411<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(),
-                                      aSrc2.PointerRoi(), aSrc2.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
-                                      aDstChroma.PointerRoi(), aDstChroma.Pitch(), aTwist, aSrc0.SizeRoi(),
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma);
+    checkSameSize(aSrc1, aDstLuma);
+    checkSameSize(aSrc2, aDstLuma);
+    checkSameSize(aSrc3, aDstLuma);
+    checkSameSize(Size2D(aSrc1.WidthRoi() / 4, aSrc1.HeightRoi()), aDstChroma.SizeRoi());
+    InvokeColorTwist3x4Src444to411<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
+                                      aSrc3.PointerRoi(), aSrc3.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
+                                      aDstChroma.PointerRoi(), aDstChroma.Pitch(), aTwist, aSrc1.SizeRoi(),
                                       aChromaSubsamplePos, aStreamCtx);
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+void ImageView<T>::ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                   const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
                                    ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, const Matrix3x4<float> &aTwist,
@@ -3219,16 +3874,22 @@ void ImageView<T>::ColorTwistTo411(const ImageView<Vector1<remove_vector_t<T>>> 
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrc0.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc1.ROI(), aDstLuma.ROI());
-    checkSameSize(aSrc2.ROI(), aDstLuma.ROI());
-    checkSameSize(Size2D(aSrc0.WidthRoi() / 4, aSrc0.HeightRoi()), aDstChroma1.SizeRoi());
-    checkSameSize(Size2D(aSrc0.WidthRoi() / 4, aSrc0.HeightRoi()), aDstChroma2.SizeRoi());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDstLuma);
+    validateImage(aDstChroma1);
+    validateImage(aDstChroma2);
+    checkSameSize(aSrc1, aDstLuma);
+    checkSameSize(aSrc2, aDstLuma);
+    checkSameSize(aSrc3, aDstLuma);
+    checkSameSize(Size2D(aSrc1.WidthRoi() / 4, aSrc1.HeightRoi()), aDstChroma1.SizeRoi());
+    checkSameSize(Size2D(aSrc1.WidthRoi() / 4, aSrc1.HeightRoi()), aDstChroma2.SizeRoi());
 
-    InvokeColorTwist3x4Src444to411<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(),
-                                      aSrc2.PointerRoi(), aSrc2.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
+    InvokeColorTwist3x4Src444to411<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
+                                      aSrc3.PointerRoi(), aSrc3.Pitch(), aDstLuma.PointerRoi(), aDstLuma.Pitch(),
                                       aDstChroma1.PointerRoi(), aDstChroma1.Pitch(), aDstChroma2.PointerRoi(),
-                                      aDstChroma2.Pitch(), aTwist, aSrc0.SizeRoi(), aChromaSubsamplePos, aStreamCtx);
+                                      aDstChroma2.Pitch(), aTwist, aSrc1.SizeRoi(), aChromaSubsamplePos, aStreamCtx);
 }
 
 template <PixelType T>
@@ -3239,7 +3900,9 @@ ImageView<Vector3<remove_vector_t<T>>> &ImageView<T>::ColorTwistFrom422(ImageVie
     requires std::same_as<Pixel8uC2, T> || std::same_as<Pixel16uC2, T> || std::same_as<Pixel16sC2, T> ||
              std::same_as<Pixel16fC2, T> || std::same_as<Pixel32fC2, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeColorTwist3x4Src422to444<Vector3<remove_vector_t<T>>>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(),
                                                                 aTwist, SizeRoi(), aSwapLumaChroma, aStreamCtx);
@@ -3248,20 +3911,24 @@ ImageView<Vector3<remove_vector_t<T>>> &ImageView<T>::ColorTwistFrom422(ImageVie
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+void ImageView<T>::ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix3x4<float> &aTwist,
                                      bool aSwapLumaChroma, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC2, T> || std::same_as<Pixel16uC2, T> || std::same_as<Pixel16sC2, T> ||
              std::same_as<Pixel16fC2, T> || std::same_as<Pixel32fC2, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
 
     InvokeColorTwist3x4Src422to444<Vector4A<remove_vector_t<T>>>(
-        PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(),
-        aDst2.Pitch(), aTwist, SizeRoi(), aSwapLumaChroma, aStreamCtx);
+        PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(),
+        aDst3.Pitch(), aTwist, SizeRoi(), aSwapLumaChroma, aStreamCtx);
 }
 
 template <PixelType T>
@@ -3275,7 +3942,10 @@ ImageView<T> &ImageView<T>::ColorTwistFrom422(ImageView<Vector1<remove_vector_t<
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst.ROI());
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma);
+    validateImage(aDst);
+    checkSameSize(aSrcLuma, aDst);
     checkSameSize(aSrcChroma.SizeRoi(), Size2D(aDst.WidthRoi() / 2, aDst.HeightRoi()));
 
     InvokeColorTwist3x4Src422to444<T>(aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma.PointerRoi(),
@@ -3297,7 +3967,11 @@ ImageView<T> &ImageView<T>::ColorTwistFrom422(ImageView<Vector1<remove_vector_t<
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst.ROI());
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma1);
+    validateImage(aSrcChroma2);
+    validateImage(aDst);
+    checkSameSize(aSrcLuma, aDst);
     checkSameSize(aSrcChroma1.SizeRoi(), Size2D(aDst.WidthRoi() / 2, aDst.HeightRoi()));
     checkSameSize(aSrcChroma2.SizeRoi(), Size2D(aDst.WidthRoi() / 2, aDst.HeightRoi()));
 
@@ -3312,22 +3986,27 @@ ImageView<T> &ImageView<T>::ColorTwistFrom422(ImageView<Vector1<remove_vector_t<
 template <PixelType T>
 void ImageView<T>::ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                      ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                      ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix3x4<float> &aTwist,
                                      ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst0.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst1.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst2.ROI());
-    checkSameSize(aSrcChroma.SizeRoi(), Size2D(aDst0.WidthRoi() / 2, aDst0.HeightRoi()));
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrcLuma, aDst1);
+    checkSameSize(aSrcLuma, aDst2);
+    checkSameSize(aSrcLuma, aDst3);
+    checkSameSize(aSrcChroma.SizeRoi(), Size2D(aDst1.WidthRoi() / 2, aDst1.HeightRoi()));
 
     InvokeColorTwist3x4Src422to444<Vector4A<remove_vector_t<T>>>(
-        aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma.PointerRoi(), aSrcChroma.Pitch(), aDst0.PointerRoi(),
-        aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aTwist, aSrcLuma.SizeRoi(),
+        aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma.PointerRoi(), aSrcChroma.Pitch(), aDst1.PointerRoi(),
+        aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aTwist, aSrcLuma.SizeRoi(),
         aChromaSubsamplePos, aInterpolationMode, aStreamCtx);
 }
 
@@ -3335,24 +4014,30 @@ template <PixelType T>
 void ImageView<T>::ColorTwistFrom422(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                      ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
                                      ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                      ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix3x4<float> &aTwist,
                                      ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst0.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst1.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst2.ROI());
-    checkSameSize(aSrcChroma1.SizeRoi(), Size2D(aDst0.WidthRoi() / 2, aDst0.HeightRoi()));
-    checkSameSize(aSrcChroma2.SizeRoi(), Size2D(aDst0.WidthRoi() / 2, aDst0.HeightRoi()));
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma1);
+    validateImage(aSrcChroma2);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrcLuma, aDst1);
+    checkSameSize(aSrcLuma, aDst2);
+    checkSameSize(aSrcLuma, aDst3);
+    checkSameSize(aSrcChroma1.SizeRoi(), Size2D(aDst1.WidthRoi() / 2, aDst1.HeightRoi()));
+    checkSameSize(aSrcChroma2.SizeRoi(), Size2D(aDst1.WidthRoi() / 2, aDst1.HeightRoi()));
 
     InvokeColorTwist3x4Src422to444<Vector4A<remove_vector_t<T>>>(
         aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma1.PointerRoi(), aSrcChroma1.Pitch(),
-        aSrcChroma2.PointerRoi(), aSrcChroma2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(),
-        aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aTwist, aSrcLuma.SizeRoi(), aChromaSubsamplePos,
+        aSrcChroma2.PointerRoi(), aSrcChroma2.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(),
+        aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aTwist, aSrcLuma.SizeRoi(), aChromaSubsamplePos,
         aInterpolationMode, aStreamCtx);
 }
 
@@ -3367,7 +4052,10 @@ ImageView<T> &ImageView<T>::ColorTwistFrom420(ImageView<Vector1<remove_vector_t<
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst.ROI());
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma);
+    validateImage(aDst);
+    checkSameSize(aSrcLuma, aDst);
     checkSameSize(aSrcChroma.SizeRoi(), Size2D(aDst.WidthRoi() / 2, aDst.HeightRoi() / 2));
 
     InvokeColorTwist3x4Src420to444<T>(aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma.PointerRoi(),
@@ -3389,7 +4077,11 @@ ImageView<T> &ImageView<T>::ColorTwistFrom420(ImageView<Vector1<remove_vector_t<
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst.ROI());
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma1);
+    validateImage(aSrcChroma2);
+    validateImage(aDst);
+    checkSameSize(aSrcLuma, aDst);
     checkSameSize(aSrcChroma1.SizeRoi(), Size2D(aDst.WidthRoi() / 2, aDst.HeightRoi() / 2));
     checkSameSize(aSrcChroma2.SizeRoi(), Size2D(aDst.WidthRoi() / 2, aDst.HeightRoi() / 2));
 
@@ -3404,22 +4096,27 @@ ImageView<T> &ImageView<T>::ColorTwistFrom420(ImageView<Vector1<remove_vector_t<
 template <PixelType T>
 void ImageView<T>::ColorTwistFrom420(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                      ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                      ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix3x4<float> &aTwist,
                                      ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst0.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst1.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst2.ROI());
-    checkSameSize(aSrcChroma.SizeRoi(), Size2D(aDst0.WidthRoi() / 2, aDst0.HeightRoi() / 2));
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrcLuma, aDst1);
+    checkSameSize(aSrcLuma, aDst2);
+    checkSameSize(aSrcLuma, aDst3);
+    checkSameSize(aSrcChroma.SizeRoi(), Size2D(aDst1.WidthRoi() / 2, aDst1.HeightRoi() / 2));
 
     InvokeColorTwist3x4Src420to444<Vector4A<remove_vector_t<T>>>(
-        aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma.PointerRoi(), aSrcChroma.Pitch(), aDst0.PointerRoi(),
-        aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aTwist, aSrcLuma.SizeRoi(),
+        aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma.PointerRoi(), aSrcChroma.Pitch(), aDst1.PointerRoi(),
+        aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aTwist, aSrcLuma.SizeRoi(),
         aChromaSubsamplePos, aInterpolationMode, aStreamCtx);
 }
 
@@ -3427,24 +4124,30 @@ template <PixelType T>
 void ImageView<T>::ColorTwistFrom420(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                      ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
                                      ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                      ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix3x4<float> &aTwist,
                                      ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst0.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst1.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst2.ROI());
-    checkSameSize(aSrcChroma1.SizeRoi(), Size2D(aDst0.WidthRoi() / 2, aDst0.HeightRoi() / 2));
-    checkSameSize(aSrcChroma2.SizeRoi(), Size2D(aDst0.WidthRoi() / 2, aDst0.HeightRoi() / 2));
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma1);
+    validateImage(aSrcChroma2);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrcLuma, aDst1);
+    checkSameSize(aSrcLuma, aDst2);
+    checkSameSize(aSrcLuma, aDst3);
+    checkSameSize(aSrcChroma1.SizeRoi(), Size2D(aDst1.WidthRoi() / 2, aDst1.HeightRoi() / 2));
+    checkSameSize(aSrcChroma2.SizeRoi(), Size2D(aDst1.WidthRoi() / 2, aDst1.HeightRoi() / 2));
 
     InvokeColorTwist3x4Src420to444<Vector4A<remove_vector_t<T>>>(
         aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma1.PointerRoi(), aSrcChroma1.Pitch(),
-        aSrcChroma2.PointerRoi(), aSrcChroma2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(),
-        aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aTwist, aSrcLuma.SizeRoi(), aChromaSubsamplePos,
+        aSrcChroma2.PointerRoi(), aSrcChroma2.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(),
+        aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aTwist, aSrcLuma.SizeRoi(), aChromaSubsamplePos,
         aInterpolationMode, aStreamCtx);
 }
 
@@ -3459,7 +4162,10 @@ ImageView<T> &ImageView<T>::ColorTwistFrom411(ImageView<Vector1<remove_vector_t<
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst.ROI());
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma);
+    validateImage(aDst);
+    checkSameSize(aSrcLuma, aDst);
     checkSameSize(aSrcChroma.SizeRoi(), Size2D(aDst.WidthRoi() / 4, aDst.HeightRoi()));
 
     InvokeColorTwist3x4Src411to444<T>(aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma.PointerRoi(),
@@ -3481,7 +4187,11 @@ ImageView<T> &ImageView<T>::ColorTwistFrom411(ImageView<Vector1<remove_vector_t<
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel16fC4A, T> || std::same_as<Pixel32fC3, T> ||
              std::same_as<Pixel32fC4A, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst.ROI());
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma1);
+    validateImage(aSrcChroma2);
+    validateImage(aDst);
+    checkSameSize(aSrcLuma, aDst);
     checkSameSize(aSrcChroma1.SizeRoi(), Size2D(aDst.WidthRoi() / 4, aDst.HeightRoi()));
     checkSameSize(aSrcChroma2.SizeRoi(), Size2D(aDst.WidthRoi() / 4, aDst.HeightRoi()));
 
@@ -3496,22 +4206,27 @@ ImageView<T> &ImageView<T>::ColorTwistFrom411(ImageView<Vector1<remove_vector_t<
 template <PixelType T>
 void ImageView<T>::ColorTwistFrom411(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                      ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                      ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix3x4<float> &aTwist,
                                      ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst0.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst1.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst2.ROI());
-    checkSameSize(aSrcChroma.SizeRoi(), Size2D(aDst0.WidthRoi() / 4, aDst0.HeightRoi()));
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrcLuma, aDst1);
+    checkSameSize(aSrcLuma, aDst2);
+    checkSameSize(aSrcLuma, aDst3);
+    checkSameSize(aSrcChroma.SizeRoi(), Size2D(aDst1.WidthRoi() / 4, aDst1.HeightRoi()));
 
     InvokeColorTwist3x4Src411to444<Vector4A<remove_vector_t<T>>>(
-        aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma.PointerRoi(), aSrcChroma.Pitch(), aDst0.PointerRoi(),
-        aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aTwist, aSrcLuma.SizeRoi(),
+        aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma.PointerRoi(), aSrcChroma.Pitch(), aDst1.PointerRoi(),
+        aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aTwist, aSrcLuma.SizeRoi(),
         aChromaSubsamplePos, aInterpolationMode, aStreamCtx);
 }
 
@@ -3519,24 +4234,30 @@ template <PixelType T>
 void ImageView<T>::ColorTwistFrom411(ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma,
                                      ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
                                      ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst0,
                                      ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2, const Matrix3x4<float> &aTwist,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix3x4<float> &aTwist,
                                      ChromaSubsamplePos aChromaSubsamplePos, InterpolationMode aInterpolationMode,
                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC3, T> || std::same_as<Pixel16uC3, T> || std::same_as<Pixel16sC3, T> ||
              std::same_as<Pixel16fC3, T> || std::same_as<Pixel32fC3, T>
 {
-    checkSameSize(aSrcLuma.ROI(), aDst0.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst1.ROI());
-    checkSameSize(aSrcLuma.ROI(), aDst2.ROI());
-    checkSameSize(aSrcChroma1.SizeRoi(), Size2D(aDst0.WidthRoi() / 4, aDst0.HeightRoi()));
-    checkSameSize(aSrcChroma2.SizeRoi(), Size2D(aDst0.WidthRoi() / 4, aDst0.HeightRoi()));
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma1);
+    validateImage(aSrcChroma2);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrcLuma, aDst1);
+    checkSameSize(aSrcLuma, aDst2);
+    checkSameSize(aSrcLuma, aDst3);
+    checkSameSize(aSrcChroma1.SizeRoi(), Size2D(aDst1.WidthRoi() / 4, aDst1.HeightRoi()));
+    checkSameSize(aSrcChroma2.SizeRoi(), Size2D(aDst1.WidthRoi() / 4, aDst1.HeightRoi()));
 
     InvokeColorTwist3x4Src411to444<Vector4A<remove_vector_t<T>>>(
         aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma1.PointerRoi(), aSrcChroma1.Pitch(),
-        aSrcChroma2.PointerRoi(), aSrcChroma2.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(),
-        aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aTwist, aSrcLuma.SizeRoi(), aChromaSubsamplePos,
+        aSrcChroma2.PointerRoi(), aSrcChroma2.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(),
+        aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aTwist, aSrcLuma.SizeRoi(), aChromaSubsamplePos,
         aInterpolationMode, aStreamCtx);
 }
 #pragma endregion
@@ -3548,7 +4269,9 @@ ImageView<T> &ImageView<T>::ColorTwist(ImageView<T> &aDst, const Matrix4x4<float
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
              std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeColorTwist4x4Src<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aTwist, SizeRoi(), aStreamCtx);
 
@@ -3556,65 +4279,83 @@ ImageView<T> &ImageView<T>::ColorTwist(ImageView<T> &aDst, const Matrix4x4<float
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                              ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+void ImageView<T>::ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                              ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix4x4<float> &aTwist,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst4, const Matrix4x4<float> &aTwist,
                               const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
              std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
-    checkSameSize(ROI(), aDst3.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
+    checkSameSize(*this, aDst4);
 
-    InvokeColorTwist4x4Src<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(),
-                              aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(),
+    InvokeColorTwist4x4Src<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(),
+                              aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(),
                               aTwist, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
 void ImageView<T>::ColorTwist(
-    const ImageView<Vector1<remove_vector_t<T>>> &aSrc0, const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
-    ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-    ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+    ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
     const Matrix4x4<float> &aTwist, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
              std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc3.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst3.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aSrc4);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
+    checkSameSize(aSrc1, aDst4);
 
-    InvokeColorTwist4x4Src<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                              aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(),
-                              aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(),
-                              aDst3.Pitch(), aTwist, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeColorTwist4x4Src<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                              aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
+                              aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(),
+                              aDst4.Pitch(), aTwist, aSrc2.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+ImageView<T> &ImageView<T>::ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                        const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                        const Matrix4x4<float> &aTwist, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
              std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
-    checkSameSize(aSrc1.ROI(), aDst.ROI());
-    checkSameSize(aSrc2.ROI(), aDst.ROI());
-    checkSameSize(aSrc3.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aDst);
+    checkSameSize(aSrc2, aDst);
+    checkSameSize(aSrc3, aDst);
+    checkSameSize(aSrc4, aDst);
 
-    InvokeColorTwist4x4Src<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                              aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aTwist,
-                              aSrc1.SizeRoi(), aStreamCtx);
+    InvokeColorTwist4x4Src<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                              aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aTwist,
+                              aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -3624,6 +4365,7 @@ ImageView<T> &ImageView<T>::ColorTwist(const Matrix4x4<float> &aTwist, const mpp
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
              std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>
 {
+    validateImage(*this);
     InvokeColorTwist4x4Inplace<T>(PointerRoi(), Pitch(), aTwist, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -3638,7 +4380,9 @@ ImageView<T> &ImageView<T>::ColorTwist(ImageView<T> &aDst, const Matrix4x4<float
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
              std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeColorTwist4x4CSrc<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aTwist, aConstant, SizeRoi(),
                                aStreamCtx);
@@ -3647,66 +4391,84 @@ ImageView<T> &ImageView<T>::ColorTwist(ImageView<T> &aDst, const Matrix4x4<float
 }
 
 template <PixelType T>
-void ImageView<T>::ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                              ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+void ImageView<T>::ColorTwist(ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                               ImageView<Vector1<remove_vector_t<T>>> &aDst2,
-                              ImageView<Vector1<remove_vector_t<T>>> &aDst3, const Matrix4x4<float> &aTwist,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+                              ImageView<Vector1<remove_vector_t<T>>> &aDst4, const Matrix4x4<float> &aTwist,
                               const Pixel32fC4 &aConstant, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
              std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(ROI(), aDst0.ROI());
-    checkSameSize(ROI(), aDst1.ROI());
-    checkSameSize(ROI(), aDst2.ROI());
-    checkSameSize(ROI(), aDst3.ROI());
+    validateImage(*this);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(*this, aDst1);
+    checkSameSize(*this, aDst2);
+    checkSameSize(*this, aDst3);
+    checkSameSize(*this, aDst4);
 
-    InvokeColorTwist4x4CSrc<T>(PointerRoi(), Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(),
-                               aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(),
+    InvokeColorTwist4x4CSrc<T>(PointerRoi(), Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(),
+                               aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(),
                                aTwist, aConstant, SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
 void ImageView<T>::ColorTwist(
-    const ImageView<Vector1<remove_vector_t<T>>> &aSrc0, const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
-    ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-    ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+    ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4,
     const Matrix4x4<float> &aTwist, const Pixel32fC4 &aConstant, const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
              std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc3.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst3.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aSrc4);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
+    checkSameSize(aSrc1, aDst4);
 
-    InvokeColorTwist4x4CSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                               aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(),
-                               aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(),
-                               aDst3.Pitch(), aTwist, aConstant, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeColorTwist4x4CSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                               aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
+                               aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(),
+                               aDst4.Pitch(), aTwist, aConstant, aSrc2.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+ImageView<T> &ImageView<T>::ColorTwist(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                                        const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<T> &aDst,
+                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc4, ImageView<T> &aDst,
                                        const Matrix4x4<float> &aTwist, const Pixel32fC4 &aConstant,
                                        const mpp::cuda::StreamCtx &aStreamCtx)
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
              std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>
 {
-    checkSameSize(aSrc0.ROI(), aDst.ROI());
-    checkSameSize(aSrc1.ROI(), aDst.ROI());
-    checkSameSize(aSrc2.ROI(), aDst.ROI());
-    checkSameSize(aSrc3.ROI(), aDst.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aDst);
+    checkSameSize(aSrc2, aDst);
+    checkSameSize(aSrc3, aDst);
+    checkSameSize(aSrc4, aDst);
 
-    InvokeColorTwist4x4CSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                               aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
-                               aTwist, aConstant, aSrc1.SizeRoi(), aStreamCtx);
+    InvokeColorTwist4x4CSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                               aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(),
+                               aTwist, aConstant, aSrc2.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -3717,6 +4479,7 @@ ImageView<T> &ImageView<T>::ColorTwist(const Matrix4x4<float> &aTwist, const Pix
     requires std::same_as<Pixel8uC4, T> || std::same_as<Pixel16uC4, T> || std::same_as<Pixel16sC4, T> ||
              std::same_as<Pixel16fC4, T> || std::same_as<Pixel32fC4, T>
 {
+    validateImage(*this);
     InvokeColorTwist4x4CInplace<T>(PointerRoi(), Pitch(), aTwist, aConstant, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -3732,7 +4495,9 @@ ImageView<T> &ImageView<T>::GammaCorrBT709(ImageView<T> &aDst, float aNormFactor
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeGammaCorrBT709Src<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormFactor, SizeRoi(),
                                aStreamCtx);
@@ -3741,74 +4506,92 @@ ImageView<T> &ImageView<T>::GammaCorrBT709(ImageView<T> &aDst, float aNormFactor
 }
 
 template <PixelType T>
-void ImageView<T>::GammaCorrBT709(ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst1, float aNormFactor,
-                                  const mpp::cuda::StreamCtx &aStreamCtx)
-    requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
-             std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
-             std::same_as<float, remove_vector_t<T>>) &&
-            (vector_active_size_v<T> == 2)
-{
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-
-    InvokeGammaCorrBT709Src<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aDst0.PointerRoi(),
-                               aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aNormFactor, aSrc0.SizeRoi(),
-                               aStreamCtx);
-}
-
-template <PixelType T>
-void ImageView<T>::GammaCorrBT709(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                  ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+void ImageView<T>::GammaCorrBT709(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                   ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormFactor,
                                   const mpp::cuda::StreamCtx &aStreamCtx)
     requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>) &&
+            (vector_active_size_v<T> == 2)
+{
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+
+    InvokeGammaCorrBT709Src<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aDst1.PointerRoi(),
+                               aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aNormFactor, aSrc1.SizeRoi(),
+                               aStreamCtx);
+}
+
+template <PixelType T>
+void ImageView<T>::GammaCorrBT709(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                  const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                  ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormFactor,
+                                  const mpp::cuda::StreamCtx &aStreamCtx)
+    requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+             std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+             std::same_as<float, remove_vector_t<T>>) &&
             (vector_active_size_v<T> == 3)
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
     InvokeGammaCorrBT709Src<Vector4A<remove_vector_t<T>>>(
-        aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
-        aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
-        aNormFactor, aSrc0.SizeRoi(), aStreamCtx);
+        aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(),
+        aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(),
+        aNormFactor, aSrc1.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
 void ImageView<T>::GammaCorrBT709(
-    const ImageView<Vector1<remove_vector_t<T>>> &aSrc0, const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
-    ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-    ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormFactor,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+    ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormFactor,
     const mpp::cuda::StreamCtx &aStreamCtx)
     requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>) &&
             (vector_active_size_v<T> == 4)
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc3.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst3.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aSrc4);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
+    checkSameSize(aSrc1, aDst4);
 
-    InvokeGammaCorrBT709Src<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                               aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(),
-                               aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(),
-                               aDst3.Pitch(), aNormFactor, aSrc0.SizeRoi(), aStreamCtx);
+    InvokeGammaCorrBT709Src<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                               aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
+                               aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(),
+                               aDst4.Pitch(), aNormFactor, aSrc1.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
@@ -3817,6 +4600,7 @@ ImageView<T> &ImageView<T>::GammaCorrBT709(float aNormFactor, const mpp::cuda::S
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>
 {
+    validateImage(*this);
     InvokeGammaCorrBT709Inplace<T>(PointerRoi(), Pitch(), aNormFactor, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -3832,7 +4616,9 @@ ImageView<T> &ImageView<T>::GammaInvCorrBT709(ImageView<T> &aDst, float aNormFac
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeGammaInvCorrBT709Src<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormFactor, SizeRoi(),
                                   aStreamCtx);
@@ -3841,74 +4627,92 @@ ImageView<T> &ImageView<T>::GammaInvCorrBT709(ImageView<T> &aDst, float aNormFac
 }
 
 template <PixelType T>
-void ImageView<T>::GammaInvCorrBT709(ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst1, float aNormFactor,
-                                     const mpp::cuda::StreamCtx &aStreamCtx)
-    requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
-             std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
-             std::same_as<float, remove_vector_t<T>>) &&
-            (vector_active_size_v<T> == 2)
-{
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-
-    InvokeGammaInvCorrBT709Src<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(),
-                                  aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aNormFactor,
-                                  aSrc0.SizeRoi(), aStreamCtx);
-}
-
-template <PixelType T>
-void ImageView<T>::GammaInvCorrBT709(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                     ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+void ImageView<T>::GammaInvCorrBT709(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                      ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                      ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormFactor,
                                      const mpp::cuda::StreamCtx &aStreamCtx)
     requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>) &&
+            (vector_active_size_v<T> == 2)
+{
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+
+    InvokeGammaInvCorrBT709Src<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
+                                  aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aNormFactor,
+                                  aSrc1.SizeRoi(), aStreamCtx);
+}
+
+template <PixelType T>
+void ImageView<T>::GammaInvCorrBT709(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                     const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                     ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormFactor,
+                                     const mpp::cuda::StreamCtx &aStreamCtx)
+    requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+             std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+             std::same_as<float, remove_vector_t<T>>) &&
             (vector_active_size_v<T> == 3)
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
     InvokeGammaInvCorrBT709Src<Vector4A<remove_vector_t<T>>>(
-        aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
-        aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
-        aNormFactor, aSrc0.SizeRoi(), aStreamCtx);
+        aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(),
+        aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(),
+        aNormFactor, aSrc1.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
 void ImageView<T>::GammaInvCorrBT709(
-    const ImageView<Vector1<remove_vector_t<T>>> &aSrc0, const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
-    ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-    ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormFactor,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+    ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormFactor,
     const mpp::cuda::StreamCtx &aStreamCtx)
     requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>) &&
             (vector_active_size_v<T> == 4)
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc3.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst3.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aSrc4);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
+    checkSameSize(aSrc1, aDst4);
 
     InvokeGammaInvCorrBT709Src<T>(
-        aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
-        aSrc3.PointerRoi(), aSrc3.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-        aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aNormFactor, aSrc0.SizeRoi(), aStreamCtx);
+        aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(),
+        aSrc4.PointerRoi(), aSrc4.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+        aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(), aNormFactor, aSrc1.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
@@ -3917,6 +4721,7 @@ ImageView<T> &ImageView<T>::GammaInvCorrBT709(float aNormFactor, const mpp::cuda
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>
 {
+    validateImage(*this);
     InvokeGammaInvCorrBT709Inplace<T>(PointerRoi(), Pitch(), aNormFactor, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -3932,7 +4737,9 @@ ImageView<T> &ImageView<T>::GammaCorrsRGB(ImageView<T> &aDst, float aNormFactor,
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeGammaCorrsRGBSrc<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormFactor, SizeRoi(),
                               aStreamCtx);
@@ -3941,74 +4748,92 @@ ImageView<T> &ImageView<T>::GammaCorrsRGB(ImageView<T> &aDst, float aNormFactor,
 }
 
 template <PixelType T>
-void ImageView<T>::GammaCorrsRGB(ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                 ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                 ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                                 ImageView<Vector1<remove_vector_t<T>>> &aDst1, float aNormFactor,
-                                 const mpp::cuda::StreamCtx &aStreamCtx)
-    requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
-             std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
-             std::same_as<float, remove_vector_t<T>>) &&
-            (vector_active_size_v<T> == 2)
-{
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-
-    InvokeGammaCorrsRGBSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aDst0.PointerRoi(),
-                              aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aNormFactor, aSrc0.SizeRoi(),
-                              aStreamCtx);
-}
-
-template <PixelType T>
-void ImageView<T>::GammaCorrsRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                 const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                 const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                 ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+void ImageView<T>::GammaCorrsRGB(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                  ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                  ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormFactor,
                                  const mpp::cuda::StreamCtx &aStreamCtx)
     requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>) &&
+            (vector_active_size_v<T> == 2)
+{
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+
+    InvokeGammaCorrsRGBSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aDst1.PointerRoi(),
+                              aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aNormFactor, aSrc1.SizeRoi(),
+                              aStreamCtx);
+}
+
+template <PixelType T>
+void ImageView<T>::GammaCorrsRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                 const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                 const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                 ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormFactor,
+                                 const mpp::cuda::StreamCtx &aStreamCtx)
+    requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+             std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+             std::same_as<float, remove_vector_t<T>>) &&
             (vector_active_size_v<T> == 3)
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
     InvokeGammaCorrsRGBSrc<Vector4A<remove_vector_t<T>>>(
-        aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
-        aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
-        aNormFactor, aSrc0.SizeRoi(), aStreamCtx);
+        aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(),
+        aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(),
+        aNormFactor, aSrc1.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
 void ImageView<T>::GammaCorrsRGB(
-    const ImageView<Vector1<remove_vector_t<T>>> &aSrc0, const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
-    ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-    ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormFactor,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+    ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormFactor,
     const mpp::cuda::StreamCtx &aStreamCtx)
     requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>) &&
             (vector_active_size_v<T> == 4)
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc3.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst3.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aSrc4);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
+    checkSameSize(aSrc1, aDst4);
 
-    InvokeGammaCorrsRGBSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
-                              aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(),
-                              aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(),
-                              aDst3.Pitch(), aNormFactor, aSrc0.SizeRoi(), aStreamCtx);
+    InvokeGammaCorrsRGBSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(),
+                              aSrc3.Pitch(), aSrc4.PointerRoi(), aSrc4.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
+                              aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(),
+                              aDst4.Pitch(), aNormFactor, aSrc1.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
@@ -4017,6 +4842,7 @@ ImageView<T> &ImageView<T>::GammaCorrsRGB(float aNormFactor, const mpp::cuda::St
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>
 {
+    validateImage(*this);
     InvokeGammaCorrsRGBInplace<T>(PointerRoi(), Pitch(), aNormFactor, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -4032,7 +4858,9 @@ ImageView<T> &ImageView<T>::GammaInvCorrsRGB(ImageView<T> &aDst, float aNormFact
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeGammaInvCorrsRGBSrc<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNormFactor, SizeRoi(),
                                  aStreamCtx);
@@ -4041,74 +4869,92 @@ ImageView<T> &ImageView<T>::GammaInvCorrsRGB(ImageView<T> &aDst, float aNormFact
 }
 
 template <PixelType T>
-void ImageView<T>::GammaInvCorrsRGB(ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                    ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                    ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                                    ImageView<Vector1<remove_vector_t<T>>> &aDst1, float aNormFactor,
-                                    const mpp::cuda::StreamCtx &aStreamCtx)
-    requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
-             std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
-             std::same_as<float, remove_vector_t<T>>) &&
-            (vector_active_size_v<T> == 2)
-{
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-
-    InvokeGammaInvCorrsRGBSrc<T>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(),
-                                 aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aNormFactor,
-                                 aSrc0.SizeRoi(), aStreamCtx);
-}
-
-template <PixelType T>
-void ImageView<T>::GammaInvCorrsRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                    ImageView<Vector1<remove_vector_t<T>>> &aDst0,
+void ImageView<T>::GammaInvCorrsRGB(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
                                     ImageView<Vector1<remove_vector_t<T>>> &aDst1,
                                     ImageView<Vector1<remove_vector_t<T>>> &aDst2, float aNormFactor,
                                     const mpp::cuda::StreamCtx &aStreamCtx)
     requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>) &&
+            (vector_active_size_v<T> == 2)
+{
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+
+    InvokeGammaInvCorrsRGBSrc<T>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
+                                 aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aNormFactor,
+                                 aSrc1.SizeRoi(), aStreamCtx);
+}
+
+template <PixelType T>
+void ImageView<T>::GammaInvCorrsRGB(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aDst1,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+                                    ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormFactor,
+                                    const mpp::cuda::StreamCtx &aStreamCtx)
+    requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
+             std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
+             std::same_as<float, remove_vector_t<T>>) &&
             (vector_active_size_v<T> == 3)
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
 
     InvokeGammaInvCorrsRGBSrc<Vector4A<remove_vector_t<T>>>(
-        aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
-        aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
-        aNormFactor, aSrc0.SizeRoi(), aStreamCtx);
+        aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(),
+        aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(),
+        aNormFactor, aSrc1.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
 void ImageView<T>::GammaInvCorrsRGB(
-    const ImageView<Vector1<remove_vector_t<T>>> &aSrc0, const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-    const ImageView<Vector1<remove_vector_t<T>>> &aSrc2, const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
-    ImageView<Vector1<remove_vector_t<T>>> &aDst0, ImageView<Vector1<remove_vector_t<T>>> &aDst1,
-    ImageView<Vector1<remove_vector_t<T>>> &aDst2, ImageView<Vector1<remove_vector_t<T>>> &aDst3, float aNormFactor,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    ImageView<Vector1<remove_vector_t<T>>> &aDst1, ImageView<Vector1<remove_vector_t<T>>> &aDst2,
+    ImageView<Vector1<remove_vector_t<T>>> &aDst3, ImageView<Vector1<remove_vector_t<T>>> &aDst4, float aNormFactor,
     const mpp::cuda::StreamCtx &aStreamCtx)
     requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>) &&
             (vector_active_size_v<T> == 4)
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc3.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
-    checkSameSize(aSrc0.ROI(), aDst1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst3.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aSrc4);
+    checkSameSize(aSrc1, aDst1);
+    checkSameSize(aSrc1, aDst2);
+    checkSameSize(aSrc1, aDst3);
+    checkSameSize(aSrc1, aDst4);
 
     InvokeGammaInvCorrsRGBSrc<T>(
-        aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
-        aSrc3.PointerRoi(), aSrc3.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(),
-        aDst2.PointerRoi(), aDst2.Pitch(), aDst3.PointerRoi(), aDst3.Pitch(), aNormFactor, aSrc0.SizeRoi(), aStreamCtx);
+        aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(),
+        aSrc4.PointerRoi(), aSrc4.Pitch(), aDst1.PointerRoi(), aDst1.Pitch(), aDst2.PointerRoi(), aDst2.Pitch(),
+        aDst3.PointerRoi(), aDst3.Pitch(), aDst4.PointerRoi(), aDst4.Pitch(), aNormFactor, aSrc1.SizeRoi(), aStreamCtx);
 }
 
 template <PixelType T>
@@ -4117,6 +4963,7 @@ ImageView<T> &ImageView<T>::GammaInvCorrsRGB(float aNormFactor, const mpp::cuda:
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>
 {
+    validateImage(*this);
     InvokeGammaInvCorrsRGBInplace<T>(PointerRoi(), Pitch(), aNormFactor, SizeRoi(), aStreamCtx);
 
     return *this;
@@ -4134,7 +4981,9 @@ ImageView<Vector1<remove_vector_t<T>>> &ImageView<T>::GradientColorToGray(ImageV
              std::same_as<float, remove_vector_t<T>>) &&
             (vector_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeColorGradientToGraySrc<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNorm, SizeRoi(),
                                     aStreamCtx);
@@ -4143,63 +4992,76 @@ ImageView<Vector1<remove_vector_t<T>>> &ImageView<T>::GradientColorToGray(ImageV
 }
 
 template <PixelType T>
-void ImageView<T>::GradientColorToGray(ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                       ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                       ImageView<Vector1<remove_vector_t<T>>> &aDst0, Norm aNorm,
-                                       const mpp::cuda::StreamCtx &aStreamCtx)
+ImageView<Vector1<remove_vector_t<T>>> &ImageView<T>::GradientColorToGray(ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
+                                                                          ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+                                                                          ImageView<Vector1<remove_vector_t<T>>> &aDst,
+                                                                          Norm aNorm,
+                                                                          const mpp::cuda::StreamCtx &aStreamCtx)
     requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>) &&
             (vector_active_size_v<T> == 2)
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeColorGradientToGraySrc<Vector2<remove_vector_t<T>>>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(),
-                                                              aSrc1.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aNorm,
-                                                              aSrc0.SizeRoi(), aStreamCtx);
+    InvokeColorGradientToGraySrc<Vector2<remove_vector_t<T>>>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
+                                                              aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNorm,
+                                                              aSrc1.SizeRoi(), aStreamCtx);
+    return aDst;
 }
 
 template <PixelType T>
-void ImageView<T>::GradientColorToGray(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                       ImageView<Vector1<remove_vector_t<T>>> &aDst0, Norm aNorm,
-                                       const mpp::cuda::StreamCtx &aStreamCtx)
+ImageView<Vector1<remove_vector_t<T>>> &ImageView<T>::GradientColorToGray(
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst, Norm aNorm,
+    const mpp::cuda::StreamCtx &aStreamCtx)
     requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>) &&
             (vector_active_size_v<T> == 3)
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
     InvokeColorGradientToGraySrc<Vector4A<remove_vector_t<T>>>(
-        aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
-        aDst0.PointerRoi(), aDst0.Pitch(), aNorm, aSrc0.SizeRoi(), aStreamCtx);
+        aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(),
+        aDst.PointerRoi(), aDst.Pitch(), aNorm, aSrc1.SizeRoi(), aStreamCtx);
+    return aDst;
 }
 
 template <PixelType T>
-void ImageView<T>::GradientColorToGray(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                                       const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
-                                       ImageView<Vector1<remove_vector_t<T>>> &aDst0, Norm aNorm,
-                                       const mpp::cuda::StreamCtx &aStreamCtx)
+ImageView<Vector1<remove_vector_t<T>>> &ImageView<T>::GradientColorToGray(
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    ImageView<Vector1<remove_vector_t<T>>> &aDst, Norm aNorm, const mpp::cuda::StreamCtx &aStreamCtx)
     requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>) &&
             (vector_active_size_v<T> == 4)
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc3.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aSrc4);
+    checkSameSize(aSrc1, aDst);
 
     InvokeColorGradientToGraySrc<Vector4<remove_vector_t<T>>>(
-        aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
-        aSrc3.PointerRoi(), aSrc3.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aNorm, aSrc0.SizeRoi(), aStreamCtx);
+        aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(),
+        aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aNorm, aSrc1.SizeRoi(), aStreamCtx);
+    return aDst;
 }
 
 #pragma endregion
@@ -4214,7 +5076,9 @@ ImageView<Vector1<remove_vector_t<T>>> &ImageView<T>::ColorToGray(
              std::same_as<float, remove_vector_t<T>>) &&
             (vector_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeColorToGraySrc<T>(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aWeights, SizeRoi(), aStreamCtx);
 
@@ -4222,66 +5086,76 @@ ImageView<Vector1<remove_vector_t<T>>> &ImageView<T>::ColorToGray(
 }
 
 template <PixelType T>
-void ImageView<T>::ColorToGray(ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                               ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                               ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                               const same_vector_size_different_type_t<T, float> &aWeights,
-                               const mpp::cuda::StreamCtx &aStreamCtx)
+ImageView<Vector1<remove_vector_t<T>>> &ImageView<T>::ColorToGray(
+    ImageView<Vector1<remove_vector_t<T>>> &aSrc1, ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    ImageView<Vector1<remove_vector_t<T>>> &aDst, const same_vector_size_different_type_t<T, float> &aWeights,
+    const mpp::cuda::StreamCtx &aStreamCtx)
     requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>) &&
             (vector_active_size_v<T> == 2)
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aDst);
 
-    InvokeColorToGraySrc<Vector2<remove_vector_t<T>>>(aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(),
-                                                      aSrc1.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aWeights,
-                                                      aSrc0.SizeRoi(), aStreamCtx);
+    InvokeColorToGraySrc<Vector2<remove_vector_t<T>>>(aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(),
+                                                      aSrc2.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aWeights,
+                                                      aSrc1.SizeRoi(), aStreamCtx);
+    return aDst;
 }
 
 template <PixelType T>
-void ImageView<T>::ColorToGray(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                               ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                               const same_vector_size_different_type_t<T, float> &aWeights,
-                               const mpp::cuda::StreamCtx &aStreamCtx)
+ImageView<Vector1<remove_vector_t<T>>> &ImageView<T>::ColorToGray(
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, ImageView<Vector1<remove_vector_t<T>>> &aDst,
+    const same_vector_size_different_type_t<T, float> &aWeights, const mpp::cuda::StreamCtx &aStreamCtx)
     requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>) &&
             (vector_active_size_v<T> == 3)
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aDst);
 
     InvokeColorToGraySrc<Vector4A<remove_vector_t<T>>>(
-        aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
-        aDst0.PointerRoi(), aDst0.Pitch(), aWeights, aSrc0.SizeRoi(), aStreamCtx);
+        aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(),
+        aDst.PointerRoi(), aDst.Pitch(), aWeights, aSrc1.SizeRoi(), aStreamCtx);
+    return aDst;
 }
 
 template <PixelType T>
-void ImageView<T>::ColorToGray(const ImageView<Vector1<remove_vector_t<T>>> &aSrc0,
-                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
-                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
-                               const ImageView<Vector1<remove_vector_t<T>>> &aSrc3,
-                               ImageView<Vector1<remove_vector_t<T>>> &aDst0,
-                               const same_vector_size_different_type_t<T, float> &aWeights,
-                               const mpp::cuda::StreamCtx &aStreamCtx)
+ImageView<Vector1<remove_vector_t<T>>> &ImageView<T>::ColorToGray(
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc1, const ImageView<Vector1<remove_vector_t<T>>> &aSrc2,
+    const ImageView<Vector1<remove_vector_t<T>>> &aSrc3, const ImageView<Vector1<remove_vector_t<T>>> &aSrc4,
+    ImageView<Vector1<remove_vector_t<T>>> &aDst, const same_vector_size_different_type_t<T, float> &aWeights,
+    const mpp::cuda::StreamCtx &aStreamCtx)
     requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
              std::same_as<short, remove_vector_t<T>> || std::same_as<HalfFp16, remove_vector_t<T>> ||
              std::same_as<float, remove_vector_t<T>>) &&
             (vector_active_size_v<T> == 4)
 {
-    checkSameSize(aSrc0.ROI(), aSrc1.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc2.ROI());
-    checkSameSize(aSrc0.ROI(), aSrc3.ROI());
-    checkSameSize(aSrc0.ROI(), aDst0.ROI());
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst);
+    checkSameSize(aSrc1, aSrc2);
+    checkSameSize(aSrc1, aSrc3);
+    checkSameSize(aSrc1, aSrc4);
+    checkSameSize(aSrc1, aDst);
 
     InvokeColorToGraySrc<Vector4<remove_vector_t<T>>>(
-        aSrc0.PointerRoi(), aSrc0.Pitch(), aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(),
-        aSrc3.PointerRoi(), aSrc3.Pitch(), aDst0.PointerRoi(), aDst0.Pitch(), aWeights, aSrc0.SizeRoi(), aStreamCtx);
+        aSrc1.PointerRoi(), aSrc1.Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aSrc3.PointerRoi(), aSrc3.Pitch(),
+        aSrc4.PointerRoi(), aSrc4.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aWeights, aSrc1.SizeRoi(), aStreamCtx);
+    return aDst;
 }
 
 #pragma endregion
@@ -4295,8 +5169,10 @@ ImageView<Vector3<remove_vector_t<T>>> &ImageView<T>::CFAToRGB(ImageView<Vector3
              std::same_as<Pixel16sC1, T> || std::same_as<Pixel32sC1, T> || std::same_as<Pixel16bfC1, T> ||
              std::same_as<Pixel16fC1, T> || std::same_as<Pixel32fC1, T>)
 {
+    validateImage(*this);
+    validateImage(aDst);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
-    checkSameSize(ROI(), aDst.ROI());
+    checkSameSize(*this, aDst);
     if (WidthRoi() % 2 != 0 || HeightRoi() % 2 != 0)
     {
         throw INVALIDARGUMENT(ROI, "The image ROI must have even width and height, but is: " << SizeRoi());
@@ -4320,8 +5196,10 @@ ImageView<Vector4<remove_vector_t<T>>> &ImageView<T>::CFAToRGB(ImageView<Vector4
              std::same_as<Pixel16sC1, T> || std::same_as<Pixel32sC1, T> || std::same_as<Pixel16bfC1, T> ||
              std::same_as<Pixel16fC1, T> || std::same_as<Pixel32fC1, T>)
 {
+    validateImage(*this);
+    validateImage(aDst);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
-    checkSameSize(ROI(), aDst.ROI());
+    checkSameSize(*this, aDst);
     if (WidthRoi() % 2 != 0 || HeightRoi() % 2 != 0)
     {
         throw INVALIDARGUMENT(ROI, "The image ROI must have even width and height, but is: " << SizeRoi());
@@ -4368,7 +5246,9 @@ ImageView<Vector1<remove_vector_t<T>>> &ImageView<T>::RGBToCFA(ImageView<Vector1
              std::same_as<HalfFp16, remove_vector_t<T>> || std::same_as<float, remove_vector_t<T>>) &&
             (vector_active_size_v<T> == 3)
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
     if (WidthRoi() % 2 != 0 || HeightRoi() % 2 != 0)
     {
         throw INVALIDARGUMENT(ROI, "The image ROI must have even width and height, but is: " << SizeRoi());
@@ -4388,6 +5268,9 @@ void ImageView<T>::LUTToPalette(const int *aLevels, const int *aValues, int aLUT
     requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, short> ||
              std::same_as<remove_vector_t<T>, ushort>)
 {
+    checkNullptr(aLevels);
+    checkNullptr(aValues);
+    checkNullptr(aPalette);
     switch (aInterpolationMode)
     {
         case mpp::InterpolationMode::NearestNeighbor:
@@ -4416,6 +5299,9 @@ void ImageView<T>::LUTToPalette(const mpp::cuda::DevVarView<int> &aLevels, const
     requires(std::same_as<remove_vector_t<T>, byte> || std::same_as<remove_vector_t<T>, short> ||
              std::same_as<remove_vector_t<T>, ushort>)
 {
+    checkNullptr(aLevels);
+    checkNullptr(aValues);
+    checkNullptr(aPalette);
     if (aLevels.Size() != aValues.Size())
     {
         throw INVALIDARGUMENT(aLevels aValues, "aLevels and aValues must have the same size, but sizes are: "
@@ -4436,7 +5322,10 @@ ImageView<T> &ImageView<T>::LUTPalette(ImageView<T> &aDst, const mpp::cuda::DevV
              std::same_as<remove_vector_t<T>, ushort>) &&
             (vector_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aPalette);
+    checkSameSize(*this, aDst);
 
     if constexpr (std::same_as<Pixel16sC1, T>)
     {
@@ -4465,6 +5354,8 @@ ImageView<T> &ImageView<T>::LUTPalette(const mpp::cuda::DevVarView<T> &aPalette,
                                        const mpp::cuda::StreamCtx &aStreamCtx)
     requires(std::same_as<Pixel8uC1, T> || std::same_as<Pixel16sC1, T> || std::same_as<Pixel16uC1, T>)
 {
+    validateImage(*this);
+    checkNullptr(aPalette);
     if constexpr (std::same_as<Pixel16sC1, T>)
     {
         if (aBitSize != 16)
@@ -4492,7 +5383,10 @@ ImageView<Vector3<remove_vector_t<T>>> &ImageView<T>::LUTPalette(
     int aBitSize, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<Pixel8uC1, T> || std::same_as<Pixel16sC1, T> || std::same_as<Pixel16uC1, T>)
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aPalette);
+    checkSameSize(*this, aDst);
 
     if constexpr (std::same_as<Pixel16sC1, T>)
     {
@@ -4522,7 +5416,10 @@ ImageView<Vector3<remove_vector_t<T>>> &ImageView<T>::LUTPalette(
     int aBitSize, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<Pixel8uC1, T> || std::same_as<Pixel16sC1, T> || std::same_as<Pixel16uC1, T>)
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aPalette);
+    checkSameSize(*this, aDst);
 
     if constexpr (std::same_as<Pixel16sC1, T>)
     {
@@ -4552,7 +5449,10 @@ ImageView<Vector4A<remove_vector_t<T>>> &ImageView<T>::LUTPalette(
     int aBitSize, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<Pixel8uC1, T> || std::same_as<Pixel16sC1, T> || std::same_as<Pixel16uC1, T>)
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aPalette);
+    checkSameSize(*this, aDst);
 
     if constexpr (std::same_as<Pixel16sC1, T>)
     {
@@ -4582,7 +5482,10 @@ ImageView<Vector4A<remove_vector_t<T>>> &ImageView<T>::LUTPalette(
     int aBitSize, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<Pixel8uC1, T> || std::same_as<Pixel16sC1, T> || std::same_as<Pixel16uC1, T>)
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aPalette);
+    checkSameSize(*this, aDst);
 
     if constexpr (std::same_as<Pixel16sC1, T>)
     {
@@ -4612,7 +5515,10 @@ ImageView<Vector4<remove_vector_t<T>>> &ImageView<T>::LUTPalette(
     int aBitSize, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<Pixel8uC1, T> || std::same_as<Pixel16sC1, T> || std::same_as<Pixel16uC1, T>)
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aPalette);
+    checkSameSize(*this, aDst);
 
     if constexpr (std::same_as<Pixel16sC1, T>)
     {
@@ -4644,7 +5550,10 @@ ImageView<T> &ImageView<T>::LUTPalette(
              std::same_as<remove_vector_t<T>, ushort>) &&
             (vector_active_size_v<T> >= 2)
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aPalette[0]);
+    checkSameSize(*this, aDst);
 
     if constexpr (std::same_as<Pixel16sC1, T>)
     {
@@ -4664,6 +5573,7 @@ ImageView<T> &ImageView<T>::LUTPalette(
 
     if constexpr (vector_active_size_v<T> == 2)
     {
+        checkNullptr(aPalette[1]);
         const std::array<const Vector1<remove_vector_t<T>> *, vector_active_size_v<T>> palette = {
             aPalette[0].Pointer(), aPalette[1].Pointer()};
 
@@ -4672,6 +5582,7 @@ ImageView<T> &ImageView<T>::LUTPalette(
     }
     else if constexpr (vector_active_size_v<T> == 3)
     {
+        checkNullptr(aPalette[2]);
         const std::array<const Vector1<remove_vector_t<T>> *, vector_active_size_v<T>> palette = {
             aPalette[0].Pointer(), aPalette[1].Pointer(), aPalette[2].Pointer()};
 
@@ -4680,6 +5591,7 @@ ImageView<T> &ImageView<T>::LUTPalette(
     }
     else
     {
+        checkNullptr(aPalette[3]);
         const std::array<const Vector1<remove_vector_t<T>> *, vector_active_size_v<T>> palette = {
             aPalette[0].Pointer(), aPalette[1].Pointer(), aPalette[2].Pointer(), aPalette[3].Pointer()};
 
@@ -4698,6 +5610,8 @@ ImageView<T> &ImageView<T>::LUTPalette(
              std::same_as<remove_vector_t<T>, ushort>) &&
             (vector_active_size_v<T> >= 2)
 {
+    validateImage(*this);
+    checkNullptr(aPalette[0]);
     if constexpr (std::same_as<Pixel16sC1, T>)
     {
         if (aBitSize != 16)
@@ -4716,6 +5630,7 @@ ImageView<T> &ImageView<T>::LUTPalette(
 
     if constexpr (vector_active_size_v<T> == 2)
     {
+        checkNullptr(aPalette[1]);
         const std::array<const Vector1<remove_vector_t<T>> *, vector_active_size_v<T>> palette = {
             aPalette[0].Pointer(), aPalette[1].Pointer()};
 
@@ -4723,6 +5638,7 @@ ImageView<T> &ImageView<T>::LUTPalette(
     }
     else if constexpr (vector_active_size_v<T> == 3)
     {
+        checkNullptr(aPalette[2]);
         const std::array<const Vector1<remove_vector_t<T>> *, vector_active_size_v<T>> palette = {
             aPalette[0].Pointer(), aPalette[1].Pointer(), aPalette[2].Pointer()};
 
@@ -4730,6 +5646,7 @@ ImageView<T> &ImageView<T>::LUTPalette(
     }
     else
     {
+        checkNullptr(aPalette[3]);
         const std::array<const Vector1<remove_vector_t<T>> *, vector_active_size_v<T>> palette = {
             aPalette[0].Pointer(), aPalette[1].Pointer(), aPalette[2].Pointer(), aPalette[3].Pointer()};
 
@@ -4745,7 +5662,10 @@ ImageView<Pixel8uC1> &ImageView<T>::LUTPalette(ImageView<Pixel8uC1> &aDst,
                                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<Pixel16uC1, T>)
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aPalette);
+    checkSameSize(*this, aDst);
 
     if (aBitSize < 1 || aBitSize > static_cast<int>(8 * sizeof(remove_vector_t<T>)))
     {
@@ -4765,7 +5685,10 @@ ImageView<Pixel8uC3> &ImageView<T>::LUTPalette(ImageView<Pixel8uC3> &aDst,
                                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<Pixel16uC1, T>)
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aPalette);
+    checkSameSize(*this, aDst);
 
     if (aBitSize < 1 || aBitSize > static_cast<int>(8 * sizeof(remove_vector_t<T>)))
     {
@@ -4785,7 +5708,10 @@ ImageView<Pixel8uC4> &ImageView<T>::LUTPalette(ImageView<Pixel8uC4> &aDst,
                                                const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<Pixel16uC1, T>)
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aPalette);
+    checkSameSize(*this, aDst);
 
     if (aBitSize < 1 || aBitSize > static_cast<int>(8 * sizeof(remove_vector_t<T>)))
     {
@@ -4805,7 +5731,10 @@ ImageView<Pixel8uC4A> &ImageView<T>::LUTPalette(ImageView<Pixel8uC4A> &aDst,
                                                 const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<Pixel16uC1, T>)
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aPalette);
+    checkSameSize(*this, aDst);
 
     if (aBitSize < 1 || aBitSize > static_cast<int>(8 * sizeof(remove_vector_t<T>)))
     {
@@ -4825,6 +5754,8 @@ template <PixelType T>
 void ImageView<T>::LUTAccelerator(const Pixel32fC1 *aLevels, int *aAccelerator, int aLUTSize, int aAcceleratorSize)
     requires RealFloatingPoint<remove_vector_t<T>> && (!std::same_as<remove_vector_t<T>, double>)
 {
+    checkNullptr(aLevels);
+    checkNullptr(aAccelerator);
     mpp::LUTAccelerator(reinterpret_cast<const float *>(aLevels), aLUTSize, aAccelerator, aAcceleratorSize);
 }
 
@@ -4836,6 +5767,8 @@ void ImageView<T>::LUTAccelerator(const mpp::cuda::DevVarView<Pixel32fC1> &aLeve
     const int lutSize         = static_cast<int>(aLevels.Size());
     const int acceleratorSize = static_cast<int>(aAccelerator.Size());
 
+    checkNullptr(aLevels);
+    checkNullptr(aAccelerator);
     InvokeLutAcceleratorKernelDefault(reinterpret_cast<const float *>(aLevels.Pointer()), lutSize,
                                       aAccelerator.Pointer(), acceleratorSize, aStreamCtx);
 }
@@ -4848,7 +5781,12 @@ ImageView<T> &ImageView<T>::LUT(ImageView<T> &aDst, const mpp::cuda::DevVarView<
     requires RealFloatingPoint<remove_vector_t<T>> && (!std::same_as<remove_vector_t<T>, double>) &&
              (vector_active_size_v<T> == 1)
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aLevels);
+    checkNullptr(aValues);
+    checkNullptr(aAccelerator);
+    checkSameSize(*this, aDst);
     if (aLevels.Size() != aValues.Size())
     {
         throw INVALIDARGUMENT(aLevels aValues, "aLevels and aValues must have the same size, but sizes are: "
@@ -4872,10 +5810,15 @@ ImageView<T> &ImageView<T>::LUT(ImageView<T> &aDst,
     requires RealFloatingPoint<remove_vector_t<T>> && (!std::same_as<remove_vector_t<T>, double>) &&
              (vector_active_size_v<T> > 1)
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     for (size_t channel = 0; channel < vector_active_size_v<T>; channel++)
     {
+        checkNullptr(aLevels[channel]);
+        checkNullptr(aValues[channel]);
+        checkNullptr(aAccelerator[channel]);
         if (aLevels[channel].Size() != aValues[channel].Size())
         {
             throw INVALIDARGUMENT(aLevels aValues, "aLevels and aValues must have the same size, but sizes for channel "
@@ -4947,6 +5890,10 @@ ImageView<T> &ImageView<T>::LUT(const mpp::cuda::DevVarView<Pixel32fC1> &aLevels
     requires RealFloatingPoint<remove_vector_t<T>> && (!std::same_as<remove_vector_t<T>, double>) &&
              (vector_active_size_v<T> == 1)
 {
+    checkNullptr(aLevels);
+    checkNullptr(aValues);
+    checkNullptr(aAccelerator);
+    validateImage(*this);
     if (aLevels.Size() != aValues.Size())
     {
         throw INVALIDARGUMENT(aLevels aValues, "aLevels and aValues must have the same size, but sizes are: "
@@ -4969,9 +5916,12 @@ ImageView<T> &ImageView<T>::LUT(const mpp::cuda::DevVarView<Pixel32fC1> aLevels[
     requires RealFloatingPoint<remove_vector_t<T>> && (!std::same_as<remove_vector_t<T>, double>) &&
              (vector_active_size_v<T> > 1)
 {
-
+    validateImage(*this);
     for (size_t channel = 0; channel < vector_active_size_v<T>; channel++)
     {
+        checkNullptr(aLevels[channel]);
+        checkNullptr(aValues[channel]);
+        checkNullptr(aAccelerator[channel]);
         if (aLevels[channel].Size() != aValues[channel].Size())
         {
             throw INVALIDARGUMENT(aLevels aValues, "aLevels and aValues must have the same size, but sizes for channel "
@@ -5048,7 +5998,10 @@ ImageView<T> &ImageView<T>::LUTTrilinear(ImageView<T> &aDst,
              std::same_as<short, remove_vector_t<T>> || std::same_as<float, remove_vector_t<T>>) &&
             (vector_active_size_v<T> >= 3)
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aLut3D);
+    checkSameSize(*this, aDst);
 
     InvokeLutTrilinearSrc(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aLut3D.Pointer(), aMinLevel,
                           aMaxLevel, aLutSize, SizeRoi(), aStreamCtx);
@@ -5066,7 +6019,10 @@ ImageView<T> &ImageView<T>::LUTTrilinear(ImageView<T> &aDst,
              std::same_as<short, remove_vector_t<T>> || std::same_as<float, remove_vector_t<T>>) &&
             (vector_active_size_v<T> >= 3)
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aLut3D);
+    checkSameSize(*this, aDst);
 
     InvokeLutTrilinearSrc(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aLut3D.Pointer(), aMinLevel,
                           aMaxLevel, aLutSize, SizeRoi(), aStreamCtx);
@@ -5083,6 +6039,8 @@ ImageView<T> &ImageView<T>::LUTTrilinear(const mpp::cuda::DevVarView<Vector3<rem
              std::same_as<short, remove_vector_t<T>> || std::same_as<float, remove_vector_t<T>>) &&
             (vector_active_size_v<T> >= 3)
 {
+    validateImage(*this);
+    checkNullptr(aLut3D);
     InvokeLutTrilinearInplace(PointerRoi(), Pitch(), aLut3D.Pointer(), aMinLevel, aMaxLevel, aLutSize, SizeRoi(),
                               aStreamCtx);
 
@@ -5098,6 +6056,8 @@ ImageView<T> &ImageView<T>::LUTTrilinear(const mpp::cuda::DevVarView<Vector4A<re
              std::same_as<short, remove_vector_t<T>> || std::same_as<float, remove_vector_t<T>>) &&
             (vector_active_size_v<T> >= 3)
 {
+    validateImage(*this);
+    checkNullptr(aLut3D);
     InvokeLutTrilinearInplace(PointerRoi(), Pitch(), aLut3D.Pointer(), aMinLevel, aMaxLevel, aLutSize, SizeRoi(),
                               aStreamCtx);
 

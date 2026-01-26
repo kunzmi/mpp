@@ -42,7 +42,12 @@ template <RealFloatingPoint T> class MPPEXPORT_COMMON AffineTransformation
     /// <summary>
     /// All values filled with aValues
     /// </summary>
-    explicit AffineTransformation(T aValues[mSize]) noexcept;
+    explicit AffineTransformation(const T aValues[mSize]) noexcept;
+
+    /// <summary>
+    /// All values filled with aValues
+    /// </summary>
+    explicit AffineTransformation(const T aValues[mRows][mCols]) noexcept;
 
     /// <summary>
     /// Creates a new AffineTransformation with the given entries:<para/>
@@ -51,24 +56,6 @@ template <RealFloatingPoint T> class MPPEXPORT_COMMON AffineTransformation
     ///   0,   0,   1
     /// </summary>
     AffineTransformation(T a00, T a01, T a02, T a10, T a11, T a12) noexcept;
-
-    /// <summary>
-    /// Estimates an affine transformation for three given points
-    /// </summary>
-    AffineTransformation(const std::pair<Vector2<T>, Vector2<T>> &aP0, const std::pair<Vector2<T>, Vector2<T>> &aP1,
-                         const std::pair<Vector2<T>, Vector2<T>> &aP2) noexcept;
-
-    /// <summary>
-    /// Estimates an affine transformation for a ROI and corresponding coordinates given as a Quad (fourth component is
-    /// ignored)
-    /// </summary>
-    AffineTransformation(const Roi &aRoi, const Quad<T> &aQuad) noexcept;
-
-    /// <summary>
-    /// Estimates an affine transformation from aSrcQuad to corresponding coordinates given in aDstQuad (fourth
-    /// component is ignored)
-    /// </summary>
-    AffineTransformation(const Quad<T> &aSrcQuad, const Quad<T> &aDstQuad) noexcept;
 
     ~AffineTransformation() = default;
 
@@ -83,6 +70,19 @@ template <RealFloatingPoint T> class MPPEXPORT_COMMON AffineTransformation
     AffineTransformation(AffineTransformation &&) noexcept                 = default;
     AffineTransformation &operator=(const AffineTransformation &) noexcept = default; // NOLINT
     AffineTransformation &operator=(AffineTransformation &&) noexcept      = default;
+
+    /// <summary>
+    /// Estimates an affine transformation for three given points
+    /// </summary>
+    static AffineTransformation FromPoints(const std::pair<Vector2<T>, Vector2<T>> &aP0,
+                                           const std::pair<Vector2<T>, Vector2<T>> &aP1,
+                                           const std::pair<Vector2<T>, Vector2<T>> &aP2);
+
+    /// <summary>
+    /// Estimates an affine transformation from aSrcQuad to corresponding coordinates given in aDstQuad (fourth
+    /// component is ignored)
+    /// </summary>
+    static AffineTransformation FromQuads(const Quad<T> &aSrcQuad, const Quad<T> &aDstQuad);
 
     bool operator==(const AffineTransformation &aOther) const;
     bool operator!=(const AffineTransformation &aOther) const;

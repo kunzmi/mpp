@@ -65,7 +65,7 @@ template <Number T> struct alignas(sizeof(T)) MPPEXPORT_COMMON Vector3
     /// <summary>
     /// Initializes vector to all components = [aVal[0], aVal[1], aVal[2]]
     /// </summary>
-    DEVICE_CODE constexpr explicit Vector3(T aVal[3]) // NOLINT
+    DEVICE_CODE constexpr explicit Vector3(const T aVal[3]) // NOLINT
         : x(aVal[0]), y(aVal[1]), z(aVal[2])
     {
     }

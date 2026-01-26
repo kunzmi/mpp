@@ -1,7 +1,6 @@
 #pragma once
 #include "imageView.h"
 #include <backends/cuda/cudaException.h>
-#include <backends/cuda/devVarView.h>
 #include <backends/cuda/image/geometryTransforms/geometryTransformsKernel.h>
 #include <backends/cuda/streamCtx.h>
 #include <common/bfloat16.h>
@@ -14,6 +13,7 @@
 #include <common/image/roi.h>
 #include <common/image/roiException.h>
 #include <common/image/size2D.h>
+#include <common/image/validateImage.h>
 #include <common/mpp_defs.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
@@ -277,6 +277,8 @@ ImageView<T> &ImageView<T>::WarpAffineBack(ImageView<T> &aDst, const AffineTrans
                                            InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                            const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
+    validateImage(*this);
+    validateImage(aDst);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -342,13 +344,17 @@ void ImageView<T>::WarpAffineBack(const ImageView<Vector1<remove_vector_t<T>>> &
                                   const mpp::cuda::StreamCtx &aStreamCtx)
     requires TwoChannel<T>
 {
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aDst1);
+    validateImage(aDst2);
     if (aSrc1.ROI() != aSrc2.ROI())
     {
         throw INVALIDARGUMENT(
             aSrc1 aSrc2,
             "All source images must have the same ROI defined with the same size and the same starting pixel.");
     }
-    checkSameSize(aDst1.ROI(), aDst2.ROI());
+    checkSameSize(aDst1, aDst2);
 
     const Size2D minSizeAllocSrc = Size2D::Min(aSrc1.SizeAlloc(), aSrc2.SizeAlloc());
 
@@ -422,14 +428,20 @@ void ImageView<T>::WarpAffineBack(
     BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires ThreeChannel<T>
 {
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI())
     {
         throw INVALIDARGUMENT(
             aSrc1 aSrc2 aSrc3,
             "All source images must have the same ROI defined with the same size and the same starting pixel.");
     }
-    checkSameSize(aDst1.ROI(), aDst2.ROI());
-    checkSameSize(aDst1.ROI(), aDst3.ROI());
+    checkSameSize(aDst1, aDst2);
+    checkSameSize(aDst1, aDst3);
 
     const Size2D minSizeAllocSrc = Size2D::Min(Size2D::Min(aSrc1.SizeAlloc(), aSrc2.SizeAlloc()), aSrc3.SizeAlloc());
 
@@ -506,15 +518,23 @@ void ImageView<T>::WarpAffineBack(
     BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T>
 {
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI() || aSrc1.ROI() != aSrc4.ROI())
     {
         throw INVALIDARGUMENT(
             aSrc1 aSrc2 aSrc3 aSrc4,
             "All source images must have the same ROI defined with the same size and the same starting pixel.");
     }
-    checkSameSize(aDst1.ROI(), aDst2.ROI());
-    checkSameSize(aDst1.ROI(), aDst3.ROI());
-    checkSameSize(aDst1.ROI(), aDst4.ROI());
+    checkSameSize(aDst1, aDst2);
+    checkSameSize(aDst1, aDst3);
+    checkSameSize(aDst1, aDst4);
 
     const Size2D minSizeAllocSrc = Size2D::Min(
         Size2D::Min(Size2D::Min(aSrc1.SizeAlloc(), aSrc2.SizeAlloc()), aSrc3.SizeAlloc()), aSrc4.SizeAlloc());
@@ -804,6 +824,8 @@ ImageView<T> &ImageView<T>::WarpPerspectiveBack(ImageView<T> &aDst,
                                                 BorderType aBorder, const Roi &aAllowedReadRoi,
                                                 const mpp::cuda::StreamCtx &aStreamCtx) const
 {
+    validateImage(*this);
+    validateImage(aDst);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
@@ -873,13 +895,17 @@ void ImageView<T>::WarpPerspectiveBack(const ImageView<Vector1<remove_vector_t<T
                                        const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires TwoChannel<T>
 {
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aDst1);
+    validateImage(aDst2);
     if (aSrc1.ROI() != aSrc2.ROI())
     {
         throw INVALIDARGUMENT(
             aSrc1 aSrc2,
             "All source images must have the same ROI defined with the same size and the same starting pixel.");
     }
-    checkSameSize(aDst1.ROI(), aDst2.ROI());
+    checkSameSize(aDst1, aDst2);
 
     const Size2D minSizeAllocSrc = Size2D::Min(aSrc1.SizeAlloc(), aSrc2.SizeAlloc());
 
@@ -949,14 +975,20 @@ void ImageView<T>::WarpPerspectiveBack(
     BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires ThreeChannel<T>
 {
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI())
     {
         throw INVALIDARGUMENT(
             aSrc1 aSrc2 aSrc3,
             "All source images must have the same ROI defined with the same size and the same starting pixel.");
     }
-    checkSameSize(aDst1.ROI(), aDst2.ROI());
-    checkSameSize(aDst1.ROI(), aDst3.ROI());
+    checkSameSize(aDst1, aDst2);
+    checkSameSize(aDst1, aDst3);
 
     const Size2D minSizeAllocSrc = Size2D::Min(Size2D::Min(aSrc1.SizeAlloc(), aSrc2.SizeAlloc()), aSrc3.SizeAlloc());
 
@@ -1033,15 +1065,23 @@ void ImageView<T>::WarpPerspectiveBack(
     BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T>
 {
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI() || aSrc1.ROI() != aSrc4.ROI())
     {
         throw INVALIDARGUMENT(
             aSrc1 aSrc2 aSrc3 aSrc4,
             "All source images must have the same ROI defined with the same size and the same starting pixel.");
     }
-    checkSameSize(aDst1.ROI(), aDst2.ROI());
-    checkSameSize(aDst1.ROI(), aDst3.ROI());
-    checkSameSize(aDst1.ROI(), aDst4.ROI());
+    checkSameSize(aDst1, aDst2);
+    checkSameSize(aDst1, aDst3);
+    checkSameSize(aDst1, aDst4);
 
     const Size2D minSizeAllocSrc = Size2D::Min(
         Size2D::Min(Size2D::Min(aSrc1.SizeAlloc(), aSrc2.SizeAlloc()), aSrc3.SizeAlloc()), aSrc4.SizeAlloc());
@@ -1568,6 +1608,8 @@ ImageView<T> &ImageView<T>::Resize(ImageView<T> &aDst, const Vector2<double> &aS
                                    InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                    const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
+    validateImage(*this);
+    validateImage(aDst);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     if (aScale.x <= 0 || aScale.y <= 0)
@@ -1601,13 +1643,17 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                           const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires TwoChannel<T>
 {
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aDst1);
+    validateImage(aDst2);
     if (aSrc1.ROI() != aSrc2.ROI())
     {
         throw INVALIDARGUMENT(
             aSrc1 aSrc2,
             "All source images must have the same ROI defined with the same size and the same starting pixel.");
     }
-    checkSameSize(aDst1.ROI(), aDst2.ROI());
+    checkSameSize(aDst1, aDst2);
 
     if (aScale.x <= 0 || aScale.y <= 0)
     {
@@ -1647,14 +1693,20 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                           BorderType aBorder, const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires ThreeChannel<T>
 {
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI())
     {
         throw INVALIDARGUMENT(
             aSrc1 aSrc2 aSrc3,
             "All source images must have the same ROI defined with the same size and the same starting pixel.");
     }
-    checkSameSize(aDst1.ROI(), aDst2.ROI());
-    checkSameSize(aDst1.ROI(), aDst3.ROI());
+    checkSameSize(aDst1, aDst2);
+    checkSameSize(aDst1, aDst3);
 
     if (aScale.x <= 0 || aScale.y <= 0)
     {
@@ -1699,15 +1751,23 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                           const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T>
 {
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI() || aSrc1.ROI() != aSrc4.ROI())
     {
         throw INVALIDARGUMENT(
             aSrc1 aSrc2 aSrc3 aSrc4,
             "All source images must have the same ROI defined with the same size and the same starting pixel.");
     }
-    checkSameSize(aDst1.ROI(), aDst2.ROI());
-    checkSameSize(aDst1.ROI(), aDst3.ROI());
-    checkSameSize(aDst1.ROI(), aDst4.ROI());
+    checkSameSize(aDst1, aDst2);
+    checkSameSize(aDst1, aDst3);
+    checkSameSize(aDst1, aDst4);
 
     if (aScale.x <= 0 || aScale.y <= 0)
     {
@@ -1749,7 +1809,7 @@ void ImageView<T>::Resize(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
 template <PixelType T>
 ImageView<T> &ImageView<T>::Mirror(ImageView<T> &aDst, MirrorAxis aAxis, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
-    checkSameSize(ROI(), aDst.ROI());
+    checkSameSize(*this, aDst);
 
     InvokeMirrorSrc(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aAxis, SizeRoi(), aStreamCtx);
 
@@ -1935,7 +1995,10 @@ ImageView<T> &ImageView<T>::Remap(ImageView<T> &aDst, const ImageView<Pixel32fC2
                                   InterpolationMode aInterpolation, const T &aConstant, BorderType aBorder,
                                   const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
-    checkSameSize(aDst.SizeRoi(), aCoordinateMap.SizeRoi());
+    validateImage(*this);
+    validateImage(aDst);
+    validateImage(aCoordinateMap);
+    checkSameSize(aDst, aCoordinateMap);
 
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
@@ -1958,14 +2021,19 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const mpp::cuda::StreamCtx &aStreamCtx)
     requires TwoChannel<T>
 {
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aCoordinateMap);
     if (aSrc1.ROI() != aSrc2.ROI())
     {
         throw INVALIDARGUMENT(
             aSrc1 aSrc2,
             "All source images must have the same ROI defined with the same size and the same starting pixel.");
     }
-    checkSameSize(aDst1.ROI(), aDst2.ROI());
-    checkSameSize(aDst1.SizeRoi(), aCoordinateMap.SizeRoi());
+    checkSameSize(aDst1, aDst2);
+    checkSameSize(aDst1, aCoordinateMap);
 
     const Size2D minSizeAllocSrc = Size2D::Min(aSrc1.SizeAlloc(), aSrc2.SizeAlloc());
 
@@ -1993,15 +2061,22 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires ThreeChannel<T>
 {
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aCoordinateMap);
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI())
     {
         throw INVALIDARGUMENT(
             aSrc1 aSrc2 aSrc3,
             "All source images must have the same ROI defined with the same size and the same starting pixel.");
     }
-    checkSameSize(aDst1.ROI(), aDst2.ROI());
-    checkSameSize(aDst1.ROI(), aDst3.ROI());
-    checkSameSize(aDst1.SizeRoi(), aCoordinateMap.SizeRoi());
+    checkSameSize(aDst1, aDst2);
+    checkSameSize(aDst1, aDst3);
+    checkSameSize(aDst1, aCoordinateMap);
 
     const Size2D minSizeAllocSrc = Size2D::Min(Size2D::Min(aSrc1.SizeAlloc(), aSrc2.SizeAlloc()), aSrc3.SizeAlloc());
 
@@ -2033,16 +2108,25 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T>
 {
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    validateImage(aCoordinateMap);
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI() || aSrc1.ROI() != aSrc4.ROI())
     {
         throw INVALIDARGUMENT(
             aSrc1 aSrc2 aSrc3 aSrc4,
             "All source images must have the same ROI defined with the same size and the same starting pixel.");
     }
-    checkSameSize(aDst1.ROI(), aDst2.ROI());
-    checkSameSize(aDst1.ROI(), aDst3.ROI());
-    checkSameSize(aDst1.ROI(), aDst4.ROI());
-    checkSameSize(aDst1.SizeRoi(), aCoordinateMap.SizeRoi());
+    checkSameSize(aDst1, aDst2);
+    checkSameSize(aDst1, aDst3);
+    checkSameSize(aDst1, aDst4);
+    checkSameSize(aDst1, aCoordinateMap);
 
     const Size2D minSizeAllocSrc = Size2D::Min(
         Size2D::Min(Size2D::Min(aSrc1.SizeAlloc(), aSrc2.SizeAlloc()), aSrc3.SizeAlloc()), aSrc4.SizeAlloc());
@@ -2245,8 +2329,12 @@ ImageView<T> &ImageView<T>::Remap(ImageView<T> &aDst, const ImageView<Pixel32fC1
                                   const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi,
                                   const mpp::cuda::StreamCtx &aStreamCtx) const
 {
-    checkSameSize(aDst.SizeRoi(), aCoordinateMapX.SizeRoi());
-    checkSameSize(aDst.SizeRoi(), aCoordinateMapY.SizeRoi());
+    validateImage(*this);
+    validateImage(aDst);
+    validateImage(aCoordinateMapX);
+    validateImage(aCoordinateMapY);
+    checkSameSize(aDst, aCoordinateMapX);
+    checkSameSize(aDst, aCoordinateMapY);
 
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
@@ -2269,15 +2357,21 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires TwoChannel<T>
 {
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aCoordinateMapX);
+    validateImage(aCoordinateMapY);
     if (aSrc1.ROI() != aSrc2.ROI())
     {
         throw INVALIDARGUMENT(
             aSrc1 aSrc2,
             "All source images must have the same ROI defined with the same size and the same starting pixel.");
     }
-    checkSameSize(aDst1.ROI(), aDst2.ROI());
-    checkSameSize(aDst1.SizeRoi(), aCoordinateMapX.SizeRoi());
-    checkSameSize(aDst1.SizeRoi(), aCoordinateMapY.SizeRoi());
+    checkSameSize(aDst1, aDst2);
+    checkSameSize(aDst1, aCoordinateMapX);
+    checkSameSize(aDst1, aCoordinateMapY);
 
     const Size2D minSizeAllocSrc = Size2D::Min(aSrc1.SizeAlloc(), aSrc2.SizeAlloc());
 
@@ -2306,16 +2400,24 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const mpp::cuda::StreamCtx &aStreamCtx)
     requires ThreeChannel<T>
 {
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aCoordinateMapX);
+    validateImage(aCoordinateMapY);
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI())
     {
         throw INVALIDARGUMENT(
             aSrc1 aSrc2 aSrc3,
             "All source images must have the same ROI defined with the same size and the same starting pixel.");
     }
-    checkSameSize(aDst1.ROI(), aDst2.ROI());
-    checkSameSize(aDst1.ROI(), aDst3.ROI());
-    checkSameSize(aDst1.SizeRoi(), aCoordinateMapX.SizeRoi());
-    checkSameSize(aDst1.SizeRoi(), aCoordinateMapY.SizeRoi());
+    checkSameSize(aDst1, aDst2);
+    checkSameSize(aDst1, aDst3);
+    checkSameSize(aDst1, aCoordinateMapX);
+    checkSameSize(aDst1, aCoordinateMapY);
 
     const Size2D minSizeAllocSrc = Size2D::Min(Size2D::Min(aSrc1.SizeAlloc(), aSrc2.SizeAlloc()), aSrc3.SizeAlloc());
 
@@ -2348,17 +2450,27 @@ void ImageView<T>::Remap(const ImageView<Vector1<remove_vector_t<T>>> &aSrc1,
                          const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx)
     requires FourChannelNoAlpha<T>
 {
+    validateImage(aSrc1);
+    validateImage(aSrc2);
+    validateImage(aSrc3);
+    validateImage(aSrc4);
+    validateImage(aDst1);
+    validateImage(aDst2);
+    validateImage(aDst3);
+    validateImage(aDst4);
+    validateImage(aCoordinateMapX);
+    validateImage(aCoordinateMapY);
     if (aSrc1.ROI() != aSrc2.ROI() || aSrc1.ROI() != aSrc3.ROI() || aSrc1.ROI() != aSrc4.ROI())
     {
         throw INVALIDARGUMENT(
             aSrc1 aSrc2 aSrc3 aSrc4,
             "All source images must have the same ROI defined with the same size and the same starting pixel.");
     }
-    checkSameSize(aDst1.ROI(), aDst2.ROI());
-    checkSameSize(aDst1.ROI(), aDst3.ROI());
-    checkSameSize(aDst1.ROI(), aDst4.ROI());
-    checkSameSize(aDst1.SizeRoi(), aCoordinateMapX.SizeRoi());
-    checkSameSize(aDst1.SizeRoi(), aCoordinateMapY.SizeRoi());
+    checkSameSize(aDst1, aDst2);
+    checkSameSize(aDst1, aDst3);
+    checkSameSize(aDst1, aDst4);
+    checkSameSize(aDst1, aCoordinateMapX);
+    checkSameSize(aDst1, aCoordinateMapY);
 
     const Size2D minSizeAllocSrc = Size2D::Min(
         Size2D::Min(Size2D::Min(aSrc1.SizeAlloc(), aSrc2.SizeAlloc()), aSrc3.SizeAlloc()), aSrc4.SizeAlloc());

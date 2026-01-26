@@ -5,7 +5,7 @@
 #include "roi.h"
 #include <algorithm>
 #include <cassert>
-#include <common/exception.h>
+#include <common/image/matrixException.h>
 #include <common/image/solve.h>
 #include <common/numberTypes.h>
 #include <common/safeCast.h>
@@ -29,35 +29,14 @@ template <RealFloatingPoint T> constexpr size_t Matrix<T>::GetIndex(int aRow, in
     return to_size_t(aCol + aRow * mCols);
 }
 
-// template <RealFloatingPoint T> Matrix<T>::Matrix() noexcept : mData()
-//{
-//     mData[0] = T(1);
-//     mData[4] = T(1);
-//     mData[8] = T(1);
-//     mData[1] = T(0);
-//     mData[2] = T(0);
-//     mData[3] = T(0);
-//     mData[5] = T(0);
-//     mData[6] = T(0);
-//     mData[7] = T(0);
-// }
-
-// template <RealFloatingPoint T> Matrix<T>::Matrix(T aX) noexcept : mData()
-//{
-//     mData[0] = aX;
-//     mData[1] = aX;
-//     mData[2] = aX;
-//     mData[3] = aX;
-//     mData[4] = aX;
-//     mData[5] = aX;
-//     mData[6] = aX;
-//     mData[7] = aX;
-//     mData[8] = aX;
-// }
-
-template <RealFloatingPoint T> Matrix<T>::Matrix(T aValues[mSize]) noexcept : mData()
+template <RealFloatingPoint T> Matrix<T>::Matrix(const T aValues[mSize]) noexcept : mData()
 {
     std::copy(aValues, aValues + mSize, mData);
+}
+
+template <RealFloatingPoint T> Matrix<T>::Matrix(const T aValues[mRows][mCols]) noexcept : mData()
+{
+    std::copy(reinterpret_cast<const T *>(aValues), reinterpret_cast<const T *>(aValues) + mSize, mData);
 }
 
 template <RealFloatingPoint T> Matrix<T>::Matrix(const AffineTransformation<T> &aAffine) noexcept : mData()
@@ -73,150 +52,98 @@ template <RealFloatingPoint T> Matrix<T>::Matrix(const AffineTransformation<T> &
     mData[8] = T(1);
 }
 
-// template <RealFloatingPoint T>
-// Matrix<T>::Matrix(T a00, T a01, T a02, T a10, T a11, T a12, T a20, T a21, T a22) noexcept : mData() // NOLINT
-//{
-//     mData[GetIndex(0, 0)] = a00;
-//     mData[GetIndex(0, 1)] = a01;
-//     mData[GetIndex(0, 2)] = a02;
-//     mData[GetIndex(1, 0)] = a10;
-//     mData[GetIndex(1, 1)] = a11;
-//     mData[GetIndex(1, 2)] = a12;
-//     mData[GetIndex(2, 0)] = a20;
-//     mData[GetIndex(2, 1)] = a21;
-//     mData[GetIndex(2, 2)] = a22;
-// }
-
 template <RealFloatingPoint T>
-Matrix<T>::Matrix(const std::pair<Vector2<T>, Vector2<T>> &aP0, const std::pair<Vector2<T>, Vector2<T>> &aP1,
-                  const std::pair<Vector2<T>, Vector2<T>> &aP2, const std::pair<Vector2<T>, Vector2<T>> &aP3) noexcept
-    : mData()
+Matrix<T> Matrix<T>::FromPoints(const std::pair<Vector2<T>, Vector2<T>> &aP0,
+                                const std::pair<Vector2<T>, Vector2<T>> &aP1,
+                                const std::pair<Vector2<T>, Vector2<T>> &aP2,
+                                const std::pair<Vector2<T>, Vector2<T>> &aP3)
 {
-    bool ok = false;
-    try
+    const Vector2<T> xy0 = aP0.first;
+    const Vector2<T> xy1 = aP1.first;
+    const Vector2<T> xy2 = aP2.first;
+    const Vector2<T> xy3 = aP3.first;
+
+    const Vector2<T> uv0 = aP0.second;
+    const Vector2<T> uv1 = aP1.second;
+    const Vector2<T> uv2 = aP2.second;
+    const Vector2<T> uv3 = aP3.second;
+
+    /*
+     * Coefficients are calculated by solving linear system:
+     * / x0 y0  1  0  0  0 -x0*u0 -y0*u0 \ /c00\ /u0\
+     * | x1 y1  1  0  0  0 -x1*u1 -y1*u1 | |c01| |u1|
+     * | x2 y2  1  0  0  0 -x2*u2 -y2*u2 | |c02| |u2|
+     * | x3 y3  1  0  0  0 -x3*u3 -y3*u3 |.|c10|=|u3|,
+     * |  0  0  0 x0 y0  1 -x0*v0 -y0*v0 | |c11| |v0|
+     * |  0  0  0 x1 y1  1 -x1*v1 -y1*v1 | |c12| |v1|
+     * |  0  0  0 x2 y2  1 -x2*v2 -y2*v2 | |c20| |v2|
+     * \  0  0  0 x3 y3  1 -x3*v3 -y3*v3 / \c21/ \v3/
+     */
+    std::vector<T> matrix = {
+        xy0.x, xy0.y, 1, 0,     0,     0, -xy0.x * uv0.x, -xy0.y * uv0.x, uv0.x, //
+        xy1.x, xy1.y, 1, 0,     0,     0, -xy1.x * uv1.x, -xy1.y * uv1.x, uv1.x, //
+        xy2.x, xy2.y, 1, 0,     0,     0, -xy2.x * uv2.x, -xy2.y * uv2.x, uv2.x, //
+        xy3.x, xy3.y, 1, 0,     0,     0, -xy3.x * uv3.x, -xy3.y * uv3.x, uv3.x, //
+        0,     0,     0, xy0.x, xy0.y, 1, -xy0.x * uv0.y, -xy0.y * uv0.y, uv0.y, //
+        0,     0,     0, xy1.x, xy1.y, 1, -xy1.x * uv1.y, -xy1.y * uv1.y, uv1.y, //
+        0,     0,     0, xy2.x, xy2.y, 1, -xy2.x * uv2.y, -xy2.y * uv2.y, uv2.y, //
+        0,     0,     0, xy3.x, xy3.y, 1, -xy3.x * uv3.y, -xy3.y * uv3.y, uv3.y  //
+    };
+
+    Matrix<T> ret;
+    if (!solve(matrix.data(), ret.mData, 8))
     {
-        const Vector2<T> xy0 = aP0.first;
-        const Vector2<T> xy1 = aP1.first;
-        const Vector2<T> xy2 = aP2.first;
-        const Vector2<T> xy3 = aP3.first;
-
-        const Vector2<T> uv0 = aP0.second;
-        const Vector2<T> uv1 = aP1.second;
-        const Vector2<T> uv2 = aP2.second;
-        const Vector2<T> uv3 = aP3.second;
-
-        /*
-         * Coefficients are calculated by solving linear system:
-         * / x0 y0  1  0  0  0 -x0*u0 -y0*u0 \ /c00\ /u0\
-         * | x1 y1  1  0  0  0 -x1*u1 -y1*u1 | |c01| |u1|
-         * | x2 y2  1  0  0  0 -x2*u2 -y2*u2 | |c02| |u2|
-         * | x3 y3  1  0  0  0 -x3*u3 -y3*u3 |.|c10|=|u3|,
-         * |  0  0  0 x0 y0  1 -x0*v0 -y0*v0 | |c11| |v0|
-         * |  0  0  0 x1 y1  1 -x1*v1 -y1*v1 | |c12| |v1|
-         * |  0  0  0 x2 y2  1 -x2*v2 -y2*v2 | |c20| |v2|
-         * \  0  0  0 x3 y3  1 -x3*v3 -y3*v3 / \c21/ \v3/
-         */
-        std::vector<T> matrix = {
-            xy0.x, xy0.y, 1, 0,     0,     0, -xy0.x * uv0.x, -xy0.y * uv0.x, uv0.x, //
-            xy1.x, xy1.y, 1, 0,     0,     0, -xy1.x * uv1.x, -xy1.y * uv1.x, uv1.x, //
-            xy2.x, xy2.y, 1, 0,     0,     0, -xy2.x * uv2.x, -xy2.y * uv2.x, uv2.x, //
-            xy3.x, xy3.y, 1, 0,     0,     0, -xy3.x * uv3.x, -xy3.y * uv3.x, uv3.x, //
-            0,     0,     0, xy0.x, xy0.y, 1, -xy0.x * uv0.y, -xy0.y * uv0.y, uv0.y, //
-            0,     0,     0, xy1.x, xy1.y, 1, -xy1.x * uv1.y, -xy1.y * uv1.y, uv1.y, //
-            0,     0,     0, xy2.x, xy2.y, 1, -xy2.x * uv2.y, -xy2.y * uv2.y, uv2.y, //
-            0,     0,     0, xy3.x, xy3.y, 1, -xy3.x * uv3.y, -xy3.y * uv3.y, uv3.y  //
-        };
-
-        ok = solve(matrix.data(), mData, 8);
-    }
-    catch (...)
-    {
-        ok = false;
+        throw MATRIXEXCEPTION("Failed to solve linear system of equations.");
     }
 
     // the last matrix entry is not calculated and must be set to 1:
-    mData[8] = 1;
-
-    if (!ok) // failed to solve system of equation
-    {
-        // set to unit matrix
-        mData[0] = 1;
-        mData[4] = 1;
-        mData[8] = 1;
-        mData[1] = 0;
-        mData[2] = 0;
-        mData[3] = 0;
-        mData[5] = 0;
-        mData[6] = 0;
-        mData[7] = 0;
-    }
+    ret.mData[8] = 1;
+    return ret;
 }
 
-template <RealFloatingPoint T>
-Matrix<T>::Matrix(const Roi &aRoi, const Quad<T> &aQuad) noexcept : Matrix(Quad<T>(aRoi), aQuad)
+template <RealFloatingPoint T> Matrix<T> Matrix<T>::FromQuads(const Quad<T> &aSrcQuad, const Quad<T> &aDstQuad)
 {
-}
+    const Vector2<T> xy0 = aSrcQuad.P0;
+    const Vector2<T> xy1 = aSrcQuad.P1;
+    const Vector2<T> xy2 = aSrcQuad.P2;
+    const Vector2<T> xy3 = aSrcQuad.P3;
 
-template <RealFloatingPoint T> Matrix<T>::Matrix(const Quad<T> &aSrcQuad, const Quad<T> &aDstQuad) noexcept : mData()
-{
-    bool ok = false;
-    try
+    const Vector2<T> uv0 = aDstQuad.P0;
+    const Vector2<T> uv1 = aDstQuad.P1;
+    const Vector2<T> uv2 = aDstQuad.P2;
+    const Vector2<T> uv3 = aDstQuad.P3;
+
+    /*
+     * Coefficients are calculated by solving linear system:
+     * / x0 y0  1  0  0  0 -x0*u0 -y0*u0 \ /c00\ /u0\
+     * | x1 y1  1  0  0  0 -x1*u1 -y1*u1 | |c01| |u1|
+     * | x2 y2  1  0  0  0 -x2*u2 -y2*u2 | |c02| |u2|
+     * | x3 y3  1  0  0  0 -x3*u3 -y3*u3 |.|c10|=|u3|,
+     * |  0  0  0 x0 y0  1 -x0*v0 -y0*v0 | |c11| |v0|
+     * |  0  0  0 x1 y1  1 -x1*v1 -y1*v1 | |c12| |v1|
+     * |  0  0  0 x2 y2  1 -x2*v2 -y2*v2 | |c20| |v2|
+     * \  0  0  0 x3 y3  1 -x3*v3 -y3*v3 / \c21/ \v3/
+     */
+    std::vector<T> matrix = {
+        xy0.x, xy0.y, 1, 0,     0,     0, -xy0.x * uv0.x, -xy0.y * uv0.x, uv0.x, //
+        xy1.x, xy1.y, 1, 0,     0,     0, -xy1.x * uv1.x, -xy1.y * uv1.x, uv1.x, //
+        xy2.x, xy2.y, 1, 0,     0,     0, -xy2.x * uv2.x, -xy2.y * uv2.x, uv2.x, //
+        xy3.x, xy3.y, 1, 0,     0,     0, -xy3.x * uv3.x, -xy3.y * uv3.x, uv3.x, //
+        0,     0,     0, xy0.x, xy0.y, 1, -xy0.x * uv0.y, -xy0.y * uv0.y, uv0.y, //
+        0,     0,     0, xy1.x, xy1.y, 1, -xy1.x * uv1.y, -xy1.y * uv1.y, uv1.y, //
+        0,     0,     0, xy2.x, xy2.y, 1, -xy2.x * uv2.y, -xy2.y * uv2.y, uv2.y, //
+        0,     0,     0, xy3.x, xy3.y, 1, -xy3.x * uv3.y, -xy3.y * uv3.y, uv3.y  //
+    };
+
+    Matrix<T> ret;
+    if (!solve(matrix.data(), ret.mData, 8))
     {
-        const Vector2<T> xy0 = aSrcQuad.P0;
-        const Vector2<T> xy1 = aSrcQuad.P1;
-        const Vector2<T> xy2 = aSrcQuad.P2;
-        const Vector2<T> xy3 = aSrcQuad.P3;
-
-        const Vector2<T> uv0 = aDstQuad.P0;
-        const Vector2<T> uv1 = aDstQuad.P1;
-        const Vector2<T> uv2 = aDstQuad.P2;
-        const Vector2<T> uv3 = aDstQuad.P3;
-
-        /*
-         * Coefficients are calculated by solving linear system:
-         * / x0 y0  1  0  0  0 -x0*u0 -y0*u0 \ /c00\ /u0\
-         * | x1 y1  1  0  0  0 -x1*u1 -y1*u1 | |c01| |u1|
-         * | x2 y2  1  0  0  0 -x2*u2 -y2*u2 | |c02| |u2|
-         * | x3 y3  1  0  0  0 -x3*u3 -y3*u3 |.|c10|=|u3|,
-         * |  0  0  0 x0 y0  1 -x0*v0 -y0*v0 | |c11| |v0|
-         * |  0  0  0 x1 y1  1 -x1*v1 -y1*v1 | |c12| |v1|
-         * |  0  0  0 x2 y2  1 -x2*v2 -y2*v2 | |c20| |v2|
-         * \  0  0  0 x3 y3  1 -x3*v3 -y3*v3 / \c21/ \v3/
-         */
-        std::vector<T> matrix = {
-            xy0.x, xy0.y, 1, 0,     0,     0, -xy0.x * uv0.x, -xy0.y * uv0.x, uv0.x, //
-            xy1.x, xy1.y, 1, 0,     0,     0, -xy1.x * uv1.x, -xy1.y * uv1.x, uv1.x, //
-            xy2.x, xy2.y, 1, 0,     0,     0, -xy2.x * uv2.x, -xy2.y * uv2.x, uv2.x, //
-            xy3.x, xy3.y, 1, 0,     0,     0, -xy3.x * uv3.x, -xy3.y * uv3.x, uv3.x, //
-            0,     0,     0, xy0.x, xy0.y, 1, -xy0.x * uv0.y, -xy0.y * uv0.y, uv0.y, //
-            0,     0,     0, xy1.x, xy1.y, 1, -xy1.x * uv1.y, -xy1.y * uv1.y, uv1.y, //
-            0,     0,     0, xy2.x, xy2.y, 1, -xy2.x * uv2.y, -xy2.y * uv2.y, uv2.y, //
-            0,     0,     0, xy3.x, xy3.y, 1, -xy3.x * uv3.y, -xy3.y * uv3.y, uv3.y  //
-        };
-
-        ok = solve(matrix.data(), mData, 8);
-    }
-    catch (...)
-    {
-        ok = false;
+        throw MATRIXEXCEPTION("Failed to solve linear system of equations.");
     }
 
     // the last matrix entry is not calculated and must be set to 1:
-    mData[8] = 1;
-
-    if (!ok) // failed to solve system of equation
-    {
-        // set to unit matrix
-        mData[0] = 1;
-        mData[4] = 1;
-        mData[8] = 1;
-        mData[1] = 0;
-        mData[2] = 0;
-        mData[3] = 0;
-        mData[5] = 0;
-        mData[6] = 0;
-        mData[7] = 0;
-    }
+    ret.mData[8] = 1;
+    return ret;
 }
 
 // for conversion
@@ -262,24 +189,11 @@ template <RealFloatingPoint T> T &Matrix<T>::operator[](int aFlatIndex)
     return mData[to_size_t(aFlatIndex)]; // NOLINT
 }
 
-// template <RealFloatingPoint T> const T &Matrix<T>::operator[](int aFlatIndex) const
-//{
-//     assert(aFlatIndex >= 0);
-//     assert(aFlatIndex < mSize);
-//     return mData[to_size_t(aFlatIndex)]; // NOLINT
-// }
-
 template <RealFloatingPoint T> T &Matrix<T>::operator[](size_t aFlatIndex)
 {
     assert(to_int(aFlatIndex) < mSize);
     return mData[aFlatIndex]; // NOLINT
 }
-
-// template <RealFloatingPoint T> const T &Matrix<T>::operator[](size_t aFlatIndex) const
-//{
-//     assert(to_int(aFlatIndex) < mSize);
-//     return mData[aFlatIndex]; // NOLINT
-// }
 
 template <RealFloatingPoint T> const T *Matrix<T>::Data() const
 {
@@ -342,23 +256,6 @@ template <RealFloatingPoint T> Matrix<T> &Matrix<T>::operator*=(const Matrix &aO
     return *this;
 }
 
-// template <RealFloatingPoint T> Matrix<T> Matrix<T>::operator*(const Matrix &aOther) const
-//{
-//     Matrix ret;
-//
-//     ret[0] = mData[0] * aOther[0] + mData[1] * aOther[3] + mData[2] * aOther[6];
-//     ret[1] = mData[0] * aOther[1] + mData[1] * aOther[4] + mData[2] * aOther[7];
-//     ret[2] = mData[0] * aOther[2] + mData[1] * aOther[5] + mData[2] * aOther[8];
-//     ret[3] = mData[3] * aOther[0] + mData[4] * aOther[3] + mData[5] * aOther[6];
-//     ret[4] = mData[3] * aOther[1] + mData[4] * aOther[4] + mData[5] * aOther[7];
-//     ret[5] = mData[3] * aOther[2] + mData[4] * aOther[5] + mData[5] * aOther[8];
-//     ret[6] = mData[6] * aOther[0] + mData[7] * aOther[3] + mData[8] * aOther[6];
-//     ret[7] = mData[6] * aOther[1] + mData[7] * aOther[4] + mData[8] * aOther[7];
-//     ret[8] = mData[6] * aOther[2] + mData[7] * aOther[5] + mData[8] * aOther[8];
-//
-//     return ret;
-// }
-
 template <RealFloatingPoint T> Matrix<T> &Matrix<T>::operator/=(T aOther)
 {
     std::for_each(mData, mData + mSize, [&](auto &aN) { aN /= aOther; });
@@ -371,7 +268,7 @@ template <RealFloatingPoint T> Matrix<T> Matrix<T>::Inverse() const
 
     if (det == 0)
     {
-        throw EXCEPTION("Cannot compute Matrix inverse as determinant is 0.");
+        throw MATRIXEXCEPTION("Cannot compute Matrix inverse as determinant is 0.");
     }
 
     const T invdet = static_cast<T>(1) / det;

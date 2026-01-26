@@ -88,7 +88,12 @@ template <RealFloatingPoint T> class MPPEXPORT_COMMON Matrix4x4
     /// <summary>
     /// All values filled with aValues
     /// </summary>
-    explicit Matrix4x4(T aValues[mSize]) noexcept;
+    explicit Matrix4x4(const T aValues[mSize]) noexcept;
+
+    /// <summary>
+    /// All values filled with aValues
+    /// </summary>
+    explicit Matrix4x4(const T aValues[mRows][mCols]) noexcept;
 
     /// <summary>
     /// Creates a new matrix with the given entries:<para/>

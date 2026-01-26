@@ -21,19 +21,18 @@ namespace mpp::image::cuda
 
 #define InstantiateScaleAnyToInt_For(typeSrc, typeDst)                                                                 \
     template MPPEXPORT_CUDAI ImageView<typeDst> &ImageView<typeSrc>::Scale<typeDst>(                                   \
-        ImageView<typeDst> & aDst, complex_basetype_t<pixel_basetype_t<typeSrc>> aSrcMin,                              \
-        complex_basetype_t<pixel_basetype_t<typeSrc>> aSrcMax, RoundingMode aRoundingMode,                             \
-        const mpp::cuda::StreamCtx &aStreamCtx) const;
+        complex_basetype_t<pixel_basetype_t<typeSrc>> aSrcMin, complex_basetype_t<pixel_basetype_t<typeSrc>> aSrcMax,  \
+        ImageView<typeDst> & aDst, RoundingMode aRoundingMode, const mpp::cuda::StreamCtx &aStreamCtx) const;
 
 #define InstantiateScaleAnyToAny_For(typeSrc, typeDst)                                                                 \
     template MPPEXPORT_CUDAI ImageView<typeDst> &ImageView<typeSrc>::Scale<typeDst>(                                   \
-        ImageView<typeDst> & aDst, complex_basetype_t<pixel_basetype_t<typeSrc>> aSrcMin,                              \
-        complex_basetype_t<pixel_basetype_t<typeSrc>> aSrcMax, complex_basetype_t<pixel_basetype_t<typeDst>> aDstMin,  \
+        complex_basetype_t<pixel_basetype_t<typeSrc>> aSrcMin, complex_basetype_t<pixel_basetype_t<typeSrc>> aSrcMax,  \
+        ImageView<typeDst> & aDst, complex_basetype_t<pixel_basetype_t<typeDst>> aDstMin,                              \
         complex_basetype_t<pixel_basetype_t<typeDst>> aDstMax, const mpp::cuda::StreamCtx &aStreamCtx) const;
 
 #define InstantiateScaleAnyToAnyRound_For(typeSrc, typeDst)                                                            \
     template MPPEXPORT_CUDAI ImageView<typeDst> &ImageView<typeSrc>::Scale<typeDst>(                                   \
-        ImageView<typeDst> & aDst, scalefactor_t<typeSrc> aSrcMin, scalefactor_t<typeSrc> aSrcMax,                     \
+        scalefactor_t<typeSrc> aSrcMin, scalefactor_t<typeSrc> aSrcMax, ImageView<typeDst> & aDst,                     \
         scalefactor_t<typeDst> aDstMin, scalefactor_t<typeDst> aDstMax, RoundingMode aRoundingMode,                    \
         const mpp::cuda::StreamCtx &aStreamCtx) const;
 

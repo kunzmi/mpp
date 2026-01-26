@@ -94,4 +94,54 @@ InvalidArgumentException::InvalidArgumentException(const std::string &aArgumentN
 
     What() = ss.str();
 }
+
+NullPtrException::NullPtrException(const std::string &aArgumentName,
+                                   [[maybe_unused]] const std::filesystem::path &aCodeFileName,
+                                   [[maybe_unused]] int aLineNumber, [[maybe_unused]] const std::string &aFunctionName)
+{
+#ifdef NDEBUG
+    std::stringstream ss;
+    ss << "NullPtrException for argument: '" << aArgumentName << "'" << std::endl;
+#else
+#ifdef PROJECT_SOURCE_DIR
+    const std::filesystem::path src          = PROJECT_SOURCE_DIR;
+    const std::filesystem::path codeFileName = aCodeFileName.lexically_relative(src);
+#else
+    const std::filesystem::path codeFileName = aCodeFileName;
+#endif
+
+    std::stringstream ss;
+    ss << "Error in " << codeFileName.generic_string() << " in function " << aFunctionName << " @ " << aLineNumber
+       << std::endl
+       << "NullPtrException for argument: '" << aArgumentName << "'" << std::endl;
+#endif
+
+    What() = ss.str();
+}
+
+NullPtrException::NullPtrException(const std::string &aArgumentName, const std::string &aMessage,
+                                   [[maybe_unused]] const std::filesystem::path &aCodeFileName,
+                                   [[maybe_unused]] int aLineNumber, [[maybe_unused]] const std::string &aFunctionName)
+    : MPPException(aMessage)
+{
+#ifdef NDEBUG
+    std::stringstream ss;
+    ss << "NullPtrException for argument: '" << aArgumentName << "'" << std::endl << "Error message: " << aMessage;
+#else
+#ifdef PROJECT_SOURCE_DIR
+    const std::filesystem::path src          = PROJECT_SOURCE_DIR;
+    const std::filesystem::path codeFileName = aCodeFileName.lexically_relative(src);
+#else
+    const std::filesystem::path codeFileName = aCodeFileName;
+#endif
+
+    std::stringstream ss;
+    ss << "Error in " << codeFileName.generic_string() << " in function " << aFunctionName << " @ " << aLineNumber
+       << std::endl
+       << "NullPtrException for argument: '" << aArgumentName << "'" << std::endl
+       << "Error message: " << aMessage;
+#endif
+
+    What() = ss.str();
+}
 } // namespace mpp

@@ -6,8 +6,5 @@ namespace mpp::image::cuda
 {
 
 ForAllChannelsWithAlpha(32s);
-InstantiateInvokeAffineBackSrcP2ForGeomType(32s);
-InstantiateInvokeAffineBackSrcP3ForGeomType(32s);
-InstantiateInvokeAffineBackSrcP4ForGeomType(32s);
 
 } // namespace mpp::image::cuda

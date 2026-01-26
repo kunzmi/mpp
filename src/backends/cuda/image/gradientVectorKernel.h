@@ -6,6 +6,7 @@
 #include <common/image/fixedSizeFilters.h>
 #include <common/image/functors/borderControl.h>
 #include <common/image/gotoPtr.h>
+#include <common/image/pitchException.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -152,7 +153,7 @@ __global__ void gradientVectorKernel(BorderControlT aSrcWithBC, DstT *__restrict
                             res.value[t] = DstT(temp);
                         }
 
-                        Tupel<DstT, TupelSize>::StoreAligned(res, dstX);
+                        Tupel<DstT, TupelSize>::Store(res, dstX);
                     }
                     if (aDstY != nullptr)
                     {
@@ -171,7 +172,7 @@ __global__ void gradientVectorKernel(BorderControlT aSrcWithBC, DstT *__restrict
                             res.value[t] = DstT(temp);
                         }
 
-                        Tupel<DstT, TupelSize>::StoreAligned(res, dstY);
+                        Tupel<DstT, TupelSize>::Store(res, dstY);
                     }
                     if (aDstMag != nullptr)
                     {
@@ -208,7 +209,7 @@ __global__ void gradientVectorKernel(BorderControlT aSrcWithBC, DstT *__restrict
                             res.value[t] = DstT(temp);
                         }
 
-                        Tupel<DstT, TupelSize>::StoreAligned(res, dstMag);
+                        Tupel<DstT, TupelSize>::Store(res, dstMag);
                     }
                     if (aDstAngle != nullptr)
                     {
@@ -224,7 +225,7 @@ __global__ void gradientVectorKernel(BorderControlT aSrcWithBC, DstT *__restrict
                                 res.value[t] = atan2(gradientY[bl][t].x, gradientX[bl][t].x);
                             }
 
-                            Tupel<DstT, TupelSize>::StoreAligned(res, dstAngle);
+                            Tupel<DstT, TupelSize>::Store(res, dstAngle);
                         }
                         else
                         {
@@ -452,41 +453,6 @@ void InvokeGradientVectorKernel(const dim3 &aBlockSize, uint aSharedMemory, int 
 
     ThreadSplit<WarpAlignmentInBytes, TupelSize> ts(dst, aSize.x, aWarpSize);
 
-    if constexpr (TupelSize != 1)
-    {
-        ThreadSplit<WarpAlignmentInBytes, TupelSize> tsCheckX(aDstX, aSize.x, aWarpSize);
-        if (aDstX != nullptr && ts != tsCheckX)
-        {
-            throw INVALIDARGUMENT(
-                aDstX aDstY aDstMag,
-                "All destination images must fulfill the same byte-alignments in order to use tupeled memory access.");
-        }
-        ThreadSplit<WarpAlignmentInBytes, TupelSize> tsCheckY(aDstY, aSize.x, aWarpSize);
-        if (aDstY != nullptr && ts != tsCheckY)
-        {
-            throw INVALIDARGUMENT(
-                aDstX aDstY aDstMag,
-                "All destination images must fulfill the same byte-alignments in order to use tupeled memory access.");
-        }
-        ThreadSplit<WarpAlignmentInBytes, TupelSize> tsCheckMag(aDstMag, aSize.x, aWarpSize);
-        if (aDstMag != nullptr && ts != tsCheckMag)
-        {
-            throw INVALIDARGUMENT(
-                aDstX aDstY aDstMag,
-                "All destination images must fulfill the same byte-alignments in order to use tupeled memory access.");
-        }
-        if constexpr (std::same_as<DstT, Pixel32fC1>)
-        {
-            ThreadSplit<WarpAlignmentInBytes, TupelSize> tsCheckAng(aDstAngle, aSize.x, aWarpSize);
-            if (aDstAngle != nullptr && ts != tsCheckMag)
-            {
-                throw INVALIDARGUMENT(aDstX aDstY aDstMag aDstAngle,
-                                      "All destination images must fulfill the same "
-                                      "byte-alignments in order to use tupeled memory access.");
-            }
-        }
-    }
-
     dim3 blocksPerGrid(DIV_UP(ts.Total() / blockWidth, aBlockSize.x), DIV_UP(aSize.y / blockHeight, aBlockSize.y), 1);
 
     gradientVectorKernel<WarpAlignmentInBytes, TupelSize, ComputeT, DstT, kernelWidth, kernelHeight, kernelCenterX,
@@ -510,6 +476,12 @@ void InvokeGradientVectorKernelDefault(const BorderControlT &aSrcWithBC, DstT *a
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {
+        checkPitchIsMultiple(aPitchDstX, ConfigWarpAlignment<"Default">::value, TupelSize);
+        checkPitchIsMultiple(aPitchDstY, ConfigWarpAlignment<"Default">::value, TupelSize);
+        checkPitchIsMultiple(aPitchDstMag, ConfigWarpAlignment<"Default">::value, TupelSize);
+        checkPitchIsMultiple(aPitchDstAngle, ConfigWarpAlignment<"Default">::value, TupelSize);
+        checkPitchIsMultiple(aPitchDstCovariance, ConfigWarpAlignment<"Default">::value, TupelSize);
+
         dim3 BlockSize = ConfigBlockSize<"Default">::value;
 
         if (blockHeight > 1)

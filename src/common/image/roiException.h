@@ -2,6 +2,7 @@
 #include "../dllexport_common.h"
 #include <common/defines.h>
 #include <common/exception.h>
+#include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
 #include <filesystem>
 #include <iostream>
@@ -27,7 +28,15 @@ class MPPEXPORT_COMMON RoiException : public MPPException
     RoiException(const RoiException &)            = default;
     RoiException &operator=(const RoiException &) = delete;
     RoiException &operator=(RoiException &&)      = delete;
+
+    [[nodiscard]] ExceptionCode GetCode() const override
+    {
+        return ExceptionCode::Roi;
+    }
 };
+
+// forward declaration:
+template <PixelType T> class ImageViewBase;
 } // namespace mpp::image
 
 // NOLINTBEGIN --> function like macro, parantheses for "msg",
@@ -50,8 +59,8 @@ inline void __checkRoiIsInRoi(const mpp::image::Roi &aRoi1, const mpp::image::Ro
 /// <summary>
 /// Checks if both provided sizes are equal and throws a RoiException if not
 /// </summary>
-inline void __checkSameSize(const mpp::image::Size2D &aSize1, const mpp::image::Size2D &aSize2, const char *aCodeFile,
-                            int aLine, const char *aFunction)
+inline void __checkSameSize(const mpp::image::Size2D &aSize1, const mpp::image::Size2D &aSize2, const char * /*unused*/,
+                            const char * /*unused*/, const char *aCodeFile, int aLine, const char *aFunction)
 {
     if (aSize1 != aSize2)
     {
@@ -64,8 +73,8 @@ inline void __checkSameSize(const mpp::image::Size2D &aSize1, const mpp::image::
 /// <summary>
 /// Checks if both provided sizes are equal and throws a RoiException if not
 /// </summary>
-inline void __checkSameSize(const mpp::image::Roi &aRoi1, const mpp::image::Roi &aRoi2, const char *aCodeFile,
-                            int aLine, const char *aFunction)
+inline void __checkSameSize(const mpp::image::Roi &aRoi1, const mpp::image::Roi &aRoi2, const char * /*unused*/,
+                            const char * /*unused*/, const char *aCodeFile, int aLine, const char *aFunction)
 {
     if (aRoi1.Size() != aRoi2.Size())
     {
@@ -76,8 +85,26 @@ inline void __checkSameSize(const mpp::image::Roi &aRoi1, const mpp::image::Roi 
     }
 }
 
+/// <summary>
+/// Checks if both provided sizes are equal and throws a RoiException if not
+/// </summary>
+template <mpp::image::PixelType T, mpp::image::PixelType T2>
+void __checkSameSize(const mpp::image::ImageViewBase<T> &aSrc1, const mpp::image::ImageViewBase<T2> &aSrc2,
+                     const std::string &aNameSrc1, const std::string &aNameSrc2, const char *aCodeFile, int aLine,
+                     const char *aFunction)
+{
+    if (aSrc1.SizeRoi() != aSrc2.SizeRoi())
+    {
+        std::stringstream ss;
+        ss << "ROI sizes must be equal but for " << (aNameSrc1 == "*this" ? "first source image" : aNameSrc1) << " "
+           << aSrc1.ROI() << " and for " << aNameSrc2 << " " << aSrc2.ROI() << ".";
+        throw mpp::image::RoiException(ss.str(), aCodeFile, aLine, aFunction);
+    }
+}
+
 #define checkRoiIsInRoi(aRoi1, aRoi2) __checkRoiIsInRoi(aRoi1, aRoi2, __FILE__, __LINE__, __PRETTY_FUNCTION__)
-#define checkSameSize(aSize1, aSize2) __checkSameSize(aSize1, aSize2, __FILE__, __LINE__, __PRETTY_FUNCTION__)
+#define checkSameSize(aSize1, aSize2)                                                                                  \
+    __checkSameSize(aSize1, aSize2, #aSize1, #aSize2, __FILE__, __LINE__, __PRETTY_FUNCTION__)
 
 #define ROIEXCEPTION(msg)                                                                                              \
     (mpp::image::RoiException((std::ostringstream() << msg).str(), __FILE__, __LINE__, __PRETTY_FUNCTION__))

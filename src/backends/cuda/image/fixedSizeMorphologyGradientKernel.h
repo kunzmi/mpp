@@ -5,6 +5,7 @@
 #include <backends/cuda/streamCtx.h>
 #include <common/image/functors/borderControl.h>
 #include <common/image/gotoPtr.h>
+#include <common/image/pitchException.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -273,6 +274,8 @@ void InvokeFixedSizeMorphologyGradientKernelDefault(const BorderControlT &aSrcWi
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {
+        checkPitchIsMultiple(aPitchDst, ConfigWarpAlignment<"Default">::value, TupelSize);
+
         dim3 BlockSize = ConfigBlockSize<"Default">::value;
 
         if (blockHeight > 1)

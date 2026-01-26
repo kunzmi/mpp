@@ -5,7 +5,7 @@
 #include <common/numeric_limits.h>
 #include <concepts>
 #include <iostream>
-#ifdef IS_CUDA_COMPILER
+#ifdef IS_CUDA_COMPILER || ENABLE_CUDA_BFLOAT
 #include <cuda_bf16.h>
 #endif
 
@@ -77,6 +77,11 @@ class alignas(2) MPPEXPORT_COMMON BFloat16
     explicit constexpr BFloat16(double aVal) : value(FromFloat(static_cast<float>(aVal)).value)
     {
     }
+#ifdef ENABLE_CUDA_BFLOAT
+    constexpr BFloat16(__nv_bfloat16 aBFloat) : value(__nv_bfloat16_raw(aBFloat).x)
+    {
+    }
+#endif
 #endif
 #ifdef IS_CUDA_COMPILER
     DEVICE_CODE BFloat16(__nv_bfloat16 aBFloat);

@@ -57,7 +57,7 @@ template <Number T> struct alignas(4 * sizeof(T)) MPPEXPORT_COMMON Vector4A
     /// <summary>
     /// Initializes vector to all components = [aVal[0], aVal[1], aVal[2]], w remains unitialized
     /// </summary>
-    DEVICE_CODE constexpr explicit Vector4A(T aVal[3]) noexcept // NOLINT
+    DEVICE_CODE constexpr explicit Vector4A(const T aVal[3]) noexcept // NOLINT
         : x(aVal[0]), y(aVal[1]), z(aVal[2])
     {
     }

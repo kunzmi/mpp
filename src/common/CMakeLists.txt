@@ -4,6 +4,7 @@ add_subdirectory(image)
 add_library(common SHARED
 	bfloat16.cpp
 	complex.cpp
+	errorMessageSingleton.cpp
 	exception.cpp
 	half_fp16.cpp
 	scratchBufferException.cpp

@@ -12,11 +12,13 @@
 #include <common/defines.h>
 #include <common/exception.h>
 #include <common/half_fp16.h>
+#include <common/image/channelException.h>
 #include <common/image/functors/imageFunctors.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
 #include <common/image/roiException.h>
 #include <common/image/size2D.h>
+#include <common/image/validateImage.h>
 #include <common/mpp_defs.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
@@ -32,7 +34,9 @@ template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && ConversionImplemented<T, TTo>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeConvert(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), SizeRoi(), aStreamCtx);
 
@@ -45,7 +49,9 @@ ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundi
                                       const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && ConversionRoundImplemented<T, TTo>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeConvertRound(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aRoundingMode, SizeRoi(), aStreamCtx);
 
@@ -61,7 +67,9 @@ ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundi
             (!std::same_as<TTo, float>) && (!std::same_as<TTo, double>) && (!std::same_as<TTo, Complex<float>>) &&
             (!std::same_as<TTo, Complex<double>>)
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     if constexpr (std::same_as<complex_basetype_t<T>, float> &&
                   (std::same_as<complex_basetype_t<TTo>, HalfFp16> || std::same_as<complex_basetype_t<TTo>, BFloat16>))
@@ -91,7 +99,9 @@ ImageView<TTo> &ImageView<T>::Convert(ImageView<TTo> &aDst, RoundingMode aRoundi
 template <PixelType T>
 ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeCopy(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), SizeRoi(), aStreamCtx);
 
@@ -105,8 +115,11 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::CopyMasked(ImageView<T> &aDst, const ImageView<Pixel8uC1> &aMask,
                                        const mpp::cuda::StreamCtx &aStreamCtx) const
 {
-    checkSameSize(ROI(), aDst.ROI());
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    validateImage(aMask);
+    checkSameSize(*this, aDst);
+    checkSameSize(*this, aMask);
 
     InvokeCopyMask(aMask.PointerRoi(), aMask.Pitch(), PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), SizeRoi(),
                    aStreamCtx);
@@ -125,7 +138,11 @@ ImageView<TTo> &ImageView<T>::Copy(Channel aSrcChannel, ImageView<TTo> &aDst, Ch
             (vector_size_v<TTo> > 1) && //
             std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
+    checkChannelT(aSrcChannel, T);
+    checkChannelT(aDstChannel, TTo);
 
     InvokeCopyChannel(PointerRoi(), Pitch(), aSrcChannel, aDst.PointerRoi(), aDst.Pitch(), aDstChannel, SizeRoi(),
                       aStreamCtx);
@@ -144,7 +161,10 @@ ImageView<TTo> &ImageView<T>::Copy(ImageView<TTo> &aDst, Channel aDstChannel,
             (vector_size_v<TTo> > 1) && //
             std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
+    checkChannelT(aDstChannel, TTo);
 
     InvokeCopyChannel(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aDstChannel, SizeRoi(), aStreamCtx);
 
@@ -162,7 +182,10 @@ ImageView<TTo> &ImageView<T>::Copy(Channel aSrcChannel, ImageView<TTo> &aDst,
             (vector_size_v<TTo> == 1) && //
             std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
+    checkChannelT(aSrcChannel, T);
 
     InvokeCopyChannel(PointerRoi(), Pitch(), aSrcChannel, aDst.PointerRoi(), aDst.Pitch(), SizeRoi(), aStreamCtx);
 
@@ -178,8 +201,11 @@ void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
                         const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(TwoChannel<T>)
 {
-    checkSameSize(ROI(), aDstChannel1.ROI());
-    checkSameSize(ROI(), aDstChannel2.ROI());
+    validateImage(*this);
+    validateImage(aDstChannel1);
+    validateImage(aDstChannel2);
+    checkSameSize(*this, aDstChannel1);
+    checkSameSize(*this, aDstChannel2);
 
     InvokeCopyPlanar(PointerRoi(), Pitch(), aDstChannel1.PointerRoi(), aDstChannel1.Pitch(), aDstChannel2.PointerRoi(),
                      aDstChannel2.Pitch(), SizeRoi(), aStreamCtx);
@@ -195,9 +221,13 @@ void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
                         const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(ThreeChannel<T>)
 {
-    checkSameSize(ROI(), aDstChannel1.ROI());
-    checkSameSize(ROI(), aDstChannel2.ROI());
-    checkSameSize(ROI(), aDstChannel3.ROI());
+    validateImage(*this);
+    validateImage(aDstChannel1);
+    validateImage(aDstChannel2);
+    validateImage(aDstChannel3);
+    checkSameSize(*this, aDstChannel1);
+    checkSameSize(*this, aDstChannel2);
+    checkSameSize(*this, aDstChannel3);
 
     InvokeCopyPlanar(PointerRoi(), Pitch(), aDstChannel1.PointerRoi(), aDstChannel1.Pitch(), aDstChannel2.PointerRoi(),
                      aDstChannel2.Pitch(), aDstChannel3.PointerRoi(), aDstChannel3.Pitch(), SizeRoi(), aStreamCtx);
@@ -214,10 +244,15 @@ void ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aDstChannel1,
                         const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(FourChannelNoAlpha<T>)
 {
-    checkSameSize(ROI(), aDstChannel1.ROI());
-    checkSameSize(ROI(), aDstChannel2.ROI());
-    checkSameSize(ROI(), aDstChannel3.ROI());
-    checkSameSize(ROI(), aDstChannel4.ROI());
+    validateImage(*this);
+    validateImage(aDstChannel1);
+    validateImage(aDstChannel2);
+    validateImage(aDstChannel3);
+    validateImage(aDstChannel4);
+    checkSameSize(*this, aDstChannel1);
+    checkSameSize(*this, aDstChannel2);
+    checkSameSize(*this, aDstChannel3);
+    checkSameSize(*this, aDstChannel4);
 
     InvokeCopyPlanar(PointerRoi(), Pitch(), aDstChannel1.PointerRoi(), aDstChannel1.Pitch(), aDstChannel2.PointerRoi(),
                      aDstChannel2.Pitch(), aDstChannel3.PointerRoi(), aDstChannel3.Pitch(), aDstChannel4.PointerRoi(),
@@ -233,8 +268,11 @@ ImageView<T> &ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aSrcCha
                                  const mpp::cuda::StreamCtx &aStreamCtx)
     requires(TwoChannel<T>)
 {
-    checkSameSize(aSrcChannel1.ROI(), aDst.ROI());
-    checkSameSize(aSrcChannel2.ROI(), aDst.ROI());
+    validateImage(aSrcChannel1);
+    validateImage(aSrcChannel2);
+    validateImage(aDst);
+    checkSameSize(aSrcChannel1, aDst);
+    checkSameSize(aSrcChannel2, aDst);
 
     InvokeCopyPlanar(aSrcChannel1.PointerRoi(), aSrcChannel1.Pitch(), aSrcChannel2.PointerRoi(), aSrcChannel2.Pitch(),
                      aDst.PointerRoi(), aDst.Pitch(), aDst.SizeRoi(), aStreamCtx);
@@ -252,9 +290,13 @@ ImageView<T> &ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aSrcCha
                                  const mpp::cuda::StreamCtx &aStreamCtx)
     requires(ThreeChannel<T>)
 {
-    checkSameSize(aSrcChannel1.ROI(), aDst.ROI());
-    checkSameSize(aSrcChannel2.ROI(), aDst.ROI());
-    checkSameSize(aSrcChannel3.ROI(), aDst.ROI());
+    validateImage(aSrcChannel1);
+    validateImage(aSrcChannel2);
+    validateImage(aSrcChannel3);
+    validateImage(aDst);
+    checkSameSize(aSrcChannel1, aDst);
+    checkSameSize(aSrcChannel2, aDst);
+    checkSameSize(aSrcChannel3, aDst);
 
     InvokeCopyPlanar(aSrcChannel1.PointerRoi(), aSrcChannel1.Pitch(), aSrcChannel2.PointerRoi(), aSrcChannel2.Pitch(),
                      aSrcChannel3.PointerRoi(), aSrcChannel3.Pitch(), aDst.PointerRoi(), aDst.Pitch(), aDst.SizeRoi(),
@@ -274,10 +316,15 @@ ImageView<T> &ImageView<T>::Copy(ImageView<Vector1<remove_vector_t<T>>> &aSrcCha
                                  const mpp::cuda::StreamCtx &aStreamCtx)
     requires(FourChannelNoAlpha<T>)
 {
-    checkSameSize(aSrcChannel1.ROI(), aDst.ROI());
-    checkSameSize(aSrcChannel2.ROI(), aDst.ROI());
-    checkSameSize(aSrcChannel3.ROI(), aDst.ROI());
-    checkSameSize(aSrcChannel4.ROI(), aDst.ROI());
+    validateImage(aSrcChannel1);
+    validateImage(aSrcChannel2);
+    validateImage(aSrcChannel3);
+    validateImage(aSrcChannel4);
+    validateImage(aDst);
+    checkSameSize(aSrcChannel1, aDst);
+    checkSameSize(aSrcChannel2, aDst);
+    checkSameSize(aSrcChannel3, aDst);
+    checkSameSize(aSrcChannel4, aDst);
 
     InvokeCopyPlanar(aSrcChannel1.PointerRoi(), aSrcChannel1.Pitch(), aSrcChannel2.PointerRoi(), aSrcChannel2.Pitch(),
                      aSrcChannel3.PointerRoi(), aSrcChannel3.Pitch(), aSrcChannel4.PointerRoi(), aSrcChannel4.Pitch(),
@@ -292,6 +339,13 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst, const Vector2<int> &aLowerBorderSize, BorderType aBorder,
                                  const mpp::cuda::StreamCtx &aStreamCtx) const
 {
+    if (aBorder == BorderType::Constant)
+    {
+        throw INVALIDARGUMENT(aBorder,
+                              "When using BorderType::Constant, the constant value aConstant must be provided.");
+    }
+    validateImage(*this);
+    validateImage(aDst);
     InvokeCopyBorder(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aLowerBorderSize, aBorder, {0}, SizeRoi(),
                      aStreamCtx);
 
@@ -299,9 +353,11 @@ ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst, const Vector2<int> &aLowerB
 }
 
 template <PixelType T>
-ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst, const Vector2<int> &aLowerBorderSize, BorderType aBorder,
-                                 const T &aConstant, const mpp::cuda::StreamCtx &aStreamCtx) const
+ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst, const Vector2<int> &aLowerBorderSize, const T &aConstant,
+                                 BorderType aBorder, const mpp::cuda::StreamCtx &aStreamCtx) const
 {
+    validateImage(*this);
+    validateImage(aDst);
     InvokeCopyBorder(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aLowerBorderSize, aBorder, aConstant,
                      SizeRoi(), aStreamCtx);
 
@@ -314,6 +370,8 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst, const Pixel32fC2 &aDelta, InterpolationMode aInterpolation,
                                  const mpp::cuda::StreamCtx &aStreamCtx) const
 {
+    validateImage(*this);
+    validateImage(aDst);
     InvokeCopySubpix(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aDelta, aInterpolation, SizeRoi(),
                      aStreamCtx);
 
@@ -328,7 +386,9 @@ ImageView<TTo> &ImageView<T>::Dup(ImageView<TTo> &aDst, const mpp::cuda::StreamC
     requires(vector_size_v<T> == 1) &&
             (vector_size_v<TTo> > 1) && std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeDupSrc(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), SizeRoi(), aStreamCtx);
 
@@ -342,10 +402,13 @@ template <PixelType T>
 template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, RoundingMode aRoundingMode,
                                     const mpp::cuda::StreamCtx &aStreamCtx) const
-    requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<T> &&
+    requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) &&
+            (vector_active_size_v<T> == vector_active_size_v<TTo>) && RealOrComplexIntVector<T> &&
             RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     // When converting sbyte with ComputeT == long64, ClangTidy thinks we mess things up, but the cast is correct
     // NOLINTBEGIN(bugprone-signed-char-misuse,cert-str34-c)
@@ -380,10 +443,13 @@ template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, complex_basetype_t<pixel_basetype_t<TTo>> aDstMin,
                                     complex_basetype_t<pixel_basetype_t<TTo>> aDstMax,
                                     const mpp::cuda::StreamCtx &aStreamCtx) const
-    requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<T> &&
+    requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) &&
+            (vector_active_size_v<T> == vector_active_size_v<TTo>) && RealOrComplexIntVector<T> &&
             RealOrComplexFloatingVector<TTo> && ScaleImplemented<T, TTo>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     // When converting sbyte with ComputeT == long64, ClangTidy thinks we mess things up, but the cast is correct
     // NOLINTBEGIN(bugprone-signed-char-misuse,cert-str34-c)
@@ -407,10 +473,13 @@ template <PixelType TTo>
 ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, complex_basetype_t<pixel_basetype_t<TTo>> aDstMin,
                                     complex_basetype_t<pixel_basetype_t<TTo>> aDstMax, RoundingMode aRoundingMode,
                                     const mpp::cuda::StreamCtx &aStreamCtx) const
-    requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<T> &&
+    requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) &&
+            (vector_active_size_v<T> == vector_active_size_v<TTo>) && RealOrComplexIntVector<T> &&
             RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     // When converting sbyte with ComputeT == long64, ClangTidy thinks we mess things up, but the cast is correct
     // NOLINTBEGIN(bugprone-signed-char-misuse,cert-str34-c)
@@ -441,13 +510,16 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, complex_basetype_t<pix
 
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, complex_basetype_t<pixel_basetype_t<T>> aSrcMin,
-                                    complex_basetype_t<pixel_basetype_t<T>> aSrcMax, RoundingMode aRoundingMode,
-                                    const mpp::cuda::StreamCtx &aStreamCtx) const
-    requires(!std::same_as<T, TTo>) &&
-            (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>
+ImageView<TTo> &ImageView<T>::Scale(complex_basetype_t<pixel_basetype_t<T>> aSrcMin,
+                                    complex_basetype_t<pixel_basetype_t<T>> aSrcMax, ImageView<TTo> &aDst,
+                                    RoundingMode aRoundingMode, const mpp::cuda::StreamCtx &aStreamCtx) const
+    requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) &&
+            (vector_active_size_v<T> == vector_active_size_v<TTo>) && RealOrComplexIntVector<TTo> &&
+            ScaleImplemented<T, TTo>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     // When converting sbyte with ComputeT == long64, ClangTidy thinks we mess things up, but the cast is correct
     // NOLINTBEGIN(bugprone-signed-char-misuse,cert-str34-c)
@@ -503,15 +575,18 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, complex_basetype_t<pix
 
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, complex_basetype_t<pixel_basetype_t<T>> aSrcMin,
-                                    complex_basetype_t<pixel_basetype_t<T>> aSrcMax,
+ImageView<TTo> &ImageView<T>::Scale(complex_basetype_t<pixel_basetype_t<T>> aSrcMin,
+                                    complex_basetype_t<pixel_basetype_t<T>> aSrcMax, ImageView<TTo> &aDst,
                                     complex_basetype_t<pixel_basetype_t<TTo>> aDstMin,
                                     complex_basetype_t<pixel_basetype_t<TTo>> aDstMax,
                                     const mpp::cuda::StreamCtx &aStreamCtx) const
-    requires(!std::same_as<T, TTo>) &&
-            (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexFloatingVector<TTo> && ScaleImplemented<T, TTo>
+    requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) &&
+            (vector_active_size_v<T> == vector_active_size_v<TTo>) && RealOrComplexFloatingVector<TTo> &&
+            ScaleImplemented<T, TTo>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     // When converting sbyte with ComputeT == long64, ClangTidy thinks we mess things up, but the cast is correct
     // NOLINTBEGIN(bugprone-signed-char-misuse,cert-str34-c)
@@ -532,15 +607,18 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, complex_basetype_t<pix
 
 template <PixelType T>
 template <PixelType TTo>
-ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, complex_basetype_t<pixel_basetype_t<T>> aSrcMin,
-                                    complex_basetype_t<pixel_basetype_t<T>> aSrcMax,
+ImageView<TTo> &ImageView<T>::Scale(complex_basetype_t<pixel_basetype_t<T>> aSrcMin,
+                                    complex_basetype_t<pixel_basetype_t<T>> aSrcMax, ImageView<TTo> &aDst,
                                     complex_basetype_t<pixel_basetype_t<TTo>> aDstMin,
                                     complex_basetype_t<pixel_basetype_t<TTo>> aDstMax, RoundingMode aRoundingMode,
                                     const mpp::cuda::StreamCtx &aStreamCtx) const
-    requires(!std::same_as<T, TTo>) &&
-            (vector_size_v<T> == vector_size_v<TTo>) && RealOrComplexIntVector<TTo> && ScaleImplemented<T, TTo>
+    requires(!std::same_as<T, TTo>) && (vector_size_v<T> == vector_size_v<TTo>) &&
+            (vector_active_size_v<T> == vector_active_size_v<TTo>) && RealOrComplexIntVector<TTo> &&
+            ScaleImplemented<T, TTo>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     // When converting sbyte with ComputeT == long64, ClangTidy thinks we mess things up, but the cast is correct
     // NOLINTBEGIN(bugprone-signed-char-misuse,cert-str34-c)
@@ -574,6 +652,7 @@ ImageView<TTo> &ImageView<T>::Scale(ImageView<TTo> &aDst, complex_basetype_t<pix
 #pragma region Set
 template <PixelType T> ImageView<T> &ImageView<T>::Set(const T &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
 {
+    validateImage(*this);
     InvokeSetC(aConst, PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
 
     return *this;
@@ -582,6 +661,8 @@ template <PixelType T> ImageView<T> &ImageView<T>::Set(const T &aConst, const mp
 template <PixelType T>
 ImageView<T> &ImageView<T>::Set(const mpp::cuda::DevVarView<T> &aConst, const mpp::cuda::StreamCtx &aStreamCtx)
 {
+    checkNullptr(aConst);
+    validateImage(*this);
     InvokeSetDevC(aConst.Pointer(), PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
 
     return *this;
@@ -591,7 +672,9 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::SetMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask,
                                       const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    validateImage(*this);
+    validateImage(aMask);
+    checkSameSize(*this, aMask);
     InvokeSetCMask(aMask.PointerRoi(), aMask.Pitch(), aConst, PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
 
     return *this;
@@ -601,7 +684,9 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::SetMasked(const mpp::cuda::DevVarView<T> &aConst, const ImageView<Pixel8uC1> &aMask,
                                       const mpp::cuda::StreamCtx &aStreamCtx)
 {
-    checkSameSize(ROI(), aMask.ROI());
+    checkNullptr(aConst);
+    validateImage(*this);
+    checkSameSize(*this, aMask);
     InvokeSetDevCMask(aMask.PointerRoi(), aMask.Pitch(), aConst.Pointer(), PointerRoi(), Pitch(), SizeRoi(),
                       aStreamCtx);
 
@@ -612,6 +697,8 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::Set(remove_vector_t<T> aConst, Channel aChannel, const mpp::cuda::StreamCtx &aStreamCtx)
     requires(vector_size_v<T> > 1)
 {
+    validateImage(*this);
+    checkChannelT(aChannel, T);
     InvokeSetChannelC(aConst, aChannel, PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
 
     return *this;
@@ -622,6 +709,9 @@ ImageView<T> &ImageView<T>::Set(const mpp::cuda::DevVarView<remove_vector_t<T>> 
                                 const mpp::cuda::StreamCtx &aStreamCtx)
     requires(vector_size_v<T> > 1)
 {
+    checkNullptr(aConst);
+    validateImage(*this);
+    checkChannelT(aChannel, T);
     InvokeSetChannelDevC(aConst.Pointer(), aChannel, PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
 
     return *this;
@@ -636,7 +726,9 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::SwapChannel(ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(vector_size_v<T> == 2)
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeSwapChannelSrc(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), SizeRoi(), aStreamCtx);
 
@@ -649,6 +741,7 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::SwapChannel(const mpp::cuda::StreamCtx &aStreamCtx)
     requires(vector_size_v<T> == 2)
 {
+    validateImage(*this);
     InvokeSwapChannelInplace(PointerRoi(), Pitch(), SizeRoi(), aStreamCtx);
 
     return *this;
@@ -668,14 +761,16 @@ ImageView<TTo> &ImageView<T>::SwapChannel(ImageView<TTo> &aDst,
             (!has_alpha_channel_v<T>) &&                                //
             std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
     for (size_t i = 0; i < vector_active_size_v<TTo>; i++)
     {
         if (!aDstChannels.data()[i].template IsInRange<T>())
         {
-            throw INVALIDARGUMENT(aDstChannels,
-                                  "Channel " << i << " in aDstChannels is out of range. Expected value in range 0.."
-                                             << vector_active_size_v<T> - 1 << " but got: " << aDstChannels.data()[i]);
+            throw CHANNELEXCEPTION("Channel " << i + 1
+                                              << " in aDstChannels is out of range. Expected value in range 0.."
+                                              << vector_active_size_v<T> - 1 << " but got: " << aDstChannels.data()[i]);
         }
     }
 
@@ -692,13 +787,14 @@ ImageView<T> &ImageView<T>::SwapChannel(const ChannelList<vector_active_size_v<T
                                         const mpp::cuda::StreamCtx &aStreamCtx)
     requires(vector_size_v<T> >= 3) && (!has_alpha_channel_v<T>)
 {
+    validateImage(*this);
     for (size_t i = 0; i < vector_active_size_v<T>; i++)
     {
         if (!aDstChannels.data()[i].template IsInRange<T>())
         {
-            throw INVALIDARGUMENT(aDstChannels,
-                                  "Channel " << i << " in aDstChannels is out of range. Expected value in range 0.."
-                                             << vector_active_size_v<T> - 1 << " but got: " << aDstChannels.data()[i]);
+            throw CHANNELEXCEPTION("Channel " << i + 1
+                                              << " in aDstChannels is out of range. Expected value in range 0.."
+                                              << vector_active_size_v<T> - 1 << " but got: " << aDstChannels.data()[i]);
         }
     }
 
@@ -719,7 +815,9 @@ ImageView<TTo> &ImageView<T>::SwapChannel(ImageView<TTo> &aDst,
             (!has_alpha_channel_v<T>) &&        //
             std::same_as<remove_vector_t<T>, remove_vector_t<TTo>>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    validateImage(*this);
+    validateImage(aDst);
+    checkSameSize(*this, aDst);
 
     InvokeSwapChannelSrc(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aDstChannels, aValue, SizeRoi(),
                          aStreamCtx);
@@ -733,6 +831,8 @@ template <PixelType T>
 ImageView<T> &ImageView<T>::Transpose(ImageView<T> &aDst, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires NoAlpha<T>
 {
+    validateImage(*this);
+    validateImage(aDst);
     if (SizeRoi() != Size2D(aDst.SizeRoi().y, aDst.SizeRoi().x))
     {
         throw ROIEXCEPTION(

@@ -1,7 +1,5 @@
 #include "histogramEven.h"
 #include <backends/cuda/image/configurations.h>
-#include <backends/cuda/image/reductionAlongXKernel.h>
-#include <backends/cuda/image/reductionAlongYKernel.h>
 #include <backends/cuda/streamCtx.h>
 #include <backends/cuda/templateRegistry.h>
 #include <common/defines.h>

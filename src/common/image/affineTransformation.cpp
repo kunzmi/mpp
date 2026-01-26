@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
-#include <common/exception.h>
+#include <common/image/affineTransformationException.h>
 #include <common/image/solve.h>
 #include <common/numberTypes.h>
 #include <common/safeCast.h>
@@ -40,9 +40,15 @@ template <RealFloatingPoint T> AffineTransformation<T>::AffineTransformation() n
     mData[5] = 0;
 }
 
-template <RealFloatingPoint T> AffineTransformation<T>::AffineTransformation(T aValues[mSize]) noexcept : mData()
+template <RealFloatingPoint T> AffineTransformation<T>::AffineTransformation(const T aValues[mSize]) noexcept : mData()
 {
     std::copy(aValues, aValues + mSize, mData);
+}
+
+template <RealFloatingPoint T>
+AffineTransformation<T>::AffineTransformation(const T aValues[mRows][mCols]) noexcept : mData()
+{
+    std::copy(reinterpret_cast<const T *>(aValues), reinterpret_cast<const T *>(aValues) + mSize, mData);
 }
 
 template <RealFloatingPoint T> AffineTransformation<T>::AffineTransformation(T aX) noexcept : mData()
@@ -68,99 +74,66 @@ AffineTransformation<T>::AffineTransformation(T a00, T a01, T a02, T a10, T a11,
 }
 
 template <RealFloatingPoint T>
-AffineTransformation<T>::AffineTransformation(const std::pair<Vector2<T>, Vector2<T>> &aP0,
-                                              const std::pair<Vector2<T>, Vector2<T>> &aP1,
-                                              const std::pair<Vector2<T>, Vector2<T>> &aP2) noexcept
-    : mData()
+AffineTransformation<T> AffineTransformation<T>::FromPoints(const std::pair<Vector2<T>, Vector2<T>> &aP0,
+                                                            const std::pair<Vector2<T>, Vector2<T>> &aP1,
+                                                            const std::pair<Vector2<T>, Vector2<T>> &aP2)
+
 {
-    bool ok = false;
-    try
-    {
-        /*
-         * Coefficients are calculated by solving linear system:
-         * / x0 y0  1  0  0  0 \ /c00\ /u0\
-         * | x1 y1  1  0  0  0 | |c01| |u1|
-         * | x2 y2  1  0  0  0 | |c02| |u2|
-         * |  0  0  0 x0 y0  1 | |c10| |v0|
-         * |  0  0  0 x1 y1  1 | |c11| |v1|
-         * \  0  0  0 x2 y2  1 / |c12| |v2|
-         */
-        std::vector<T> matrix = {
-            aP0.first.x, aP0.first.y, 1, 0,           0,           0, aP0.second.x, //
-            aP1.first.x, aP1.first.y, 1, 0,           0,           0, aP1.second.x, //
-            aP2.first.x, aP2.first.y, 1, 0,           0,           0, aP2.second.x, //
-            0,           0,           0, aP0.first.x, aP0.first.y, 1, aP0.second.y, //
-            0,           0,           0, aP1.first.x, aP1.first.y, 1, aP1.second.y, //
-            0,           0,           0, aP2.first.x, aP2.first.y, 1, aP2.second.y  //
-        };
+    /*
+     * Coefficients are calculated by solving linear system:
+     * / x0 y0  1  0  0  0 \ /c00\ /u0\
+     * | x1 y1  1  0  0  0 | |c01| |u1|
+     * | x2 y2  1  0  0  0 | |c02| |u2|
+     * |  0  0  0 x0 y0  1 | |c10| |v0|
+     * |  0  0  0 x1 y1  1 | |c11| |v1|
+     * \  0  0  0 x2 y2  1 / |c12| |v2|
+     */
+    std::vector<T> matrix = {
+        aP0.first.x, aP0.first.y, 1, 0,           0,           0, aP0.second.x, //
+        aP1.first.x, aP1.first.y, 1, 0,           0,           0, aP1.second.x, //
+        aP2.first.x, aP2.first.y, 1, 0,           0,           0, aP2.second.x, //
+        0,           0,           0, aP0.first.x, aP0.first.y, 1, aP0.second.y, //
+        0,           0,           0, aP1.first.x, aP1.first.y, 1, aP1.second.y, //
+        0,           0,           0, aP2.first.x, aP2.first.y, 1, aP2.second.y  //
+    };
 
-        ok = solve(matrix.data(), mData, 6);
-    }
-    catch (...)
+    AffineTransformation<T> ret;
+    if (!solve(matrix.data(), ret.mData, 6))
     {
-        ok = false;
+        throw AFFINETRANSFORMATIONEXCEPTION("Failed to solve linear system of equations.");
     }
-
-    if (!ok) // failed to solve system of equation
-    {
-        // set to unit transformation:
-        mData[0] = 1;
-        mData[4] = 1;
-        mData[1] = 0;
-        mData[2] = 0;
-        mData[3] = 0;
-        mData[5] = 0;
-    }
+    return ret;
 }
 
 template <RealFloatingPoint T>
-AffineTransformation<T>::AffineTransformation(const Roi &aRoi, const Quad<T> &aQuad) noexcept
-    : AffineTransformation(Quad<T>(aRoi), aQuad)
+AffineTransformation<T> AffineTransformation<T>::FromQuads(const Quad<T> &aSrcQuad, const Quad<T> &aDstQuad)
 {
-}
+    const Quad<T> &src = aSrcQuad;
+    const Quad<T> &dst = aDstQuad;
 
-template <RealFloatingPoint T>
-AffineTransformation<T>::AffineTransformation(const Quad<T> &aSrcQuad, const Quad<T> &aDstQuad) noexcept : mData()
-{
-    bool ok = false;
-    try
+    /*
+     * Coefficients are calculated by solving linear system:
+     * / x0 y0  1  0  0  0 \ /c00\ /u0\
+     * | x1 y1  1  0  0  0 | |c01| |u1|
+     * | x2 y2  1  0  0  0 | |c02| |u2|
+     * |  0  0  0 x0 y0  1 | |c10| |v0|
+     * |  0  0  0 x1 y1  1 | |c11| |v1|
+     * \  0  0  0 x2 y2  1 / |c12| |v2|
+     */
+    std::vector<T> matrix = {src.P0.x, src.P0.y, 1, 0,        0,        0, dst.P0.x, //
+                             src.P1.x, src.P1.y, 1, 0,        0,        0, dst.P1.x, //
+                             src.P2.x, src.P2.y, 1, 0,        0,        0, dst.P2.x, //
+                             0,        0,        0, src.P0.x, src.P0.y, 1, dst.P0.y, //
+                             0,        0,        0, src.P1.x, src.P1.y, 1, dst.P1.y, //
+                             0,        0,        0, src.P2.x, src.P2.y, 1, dst.P2.y};
+
+    AffineTransformation<T> ret;
+    if (!solve(matrix.data(), ret.mData, 6))
     {
-        const Quad<T> &src = aSrcQuad;
-        const Quad<T> &dst = aDstQuad;
-
-        /*
-         * Coefficients are calculated by solving linear system:
-         * / x0 y0  1  0  0  0 \ /c00\ /u0\
-         * | x1 y1  1  0  0  0 | |c01| |u1|
-         * | x2 y2  1  0  0  0 | |c02| |u2|
-         * |  0  0  0 x0 y0  1 | |c10| |v0|
-         * |  0  0  0 x1 y1  1 | |c11| |v1|
-         * \  0  0  0 x2 y2  1 / |c12| |v2|
-         */
-        std::vector<T> matrix = {src.P0.x, src.P0.y, 1, 0,        0,        0, dst.P0.x, //
-                                 src.P1.x, src.P1.y, 1, 0,        0,        0, dst.P1.x, //
-                                 src.P2.x, src.P2.y, 1, 0,        0,        0, dst.P2.x, //
-                                 0,        0,        0, src.P0.x, src.P0.y, 1, dst.P0.y, //
-                                 0,        0,        0, src.P1.x, src.P1.y, 1, dst.P1.y, //
-                                 0,        0,        0, src.P2.x, src.P2.y, 1, dst.P2.y};
-
-        ok = solve(matrix.data(), mData, 6);
-    }
-    catch (...)
-    {
-        ok = false;
+        throw AFFINETRANSFORMATIONEXCEPTION("Failed to solve linear system of equations.");
     }
 
-    if (!ok) // failed to solve system of equation
-    {
-        // set to unit transformation:
-        mData[0] = 1;
-        mData[4] = 1;
-        mData[1] = 0;
-        mData[2] = 0;
-        mData[3] = 0;
-        mData[5] = 0;
-    }
+    return ret;
 }
 
 template <RealFloatingPoint T>
@@ -218,24 +191,11 @@ template <RealFloatingPoint T> T &AffineTransformation<T>::operator[](int aFlatI
     return mData[to_size_t(aFlatIndex)]; // NOLINT --> non constant array index
 }
 
-// template <RealFloatingPoint T> T const &AffineTransformation<T>::operator[](int aFlatIndex) const
-//{
-//     assert(aFlatIndex >= 0);
-//     assert(aFlatIndex < mSize);
-//     return mData[to_size_t(aFlatIndex)]; // NOLINT --> non constant array index
-// }
-
 template <RealFloatingPoint T> T &AffineTransformation<T>::operator[](size_t aFlatIndex)
 {
     assert(to_int(aFlatIndex) < mSize);
     return mData[aFlatIndex]; // NOLINT --> non constant array index
 }
-
-// template <RealFloatingPoint T> T const &AffineTransformation<T>::operator[](size_t aFlatIndex) const
-//{
-//     assert(to_int(aFlatIndex) < mSize);
-//     return mData[aFlatIndex]; // NOLINT --> non constant array index
-// }
 
 template <RealFloatingPoint T> AffineTransformation<T> &AffineTransformation<T>::operator+=(T aOther)
 {
@@ -320,7 +280,7 @@ template <RealFloatingPoint T> AffineTransformation<T> AffineTransformation<T>::
 
     if (det == 0)
     {
-        throw EXCEPTION("Cannot compute AffineTransformation inverse as determinant is 0.");
+        throw AFFINETRANSFORMATIONEXCEPTION("Cannot compute AffineTransformation inverse as determinant is 0.");
     }
 
     const T invdet = static_cast<T>(1.0) / det;

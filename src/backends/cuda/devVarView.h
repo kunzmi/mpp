@@ -47,15 +47,10 @@ template <typename T> class DevVarView
     /// Creates a new DevVarView from an existing T*.
     /// </summary>
     /// <param name="aDevPtr"></param>
-    /// <param name="aSizeInBytes">Size in Bytes</param>
-    DevVarView(T *aDevPtr, size_t aSizeInBytes) : mDevPtr(aDevPtr)
+    /// <param name="aSizeInElements">Size in Elements</param>
+    DevVarView(T *aDevPtr, size_t aSizeInElements) : mDevPtr(aDevPtr)
     {
-        mSize = aSizeInBytes / mTypeSize;
-        if (aSizeInBytes != mSize * mTypeSize)
-        {
-            throw CUDAEXCEPTION("Variable size is not a multiple of its type size. Size in bytes: "
-                                << aSizeInBytes << " number of elements: " << mSize << " type size: " << mTypeSize);
-        }
+        mSize = aSizeInElements;
     }
 
     ~DevVarView() = default;
@@ -309,4 +304,16 @@ template <typename T> class DevVarView
 };
 
 } // namespace mpp::cuda
+
+// NOLINTBEGIN --> function like macro, parantheses for "msg"...
+template <typename T>
+void __checkNullptr(const mpp::cuda::DevVarView<T> &aDevVar, const std::string &aName, const char *aCodeFile, int aLine,
+                    const char *aFunction)
+{
+    if (aDevVar.Pointer() == nullptr)
+    {
+        throw mpp::NullPtrException(aName, aCodeFile, aLine, aFunction);
+    }
+}
+// NOLINTEND
 #endif // MPP_ENABLE_CUDA_CORE

@@ -84,7 +84,7 @@ void InvokeFixedSizeFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, siz
                         bc, aDst, aPitchDst, aFilter, aFilterCenter, aSize, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Constant:
+                /*case mpp::BorderType::Constant:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
@@ -94,7 +94,7 @@ void InvokeFixedSizeFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, siz
                                                        RoundingMode::NearestTiesToEven, BCType>(
                         bc, aDst, aPitchDst, aFilter, aFilterCenter, aSize, aStreamCtx);
                 }
-                break;
+                break;*/
                 case mpp::BorderType::Replicate:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
@@ -106,7 +106,7 @@ void InvokeFixedSizeFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, siz
                         bc, aDst, aPitchDst, aFilter, aFilterCenter, aSize, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Mirror:
+                /*case mpp::BorderType::Mirror:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -138,7 +138,7 @@ void InvokeFixedSizeFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, siz
                                                        RoundingMode::NearestTiesToEven, BCType>(
                         bc, aDst, aPitchDst, aFilter, aFilterCenter, aSize, aStreamCtx);
                 }
-                break;
+                break;*/
                 default:
                     throw INVALIDARGUMENT(aBorderType,
                                           aBorderType << " is not a supported border type mode for Fixed Size filter.");
@@ -163,7 +163,7 @@ void InvokeFixedSizeFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, siz
                         bc, aDst, aPitchDst, aFilter, aFilterCenter, aSize, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Constant:
+                /*case mpp::BorderType::Constant:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
@@ -173,7 +173,7 @@ void InvokeFixedSizeFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, siz
                                                        RoundingMode::NearestTiesToEven, BCType>(
                         bc, aDst, aPitchDst, aFilter, aFilterCenter, aSize, aStreamCtx);
                 }
-                break;
+                break;*/
                 case mpp::BorderType::Replicate:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
@@ -185,7 +185,7 @@ void InvokeFixedSizeFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, siz
                         bc, aDst, aPitchDst, aFilter, aFilterCenter, aSize, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Mirror:
+                /*case mpp::BorderType::Mirror:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -217,7 +217,7 @@ void InvokeFixedSizeFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, siz
                                                        RoundingMode::NearestTiesToEven, BCType>(
                         bc, aDst, aPitchDst, aFilter, aFilterCenter, aSize, aStreamCtx);
                 }
-                break;
+                break;*/
                 default:
                     throw INVALIDARGUMENT(aBorderType,
                                           aBorderType << " is not a supported border type mode for Fixed Size filter.");
@@ -242,7 +242,7 @@ void InvokeFixedSizeFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, siz
                         bc, aDst, aPitchDst, aFilter, aFilterCenter, aSize, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Constant:
+                /*case mpp::BorderType::Constant:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
@@ -252,7 +252,7 @@ void InvokeFixedSizeFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, siz
                                                        RoundingMode::NearestTiesToEven, BCType>(
                         bc, aDst, aPitchDst, aFilter, aFilterCenter, aSize, aStreamCtx);
                 }
-                break;
+                break;*/
                 case mpp::BorderType::Replicate:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
@@ -264,7 +264,7 @@ void InvokeFixedSizeFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, siz
                         bc, aDst, aPitchDst, aFilter, aFilterCenter, aSize, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Mirror:
+                /*case mpp::BorderType::Mirror:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -296,7 +296,7 @@ void InvokeFixedSizeFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, siz
                                                        RoundingMode::NearestTiesToEven, BCType>(
                         bc, aDst, aPitchDst, aFilter, aFilterCenter, aSize, aStreamCtx);
                 }
-                break;
+                break;*/
                 default:
                     throw INVALIDARGUMENT(aBorderType,
                                           aBorderType << " is not a supported border type mode for Fixed Size filter.");
@@ -321,7 +321,7 @@ void InvokeFixedSizeFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, siz
                         bc, aDst, aPitchDst, aFilter, aFilterCenter, aSize, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Constant:
+                /*case mpp::BorderType::Constant:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
@@ -331,7 +331,7 @@ void InvokeFixedSizeFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, siz
                                                        RoundingMode::NearestTiesToEven, BCType>(
                         bc, aDst, aPitchDst, aFilter, aFilterCenter, aSize, aStreamCtx);
                 }
-                break;
+                break;*/
                 case mpp::BorderType::Replicate:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
@@ -343,7 +343,7 @@ void InvokeFixedSizeFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, siz
                         bc, aDst, aPitchDst, aFilter, aFilterCenter, aSize, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Mirror:
+                /*case mpp::BorderType::Mirror:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -375,7 +375,7 @@ void InvokeFixedSizeFilter(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, siz
                                                        RoundingMode::NearestTiesToEven, BCType>(
                         bc, aDst, aPitchDst, aFilter, aFilterCenter, aSize, aStreamCtx);
                 }
-                break;
+                break;*/
                 default:
                     throw INVALIDARGUMENT(aBorderType,
                                           aBorderType << " is not a supported border type mode for Fixed Size filter.");

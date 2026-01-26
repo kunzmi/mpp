@@ -25,6 +25,11 @@ class MPPEXPORT_COMMON ScratchBufferException : public MPPException
     ScratchBufferException(const ScratchBufferException &)            = default;
     ScratchBufferException &operator=(const ScratchBufferException &) = delete;
     ScratchBufferException &operator=(ScratchBufferException &&)      = delete;
+
+    [[nodiscard]] ExceptionCode GetCode() const override
+    {
+        return ExceptionCode::ScratchBuffer;
+    }
 };
 } // namespace mpp
 

@@ -89,7 +89,7 @@ void InvokeFixedSizeDilationGray(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDs
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, op, postOp, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Constant:
+                /*case mpp::BorderType::Constant:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
@@ -98,7 +98,7 @@ void InvokeFixedSizeDilationGray(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDs
                                                            pixelBlockSizeX, pixelBlockSizeY, BCType, MorphOp, PostOp>(
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, op, postOp, aStreamCtx);
                 }
-                break;
+                break;*/
                 case mpp::BorderType::Replicate:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
@@ -109,7 +109,7 @@ void InvokeFixedSizeDilationGray(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDs
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, op, postOp, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Mirror:
+                /*case mpp::BorderType::Mirror:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -138,7 +138,7 @@ void InvokeFixedSizeDilationGray(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDs
                                                            pixelBlockSizeX, pixelBlockSizeY, BCType, MorphOp, PostOp>(
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, op, postOp, aStreamCtx);
                 }
-                break;
+                break;*/
                 default:
                     throw INVALIDARGUMENT(
                         aBorderType, aBorderType << " is not a supported border type mode for Fixed Size Morphology.");
@@ -162,7 +162,7 @@ void InvokeFixedSizeDilationGray(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDs
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, op, postOp, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Constant:
+                /*case mpp::BorderType::Constant:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
@@ -171,7 +171,7 @@ void InvokeFixedSizeDilationGray(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDs
                                                            pixelBlockSizeX, pixelBlockSizeY, BCType, MorphOp, PostOp>(
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, op, postOp, aStreamCtx);
                 }
-                break;
+                break;*/
                 case mpp::BorderType::Replicate:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
@@ -182,7 +182,7 @@ void InvokeFixedSizeDilationGray(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDs
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, op, postOp, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Mirror:
+                /*case mpp::BorderType::Mirror:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -211,7 +211,7 @@ void InvokeFixedSizeDilationGray(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDs
                                                            pixelBlockSizeX, pixelBlockSizeY, BCType, MorphOp, PostOp>(
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, op, postOp, aStreamCtx);
                 }
-                break;
+                break;*/
                 default:
                     throw INVALIDARGUMENT(
                         aBorderType, aBorderType << " is not a supported border type mode for Fixed Size Morphology.");
@@ -235,7 +235,7 @@ void InvokeFixedSizeDilationGray(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDs
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, op, postOp, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Constant:
+                /*case mpp::BorderType::Constant:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
@@ -244,7 +244,7 @@ void InvokeFixedSizeDilationGray(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDs
                                                            pixelBlockSizeX, pixelBlockSizeY, BCType, MorphOp, PostOp>(
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, op, postOp, aStreamCtx);
                 }
-                break;
+                break;*/
                 case mpp::BorderType::Replicate:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
@@ -255,7 +255,7 @@ void InvokeFixedSizeDilationGray(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDs
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, op, postOp, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Mirror:
+                /*case mpp::BorderType::Mirror:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -284,7 +284,7 @@ void InvokeFixedSizeDilationGray(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDs
                                                            pixelBlockSizeX, pixelBlockSizeY, BCType, MorphOp, PostOp>(
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, op, postOp, aStreamCtx);
                 }
-                break;
+                break;*/
                 default:
                     throw INVALIDARGUMENT(
                         aBorderType, aBorderType << " is not a supported border type mode for Fixed Size Morphology.");
@@ -308,7 +308,7 @@ void InvokeFixedSizeDilationGray(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDs
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, op, postOp, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Constant:
+                /*case mpp::BorderType::Constant:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Constant, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi, aConstant);
@@ -317,7 +317,7 @@ void InvokeFixedSizeDilationGray(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDs
                                                            pixelBlockSizeX, pixelBlockSizeY, BCType, MorphOp, PostOp>(
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, op, postOp, aStreamCtx);
                 }
-                break;
+                break;*/
                 case mpp::BorderType::Replicate:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Replicate, false, false, false, false>;
@@ -328,7 +328,7 @@ void InvokeFixedSizeDilationGray(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDs
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, op, postOp, aStreamCtx);
                 }
                 break;
-                case mpp::BorderType::Mirror:
+                /*case mpp::BorderType::Mirror:
                 {
                     using BCType = BorderControl<SrcT, BorderType::Mirror, false, false, false, false>;
                     const BCType bc(aSrc1, aPitchSrc1, aAllowedReadRoiSize, aOffsetToActualRoi);
@@ -357,7 +357,7 @@ void InvokeFixedSizeDilationGray(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDs
                                                            pixelBlockSizeX, pixelBlockSizeY, BCType, MorphOp, PostOp>(
                         bc, aDst, aPitchDst, aMask, aFilterCenter, aSize, op, postOp, aStreamCtx);
                 }
-                break;
+                break;*/
                 default:
                     throw INVALIDARGUMENT(
                         aBorderType, aBorderType << " is not a supported border type mode for Fixed Size Morphology.");

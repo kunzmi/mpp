@@ -15,11 +15,13 @@
 #include <common/exception.h>
 #include <common/half_fp16.h>
 #include <common/image/filterArea.h>
+#include <common/image/filterAreaException.h>
 #include <common/image/functors/imageFunctors.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
 #include <common/image/roiException.h>
 #include <common/image/size2D.h>
+#include <common/image/validateImage.h>
 #include <common/mpp_defs.h>
 #include <common/numberTypes.h>
 #include <common/numeric_limits.h>
@@ -50,12 +52,18 @@ ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const FilterArea &aFilt
                                      const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
     const T *allowedPtr          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
 
-    if (aFilterArea.Size == 3 || aFilterArea.Size == 5 || aFilterArea.Size == 7 || aFilterArea.Size == 9)
+    const bool haveFixedSize = aBorder == BorderType::None || aBorder == BorderType::Replicate;
+
+    if (haveFixedSize &&
+        (aFilterArea.Size == 3 || aFilterArea.Size == 5 || aFilterArea.Size == 7 || aFilterArea.Size == 9))
     {
         // this implies aFilterArea.Size.x == aFilterArea.Size.y
         InvokeFixedSizeMaxFilter(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aFilterArea.Size.x,
@@ -89,12 +97,18 @@ ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const FilterArea &aFilte
                                     const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
     const T *allowedPtr          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
 
-    if (aFilterArea.Size == 3 || aFilterArea.Size == 5 || aFilterArea.Size == 7 || aFilterArea.Size == 9)
+    const bool haveFixedSize = aBorder == BorderType::None || aBorder == BorderType::Replicate;
+
+    if (haveFixedSize &&
+        (aFilterArea.Size == 3 || aFilterArea.Size == 5 || aFilterArea.Size == 7 || aFilterArea.Size == 9))
     {
         // this implies aFilterArea.Size.x == aFilterArea.Size.y
         InvokeFixedSizeMinFilter(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aFilterArea.Size.x,
@@ -165,30 +179,36 @@ ImageView<T> &ImageView<T>::Erosion(ImageView<T> &aDst, const mpp::cuda::DevVarV
                                     const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aMask);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
     const T *allowedPtr          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
 
-    if (aFilterArea.Size == Vec2i{3, 3})
+    const bool haveFixedSize = aBorder == BorderType::None || aBorder == BorderType::Replicate;
+
+    if (aFilterArea.Size == Vec2i{3, 3} && haveFixedSize)
     {
         InvokeFixedSizeErosion(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aMask.Pointer(),
                                MaskSize::Mask_3x3, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                                roiOffset, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{5, 5})
+    else if (aFilterArea.Size == Vec2i{5, 5} && haveFixedSize)
     {
         InvokeFixedSizeErosion(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aMask.Pointer(),
                                MaskSize::Mask_5x5, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                                roiOffset, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{7, 7})
+    else if (aFilterArea.Size == Vec2i{7, 7} && haveFixedSize)
     {
         InvokeFixedSizeErosion(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aMask.Pointer(),
                                MaskSize::Mask_7x7, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                                roiOffset, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{9, 9})
+    else if (aFilterArea.Size == Vec2i{9, 9} && haveFixedSize)
     {
         InvokeFixedSizeErosion(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aMask.Pointer(),
                                MaskSize::Mask_9x9, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -225,30 +245,36 @@ ImageView<T> &ImageView<T>::ErosionGray(ImageView<T> &aDst,
                                         const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aMask);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
     const T *allowedPtr          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
 
-    if (aFilterArea.Size == Vec2i{3, 3})
+    const bool haveFixedSize = aBorder == BorderType::None || aBorder == BorderType::Replicate;
+
+    if (aFilterArea.Size == Vec2i{3, 3} && haveFixedSize)
     {
         InvokeFixedSizeErosionGray(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aMask.Pointer(),
                                    MaskSize::Mask_3x3, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                                    roiOffset, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{5, 5})
+    else if (aFilterArea.Size == Vec2i{5, 5} && haveFixedSize)
     {
         InvokeFixedSizeErosionGray(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aMask.Pointer(),
                                    MaskSize::Mask_5x5, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                                    roiOffset, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{7, 7})
+    else if (aFilterArea.Size == Vec2i{7, 7} && haveFixedSize)
     {
         InvokeFixedSizeErosionGray(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aMask.Pointer(),
                                    MaskSize::Mask_7x7, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                                    roiOffset, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{9, 9})
+    else if (aFilterArea.Size == Vec2i{9, 9} && haveFixedSize)
     {
         InvokeFixedSizeErosionGray(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aMask.Pointer(),
                                    MaskSize::Mask_9x9, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -324,30 +350,36 @@ ImageView<T> &ImageView<T>::Dilation(ImageView<T> &aDst, const mpp::cuda::DevVar
                                      const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aMask);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
     const T *allowedPtr          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
 
-    if (aFilterArea.Size == Vec2i{3, 3})
+    const bool haveFixedSize = aBorder == BorderType::None || aBorder == BorderType::Replicate;
+
+    if (aFilterArea.Size == Vec2i{3, 3} && haveFixedSize)
     {
         InvokeFixedSizeDilation(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aMask.Pointer(),
                                 MaskSize::Mask_3x3, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                                 roiOffset, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{5, 5})
+    else if (aFilterArea.Size == Vec2i{5, 5} && haveFixedSize)
     {
         InvokeFixedSizeDilation(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aMask.Pointer(),
                                 MaskSize::Mask_5x5, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                                 roiOffset, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{7, 7})
+    else if (aFilterArea.Size == Vec2i{7, 7} && haveFixedSize)
     {
         InvokeFixedSizeDilation(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aMask.Pointer(),
                                 MaskSize::Mask_7x7, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                                 roiOffset, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{9, 9})
+    else if (aFilterArea.Size == Vec2i{9, 9} && haveFixedSize)
     {
         InvokeFixedSizeDilation(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aMask.Pointer(),
                                 MaskSize::Mask_9x9, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -384,30 +416,36 @@ ImageView<T> &ImageView<T>::DilationGray(ImageView<T> &aDst,
                                          const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aMask);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
     const T *allowedPtr          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
 
-    if (aFilterArea.Size == Vec2i{3, 3})
+    const bool haveFixedSize = aBorder == BorderType::None || aBorder == BorderType::Replicate;
+
+    if (aFilterArea.Size == Vec2i{3, 3} && haveFixedSize)
     {
         InvokeFixedSizeDilationGray(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aMask.Pointer(),
                                     MaskSize::Mask_3x3, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                                     roiOffset, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{5, 5})
+    else if (aFilterArea.Size == Vec2i{5, 5} && haveFixedSize)
     {
         InvokeFixedSizeDilationGray(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aMask.Pointer(),
                                     MaskSize::Mask_5x5, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                                     roiOffset, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{7, 7})
+    else if (aFilterArea.Size == Vec2i{7, 7} && haveFixedSize)
     {
         InvokeFixedSizeDilationGray(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aMask.Pointer(),
                                     MaskSize::Mask_7x7, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                                     roiOffset, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{9, 9})
+    else if (aFilterArea.Size == Vec2i{9, 9} && haveFixedSize)
     {
         InvokeFixedSizeDilationGray(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aMask.Pointer(),
                                     MaskSize::Mask_9x9, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -483,14 +521,22 @@ ImageView<T> &ImageView<T>::Open(ImageView<T> &aTemp, ImageView<T> &aDst, const 
                                  const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
+    validateImage(*this);
+    validateImage(aTemp);
+    validateImage(aDst);
+    checkNullptr(aMask);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
+    checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, aTemp.SizeAlloc()));
 
     const Vector2<int> roiOffset1 = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
     const T *allowedPtr1          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
     const Vector2<int> roiOffset2 = aTemp.ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
     const T *allowedPtr2 = gotoPtr(aTemp.Pointer(), aTemp.Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
 
-    if (aFilterArea.Size == Vec2i{3, 3})
+    const bool haveFixedSize = aBorder == BorderType::None || aBorder == BorderType::Replicate;
+
+    if (aFilterArea.Size == Vec2i{3, 3} && haveFixedSize)
     {
         InvokeFixedSizeErosion(allowedPtr1, Pitch(), aTemp.PointerRoi(), aTemp.Pitch(), aMask.Pointer(),
                                MaskSize::Mask_3x3, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -499,7 +545,7 @@ ImageView<T> &ImageView<T>::Open(ImageView<T> &aTemp, ImageView<T> &aDst, const 
                                 MaskSize::Mask_3x3, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                                 roiOffset2, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{5, 5})
+    else if (aFilterArea.Size == Vec2i{5, 5} && haveFixedSize)
     {
         InvokeFixedSizeErosion(allowedPtr1, Pitch(), aTemp.PointerRoi(), aTemp.Pitch(), aMask.Pointer(),
                                MaskSize::Mask_5x5, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -508,7 +554,7 @@ ImageView<T> &ImageView<T>::Open(ImageView<T> &aTemp, ImageView<T> &aDst, const 
                                 MaskSize::Mask_5x5, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                                 roiOffset2, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{7, 7})
+    else if (aFilterArea.Size == Vec2i{7, 7} && haveFixedSize)
     {
         InvokeFixedSizeErosion(allowedPtr1, Pitch(), aTemp.PointerRoi(), aTemp.Pitch(), aMask.Pointer(),
                                MaskSize::Mask_7x7, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -517,7 +563,7 @@ ImageView<T> &ImageView<T>::Open(ImageView<T> &aTemp, ImageView<T> &aDst, const 
                                 MaskSize::Mask_7x7, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                                 roiOffset2, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{9, 9})
+    else if (aFilterArea.Size == Vec2i{9, 9} && haveFixedSize)
     {
         InvokeFixedSizeErosion(allowedPtr1, Pitch(), aTemp.PointerRoi(), aTemp.Pitch(), aMask.Pointer(),
                                MaskSize::Mask_9x9, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -579,14 +625,22 @@ ImageView<T> &ImageView<T>::Close(ImageView<T> &aTemp, ImageView<T> &aDst,
                                   const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
+    validateImage(*this);
+    validateImage(aTemp);
+    validateImage(aDst);
+    checkNullptr(aMask);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
+    checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, aTemp.SizeAlloc()));
 
     const Vector2<int> roiOffset1 = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
     const T *allowedPtr1          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
     const Vector2<int> roiOffset2 = aTemp.ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
     const T *allowedPtr2 = gotoPtr(aTemp.Pointer(), aTemp.Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
 
-    if (aFilterArea.Size == Vec2i{3, 3})
+    const bool haveFixedSize = aBorder == BorderType::None || aBorder == BorderType::Replicate;
+
+    if (aFilterArea.Size == Vec2i{3, 3} && haveFixedSize)
     {
         InvokeFixedSizeDilation(allowedPtr1, Pitch(), aTemp.PointerRoi(), aTemp.Pitch(), aMask.Pointer(),
                                 MaskSize::Mask_3x3, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -595,7 +649,7 @@ ImageView<T> &ImageView<T>::Close(ImageView<T> &aTemp, ImageView<T> &aDst,
                                MaskSize::Mask_3x3, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                                roiOffset2, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{5, 5})
+    else if (aFilterArea.Size == Vec2i{5, 5} && haveFixedSize)
     {
         InvokeFixedSizeDilation(allowedPtr1, Pitch(), aTemp.PointerRoi(), aTemp.Pitch(), aMask.Pointer(),
                                 MaskSize::Mask_5x5, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -604,7 +658,7 @@ ImageView<T> &ImageView<T>::Close(ImageView<T> &aTemp, ImageView<T> &aDst,
                                MaskSize::Mask_5x5, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                                roiOffset2, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{7, 7})
+    else if (aFilterArea.Size == Vec2i{7, 7} && haveFixedSize)
     {
         InvokeFixedSizeDilation(allowedPtr1, Pitch(), aTemp.PointerRoi(), aTemp.Pitch(), aMask.Pointer(),
                                 MaskSize::Mask_7x7, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -613,7 +667,7 @@ ImageView<T> &ImageView<T>::Close(ImageView<T> &aTemp, ImageView<T> &aDst,
                                MaskSize::Mask_7x7, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
                                roiOffset2, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{9, 9})
+    else if (aFilterArea.Size == Vec2i{9, 9} && haveFixedSize)
     {
         InvokeFixedSizeDilation(allowedPtr1, Pitch(), aTemp.PointerRoi(), aTemp.Pitch(), aMask.Pointer(),
                                 MaskSize::Mask_9x9, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -675,14 +729,22 @@ ImageView<T> &ImageView<T>::TopHat(ImageView<T> &aTemp, ImageView<T> &aDst,
                                    const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
+    validateImage(*this);
+    validateImage(aTemp);
+    validateImage(aDst);
+    checkNullptr(aMask);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
+    checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, aTemp.SizeAlloc()));
 
     const Vector2<int> roiOffset1 = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
     const T *allowedPtr1          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
     const Vector2<int> roiOffset2 = aTemp.ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
     const T *allowedPtr2 = gotoPtr(aTemp.Pointer(), aTemp.Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
 
-    if (aFilterArea.Size == Vec2i{3, 3})
+    const bool haveFixedSize = aBorder == BorderType::None || aBorder == BorderType::Replicate;
+
+    if (aFilterArea.Size == Vec2i{3, 3} && haveFixedSize)
     {
         InvokeFixedSizeErosion(allowedPtr1, Pitch(), aTemp.PointerRoi(), aTemp.Pitch(), aMask.Pointer(),
                                MaskSize::Mask_3x3, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -691,7 +753,7 @@ ImageView<T> &ImageView<T>::TopHat(ImageView<T> &aTemp, ImageView<T> &aDst,
                               aMask.Pointer(), MaskSize::Mask_3x3, aFilterArea.Center, aBorder, aConstant,
                               aAllowedReadRoi.Size(), roiOffset2, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{5, 5})
+    else if (aFilterArea.Size == Vec2i{5, 5} && haveFixedSize)
     {
         InvokeFixedSizeErosion(allowedPtr1, Pitch(), aTemp.PointerRoi(), aTemp.Pitch(), aMask.Pointer(),
                                MaskSize::Mask_5x5, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -700,7 +762,7 @@ ImageView<T> &ImageView<T>::TopHat(ImageView<T> &aTemp, ImageView<T> &aDst,
                               aMask.Pointer(), MaskSize::Mask_5x5, aFilterArea.Center, aBorder, aConstant,
                               aAllowedReadRoi.Size(), roiOffset2, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{7, 7})
+    else if (aFilterArea.Size == Vec2i{7, 7} && haveFixedSize)
     {
         InvokeFixedSizeErosion(allowedPtr1, Pitch(), aTemp.PointerRoi(), aTemp.Pitch(), aMask.Pointer(),
                                MaskSize::Mask_7x7, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -709,7 +771,7 @@ ImageView<T> &ImageView<T>::TopHat(ImageView<T> &aTemp, ImageView<T> &aDst,
                               aMask.Pointer(), MaskSize::Mask_7x7, aFilterArea.Center, aBorder, aConstant,
                               aAllowedReadRoi.Size(), roiOffset2, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{9, 9})
+    else if (aFilterArea.Size == Vec2i{9, 9} && haveFixedSize)
     {
         InvokeFixedSizeErosion(allowedPtr1, Pitch(), aTemp.PointerRoi(), aTemp.Pitch(), aMask.Pointer(),
                                MaskSize::Mask_9x9, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -772,14 +834,22 @@ ImageView<T> &ImageView<T>::BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst,
                                      const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
+    validateImage(*this);
+    validateImage(aTemp);
+    validateImage(aDst);
+    checkNullptr(aMask);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
+    checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, aTemp.SizeAlloc()));
 
     const Vector2<int> roiOffset1 = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
     const T *allowedPtr1          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
     const Vector2<int> roiOffset2 = aTemp.ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
     const T *allowedPtr2 = gotoPtr(aTemp.Pointer(), aTemp.Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
 
-    if (aFilterArea.Size == Vec2i{3, 3})
+    const bool haveFixedSize = aBorder == BorderType::None || aBorder == BorderType::Replicate;
+
+    if (aFilterArea.Size == Vec2i{3, 3} && haveFixedSize)
     {
         InvokeFixedSizeDilation(allowedPtr1, Pitch(), aTemp.PointerRoi(), aTemp.Pitch(), aMask.Pointer(),
                                 MaskSize::Mask_3x3, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -788,7 +858,7 @@ ImageView<T> &ImageView<T>::BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst,
                                 aMask.Pointer(), MaskSize::Mask_3x3, aFilterArea.Center, aBorder, aConstant,
                                 aAllowedReadRoi.Size(), roiOffset2, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{5, 5})
+    else if (aFilterArea.Size == Vec2i{5, 5} && haveFixedSize)
     {
         InvokeFixedSizeDilation(allowedPtr1, Pitch(), aTemp.PointerRoi(), aTemp.Pitch(), aMask.Pointer(),
                                 MaskSize::Mask_5x5, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -797,7 +867,7 @@ ImageView<T> &ImageView<T>::BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst,
                                 aMask.Pointer(), MaskSize::Mask_5x5, aFilterArea.Center, aBorder, aConstant,
                                 aAllowedReadRoi.Size(), roiOffset2, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{7, 7})
+    else if (aFilterArea.Size == Vec2i{7, 7} && haveFixedSize)
     {
         InvokeFixedSizeDilation(allowedPtr1, Pitch(), aTemp.PointerRoi(), aTemp.Pitch(), aMask.Pointer(),
                                 MaskSize::Mask_7x7, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -806,7 +876,7 @@ ImageView<T> &ImageView<T>::BlackHat(ImageView<T> &aTemp, ImageView<T> &aDst,
                                 aMask.Pointer(), MaskSize::Mask_7x7, aFilterArea.Center, aBorder, aConstant,
                                 aAllowedReadRoi.Size(), roiOffset2, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{9, 9})
+    else if (aFilterArea.Size == Vec2i{9, 9} && haveFixedSize)
     {
         InvokeFixedSizeDilation(allowedPtr1, Pitch(), aTemp.PointerRoi(), aTemp.Pitch(), aMask.Pointer(),
                                 MaskSize::Mask_9x9, aFilterArea.Center, aBorder, aConstant, aAllowedReadRoi.Size(),
@@ -868,30 +938,36 @@ ImageView<T> &ImageView<T>::MorphologyGradient(ImageView<T> &aDst, const mpp::cu
                                                const Roi &aAllowedReadRoi, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T>
 {
+    validateImage(*this);
+    validateImage(aDst);
+    checkNullptr(aMask);
+    checkFilterArea(aFilterArea);
     checkRoiIsInRoi(aAllowedReadRoi, Roi(0, 0, SizeAlloc()));
 
     const Vector2<int> roiOffset = ROI().FirstPixel() - aAllowedReadRoi.FirstPixel();
     const T *allowedPtr          = gotoPtr(Pointer(), Pitch(), aAllowedReadRoi.FirstX(), aAllowedReadRoi.FirstY());
 
-    if (aFilterArea.Size == Vec2i{3, 3})
+    const bool haveFixedSize = aBorder == BorderType::None || aBorder == BorderType::Replicate;
+
+    if (aFilterArea.Size == Vec2i{3, 3} && haveFixedSize)
     {
         InvokeFixedSizeMorphologyGradient(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aMask.Pointer(),
                                           MaskSize::Mask_3x3, aFilterArea.Center, aBorder, aConstant,
                                           aAllowedReadRoi.Size(), roiOffset, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{5, 5})
+    else if (aFilterArea.Size == Vec2i{5, 5} && haveFixedSize)
     {
         InvokeFixedSizeMorphologyGradient(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aMask.Pointer(),
                                           MaskSize::Mask_5x5, aFilterArea.Center, aBorder, aConstant,
                                           aAllowedReadRoi.Size(), roiOffset, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{7, 7})
+    else if (aFilterArea.Size == Vec2i{7, 7} && haveFixedSize)
     {
         InvokeFixedSizeMorphologyGradient(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aMask.Pointer(),
                                           MaskSize::Mask_7x7, aFilterArea.Center, aBorder, aConstant,
                                           aAllowedReadRoi.Size(), roiOffset, SizeRoi(), aStreamCtx);
     }
-    else if (aFilterArea.Size == Vec2i{9, 9})
+    else if (aFilterArea.Size == Vec2i{9, 9} && haveFixedSize)
     {
         InvokeFixedSizeMorphologyGradient(allowedPtr, Pitch(), aDst.PointerRoi(), aDst.Pitch(), aMask.Pointer(),
                                           MaskSize::Mask_9x9, aFilterArea.Center, aBorder, aConstant,

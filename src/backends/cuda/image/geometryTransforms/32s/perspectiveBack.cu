@@ -6,8 +6,5 @@ namespace mpp::image::cuda
 {
 
 ForAllChannelsWithAlpha(32s);
-InstantiateInvokePerspectiveBackSrcP2_ForGeomType(32s);
-InstantiateInvokePerspectiveBackSrcP3_ForGeomType(32s);
-InstantiateInvokePerspectiveBackSrcP4_ForGeomType(32s);
 
 } // namespace mpp::image::cuda

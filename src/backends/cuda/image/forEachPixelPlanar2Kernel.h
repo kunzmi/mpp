@@ -4,6 +4,7 @@
 #include <backends/cuda/streamCtx.h>
 #include <common/exception.h>
 #include <common/image/gotoPtr.h>
+#include <common/image/pitchException.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -57,7 +58,8 @@ __global__ void forEachPixelPlanar2Kernel(Vector1<remove_vector_t<DstT>> *__rest
                 {
                     res.value[i].x = resPlane.value[i].x;
                 }
-                resPlane = Tupel<DstPlaneT, TupelSize>::LoadAligned(pixelsOut2);
+                // the tuples are only guaranteed to be aligned to aDst1, the others might be misaligned
+                resPlane = Tupel<DstPlaneT, TupelSize>::Load(pixelsOut2);
 #pragma unroll
                 for (size_t i = 0; i < TupelSize; i++)
                 {
@@ -73,12 +75,13 @@ __global__ void forEachPixelPlanar2Kernel(Vector1<remove_vector_t<DstT>> *__rest
                 resPlane.value[i].x = res.value[i].x;
             }
             Tupel<DstPlaneT, TupelSize>::StoreAligned(resPlane, pixelsOut1);
+            // the tuples are only guaranteed to be aligned to aDst1, the others might be misaligned
 #pragma unroll
             for (size_t i = 0; i < TupelSize; i++)
             {
                 resPlane.value[i].x = res.value[i].y;
             }
-            Tupel<DstPlaneT, TupelSize>::StoreAligned(resPlane, pixelsOut2);
+            Tupel<DstPlaneT, TupelSize>::Store(resPlane, pixelsOut2);
             return;
         }
     }
@@ -112,17 +115,6 @@ void InvokeForEachPixelPlanar2Kernel(const dim3 &aBlockSize, uint aSharedMemory,
 {
     ThreadSplit<WarpAlignmentInBytes, TupelSize> ts(aDst1, aSize.x, aWarpSize);
 
-    if (TupelSize != 1)
-    {
-        ThreadSplit<WarpAlignmentInBytes, TupelSize> tsCheck(aDst2, aSize.x, aWarpSize);
-        if (ts != tsCheck)
-        {
-            throw INVALIDARGUMENT(
-                aDst1 and aDst2,
-                "Both destination images must fulfill the same byte-alignments in order to use tupeled memory access.");
-        }
-    }
-
     dim3 blocksPerGrid(DIV_UP(ts.Total(), aBlockSize.x), DIV_UP(aSize.y, aBlockSize.y), 1);
 
     forEachPixelPlanar2Kernel<WarpAlignmentInBytes, TupelSize, DstT, funcType>
@@ -142,6 +134,9 @@ void InvokeForEachPixelPlanar2KernelDefault(Vector1<remove_vector_t<DstT>> *__re
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {
+        checkPitchIsMultiple(aPitchDst1, ConfigWarpAlignment<"Default">::value, TupelSize);
+        checkPitchIsMultiple(aPitchDst2, ConfigWarpAlignment<"Default">::value, TupelSize);
+
         const dim3 BlockSize               = ConfigBlockSize<"Default">::value;
         constexpr int WarpAlignmentInBytes = ConfigWarpAlignment<"Default">::value;
         constexpr uint SharedMemory        = 0;

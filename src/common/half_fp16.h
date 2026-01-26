@@ -4,7 +4,7 @@
 #include <common/defines.h>
 #include <common/numeric_limits.h>
 #include <concepts>
-#ifdef IS_CUDA_COMPILER
+#ifdef IS_CUDA_COMPILER || ENABLE_CUDA_HALFFLOAT
 #include <cuda_fp16.h>
 #endif
 #ifdef IS_HOST_COMPILER
@@ -101,6 +101,12 @@ class alignas(2) MPPEXPORT_COMMON HalfFp16
 #endif
 
 #ifdef IS_HOST_COMPILER
+#ifdef ENABLE_CUDA_HALFFLOAT
+    constexpr HalfFp16(__half aHalf) : value(half_float::half(__nv_half_raw(aHalf).x), BINARY)
+    {
+    }
+#endif
+
     DEVICE_CODE operator float() const; // NOLINT(hicpp-explicit-conversions)
 
     [[nodiscard]] constexpr static HalfFp16 FromUShort(ushort aUShort)

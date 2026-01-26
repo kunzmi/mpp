@@ -11,6 +11,23 @@
 
 namespace mpp
 {
+// each exception type is identified with a unique code that we will centralize here in this enum:
+enum class ExceptionCode : int // NOLINT
+{
+    Unknown              = -999999,
+    InvalidArgument      = -1,
+    NullPtr              = -2,
+    ScratchBuffer        = -3,
+    Roi                  = -4,
+    Channel              = -5,
+    FilterArea           = -6,
+    AffineTransformation = -7,
+    Matrix               = -8,
+    Cuda                 = -1000,
+    CudaUnsupported      = -1001,
+    Npp                  = -10000
+};
+
 /// <summary>
 /// Exception base class for all exceptions thrown in MPP.
 /// </summary>
@@ -44,6 +61,11 @@ class MPPEXPORT_COMMON MPPException : public std::exception
     /// The error message that was provided when throwing the exception
     /// </summary>
     [[nodiscard]] const std::string &Message() const noexcept;
+
+    [[nodiscard]] virtual ExceptionCode GetCode() const
+    {
+        return ExceptionCode::Unknown;
+    }
 };
 
 /// <summary>
@@ -60,6 +82,11 @@ class MPPEXPORT_COMMON Exception : public MPPException
     Exception(const Exception &)            = default;
     Exception &operator=(const Exception &) = delete;
     Exception &operator=(Exception &&)      = delete;
+
+    [[nodiscard]] ExceptionCode GetCode() const override
+    {
+        return ExceptionCode::Unknown;
+    }
 };
 
 /// <summary>
@@ -77,13 +104,58 @@ class MPPEXPORT_COMMON InvalidArgumentException : public MPPException
     InvalidArgumentException(const InvalidArgumentException &)            = default;
     InvalidArgumentException &operator=(const InvalidArgumentException &) = delete;
     InvalidArgumentException &operator=(InvalidArgumentException &&)      = delete;
+
+    [[nodiscard]] ExceptionCode GetCode() const override
+    {
+        return ExceptionCode::InvalidArgument;
+    }
+};
+
+/// <summary>
+/// NullPtrException is thrown if an argument is nullptr but shouldn't.
+/// </summary>
+class MPPEXPORT_COMMON NullPtrException : public MPPException
+{
+  public:
+    NullPtrException(const std::string &aArgumentName, const std::filesystem::path &aCodeFileName, int aLineNumber,
+                     const std::string &aFunctionName);
+    NullPtrException(const std::string &aArgumentName, const std::string &aMessage,
+                     const std::filesystem::path &aCodeFileName, int aLineNumber, const std::string &aFunctionName);
+    ~NullPtrException() noexcept override = default;
+
+    NullPtrException(NullPtrException &&) noexcept        = default;
+    NullPtrException(const NullPtrException &)            = default;
+    NullPtrException &operator=(const NullPtrException &) = delete;
+    NullPtrException &operator=(NullPtrException &&)      = delete;
+
+    [[nodiscard]] ExceptionCode GetCode() const override
+    {
+        return ExceptionCode::NullPtr;
+    }
 };
 } // namespace mpp
 
 // NOLINTBEGIN --> function like macro, parantheses for "msg"...
+/// <summary>
+/// Checks if a pointer is nullptr and throws NullPtrException if it is
+/// </summary>
+inline void __checkNullptr(const void *aPtr, const std::string &aName, const char *aCodeFile, int aLine,
+                           const char *aFunction)
+{
+    if (aPtr == nullptr)
+    {
+        throw mpp::NullPtrException(aName, aCodeFile, aLine, aFunction);
+    }
+}
 #define EXCEPTION(msg) (mpp::Exception((std::ostringstream() << msg).str(), __FILE__, __LINE__, __PRETTY_FUNCTION__))
 
 #define INVALIDARGUMENT(argument, msg)                                                                                 \
     (mpp::InvalidArgumentException(#argument, (std::ostringstream() << msg).str(), __FILE__, __LINE__,                 \
                                    __PRETTY_FUNCTION__))
+
+#define NULLPTR(argument, msg)                                                                                         \
+    (mpp::NullPtrException(#argument, (std::ostringstream() << msg).str(), __FILE__, __LINE__, __PRETTY_FUNCTION__))
+
+#define checkNullptr(aPtr) __checkNullptr(aPtr, #aPtr, __FILE__, __LINE__, __PRETTY_FUNCTION__)
+
 // NOLINTEND

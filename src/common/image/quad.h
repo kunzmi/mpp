@@ -37,6 +37,12 @@ template <RealFloatingPoint T> struct Quad
     {
     }
 
+    Quad(const T aQuad[4][2])
+        : P0(aQuad[0][0], aQuad[0][1]), P1(aQuad[1][0], aQuad[1][1]), P2(aQuad[2][0], aQuad[2][1]),
+          P3(aQuad[3][0], aQuad[3][1])
+    {
+    }
+
     Quad(const Roi &aRoi)
         : P0(aRoi.FirstPixel()), P1(aRoi.LastX(), aRoi.FirstY()), P2(aRoi.LastPixel()), P3(aRoi.FirstX(), aRoi.LastY())
     {

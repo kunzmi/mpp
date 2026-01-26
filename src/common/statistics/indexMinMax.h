@@ -16,8 +16,8 @@ struct IndexMinMax
 struct IndexMinMaxChannel
 {
     Vector2<int> IndexMin;
-    int ChannelMin;
     Vector2<int> IndexMax;
+    int ChannelMin;
     int ChannelMax;
 };
 } // namespace mpp

@@ -31,6 +31,11 @@ class MPPEXPORT_NPP NppException : public MPPException
     NppException(const NppException &)            = default;
     NppException &operator=(const NppException &) = delete;
     NppException &operator=(NppException &&)      = delete;
+
+    [[nodiscard]] ExceptionCode GetCode() const override
+    {
+        return ExceptionCode::Npp;
+    }
 };
 
 constexpr const char *NppException::ConvertErrorCodeToMessage(NppStatus aErrorCode)
