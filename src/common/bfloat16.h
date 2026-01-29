@@ -5,8 +5,12 @@
 #include <common/numeric_limits.h>
 #include <concepts>
 #include <iostream>
-#ifdef IS_CUDA_COMPILER || ENABLE_CUDA_BFLOAT
+#if defined(IS_CUDA_COMPILER) || defined(ENABLE_CUDA_BFLOAT)
+#include "disableWarningsBegin.h" // -Werror=old-style-cast in GCC
+
 #include <cuda_bf16.h>
+
+#include "disableWarningsEnd.h"
 #endif
 
 namespace mpp
@@ -78,7 +82,7 @@ class alignas(2) MPPEXPORT_COMMON BFloat16
     {
     }
 #ifdef ENABLE_CUDA_BFLOAT
-    constexpr BFloat16(__nv_bfloat16 aBFloat) : value(__nv_bfloat16_raw(aBFloat).x)
+    BFloat16(__nv_bfloat16 aBFloat) : value(__nv_bfloat16_raw(aBFloat).x) // NOLINT
     {
     }
 #endif

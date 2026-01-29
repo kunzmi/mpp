@@ -14,7 +14,7 @@ add_library(common SHARED
 	vector4.cpp
 	vector4A.cpp
 	)
-target_compile_definitions(common PRIVATE -DMPP_COMMON)  
+target_compile_definitions(common PRIVATE -DMPP_COMMON -DENABLE_CUDA_BFLOAT -DENABLE_CUDA_HALFFLOAT)  
 
 target_link_libraries(common PRIVATE  
 						project_options

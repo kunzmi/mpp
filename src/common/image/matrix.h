@@ -423,25 +423,5 @@ template <RealFloatingPoint T> DEVICE_CODE Vector2<T> operator*(const Matrix<T> 
                       (aLeft[3] * aRight.x + aLeft[4] * aRight.y + aLeft[5]) / scaling};
 }
 
-//// some common color space conversion matrices (values as used in NPP/IPP)
-// extern const Matrix<float> RGBLimitedRangetoYUVBT709LimitedRange;
-// extern const Matrix<float> YUVBT709LimitedRangetoRGBLimitedRange;
-// extern const Matrix<float> RGBtoYUVBT709FullRange;
-// extern const Matrix<float> YUVBT709FullRangetoRGB;
-//
-// extern const Matrix<float> RGBtoYUVBT601LimitedRange;
-// extern const Matrix<float> YUVBT601LimitedRangetoRGB;
-// extern const Matrix<float> RGBtoYUVBT601FullRange;
-// extern const Matrix<float> YUVBT601FullRangetoRGB;
-//
-// extern const Matrix<float> RGBtoYCbCr;
-// extern const Matrix<float> CbCrtoRGB;
-//
-// extern const Matrix<float> RGBtoXYZ;
-// extern const Matrix<float> XYZtoRGB;
-//
-// extern const Matrix<float> RGBtoYCC;
-// extern const Matrix<float> YCCtoRGB;
-
 template <RealFloatingPoint T> using PerspectiveTransformation = Matrix<T>;
 } // namespace mpp::image

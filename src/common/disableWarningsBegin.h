@@ -1,14 +1,13 @@
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
-// #pragma GCC diagnostic ignored "-Wpedantic"
+#pragma GCC diagnostic ignored "-Wuseless-cast"
 
 #endif // defined(__GNUC__)
 
 #if defined(__clang__)
 #pragma clang diagnostic push
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-// #pragma clang diagnostic ignored "-Wpedantic"
+#pragma clang diagnostic ignored "-Wold-style-cast"
 
 #endif // defined(__clang__)
 

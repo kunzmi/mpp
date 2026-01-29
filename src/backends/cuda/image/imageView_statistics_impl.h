@@ -4287,7 +4287,7 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, do
 }
 
 template <PixelType T>
-void ImageView<T>::RectStdDev(ImageView<same_vector_size_different_type_t<T, int>> &aSqr,
+void ImageView<T>::RectStdDev(const ImageView<same_vector_size_different_type_t<T, int>> &aSqr,
                               ImageView<same_vector_size_different_type_t<T, float>> &aDst,
                               const FilterArea &aFilterArea, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<remove_vector_t<T>, int>) && NoAlpha<T>
@@ -4307,7 +4307,7 @@ void ImageView<T>::RectStdDev(ImageView<same_vector_size_different_type_t<T, int
 }
 
 template <PixelType T>
-void ImageView<T>::RectStdDev(ImageView<same_vector_size_different_type_t<T, long64>> &aSqr,
+void ImageView<T>::RectStdDev(const ImageView<same_vector_size_different_type_t<T, long64>> &aSqr,
                               ImageView<same_vector_size_different_type_t<T, float>> &aDst,
                               const FilterArea &aFilterArea, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<remove_vector_t<T>, int>) && NoAlpha<T>
@@ -4328,7 +4328,7 @@ void ImageView<T>::RectStdDev(ImageView<same_vector_size_different_type_t<T, lon
 }
 
 template <PixelType T>
-void ImageView<T>::RectStdDev(ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
+void ImageView<T>::RectStdDev(const ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
                               ImageView<same_vector_size_different_type_t<T, float>> &aDst,
                               const FilterArea &aFilterArea, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<remove_vector_t<T>, float>) && NoAlpha<T>
@@ -4349,7 +4349,7 @@ void ImageView<T>::RectStdDev(ImageView<same_vector_size_different_type_t<T, dou
 }
 
 template <PixelType T>
-void ImageView<T>::RectStdDev(ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
+void ImageView<T>::RectStdDev(const ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
                               ImageView<same_vector_size_different_type_t<T, double>> &aDst,
                               const FilterArea &aFilterArea, const mpp::cuda::StreamCtx &aStreamCtx) const
     requires(std::same_as<remove_vector_t<T>, double>) && NoAlpha<T>

@@ -9420,33 +9420,45 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
         requires RealVector<T> && NoAlpha<T>;
 
     /// <summary>
-    /// Computes the standard deviation from integral square images.
+    /// Computes the standard deviation from integral square images.<para/>
+    /// The function computes the standard deviation of the pixel in the rectangular window (aFilterArea)
+    /// with the integral image (this) and the squared integral image (aSqr), which can be obtained by calling
+    /// SqrIntegral().
     /// </summary>
-    void RectStdDev(ImageView<same_vector_size_different_type_t<T, int>> &aSqr,
+    void RectStdDev(const ImageView<same_vector_size_different_type_t<T, int>> &aSqr,
                     ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea,
                     const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires(std::same_as<remove_vector_t<T>, int>) && NoAlpha<T>;
 
     /// <summary>
-    /// Computes the standard deviation from integral square images.
+    /// Computes the standard deviation from integral square images.<para/>
+    /// The function computes the standard deviation of the pixel in the rectangular window (aFilterArea)
+    /// with the integral image (this) and the squared integral image (aSqr), which can be obtained by calling
+    /// SqrIntegral().
     /// </summary>
-    void RectStdDev(ImageView<same_vector_size_different_type_t<T, long64>> &aSqr,
+    void RectStdDev(const ImageView<same_vector_size_different_type_t<T, long64>> &aSqr,
                     ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea,
                     const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires(std::same_as<remove_vector_t<T>, int>) && NoAlpha<T>;
 
     /// <summary>
-    /// Computes the standard deviation from integral square images.
+    /// Computes the standard deviation from integral square images.<para/>
+    /// The function computes the standard deviation of the pixel in the rectangular window (aFilterArea)
+    /// with the integral image (this) and the squared integral image (aSqr), which can be obtained by calling
+    /// SqrIntegral().
     /// </summary>
-    void RectStdDev(ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
+    void RectStdDev(const ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
                     ImageView<same_vector_size_different_type_t<T, float>> &aDst, const FilterArea &aFilterArea,
                     const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires(std::same_as<remove_vector_t<T>, float>) && NoAlpha<T>;
 
     /// <summary>
-    /// Computes the standard deviation from integral square images.
+    /// Computes the standard deviation from integral square images.<para/>
+    /// The function computes the standard deviation of the pixel in the rectangular window (aFilterArea)
+    /// with the integral image (this) and the squared integral image (aSqr), which can be obtained by calling
+    /// SqrIntegral().
     /// </summary>
-    void RectStdDev(ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
+    void RectStdDev(const ImageView<same_vector_size_different_type_t<T, double>> &aSqr,
                     ImageView<same_vector_size_different_type_t<T, double>> &aDst, const FilterArea &aFilterArea,
                     const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires(std::same_as<remove_vector_t<T>, double>) && NoAlpha<T>;

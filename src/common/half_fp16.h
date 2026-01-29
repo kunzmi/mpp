@@ -4,8 +4,12 @@
 #include <common/defines.h>
 #include <common/numeric_limits.h>
 #include <concepts>
-#ifdef IS_CUDA_COMPILER || ENABLE_CUDA_HALFFLOAT
+#if defined(IS_CUDA_COMPILER) || defined(ENABLE_CUDA_HALFFLOAT)
+#include "disableWarningsBegin.h" // -Werror=old-style-cast in GCC
+
 #include <cuda_fp16.h>
+
+#include "disableWarningsEnd.h"
 #endif
 #ifdef IS_HOST_COMPILER
 #include <bit>
@@ -102,7 +106,7 @@ class alignas(2) MPPEXPORT_COMMON HalfFp16
 
 #ifdef IS_HOST_COMPILER
 #ifdef ENABLE_CUDA_HALFFLOAT
-    constexpr HalfFp16(__half aHalf) : value(half_float::half(__nv_half_raw(aHalf).x), BINARY)
+    HalfFp16(__half aHalf) : value(half_float::half(__nv_half_raw(aHalf).x), BINARY) // NOLINT
     {
     }
 #endif

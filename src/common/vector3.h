@@ -1352,7 +1352,7 @@ template <HostCode T2>
 MPPEXPORT_COMMON std::wistream &operator>>(std::wistream &aIs, Vector3<T2> &aVec)
     requires ByteSizeType<T2>;
 
-#ifdef IS_HOST_COMPILER
+#if defined(IS_HOST_COMPILER)
 extern template struct Vector3<sbyte>;
 extern template struct Vector3<byte>;
 extern template struct Vector3<short>;

@@ -1031,7 +1031,7 @@ template <RealFloatingPoint T> DEVICE_CODE inline bool isfinite(const Complex<T>
     return isfinite(aVal.real) && isfinite(aVal.imag);
 }
 
-#ifdef IS_HOST_COMPILER
+#if defined(IS_HOST_COMPILER)
 extern template struct Complex<sbyte>;
 extern template struct Complex<short>;
 extern template struct Complex<int>;

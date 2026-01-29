@@ -17,6 +17,10 @@ add_library(backends.cuda.image8u SHARED
 # will be defined in host code whereas they should get linked to mpp-common.dll. To avoid linkage issues due to double defined 
 # symbols, force the linker to ignore that... (Issue only appears on windows)
 target_compile_definitions(backends.cuda.image8u PRIVATE -DMPP_CUDAI) 
+if (UNIX)
+# and on linux gcc/ld doesn't export the imageView symbols if MPP_COMMON is not defined, too...
+target_compile_definitions(backends.cuda.image8u PRIVATE -DMPP_COMMON) 
+endif()
 target_link_options(backends.cuda.image8u PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)	
 target_include_directories(backends.cuda.image8u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image8u PRIVATE project_options)
@@ -43,6 +47,9 @@ add_library(backends.cuda.image8s SHARED
 						)
 						
 target_compile_definitions(backends.cuda.image8s PRIVATE -DMPP_CUDAI) 
+if (UNIX)
+target_compile_definitions(backends.cuda.image8s PRIVATE -DMPP_COMMON) 
+endif()
 target_link_options(backends.cuda.image8s PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 target_include_directories(backends.cuda.image8s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image8s PRIVATE project_options)
@@ -67,7 +74,10 @@ add_library(backends.cuda.image16u SHARED
 						imageView16u.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image16u PRIVATE -DMPP_CUDAI) 
+target_compile_definitions(backends.cuda.image16u PRIVATE -DMPP_CUDAI)
+if (UNIX)
+target_compile_definitions(backends.cuda.image16u PRIVATE -DMPP_COMMON) 
+endif() 
 target_link_options(backends.cuda.image16u PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 target_include_directories(backends.cuda.image16u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image16u PRIVATE project_options)
@@ -94,6 +104,9 @@ add_library(backends.cuda.image16s SHARED
 						)
 						
 target_compile_definitions(backends.cuda.image16s PRIVATE -DMPP_CUDAI)
+if (UNIX)
+target_compile_definitions(backends.cuda.image16s PRIVATE -DMPP_COMMON) 
+endif()
 target_link_options(backends.cuda.image16s PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>) 
 target_include_directories(backends.cuda.image16s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image16s PRIVATE project_options)
@@ -118,7 +131,10 @@ add_library(backends.cuda.image32u SHARED
 						imageView32u.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image32u PRIVATE -DMPP_CUDAI) 
+target_compile_definitions(backends.cuda.image32u PRIVATE -DMPP_CUDAI)
+if (UNIX)
+target_compile_definitions(backends.cuda.image32u PRIVATE -DMPP_COMMON) 
+endif() 
 target_link_options(backends.cuda.image32u PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 target_include_directories(backends.cuda.image32u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image32u PRIVATE project_options)
@@ -143,7 +159,10 @@ add_library(backends.cuda.image32s SHARED
 						imageView32s.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image32s PRIVATE -DMPP_CUDAI) 
+target_compile_definitions(backends.cuda.image32s PRIVATE -DMPP_CUDAI)
+if (UNIX)
+target_compile_definitions(backends.cuda.image32s PRIVATE -DMPP_COMMON) 
+endif() 
 target_link_options(backends.cuda.image32s PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 target_include_directories(backends.cuda.image32s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image32s PRIVATE project_options)
@@ -169,7 +188,10 @@ add_library(backends.cuda.image16sc SHARED
 						imageView16sc.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image16sc PRIVATE -DMPP_CUDAI) 
+target_compile_definitions(backends.cuda.image16sc PRIVATE -DMPP_CUDAI)
+if (UNIX)
+target_compile_definitions(backends.cuda.image16sc PRIVATE -DMPP_COMMON) 
+endif() 
 target_link_options(backends.cuda.image16sc PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 target_include_directories(backends.cuda.image16sc PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image16sc PRIVATE project_options)
@@ -191,7 +213,10 @@ add_library(backends.cuda.image32sc SHARED
 						imageView32sc.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image32sc PRIVATE -DMPP_CUDAI) 
+target_compile_definitions(backends.cuda.image32sc PRIVATE -DMPP_CUDAI)
+if (UNIX)
+target_compile_definitions(backends.cuda.image32sc PRIVATE -DMPP_COMMON) 
+endif() 
 target_link_options(backends.cuda.image32sc PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 target_include_directories(backends.cuda.image32sc PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image32sc PRIVATE project_options)
@@ -213,7 +238,10 @@ add_library(backends.cuda.image32fc SHARED
 						imageView32fc.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image32fc PRIVATE -DMPP_CUDAI) 
+target_compile_definitions(backends.cuda.image32fc PRIVATE -DMPP_CUDAI)
+if (UNIX)
+target_compile_definitions(backends.cuda.image32fc PRIVATE -DMPP_COMMON) 
+endif() 
 target_link_options(backends.cuda.image32fc PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 target_include_directories(backends.cuda.image32fc PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image32fc PRIVATE project_options)
@@ -235,7 +263,10 @@ add_library(backends.cuda.image16bf SHARED
 						imageView16bf.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image16bf PRIVATE -DMPP_CUDAI) 
+target_compile_definitions(backends.cuda.image16bf PRIVATE -DMPP_CUDAI)
+if (UNIX)
+target_compile_definitions(backends.cuda.image16bf PRIVATE -DMPP_COMMON) 
+endif() 
 target_link_options(backends.cuda.image16bf PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 target_include_directories(backends.cuda.image16bf PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image16bf PRIVATE project_options)
@@ -261,7 +292,10 @@ add_library(backends.cuda.image16f SHARED
 						imageView16f.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image16f PRIVATE -DMPP_CUDAI) 
+target_compile_definitions(backends.cuda.image16f PRIVATE -DMPP_CUDAI)
+if (UNIX)
+target_compile_definitions(backends.cuda.image16f PRIVATE -DMPP_COMMON) 
+endif() 
 target_link_options(backends.cuda.image16f PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 target_include_directories(backends.cuda.image16f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image16f PRIVATE project_options)
@@ -287,7 +321,10 @@ add_library(backends.cuda.image32f SHARED
 						imageView32f.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image32f PRIVATE -DMPP_CUDAI) 
+target_compile_definitions(backends.cuda.image32f PRIVATE -DMPP_CUDAI)
+if (UNIX)
+target_compile_definitions(backends.cuda.image32f PRIVATE -DMPP_COMMON) 
+endif() 
 target_link_options(backends.cuda.image32f PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 target_include_directories(backends.cuda.image32f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image32f PRIVATE project_options)
@@ -313,7 +350,10 @@ add_library(backends.cuda.image64f SHARED
 						imageView64f.cpp
 						)
 						
-target_compile_definitions(backends.cuda.image64f PRIVATE -DMPP_CUDAI)  
+target_compile_definitions(backends.cuda.image64f PRIVATE -DMPP_CUDAI)
+if (UNIX)
+target_compile_definitions(backends.cuda.image64f PRIVATE -DMPP_COMMON) 
+endif()  
 target_link_options(backends.cuda.image64f PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/FORCE:MULTIPLE>)
 target_include_directories(backends.cuda.image64f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image64f PRIVATE project_options)
